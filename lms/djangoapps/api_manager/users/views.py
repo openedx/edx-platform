@@ -8,9 +8,7 @@ from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.utils.translation import get_language, ugettext_lazy as _
-
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -27,6 +25,7 @@ from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
 )
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -45,7 +44,6 @@ def _generate_base_uri(request):
     )
     return resource_uri
 
-
 def _serialize_user(response_data, user):
     """
     Loads the object data into the response dict
@@ -57,7 +55,6 @@ def _serialize_user(response_data, user):
     response_data['last_name'] = user.last_name
     response_data['id'] = user.id
     return response_data
-
 
 def _save_module_position(request, user, course_id, course_descriptor, position):
     """
@@ -91,6 +88,7 @@ def _save_module_position(request, user, course_id, course_descriptor, position)
     save_child_position(parent_module, child_module.location.name)
     saved_module = get_current_child(parent_module)
     return saved_module.id
+
 
 class UsersList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
@@ -207,6 +205,84 @@ class UsersDetail(APIView):
             pass
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
+    def post(self, request, user_id, format=None):
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+        limiter = BadRequestRateLimiter()
+        if limiter.is_rate_limit_exceeded(request):
+            AUDIT_LOG.warning("API::Rate limit exceeded in password_reset")
+            response_data['message'] = _('Rate limit exceeded in password_reset.')
+            status_code = status.HTTP_403_FORBIDDEN
+            return Response(response_data, status=status_code)
+        try:
+            existing_user = User.objects.get(id=user_id)
+            old_password_hash = existing_user.password
+            _serialize_user(response_data, existing_user)
+            password = request.DATA['password']
+            if existing_user:
+                if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+                    try:
+                        validate_password_length(password)
+                        validate_password_complexity(password)
+                        validate_password_dictionary(password)
+                    except ValidationError, err:
+                        # bad user? tick the rate limiter counter
+                        AUDIT_LOG.warning("API::Bad password in password_reset.")
+                        status_code = status.HTTP_400_BAD_REQUEST
+                        response_data['message'] = _('Password: ') + '; '.join(err.messages)
+                        return Response(response_data, status=status_code)
+
+                # also, check the password reuse policy
+                err_msg = None
+                if not PasswordHistory.is_allowable_password_reuse(existing_user, password):
+                    if existing_user.is_staff:
+                        num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+                    else:
+                        num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+                    err_msg = _(
+                        "You are re-using a password that you have used recently. You must "
+                        "have {0} distinct password(s) before reusing a previous password."
+                    ).format(num_distinct)
+
+                # also, check to see if passwords are getting reset too frequent
+                if PasswordHistory.is_password_reset_too_soon(existing_user):
+                    num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+                    err_msg = _(
+                        "You are resetting passwords too frequently. Due to security policies, "
+                        "{0} day(s) must elapse between password resets"
+                    ).format(num_days)
+
+                if err_msg:
+                    # We have an password reset attempt which violates some security policy,
+                    status_code = status.HTTP_403_FORBIDDEN
+                    response_data['message'] = err_msg
+                    return Response(response_data, status=status_code)
+
+                existing_user.is_active = True
+                existing_user.set_password(password)
+                existing_user.save()
+                update_user_password_hash = existing_user.password
+
+                if update_user_password_hash != old_password_hash:
+                    # add this account creation to password history
+                    # NOTE, this will be a NOP unless the feature has been turned on in configuration
+                    password_history_entry = PasswordHistory()
+                    password_history_entry.create(existing_user)
+
+                status_code = status.HTTP_201_CREATED
+                response_data['uri'] = base_uri
+                response_data['message'] = 'Password Reset Successful'
+
+            else:
+                status_code = status.HTTP_404_NOT_FOUND
+                response_data['message'] = 'User not exist'
+
+        except ObjectDoesNotExist:
+            limiter.tick_bad_request_counter(request)
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+        return Response(response_data, status=status_code)
+
 
 class UsersGroupsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
@@ -263,7 +339,6 @@ class UsersGroupsList(APIView):
             response_data['groups'].append(group_data)
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
-
 
 
 class UsersGroupsDetail(APIView):
