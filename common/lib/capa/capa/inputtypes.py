@@ -62,7 +62,47 @@ log = logging.getLogger(__name__)
 
 #########################################################################
 
-registry = TagRegistry()
+registry = TagRegistry()  # pylint: disable=C0103
+
+
+class Status(object):
+    """
+    Problem status
+    attributes: classname, display_name
+    """
+    css_classes = {
+        # status: css class
+        'unsubmitted': 'unanswered',
+        'incomplete': 'incorrect',
+        'queued': 'processing',
+    }
+    __slots__ = ('classname', '_status', 'display_name')
+
+    def __init__(self, status, gettext_func=unicode):
+        self.classname = self.css_classes.get(status, status)
+        _ = gettext_func
+        names = {
+            'correct': _('correct'),
+            'incorrect': _('incorrect'),
+            'incomplete': _('incomplete'),
+            'unanswered': _('unanswered'),
+            'unsubmitted': _('unanswered'),
+            'queued': _('processing'),
+        }
+        self.display_name = names.get(status, unicode(status))
+        self._status = status or ''
+
+    def __str__(self):
+        return self._status
+
+    def __unicode__(self):
+        return self._status.decode('utf8')
+
+    def __repr__(self):
+        return 'Status(%r)' % self._status
+
+    def __eq__(self, other):
+        return self._status == str(other)
 
 
 class Attribute(object):
@@ -261,9 +301,7 @@ class InputTypeBase(object):
         context = {
             'id': self.input_id,
             'value': self.value,
-            'status': self.status,
-            'status_class': self.status_class,
-            'status_display': self.status_display,
+            'status': Status(self.status, self.capa_system.i18n.ugettext),
             'msg': self.msg,
             'STATIC_URL': self.capa_system.STATIC_URL,
         }
@@ -272,34 +310,6 @@ class InputTypeBase(object):
         )
         context.update(self._extra_context())
         return context
-
-    @property
-    def status_class(self):
-        """
-        Return the CSS class for the associated status.
-        """
-        statuses = {
-            'unsubmitted': 'unanswered',
-            'incomplete': 'incorrect',
-            'queued': 'processing',
-        }
-        return statuses.get(self.status, self.status)
-
-    @property
-    def status_display(self):
-        """
-        Return the human-readable and translated word for the associated status.
-        """
-        _ = self.capa_system.i18n.ugettext
-        statuses = {
-            'correct': _('correct'),
-            'incorrect': _('incorrect'),
-            'incomplete': _('incomplete'),
-            'unanswered': _('unanswered'),
-            'unsubmitted': _('unanswered'),
-            'queued': _('queued'),
-        }
-        return statuses.get(self.status, self.status)
 
     def _extra_context(self):
         """
