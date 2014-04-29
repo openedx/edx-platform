@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-24 12:24+0000\n"
-"PO-Revision-Date: 2014-04-24 16:37+0300\n"
+"POT-Creation-Date: 2014-04-28 13:17+0000\n"
+"PO-Revision-Date: 2014-04-29 15:17+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -444,8 +444,8 @@ msgid ""
 "To register for a Verified Certificate of Achievement option, you will need "
 "a webcam, a credit or debit card, and an ID."
 msgstr ""
-"Для регистрации на верифицированный сертифика достижений вам потребуется веб-"
-"камера, банковская карта и документ, удостоверяющий личность."
+"Для регистрации на верифицированный сертификат достижений вам потребуется "
+"веб-камера, банковская карта и документ, удостоверяющий личность."
 
 #: common/templates/course_modes/choose.html:158
 msgid "What is an ID Verified Certificate?"
@@ -508,7 +508,6 @@ msgid "Hide Annotations"
 msgstr "Скрыть аннотации"
 
 #: lms/templates/announcement-list.html:83 lms/templates/dashboard.html:83
-#: lms/templates/announcements/announcement_list.html:82
 #: lms/templates/courseware/course_about.html:54
 #: lms/templates/courseware/course_about.html:91
 #: lms/templates/courseware/mktg_course_about.html:40
@@ -516,23 +515,20 @@ msgid "An error occurred. Please try again later."
 msgstr "Возникла ошибка. Пожалуйста, попробуйте повторить операцию позже."
 
 #: lms/templates/announcement-list.html:116 lms/templates/dashboard.html:116
-#: lms/templates/announcements/announcement_list.html:115
 msgid "Please verify your new email"
 msgstr "Проверьте Ваш новый адрес email"
 
 #: lms/templates/announcement-list.html:117 lms/templates/dashboard.html:117
-#: lms/templates/announcements/announcement_list.html:116
 msgid ""
 "You'll receive a confirmation in your in-box. Please click the link in the "
 "email to confirm the email change."
 msgstr ""
-"Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
-"ссылке указанной в письме для смены почтового адреса."
+"Вы получите подтверждение в вашем входящем ящике. Пожалуйста, пройдите по "
+"ссылке, указанной в письме, для смены почтового адреса."
 
 #: lms/templates/announcement-list.html:259 lms/templates/dashboard.html:255
 #: lms/templates/register-shib.html:141 lms/templates/register.html:161
 #: lms/templates/sysadmin_dashboard.html:75
-#: lms/templates/announcements/announcement_list.html:244
 #: lms/templates/verify_student/_modal_editname.html:19
 #: lms/templates/verify_student/face_upload.html:309
 msgid "Full Name"
@@ -541,15 +537,12 @@ msgstr "Полное имя"
 #: lms/templates/announcement-list.html:259
 #: lms/templates/announcement-list.html:264 lms/templates/dashboard.html:255
 #: lms/templates/dashboard.html:260
-#: lms/templates/announcements/announcement_list.html:244
-#: lms/templates/announcements/announcement_list.html:249
 #: lms/templates/dashboard/_dashboard_info_language.html:9
 msgid "edit"
 msgstr "изменить"
 
 #: lms/templates/announcement-list.html:262 lms/templates/dashboard.html:258
 #: lms/templates/login.html:187
-#: lms/templates/announcements/announcement_list.html:247
 #: lms/templates/courseware/instructor_dashboard.html:144
 #: lms/templates/university_profile/edge.html:18
 msgid "Email"
@@ -558,8 +551,6 @@ msgstr "Эл. почта"
 #: lms/templates/announcement-list.html:275
 #: lms/templates/announcement-list.html:278 lms/templates/dashboard.html:271
 #: lms/templates/dashboard.html:274
-#: lms/templates/announcements/announcement_list.html:260
-#: lms/templates/announcements/announcement_list.html:263
 msgid "Reset Password"
 msgstr "Восстановить/изменить пароль"
 
@@ -568,16 +559,10 @@ msgstr "Восстановить/изменить пароль"
 #: lms/templates/announcement-list.html:337
 #: lms/templates/announcement-list.html:366
 #: lms/templates/announcement-list.html:409
-#: lms/templates/announcements/announcement_list.html:348
-#: lms/templates/announcements/announcement_list.html:380
-#: lms/templates/announcements/announcement_list.html:409
-#: lms/templates/announcements/announcement_list.html:452
-#: lms/templates/announcements/announcement_list.html:494
 msgid "Close Modal"
 msgstr "Закрыть"
 
 #: lms/templates/announcement-list.html:343 lms/templates/dashboard.html:398
-#: lms/templates/announcements/announcement_list.html:386
 msgid "Password Reset Email Sent"
 msgstr "Письмо с инструкциями по восстановлению пароля выслано"
 
@@ -586,17 +571,11 @@ msgstr "Письмо с инструкциями по восстановлени
 #: lms/templates/announcement-list.html:346
 #: lms/templates/announcement-list.html:375
 #: lms/templates/announcement-list.html:418
-#: lms/templates/announcements/announcement_list.html:357
-#: lms/templates/announcements/announcement_list.html:389
-#: lms/templates/announcements/announcement_list.html:418
-#: lms/templates/announcements/announcement_list.html:461
-#: lms/templates/announcements/announcement_list.html:503
 #: lms/templates/modal/accessible_confirm.html:17
 msgid "modal open"
 msgstr ""
 
 #: lms/templates/announcement-list.html:354 lms/templates/dashboard.html:409
-#: lms/templates/announcements/announcement_list.html:397
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
@@ -607,30 +586,24 @@ msgstr ""
 #: lms/templates/announcement-list.html:372
 #: lms/templates/announcement-list.html:394 lms/templates/dashboard.html:428
 #: lms/templates/dashboard.html:450
-#: lms/templates/announcements/announcement_list.html:415
-#: lms/templates/announcements/announcement_list.html:437
 msgid "Change Email"
 msgstr "Изменить Email"
 
 #: lms/templates/announcement-list.html:385 lms/templates/dashboard.html:441
-#: lms/templates/announcements/announcement_list.html:428
 msgid "Please enter your new email address:"
 msgstr "Введите новый адрес электронной почты:"
 
 #: lms/templates/announcement-list.html:387 lms/templates/dashboard.html:443
-#: lms/templates/announcements/announcement_list.html:430
 msgid "Please confirm your password:"
 msgstr "Подтвердите ваш пароль:"
 
 #: lms/templates/announcement-list.html:391 lms/templates/dashboard.html:447
-#: lms/templates/announcements/announcement_list.html:434
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr "Мы вышлем подтверждения и на адрес {email}, и на новый адрес."
 
 #: lms/templates/announcement-list.html:415 lms/templates/dashboard.html:472
-#: lms/templates/announcements/announcement_list.html:458
 msgid "Change your name"
 msgstr "Изменение отображаемого имени"
 
@@ -638,7 +611,6 @@ msgstr "Изменение отображаемого имени"
 #. like: "edX certificate". Please do not change the order of these
 #. placeholders.
 #: lms/templates/announcement-list.html:427 lms/templates/dashboard.html:484
-#: lms/templates/announcements/announcement_list.html:470
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
 "changes will be logged and recorded."
@@ -650,20 +622,17 @@ msgstr ""
 #. like: "edX certificate". Please do not change the order of these
 #. placeholders.
 #: lms/templates/announcement-list.html:432 lms/templates/dashboard.html:489
-#: lms/templates/announcements/announcement_list.html:475
 msgid ""
 "Enter your desired full name, as it will appear on your {platform} "
 "{cert_name_short}:"
 msgstr "Введите Ваше полное имя, как оно будет напечатано на сертификате ЦПМ:"
 
 #: lms/templates/announcement-list.html:434 lms/templates/dashboard.html:491
-#: lms/templates/announcements/announcement_list.html:477
 #: lms/templates/verify_student/_modal_editname.html:21
 msgid "Reason for name change:"
 msgstr "Причина изменения имени:"
 
 #: lms/templates/announcement-list.html:438 lms/templates/dashboard.html:495
-#: lms/templates/announcements/announcement_list.html:481
 msgid "Change My Name"
 msgstr "Изменить имя"
 
@@ -706,7 +675,6 @@ msgid "General Inquiries and Feedback"
 msgstr "Общие вопросы и обратная связь"
 
 #: lms/templates/contact.html:25
-#, fuzzy
 msgid ""
 "If you have a general question about {platform_name} please email "
 "{contact_email}. To see if your question has already been answered, visit "
@@ -714,7 +682,7 @@ msgid ""
 "on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
 "chance to respond to every email, we take all feedback into consideration."
 msgstr ""
-"Если у Вас есть вопрос общего характера о {platform_name}, пожалуйста "
+"Если у Вас есть вопрос общего характера о {platform_name}, пожалуйста, "
 "напишите письмо по адресу <a href=\"mailto:{contact_email}\">{contact_email}"
 "</a>. Чтобы посмотреть, был ли Ваш вопрос уже отвечен, посетите наш раздел "
 "{faq_link_start}часто задаваемых вопросов{faq_link_end}. Вы можете также "
@@ -727,7 +695,6 @@ msgid "Technical Inquiries and Feedback"
 msgstr "Технические вопросы и обратная связь"
 
 #: lms/templates/contact.html:41
-#, fuzzy
 msgid ""
 "If you have suggestions/feedback about the overall {platform_name} platform, "
 "or are facing general technical issues with the platform (e.g., issues with "
@@ -738,10 +705,10 @@ msgid ""
 "issues, you can reach us at the following: {bugs_email}."
 msgstr ""
 "Если у Вас есть предложения или замечания по платформе {platform_name} в "
-"целом, или у Вас возникли технические проблемы при работе с платформой "
+"целом или у Вас возникли технические проблемы при работе с платформой "
 "(например, проблемы с почтой или паролем), напишите нам по адресу <a href="
 "\"mailto:{tech_email}\">{tech_email}</a>. Убедитесь, пожалуйста, что Вы "
-"используете последнюю версию браузера Firefox или Chrome и укажите тип и "
+"используете последнюю версию браузера Firefox или Chrome, и укажите тип и "
 "версию браузера в письме, а также приложите снимки экрана и другие важные "
 "детали. Если Вы обнаружили ошибку или другие проблемы, пишите нам по адресу "
 "<a href=\"mailto:{bugs_email}\">{bugs_email}</a>."
@@ -803,32 +770,26 @@ msgid "Search"
 msgstr "Поиск"
 
 #: lms/templates/dashboard.html:22
-#: lms/templates/announcements/announcement_list.html:21
 msgid "Dashboard"
 msgstr "Личный кабинет"
 
 #: lms/templates/dashboard.html:307
-#: lms/templates/announcements/announcement_list.html:297
 msgid "Current Courses"
 msgstr "Текущие курсы"
 
 #: lms/templates/dashboard.html:325
-#: lms/templates/announcements/announcement_list.html:315
 msgid "Looks like you haven't registered for any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
 #: lms/templates/dashboard.html:327
-#: lms/templates/announcements/announcement_list.html:317
 msgid "Find courses now!"
 msgstr "Найти курсы!"
 
 #: lms/templates/dashboard.html:330
-#: lms/templates/announcements/announcement_list.html:320
 msgid "Looks like you haven't been enrolled in any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
 #: lms/templates/dashboard.html:337
-#: lms/templates/announcements/announcement_list.html:327
 msgid "Course-loading errors"
 msgstr "Ошибка при загрузке курсов"
 
@@ -850,7 +811,6 @@ msgid "Close"
 msgstr "Закрыть"
 
 #: lms/templates/dashboard.html:365
-#: lms/templates/announcements/announcement_list.html:354
 msgid "Email Settings for {course_number}"
 msgstr "Настройки email для {course_number}"
 
@@ -864,24 +824,20 @@ msgid "window open"
 msgstr ""
 
 #: lms/templates/dashboard.html:376
-#: lms/templates/announcements/announcement_list.html:365
 msgid "Receive course emails"
 msgstr "Получать рассылку курса"
 
 #: lms/templates/dashboard.html:378
-#: lms/templates/announcements/announcement_list.html:367
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
 #: lms/templates/dashboard.html:515
-#: lms/templates/announcements/announcement_list.html:500
 msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-info\"></"
 "span>"
 msgstr ""
 
 #: lms/templates/dashboard.html:528
-#: lms/templates/announcements/announcement_list.html:513
 #: lms/templates/dashboard/_dashboard_course_listing.html:117
 #: lms/templates/dashboard/_dashboard_course_listing.html:123
 #: lms/templates/dashboard/_dashboard_course_listing.html:129
@@ -914,8 +870,8 @@ msgstr "e-mail успешно изменен!"
 #: lms/templates/emails_change_successful.html:12
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
-"Новый адрес email должен появиться на вашей {link_start}персональной "
-"странице{link_end}."
+"Новый адрес email должен появиться на вашей {link_start}персональной странице"
+"{link_end}."
 
 #: lms/templates/email_exists.html:11
 msgid "An account with the new e-mail address already exists."
@@ -1163,7 +1119,7 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a rel="
+"Вы можете начать обучение с помощью {platform_name}, войдя с помощью <a rel="
 "\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
 
 #: lms/templates/login-sidebar.html:19
@@ -1463,8 +1419,8 @@ msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
-"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены "
-"(*)</strong>."
+"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены (*)"
+"</strong>."
 
 #: lms/templates/register-shib.html:117
 msgid "Enter a public username:"
@@ -1938,7 +1894,7 @@ msgid ""
 "Clicking the subtitles is a fast way to skip forwards and backwards by small "
 "amounts."
 msgstr ""
-"При воспроизведении видео, используйте субтитры и полосу прокрутки для "
+"При воспроизведении видео используйте субтитры и полосу прокрутки для "
 "навигации. Щелчок по субтитрам - это быстрый способ небольшой перемотки "
 "вперед или назад."
 
@@ -2045,10 +2001,6 @@ msgstr "Ваши слова:"
 msgid "Total number of words:"
 msgstr "Всего слов:"
 
-#: lms/templates/announcements/announcement_list.html:276
-msgid "The Neeews"
-msgstr ""
-
 #: lms/templates/combinedopenended/combined_open_ended.html:14
 msgid "Open Response"
 msgstr "Открытый ответ"
@@ -2079,9 +2031,9 @@ msgid ""
 "already graded, or when the original is graded if not."
 msgstr ""
 "Обратите внимание на то, что дубликаты ответов будут оценены автоматически. "
-"Автоматическая оценка будет произведена в течение 30 минут с момента "
-"отсылки, либо, в случае отсутствия оценки оригинального ответа, когда будет "
-"получена оценка для оригинального ответа."
+"Автоматическая оценка будет произведена в течение 30 минут с момента отсылки "
+"либо, в случае отсутствия оценки оригинального ответа, когда будет получена "
+"оценка для оригинального ответа."
 
 #: lms/templates/combinedopenended/combined_open_ended_legend.html:4
 msgid "Legend"
@@ -3088,7 +3040,7 @@ msgid ""
 "submitted for this course, click on this button:"
 msgstr ""
 "Письма отправляются в фоновом режиме, статус активных заданий по отправке "
-"писем будет отображаться в таблице ниже. Чтобы увидеть статус всех заданий "
+"писем будет отображаться в таблице ниже. Чтобы увидеть статус всех заданий, "
 "нажмите на кнопку:"
 
 #: lms/templates/courseware/instructor_dashboard.html:610
@@ -3835,7 +3787,7 @@ msgstr "Прикрепить нить"
 #: lms/templates/discussion/_underscore_templates.html:71
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache:12
 msgid "Pinned"
-msgstr "Прикрепленно"
+msgstr "Прикреплено"
 
 #: lms/templates/discussion/_underscore_templates.html:80
 #, python-format
@@ -4187,9 +4139,8 @@ msgid "Your other courses have not been affected."
 msgstr "Ваши изменения были сохранены."
 
 #: lms/templates/emails/remove_beta_tester_email_subject.txt:3
-#, fuzzy
 msgid "You have been removed from a beta test for {course_name}"
-msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
+msgstr "Вы уверены, что хотите удалить регистрацию с курса {course_number}?"
 
 #: lms/templates/instructor/staff_grading.html:12
 msgid "{course_number} Staff Grading"
@@ -4556,13 +4507,13 @@ msgid "Auto Enroll"
 msgstr "Авторегистрировать"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:44
-#, fuzzy
 msgid ""
 "If this option is <em>checked</em>, users who have not yet registered for "
 "{platform_name} will be automatically enrolled."
 msgstr ""
-"Если авторегистрация на курс включена, студенты, кто еще не "
-"зарегистрировался в edX, будут автоматически зарегистрированы и на этот курс."
+"Если авторегистрация на курс включена, студенты, которые еще не "
+"зарегистрировались в edX, будут автоматически зарегистрированы и на этот "
+"курс."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:45
 #, fuzzy
@@ -4635,7 +4586,7 @@ msgid ""
 msgstr ""
 "Персонал не может изменять списки персонала или бета-тестеров. Для изменения "
 "этих списков обратитесь к администратору и попросите его добавить Вас как "
-"администратора для персонала и списков бета-тестеров, или как администратора "
+"администратора для персонала и списков бета-тестеров или как администратора "
 "форума для управления форумом."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:130
@@ -5649,7 +5600,6 @@ msgid "Having Technical Trouble?"
 msgstr "Возникли технические проблемы?"
 
 #: lms/templates/verify_student/_reverification_support.html:16
-#, fuzzy
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent "
 "version possible{a_end}</strong>. Also, please make sure your <strong>web "
@@ -5657,7 +5607,7 @@ msgid ""
 "(commonly adjustable in your browser settings)</strong>"
 msgstr ""
 "Убедитесь, что вы используете {strong_start}{a_start}последнюю версию "
-"браузера{a_end}{strong_end}. Кроме того убедитесь, что {strong_start}веб-"
+"браузера{a_end}{strong_end}. Кроме того, убедитесь, что {strong_start}веб-"
 "камера подключена, включена и может работать в веб-браузере (обычно это "
 "может быть установлено в настройках браузера).{strong_end}"
 
@@ -5669,8 +5619,8 @@ msgstr "Задать вопрос"
 #: lms/templates/verify_student/_reverification_support.html:23
 #: lms/templates/verify_student/_verification_support.html:9
 msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
+"Please read {a_start}our FAQs to view common questions about our certificates"
+"{a_end}."
 msgstr ""
 "Пожалуйста, прочтите {a_start}наш раздел ЧаВо{a_end} для ответов на вопросы "
 "о наших сертификатах."
@@ -5728,7 +5678,6 @@ msgid "Technical Requirements"
 msgstr "Требования"
 
 #: lms/templates/verify_student/_verification_support.html:30
-#, fuzzy
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent "
 "version possible{a_end}</strong>. Also, please make sure your <strong>web "
@@ -5736,7 +5685,7 @@ msgid ""
 "(commonly adjustable in your browser settings).</strong>"
 msgstr ""
 "Убедитесь, что вы используете {strong_start}{a_start}последнюю версию "
-"браузера{a_end}{strong_end}. Кроме того убедитесь, что {strong_start}веб-"
+"браузера{a_end}{strong_end}. Кроме того, убедитесь, что {strong_start}веб-"
 "камера подключена, включена и может работать в веб-браузере (обычно это "
 "может быть установлено в настройках браузера).{strong_end}"
 
@@ -5761,20 +5710,19 @@ msgstr "Веб-камера не обнаружена"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html:24
 #: lms/templates/verify_student/photo_reverification.html:25
-#, fuzzy
 msgid ""
 "You don't seem to have a webcam connected. Double-check that your webcam is "
 "connected and working to continue."
 msgstr ""
-"Похоже веб-камера не подключена. Перепроверьте, что веб-камера подключена и "
-"работает для того, чтобы продолжить регистрацию, или {a_start}начните "
+"Похоже, веб-камера не подключена. Перепроверьте, что веб-камера подключена и "
+"работает, для того, чтобы продолжить регистрацию, или {a_start}начните "
 "бесполатный аудит курса{a_end} без верификации."
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html:34
 #: lms/templates/verify_student/photo_reverification.html:35
 #: lms/templates/verify_student/photo_verification.html:40
 msgid "No Flash Detected"
-msgstr "Flesh не поддерживается"
+msgstr "Flash не поддерживается"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html:36
 #: lms/templates/verify_student/photo_reverification.html:37
@@ -5783,7 +5731,7 @@ msgid ""
 "You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
 "continue your registration."
 msgstr ""
-"Похоже Flash не установлен. {a_start}Загрузите Flash{a_end} для продолжения "
+"Похоже, Flash не установлен. {a_start}Загрузите Flash{a_end} для продолжения "
 "регистрации."
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html:47
@@ -6333,7 +6281,7 @@ msgid ""
 "connected and working to continue registering, or select to {a_start} audit "
 "the course for free {a_end} without verifying."
 msgstr ""
-"Похоже веб-камера не подключена. Перепроверьте, что веб-камера подключена и "
+"Похоже, веб-камера не подключена. Перепроверьте, что веб-камера подключена и "
 "работает для того, чтобы продолжить регистрацию, или {a_start}начните "
 "бесполатный аудит курса{a_end} без верификации."
 
@@ -6434,7 +6382,7 @@ msgid ""
 "Please check your email for further instructions on activating your new "
 "account."
 msgstr ""
-"Пожалуйста проверьте Вашу электронную почту для дальнейших инструкций по "
+"Пожалуйста, проверьте Вашу электронную почту для дальнейших инструкций по "
 "активации вашей учетной записи."
 
 #: lms/templates/verify_student/show_requirements.html:82
@@ -6582,16 +6530,16 @@ msgstr ""
 #~ msgid ""
 #~ "If you have a general question about {platform_name} please email <a href="
 #~ "\"mailto:{contact_email}\">{contact_email}</a>. To see if your question "
-#~ "has already been answered, visit our {faq_link_start}FAQ "
-#~ "page{faq_link_end}. You can also join the discussion on our "
-#~ "{fb_link_start}facebook page{fb_link_end}. Though we may not have a "
-#~ "chance to respond to every email, we take all feedback into consideration."
+#~ "has already been answered, visit our {faq_link_start}FAQ page"
+#~ "{faq_link_end}. You can also join the discussion on our {fb_link_start}"
+#~ "facebook page{fb_link_end}. Though we may not have a chance to respond to "
+#~ "every email, we take all feedback into consideration."
 #~ msgstr ""
 #~ "Если у Вас есть вопрос общего характера о {platform_name}, пожалуйста "
-#~ "напишите письмо по адресу <a href=\"mailto:"
-#~ "{contact_email}\">{contact_email}</a>. Чтобы посмотреть, был ли Ваш "
-#~ "вопрос уже отвечен, посетите наш раздел {faq_link_start}часто задаваемых "
-#~ "вопросов{faq_link_end}. Вы можете также присоединиться к дискуссии в "
+#~ "напишите письмо по адресу <a href=\"mailto:{contact_email}\">"
+#~ "{contact_email}</a>. Чтобы посмотреть, был ли Ваш вопрос уже отвечен, "
+#~ "посетите наш раздел {faq_link_start}часто задаваемых вопросов"
+#~ "{faq_link_end}. Вы можете также присоединиться к дискуссии в "
 #~ "{fb_link_start}Фейсбуке{fb_link_end}. Хотя мы не можем отвечать на каждое "
 #~ "сообщение, полученное по электронной почте, все они рассматриваются."
 
@@ -7324,8 +7272,8 @@ msgstr ""
 #~ msgstr ""
 #~ "Приносим свои извинения. Мы не смогли найти запрашиваемую вами страницу. "
 #~ "Вы можете вернуться на главную страницу и повторить попытку. Если "
-#~ "проблема все еще возникает обратитесь в {link_start}центр "
-#~ "поддержки{link_end} для дальнейшей помощи."
+#~ "проблема все еще возникает обратитесь в {link_start}центр поддержки"
+#~ "{link_end} для дальнейшей помощи."
 
 #~ msgid "Use our feedback tool, Tender, to share your feedback"
 #~ msgstr "Для обратной связи используйте наш инструмент Tender."
@@ -7845,9 +7793,9 @@ msgstr ""
 #~ msgstr "Помощь в студии"
 
 #~ msgid ""
-#~ "Having trouble with your account? Use {link_start}our support "
-#~ "center{link_end} to look over self help steps, find solutions others have "
-#~ "found to the same problem, or let us know of your issue."
+#~ "Having trouble with your account? Use {link_start}our support center"
+#~ "{link_end} to look over self help steps, find solutions others have found "
+#~ "to the same problem, or let us know of your issue."
 #~ msgstr ""
 #~ "Есть проблемы с аккаунтом? Используйте {link_start} наш центр поддержки "
 #~ "{link_end}, чтобы посмотреть пошаговую помощь, найти решения других "
@@ -10743,8 +10691,8 @@ msgstr ""
 
 #, fuzzy
 #~ msgid ""
-#~ "Please {contact_link_start}contact edX at exam-help@edx."
-#~ "org{contact_link_end}."
+#~ "Please {contact_link_start}contact edX at exam-help@edx.org"
+#~ "{contact_link_end}."
 #~ msgstr ""
 #~ "В противном случае {link_start}свяжитесь с edX по адресу {email}"
 #~ "{link_end} для получения помощи."
@@ -10926,14 +10874,12 @@ msgstr ""
 
 #~ msgid ""
 #~ "Our staff is currently working to get the site back up as soon as "
-#~ "possible. Please email us at <a href=\"mailto:"
-#~ "\\{tech_support_email}\">{tech_support_email}</a> to report any problems "
-#~ "or downtime."
+#~ "possible. Please email us at <a href=\"mailto:\\{tech_support_email}\">"
+#~ "{tech_support_email}</a> to report any problems or downtime."
 #~ msgstr ""
 #~ "Персонал работает над восстановлением функционирования сайта. Пожалуйста, "
-#~ "пишите нам по адресу <a href=\"mailto:"
-#~ "{tech_support_email}\">{tech_support_email}</a> для сообщений об ошибках "
-#~ "или недоступности сайта."
+#~ "пишите нам по адресу <a href=\"mailto:{tech_support_email}\">"
+#~ "{tech_support_email}</a> для сообщений об ошибках или недоступности сайта."
 
 #, fuzzy
 #~ msgid "Show All Discussionsdf"
