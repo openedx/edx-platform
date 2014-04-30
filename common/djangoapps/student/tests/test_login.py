@@ -20,6 +20,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
 from external_auth.models import ExternalAuthMap
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
@@ -275,7 +276,10 @@ class UtilFnTest(TestCase):
         COURSE_ID = u'org/num/run'                                # pylint: disable=C0103
         COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=C0103
         NON_COURSE_URL = u'/blahblah'                             # pylint: disable=C0103
-        self.assertEqual(_parse_course_id_from_string(COURSE_URL), COURSE_ID)
+        self.assertEqual(
+            _parse_course_id_from_string(COURSE_URL),
+            SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID)
+        )
         self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
 
 
@@ -320,7 +324,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         Tests the _get_course_enrollment_domain utility function
         """
-        self.assertIsNone(_get_course_enrollment_domain("I/DONT/EXIST"))
+        self.assertIsNone(_get_course_enrollment_domain(SlashSeparatedCourseKey("I", "DONT", "EXIST")))
         self.assertIsNone(_get_course_enrollment_domain(self.course.id))
         self.assertEqual(self.shib_course.enrollment_domain, _get_course_enrollment_domain(self.shib_course.id))
 
@@ -340,7 +344,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[self.course.id])            # pylint: disable=C0103
+        TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=C0103
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
@@ -348,7 +352,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id])  # pylint: disable=C0103
+        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=C0103
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,
