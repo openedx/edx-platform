@@ -8,7 +8,8 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
             describe("Supports reordering components", function () {
 
                 var model, containerView, mockContainerHTML, respondWithMockXBlockFragment,
-                    init, dragHandle, verifyRequest, verifyNumReorderCalls, respondToRequest,
+                    init, dragHandleVertically, dragHandleOver, verifyRequest, verifyNumReorderCalls,
+                    respondToRequest,
 
                     rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
                     containerTestUrl = '/xblock/' + rootLocator,
@@ -65,8 +66,15 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                     return requests;
                 };
 
-                dragHandle = function (index, dy) {
+                dragHandleVertically = function (index, dy) {
                     var handle = containerView.$(".drag-handle:eq(" + index + ")");
+                    handle.simulate("drag", {dy: dy});
+                };
+
+                dragHandleOver = function (index, targetElement) {
+                    var handle = containerView.$(".drag-handle:eq(" + index + ")"),
+                        dy = handle.y - targetElement.y;
+
                     handle.simulate("drag", {dy: dy});
                 };
 
@@ -95,14 +103,14 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 it('does nothing if item not moved far enough', function () {
                     var requests = init(this);
                     // Drag the first thing in Group A (text component) down very slightly, but not past second thing.
-                    dragHandle(2, 5);
+                    dragHandleVertically(2, 5);
                     verifyNumReorderCalls(requests, 0);
                 });
 
                 it('can reorder within a group', function () {
                     var requests = init(this);
                     // Drag the first component in Group A to the end
-                    dragHandle(2, 80);
+                    dragHandleVertically(2, 80);
                     respondToRequest(requests, 0, 200);
                     verifyNumReorderCalls(requests, 1);
                     verifyRequest(requests, 0, groupAUrl, [groupAComponent2, groupAComponent3, groupAComponent1]);
@@ -111,7 +119,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 it('can drag from one group to another', function () {
                     var requests = init(this);
                     // Drag the first component in Group A into the second group.
-                    dragHandle(2, 300);
+                    dragHandleVertically(2, 300);
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
                     // Will get an event to move into Group B and an event to remove from Group A.
@@ -124,7 +132,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 it('does not remove from old group if addition to new group fails', function () {
                     var requests = init(this);
                     // Drag the first component in Group A into the second group.
-                    dragHandle(2, 300);
+                    dragHandleVertically(2, 300);
                     respondToRequest(requests, 0, 500);
                     // Send failure for addition to new group-- no removal event should be received.
                     verifyNumReorderCalls(requests, 1);
@@ -135,7 +143,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 it('can swap group A and group B', function () {
                     var requests = init(this);
                     // Drag Group B before group A.
-                    dragHandle(5, -300);
+                    dragHandleVertically(5, -300);
                     respondToRequest(requests, 0, 200);
                     verifyNumReorderCalls(requests, 1);
                     verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
@@ -145,7 +153,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 it('can drag a component to the top level, and nest one group in another', function () {
                     var requests = init(this);
                     // Drag text item in Group A to the top level (in first position).
-                    dragHandle(2, -40);
+                    dragHandleVertically(2, -40);
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
                     verifyNumReorderCalls(requests, 2);
@@ -153,7 +161,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                     verifyRequest(requests, 1, groupAUrl, [groupAComponent2, groupAComponent3]);
 
                     // Drag Group A into Group B.
-                    dragHandle(1, 150);
+                    dragHandleVertically(1, 150);
                     respondToRequest(requests, 2, 200);
                     respondToRequest(requests, 3, 200);
                     verifyNumReorderCalls(requests, 4);
@@ -175,7 +183,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                         requests = init(this);
 
                         // Drag the first component in Group A into the second group.
-                        dragHandle(2, 200);
+                        dragHandleVertically(2, 200);
 
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();
@@ -194,7 +202,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                         var requests = init(this);
 
                         // Drag the first component in Group A into the second group.
-                        dragHandle(2, 200);
+                        dragHandleVertically(2, 200);
 
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();

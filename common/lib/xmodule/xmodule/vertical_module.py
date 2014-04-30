@@ -46,7 +46,8 @@ class VerticalModule(VerticalFields, XModule):
             })
 
         fragment.add_content(self.system.render_template(template_name, {
-            'items': contents
+            'items': contents,
+            'xblock_context': context,
         }))
         return fragment
 

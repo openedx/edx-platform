@@ -2,10 +2,12 @@
 Unit tests for the container view.
 """
 
+import json
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.helpers import xblock_studio_url
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import loc_mapper, modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
@@ -56,7 +58,6 @@ class ContainerViewTestCase(CourseTestCase):
             parent_location=published_xblock_with_child.location,
             category="html", display_name="Child HTML"
         )
-        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
         self._test_html_content(
             published_xblock_with_child,
@@ -73,6 +74,11 @@ class ContainerViewTestCase(CourseTestCase):
                 r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
             ).format(branch_name=branch_name)
         )
+
+        # Now make the unit and its children into a draft and validate the container again
+        modulestore('draft').convert_to_draft(self.vertical.location)
+        modulestore('draft').convert_to_draft(self.child_vertical.location)
+        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         self._test_html_content(
             draft_xblock_with_child,
             branch_name=branch_name,
@@ -112,3 +118,32 @@ class ContainerViewTestCase(CourseTestCase):
             branch_name=branch_name
         )
         self.assertIn(expected_unit_link, html)
+
+    def test_container_preview_html(self):
+        """
+        Verify that an xblock returns the expected HTML for a container preview
+        """
+        # First verify that the behavior is correct with a published container
+        self._test_preview_html(self.child_vertical)
+
+        # Now make the unit and its children into a draft and validate the preview again
+        modulestore('draft').convert_to_draft(self.vertical.location)
+        draft_container = modulestore('draft').convert_to_draft(self.child_vertical.location)
+        self._test_preview_html(draft_container)
+
+    def _test_preview_html(self, xblock):
+        locator = loc_mapper().translate_location(self.course.id, xblock.location, published=False)
+        publish_state = compute_publish_state(xblock)
+        preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
+
+        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        self.assertEqual(resp.status_code, 200)
+        resp_content = json.loads(resp.content)
+        html = resp_content['html']
+
+        # Verify that there are no drag handles for public pages
+        drag_handle_html = '<span data-tooltip="Drag to reorder" class="drag-handle action"></span>'
+        if publish_state == PublishState.public:
+            self.assertNotIn(drag_handle_html, html)
+        else:
+            self.assertIn(drag_handle_html, html)
