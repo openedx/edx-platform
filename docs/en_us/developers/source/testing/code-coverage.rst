@@ -5,7 +5,7 @@ Code Coverage
 We measure which lines of our codebase are covered by unit tests using
 `coverage.py`_ for Python and `JSCover`_ for Javascript.
 
-Our codebase is far from perfect, but the goal is to slowly improve our coverage
+Our codebase is far from perfect, but the goal is to steadily improve our coverage
 over time. To do this, we wrote a tool called `diff-cover`_ that will
 report which lines in your branch are not covered by tests, while ignoring
 other lines in the project that may not be covered. Using this tool,

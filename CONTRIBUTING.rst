@@ -11,9 +11,9 @@ but here's a step-by-step guide that should help you get started.
 Step 0: Join the Conversation
 =============================
 
-Got an idea for how to improve the codebase? Fantastic; we'd love to hear about
+Got an idea for how to improve the codebase? Fantastic, we'd love to hear about
 it! Before you dive in and spend a lot of time and effort making a pull request,
-it's a good idea to discuss your idea with other interested developers; you may
+it's a good idea to discuss your idea with other interested developers. You may
 get some valuable feedback that changes how you think about your idea, or you
 may find other developers who have the same idea and want to work together.
 

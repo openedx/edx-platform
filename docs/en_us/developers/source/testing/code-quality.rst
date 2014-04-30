@@ -2,13 +2,13 @@
 Code Quality
 ************
 
-In order to keep our codebase as clear and readable as possible, we use various
+In order to keep our code as clear and readable as possible, we use various
 tools to assess the quality of pull requests:
 
 * We use the `pep8`_ tool to follow `PEP-8`_ guidelines
 * We use `pylint`_ for static analysis and uncovering trouble spots in our code
 
-Our codebase is far from perfect, but the goal is to slowly improve our quality
+Our codebase is far from perfect, but the goal is to steadily improve our quality
 over time. To do this, we wrote a tool called `diff-quality`_ that will
 only report on the quality violations on lines that have changed in a
 pull request. Using this tool, we can ensure that pull requests do not introduce
