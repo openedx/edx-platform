@@ -10,7 +10,7 @@ from notes.utils import notes_enabled_for_course
 def notes(request, course_id):
     ''' Displays the student's notes. '''
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     if not notes_enabled_for_course(course):
         raise Http404
 

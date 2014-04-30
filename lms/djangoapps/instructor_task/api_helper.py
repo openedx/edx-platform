@@ -1,3 +1,9 @@
+"""
+Helper lib for instructor_tasks API.
+
+Includes methods to check args for rescoring task, encoding student input,
+and task submission logic, including handling the Celery backend.
+"""
 import hashlib
 import json
 import logging
@@ -8,6 +14,7 @@ from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import Location
 from instructor_task.models import InstructorTask, PROGRESS
 
 
@@ -21,11 +28,13 @@ class AlreadyRunningError(Exception):
 
 def _task_is_running(course_id, task_type, task_key):
     """Checks if a particular task is already running"""
-    runningTasks = InstructorTask.objects.filter(course_id=course_id, task_type=task_type, task_key=task_key)
+    running_tasks = InstructorTask.objects.filter(
+        course_id=course_id, task_type=task_type, task_key=task_key
+    )
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
-        runningTasks = runningTasks.exclude(task_state=state)
-    return len(runningTasks) > 0
+        running_tasks = running_tasks.exclude(task_state=state)
+    return len(running_tasks) > 0
 
 
 def _reserve_task(course_id, task_type, task_key, task_input, requester):
@@ -229,34 +238,37 @@ def get_status_from_instructor_task(instructor_task):
     return status
 
 
-def check_arguments_for_rescoring(course_id, problem_url):
+def check_arguments_for_rescoring(usage_key):
     """
     Do simple checks on the descriptor to confirm that it supports rescoring.
 
-    Confirms first that the problem_url is defined (since that's currently typed
+    Confirms first that the usage_key is defined (since that's currently typed
     in).  An ItemNotFoundException is raised if the corresponding module
     descriptor doesn't exist.  NotImplementedError is raised if the
     corresponding module doesn't support rescoring calls.
     """
-    descriptor = modulestore().get_instance(course_id, problem_url)
+    descriptor = modulestore().get_item(usage_key)
     if not hasattr(descriptor, 'module_class') or not hasattr(descriptor.module_class, 'rescore_problem'):
         msg = "Specified module does not support rescoring."
         raise NotImplementedError(msg)
 
 
-def encode_problem_and_student_input(problem_url, student=None):
+def encode_problem_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
     """
-    Encode optional problem_url and optional student into task_key and task_input values.
+    Encode optional usage_key and optional student into task_key and task_input values.
 
-    `problem_url` is full URL of the problem.
-    `student` is the user object of the student
+    Args:
+        usage_key (Location): The usage_key identifying the problem.
+        student (User): the student affected
     """
+
+    assert isinstance(usage_key, Location)
     if student is not None:
-        task_input = {'problem_url': problem_url, 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=problem_url)
+        task_input = {'problem_url': usage_key.to_deprecated_string(), 'student': student.username}
+        task_key_stub = "{student}_{problem}".format(student=student.id, problem=usage_key.to_deprecated_string())
     else:
-        task_input = {'problem_url': problem_url}
-        task_key_stub = "_{problem}".format(problem=problem_url)
+        task_input = {'problem_url': usage_key.to_deprecated_string()}
+        task_key_stub = "_{problem}".format(problem=usage_key.to_deprecated_string())
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
@@ -264,11 +276,11 @@ def encode_problem_and_student_input(problem_url, student=None):
     return task_input, task_key
 
 
-def submit_task(request, task_type, task_class, course_id, task_input, task_key):
+def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.
 
-    Reserves the requested task, based on the `course_id`, `task_type`, and `task_key`,
+    Reserves the requested task, based on the `course_key`, `task_type`, and `task_key`,
     checking to see if the task is already running.  The `task_input` is also passed so that
     it can be stored in the resulting InstructorTask entry.  Arguments are extracted from
     the `request` provided by the originating server request.  Then the task is submitted to run
@@ -285,7 +297,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     """
     # check to see if task is already running, and reserve it otherwise:
-    instructor_task = _reserve_task(course_id, task_type, task_key, task_input, request.user)
+    instructor_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
 
     # submit task:
     task_id = instructor_task.task_id

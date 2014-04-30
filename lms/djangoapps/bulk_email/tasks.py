@@ -107,8 +107,8 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
     else:
-        staff_qset = CourseStaffRole(course_location).users_with_role()
-        instructor_qset = CourseInstructorRole(course_location).users_with_role()
+        staff_qset = CourseStaffRole(course_id).users_with_role()
+        instructor_qset = CourseInstructorRole(course_id).users_with_role()
         recipient_qset = staff_qset | instructor_qset
         if to_option == SEND_TO_ALL:
             # We also require students to have activated their accounts to
@@ -129,7 +129,7 @@ def _get_course_email_context(course):
     """
     Returns context arguments to apply to all emails, independent of recipient.
     """
-    course_id = course.id
+    course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_url = 'https://{}{}'.format(
         settings.SITE_NAME,
@@ -160,9 +160,9 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Perfunctory check, since expansion is made for convenience of other task
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
-        format_msg = u"Course id conflict: explicit value {} does not match task value {}"
-        log.warning("Task %s: %s", task_id, format_msg.format(course_id, entry.course_id))
-        raise ValueError("Course id conflict: explicit value does not match task value")
+        format_msg = u"Course id conflict: explicit value %r does not match task value %r"
+        log.warning("Task %s: " + format_msg, task_id, course_id, entry.course_id)
+        raise ValueError(format_msg % (course_id, entry.course_id))
 
     # Fetch the CourseEmail.
     email_id = task_input['email_id']
@@ -188,16 +188,17 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
-        format_msg = u"Course id conflict: explicit value {} does not match email value {}"
-        log.warning("Task %s: %s", task_id, format_msg.format(course_id, entry.course_id))
-        raise ValueError("Course id conflict: explicit value does not match email value")
+        format_msg = u"Course id conflict: explicit value %r does not match email value %r"
+        log.warning("Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
+        raise ValueError(format_msg % (course_id, email_obj.course_id))
 
     # Fetch the course object.
-    try:
-        course = get_course(course_id)
-    except ValueError:
-        log.exception("Task %s: course not found: %s", task_id, course_id)
-        raise
+    course = get_course(course_id)
+
+    if course is None:
+        msg = "Task %s: course not found: %s"
+        log.error(msg, task_id, course_id)
+        raise ValueError(msg % (task_id, course_id))
 
     # Get arguments that will be passed to every subtask.
     to_option = email_obj.to_option
@@ -373,11 +374,11 @@ def _get_source_address(course_id, course_title):
     # so pull out the course_num.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    course_num = Location.parse_course_id(course_id)['course']
-    invalid_chars = re.compile(r"[^\w.-]")
-    course_num = invalid_chars.sub('_', course_num)
-
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(course_title_no_quotes, course_num, settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
+    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
+        course_title_no_quotes,
+        re.sub(r"[^\w.-]", '_', course_id.run),
+        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+    )
     return from_addr
 
 
