@@ -418,7 +418,7 @@ class CourseGradingTest(CourseTestCase):
         # see if test makes sense
         self.assertGreater(len(sections), 0, "No sections found")
         section = sections[0]  # just take the first one
-        return reverse_usage_url('xblock_handler', unicode(section.location))
+        return reverse_usage_url('xblock_handler', section.location)
 
     def test_set_get_section_grader_ajax(self):
         """
