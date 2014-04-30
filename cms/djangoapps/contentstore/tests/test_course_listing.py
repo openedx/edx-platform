@@ -18,8 +18,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
-TOTAL_COURSES_COUNT = 5
-USER_COURSES_COUNT = 2
+TOTAL_COURSES_COUNT = 500
+USER_COURSES_COUNT = 50
 
 
 class TestCourseListing(ModuleStoreTestCase):
