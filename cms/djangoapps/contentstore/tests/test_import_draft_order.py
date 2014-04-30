@@ -4,7 +4,6 @@ from xmodule.modulestore.xml_importer import import_from_xml
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
@@ -17,10 +16,9 @@ class DraftReorderTestCase(ModuleStoreTestCase):
     def test_order(self):
         store = modulestore('direct')
         draft_store = modulestore('default')
-        import_from_xml(store, 'common/test/data/', ['import_draft_order'], draft_store=draft_store)
-        sequential = draft_store.get_item(
-            Location('i4x', 'test_org', 'import_draft_order', 'sequential', '0f4f7649b10141b0bdc9922dcf94515a', None)
-        )
+        _, course_items = import_from_xml(store, 'common/test/data/', ['import_draft_order'], draft_store=draft_store)
+        course_key = course_items[0].id
+        sequential = draft_store.get_item(course_key.make_usage_key('sequential', '0f4f7649b10141b0bdc9922dcf94515a'))
         verticals = sequential.children
 
         # The order that files are read in from the file system is not guaranteed (cannot rely on
@@ -32,22 +30,20 @@ class DraftReorderTestCase(ModuleStoreTestCase):
         #
         # '5a05be9d59fc4bb79282c94c9e6b88c7' and 'second' are public verticals.
         self.assertEqual(7, len(verticals))
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/z', verticals[0])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/5a05be9d59fc4bb79282c94c9e6b88c7', verticals[1])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/a', verticals[2])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/second', verticals[3])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/b', verticals[4])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/d', verticals[5])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/c', verticals[6])
+        self.assertEqual(course_key.make_usage_key('vertical', 'z'), verticals[0])
+        self.assertEqual(course_key.make_usage_key('vertical', '5a05be9d59fc4bb79282c94c9e6b88c7'), verticals[1])
+        self.assertEqual(course_key.make_usage_key('vertical', 'a'), verticals[2])
+        self.assertEqual(course_key.make_usage_key('vertical', 'second'), verticals[3])
+        self.assertEqual(course_key.make_usage_key('vertical', 'b'), verticals[4])
+        self.assertEqual(course_key.make_usage_key('vertical', 'd'), verticals[5])
+        self.assertEqual(course_key.make_usage_key('vertical', 'c'), verticals[6])
 
         # Now also test that the verticals in a second sequential are correct.
-        sequential = draft_store.get_item(
-            Location('i4x', 'test_org', 'import_draft_order', 'sequential', 'secondseq', None)
-        )
+        sequential = draft_store.get_item(course_key.make_usage_key('sequential', 'secondseq'))
         verticals = sequential.children
         # 'asecond' and 'zsecond' are drafts with 'index_in_children_list' 0 and 2, respectively.
         # 'secondsubsection' is a public vertical.
         self.assertEqual(3, len(verticals))
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/asecond', verticals[0])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/secondsubsection', verticals[1])
-        self.assertEqual(u'i4x://test_org/import_draft_order/vertical/zsecond', verticals[2])
+        self.assertEqual(course_key.make_usage_key('vertical', 'asecond'), verticals[0])
+        self.assertEqual(course_key.make_usage_key('vertical', 'secondsubsection'), verticals[1])
+        self.assertEqual(course_key.make_usage_key('vertical', 'zsecond'), verticals[2])

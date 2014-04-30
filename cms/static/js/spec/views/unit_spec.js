@@ -3,7 +3,7 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
     function (UnitEditView, ModuleModel, create_sinon, NotificationView) {
         var verifyJSON = function (requests, json) {
             var request = requests[requests.length - 1];
-            expect(request.url).toEqual("/xblock");
+            expect(request.url).toEqual("/xblock/");
             expect(request.method).toEqual("POST");
             // There was a problem with order of returned parameters in strings.
             // Changed to compare objects instead strings.

@@ -12,7 +12,7 @@ define([], function () {
 
     var getUpdateUrl = function (locator) {
         if (locator === undefined) {
-            return urlRoot;
+            return urlRoot + "/";
         }
         else {
             return urlRoot + "/" + locator;

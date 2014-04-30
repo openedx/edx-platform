@@ -12,13 +12,13 @@ from pytz import UTC
 import json
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
+from contentstore.utils import reverse_course_url
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.django import loc_mapper
 from django.test.utils import override_settings
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
 
 
 class AssetsTestCase(CourseTestCase):
@@ -27,8 +27,7 @@ class AssetsTestCase(CourseTestCase):
     """
     def setUp(self):
         super(AssetsTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.url = location.url_reverse('assets/', '')
+        self.url = reverse_course_url('assets_handler', self.course.id)
 
     def upload_asset(self, name="asset-1"):
         f = BytesIO(name)
@@ -42,7 +41,9 @@ class BasicAssetsTestCase(AssetsTestCase):
         self.assertEquals(resp.status_code, 200)
 
     def test_static_url_generation(self):
-        location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
+
+        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         path = StaticContent.get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
 
@@ -56,13 +57,12 @@ class BasicAssetsTestCase(AssetsTestCase):
             verbose=True
         )
         course = course_items[0]
-        location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
-        url = location.url_reverse('assets/', '')
+        url = reverse_course_url('assets_handler', course.id)
 
         # Test valid contentType for pdf asset (textbook.pdf)
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
-        asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/textbook.pdf')
+        asset_location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/textbook.pdf')
         content = contentstore().find(asset_location)
         # Check after import textbook.pdf has valid contentType ('application/pdf')
 
@@ -122,8 +122,7 @@ class UploadTestCase(AssetsTestCase):
     """
     def setUp(self):
         super(UploadTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.url = location.url_reverse('assets/', '')
+        self.url = reverse_course_url('assets_handler', self.course.id)
 
     def test_happy_path(self):
         resp = self.upload_asset()
@@ -143,18 +142,19 @@ class AssetToJsonTestCase(AssetsTestCase):
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
 
-        location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
-        thumbnail_location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name_thumb.jpg'])
+        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        location = course_key.make_asset_key('asset', 'my_file_name.jpg')
+        thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
         output = assets._get_asset_json("my_file", upload_date, location, thumbnail_location, True)
 
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
-        self.assertEquals(output["url"], "/i4x/foo/bar/asset/my_file_name.jpg")
-        self.assertEquals(output["external_url"], "lms_base_url/i4x/foo/bar/asset/my_file_name.jpg")
+        self.assertEquals(output["url"], "/c4x/org/class/asset/my_file_name.jpg")
+        self.assertEquals(output["external_url"], "lms_base_url/c4x/org/class/asset/my_file_name.jpg")
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
-        self.assertEquals(output["thumbnail"], "/i4x/foo/bar/asset/my_file_name_thumb.jpg")
-        self.assertEquals(output["id"], output["url"])
+        self.assertEquals(output["thumbnail"], "/c4x/org/class/thumbnail/my_file_name_thumb.jpg")
+        self.assertEquals(output["id"], unicode(location))
         self.assertEquals(output['locked'], True)
 
         output = assets._get_asset_json("name", upload_date, location, None, False)
@@ -176,12 +176,11 @@ class LockAssetTestCase(AssetsTestCase):
             content = contentstore().find(asset_location)
             self.assertEqual(content.locked, locked)
 
-        def post_asset_update(lock):
+        def post_asset_update(lock, course):
             """ Helper method for posting asset update. """
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
-            asset_location = Location(['c4x', 'edX', 'toy', 'asset', 'sample_static.txt'])
-            location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
-            url = location.url_reverse('assets/', '')
+            asset_location = course.id.make_asset_key('asset', 'sample_static.txt')
+            url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
 
             resp = self.client.post(
                 url,
@@ -204,11 +203,11 @@ class LockAssetTestCase(AssetsTestCase):
         verify_asset_locked_state(False)
 
         # Lock the asset
-        resp_asset = post_asset_update(True)
+        resp_asset = post_asset_update(True, course)
         self.assertTrue(resp_asset['locked'])
         verify_asset_locked_state(True)
 
         # Unlock the asset
-        resp_asset = post_asset_update(False)
+        resp_asset = post_asset_update(False, course)
         self.assertFalse(resp_asset['locked'])
         verify_asset_locked_state(False)

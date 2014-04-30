@@ -7,15 +7,15 @@ from django.views.decorators.http import require_POST
 from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from util.json_request import JsonResponse, expect_json
-from student.roles import CourseRole, CourseInstructorRole, CourseStaffRole, GlobalStaff
+from student.roles import CourseInstructorRole, CourseStaffRole
 from course_creators.views import user_requested_access
 
 from .access import has_course_access
 
 from student.models import CourseEnrollment
-from xmodule.modulestore.locator import BlockUsageLocator
 from django.http import HttpResponseNotFound
 from student import auth
 
@@ -37,7 +37,7 @@ def request_course_creator(request):
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def course_team_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, email=None):
+def course_team_handler(request, course_key_string=None, email=None):
     """
     The restful handler for course team users.
 
@@ -49,51 +49,49 @@ def course_team_handler(request, tag=None, package_id=None, branch=None, version
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string) if course_key_string else None
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        return _course_team_user(request, location, email)
+        return _course_team_user(request, course_key, email)
     elif request.method == 'GET':  # assume html
-        return _manage_users(request, location)
+        return _manage_users(request, course_key)
     else:
         return HttpResponseNotFound()
 
 
-def _manage_users(request, locator):
+def _manage_users(request, course_key):
     """
     This view will return all CMS users who are editors for the specified course
     """
-    old_location = loc_mapper().translate_locator_to_location(locator)
-
     # check that logged in user has permissions to this item
-    if not has_course_access(request.user, locator):
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    course_module = modulestore().get_item(old_location)
-    instructors = CourseInstructorRole(locator).users_with_role()
+    course_module = modulestore().get_course(course_key)
+    instructors = CourseInstructorRole(course_key).users_with_role()
     # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
-    staff = set(CourseStaffRole(locator).users_with_role()).union(instructors)
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
 
     return render_to_response('manage_users.html', {
         'context_course': course_module,
         'staff': staff,
         'instructors': instructors,
-        'allow_actions': has_course_access(request.user, locator, role=CourseInstructorRole),
+        'allow_actions': has_course_access(request.user, course_key, role=CourseInstructorRole),
     })
 
 
 @expect_json
-def _course_team_user(request, locator, email):
+def _course_team_user(request, course_key, email):
     """
     Handle the add, remove, promote, demote requests ensuring the requester has authority
     """
     # check that logged in user has permissions to this item
-    if has_course_access(request.user, locator, role=CourseInstructorRole):
+    if has_course_access(request.user, course_key, role=CourseInstructorRole):
         # instructors have full permissions
         pass
-    elif has_course_access(request.user, locator, role=CourseStaffRole) and email == request.user.email:
+    elif has_course_access(request.user, course_key, role=CourseStaffRole) and email == request.user.email:
         # staff can only affect themselves
         pass
     else:
@@ -101,6 +99,7 @@ def _course_team_user(request, locator, email):
             "error": _("Insufficient permissions")
         }
         return JsonResponse(msg, 400)
+
 
     try:
         user = User.objects.get(email=email)
@@ -119,7 +118,7 @@ def _course_team_user(request, locator, email):
             "role": None,
         }
         # what's the highest role that this user has? (How should this report global staff?)
-        for role in [CourseInstructorRole(locator), CourseStaffRole(locator)]:
+        for role in [CourseInstructorRole(course_key), CourseStaffRole(course_key)]:
             if role.has_user(user):
                 msg["role"] = role.ROLE
                 break
@@ -134,11 +133,11 @@ def _course_team_user(request, locator, email):
 
     if request.method == "DELETE":
         try:
-            try_remove_instructor(request, locator, user)
+            try_remove_instructor(request, course_key, user)
         except CannotOrphanCourse as oops:
             return JsonResponse(oops.msg, 400)
 
-        auth.remove_users(request.user, CourseStaffRole(locator), user)
+        auth.remove_users(request.user, CourseStaffRole(course_key), user)
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
@@ -146,27 +145,26 @@ def _course_team_user(request, locator, email):
     if role is None:
         return JsonResponse({"error": _("`role` is required")}, 400)
 
-    old_location = loc_mapper().translate_locator_to_location(locator)
     if role == "instructor":
-        if not has_course_access(request.user, locator, role=CourseInstructorRole):
+        if not has_course_access(request.user, course_key, role=CourseInstructorRole):
             msg = {
                 "error": _("Only instructors may create other instructors")
             }
             return JsonResponse(msg, 400)
-        auth.add_users(request.user, CourseInstructorRole(locator), user)
+        auth.add_users(request.user, CourseInstructorRole(course_key), user)
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, old_location.course_id)
+        CourseEnrollment.enroll(user, course_key)
     elif role == "staff":
         # add to staff regardless (can't do after removing from instructors as will no longer
         # be allowed)
-        auth.add_users(request.user, CourseStaffRole(locator), user)
+        auth.add_users(request.user, CourseStaffRole(course_key), user)
         try:
-            try_remove_instructor(request, locator, user)
+            try_remove_instructor(request, course_key, user)
         except CannotOrphanCourse as oops:
             return JsonResponse(oops.msg, 400)
 
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, old_location.course_id)
+        CourseEnrollment.enroll(user, course_key)
 
     return JsonResponse()
 
@@ -180,13 +178,14 @@ class CannotOrphanCourse(Exception):
         Exception.__init__(self)
 
 
-def try_remove_instructor(request, locator, user):
+def try_remove_instructor(request, course_key, user):
+
     # remove all roles in this course from this user: but fail if the user
     # is the last instructor in the course team
-    instructors = CourseInstructorRole(locator)
+    instructors = CourseInstructorRole(course_key)
     if instructors.has_user(user):
         if instructors.users_with_role().count() == 1:
-            msg = {"error":_("You may not remove the last instructor from a course")}
+            msg = {"error": _("You may not remove the last instructor from a course")}
             raise CannotOrphanCourse(msg)
         else:
             auth.remove_users(request.user, instructors, user)
