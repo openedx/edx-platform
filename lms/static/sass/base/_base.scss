@@ -225,7 +225,7 @@ mark {
 .help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
-  top: 50%;
+  top: 250px;
   left: 0;
   position: fixed;
   z-index: 99;
@@ -244,7 +244,7 @@ mark {
 
     &:hover, &:focus {
       color: #fff;
-      background: #1D9DD9;
+      background: $link-color;
     }
   }
 }
@@ -273,13 +273,24 @@ mark {
 
     &:hover, &:focus {
       color: #fff;
-      background: #1D9DD9;
+      background: $link-color;
     }
   }
 }
 
-#feedback_form textarea[name="details"] {
-  height: 150px;
+#feedback_form {
+  input, textarea {
+    font: normal 1em/1.4em $sans-serif;
+  }
+  textarea[name="details"] {
+    height: 150px;
+  }
+}
+
+#feedback_success_wrapper {
+  p {
+    padding: 0 20px 20px 20px;
+  }
 }
 
 // ====================
