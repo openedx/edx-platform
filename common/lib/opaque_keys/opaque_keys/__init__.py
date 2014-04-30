@@ -25,11 +25,8 @@ class OpaqueKeyMetaclass(ABCMeta):
     with a fieldset equal to the KEY_FIELDS class attribute, if KEY_FIELDS is set.
     """
     def __new__(mcs, name, bases, attrs):
-        if 'KEY_FIELDS' in attrs:
-            bases = bases + (namedtuple(name, attrs['KEY_FIELDS']), )
-
-            def __eq__(self, other):
-                return self.__class__ == other.__class__ and super()
+        for field in attrs.get('KEY_FIELDS', []):
+            attrs.setdefault(field, None)
         return super(OpaqueKeyMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
@@ -64,7 +61,7 @@ class OpaqueKey(object):
 
     OpaqueKeys are immutable.
     """
-    __metaclass__ = ABCMeta
+    __metaclass__ = OpaqueKeyMetaclass
     __slots__ = ('_initialized')
 
     NAMESPACE_SEPARATOR = u':'
