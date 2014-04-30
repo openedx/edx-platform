@@ -124,8 +124,6 @@ def _assets_json(request, course_key):
         asset_id = asset['_id']
         asset_location = StaticContent.compute_location(course_key, asset_id['name'])
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
-        # Note also that we are ignoring the value of the thumbnail_location-- we only care whether
-        # or not a thumbnail has been stored, and we can now easily create the correct path.
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
             thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
