@@ -68,6 +68,9 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
+    
+    # Feedback Form endpoint
+    url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
@@ -122,9 +125,6 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Favicon
         (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-
-        url(r'^submit_feedback$', 'util.views.submit_feedback'),
-
     )
 
 # Only enable URLs for those marketing links actually enabled in the
