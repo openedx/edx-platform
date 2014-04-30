@@ -17,7 +17,6 @@ location_map:
 
 ```
 ensureIndex({'org': 1, 'offering': 1})
-ensureIndex({'lower_org': 1, 'lower_offering': 1})
 ensureIndex({'schema': 1})
 ```
 
@@ -65,4 +64,25 @@ db.modulestore.find({$where: function() {
     } 
     return false; }}, 
     {_id: 1})
+```
+
+modulestore.active_versions
+===========================
+
+```
+ensureIndex({'org': 1, 'offering': 1})
+```
+
+modulestore.structures
+======================
+
+```
+ensureIndex({'previous_version': 1})
+```
+
+modulestore.definitions
+=======================
+
+```
+ensureIndex({'category': 1})
 ```
