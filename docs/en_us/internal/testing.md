@@ -110,7 +110,7 @@ You can run all the python tests using `rake` commands.  For example,
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
-You can re-run all failed python tests by running
+You can re-run all failed python tests by running: (see note at end of section)
 
     rake test:python[--failed]
 
@@ -139,7 +139,7 @@ To run a single django test:
 
     rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login]
 
-To re-run all failing django tests from lms or cms:
+To re-run all failing django tests from lms or cms: (see note at end of section)
 
     rake test_lms[--failed]
 
@@ -179,6 +179,11 @@ you can do one of:
 
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
+
+
+Note: More on the `--failed` functionality
+* In order to use this, you must run the tests first. If you haven't already run the tests, or if no tests failed in the previous run, then using the `--failed` switch will result in **all** of the tests being run.  See more about this in the [nose documentation](http://nose.readthedocs.org/en/latest/plugins/testid.html#looping-over-failed-tests).
+* Note that `rake test:python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `rake test:python[--failed]` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `rake test_lms[--failed]` or `rake test_cms[--failed]` commands. 
 
 
 ### Running Javascript Unit Tests
