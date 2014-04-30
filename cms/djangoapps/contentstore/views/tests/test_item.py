@@ -3,6 +3,7 @@
 import json
 from datetime import datetime
 import ddt
+from uuid import uuid4
 
 from mock import patch
 from pytz import UTC
@@ -12,17 +13,16 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from contentstore.views.component import component_handler
-
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
+from contentstore.views.component import component_handler
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import Location
+from xmodule.modulestore.locator import BlockUsageLocator
 
 
 class ItemTest(CourseTestCase):
@@ -56,7 +56,10 @@ class ItemTest(CourseTestCase):
         parsed = json.loads(response.content)
         return parsed['locator']
 
-    def create_xblock(self, parent_locator=None, display_name=None, category=None, boilerplate=None):
+    def create_xblock(self, parent_locator=None, display_name=None, category=None, boilerplate=None, type=None):
+        """
+        Create xblock
+        """
         data = {
             'parent_locator': self.unicode_locator if parent_locator is None else parent_locator,
             'category': category
@@ -65,6 +68,8 @@ class ItemTest(CourseTestCase):
             data['display_name'] = display_name
         if boilerplate is not None:
             data['boilerplate'] = boilerplate
+        if type is not None:
+            data['type'] = type
         return self.client.ajax_post('/xblock', json.dumps(data))
 
 
@@ -672,6 +677,88 @@ class TestEditItem(ItemTest):
         published = self.get_item_from_modulestore(self.problem_locator, False)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertNotEqual(draft.data, published.data)
+
+    def test_create_delete_discussion_components(self):
+        """
+        Create discussion components and test that they are deleted from loc_mapper on delete
+        """
+        # Test that creating two discussion components with first 3 digit same of uuid will have
+        # different block_ids (locators)
+        with patch("uuid.UUID.hex", '987' + uuid4().hex[3:]):
+            resp = self.create_xblock(parent_locator=self.seq_locator, category='discussion', type='discussion')
+            self.assertEqual(resp.status_code, 200)
+        discussion_1_locator = self.response_locator(resp)
+        discussion_1_draft = self.get_item_from_modulestore(discussion_1_locator, True)
+        self.assertIsNotNone(discussion_1_draft)
+
+        with patch("uuid.UUID.hex", '987' + uuid4().hex[3:]):
+            resp = self.create_xblock(parent_locator=self.seq_locator, category='discussion', type='discussion')
+            self.assertEqual(resp.status_code, 200)
+        discussion_2_locator = self.response_locator(resp)
+        discussion_2_draft = self.get_item_from_modulestore(discussion_2_locator, True)
+        self.assertIsNotNone(discussion_2_draft)
+
+        self.assertNotEqual(discussion_1_locator, discussion_2_locator)
+        # now delete first discussion component
+        resp = self.client.delete('/xblock/' + discussion_1_locator)
+        self.assertEqual(resp.status_code, 204)
+
+        # create a new discussion component and check that it has same locator as first discussion component
+        # but different id's
+        with patch("uuid.UUID.hex", '987' + uuid4().hex[3:]):
+            resp = self.create_xblock(parent_locator=self.seq_locator, category='discussion', type='discussion')
+            self.assertEqual(resp.status_code, 200)
+        discussion_3_locator = self.response_locator(resp)
+        discussion_3_draft = self.get_item_from_modulestore(discussion_3_locator, True)
+        self.assertIsNotNone(discussion_3_draft)
+
+        self.assertEqual(discussion_1_locator, discussion_3_locator)
+        self.assertNotEqual(discussion_1_draft.id, discussion_3_draft.id)
+
+    def test_delete_published_component(self):
+        """
+        Create a draft and publish it then delete the draft and check that published component is still accessible
+        """
+        # Make problem public.
+        resp = self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+
+        # Now make a draft
+        resp = self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'id': self.problem_locator,
+                'metadata': {},
+                'data': "<p>Problem content draft.</p>",
+                'publish': 'create_draft'
+            }
+        )
+
+        # Both published and draft content should be present in db and different in content
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertNotEqual(draft.data, published.data)
+
+        # Now delete draft and check that published version is still accessible
+        resp = self.client.delete('/xblock/' + self.problem_locator)
+        self.assertEqual(resp.status_code, 204)
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+
+    def test_delete_draft_component(self):
+        """
+        Delete a new xblock component (draft only) and check that it is no more accessible
+        """
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, True))
+
+        resp = self.client.delete('/xblock/' + self.problem_locator)
+        self.assertEqual(resp.status_code, 204)
+
+        # should raise an exception on getting deleted component
+        with self.assertRaises(AttributeError):
+            self.get_item_from_modulestore(self.problem_locator, True)
 
     def test_publish_states_of_nested_xblocks(self):
         """ Test publishing of a unit page containing a nested xblock  """
