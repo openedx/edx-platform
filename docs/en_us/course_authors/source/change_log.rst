@@ -12,6 +12,9 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/07/14
+     - Updated the :ref:`Discussions` chapter to include a topic on closing
+       discussions.
    * - 05/06/14
      - Expanded the :ref:`Grades` chapter to include a topic on interpreting the score histograms for problems.
    * - 
