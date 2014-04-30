@@ -538,7 +538,7 @@ describe 'MarkdownEditingDescriptor', ->
     
     <p>What is the capital of Germany?</p>
     <multiplechoiceresponse>
-      <choicegroup type="MultipleChoice">
+      <choicegroup label="What is the capital of Germany?" type="MultipleChoice">
         <choice correct="false">Bonn</choice>
         <choice correct="false">Hamburg</choice>
         <choice correct="true">Berlin</choice>
