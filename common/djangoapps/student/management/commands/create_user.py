@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.utils import translation
 
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, Registration, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand
@@ -68,6 +71,15 @@ class Command(TrackedCommand):
         if not name:
             name = options['email'].split('@')[0]
 
+        # parse out the course into a coursekey
+        if options['course']:
+            try:
+                course = CourseKey.from_string(options['course'])
+            # if it's not a new-style course key, parse it from an old-style
+            # course key
+            except InvalidKeyError:
+                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+
         post_data = {
             'username': username,
             'email': options['email'],
@@ -93,5 +105,5 @@ class Command(TrackedCommand):
             print e.message
             user = User.objects.get(email=options['email'])
         if options['course']:
-            CourseEnrollment.enroll(user, options['course'], mode=options['mode'])
+            CourseEnrollment.enroll(user, course, mode=options['mode'])
         translation.deactivate()

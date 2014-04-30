@@ -18,7 +18,7 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
+def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
@@ -43,6 +43,8 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
     :param view: The name of the view that rendered the fragment being wrapped
     :param frag: The :class:`Fragment` to be wrapped
     :param context: The context passed to the view being rendered
+    :param usage_id_serializer: A function to serialize the block's usage_id for use by the
+        front-end Javascript Runtime.
     :param display_name_only: If true, don't render the fragment content at all.
         Instead, just render the `display_name` of `block`
     :param extra_data: A dictionary with extra data values to be set on the wrapper
@@ -74,13 +76,14 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
         data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version
         data['block-type'] = block.scope_ids.block_type
-        data['usage-id'] = quote_slashes(unicode(block.scope_ids.usage_id))
+        data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
 
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default,
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(key, value) for key, value in data.items()),
+        'data_attributes': u' '.join(u'data-{}="{}"'.format(key, value)
+                                     for key, value in data.iteritems()),
     }
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
@@ -145,7 +148,7 @@ def grade_histogram(module_id):
     WHERE courseware_studentmodule.module_id=%s
     GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id])
+    cursor.execute(q, [module_id.to_deprecated_string()])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -167,14 +170,14 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalModule):
         # check that the course is a mongo backed Studio course before doing work
-        is_mongo_course = modulestore().get_modulestore_type(block.course_id) == MONGO_MODULESTORE_TYPE
+        is_mongo_course = modulestore().get_modulestore_type(block.location.course_key) == MONGO_MODULESTORE_TYPE
         is_studio_course = block.course_edit_method == "Studio"
 
         if is_studio_course and is_mongo_course:
-            # get relative url/location of unit in Studio
-            locator = loc_mapper().translate_location(block.course_id, block.location, False, True)
-            # build edit link to unit in CMS
-            edit_link = "//" + settings.CMS_BASE + locator.url_reverse('unit', '')
+            # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
+            # reverse for contentstore.views.unit_handler
+            edit_link = "//" + settings.CMS_BASE + '/unit/' + unicode(block.location)
+
             # return edit link in rendered HTML for display
             return wrap_fragment(frag, render_to_string("edit_unit_link.html", {'frag_content': frag.content, 'edit_link': edit_link}))
         else:
@@ -183,7 +186,7 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
     if isinstance(block, SequenceModule):
         return frag
 
-    block_id = block.id
+    block_id = block.location
     if block.has_score and settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
