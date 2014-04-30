@@ -53,11 +53,11 @@ class TestOrphan(CourseTestCase):
         )
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course.location.replace(category='chapter', name='OrphanChapter')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
         location = self.course.location.replace(category='vertical', name='OrphanVert')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
         location = self.course.location.replace(category='html', name='OrphanHtml')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
 
     def test_mongo_orphan_delete(self):
         """
