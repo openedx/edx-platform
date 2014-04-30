@@ -3,6 +3,20 @@ Change Log
 ############
 
 ************
+May, 2014
+************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 05/02/14
+     - Updated :ref:`Drag and Drop` information
+
+
+************
 April, 2014
 ************
 
