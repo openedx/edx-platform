@@ -13,14 +13,17 @@ file and check it in at the same time as your model changes. To do that,
 from django.db import models
 
 from config_models.models import ConfigurationModel
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
     """
+    objects = NoneToEmptyManager()
+
     # The course to embargo
-    course_id = models.CharField(max_length=255, db_index=True, unique=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
 
     # Whether or not to embargo
     embargoed = models.BooleanField(default=False)
@@ -42,7 +45,8 @@ class EmbargoedCourse(models.Model):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
-        return u"Course '{}' is {}Embargoed".format(self.course_id, not_em)
+        # pylint: disable=no-member
+        return u"Course '{}' is {}Embargoed".format(self.course_id.to_deprecated_string(), not_em)
 
 
 class EmbargoedState(ConfigurationModel):

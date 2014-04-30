@@ -9,7 +9,8 @@ from django.utils.translation import ugettext_noop
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
@@ -48,16 +49,20 @@ def assign_default_role(course_id, user):
 
 
 class Role(models.Model):
+
+    objects = NoneToEmptyManager()
+
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
-    course_id = models.CharField(max_length=255, blank=True, db_index=True)
+    course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
 
     class Meta:
         # use existing table that was originally created from django_comment_client app
         db_table = 'django_comment_client_role'
 
     def __unicode__(self):
-        return self.name + " for " + (self.course_id if self.course_id else "all courses")
+        # pylint: disable=no-member
+        return self.name + " for " + (self.course_id.to_deprecated_string() if self.course_id else "all courses")
 
     def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
@@ -71,8 +76,9 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
-        course_loc = CourseDescriptor.id_to_location(self.course_id)
-        course = modulestore().get_instance(self.course_id, course_loc)
+        course = modulestore().get_course(self.course_id)
+        if course is None:
+            raise ItemNotFoundError(self.course_id)
         if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):

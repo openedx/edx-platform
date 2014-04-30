@@ -3,8 +3,6 @@ Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
 
-import logging
-import StringIO
 import unittest
 
 from django.conf import settings
@@ -22,7 +20,7 @@ from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 from student.tests.factories import UserFactory
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from opaque_keys import InvalidKeyError
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
@@ -193,18 +191,23 @@ class SSLClientTest(TestCase):
         This tests to make sure when immediate signup is on that
         the user doesn't get presented with the registration page.
         """
-        # Expect a NotImplementError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(InsufficientSpecificationError,
-                                     'Must provide one of url, version_guid, package_id'):
+        # Expect an InvalidKeyError from course page as we don't have anything else built
+        with self.assertRaisesRegexp(
+                InvalidKeyError,
+                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+        ):
             self.client.get(
                 reverse('signup'), follow=True,
-                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+            )
         # assert that we are logged in
         self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(InsufficientSpecificationError,
-                                     'Must provide one of url, version_guid, package_id'):
+        with self.assertRaisesRegexp(
+                InvalidKeyError,
+                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+        ):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -227,7 +230,6 @@ class SSLClientTest(TestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
         self.assertIn(SESSION_KEY, self.client.session)
-
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
