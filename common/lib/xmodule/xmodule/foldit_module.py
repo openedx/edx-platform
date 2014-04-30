@@ -108,7 +108,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         if courses is None:
-            courses = [self.location.course_id]
+            courses = [self.location.course_key]
 
         leaders = [(leader['username'], leader['score']) for leader in Score.get_tops_n(10, course_list=courses)]
         leaders.sort(key=lambda x: -x[1])
