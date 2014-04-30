@@ -81,8 +81,8 @@ class RolesTestCase(TestCase):
             "Student doesn't have access to {}".format(unicode(vertical_locator))
         )
         self.assertTrue(
-            CourseStaffRole(vertical_location, course_context=self.course.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(vertical_location.url()))
+            CourseStaffRole(self.course_id).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(vertical_location.to_deprecated_string()))
         )
 
     def test_get_user_for_role(self):
