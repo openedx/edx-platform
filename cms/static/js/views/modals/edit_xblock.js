@@ -190,6 +190,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     xblockElement = xblockWrapperElement.find('.xblock');
                     xblockInfo = new XBlockInfo({
                         id: xblockWrapperElement.data('locator'),
+                        courseKey: xblockWrapperElement.data('course-key'),
                         category: xblockElement.data('block-type')
                     });
                 }

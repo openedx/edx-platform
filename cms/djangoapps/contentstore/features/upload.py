@@ -146,7 +146,7 @@ def user_foo_is_enrolled_in_the_course(step, name):
     world.create_user(name, 'test')
     user = User.objects.get(username=name)
 
-    course_id = world.scenario_dict['COURSE'].location.course_id
+    course_id = world.scenario_dict['COURSE'].id
     CourseEnrollment.enroll(user, course_id)
 
 

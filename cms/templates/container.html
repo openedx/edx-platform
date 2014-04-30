@@ -56,7 +56,7 @@ main_xblock_info = {
             <small class="navigation navigation-parents">
                 % for ancestor in ancestor_xblocks:
                     <%
-                    ancestor_url = xblock_studio_url(ancestor, context_course)
+                    ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
                     <a href="${ancestor_url}"
@@ -80,7 +80,7 @@ main_xblock_info = {
         <section class="content-area">
 
             <article class="content-primary window">
-                <section class="wrapper-xblock level-page is-hidden" data-locator="${xblock_locator}">
+                <section class="wrapper-xblock level-page is-hidden" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="no-container-content is-hidden">
                     <p>${_("This page has no content yet.")}</p>

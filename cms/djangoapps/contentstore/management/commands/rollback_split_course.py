@@ -4,7 +4,7 @@ is to delete the course from the split mongo datastore.
 """
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.locator import CourseLocator
 
 
@@ -12,18 +12,18 @@ class Command(BaseCommand):
     "Rollback a course that was migrated to the split Mongo datastore"
 
     help = "Rollback a course that was migrated to the split Mongo datastore"
-    args = "locator"
+    args = "org offering"
 
     def handle(self, *args, **options):
-        if len(args) < 1:
+        if len(args) < 2:
             raise CommandError(
-                "rollback_split_course requires at least one argument (locator)"
+                "rollback_split_course requires 2 arguments (org offering)"
             )
 
         try:
-            locator = CourseLocator(url=args[0])
+            locator = CourseLocator(org=args[0], offering=args[1])
         except ValueError:
-            raise CommandError("Invalid locator string {}".format(args[0]))
+            raise CommandError("Invalid org or offering string {}, {}".format(*args))
 
         location = loc_mapper().translate_locator_to_location(locator, get_course=True)
         if not location:
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             )
 
         try:
-            modulestore('split').delete_course(locator.package_id)
+            modulestore('split').delete_course(locator)
         except ItemNotFoundError:
             raise CommandError("No course found with locator {}".format(locator))
 
