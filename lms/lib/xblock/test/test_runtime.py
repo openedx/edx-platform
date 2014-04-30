@@ -7,6 +7,7 @@ from ddt import ddt, data
 from mock import Mock
 from unittest import TestCase
 from urlparse import urlparse
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 
 TEST_STRINGS = [
@@ -41,14 +42,15 @@ class TestHandlerUrl(TestCase):
 
     def setUp(self):
         self.block = Mock()
-        self.course_id = "org/course/run"
+        self.block.scope_ids.usage_id.to_deprecated_string.return_value.encode.return_value = 'dummy'
+        self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             render_template=Mock(),
             replace_urls=str,
-            course_id=self.course_id,
+            course_id=self.course_key,
             descriptor_runtime=Mock(),
         )
 
@@ -92,7 +94,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
-        self.course_id = "org/course/run"
+        self.course_id = SlashSeparatedCourseKey("org", "course", "run")
 
         self.user = User(username='runtime_robot', email='runtime_robot@edx.org', password='test', first_name='Robot')
         self.user.save()

@@ -27,12 +27,12 @@ class DummyRequest(object):
         return False
 
 
-def get_module_for_student(student, course, location, request=None):
+def get_module_for_student(student, usage_key, request=None):
     """Return the module for the (student, location) using a DummyRequest."""
     if request is None:
         request = DummyRequest()
         request.user = student
 
-    descriptor = modulestore().get_instance(course.id, location, depth=0)
-    field_data_cache = FieldDataCache([descriptor], course.id, student)
-    return get_module(student, request, location, field_data_cache, course.id)
+    descriptor = modulestore().get_item(usage_key, depth=0)
+    field_data_cache = FieldDataCache([descriptor], usage_key.course_key, student)
+    return get_module(student, request, usage_key, field_data_cache)

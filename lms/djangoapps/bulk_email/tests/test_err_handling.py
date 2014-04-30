@@ -17,6 +17,7 @@ from django.db import DatabaseError
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
@@ -51,7 +52,7 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
 
     def tearDown(self):
         patch.stopall()
@@ -171,12 +172,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = "I/DONT/EXIST"
+        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101
-        with self.assertRaisesRegexp(ValueError, "Course not found"):
+        # (?i) is a regex for ignore case
+        with self.assertRaisesRegexp(ValueError, r"(?i)course not found"):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")  # pylint: disable=E1101
 
     def test_nonexistent_to_option(self):
@@ -205,7 +207,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
-        email = CourseEmail(course_id="bogus_course_id", to_option=SEND_TO_ALL)
+        email = CourseEmail(course_id=SlashSeparatedCourseKey("bogus", "course", "id"), to_option=SEND_TO_ALL)
         email.save()
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101

@@ -244,15 +244,14 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     # get start time for task:
     start_time = time()
 
-    module_state_key = task_input.get('problem_url')
+    usage_key = course_id.make_usage_key_from_deprecated_string(task_input.get('problem_url'))
     student_identifier = task_input.get('student')
 
     # find the problem descriptor:
-    module_descriptor = modulestore().get_instance(course_id, module_state_key)
+    module_descriptor = modulestore().get_item(usage_key)
 
     # find the module in question
-    modules_to_update = StudentModule.objects.filter(course_id=course_id,
-                                                     module_state_key=module_state_key)
+    modules_to_update = StudentModule.objects.filter(course_id=course_id, module_id=usage_key)
 
     # give the option of updating an individual student. If not specified,
     # then updates all students who have responded to a problem so far
@@ -394,13 +393,13 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     # unpack the StudentModule:
     course_id = student_module.course_id
     student = student_module.student
-    module_state_key = student_module.module_state_key
+    usage_key = student_module.module_state_key
     instance = _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args, grade_bucket_type='rescore')
 
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        msg = "No module {loc} for student {student}--access denied?".format(loc=module_state_key,
+        msg = "No module {loc} for student {student}--access denied?".format(loc=usage_key,
                                                                              student=student)
         TASK_LOG.debug(msg)
         raise UpdateProblemModuleStateError(msg)
@@ -416,15 +415,15 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     if 'success' not in result:
         # don't consider these fatal, but false means that the individual call didn't complete:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=module_state_key, student=student))
+                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=usage_key, student=student))
         return UPDATE_STATUS_FAILED
     elif result['success'] not in ['correct', 'incorrect']:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
+                         u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
         return UPDATE_STATUS_FAILED
     else:
         TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
-                       u"{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
+                       u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
         return UPDATE_STATUS_SUCCEEDED
 
 
@@ -552,7 +551,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.replace("/", "_"))
+    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
 
     # Perform the actual upload
     report_store = ReportStore.from_config()

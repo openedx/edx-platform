@@ -2,19 +2,13 @@
 Script for importing courseware from git/xml into a mongo modulestore
 """
 
-import os
-import re
-import StringIO
-import subprocess
 import logging
 
-from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
 import dashboard.git_import
 from dashboard.git_import import GitImportError
-from dashboard.models import CourseImportLog
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 
