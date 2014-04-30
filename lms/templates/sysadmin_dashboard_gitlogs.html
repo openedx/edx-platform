@@ -78,7 +78,7 @@ textarea {
 		%for cil in cilset[:10]:
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${cil.course_id.to_deprecated_string()}">${cil.course_id.to_deprecated_string()}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 		%endfor
@@ -105,7 +105,7 @@ textarea {
 		% for cil in cilset[:2]:
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${cil.course_id.to_deprecated_string()}">${cil.course_id.to_deprecated_string()}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 	
