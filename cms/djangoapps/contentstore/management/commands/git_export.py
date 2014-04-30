@@ -20,6 +20,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
 import contentstore.git_export_utils as git_export_utils
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class Command(BaseCommand):
         # Rethrow GitExportError as CommandError for SystemExit
         try:
             git_export_utils.export_to_git(
-                args[0],
+                SlashSeparatedCourseKey.from_deprecated_string(args[0]),
                 args[1],
                 options.get('user', ''),
                 options.get('rdir', None)

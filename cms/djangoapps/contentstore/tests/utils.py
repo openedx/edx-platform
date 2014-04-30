@@ -13,7 +13,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.utils import get_modulestore
-from xmodule.modulestore.django import loc_mapper
 
 
 def parse_json(response):
@@ -91,10 +90,6 @@ class CourseTestCase(ModuleStoreTestCase):
             org='MITx',
             number='999',
             display_name='Robot Super Course',
-        )
-        self.course_location = self.course.location
-        self.course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
         )
         self.store = get_modulestore(self.course.location)
 

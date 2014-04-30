@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from xmodule.course_module import CourseDescriptor
 from xmodule.contentstore.utils import empty_asset_trashcan
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from .prompt import query_yes_no
 
 
@@ -10,16 +10,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1 and len(args) != 0:
-            raise CommandError("empty_asset_trashcan requires one or no arguments: |<location>|")
-
-        locs = []
+            raise CommandError("empty_asset_trashcan requires one or no arguments: |<course_id>|")
 
         if len(args) == 1:
-            locs.append(CourseDescriptor.id_to_location(args[0]))
+            course_ids = [CourseKey.from_string(args[0])]
         else:
-            courses = modulestore('direct').get_courses()
-            for course in courses:
-                locs.append(course.location)
+            course_ids = [course.id for course in modulestore('direct').get_courses()]
 
         if query_yes_no("Emptying trashcan. Confirm?", default="no"):
-            empty_asset_trashcan(locs)
+            empty_asset_trashcan(course_ids)

@@ -7,7 +7,7 @@ from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
 from django.conf import settings
 
-from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole
+from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole, GlobalStaff
 from student.models import get_user
 
 from selenium.webdriver.common.keys import Keys
@@ -162,7 +162,7 @@ def add_course_author(user, course):
     """
     global_admin = AdminFactory()
     for role in (CourseStaffRole, CourseInstructorRole):
-        auth.add_users(global_admin, role(course.location), user)
+        auth.add_users(global_admin, role(course.id), user)
 
 
 def create_a_course():
@@ -379,15 +379,14 @@ def create_other_user(_step, name, has_extra_perms, role_name):
     user = create_studio_user(uname=name, password="test", email=email)
     if has_extra_perms:
         if role_name == "is_staff":
-            user.is_staff = True
-            user.save()
+            GlobalStaff().add_users(user)
         else:
             if role_name == "admin":
                 # admins get staff privileges, as well
                 roles = (CourseStaffRole, CourseInstructorRole)
             else:
                 roles = (CourseStaffRole,)
-            location = world.scenario_dict["COURSE"].location
+            location = world.scenario_dict["COURSE"].id
             global_admin = AdminFactory()
             for role in roles:
                 auth.add_users(global_admin, role(location), user)
