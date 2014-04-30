@@ -22,9 +22,9 @@
 
   <%block name="headextra"/>
 
-  % if not course:
-  <%include file="google_analytics.html" />
-  % endif
+  <!-- NOTE: if we want segment io on these iframes at some point, put
+    include file="widgets/segment-io.html"
+  here -->
 
   <!-- repeated button styles needed for IE (copied from _shame.scss) -->
   <style type="text/css" media="screen">
