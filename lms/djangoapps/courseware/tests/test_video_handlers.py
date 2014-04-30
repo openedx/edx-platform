@@ -10,7 +10,6 @@ from datetime import timedelta
 from webob import Request
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -21,6 +20,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
+from xmodule.modulestore.mongo.base import MongoModuleStore
 
 SRT_content = textwrap.dedent("""
         0
@@ -46,7 +46,7 @@ def _check_asset(location, asset_name):
     Check that asset with asset_name exists in assets.
     """
     content_location = StaticContent.compute_location(
-        location.org, location.course, asset_name
+        location.course_key, asset_name
     )
     try:
         contentstore().find(content_location)
@@ -61,16 +61,12 @@ def _clear_assets(location):
     """
     store = contentstore()
 
-    content_location = StaticContent.compute_location(
-        location.org, location.course, location.name
-    )
-
-    assets, __ = store.get_all_content_for_course(content_location)
+    assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
-        asset_location = Location(asset["_id"])
+        asset_location = MongoModuleStore._location_from_id(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
-        id = StaticContent.get_id_from_location(asset_location)
-        store.delete(id)
+        mongo_id = StaticContent.get_id_from_location(asset_location)
+        store.delete(mongo_id)
 
 
 def _get_subs_id(filename):
@@ -97,7 +93,7 @@ def _upload_sjson_file(subs_file, location, default_filename='subs_{}.srt.sjson'
 def _upload_file(subs_file, location, filename):
     mime_type = subs_file.content_type
     content_location = StaticContent.compute_location(
-        location.org, location.course, filename
+        location.course_key, filename
     )
     content = StaticContent(content_location, filename, mime_type, subs_file.read())
     contentstore().save(content)
