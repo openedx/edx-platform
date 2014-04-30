@@ -5,6 +5,7 @@ import logging
 
 from mock import Mock
 from pkg_resources import resource_string
+from xmodule.modulestore.locations import Location
 from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -46,7 +47,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = system.construct_xblock_from_class(
             TabsEditingDescriptor,
-            scope_ids=ScopeIds(None, None, None, None),
+            scope_ids=ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', 'revision')),
             field_data=DictFieldData({}),
         )
 

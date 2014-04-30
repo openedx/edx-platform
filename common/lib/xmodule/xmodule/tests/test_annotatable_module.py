@@ -35,7 +35,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             Mock(),
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
-            ScopeIds(None, None, None, None)
+            ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', None))
         )
 
     def test_annotation_data_attr(self):
