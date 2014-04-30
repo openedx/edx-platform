@@ -640,21 +640,17 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         created_user = self.get_user_by_email(strategy, email)
         self.assert_password_overridden_by_pipeline(overridden_password, created_user.username)
 
-        # The user's account isn't created yet, so an attempt to complete the
-        # pipeline will error out on /login:
-        self.assert_redirect_to_login_looks_correct(
-            actions.do_complete(strategy, social_views._do_login, user=created_user))
-        # So we activate the account in order to verify the redirect to /dashboard:
-        created_user.is_active = True
-        created_user.save()
+        # At this point the user object exists, but there is no associated
+        # social auth.
+        self.assert_social_auth_does_not_exist_for_user(created_user, strategy)
 
-        # Last step in the pipeline: we re-invoke the pipeline and expect to
-        # end up on /dashboard, with the correct social auth object now in the
-        # backend and the correct user's data on display.
+        # Pick the pipeline back up. This will create the account association
+        # and send the user to the dashboard, where the association will be
+        # displayed.
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=created_user))
         self.assert_social_auth_exists_for_user(created_user, strategy)
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), created_user)
+        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), created_user, linked=True)
 
     def test_new_account_registration_assigns_distinct_username_on_collision(self):
         original_username = self.get_username()
