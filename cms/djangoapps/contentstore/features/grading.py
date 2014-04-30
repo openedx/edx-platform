@@ -6,7 +6,7 @@ from common import *
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_course_url
 from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=E0611
 
 
@@ -74,7 +74,7 @@ def main_course_page(step):
         world.scenario_dict['COURSE'].number,
         course_name
     )
-    main_page_link = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
+    main_page_link = reverse_course_url('course_handler', course_key)
 
     world.visit(main_page_link)
     assert_in('Course Outline', world.css_text('h1.page-header'))

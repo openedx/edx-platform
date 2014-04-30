@@ -9,10 +9,9 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore, reverse_course_url
 
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
@@ -52,10 +51,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
         if json_request:
             return JsonResponse(expanded_checklists)
         else:
-            handler_url = reverse(
-                'contentstore.views.checklists_handler',
-                kwargs={'course_key_string': unicode(course_key)}
-            )
+            handler_url = reverse_course_url('checklists_handler', course_key)
             return render_to_response('checklists.html',
                                       {
                                           'handler_url': handler_url,
@@ -122,7 +118,6 @@ def expand_checklist_action_url(course_module, checklist):
     for item in expanded_checklist.get('items'):
         action_url = item.get('action_url')
         if action_url in urlconf_map:
-            url_prefix = urlconf_map[action_url]
-            item['action_url'] = reverse("contentstore.views." + url_prefix, kwargs={'course_key_string': unicode(course_module.id)})
+            item['action_url'] = reverse_course_url(urlconf_map[action_url], course_module.id)
 
     return expanded_checklist

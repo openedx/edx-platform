@@ -1,8 +1,7 @@
 """ Unit tests for checklist methods in views.py. """
-from contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore, reverse_course_url
 from contentstore.views.checklist import expand_checklist_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
-from django.core.urlresolvers import reverse
 
 import json
 from contentstore.tests.utils import CourseTestCase
@@ -17,10 +16,8 @@ class ChecklistTestCase(CourseTestCase):
         self.checklists_url = self.get_url()
 
     def get_url(self, checklist_index=None):
-        url_args = {'course_key_string': self.course.id}
-        if checklist_index:
-            url_args['checklist_index'] = checklist_index
-        return reverse('contentstore.views.checklists_handler', kwargs=url_args)
+        url_args = {'checklist_index': checklist_index} if checklist_index else None
+        return reverse_course_url('checklists_handler', self.course.id, kwargs=url_args)
 
     def get_persisted_checklists(self):
         """ Returns the checklists as persisted in the modulestore. """

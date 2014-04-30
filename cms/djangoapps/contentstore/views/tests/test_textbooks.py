@@ -1,7 +1,7 @@
 import json
 from unittest import TestCase
 from contentstore.tests.utils import CourseTestCase
-from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_course_url
 
 from contentstore.views.course import (
     validate_textbooks_json, validate_textbook_json, TextbookValidationError)
@@ -12,10 +12,7 @@ class TextbookIndexTestCase(CourseTestCase):
     def setUp(self):
         "Set the URL for tests"
         super(TextbookIndexTestCase, self).setUp()
-        self.url = reverse(
-            "contentstore.views.textbooks_list_handler",
-            kwargs={'course_key_string': unicode(self.course.id)}
-        )
+        self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
     def test_view_index(self):
         "Basic check that the textbook index page responds correctly"
@@ -113,10 +110,7 @@ class TextbookCreateTestCase(CourseTestCase):
     def setUp(self):
         "Set up a url and some textbook content for tests"
         super(TextbookCreateTestCase, self).setUp()
-        self.url = reverse(
-            "contentstore.views.textbooks_list_handler",
-            kwargs={'course_key_string': unicode(self.course.id)}
-        )
+        self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
         self.textbook = {
             "tab_title": "Economics",
@@ -205,10 +199,10 @@ class TextbookDetailTestCase(CourseTestCase):
         """
         Returns the URL for textbook detail handler.
         """
-        return reverse(
-            "contentstore.views.textbooks_detail_handler",
-            kwargs={'course_key_string': unicode(self.course.id),
-                    'textbook_id': textbook_id}
+        return reverse_course_url(
+            'textbooks_detail_handler',
+            self.course.id,
+            kwargs={'textbook_id': textbook_id}
         )
 
     def test_get_1(self):

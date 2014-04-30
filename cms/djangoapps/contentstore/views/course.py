@@ -30,7 +30,8 @@ from contentstore.utils import (
     get_lms_link_for_item,
     add_extra_panel_tab,
     remove_extra_panel_tab,
-    get_modulestore
+    get_modulestore,
+    reverse_course_url
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
@@ -221,9 +222,7 @@ def course_listing(request):
         """
         return (
             course.display_name,
-            reverse('contentstore.views.course_handler', kwargs={
-                'course_key_string': unicode(course.id),
-            }),
+            reverse_course_url('course_handler', course.id),
             get_lms_link_for_item(course.location),
             course.display_org_with_default,
             course.display_number_with_default,
@@ -360,10 +359,7 @@ def create_new_course(request):
         _users_assign_default_role(new_course.id)
 
         return JsonResponse({
-            'url': reverse(
-                'contentstore.views.course_handler',
-                kwargs={'course_key_string': unicode(new_course.id)}
-            )
+            'url': reverse_course_url('course_handler', new_course.id)
         })
 
     except InvalidLocationError:
@@ -412,10 +408,7 @@ def course_info_handler(request, course_key_string):
             'course_info.html',
             {
                 'context_course': course_module,
-                'updates_url': reverse(
-                    'contentstore.views.course_info_update_handler',
-                    kwargs={'course_key_string': unicode(course_key)}
-                ),
+                'updates_url': reverse_course_url('course_info_update_handler', course_key),
                 'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                 'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
             }
@@ -493,7 +486,7 @@ def settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        upload_asset_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
+        upload_asset_url = reverse_course_url('assets_handler', course_key)
 
         # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
         # course about page should be editable in Studio
@@ -510,7 +503,7 @@ def settings_handler(request, course_key_string):
             'course_locator': course_key,
             'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
             'course_image_url': utils.course_image_url(course_module),
-            'details_url': reverse('contentstore.views.settings_handler', kwargs={'course_key_string': course_key_string}),
+            'details_url': reverse_course_url('settings_handler', course_key),
             'about_page_editable': about_page_editable,
             'short_description_editable': short_description_editable,
             'upload_asset_url': upload_asset_url
@@ -554,7 +547,7 @@ def grading_handler(request, course_key_string, grader_index=None):
             'context_course': course_module,
             'course_locator': course_key,
             'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
-            'grading_url': reverse('contentstore.views.grading_handler', kwargs={'course_key_string': course_key_string}),
+            'grading_url': reverse_course_url('grading_handler', course_key),
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':
@@ -655,10 +648,7 @@ def advanced_settings_handler(request, course_key_string):
         return render_to_response('settings_advanced.html', {
             'context_course': course_module,
             'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
-            'advanced_settings_url': reverse(
-                'contentstore.views.advanced_settings_handler',
-                kwargs={'course_key_string': course_key_string}
-            )
+            'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':
@@ -760,8 +750,8 @@ def textbooks_list_handler(request, course_key_string):
 
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         # return HTML page
-        upload_asset_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': course_key_string})
-        textbook_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': course_key_string})
+        upload_asset_url = reverse_course_url('assets_handler', course_key)
+        textbook_url = reverse_course_url('textbooks_list_handler', course_key)
         return render_to_response('textbooks.html', {
             'context_course': course,
             'textbooks': course.pdf_textbooks,
@@ -806,10 +796,10 @@ def textbooks_list_handler(request, course_key_string):
             course.tabs.append(PDFTextbookTabs())
         store.update_item(course, request.user.id)
         resp = JsonResponse(textbook, status=201)
-        resp["Location"] = reverse(
-            "contentstore.views.textbooks_detail_handler",
-            kwargs={'course_key_string': unicode(course.id),
-                    'textbook_id': textbook["id"]}
+        resp["Location"] = reverse_course_url(
+            'textbooks_detail_handler',
+            course.id,
+            kwargs={'textbook_id': textbook["id"]}
         )
         return resp
 

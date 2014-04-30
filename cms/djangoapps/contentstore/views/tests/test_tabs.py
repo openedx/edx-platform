@@ -7,7 +7,7 @@ from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from courseware.courses import get_course_by_id
 from xmodule.tabs import CourseTabList, WikiTab
-from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_course_url
 
 
 class TabsPageTests(CourseTestCase):
@@ -20,7 +20,7 @@ class TabsPageTests(CourseTestCase):
         super(TabsPageTests, self).setUp()
 
         # Set the URL for tests
-        self.url = reverse('contentstore.views.tabs_handler', kwargs={"course_key_string": unicode(self.course.id)})
+        self.url = reverse_course_url('tabs_handler', self.course.id)
 
         # add a static tab to the course, for code coverage
         ItemFactory.create(
