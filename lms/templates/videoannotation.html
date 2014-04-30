@@ -57,7 +57,8 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
-	
+	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+    uri += unit_id;
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
