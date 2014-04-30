@@ -46,16 +46,16 @@ class ConditionalSteps(object):
 
         metadata = {
             'xml_attributes': {
-                'sources': world.scenario_dict['CONDITION_SOURCE'].location.url()
+                condition: cond_value
             }
         }
-        metadata['xml_attributes'][condition] = cond_value
 
         world.scenario_dict['CONDITIONAL'] = world.ItemFactory(
             parent_location=world.scenario_dict['WRAPPER'].location,
             category='conditional',
             display_name="Test Conditional",
-            metadata=metadata
+            metadata=metadata,
+            sources_list=[world.scenario_dict['CONDITION_SOURCE'].location],
         )
 
         world.ItemFactory(

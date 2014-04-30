@@ -12,14 +12,14 @@ import json
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 
+from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -33,26 +33,19 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         # Clear out the modulestores, causing them to reload
         clear_existing_modulestores()
 
-        self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
+        self.graded_course = modulestore().get_course(SlashSeparatedCourseKey("edX", "graded", "2012_Fall"))
 
         # Create staff account
-        self.instructor = 'view2@test.com'
-        self.password = 'foo'
-        self.create_account('u2', self.instructor, self.password)
-        self.activate_user(self.instructor)
-
-        def make_instructor(course):
-            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
-
-        make_instructor(self.graded_course)
+        self.staff = StaffFactory(course=self.graded_course.id)
 
         self.logout()
-        self.login(self.instructor, self.password)
+        # self.staff.password is the sha hash but login takes the plain text
+        self.login(self.staff.email, 'test')
         self.enroll(self.graded_course)
 
     def get_cw_section(self):
         url = reverse('courseware_section',
-                      kwargs={'course_id': self.graded_course.id,
+                      kwargs={'course_id': self.graded_course.id.to_deprecated_string(),
                               'chapter': 'GradedChapter',
                               'section': 'Homework1'})
 
@@ -64,7 +57,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
         sdebug = 'Staff Debug Info'
-
+        print resp.content
         self.assertTrue(sdebug in resp.content)
 
     def toggle_masquerade(self):
@@ -88,11 +81,11 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
     def get_problem(self):
         pun = 'H1P1'
-        problem_location = "i4x://edX/graded/problem/%s" % pun
+        problem_location = self.graded_course.id.make_usage_key("problem", pun)
 
         modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.graded_course.id,
-                                   'usage_id': quote_slashes(problem_location),
+                           kwargs={'course_id': self.graded_course.id.to_deprecated_string(),
+                                   'usage_id': quote_slashes(problem_location.to_deprecated_string()),
                                    'handler': 'xmodule_handler',
                                    'suffix': 'problem_get'})
 
