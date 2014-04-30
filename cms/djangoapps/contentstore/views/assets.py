@@ -9,11 +9,11 @@ from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from django.core.urlresolvers import reverse
 
 from edxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
 
+from contentstore.utils import reverse_course_url
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -84,7 +84,7 @@ def _asset_index(request, course_key):
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
-        'asset_callback_url': reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
+        'asset_callback_url': reverse_course_url('assets_handler', course_key)
     })
 
 

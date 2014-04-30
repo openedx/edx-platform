@@ -3,8 +3,8 @@ unit tests for course_info views and models.
 """
 import json
 
-from django.core.urlresolvers import reverse
 from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -14,13 +14,8 @@ class CourseUpdateTest(CourseTestCase):
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
             course_key = self.course.id
-        kwargs = {'course_key_string': unicode(course_key)}
-        if provided_id:
-            kwargs['provided_id'] = str(provided_id)
-        return reverse(
-            'contentstore.views.course_info_update_handler',
-            kwargs=kwargs
-        )
+        kwargs = {'provided_id': str(provided_id)} if provided_id else None
+        return reverse_course_url('course_info_update_handler', course_key, kwargs=kwargs)
 
     '''The do all and end all of unit test cases.'''
     def test_course_update(self):
@@ -40,7 +35,7 @@ class CourseUpdateTest(CourseTestCase):
             return json.loads(resp.content)
 
         resp = self.client.get_html(
-            reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(self.course.id)})
+            reverse_course_url('course_info_handler', self.course.id)
         )
         self.assertContains(resp, 'Course Updates', status_code=200)
 
@@ -257,10 +252,7 @@ class CourseUpdateTest(CourseTestCase):
 
         # check posting on handouts
         handouts_location = self.course.id.make_usage_key('course_info', 'handouts')
-        course_handouts_url = reverse(
-            'contentstore.views.xblock_handler',
-            kwargs={'usage_key_string': unicode(handouts_location)}
-        )
+        course_handouts_url = reverse_usage_url('xblock_handler', handouts_location)
 
         content = u"Sample handout"
         payload = {'data': content}
