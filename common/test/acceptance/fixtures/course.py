@@ -235,35 +235,35 @@ class CourseFixture(StudioApiFixture):
         self._install_course_handouts()
         self._configure_course()
         self._upload_assets()
-        self._create_xblock_children(self._course_loc, self._children)
+        self._create_xblock_children(self._course_location, self._children)
 
     @property
-    def _course_loc(self):
+    def _course_key(self):
         """
         Return the locator string for the course.
         """
-        return "{org}.{number}.{run}/branch/draft/block/{run}".format(**self._course_dict)
+        return "slashes:{org}+{number}+{run}".format(**self._course_dict)
 
     @property
-    def _updates_loc(self):
+    def _course_location(self):
         """
-        Return the locator string for the course updates
+        Return the locator string for the course.
         """
-        return "{org}.{number}.{run}/branch/draft/block/updates".format(**self._course_dict)
+        return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
 
     @property
     def _assets_url(self):
         """
         Return the url string for the assets
         """
-        return "/assets/{org}.{number}.{run}/branch/draft/block/{run}".format(**self._course_dict)
+        return "/assets/" + self._course_key + "/"
 
     @property
     def _handouts_loc(self):
         """
         Return the locator string for the course handouts
         """
-        return "{org}.{number}.{run}/branch/draft/block/handouts".format(**self._course_dict)
+        return "location:{org}+{number}+{run}+course_info+handouts".format(**self._course_dict)
 
     def _create_course(self):
         """
@@ -272,7 +272,7 @@ class CourseFixture(StudioApiFixture):
         # If the course already exists, this will respond
         # with a 200 and an error message, which we ignore.
         response = self.session.post(
-            STUDIO_BASE_URL + '/course',
+            STUDIO_BASE_URL + '/course/',
             data=self._encode_post_dict(self._course_dict),
             headers=self.headers
         )
@@ -298,7 +298,7 @@ class CourseFixture(StudioApiFixture):
         """
         Configure course settings (e.g. start and end date)
         """
-        url = STUDIO_BASE_URL + '/settings/details/' + self._course_loc
+        url = STUDIO_BASE_URL + '/settings/details/' + self._course_key
 
         # First, get the current values
         response = self.session.get(url, headers=self.headers)
@@ -326,8 +326,8 @@ class CourseFixture(StudioApiFixture):
 
         if not response.ok:
             raise CourseFixtureError(
-                "Could not update course details to '{0}'.  Status was {1}.".format(
-                    self._course_details, response.status_code))
+                "Could not update course details to '{0}' with {1}: Status was {2}.".format(
+                    self._course_details, url, response.status_code))
 
     def _install_course_handouts(self):
         """
@@ -354,13 +354,13 @@ class CourseFixture(StudioApiFixture):
 
         if not response.ok:
             raise CourseFixtureError(
-                "Could not update course handouts.  Status was {0}".format(response.status_code))
+                "Could not update course handouts with {0}.  Status was {1}".format(url, response.status_code))
 
     def _install_course_updates(self):
         """
         Add updates to the course, if any are configured.
         """
-        url = STUDIO_BASE_URL + '/course_info_update/' + self._updates_loc
+        url = STUDIO_BASE_URL + '/course_info_update/' + self._course_key + '/'
 
         for update in self._updates:
 
@@ -371,8 +371,8 @@ class CourseFixture(StudioApiFixture):
 
             if not response.ok:
                 raise CourseFixtureError(
-                    "Could not add update to course: {0}.  Status was {1}".format(
-                        update, response.status_code))
+                    "Could not add update to course: {0} with {1}.  Status was {2}".format(
+                        update, url, response.status_code))
 
     def _upload_assets(self):
         """
@@ -397,8 +397,8 @@ class CourseFixture(StudioApiFixture):
             upload_response = self.session.post(url, files=files, headers=headers)
 
             if not upload_response.ok:
-                raise CourseFixtureError('Could not upload {asset_name}. Status code: {code}'.format(
-                    asset_name=asset_name, code=upload_response.status_code))
+                raise CourseFixtureError('Could not upload {asset_name} with {url}. Status code: {code}'.format(
+                    asset_name=asset_name, url=url, code=upload_response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """
@@ -425,7 +425,7 @@ class CourseFixture(StudioApiFixture):
 
         # Create the new XBlock
         response = self.session.post(
-            STUDIO_BASE_URL + '/xblock',
+            STUDIO_BASE_URL + '/xblock/',
             data=json.dumps(create_payload),
             headers=self.headers,
         )
