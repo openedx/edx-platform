@@ -67,7 +67,6 @@
 
 .. _Building a Course: http://edx.readthedocs.org/projects/ca/en/latest/building_course/index.html#building-a-course-index
 
-.. _Creating Course Content: http://edx.readthedocs.org/projects/ca/en/latest/creating_content/index.html#creating-course-content-index
 
 .. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/index.html
 
@@ -136,6 +135,8 @@
 
 .. _Zooming Image Tool: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/zooming_image.html
 
+.. _Problem with Adaptive Hint: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/problem_with_hint.html
+
 .. DATA DOCUMENTATION
 
 .. _Student Info and Progress Data: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info
@@ -153,3 +154,7 @@
 .. _Release Dates: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/set_content_releasedates.html#release-dates
 
 .. _Data Czar/Data Team Selection and Responsibilities: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/data_czar.html
+
+.. Developer Doc
+
+.. _Contributing to Open edX: http://edx.readthedocs.org/projects/userdocs/en/latest/process/index.html
