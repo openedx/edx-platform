@@ -105,7 +105,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             # NOTE: self.system.location is valid because the capa_module
             # __init__ adds it (easiest way to get problem location into
             # response types)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             # This is a dev_facing_error
             log.exception(
                 "Grader payload from external open ended grading server is not a json object! Object: {0}".format(
@@ -116,7 +116,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         parsed_grader_payload.update({
             'location': self.location_string,
-            'course_id': system.course_id,
+            'course_id': system.course_id.to_deprecated_string(),
             'prompt': prompt_string,
             'rubric': rubric_string,
             'initial_display': self.initial_display,

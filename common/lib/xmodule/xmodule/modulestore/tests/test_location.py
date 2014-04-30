@@ -1,8 +1,11 @@
+"""
+Thorough tests of the Location class
+"""
 import ddt
 
 from unittest import TestCase
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import InvalidLocationError
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import Location, AssetLocation, SlashSeparatedCourseKey
 
 # Pairs for testing the clean* functions.
 # The first item in the tuple is the input string.
@@ -23,117 +26,89 @@ class TestLocations(TestCase):
     Tests of :class:`.Location`
     """
     @ddt.data(
-        "tag://org/course/category/name",
-        "tag://org/course/category/name@revision"
+        "org+course+run+category+name",
+        "org+course+run+category+name@revision"
     )
     def test_string_roundtrip(self, url):
-        self.assertEquals(url, Location(url).url())
-        self.assertEquals(url, str(Location(url)))
+        self.assertEquals(url, Location._from_string(url)._to_string())  # pylint: disable=protected-access
 
     @ddt.data(
-        {
-            'tag': 'tag',
+        "i4x://org/course/category/name",
+        "i4x://org/course/category/name@revision"
+    )
+    def test_deprecated_roundtrip(self, url):
+        course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.assertEquals(
+            url,
+            course_id.make_usage_key_from_deprecated_string(url).to_deprecated_string()
+        )
+
+    @ddt.data(
+        ((), {
+            'org': 'org',
             'course': 'course',
+            'run': 'run',
             'category': 'category',
             'name': 'name',
-            'org': 'org'
-        },
-        {
-            'tag': 'tag',
+        }, 'org', 'course', 'run', 'category', 'name', None),
+        ((), {
+            'org': 'org',
             'course': 'course',
+            'run': 'run',
             'category': 'category',
             'name': 'name:more_name',
-            'org': 'org'
-        },
-        ['tag', 'org', 'course', 'category', 'name'],
-        "tag://org/course/category/name",
-        "tag://org/course/category/name@revision",
-        u"tag://org/course/category/name",
-        u"tag://org/course/category/name@revision",
+        }, 'org', 'course', 'run', 'category', 'name:more_name', None),
+        (['org', 'course', 'run', 'category', 'name'], {}, 'org', 'course', 'run', 'category', 'name', None),
     )
-    def test_is_valid(self, loc):
-        self.assertTrue(Location.is_valid(loc))
+    @ddt.unpack
+    def test_valid_locations(self, args, kwargs, org, course, run, category, name, revision):
+        location = Location(*args, **kwargs)
+        self.assertEquals(org, location.org)
+        self.assertEquals(course, location.course)
+        self.assertEquals(run, location.run)
+        self.assertEquals(category, location.category)
+        self.assertEquals(name, location.name)
+        self.assertEquals(revision, location.revision)
 
     @ddt.data(
-        {
+        (("foo",), {}),
+        (["foo", "bar"], {}),
+        (["foo", "bar", "baz", "blat/blat", "foo"], {}),
+        (["foo", "bar", "baz", "blat", "foo/bar"], {}),
+        (["foo", "bar", "baz", "blat:blat", "foo:bar"], {}),  # ':' ok in name, not in category
+        (('org', 'course', 'run', 'category', 'name with spaces', 'revision'), {}),
+        (('org', 'course', 'run', 'category', 'name/with/slashes', 'revision'), {}),
+        (('org', 'course', 'run', 'category', 'name', u'\xae'), {}),
+        (('org', 'course', 'run', 'category', u'\xae', 'revision'), {}),
+        ((), {
             'tag': 'tag',
             'course': 'course',
             'category': 'category',
             'name': 'name@more_name',
             'org': 'org'
-        },
-        {
+        }),
+        ((), {
             'tag': 'tag',
             'course': 'course',
             'category': 'category',
             'name': 'name ',   # extra space
             'org': 'org'
-        },
-        "foo",
-        ["foo"],
-        ["foo", "bar"],
-        ["foo", "bar", "baz", "blat:blat", "foo:bar"],  # ':' ok in name, not in category
-        "tag://org/course/category/name with spaces@revision",
-        "tag://org/course/category/name/with/slashes@revision",
-        u"tag://org/course/category/name\xae",  # No non-ascii characters for now
-        u"tag://org/course/category\xae/name",  # No non-ascii characters for now
+        }),
     )
-    def test_is_invalid(self, loc):
-        self.assertFalse(Location.is_valid(loc))
-
-    def test_dict(self):
-        input_dict = {
-            'tag': 'tag',
-            'course': 'course',
-            'category': 'category',
-            'name': 'name',
-            'org': 'org'
-        }
-
-        self.assertEquals("tag://org/course/category/name", Location(input_dict).url())
-        self.assertEquals(dict(revision=None, **input_dict), Location(input_dict).dict())
-
-        input_dict['revision'] = 'revision'
-        self.assertEquals("tag://org/course/category/name@revision", Location(input_dict).url())
-        self.assertEquals(input_dict, Location(input_dict).dict())
-
-    def test_list(self):
-        input_list = ['tag', 'org', 'course', 'category', 'name']
-        self.assertEquals("tag://org/course/category/name", Location(input_list).url())
-        self.assertEquals(input_list + [None], Location(input_list).list())
-
-        input_list.append('revision')
-        self.assertEquals("tag://org/course/category/name@revision", Location(input_list).url())
-        self.assertEquals(input_list, Location(input_list).list())
-
-    def test_location(self):
-        input_list = ['tag', 'org', 'course', 'category', 'name']
-        self.assertEquals("tag://org/course/category/name", Location(Location(input_list)).url())
-
-    def test_none(self):
-        self.assertEquals([None] * 6, Location(None).list())
-
-    @ddt.data(
-        "foo",
-        ["foo", "bar"],
-        ["foo", "bar", "baz", "blat/blat", "foo"],
-        ["foo", "bar", "baz", "blat", "foo/bar"],
-        "tag://org/course/category/name with spaces@revision",
-        "tag://org/course/category/name/revision",
-    )
-    def test_invalid_locations(self, loc):
-        with self.assertRaises(InvalidLocationError):
-            Location(loc)
+    @ddt.unpack
+    def test_invalid_locations(self, *args, **kwargs):
+        with self.assertRaises(TypeError):
+            Location(*args, **kwargs)
 
     def test_equality(self):
         self.assertEquals(
-            Location('tag', 'org', 'course', 'category', 'name'),
-            Location('tag', 'org', 'course', 'category', 'name')
+            Location('tag', 'org', 'course', 'run', 'category', 'name'),
+            Location('tag', 'org', 'course', 'run', 'category', 'name')
         )
 
         self.assertNotEquals(
-            Location('tag', 'org', 'course', 'category', 'name1'),
-            Location('tag', 'org', 'course', 'category', 'name')
+            Location('tag', 'org', 'course', 'run', 'category', 'name1'),
+            Location('tag', 'org', 'course', 'run', 'category', 'name')
         )
 
     @ddt.data(
@@ -164,42 +139,38 @@ class TestLocations(TestCase):
         self.assertEquals(Location.clean_for_html(pair[0]), pair[1])
 
     def test_html_id(self):
-        loc = Location("tag://org/course/cat/name:more_name@rev")
-        self.assertEquals(loc.html_id(), "tag-org-course-cat-name_more_name-rev")
-
-    def test_course_id(self):
-        loc = Location('i4x', 'mitX', '103', 'course', 'test2')
-        self.assertEquals('mitX/103/test2', loc.course_id)
-
-        loc = Location('i4x', 'mitX', '103', '_not_a_course', 'test2')
-        with self.assertRaises(InvalidLocationError):
-            loc.course_id  # pylint: disable=pointless-statement
+        loc = Location('org', 'course', 'run', 'cat', 'name:more_name', 'rev')
+        self.assertEquals(loc.html_id(), "i4x-org-course-cat-name_more_name-rev")
 
     def test_replacement(self):
         # pylint: disable=protected-access
 
         self.assertEquals(
-            Location('t://o/c/c/n@r')._replace(name='new_name'),
-            Location('t://o/c/c/new_name@r'),
+            Location('o', 'c', 'r', 'c', 'n', 'r').replace(name='new_name'),
+            Location('o', 'c', 'r', 'c', 'new_name', 'r'),
         )
 
-        with self.assertRaises(InvalidLocationError):
-            Location('t://o/c/c/n@r')._replace(name=u'name\xae')
+        with self.assertRaises(InvalidKeyError):
+            Location('o', 'c', 'r', 'c', 'n', 'r').replace(name=u'name\xae')
 
     @ddt.data('org', 'course', 'category', 'name', 'revision')
     def test_immutable(self, attr):
-        loc = Location('t://o/c/c/n@r')
+        loc = Location('o', 'c', 'r', 'c', 'n', 'r')
         with self.assertRaises(AttributeError):
             setattr(loc, attr, attr)
 
-    def test_parse_course_id(self):
-        """
-        Test the parse_course_id class method
-        """
-        source_string = "myorg/mycourse/myrun"
-        parsed = Location.parse_course_id(source_string)
-        self.assertEqual(parsed['org'], 'myorg')
-        self.assertEqual(parsed['course'], 'mycourse')
-        self.assertEqual(parsed['name'], 'myrun')
-        with self.assertRaises(ValueError):
-            Location.parse_course_id('notlegit.id/foo')
+    def test_map_into_course_location(self):
+        loc = Location('org', 'course', 'run', 'cat', 'name:more_name', 'rev')
+        course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.assertEquals(
+            Location("edX", "toy", "2012_Fall", 'cat', 'name:more_name', 'rev'),
+            loc.map_into_course(course_key)
+        )
+
+    def test_map_into_course_asset_location(self):
+        loc = AssetLocation('org', 'course', 'run', 'asset', 'foo.bar')
+        course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.assertEquals(
+            AssetLocation("edX", "toy", "2012_Fall", 'asset', 'foo.bar'),
+            loc.map_into_course(course_key)
+        )
