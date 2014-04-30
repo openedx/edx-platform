@@ -19,8 +19,9 @@ from courseware.courses import get_course_with_access
 from courseware.models import XModuleUserStateSummaryField
 import courseware.module_render as module_render
 import courseware.model_data as model_data
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 @ensure_csrf_cookie
@@ -28,13 +29,14 @@ def hint_manager(request, course_id):
     """
     The URL landing function for all calls to the hint manager, both POST and GET.
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        get_course_with_access(request.user, course_id, 'staff', depth=None)
+        get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:
         out = 'Sorry, but students are not allowed to access the hint manager!'
         return HttpResponse(out)
     if request.method == 'GET':
-        out = get_hints(request, course_id, 'mod_queue')
+        out = get_hints(request, course_key, 'mod_queue')
         out.update({'error': ''})
         return render_to_response('instructor/hint_manager.html', out)
     field = request.POST['field']
@@ -52,10 +54,10 @@ def hint_manager(request, course_id):
     }
 
     # Do the operation requested, and collect any error messages.
-    error_text = switch_dict[request.POST['op']](request, course_id, field)
+    error_text = switch_dict[request.POST['op']](request, course_key, field)
     if error_text is None:
         error_text = ''
-    render_dict = get_hints(request, course_id, field)
+    render_dict = get_hints(request, course_key, field)
     render_dict.update({'error': error_text})
     rendered_html = render_to_string('instructor/hint_manager_inner.html', render_dict)
     return HttpResponse(json.dumps({'success': True, 'contents': rendered_html}))
@@ -86,13 +88,13 @@ def get_hints(request, course_id, field):
         other_field = 'mod_queue'
         field_label = 'Approved Hints'
         other_field_label = 'Hints Awaiting Moderation'
-    # The course_id is of the form school/number/classname.
     # We want to use the course_id to find all matching usage_id's.
     # To do this, just take the school/number part - leave off the classname.
-    course_id_dict = Location.parse_course_id(course_id)
-    chopped_id = u'{org}/{course}'.format(**course_id_dict)
-    chopped_id = re.escape(chopped_id)
-    all_hints = XModuleUserStateSummaryField.objects.filter(field_name=field, usage_id__regex=chopped_id)
+    # FIXME: we need to figure out how to do this with opaque keys
+    all_hints = XModuleUserStateSummaryField.objects.filter(
+        field_name=field,
+        usage_id__regex=re.escape(u'{0.org}/{0.course}'.format(course_id)),
+    )
     # big_out_dict[problem id] = [[answer, {pk: [hint, votes]}], sorted by answer]
     # big_out_dict maps a problem id to a list of [answer, hints] pairs, sorted in order of answer.
     big_out_dict = {}
@@ -101,8 +103,8 @@ def get_hints(request, course_id, field):
     id_to_name = {}
 
     for hints_by_problem in all_hints:
-        loc = Location(hints_by_problem.usage_id)
-        name = location_to_problem_name(course_id, loc)
+        hints_by_problem.usage_id = hints_by_problem.usage_id.map_into_course(course_id)
+        name = location_to_problem_name(course_id, hints_by_problem.usage_id)
         if name is None:
             continue
         id_to_name[hints_by_problem.usage_id] = name
@@ -138,9 +140,9 @@ def location_to_problem_name(course_id, loc):
     problem it wraps around.  Return None if the hinter no longer exists.
     """
     try:
-        descriptor = modulestore().get_items(loc, course_id=course_id)[0]
+        descriptor = modulestore().get_item(loc)[0]
         return descriptor.get_children()[0].display_name
-    except IndexError:
+    except ItemNotFoundError:
         # Sometimes, the problem is no longer in the course.  Just
         # don't include said problem.
         return None
@@ -164,9 +166,10 @@ def delete_hints(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
+        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
-        this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_id)
+        this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
         problem_dict = json.loads(this_problem.value)
         del problem_dict[answer][pk]
         this_problem.value = json.dumps(problem_dict)
@@ -191,7 +194,8 @@ def change_votes(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk, new_votes = request.POST.getlist(key)
-        this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_id)
+        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
+        this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
         problem_dict = json.loads(this_problem.value)
         # problem_dict[answer][pk] points to a [hint_text, #votes] pair.
         problem_dict[answer][pk][1] = int(new_votes)
@@ -210,23 +214,27 @@ def add_hint(request, course_id, field):
     """
 
     problem_id = request.POST['problem']
+    problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
     answer = request.POST['answer']
     hint_text = request.POST['hint']
 
     # Validate the answer.  This requires initializing the xmodules, which
     # is annoying.
-    loc = Location(problem_id)
-    descriptors = modulestore().get_items(loc, course_id=course_id)
+    try:
+        descriptor = modulestore().get_item(problem_key)
+        descriptors = [descriptor]
+    except ItemNotFoundError:
+        descriptors = []
     field_data_cache = model_data.FieldDataCache(descriptors, course_id, request.user)
-    hinter_module = module_render.get_module(request.user, request, loc, field_data_cache, course_id)
+    hinter_module = module_render.get_module(request.user, request, problem_key, field_data_cache, course_id)
     if not hinter_module.validate_answer(answer):
         # Invalid answer.  Don't add it to the database, or else the
         # hinter will crash when we encounter it.
         return 'Error - the answer you specified is not properly formatted: ' + str(answer)
 
-    this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_id)
+    this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
 
-    hint_pk_entry = XModuleUserStateSummaryField.objects.get(field_name='hint_pk', usage_id=problem_id)
+    hint_pk_entry = XModuleUserStateSummaryField.objects.get(field_name='hint_pk', usage_id=problem_key)
     this_pk = int(hint_pk_entry.value)
     hint_pk_entry.value = this_pk + 1
     hint_pk_entry.save()
@@ -253,16 +261,17 @@ def approve(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
+        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
-        problem_in_mod = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_id)
+        problem_in_mod = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
         problem_dict = json.loads(problem_in_mod.value)
         hint_to_move = problem_dict[answer][pk]
         del problem_dict[answer][pk]
         problem_in_mod.value = json.dumps(problem_dict)
         problem_in_mod.save()
 
-        problem_in_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=problem_id)
+        problem_in_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=problem_key)
         problem_dict = json.loads(problem_in_hints.value)
         if answer not in problem_dict:
             problem_dict[answer] = {}

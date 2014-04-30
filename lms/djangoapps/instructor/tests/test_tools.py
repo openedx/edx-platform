@@ -17,6 +17,7 @@ from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.keys import CourseKey
 
 from ..views import tools
 
@@ -186,12 +187,12 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
@@ -243,46 +244,46 @@ class TestDataDumps(ModuleStoreTestCase):
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location.url()).save()
+            module_state_key=week2.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location.url()).save()
+            module_state_key=week3.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
@@ -337,10 +338,22 @@ def get_extended_due(course, unit, student):
     student_module = StudentModule.objects.get(
         student_id=student.id,
         course_id=course.id,
-        module_state_key=unit.location.url()
+        module_id=unit.location
     )
 
     state = json.loads(student_module.state)
     extended = state.get('extended_due', None)
     if extended:
         return DATE_FIELD.from_json(extended)
+
+
+def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
+    """
+    Convert a 'problem urlname' to a module state key (db field)
+    """
+    if not isinstance(course_id, CourseKey):
+        raise ValueError
+    if urlname.endswith(".xml"):
+        urlname = urlname[:-4]
+
+    return course_id.make_usage_key(block_type, urlname)

@@ -6,6 +6,8 @@ from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import UsageKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 
@@ -37,8 +39,8 @@ class Command(BaseCommand):
         task_number = options['task_number']
 
         if len(args) == 4:
-            course_id = args[0]
-            location = args[1]
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+            location = UsageKey.from_string(args[1])
             students_ids = [line.strip() for line in open(args[2])]
             hostname = args[3]
         else:
@@ -51,7 +53,7 @@ class Command(BaseCommand):
             print err
             return
 
-        descriptor = modulestore().get_instance(course.id, location, depth=0)
+        descriptor = modulestore().get_item(location, depth=0)
         if descriptor is None:
             print "Location not found in course"
             return
@@ -76,7 +78,7 @@ def post_submission_for_student(student, course, location, task_number, dry_run=
     request.host = hostname
 
     try:
-        module = get_module_for_student(student, course, location, request=request)
+        module = get_module_for_student(student, location, request=request)
         if module is None:
             print "  WARNING: No state found."
             return False

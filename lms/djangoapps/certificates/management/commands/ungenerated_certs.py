@@ -1,9 +1,12 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from certificates.models import certificate_status_for_student
 from certificates.queue import XQueueCertInterface
 from django.contrib.auth.models import User
 from optparse import make_option
 from django.conf import settings
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.models import CertificateStatuses
@@ -66,25 +69,22 @@ class Command(BaseCommand):
         STATUS_INTERVAL = 500
 
         if options['course']:
-            ended_courses = [options['course']]
+            # try to parse out the course from the serialized form
+            try:
+                course = CourseKey.from_string(options['course'])
+            except InvalidKeyError:
+                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            ended_courses = [course]
         else:
-            # Find all courses that have ended
-            ended_courses = []
-            for course_id in [course  # all courses in COURSE_LISTINGS
-                              for sub in settings.COURSE_LISTINGS
-                              for course in settings.COURSE_LISTINGS[sub]]:
-                course_loc = CourseDescriptor.id_to_location(course_id)
-                course = modulestore().get_instance(course_id, course_loc)
-                if course.has_ended():
-                    ended_courses.append(course_id)
+            raise CommandError("You must specify a course")
 
-        for course_id in ended_courses:
+        for course_key in ended_courses:
             # prefetch all chapters/sequentials by saying depth=2
-            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+            course = modulestore().get_course(course_key, depth=2)
 
-            print "Fetching enrolled students for {0}".format(course_id)
+            print "Fetching enrolled students for {0}".format(course_key.to_deprecated_string())
             enrolled_students = User.objects.filter(
-                courseenrollment__course_id=course_id)
+                courseenrollment__course_id=course_key)
 
             xq = XQueueCertInterface()
             if options['insecure']:
@@ -108,9 +108,9 @@ class Command(BaseCommand):
                     start = datetime.datetime.now(UTC)
 
                 if certificate_status_for_student(
-                        student, course_id)['status'] in valid_statuses:
+                        student, course_key)['status'] in valid_statuses:
                     if not options['noop']:
                         # Add the certificate request to the queue
-                        ret = xq.add_cert(student, course_id, course=course)
+                        ret = xq.add_cert(student, course_key, course=course)
                         if ret == 'generating':
                             print '{0} - {1}'.format(student, ret)

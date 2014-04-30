@@ -14,7 +14,6 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from xmodule.modulestore import Location
 
 from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
                                             get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
@@ -82,7 +81,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     max_grade=1 if i < j else 0.5,
                     student=user,
                     course_id=self.course.id,
-                    module_state_key=Location(self.item.location).url(),
+                    module_state_key=self.item.location,
                     state=json.dumps({'attempts': self.attempts}),
                 )
 
@@ -90,7 +89,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 StudentModuleFactory.create(
                     course_id=self.course.id,
                     module_type='sequential',
-                    module_state_key=Location(self.item.location).url(),
+                    module_state_key=self.item.location,
                 )
 
     def test_get_problem_grade_distribution(self):
@@ -255,7 +254,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_dashboard(self):
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(
             url,
             {

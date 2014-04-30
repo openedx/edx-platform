@@ -1,13 +1,15 @@
 import django_comment_common.models as models
 from django.test import TestCase
 
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+
 
 class RoleClassTestCase(TestCase):
     def setUp(self):
         # For course ID, syntax edx/classname/classdate is important
         # because xmodel.course_module.id_to_location looks for a string to split
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.student_role = models.Role.objects.get_or_create(name="Student",
                                                               course_id=self.course_id)[0]
         self.student_role.add_permission("delete_thread")
@@ -15,7 +17,7 @@ class RoleClassTestCase(TestCase):
                                                                 course_id=self.course_id)[0]
         self.TA_role = models.Role.objects.get_or_create(name="Community TA",
                                                          course_id=self.course_id)[0]
-        self.course_id_2 = "edx/6.002x/2012_Fall"
+        self.course_id_2 = SlashSeparatedCourseKey("edx", "6.002x", "2012_Fall")
         self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",
                                                            course_id=self.course_id_2)[0]
 

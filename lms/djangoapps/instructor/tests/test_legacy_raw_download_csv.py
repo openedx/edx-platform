@@ -24,7 +24,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
         self.instructor = 'view2@test.com'
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.instructor)
-        CourseStaffRole(self.course.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.course.id).add_users(User.objects.get(email=self.instructor))
         self.logout()
         self.login(self.instructor, self.password)
         self.enroll(self.course)
@@ -45,7 +45,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
         resp = self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.assertEqual(resp.status_code, 200)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         msg = "url = {0}\n".format(url)
         response = self.client.post(url, {'action': 'Download CSV of all RAW grades'})
         msg += "instructor dashboard download raw csv grades: response = '{0}'\n".format(response)
