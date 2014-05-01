@@ -1980,14 +1980,14 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
         week3 = ItemFactory.create(due=due)
-        course.children = [week1.location.url(), week2.location.url(),
-                           week3.location.url()]
+        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
+                           week3.location.to_deprecated_string()]
 
         homework = ItemFactory.create(
             parent_location=week1.location,
             due=due
         )
-        week1.children = [homework.location.url()]
+        week1.children = [homework.location.to_deprecated_string()]
 
         user1 = UserFactory.create()
         StudentModule(
@@ -2049,7 +2049,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {
             'student': self.user1.username,
-            'url': self.week1.location.url(),
+            'url': self.week1.location.to_deprecated_string(),
             'due_datetime': '12/30/2013 00:00'
         })
         self.assertEqual(response.status_code, 200, response.content)
@@ -2061,7 +2061,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {
             'student': self.user1.username,
-            'url': self.week1.location.url(),
+            'url': self.week1.location.to_deprecated_string(),
         })
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(None,
@@ -2071,7 +2071,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.test_change_due_date()
         url = reverse('show_unit_extensions',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'url': self.week1.location.url()})
+        response = self.client.get(url, {'url': self.week1.location.to_deprecated_string()})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(json.loads(response.content), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',

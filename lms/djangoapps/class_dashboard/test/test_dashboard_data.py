@@ -155,7 +155,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_students_problem_grades(self):
 
-        attributes = '?module_id=' + self.item.location.url()
+        attributes = '?module_id=' + self.item.location.to_deprecated_string()
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -173,7 +173,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_problem_grades_max(self):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
-            attributes = '?module_id=' + self.item.location.url()
+            attributes = '?module_id=' + self.item.location.to_deprecated_string()
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
@@ -187,7 +187,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_problem_grades_csv(self):
 
         tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
-        attributes = '?module_id=' + self.item.location.url() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -207,7 +207,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_students_opened_subsection(self):
 
-        attributes = '?module_id=' + self.item.location.url()
+        attributes = '?module_id=' + self.item.location.to_deprecated_string()
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -220,7 +220,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
 
-            attributes = '?module_id=' + self.item.location.url()
+            attributes = '?module_id=' + self.item.location.to_deprecated_string()
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
@@ -234,7 +234,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_opened_subsection_csv(self):
 
         tooltip = '4162 student(s) opened Subsection 5: Relational Algebra Exercises'
-        attributes = '?module_id=' + self.item.location.url() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)

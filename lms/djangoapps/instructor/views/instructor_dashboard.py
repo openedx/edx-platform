@@ -172,7 +172,7 @@ def _section_extensions(course):
     section_data = {
         'section_key': 'extensions',
         'section_display_name': _('Extensions'),
-        'units_with_due_dates': [(title_or_url(unit), unit.location.url())
+        'units_with_due_dates': [(title_or_url(unit), unit.location.to_deprecated_string())
                                  for unit in get_units_with_due_date(course)],
         'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id.to_deprecated_string()}),
         'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id.to_deprecated_string()}),

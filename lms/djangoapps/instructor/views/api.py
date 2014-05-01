@@ -1206,9 +1206,9 @@ def _display_unit(unit):
     """
     name = getattr(unit, 'display_name', None)
     if name:
-        return u'{0} ({1})'.format(name, unit.location.url())
+        return u'{0} ({1})'.format(name, unit.location.to_deprecated_string())
     else:
-        return unit.location.url()
+        return unit.location.to_deprecated_string()
 
 
 @handle_dashboard_error

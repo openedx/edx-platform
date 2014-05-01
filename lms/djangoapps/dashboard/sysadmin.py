@@ -259,7 +259,7 @@ class Users(SysadminDashboardView):
         self.msg += u'<ol>'
         for (cdir, course) in courses.items():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(cdir), course.location.url())
+                escape(cdir), course.location.to_deprecated_string())
         self.msg += u'</ol>'
 
     def get(self, request):
