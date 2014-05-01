@@ -394,7 +394,7 @@ LMS_MIGRATION_ALLOWED_IPS = []
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000
+TRACK_MAX_EVENT = 50000
 
 DEBUG_TRACK_LOG = False
 
@@ -407,19 +407,39 @@ TRACKING_BACKENDS = {
     }
 }
 
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+
+EVENT_TRACKING_ENABLED = True
+EVENT_TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking',
+            'max_event_size': TRACK_MAX_EVENT,
+        }
+    }
+}
+EVENT_TRACKING_PROCESSORS = [
+    {
+        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
+    }
+]
+
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
-# In the future, adding the backend to TRACKING_BACKENDS enough.
+# In the future, adding the backend to TRACKING_BACKENDS should be enough.
 if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
         }
     })
-
-# We're already logging events, and we don't want to capture user
-# names/passwords.  Heartbeat events are likely not interesting.
-TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
-TRACKING_ENABLED = True
+    EVENT_TRACKING_BACKENDS.update({
+        'sql': {
+            'ENGINE': 'track.backends.django.DjangoBackend'
+        }
+    })
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = 'GOOGLE_ANALYTICS_ACCOUNT_DUMMY'
