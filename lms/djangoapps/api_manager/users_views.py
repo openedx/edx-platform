@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language, ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,7 +19,9 @@ from api_manager.permissions import ApiKeyHeaderPermission
 from courseware import module_render
 from courseware.model_data import FieldDataCache
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
-from student.models import CourseEnrollment, PasswordHistory
+from lang_pref import LANGUAGE_KEY
+from student.models import CourseEnrollment, PasswordHistory, UserProfile
+from user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -129,6 +131,7 @@ class UsersList(APIView):
             response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
             return Response(response_data, status=status_code)
 
+        # Create the User, UserProfile, and UserPreference records
         try:
             user = User.objects.create(email=email, username=username)
         except IntegrityError:
@@ -138,6 +141,12 @@ class UsersList(APIView):
             user.first_name = first_name
             user.last_name = last_name
             user.save()
+
+            profile = UserProfile(user=user)
+            profile.name = '{} {}'.format(first_name, last_name)
+            profile.save()
+            
+            UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
 
             # add this account creation to password history
             # NOTE, this will be a NOP unless the feature has been turned on in configuration
