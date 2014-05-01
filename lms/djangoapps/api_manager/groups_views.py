@@ -297,7 +297,14 @@ class GroupsGroupsList(APIView):
         response_data = []
         if from_group_relationship:
             base_uri = _generate_base_uri(request)
+            group_type = request.QUERY_PARAMS.get('type', None)
             child_groups = GroupRelationship.objects.filter(parent_group_id=group_id)
+            linked_groups = from_group_relationship.get_linked_group_relationships()
+            if group_type:
+                profiles = GroupProfile.objects.filter(group_type=request.GET['type']).values_list('group_id', flat=True)
+                if profiles:
+                    child_groups = child_groups.filter(group_id__in=profiles)
+                    linked_groups = linked_groups.filter(to_group_relationship__in=profiles)
             if child_groups:
                 for group in child_groups:
                     response_data.append({
@@ -305,7 +312,6 @@ class GroupsGroupsList(APIView):
                         "relationship_type": RELATIONSHIP_TYPES['hierarchical'],
                         "uri": '{}/{}'.format(base_uri, group.group.id)
                     })
-            linked_groups = from_group_relationship.get_linked_group_relationships()
             if linked_groups:
                 for group in linked_groups:
                     response_data.append({

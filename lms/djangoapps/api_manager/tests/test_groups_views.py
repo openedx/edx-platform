@@ -524,6 +524,55 @@ class GroupsApiTests(TestCase):
             self.assertGreater(len(relationship['uri']), 0)
         self.assertEqual(relationship_count, len(group_idlist))
 
+    def test_group_groups_list_get_with_profile_type(self):
+        data = {'name': 'Bravo Group'}
+        bravo_response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(bravo_response.status_code, 201)
+        bravo_group_id = bravo_response.data['id']
+        bravo_groups_uri = bravo_response.data['uri'] + '/groups?type=test_group'
+
+        data = {'name': 'Charlie Group', 'group_type': 'test_group'}
+        charlie_response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(charlie_response.status_code, 201)
+        charlie_group_id = charlie_response.data['id']
+        relationship_type = 'h'  # Hierarchical
+        data = {'group_id': charlie_group_id, 'relationship_type': relationship_type}
+        response = self.do_post(bravo_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        data = {'name': 'Foxtrot Group', 'group_type': 'test_group'}
+        foxtrot_response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(foxtrot_response.status_code, 201)
+        foxtrot_group_id = foxtrot_response.data['id']
+        relationship_type = 'g'  # Graph
+        data = {'group_id': foxtrot_group_id, 'relationship_type': relationship_type}
+        response = self.do_post(bravo_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        data = {'name': 'Tango Group'}
+        tango_response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(tango_response.status_code, 201)
+        tango_group_id = tango_response.data['id']
+        tango_uri = tango_response.data['uri']
+        data = {'group_id': bravo_group_id, 'relationship_type': relationship_type}
+        tango_groups_uri = tango_uri + '/groups'
+        response = self.do_post(tango_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(bravo_groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        group_idlist = (charlie_group_id, foxtrot_group_id)
+        relationship_count = 0
+        for relationship in response.data:
+            relationship_count = relationship_count + 1
+            group_id = relationship['id']
+            self.assertGreater(group_id, 0)
+            self.assertFalse(bravo_group_id == group_id)
+            self.assertTrue(relationship['relationship_type'] in ["h", "g"])
+            self.assertGreater(len(relationship['uri']), 0)
+        self.assertEqual(relationship_count, len(group_idlist))
+
     def test_group_groups_list_get_notfound(self):
         test_uri = self.base_groups_uri + '/213213123/groups'
         response = self.do_get(test_uri)
