@@ -205,26 +205,32 @@ class EnrollInCourseTest(TestCase):
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id_partial = SlashSeparatedCourseKey("edX", "Test101", None)
 
         # Test basic enrollment
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Enrolling them again should be harmless
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
         self.assert_no_events_were_emitted()
 
         # Now unenroll the user
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
         self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Unenrolling them again should also be harmless
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
         self.assert_no_events_were_emitted()
 
         # The enrollment record should still exist, just be inactive
