@@ -17,12 +17,10 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import _CONTENTSTORE
-
-from xmodule.course_module import CourseDescriptor
 
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
@@ -142,12 +140,13 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        _, courses = import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        course_key = courses[0].id
 
-        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall', 'course_info', 'handouts'))
+        handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
         self.assertIn('/static/', handouts.data)
 
-        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall', 'html', 'toyhtml'))
+        handouts = module_store.get_item(course_key.make_usage_key('html', 'toyhtml'))
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):
@@ -165,7 +164,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         conditional_module = module_store.get_item(
-            Location('testX', 'conditional_copy', 'copy_run', 'conditional', 'condone')
+            target_course_id.make_usage_key('conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
         different_course_id = SlashSeparatedCourseKey('edX', 'different_course', 'copy_run')
