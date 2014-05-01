@@ -101,7 +101,10 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
 
         # Create student account
         student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=student, course_id=SlashSeparatedCourseKey.from_deprecated_string(self.course_name))
+        CourseEnrollmentFactory.create(
+            user=student,
+            course_id=SlashSeparatedCourseKey.from_deprecated_string(self.course_name)
+        )
         self.client.login(username=student.username, password="test")
 
         try:

@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
-from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
@@ -117,7 +116,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that locked assets behave appropriately in case user is logged in
         and registered for the course.
         """
-        # pylint: disable=E1101
         CourseEnrollment.enroll(self.user, self.course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
 

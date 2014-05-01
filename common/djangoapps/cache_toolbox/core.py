@@ -110,15 +110,12 @@ def instance_key(model, instance_or_pk):
 
 
 def set_cached_content(content):
-    location_string = content.location.to_deprecated_string()
-    cache.set(unicode(location_string).encode("utf-8"), content)
+    cache.set(unicode(content.location).encode("utf-8"), content)
 
 
 def get_cached_content(location):
-    location_string = location.to_deprecated_string()
-    return cache.get(unicode(location_string).encode("utf-8"))
+    return cache.get(unicode(location).encode("utf-8"))
 
 
 def del_cached_content(location):
-    location_string = location.to_deprecated_string()
-    cache.delete(unicode(location_string).encode("utf-8"))
+    cache.delete(unicode(location).encode("utf-8"))
