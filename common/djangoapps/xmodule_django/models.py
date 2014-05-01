@@ -23,7 +23,7 @@ class CourseKeyField(models.CharField):
 
     def get_prep_value(self, value):
         assert isinstance(value, (NoneType, SlashSeparatedCourseKey))
-        return value.to_deprecated_string() if value else ''
+        return value.to_deprecated_string() if value else None
 
     def validate(self, value, model_instance):
         # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
