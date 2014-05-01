@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from api_manager.models import GroupRelationship
+from api_manager.models import GroupRelationship, GroupProfile
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -182,6 +182,21 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
         group_id = response.data['id']
+        test_uri = self.base_groups_uri + '/' + str(group_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['id'], group_id)
+        confirm_uri = self.test_server_prefix + test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
+        self.assertEqual(response.data['name'], '{:04d}: '.format(group_id))
+
+    def test_group_detail_get_with_missing_profile(self):
+        data = {'name': ''}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        group_id = response.data['id']
+        GroupProfile.objects.get(group_id=group_id).delete()
         test_uri = self.base_groups_uri + '/' + str(group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)

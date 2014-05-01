@@ -122,7 +122,6 @@ class GroupsDetail(APIView):
         response_data['uri'] = _generate_base_uri(request)
         return Response(response_data, status=status.HTTP_201_CREATED)
 
-
     def get(self, request, group_id, format=None):
         """
         GET retrieves an existing group from the system
@@ -140,18 +139,22 @@ class GroupsDetail(APIView):
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/groups'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
-
-        group_profile = GroupProfile.objects.get(group_id=group_id)
-        if len(group_profile.name):
-            response_data['name'] = group_profile.name
+        try:
+            group_profile = GroupProfile.objects.get(group_id=group_id)
+        except ObjectDoesNotExist:
+            group_profile = None
+        if group_profile:
+            if group_profile.name:
+                response_data['name'] = group_profile.name
+            else:
+                response_data['name'] = existing_group.name
+            if group_profile.group_type:
+                response_data['group_type'] = group_profile.group_type
+            data = group_profile.data
+            if data:
+                response_data['data'] = json.loads(data)
         else:
             response_data['name'] = existing_group.name
-        if group_profile.group_type:
-            response_data['group_type'] = group_profile.group_type
-        data = group_profile.data
-        if data:
-            response_data['data'] = json.loads(data)
-
         return Response(response_data, status=status.HTTP_200_OK)
 
 
