@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api_manager import groups_views
+from api_manager.groups import views as groups_views
 
 urlpatterns = patterns('',
     url(r'/*$^', groups_views.GroupsList.as_view()),

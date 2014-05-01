@@ -333,7 +333,7 @@ class GroupsApiTests(TestCase):
     def test_group_users_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/users'
         response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)        
+        self.assertEqual(response.status_code, 404)
 
     def test_group_users_detail_get(self):
         local_username = self.test_username + str(randint(11, 99))
@@ -749,9 +749,19 @@ class GroupsApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 409)
 
-    def test_group_courses_list_post_invalid_resources(self):
+    def test_group_courses_list_post_invalid_group(self):
         test_uri = self.base_groups_uri + '/1239878976/courses'
         data = {'course_id': "98723896"}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_group_courses_list_post_invalid_course(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = response.data['uri'] + '/courses'
+        data = {'course_id': "987/23/896"}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
@@ -777,7 +787,7 @@ class GroupsApiTests(TestCase):
     def test_group_courses_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/courses'
         response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)        
+        self.assertEqual(response.status_code, 404)
 
     def test_group_courses_detail_get(self):
         data = {'name': self.test_group_name}

@@ -56,7 +56,6 @@ TEST_COURSE_OVERVIEW_CONTENT = dedent("""
             <div class="teacher-image">
               <img src="/images/pl-faculty.png" align="left" style="margin:0 20 px 0" alt="Course Staff Image #1">
             </div>
-
             <h3>Staff Member #1</h3>
             <p>Biography of instructor/staff member #1</p>
           </article>
@@ -65,9 +64,16 @@ TEST_COURSE_OVERVIEW_CONTENT = dedent("""
             <div class="teacher-image">
               <img src="/images/pl-faculty.png" align="left" style="margin:0 20 px 0" alt="Course Staff Image #2">
             </div>
-
             <h3>Staff Member #2</h3>
             <p>Biography of instructor/staff member #2</p>
+          </article>
+
+          <article class="author">
+            <div class="author-image">
+              <img src="/images/pl-author.png" align="left" style="margin:0 20 px 0" alt="Author Name">
+            </div>
+            <h3>Author Name</h3>
+            <p>Biography of Author Name</p>
           </article>
         </section>
 

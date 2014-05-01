@@ -6,7 +6,7 @@ from django.conf.urls import patterns, url
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api_manager import courses_views
+from api_manager.courses import views as courses_views
 
 urlpatterns = patterns('',
     url(r'/*$^', courses_views.CoursesList.as_view()),
