@@ -88,7 +88,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if node.location.url() == url:
+        if node.location.to_deprecated_string() == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -132,7 +132,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = node.location.url()
+        title = node.location.to_deprecated_string()
     return title
 
 

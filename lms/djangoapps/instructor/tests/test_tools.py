@@ -99,7 +99,7 @@ class TestFindUnit(ModuleStoreTestCase):
         """
         Test finding a nested unit.
         """
-        url = self.homework.location.url()
+        url = self.homework.location.to_deprecated_string()
         self.assertEqual(tools.find_unit(self.course, url), self.homework)
 
     def test_find_unit_notfound(self):
@@ -124,13 +124,13 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
-        course.children = [week1.location.url(), week2.location.url()]
+        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string()]
 
         homework = ItemFactory.create(
             parent_location=week1.location,
             due=due
         )
-        week1.children = [homework.location.url()]
+        week1.children = [homework.location.to_deprecated_string()]
 
         self.course = course
         self.week1 = week1
@@ -140,7 +140,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
 
         def urls(seq):
             "URLs for sequence of nodes."
-            return sorted(i.location.url() for i in seq)
+            return sorted(i.location.to_deprecated_string() for i in seq)
 
         self.assertEquals(
             urls(tools.get_units_with_due_date(self.course)),
@@ -174,13 +174,13 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
-        course.children = [week1.location.url(), week2.location.url()]
+        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string()]
 
         homework = ItemFactory.create(
             parent_location=week1.location,
             due=due
         )
-        week1.children = [homework.location.url()]
+        week1.children = [homework.location.to_deprecated_string()]
 
         user = UserFactory.create()
         StudentModule(
@@ -230,14 +230,14 @@ class TestDataDumps(ModuleStoreTestCase):
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
         week3 = ItemFactory.create(due=due)
-        course.children = [week1.location.url(), week2.location.url(),
-                           week3.location.url()]
+        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
+                           week3.location.to_deprecated_string()]
 
         homework = ItemFactory.create(
             parent_location=week1.location,
             due=due
         )
-        week1.children = [homework.location.url()]
+        week1.children = [homework.location.to_deprecated_string()]
 
         user1 = UserFactory.create()
         StudentModule(
