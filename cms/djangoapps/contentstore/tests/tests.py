@@ -10,7 +10,6 @@ from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_url
 
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -236,13 +235,13 @@ class AuthTestCase(ContentStoreTestCase):
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
         auth_pages = (
-            reverse_url('course_handler'),
+            '/course/',
         )
 
         # These are pages that should just load when the user is logged in
         # (no data needed)
         simple_auth_pages = (
-            reverse_url('course_handler'),
+            '/course/',
         )
 
         # need an activated user
@@ -268,7 +267,7 @@ class AuthTestCase(ContentStoreTestCase):
     def test_index_auth(self):
 
         # not logged in.  Should return a redirect.
-        resp = self.client.get_html(reverse_url('course_handler'))
+        resp = self.client.get_html('/course/')
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
@@ -285,7 +284,7 @@ class AuthTestCase(ContentStoreTestCase):
         self.login(self.email, self.pw)
 
         # make sure we can access courseware immediately
-        course_url = reverse_url('course_handler')
+        course_url = '/course/'
         resp = self.client.get_html(course_url)
         self.assertEquals(resp.status_code, 200)
 
