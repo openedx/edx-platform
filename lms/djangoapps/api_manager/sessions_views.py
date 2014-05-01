@@ -13,6 +13,8 @@ from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from api_manager.permissions import ApiKeyHeaderPermission
@@ -30,81 +32,81 @@ def _generate_base_uri(request):
     resource_uri = '{}://{}{}'.format(
         protocol,
         request.get_host(),
-        request.path
+        request.get_full_path()
     )
     return resource_uri
 
 
-@api_view(['POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def session_list(request):
-    """
-    POST creates a new system session, supported authentication modes:
-    1. Open edX username/password
-    """
-    response_data = {}
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        response_data['message'] = _('Rate limit exceeded in api login.')
-        return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+class SessionsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    base_uri = _generate_base_uri(request)
-    try:
-        existing_user = User.objects.get(username=request.DATA['username'])
-    except ObjectDoesNotExist:
-        existing_user = None
+    def post(self, request, format=None):
+        """
+        POST creates a new system session, supported authentication modes:
+        1. Open edX username/password
+        """
+        response_data = {}
+        # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+        limiter = BadRequestRateLimiter()
+        if limiter.is_rate_limit_exceeded(request):
+            response_data['message'] = _('Rate limit exceeded in api login.')
+            return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
-    # see if account has been locked out due to excessive login failures
-    if existing_user and LoginFailures.is_feature_enabled():
-        if LoginFailures.is_user_locked_out(existing_user):
-            response_status = status.HTTP_403_FORBIDDEN
-            response_data['message'] = _('This account has been temporarily locked due to excessive login failures. '
-                                         'Try again later.')
-            return Response(response_data, status=response_status)
+        base_uri = _generate_base_uri(request)
+        try:
+            existing_user = User.objects.get(username=request.DATA['username'])
+        except ObjectDoesNotExist:
+            existing_user = None
 
-    if existing_user:
-        user = authenticate(username=existing_user.username, password=request.DATA['password'])
-        if user is not None:
-
-            # successful login, clear failed login attempts counters, if applicable
-            if LoginFailures.is_feature_enabled():
-                LoginFailures.clear_lockout_counter(user)
-
-            if user.is_active:
-                login(request, user)
-                response_data['token'] = request.session.session_key
-                response_data['expires'] = request.session.get_expiry_age()
-                user_dto = UserSerializer(user)
-                response_data['user'] = user_dto.data
-                response_data['uri'] = '{}/{}'.format(base_uri, request.session.session_key)
-                response_status = status.HTTP_201_CREATED
-            else:
+        # see if account has been locked out due to excessive login failures
+        if existing_user and LoginFailures.is_feature_enabled():
+            if LoginFailures.is_user_locked_out(existing_user):
                 response_status = status.HTTP_403_FORBIDDEN
+                response_data['message'] = _('This account has been temporarily locked due to excessive login failures. '
+                                             'Try again later.')
+                return Response(response_data, status=response_status)
+
+        if existing_user:
+            user = authenticate(username=existing_user.username, password=request.DATA['password'])
+            if user is not None:
+
+                # successful login, clear failed login attempts counters, if applicable
+                if LoginFailures.is_feature_enabled():
+                    LoginFailures.clear_lockout_counter(user)
+
+                if user.is_active:
+                    login(request, user)
+                    response_data['token'] = request.session.session_key
+                    response_data['expires'] = request.session.get_expiry_age()
+                    user_dto = UserSerializer(user)
+                    response_data['user'] = user_dto.data
+                    response_data['uri'] = '{}/{}'.format(base_uri, request.session.session_key)
+                    response_status = status.HTTP_201_CREATED
+                else:
+                    response_status = status.HTTP_401_UNAUTHORIZED
+            else:
+                limiter.tick_bad_request_counter(request)
+                # tick the failed login counters if the user exists in the database
+                if LoginFailures.is_feature_enabled():
+                    LoginFailures.increment_lockout_counter(existing_user)
+
+                response_status = status.HTTP_401_UNAUTHORIZED
         else:
-            limiter.tick_bad_request_counter(request)
-            # tick the failed login counters if the user exists in the database
-            if LoginFailures.is_feature_enabled():
-                LoginFailures.increment_lockout_counter(existing_user)
-
-            response_status = status.HTTP_401_UNAUTHORIZED
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=response_status)
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
 
 
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def session_detail(request, session_id):
-    """
-    GET retrieves an existing system session
-    DELETE flushes an existing system session from the system
-    """
-    response_data = {}
-    base_uri = _generate_base_uri(request)
-    engine = import_module(settings.SESSION_ENGINE)
-    session = engine.SessionStore(session_id)
-    if request.method == 'GET':
+class SessionsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, session_id, format=None):
+        """
+        GET retrieves an existing system session
+        """
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore(session_id)
         try:
             user_id = session[SESSION_KEY]
             backend_path = session[BACKEND_SESSION_KEY]
@@ -120,6 +122,14 @@ def session_detail(request, session_id):
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
-    elif request.method == 'DELETE':
+
+    def delete(self, request, session_id, format=None):
+        """
+        DELETE flushes an existing system session from the system
+        """
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore(session_id)
         session.flush()
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)

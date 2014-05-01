@@ -30,7 +30,6 @@ class PermissionsTestsDebug(TestCase):
         response = self.client.post(uri, headers=headers, data=data)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_has_permission_debug_enabled(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -57,7 +56,6 @@ class PermissionsTestsApiKey(TestCase):
         response = self.client.post(uri, headers=headers, data=data)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_has_permission_valid_api_key(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -84,7 +82,6 @@ class PermissionsTestDeniedMissingServerKey(TestCase):
         response = self.client.post(uri, headers=headers, data=data)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_has_permission_missing_server_key(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -110,7 +107,6 @@ class PermissionsTestDeniedMissingClientKey(TestCase):
         response = self.client.post(uri, headers=headers, data=data)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_has_permission_invalid_client_key(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -137,7 +133,6 @@ class PermissionsTestDeniedInvalidClientKey(TestCase):
         response = self.client.post(uri, headers=headers, data=data)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_has_permission_invalid_client_key(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))

@@ -4,19 +4,24 @@ The order of the URIs really matters here, due to the slash characters present i
 """
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns(
-    'api_manager.courses_views',
-    url(r'/*$^', 'courses_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)/submodules/*$', 'modules_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)$', 'modules_detail'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/*$', 'modules_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/(?P<group_id>[0-9]+)$', 'courses_groups_detail'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/*$', 'courses_groups_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/overview$', 'course_overview'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/updates$', 'course_updates'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs/(?P<tab_id>[a-zA-Z0-9/_:]+)$', 'static_tab_detail'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs$', 'static_tabs_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users$', 'course_users_list'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/tree/(?P<depth>[0-9]+)$', 'course_tree'),
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'courses_detail'),
+from rest_framework.urlpatterns import format_suffix_patterns
+
+from api_manager import courses_views
+
+urlpatterns = patterns('',
+    url(r'/*$^', courses_views.CoursesList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)$', courses_views.CoursesDetail.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)/submodules/*$', courses_views.ModulesList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)$', courses_views.ModulesDetail.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/*$', courses_views.ModulesList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/(?P<group_id>[0-9]+)$', courses_views.CoursesGroupsDetail.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/*$', courses_views.CoursesGroupsList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/overview$', courses_views.CoursesOverview.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/updates$', courses_views.CoursesUpdates.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs/(?P<tab_id>[a-zA-Z0-9/_:]+)$', courses_views.CoursesStaticTabsDetail.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs$', courses_views.CoursesStaticTabsList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users/(?P<user_id>[0-9]+)$', courses_views.CoursesUsersDetail.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users$', courses_views.CoursesUsersList.as_view()),
 )
+
+urlpatterns = format_suffix_patterns(urlpatterns)

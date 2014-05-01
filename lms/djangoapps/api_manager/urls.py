@@ -10,9 +10,11 @@
 
 from django.conf.urls import include, patterns, url
 
-urlpatterns = patterns('api_manager.system_views',
-                       url(r'^$', 'api_detail'),
-                       url(r'^system$', 'system_detail'),
+from api_manager import system_views
+
+urlpatterns = patterns('',
+                       url(r'^$', system_views.ApiDetail.as_view()),
+                       url(r'^system$', system_views.SystemDetail.as_view()),
                        url(r'^users/*', include('api_manager.users_urls')),
                        url(r'^groups/*', include('api_manager.groups_urls')),
                        url(r'^sessions/*', include('api_manager.sessions_urls')),

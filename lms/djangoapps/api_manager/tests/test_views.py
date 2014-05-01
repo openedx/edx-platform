@@ -46,7 +46,6 @@ class SystemApiTests(TestCase):
         response = self.client.get(uri, headers=headers)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_system_detail_get(self):
         """ Ensure the system returns base data about the system """
         test_uri = self.test_server_prefix + '/system'
@@ -62,7 +61,6 @@ class SystemApiTests(TestCase):
         self.assertIsNotNone(response.data['description'])
         self.assertGreater(len(response.data['description']), 0)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_system_detail_api_get(self):
         """ Ensure the system returns base data about the API """
         test_uri = self.test_server_prefix
