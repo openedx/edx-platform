@@ -673,7 +673,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # actual change b/c the descriptor and cache probably point to the same objects
         old_definition = self.db_connection.get_definition(definition_locator.definition_id)
         if old_definition is None:
-            raise ItemNotFoundError(definition_locator.url())
+            raise ItemNotFoundError(definition_locator.to_deprecated_string())
 
         if needs_saved():
             # new id to create new version

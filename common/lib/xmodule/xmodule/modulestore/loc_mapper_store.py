@@ -527,7 +527,7 @@ class LocMapperStore(object):
 
         delete_keys.append(unicode(published_usage))
         delete_keys.append(unicode(draft_usage))
-        delete_keys.append(u'{}+{}'.format(old_course_id, location.url()))
+        delete_keys.append(u'{}+{}'.format(old_course_id, location.to_deprecated_string()))
         delete_keys.append(old_course_id)
         self.cache.delete_many(delete_keys)
 

@@ -36,7 +36,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print("strip filename from {desc}".format(desc=descriptor.location.url()))
+    print("strip filename from {desc}".format(desc=descriptor.location.to_deprecated_string()))
     if descriptor._field_data.has(descriptor, 'filename'):
         descriptor._field_data.delete(descriptor, 'filename')
 
@@ -174,10 +174,10 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
     def test_encode_location(self):
         loc = Location('org', 'course', 'run', 'category', 'name', None)
-        self.assertEqual(loc.url(), self.encoder.default(loc))
+        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
 
         loc = Location('org', 'course', 'run', 'category', 'name', 'version')
-        self.assertEqual(loc.url(), self.encoder.default(loc))
+        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):
         self.assertEqual(
