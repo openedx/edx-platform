@@ -25,6 +25,7 @@ class Command(BaseCommand):
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
     notpassing   - The student was graded but is not passing
+    enrolled     - The student is enrolled
 
     """
 
@@ -61,8 +62,7 @@ class Command(BaseCommand):
             # find students who are enrolled
             print "Looking up certificate states for {0}".format(course_id)
             enrolled_students = User.objects.filter(
-                    courseenrollment__course_id=course_id,
-                    courseenrollment__is_active=True)
+                    courseenrollment__course_id=course_id)
             cert_data[course_id] = {'enrolled': enrolled_students.count()}
 
             tallies = GeneratedCertificate.objects.filter(
