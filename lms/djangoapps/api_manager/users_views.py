@@ -27,7 +27,7 @@ from util.password_policy_validators import (
 )
 
 log = logging.getLogger(__name__)
-
+AUDIT_LOG = logging.getLogger("audit")
 
 def _generate_base_uri(request):
     """
@@ -144,6 +144,9 @@ class UsersList(APIView):
             password_history_entry = PasswordHistory()
             password_history_entry.create(user)
 
+            # add to audit log
+            AUDIT_LOG.info(u"API::New account created with user-id - {0}".format(user.id))
+
             # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
             # auto-enroll students when they create a new account. Also be sure to remove from
             # the CourseEnrollmentAllow table after the auto-registration has taken place
@@ -155,6 +158,7 @@ class UsersList(APIView):
             status_code = status.HTTP_409_CONFLICT
             response_data['message'] = "User '%s' already exists", username
             response_data['field_conflict'] = "username"
+
         return Response(response_data, status=status_code)
 
 
