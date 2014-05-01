@@ -260,7 +260,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
-                        self.system.location.url(), self.system.anonymous_student_id
+                        self.system.location.to_deprecated_string(), self.system.anonymous_student_id
                     ))
                 return None
             count_graded = response['count_graded']

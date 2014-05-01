@@ -326,7 +326,7 @@ def import_module(
         source_course_id, dest_course_id,
         do_import_static=True, system=None):
 
-    logging.debug(u'processing import of module {}...'.format(module.location.url()))
+    logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
 
     if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
@@ -563,7 +563,7 @@ def check_module_metadata_editability(module):
         print(
             ": found non-editable metadata on {url}. "
             "These metadata keys are not supported = {keys}".format(
-                url=module.location.url(), keys=illegal_keys
+                url=module.location.to_deprecated_string(), keys=illegal_keys
             )
         )
 

@@ -67,7 +67,7 @@ class ABTestModule(ABTestFields, XModule):
 
     def get_child_descriptors(self):
         active_locations = set(self.group_content[self.group])
-        return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
+        return [desc for desc in self.descriptor.get_children() if desc.location.to_deprecated_string() in active_locations]
 
     def displayable_items(self):
         # Most modules return "self" as the displayable_item. We never display ourself

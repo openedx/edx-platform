@@ -45,12 +45,12 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             self,
             CourseLocationGenerator(self.course_id),
         )
-        self._descriptors[descriptor.location.url()] = descriptor
+        self._descriptors[descriptor.location.to_deprecated_string()] = descriptor
         return descriptor
 
     def load_item(self, location):  # pylint: disable=method-hidden
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[location.url()]
+        return self._descriptors[location.to_deprecated_string()]
 
 
 class XModuleXmlImportTest(TestCase):
