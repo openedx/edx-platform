@@ -50,7 +50,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
 
         # Select the Email view of the instructor dash
         session = self.client.session
-        session['idash_mode'] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_id)] = 'Email'
         session.save()
         response = self.client.get(self.url)
 
