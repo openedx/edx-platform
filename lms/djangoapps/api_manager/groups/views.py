@@ -86,7 +86,7 @@ class GroupsList(APIView):
         for profile in profiles:
             item_data = {}
             item_data['group_id'] = profile.group_id
-            if len(profile.name):
+            if profile.name and len(profile.name):
                 group_name = profile.name
             else:
                 group = Group.objects.get(id=profile.group_id)
