@@ -17,7 +17,7 @@ import requests
 
 IGNORED_EMAILS = set(("vagrant@precise32.(none)",))
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
-PR_BRANCH_RE = re.compile(r"remotes/origin/pr/(\d+)")
+PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
 PROJECT_ROOT = path(__file__).abspath().dirname()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
@@ -26,11 +26,11 @@ git = repo.git
 def make_parser():
     parser = argparse.ArgumentParser(description="release master multitool")
     parser.add_argument(
-        '--previous', '--prev', '-p', metavar="GITREV", default="origin/release",
-        help="previous release [origin/release]")
+        '--previous', '--prev', '-p', metavar="GITREV", default="edx/release",
+        help="previous release [%(default)s]")
     parser.add_argument(
         '--current', '--curr', '-c', metavar="GITREV", default="HEAD",
-        help="current release candidate [HEAD]")
+        help="current release candidate [%(default)s]")
     parser.add_argument(
         '--date', '-d',
         help="expected release date: defaults to "
@@ -41,19 +41,16 @@ def make_parser():
     parser.add_argument(
         '--table', '-t', action="store_true", default=False,
         help="only print table")
-    parser.add_argument(
-        '--commit-table', action="store_true", default=False,
-        help="Display table by commit, instead of by PR")
     return parser
 
 
 def ensure_pr_fetch():
     # it would be nice to use the git-python API to do this, but it doesn't seem
     # to support configurations with more than one value per key. :(
-    origin_fetches = git.config("remote.origin.fetch", get_all=True).splitlines()
-    pr_fetch = '+refs/pull/*/head:refs/remotes/origin/pr/*'
-    if pr_fetch not in origin_fetches:
-        git.config("remote.origin.fetch", pr_fetch, add=True)
+    edx_fetches = git.config("remote.edx.fetch", get_all=True).splitlines()
+    pr_fetch = '+refs/pull/*/head:refs/remotes/edx/pr/*'
+    if pr_fetch not in edx_fetches:
+        git.config("remote.edx.fetch", pr_fetch, add=True)
         git.fetch()
 
 
@@ -74,44 +71,6 @@ def parse_ticket_references(text):
     message. If there are no ticket references, return an empty list.
     """
     return JIRA_RE.findall(text)
-
-
-def emails(commit_range):
-    """
-    Returns a set of all email addresses responsible for the commits between
-    the two commit references.
-    """
-    # %ae prints the authored_by email for the commit
-    # %n prints a newline
-    # %ce prints the committed_by email for the commit
-    emails = set(git.log(commit_range, format='%ae%n%ce').splitlines())
-    return emails - IGNORED_EMAILS
-
-
-def commits_by_email(commit_range, include_merge=False):
-    """
-    Return a ordered dictionary of {email: commit_list}
-    The dictionary is alphabetically ordered by email address
-    The commit list is ordered by commit author date
-    """
-    kwargs = {}
-    if not include_merge:
-        kwargs["no-merges"] = True
-
-    data = OrderedDict()
-    for email in sorted(emails(commit_range)):
-        authored_commits = set(repo.iter_commits(
-            commit_range, author=email, **kwargs
-        ))
-        committed_commits = set(repo.iter_commits(
-            commit_range, committer=email, **kwargs
-        ))
-        commits = authored_commits | committed_commits
-        data[email] = sorted(commits, key=lambda c: c.authored_date)
-    return data
-
-
-class NotFoundError(Exception): pass
 
 
 def get_pr_for_commit(commit, branch="master"):
@@ -165,60 +124,6 @@ def get_merge_commit(commit, branch="master"):
         commit=commit, branch=branch,
     ))
 
-def get_prs_for_commit_range(commit_range):
-    """
-    Returns a set of pull requests (integers) that contain all the commits
-    in the given commit range.
-    """
-    pull_requests = set()
-    for commit in Commit.iter_items(repo, commit_range):
-        # ignore merge commits
-        if len(commit.parents) > 1:
-            continue
-        pull_requests.add(get_pr_for_commit(commit))
-    return pull_requests
-
-
-def prs_by_email(commit_range):
-    """
-    Returns an ordered dictionary of {email: pr_list}
-    Email is the email address of the person who merged the pull request
-    The dictionary is alphabetically ordered by email address
-    The pull request list is ordered by merge date
-    """
-    unordered_data = defaultdict(set)
-    for pr_num in get_prs_for_commit_range(commit_range):
-        ref = "refs/remotes/origin/pr/{num}".format(num=pr_num)
-        branch = SymbolicReference(repo, ref)
-        merge = get_merge_commit(branch.commit)
-        unordered_data[merge.author.email].add((pr_num, merge))
-
-    ordered_data = OrderedDict()
-    for email in sorted(unordered_data.keys()):
-        ordered = sorted(unordered_data[email], key=lambda pair: pair[1].authored_date)
-        ordered_data[email] = [num for num, merge in ordered]
-    return ordered_data
-
-
-def generate_table_by_commit(commit_range, include_merge=False):
-    """
-    Return a string corresponding to a commit table to embed in Confluence
-    """
-    header = "||Author||Summary||Commit||JIRA||Verified?||"
-    commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
-    rows = [header]
-    cbe = commits_by_email(commit_range, include_merge)
-    for email, commits in cbe.items():
-        for i, commit in enumerate(commits):
-            rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
-                author=email if i == 0 else "",
-                summary=commit.summary.replace("|", "\|"),
-                commit=commit_link.format(sha=commit.hexsha),
-                jira=", ".join(parse_ticket_references(commit.message)),
-                verified="",
-            ))
-    return "\n".join(rows)
-
 
 def get_pr_info(num):
     """
@@ -232,14 +137,58 @@ def get_pr_info(num):
     return result
 
 
-def generate_table_by_pr(commit_range):
+def get_merged_prs(start_ref, end_ref):
+    """
+    Return the set of all pull requests (as integers) that were merged between
+    the start_ref and end_ref.
+    """
+    ensure_pr_fetch()
+    start_unmerged_branches = set(
+        branch.strip() for branch in
+        git.branch(all=True, no_merged=start_ref).splitlines()
+    )
+    end_merged_branches = set(
+        branch.strip() for branch in
+        git.branch(all=True, merged=end_ref).splitlines()
+    )
+    merged_between_refs = start_unmerged_branches & end_merged_branches
+    merged_prs = set()
+    for branch in merged_between_refs:
+        match = PR_BRANCH_RE.search(branch)
+        if match:
+            merged_prs.add(int(match.group(1)))
+    return merged_prs
+
+
+def prs_by_email(start_ref, end_ref):
+    """
+    Returns an ordered dictionary of {email: pr_list}
+    Email is the email address of the person who merged the pull request
+    The dictionary is alphabetically ordered by email address
+    The pull request list is ordered by merge date
+    """
+    unordered_data = defaultdict(set)
+    for pr_num in get_merged_prs(start_ref, end_ref):
+        ref = "refs/remotes/edx/pr/{num}".format(num=pr_num)
+        branch = SymbolicReference(repo, ref)
+        merge = get_merge_commit(branch.commit, end_ref)
+        unordered_data[merge.author.email].add((pr_num, merge))
+
+    ordered_data = OrderedDict()
+    for email in sorted(unordered_data.keys()):
+        ordered = sorted(unordered_data[email], key=lambda pair: pair[1].authored_date)
+        ordered_data[email] = [num for num, merge in ordered]
+    return ordered_data
+
+
+def generate_table(start_ref, end_ref):
     """
     Return a string corresponding to a commit table to embed in Confluence
     """
     header = "|| Merged By || Title || PR || JIRA || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
     rows = [header]
-    prbe = prs_by_email(commit_range)
+    prbe = prs_by_email(start_ref, end_ref)
     for email, pull_requests in prbe.items():
         for i, pull_request in enumerate(pull_requests):
             try:
@@ -265,12 +214,13 @@ def generate_table_by_pr(commit_range):
     return "\n".join(rows)
 
 
-def generate_email(commit_range, release_date=None):
+def generate_email(start_ref, end_ref, release_date=None):
     """
     Returns a string roughly approximating an email.
     """
     if release_date is None:
         release_date = default_release_date()
+    prbe = prs_by_email(start_ref, end_ref)
 
     email = """
         To: {emails}
@@ -286,7 +236,7 @@ def generate_email(commit_range, release_date=None):
         the edX employee who merged in your pull request will manually verify
         your change(s), and you may disregard this message.
     """.format(
-        emails=", ".join(sorted(emails(commit_range))),
+        emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
     )
     return textwrap.dedent(email).strip()
@@ -298,17 +248,13 @@ def main():
     if isinstance(args.date, basestring):
         # user passed in a custom date, so we need to parse it
         args.date = parse_datestring(args.date).date()
-    commit_range = "{0}..{1}".format(args.previous, args.current)
 
     if args.table:
-        if args.commit_table:
-            print(generate_table_by_commit(commit_range, include_merge=args.merge))
-        else:
-            print(generate_table_by_pr(commit_range))
+        print(generate_table(args.previous, args.current))
         return
 
     print("EMAIL:")
-    print(generate_email(commit_range, release_date=args.date).encode('UTF-8'))
+    print(generate_email(args.previous, args.current, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
     print(
@@ -316,10 +262,7 @@ def main():
         "in your release wiki page"
     )
     print("\n")
-    if args.commit_table:
-        print(generate_table_by_commit(commit_range, include_merge=args.merge))
-    else:
-        print(generate_table_by_pr(commit_range))
+    print(generate_table(args.previous, args.current))
 
 if __name__ == "__main__":
     main()
