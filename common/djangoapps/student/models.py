@@ -43,6 +43,7 @@ import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 from xmodule.modulestore.keys import CourseKey
+from functools import total_ordering
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -962,6 +963,7 @@ class CourseEnrollmentAllowed(models.Model):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
 
+@total_ordering
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -993,12 +995,9 @@ class CourseAccessRole(models.Model):
         """
         return type(self) == type(other) and self._key == other._key
 
-    def __ne__(self, other):
-        return type(self) != type(other) or self._key != other._key
-
     def __hash__(self):
         return hash(self._key)
-    
+
     def __lt__(self, other):
         """
         Lexigraphic sort
