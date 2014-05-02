@@ -18,7 +18,7 @@ class VerticalModule(VerticalFields, XModule):
 
     def student_view(self, context):
         # When rendering a Studio preview, use a different template to support drag and drop.
-        if context and context['runtime_type'] == 'studio':
+        if context and context.get('runtime_type', None) == 'studio':
             return self.studio_preview_view(context)
 
         return self.render_view(context, 'vert_module.html')
