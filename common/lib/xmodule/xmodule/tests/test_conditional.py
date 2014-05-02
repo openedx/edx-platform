@@ -89,7 +89,7 @@ class ConditionalFactory(object):
         field_data = DictFieldData({
             'data': '<conditional/>',
             'xml_attributes': {'attempted': 'true'},
-            'children': [child_descriptor.location.to_deprecated_string()],
+            'children': [child_descriptor.location],
         })
 
         cond_descriptor = ConditionalDescriptor(
