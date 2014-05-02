@@ -73,39 +73,6 @@ def parse_ticket_references(text):
     return JIRA_RE.findall(text)
 
 
-def get_pr_for_commit(commit, branch="master"):
-    """
-    http://stackoverflow.com/questions/8475448/find-merge-commit-which-include-a-specific-commit
-    """
-    remote_branch = git.describe(commit, all=True, contains=True)
-    match = PR_BRANCH_RE.search(remote_branch)
-    if match:
-        pr_num = int(match.group(1))
-        return pr_num
-    # if `git describe` didn't work, we need to use `git branch` -- it's slower
-    remote_branches = git.branch(commit, all=True, contains=True).splitlines()
-    for remote_branch in remote_branches:
-        remote_branch = remote_branch.strip()
-        match = PR_BRANCH_RE.search(remote_branch)
-        if match:
-            pr_num = int(match.group(1))
-            # we have a pull request -- but is it the right one?
-            ref = SymbolicReference(repo, "refs/{}".format(remote_branch))
-            merge_base = git.merge_base(ref, branch)
-            rev = "{base}^..{branch}".format(base=merge_base, branch=remote_branch)
-            pr_commits = list(Commit.iter_items(repo, rev))
-            if commit in pr_commits:
-                # found it!
-                return pr_num
-    err = NotFoundError(
-        "Can't find pull request for commit {commit} against branch {branch}".format(
-            commit=commit, branch=branch,
-        )
-    )
-    err.commit = commit
-    raise err
-
-
 def get_merge_commit(commit, branch="master"):
     """
     Given a commit that was merged into the given branch, return the merge commit
