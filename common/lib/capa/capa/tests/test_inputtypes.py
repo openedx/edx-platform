@@ -717,9 +717,7 @@ class MatlabTest(unittest.TestCase):
 
 def html_tree_equal(received, expected):
     """
-
-    :param received:
-    :param expected:
+    Returns whether two etree Elements are the same, with insensitivity to attribute order.
     """
     if received.tag != expected.tag or received.attrib != expected.attrib:
         return False
