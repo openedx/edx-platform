@@ -15,7 +15,6 @@ from collections import OrderedDict, defaultdict
 import textwrap
 import requests
 
-IGNORED_EMAILS = set(("vagrant@precise32.(none)",))
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
 PROJECT_ROOT = path(__file__).abspath().dirname()
