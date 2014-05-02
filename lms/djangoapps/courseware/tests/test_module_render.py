@@ -556,11 +556,12 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
         child_descriptor = ItemFactory.create(
             category='vertical',
-            parent_location = descriptor.location
+            parent_location=descriptor.location
         )
 
         self.module = self._get_module(course.id, descriptor, descriptor.location)
 
+        # pylint: disable=W0201
         self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
 
     def setup_xml_course(self):
