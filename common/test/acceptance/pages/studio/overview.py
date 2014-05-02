@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .unit import UnitPage
-from . import BASE_URL
+
 
 class CourseOutlineContainer(object):
     """
