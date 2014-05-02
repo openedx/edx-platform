@@ -26,10 +26,10 @@ for details.
 Documentation
 ------------
 
-High-level documentation of the code is located in the `docs` subdirectory.
-Most (although not all) of our documentation is built using
+Documentation for developers, researchers, and course staff is located in the
+`docs` subdirectory. Documentation is built using
 [Sphinx](http://sphinx-doc.org/): you can [view the built documentation on
-ReadTheDocs](http://edx.readthedocs.org/).
+ReadTheDocs](http://docs.edx.org/).
 
 How to Contribute
 -----------------
