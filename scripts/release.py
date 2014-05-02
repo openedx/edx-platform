@@ -155,8 +155,9 @@ def generate_table(start_ref, end_ref):
     """
     Return a string corresponding to a commit table to embed in Confluence
     """
-    header = "|| Merged By || Title || PR || JIRA || Verified? ||"
+    header = "|| Merged By || Author || Title || PR || JIRA || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
+    user_link = "[@{user}|https://github.com/{user}]"
     rows = [header]
     prbe = prs_by_email(start_ref, end_ref)
     for email, pull_requests in prbe.items():
@@ -165,6 +166,7 @@ def generate_table(start_ref, end_ref):
                 pr_info = get_pr_info(pull_request)
                 title = pr_info["title"] or ""
                 body = pr_info["body"] or ""
+                author = pr_info["user"]["login"]
             except requests.exceptions.RequestException as e:
                 print(
                     "Warning: could not fetch data for #{num}: {message}".format(
@@ -174,8 +176,10 @@ def generate_table(start_ref, end_ref):
                 )
                 title = "?"
                 body = "?"
-            rows.append("| {merged_by} | {title} | {pull_request} | {jira} | {verified} |".format(
+                author = ""
+            rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {verified} |".format(
                 merged_by=email if i == 0 else "",
+                author=user_link.format(user=author) if author else "",
                 title=title.replace("|", "\|"),
                 pull_request=pr_link.format(num=pull_request),
                 jira=", ".join(parse_ticket_references(body)),
