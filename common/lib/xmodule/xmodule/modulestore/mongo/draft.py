@@ -193,13 +193,12 @@ class DraftModuleStore(MongoModuleStore):
         draft.published_by = published_by_id
         if draft.has_children:
             if original_published is not None:
-                course_key = location.course_key
                 # see if children were deleted. 2 reasons for children lists to differ:
                 #   1) child deleted
                 #   2) child moved
                 for child in original_published.children:
                     if child not in draft.children:
-                        child_i4x = course_key.make_usage_key_from_deprecated_string(child)
+                        child_i4x = child
                         rents = self.get_parent_locations(child_i4x)
                         if (len(rents) == 1 and rents[0] == location):  # the 1 is this original_published
                             self.delete_item(child_i4x, True)
