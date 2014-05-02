@@ -347,8 +347,7 @@ class LTIModule(LTIFields, XModule):
         """
         Return course by course id.
         """
-        course = self.descriptor.runtime.modulestore.get_course(self.course_id)
-        return course
+        return self.descriptor.runtime.modulestore.get_course(self.course_id)
 
     @property
     def context_id(self):

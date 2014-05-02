@@ -259,7 +259,7 @@ class CapaMixin(CapaFields):
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, self.location.url)
+            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 

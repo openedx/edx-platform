@@ -20,6 +20,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
+from xmodule.modulestore.keys import UsageKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.field_data import DictFieldData
@@ -260,6 +261,36 @@ class CourseLocationGenerator(IdGenerator):
         return self.course_id.make_usage_key(block_type, slug)
 
 
+def _make_usage_key(course_key, value):
+    """
+    Makes value into a UsageKey inside the specified course.
+    If value is already a UsageKey, returns that.
+    """
+    if isinstance(value, UsageKey):
+        return value
+    return course_key.make_usage_key_from_deprecated_string(value)
+
+
+def _convert_reference_fields_to_keys(xblock):  # pylint: disable=invalid-name
+    """
+    Find all fields of type reference and convert the payload into UsageKeys
+    """
+    course_key = xblock.scope_ids.usage_id.course_key
+
+    for field in xblock.fields.itervalues():
+        if field.is_set_on(xblock):
+            field_value = getattr(xblock, field.name)
+            if isinstance(field, Reference):
+                setattr(xblock, field.name, _make_usage_key(course_key, field_value))
+            elif isinstance(field, ReferenceList):
+                setattr(xblock, field.name, [_make_usage_key(course_key, ele) for ele in field_value])
+            elif isinstance(field, ReferenceValueDict):
+                for key, subvalue in field_value.iteritems():
+                    assert isinstance(subvalue, basestring)
+                    field_value[key] = _make_usage_key(course_key, subvalue)
+                setattr(xblock, field.name, field_value)
+
+
 def create_block_from_xml(xml_data, system, id_generator):
     """
     Create an XBlock instance from XML data.
@@ -275,25 +306,6 @@ def create_block_from_xml(xml_data, system, id_generator):
         XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
 
     """
-    def _convert_reference_fields_to_keys(xblock):  # pylint: disable=invalid-name
-        """
-        Find all fields of type reference and convert the payload into UsageKeys
-        """
-        course_key = xblock.scope_ids.usage_id.course_key
-
-        for field in xblock.fields.itervalues():
-            if field.is_set_on(xblock):
-                field_value = getattr(xblock, field.name)
-                if isinstance(field, Reference):
-                    setattr(xblock, field.name, course_key.make_usage_key_from_deprecated_string(field_value))
-                elif isinstance(field, ReferenceList):
-                    setattr(xblock, field.name, [course_key.make_usage_key_from_deprecated_string(ele) for ele in field_value])
-                elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in field_value.iteritems():
-                        assert isinstance(subvalue, basestring)
-                        field_value[key] = course_key.make_usage_key_from_deprecated_string(subvalue)
-                    setattr(xblock, field.name, field_value)
-
     node = etree.fromstring(xml_data)
     raw_class = system.load_block_type(node.tag)
     xblock_class = system.mixologist.mix(raw_class)
