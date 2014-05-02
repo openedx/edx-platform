@@ -169,6 +169,11 @@ class GroupsApiTests(TestCase):
         response = self.do_get(self.base_groups_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
+        profile.name = None
+        profile.save()
+        response = self.do_get(self.base_groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get(self):
         data = {'name': self.test_group_name}
