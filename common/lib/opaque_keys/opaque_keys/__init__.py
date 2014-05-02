@@ -25,8 +25,9 @@ class OpaqueKeyMetaclass(ABCMeta):
     with a fieldset equal to the KEY_FIELDS class attribute, if KEY_FIELDS is set.
     """
     def __new__(mcs, name, bases, attrs):
-        for field in attrs.get('KEY_FIELDS', []):
-            attrs.setdefault(field, None)
+        if '__slots__' not in attrs:
+            for field in attrs.get('KEY_FIELDS', []):
+                attrs.setdefault(field, None)
         return super(OpaqueKeyMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
