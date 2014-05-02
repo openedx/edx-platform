@@ -4,7 +4,6 @@
         <header class="mast has-actions has-navigation">
             <h1 class="page-header">
                 <small class="navigation navigation-parents">
-
                     <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
                     <a href="#" class="navigation-link navigation-current">Nested Vertical Test</a>
                 </small>
@@ -23,7 +22,7 @@
             <section class="content-area">
 
                 <article class="content-primary window">
-                    <section class="wrapper-xblock level-page" data-locator="TestCourse/branch/draft/block/vertical131">
+                    <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="TestCourse/branch/draft/block/vertical131">
                     </section>
                     <div class="no-container-content is-hidden">
                         <p>This page has no content yet.</p>
@@ -37,6 +36,4 @@
             </section>
         </div>
     </div>
-
-    <div id="page-notification"></div>
 </div>

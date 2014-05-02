@@ -31,15 +31,18 @@ main_xblock_info = {
 %>
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
-            "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function(doc, $, XBlockInfo, ContainerPage) {
+        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+            function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates) {
                 var view, mainXBlockInfo;
+
+                var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
 
                 mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
 
                 view = new ContainerPage({
                     el: $('#content'),
-                    model: mainXBlockInfo
+                    model: mainXBlockInfo,
+                    templates: templates
                 });
                 view.render();
             });
@@ -80,7 +83,7 @@ main_xblock_info = {
         <section class="content-area">
 
             <article class="content-primary window">
-                <section class="wrapper-xblock level-page is-hidden" data-locator="${xblock_locator}">
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}">
                 </section>
                 <div class="no-container-content is-hidden">
                     <p>${_("This page has no content yet.")}</p>

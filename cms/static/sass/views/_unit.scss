@@ -1,7 +1,8 @@
 // studio - views - unit
 // ====================
 
-body.course.unit,.view-unit {
+body.course.unit,
+.view-unit {
 
   .main-wrapper {
     margin-top: ($baseline*2);
@@ -91,286 +92,18 @@ body.course.unit,.view-unit {
           }
         }
 
-        // ====================
-
-        // New Components
-        &.new-component-item {
-          margin: $baseline 0px;
-          border-top: 1px solid $mediumGrey;
-          box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
-          background-color: $lightGrey;
-          margin-bottom: 0px;
-          padding-bottom: $baseline;
-
-          .new-component-button {
-            display: block;
-            padding: $baseline;
-            text-align: center;
-            color: #edf1f5;
-          }
-
-          h5 {
-            margin: $baseline 0px;
-            color: #fff;
-            font-weight: 600;
-            font-size: 18px;
-          }
-
-          .rendered-component {
-            display: none;
-            background: #fff;
-            border-radius: 3px 3px 0 0;
-          }
-
-          .new-component-type {
-
-            a,
-            li {
-              display: inline-block;
-            }
-
-            a {
-              border: 1px solid $mediumGrey;
-              width: 100px;
-              height: 100px;
-              color: #fff;
-              margin-right: 15px;
-              margin-bottom: $baseline;
-              border-radius: 8px;
-              font-size: 15px;
-              line-height: 14px;
-              text-align: center;
-              box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset;
-
-              .name {
-                position: absolute;
-                bottom: 5px;
-                left: 0;
-                width: 100%;
-                padding: $baseline/2;
-                @include box-sizing(border-box);
-                color: #fff;
-              }
-            }
-          }
-
-          .new-component-templates {
-            display: none;
-            margin: $baseline 2*$baseline;
-            border-radius: 3px;
-            border: 1px solid $mediumGrey;
-            background-color: #fff;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset;
-            @include clearfix;
-
-            .cancel-button {
-              margin: $baseline 0px $baseline/2 $baseline/2;
-              @include white-button;
-            }
-
-            .problem-type-tabs {
-              display: none;
-            }
-
-            // specific menu types
-            &.new-component-problem {
-              padding-bottom: $baseline/2;
-
-              [class^="icon-"], .editor-indicator {
-                display: inline-block;
-              }
-
-              .problem-type-tabs {
-                display: inline-block;
-              }
-            }
-          }
-
-          .new-component-type,
-          .new-component-template {
-            @include clearfix;
-
-            a {
-              position: relative;
-              border: 1px solid $darkGreen;
-              background: tint($green,20%);
-              color: #fff;
-
-              &:hover {
-                background: $brightGreen;
-              }
-            }
-          }
-
-          .problem-type-tabs {
-            list-style-type: none;
-            border-radius: 0;
-            width: 100%;
-            @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-            background-color: $lightBluishGrey;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
-
-            li:first-child {
-              margin-left: $baseline;
-            }
-
-            li {
-              float:left;
-              display:inline-block;
-              text-align:center;
-              width: auto;
-              @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-              background-color: tint($lightBluishGrey, 10%);
-              box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
-              opacity: 0.8;
-
-              &:hover {
-                opacity: 0.9;
-                background-color: tint($lightBluishGrey, 20%);
-              }
-
-              &.ui-state-active {
-                border: 0px;
-                @include active;
-                opacity: 1.0;
-              }
-            }
-
-            a {
-              display: block;
-              padding: 15px 25px;
-              font-size: 15px;
-              line-height: 16px;
-              text-align: center;
-              color: #3c3c3c;
-              text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-            }
-          }
-
-          .new-component-template {
-
-            a {
-              @include transition(none);
-              background: #fff;
-              border: 0px;
-              color: #3c3c3c;
-
-              &:hover {
-                @include transition(background-color $tmg-f2 linear 0s);
-                background: tint($green,30%);
-                color: #fff;
-              }
-            }
-
-            li {
-                border:none;
-                border-bottom: 1px dashed $lightGrey;
-                color: #fff;
-            }
-
-            li:first-child {
-              a {
-                border-top: 0px;
-              }
-            }
-
-            li:nth-child(2) {
-              a {
-                border-radius: 0px;
-              }
-            }
-
-            a {
-              @include clearfix();
-              display: block;
-              padding: 7px $baseline;
-              border-bottom: none;
-              font-weight: 500;
-
-              .name {
-                float: left;
-
-                [class^="icon-"] {
-                  @include transition(opacity $tmg-f2 linear 0s);
-                  display: inline-block;
-                  top: 1px;
-                  margin-right: 5px;
-                  opacity: 0.5;
-                  width: 17;
-                  height: 21px;
-                  vertical-align: middle;
-                }
-              }
-
-              .editor-indicator {
-                @include transition(opacity $tmg-f2 linear 0s);
-                float: right;
-                position: relative;
-                top: 3px;
-                font-size: 12px;
-                opacity: 0.3;
-              }
-
-              [class^="icon-"], .editor-indicator {
-                display: none;
-              }
-
-              &:hover {
-                color: #fff;
-
-                [class^="icon-"] {
-                  opacity: 1.0;
-                }
-
-                .editor-indicator {
-                  opacity: 1.0;
-                }
-              }
-            }
-
-            // specific editor types
-            .empty {
-
-              a {
-                line-height: 1.4;
-                font-weight: 400;
-                background: #fff;
-                color: #3c3c3c;
-
-
-                &:hover {
-                background: tint($green,30%);
-                color: #fff;
-              }
-              }
-            }
-          }
-
-          .new-component {
-            text-align: center;
-
-            h5 {
-              color: $darkGreen;
-            }
-
-          }
-        }
-
       .wrapper-alert-error {
-          margin-top: ($baseline*1.25);
-          box-shadow: none;
-          border-top: 5px solid $red-l1;
+        margin-top: ($baseline*1.25);
+        box-shadow: none;
+        border-top: 5px solid $red-l1;
 
-          .copy,
-          .title {
-            color: $white;
-          }
-
-      }
-
-
+        .copy,
+        .title {
+          color: $white;
+        }
       }
     }
+  }
 
     // ====================
 
@@ -1442,5 +1175,262 @@ body.unit .component {
 body.unit .component.editing {
   .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
     margin-top: 0;
+  }
+}
+
+
+body.view-unit .main-column .unit-body,
+body.view-container {
+
+  // New Components
+  .new-component-item {
+    margin: $baseline 0 0 0;
+    border-top: 1px solid $gray-l3;
+    box-shadow: 0 2px 1px $shadow-l1 inset;
+    background-color: $lightGrey;
+    padding: $baseline;
+
+    .new-component {
+      text-align: center;
+
+      h5 {
+        color: $darkGreen;
+      }
+    }
+
+    .new-component-button {
+      display: block;
+      padding: $baseline;
+      text-align: center;
+      color: $green;
+    }
+
+    h5 {
+      @extend %t-title5;
+      margin: 0 0 $baseline 0;
+      color: $white;
+      font-weight: 600;
+    }
+
+    .rendered-component {
+      display: none;
+      background: $white;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .new-component-type {
+
+      a,
+      li {
+        display: inline-block;
+      }
+
+      a {
+        @extend %t-action3;
+        width: ($baseline*5);
+        height: ($baseline*5);
+        margin-right: ($baseline*.75);
+        margin-bottom: $baseline;
+        border: 1px solid $mediumGrey;
+        border-radius: ($baseline/4);
+        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
+        text-align: center;
+        color: $white;
+
+        .name {
+          @include box-sizing(border-box);
+          display: block;
+          color: $white;
+        }
+      }
+    }
+
+    .new-component-templates {
+      @include clearfix;
+      display: none;
+      margin: $baseline ($baseline*2);
+      border-radius: 3px;
+      border: 1px solid $mediumGrey;
+      background-color: $white;
+      box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
+
+      .cancel-button {
+        @include white-button;
+        margin: $baseline 0 ($baseline/2) ($baseline/2);
+      }
+
+      .problem-type-tabs {
+        display: none;
+      }
+
+      // specific menu types
+      &.new-component-problem {
+        padding-bottom: ($baseline/2);
+
+        [class^="icon-"], .editor-indicator {
+          display: inline-block;
+        }
+
+        .problem-type-tabs {
+          display: inline-block;
+        }
+      }
+    }
+
+    .new-component-type,
+    .new-component-template {
+      @include clearfix;
+
+      a {
+        position: relative;
+        border: 1px solid $green-d2;
+        background-color: $green-l1;
+        color: $white;
+
+        &:hover {
+          background: $green-s1;
+        }
+      }
+    }
+
+    .problem-type-tabs {
+      @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+      list-style-type: none;
+      width: 100%;
+      border-radius: 0;
+      background-color: $lightBluishGrey;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
+
+      li:first-child {
+        margin-left: $baseline;
+      }
+
+      li {
+        @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+        opacity: 0.8;
+        float: left;
+        display: inline-block;
+        width: auto;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
+        background-color: tint($lightBluishGrey, 10%);
+        text-align: center;
+
+        &:hover {
+          opacity: 0.9;
+          background-color: tint($lightBluishGrey, 20%);
+        }
+
+        &.ui-state-active {
+          @include active;
+          border: 0px;
+          opacity: 1.0;
+        }
+      }
+
+      a {
+        @extend %t-action3;
+        display: block;
+        padding: ($baseline*.75) ($baseline*1.25);
+        text-align: center;
+        color: $gray-d3;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .new-component-template {
+
+      a {
+        @include transition(none);
+        border: 0px;
+        background: $white;
+        color: $gray-d3;
+
+        &:hover {
+          @include transition(background-color $tmg-f2 linear 0s);
+          background: tint($green,30%);
+          color: $white;
+        }
+      }
+
+      li {
+        border:none;
+        border-bottom: 1px dashed $lightGrey;
+        color: $white;
+      }
+
+      li:first-child a {
+        border-top: 0;
+      }
+
+      li:nth-child(2) a {
+        border-radius: 0;
+      }
+
+      a {
+        @include clearfix();
+        display: block;
+        padding: 7px $baseline;
+        border-bottom: none;
+        font-weight: 500;
+
+        .name {
+          float: left;
+
+          [class^="icon-"] {
+            @include transition(opacity $tmg-f2 linear 0s);
+            display: inline-block;
+            top: 1px;
+            margin-right: 5px;
+            opacity: 0.5;
+            width: 17;
+            height: 21px;
+            vertical-align: middle;
+          }
+        }
+
+        .editor-indicator {
+          @extend %t-copy-sub2;
+          @include transition(opacity $tmg-f2 linear 0s);
+          float: right;
+          position: relative;
+          top: 3px;
+          opacity: 0.3;
+        }
+
+        [class^="icon-"], .editor-indicator {
+          display: none;
+        }
+
+        &:hover {
+          color: $white;
+
+          [class^="icon-"] {
+            opacity: 1.0;
+          }
+
+          .editor-indicator {
+            opacity: 1.0;
+          }
+        }
+      }
+
+      // specific editor types
+      .empty {
+
+        a {
+
+          background: $white;
+          line-height: 1.4;
+          font-weight: 400;
+          color: $gray-d3;
+
+
+          &:hover {
+            background: tint($green,30%);
+            color: $white;
+          }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,23 @@
+<% if (type === 'advanced' || templates.length > 1) { %>
+    <div class="tab current" id="tab1">
+        <ul class="new-component-template">
+            <% for (var i = 0; i < templates.length; i++) { %>
+                <% if (!templates[i].boilerplate_name) { %>
+                <li class="editor-md empty">
+                    <a href="#" data-category="<%= templates[i].category %>">
+                        <span class="name"><%= templates[i].display_name %></span>
+                    </a>
+                </li>
+                <% } else { %>
+                <li class="editor-md">
+                    <a href="#" data-category="<%= templates[i].category %>"
+                       data-boilerplate="<%= templates[i].boilerplate_name %>">
+                        <span class="name"><%= templates[i].display_name %></span>
+                    </a>
+                </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <a href="#" class="cancel-button"><%= gettext("Cancel") %></a>
+<% } %>
