@@ -42,6 +42,7 @@ from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
+from xmodule.modulestore.keys import CourseKey
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -615,8 +616,7 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
-        #assert(isinstance(course_key, CourseKey))
-        #course_id = course_key.to_deprecated_string()
+        assert(isinstance(course_key, CourseKey))
 
         if user.id is None:
             user.save()
@@ -976,16 +976,21 @@ class CourseAccessRole(models.Model):
     role = models.CharField(max_length=64, db_index=True)
 
     class Meta:
-        unique_together = (('user', 'org', 'course_id', 'role'),)
+        unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
     def _key(self):
         """
-        convenience function to make eq overrides easier and clearer
+        convenience function to make eq overrides easier and clearer. arbitrary decision
+        that role is primary, followed by org, course, and then user
         """
-        return (self.user, self.org, self.course_id, self.role)
+        return (self.role, self.org, self.course_id, self.user)
 
     def __eq__(self, other):
+        """
+        Overriding eq b/c the django impl relies on the primary key which requires fetch. sometimes we
+        just want to compare roles w/o doing another fetch.
+        """
         return self._key == other._key
 
     def __ne__(self, other):
@@ -993,6 +998,12 @@ class CourseAccessRole(models.Model):
 
     def __hash__(self):
         return hash(self._key)
+    
+    def __lt__(self, other):
+        """
+        Lexigraphic sort: i guess key order should
+        """
+        return self._key < other._key
 
 
 #### Helper methods for use from python manage.py shell and other classes.
