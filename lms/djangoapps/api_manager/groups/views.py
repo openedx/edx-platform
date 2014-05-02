@@ -46,8 +46,10 @@ class GroupsList(APIView):
         base_uri = _generate_base_uri(request)
         # Group name must be unique, but we need to support dupes
         group = Group.objects.create(name=str(uuid.uuid4()))
-        original_group_name = request.DATA['name']
-
+        if request.DATA.get('name'):
+            original_group_name = request.DATA.get('name')
+        else:
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         group.name = '{:04d}: {}'.format(group.id, original_group_name)
         group.record_active = True
         group.record_date_created = timezone.now()
@@ -61,9 +63,9 @@ class GroupsList(APIView):
         group_type = request.DATA.get('group_type', None)
         data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else {}
         profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, name=original_group_name, data=data)
-        
+
         response_data = {
-            'id': group.id, 
+            'id': group.id,
             'name': original_group_name,
             'type': group_type,
         }
