@@ -2,6 +2,7 @@ from xblock.fragment import Fragment
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
+from xmodule.studio_editable import StudioEditableModule
 from pkg_resources import resource_string
 from copy import copy
 
@@ -14,7 +15,7 @@ class VerticalFields(object):
     has_children = True
 
 
-class VerticalModule(VerticalFields, XModule):
+class VerticalModule(VerticalFields, XModule, StudioEditableModule):
     ''' Layout module for laying out submodules vertically.'''
 
     def student_view(self, context):
@@ -28,7 +29,9 @@ class VerticalModule(VerticalFields, XModule):
         """
         Renders the Studio preview view, which supports drag and drop.
         """
-        return self.render_view(context, 'vert_module_studio_view.html')
+        fragment = Fragment()
+        self.render_reorderable_children(context, fragment)
+        return fragment
 
     def render_view(self, context, template_name):
         """
