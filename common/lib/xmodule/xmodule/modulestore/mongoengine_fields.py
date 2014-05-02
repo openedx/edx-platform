@@ -21,7 +21,7 @@ class CourseKeyField(mongoengine.StringField):
         """
         assert isinstance(course_key, (NoneType, SlashSeparatedCourseKey))
         if course_key:
-            # don't call super as it calls to_python() for some odd reason
+            # don't call super as base.BaseField.to_mongo calls to_python() for some odd reason
             return course_key.to_deprecated_string()
         else:
             return None
@@ -30,9 +30,10 @@ class CourseKeyField(mongoengine.StringField):
         """
         Deserialize to a CourseKey instance
         """
+        # calling super b/c it decodes utf (and doesn't have circularity of from_python)
         course_key = super(CourseKeyField, self).to_python(course_key)
         assert isinstance(course_key, (NoneType, basestring, SlashSeparatedCourseKey))
-        if course_key is None:
+        if course_key == '':
             return None
         if isinstance(course_key, basestring):
             return SlashSeparatedCourseKey.from_deprecated_string(course_key)
@@ -68,7 +69,7 @@ class UsageKeyField(mongoengine.StringField):
         Deserialize to a UsageKey instance: for now it's a location missing the run
         """
         assert isinstance(location, (NoneType, basestring, Location))
-        if not location:
+        if location == '':
             return None
         if isinstance(location, basestring):
             location = super(UsageKeyField, self).to_python(location)
