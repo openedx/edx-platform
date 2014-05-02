@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from user_api import user_service
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
 
@@ -179,6 +180,18 @@ class UserTagsService(object):
 
         return user_service.set_course_tag(self._get_current_user(),
                                            self.runtime.course_id, key, value)
+
+
+class LmsMetadataService(object):
+    """
+    Implement the XBlock runtime "Metadata" service.
+
+    Allows the retrieval of LMS specific metadata. Exposes methods specific to
+    the LMS configuration and requests.
+    """
+    def is_preview_enabled(self):
+        module_store = modulestore()
+        return isinstance(module_store, DraftModuleStore)
 
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method
