@@ -153,7 +153,7 @@ class TestTitleOrUrl(unittest.TestCase):
 
     def test_url(self):
         unit = mock.Mock(display_name=None)
-        unit.location.url.return_value = 'test:hello'
+        unit.location.to_deprecated_string.return_value = 'test:hello'
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
