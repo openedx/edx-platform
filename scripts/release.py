@@ -45,13 +45,16 @@ def make_parser():
 
 
 def ensure_pr_fetch():
+    remotes = git.remote().splitlines()
+    if not "edx" in remotes:
+        git.remote("add", "edx", "https://github.com/edx/edx-platform.git")
     # it would be nice to use the git-python API to do this, but it doesn't seem
     # to support configurations with more than one value per key. :(
     edx_fetches = git.config("remote.edx.fetch", get_all=True).splitlines()
     pr_fetch = '+refs/pull/*/head:refs/remotes/edx/pr/*'
     if pr_fetch not in edx_fetches:
         git.config("remote.edx.fetch", pr_fetch, add=True)
-        git.fetch()
+        git.fetch("edx")
 
 
 def default_release_date():
