@@ -153,14 +153,22 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data[0]['name'], self.test_group_name)
         self.assertEqual(response.data[0]['data']['display_name'], 'My updated series')
 
-    def test_group_list_get_uses_base_group_name(self):
+    def test_group_list_post_invalid_name(self):
         data = {'name': ''}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_group_list_get_uses_base_group_name(self):
+        data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
+        profile = GroupProfile.objects.get(group_id=group_id)
+        profile.name = ''
+        profile.save()
         response = self.do_get(self.base_groups_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['name'], '{:04d}: '.format(group_id))
+        self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get(self):
         data = {'name': self.test_group_name}
@@ -177,21 +185,24 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['name'], self.test_group_name)
 
     def test_group_detail_get_uses_base_group_name(self):
-        data = {'name': ''}
+        data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
         group_id = response.data['id']
+        profile = GroupProfile.objects.get(group_id=group_id)
+        profile.name = ''
+        profile.save()
         test_uri = self.base_groups_uri + '/' + str(group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['id'], group_id)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertEqual(response.data['name'], '{:04d}: '.format(group_id))
+        self.assertEqual(response.data['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get_with_missing_profile(self):
-        data = {'name': ''}
+        data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
@@ -203,7 +214,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['id'], group_id)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertEqual(response.data['name'], '{:04d}: '.format(group_id))
+        self.assertEqual(response.data['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get_undefined(self):
         test_uri = self.base_groups_uri + '/123456789'
