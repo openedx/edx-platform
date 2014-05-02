@@ -278,8 +278,7 @@ class LocatorTest(TestCase):
     def test_description_locator_url(self):
         object_id = '{:024x}'.format(random.randrange(16 ** 24))
         definition_locator = DefinitionLocator(object_id)
-        self.assertEqual('defx:' + VERSION_PREFIX + object_id, definition_locator.to_deprecated_string())
-        self.assertEqual(definition_locator, DefinitionLocator(definition_locator.to_deprecated_string()))
+        self.assertEqual('defx:' + VERSION_PREFIX + object_id, unicode(definition_locator))
 
     def test_description_locator_version(self):
         object_id = '{:024x}'.format(random.randrange(16 ** 24))
