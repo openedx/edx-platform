@@ -198,7 +198,10 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         if not self.sources_list:
             if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
                 sources = ConditionalDescriptor.parse_sources(self.xml_attributes)
-                self.sources_list = sources
+                self.sources_list = [
+                    self.location.course_key.make_usage_key_from_deprecated_string(source)
+                    for source in sources
+                ]
 
     @staticmethod
     def parse_sources(xml_element):
@@ -214,7 +217,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         descriptors = []
         for location in self.sources_list:
             try:
-                location = self.location.course_key.make_usage_key_from_deprecated_string(location)
                 descriptor = self.system.load_item(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:
