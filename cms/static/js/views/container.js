@@ -18,8 +18,6 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                     stop: function (event, ui) {
                         var saving, hideSaving, removeFromParent;
 
-                        console.log('stop');
-
                         if (oldParent === undefined) {
                             // If no actual change occurred,
                             // oldParent will never have been set.
@@ -81,8 +79,6 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             reorder: function (targetParent, successCallback) {
                 var children, childLocators;
 
-                console.log('calling reorder for ' + targetParent.data('locator'));
-
                 // Find descendants with class "wrapper-xblock" whose parent == targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.
                 children = targetParent.find('.wrapper-xblock').filter(function () {
@@ -106,7 +102,6 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                     }),
                     success: function () {
                         // change data-parent on the element moved.
-                        console.log('SAVED! ' + targetParent.data('locator') + " with " + childLocators.length + "  children");
                         if (successCallback) {
                             successCallback();
                         }

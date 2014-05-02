@@ -1,15 +1,15 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", "js/models/xblock_info",
-    "js/views/feedback_notification", "jquery.simulate",
+define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers",
+    "js/views/container", "js/models/xblock_info", "js/views/feedback_notification", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, URI, ContainerView, XBlockInfo, Notification) {
+    function ($, create_sinon, view_helpers, ContainerView, XBlockInfo, Notification) {
 
         describe("Container View", function () {
 
             describe("Supports reordering components", function () {
 
-                var model, containerView, mockContainerHTML, respondWithMockXBlockFragment,
-                    init, dragHandleVertically, dragHandleOver, verifyRequest, verifyNumReorderCalls,
-                    respondToRequest,
+                var model, containerView, mockContainerHTML, respondWithMockXBlockFragment, init, getComponent,
+                    getDragHandle, dragComponentVertically, dragComponentToY, dragComponentAbove, dragComponentBelow,
+                    verifyRequest, verifyNumReorderCalls, respondToRequest,
 
                     rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
                     containerTestUrl = '/xblock/' + rootLocator,
@@ -35,7 +35,8 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 };
 
                 beforeEach(function () {
-                    setFixtures('<div class="wrapper-xblock level-page" data-locator="' + rootLocator + '"></div>');
+                    view_helpers.installViewTemplates();
+                    appendSetFixtures('<div class="wrapper-xblock level-page" data-locator="' + rootLocator + '"></div>');
                     model = new XBlockInfo({
                         id: rootLocator,
                         display_name: 'Test AB Test',
@@ -66,22 +67,43 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                     return requests;
                 };
 
-                dragHandleVertically = function (index, dy) {
-                    var handle = containerView.$(".drag-handle:eq(" + index + ")");
+                getComponent = function(locator) {
+                    return containerView.$('[data-locator="' + locator + '"]');
+                };
+
+                getDragHandle = function(locator) {
+                    var component = getComponent(locator);
+                    return component.prev();
+                };
+
+                dragComponentVertically = function (locator, dy) {
+                    var handle = getDragHandle(locator);
                     handle.simulate("drag", {dy: dy});
                 };
 
-                dragHandleOver = function (index, targetElement) {
-                    var handle = containerView.$(".drag-handle:eq(" + index + ")"),
-                        dy = handle.y - targetElement.y;
-
+                dragComponentToY = function (locator, y) {
+                    var handle = getDragHandle(locator),
+                        handleY = handle.offset().top + (handle.height() / 2),
+                        dy = y - handleY;
                     handle.simulate("drag", {dy: dy});
+                };
+
+                dragComponentAbove = function (sourceLocator, targetLocator) {
+                    var targetElement = getComponent(targetLocator);
+                    dragComponentToY(sourceLocator, targetElement.offset().top + 1);
+                };
+
+                dragComponentBelow = function (sourceLocator, targetLocator) {
+                    var targetElement = containerView.$('[data-locator="' + targetLocator + '"]');
+                    dragComponentToY(sourceLocator, targetElement.offset().top + targetElement.height() - 1);
                 };
 
                 verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {
-                    var request, children, i;
+                    var actualIndex, request, children, i;
                     // 0th call is the response to the initial render call to get HTML.
-                    request = requests[reorderCallIndex + 1];
+                    actualIndex = reorderCallIndex + 1;
+                    expect(requests.length).toBeGreaterThan(actualIndex);
+                    request = requests[actualIndex];
                     expect(request.url).toEqual(expectedURL);
                     children = (JSON.parse(request.requestBody)).children;
                     expect(children.length).toEqual(expectedChildren.length);
@@ -96,77 +118,60 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                 };
 
                 respondToRequest = function (requests, reorderCallIndex, status) {
+                    var actualIndex;
                     // Number of calls will be 1 more than expected because of the initial render call to get HTML.
-                    requests[reorderCallIndex + 1].respond(status);
+                    actualIndex = reorderCallIndex + 1;
+                    expect(requests.length).toBeGreaterThan(actualIndex);
+                    requests[actualIndex].respond(status);
                 };
 
                 it('does nothing if item not moved far enough', function () {
                     var requests = init(this);
-                    // Drag the first thing in Group A (text component) down very slightly, but not past second thing.
-                    dragHandleVertically(2, 5);
+                    // Drag the first component in Group A down very slightly but not enough to move it.
+                    dragComponentVertically(groupAComponent1, 5);
                     verifyNumReorderCalls(requests, 0);
                 });
 
                 it('can reorder within a group', function () {
                     var requests = init(this);
-                    // Drag the first component in Group A to the end
-                    dragHandleVertically(2, 80);
+                    // Drag the third component in Group A to be the first
+                    dragComponentAbove(groupAComponent3, groupAComponent1);
                     respondToRequest(requests, 0, 200);
-                    verifyNumReorderCalls(requests, 1);
-                    verifyRequest(requests, 0, groupAUrl, [groupAComponent2, groupAComponent3, groupAComponent1]);
+                    verifyRequest(requests, 0, groupAUrl, [groupAComponent3, groupAComponent1, groupAComponent2]);
                 });
 
                 it('can drag from one group to another', function () {
                     var requests = init(this);
-                    // Drag the first component in Group A into the second group.
-                    dragHandleVertically(2, 300);
+                    // Drag the first component in Group B to the first group.
+                    dragComponentAbove(groupBComponent1, groupAComponent1);
+
+                    // Respond to the first request which will trigger a request to make the move
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
-                    // Will get an event to move into Group B and an event to remove from Group A.
-                    verifyNumReorderCalls(requests, 2);
-                    verifyRequest(requests, 0, groupBUrl,
-                        [groupBComponent1, groupBComponent2, groupAComponent1, groupBComponent3]);
-                    verifyRequest(requests, 1, groupAUrl, [groupAComponent2, groupAComponent3]);
+
+                    verifyRequest(requests, 0, groupAUrl,
+                        [groupBComponent1, groupAComponent1, groupAComponent2, groupAComponent3]);
+                    verifyRequest(requests, 1, groupBUrl, [groupBComponent2, groupBComponent3]);
                 });
 
                 it('does not remove from old group if addition to new group fails', function () {
                     var requests = init(this);
-                    // Drag the first component in Group A into the second group.
-                    dragHandleVertically(2, 300);
+                    // Drag the first component in Group B to the first group.
+                    dragComponentAbove(groupBComponent1, groupAComponent1);
                     respondToRequest(requests, 0, 500);
-                    // Send failure for addition to new group-- no removal event should be received.
+                    // Send failure for addition to new group -- no removal event should be received.
+                    verifyRequest(requests, 0, groupAUrl,
+                        [groupBComponent1, groupAComponent1, groupAComponent2, groupAComponent3]);
+                    // Verify that a second request was not issued
                     verifyNumReorderCalls(requests, 1);
-                    verifyRequest(requests, 0, groupBUrl,
-                        [groupBComponent1, groupBComponent2, groupAComponent1, groupBComponent3]);
                 });
 
                 it('can swap group A and group B', function () {
                     var requests = init(this);
                     // Drag Group B before group A.
-                    dragHandleVertically(5, -300);
+                    dragComponentAbove(groupB, groupA);
                     respondToRequest(requests, 0, 200);
-                    verifyNumReorderCalls(requests, 1);
                     verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
-                });
-
-
-                it('can drag a component to the top level, and nest one group in another', function () {
-                    var requests = init(this);
-                    // Drag text item in Group A to the top level (in first position).
-                    dragHandleVertically(2, -40);
-                    respondToRequest(requests, 0, 200);
-                    respondToRequest(requests, 1, 200);
-                    verifyNumReorderCalls(requests, 2);
-                    verifyRequest(requests, 0, containerTestUrl, [groupAComponent1, groupA, groupB]);
-                    verifyRequest(requests, 1, groupAUrl, [groupAComponent2, groupAComponent3]);
-
-                    // Drag Group A into Group B.
-                    dragHandleVertically(1, 150);
-                    respondToRequest(requests, 2, 200);
-                    respondToRequest(requests, 3, 200);
-                    verifyNumReorderCalls(requests, 4);
-                    verifyRequest(requests, 2, groupBUrl, [groupBComponent1, groupA, groupBComponent2]);
-                    verifyRequest(requests, 3, containerTestUrl, [groupAComponent1, groupB]);
                 });
 
                 describe("Shows a saving message", function () {
@@ -182,8 +187,8 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                         var requests, savingOptions;
                         requests = init(this);
 
-                        // Drag the first component in Group A into the second group.
-                        dragHandleVertically(2, 200);
+                        // Drag the first component in Group B to the first group.
+                        dragComponentAbove(groupBComponent1, groupAComponent1);
 
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();
@@ -195,14 +200,13 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
                         expect(savingSpies.hide).not.toHaveBeenCalled();
                         respondToRequest(requests, 1, 200);
                         expect(savingSpies.hide).toHaveBeenCalled();
-                        verifyNumReorderCalls(requests, 2);
                     });
 
                     it('does not hide saving message if failure', function () {
                         var requests = init(this);
 
-                        // Drag the first component in Group A into the second group.
-                        dragHandleVertically(2, 200);
+                        // Drag the first component in Group B to the first group.
+                        dragComponentAbove(groupBComponent1, groupAComponent1);
 
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();
@@ -210,6 +214,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
 
                         respondToRequest(requests, 0, 500);
                         expect(savingSpies.hide).not.toHaveBeenCalled();
+
                         // Since the first reorder call failed, the removal will not be called.
                         verifyNumReorderCalls(requests, 1);
                     });
@@ -217,4 +222,3 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", 
             });
         });
     });
-147
