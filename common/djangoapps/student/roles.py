@@ -9,13 +9,6 @@ from django.contrib.auth.models import User
 from student.models import CourseAccessRole
 
 
-class CourseIdRequired(Exception):
-    """
-    Raised when a course_id is required to determine permissions
-    """
-    pass
-
-
 class AccessRole(object):
     """
     Object representing a role with particular access to a resource
@@ -74,13 +67,16 @@ class GlobalStaff(AccessRole):
         raise Exception("This operation is un-indexed, and shouldn't be used")
 
 
-class GroupBasedRole(AccessRole):
+class RoleBase(AccessRole):
     """
-    A role based on having a role independent of org or course.
+    Roles by type (e.g., instructor, beta_user) and optionally org, course_key
     """
     def __init__(self, role_name, org=None, course_key=None):
         """
-        Create a GroupBasedRole from a group names
+        Create role from required role_name w/ optional org and course_key
+        :param role_name:
+        :param org:
+        :param course_key:
         """
         self.org = org
         self.course_key = course_key
@@ -88,14 +84,14 @@ class GroupBasedRole(AccessRole):
 
     def has_user(self, user):
         """
-        Return whether the supplied django user has access to this role independent of org and course.
+        Return whether the supplied django user has access to this role.
         """
         if not (user.is_authenticated() and user.is_active):
             return False
 
         # pylint: disable=protected-access
         if not hasattr(user, '_roles'):
-            user._roles = list(
+            user._roles = set(
                 CourseAccessRole.objects.filter(user=user).all()
             )
 
@@ -145,7 +141,7 @@ class GroupBasedRole(AccessRole):
         return entries
 
 
-class CourseRole(GroupBasedRole):
+class CourseRole(RoleBase):
     """
     A named role in a particular course
     """
@@ -161,7 +157,7 @@ class CourseRole(GroupBasedRole):
         return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
 
-class OrgRole(GroupBasedRole):
+class OrgRole(RoleBase):
     """
     A named role in a particular org independent of course
     """
@@ -205,7 +201,7 @@ class OrgInstructorRole(OrgRole):
         super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
 
 
-class CourseCreatorRole(GroupBasedRole):
+class CourseCreatorRole(RoleBase):
     """
     This is the group of people who have permission to create new courses (we may want to eventually
     make this an org based role).
