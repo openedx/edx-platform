@@ -20,6 +20,7 @@ Creating Exercises and Tools
    full_screen_image
    gene_explorer
    google_hangouts
+   iframe
    image_mapped_input
    lti_component
    math_expression_input

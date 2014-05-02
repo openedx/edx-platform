@@ -46,6 +46,11 @@ General Exercises and Tools
           :alt: Google Hangout
      - :ref:`Google Instant Hangout`
      - You can add the ability for students to participate in instant hangouts directly from your course. With instant hangouts, students can interact through live video and voice, share screens and watch videos together, and collaborate on documents. 
+   * - .. image:: /Images/IFrame_1.png
+          :width: 100
+          :alt: Example IFrame tool
+     - :ref:`IFrame`
+     - IFrames allow you to integrate ungraded exercises and tools from any Internet site into an HTML component in your course.
    * - .. image:: /Images/LTIExample.png
           :width: 100
           :alt: Example LTI component
