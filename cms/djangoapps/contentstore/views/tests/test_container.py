@@ -56,7 +56,6 @@ class ContainerViewTestCase(CourseTestCase):
             parent_location=published_xblock_with_child.location,
             category="html", display_name="Child HTML"
         )
-        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
         self._test_html_content(
             published_xblock_with_child,
@@ -73,6 +72,11 @@ class ContainerViewTestCase(CourseTestCase):
                 r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
             ).format(branch_name=branch_name)
         )
+
+        # Now make the unit and its children into a draft and validate the container again
+        modulestore('draft').convert_to_draft(self.vertical.location)
+        modulestore('draft').convert_to_draft(self.child_vertical.location)
+        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         self._test_html_content(
             draft_xblock_with_child,
             branch_name=branch_name,
