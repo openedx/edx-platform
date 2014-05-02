@@ -73,10 +73,10 @@ class RoleBase(AccessRole):
     """
     def __init__(self, role_name, org=None, course_key=None):
         """
-        Create role from required role_name w/ optional org and course_key
-        :param role_name:
-        :param org:
-        :param course_key:
+        Create role from required role_name w/ optional org and course_key. You may just provide a role
+        name if it's a global role (not constrained to an org or course). Provide org if constrained to
+        an org. Provide org and course if constrained to a course. Although, you should use the subclasses
+        for all of these.
         """
         self.org = org
         self.course_key = course_key
@@ -127,17 +127,11 @@ class RoleBase(AccessRole):
         """
         Return a django QuerySet for all of the users with this role
         """
-        if self.course_key:
-            entries = User.objects.filter(
-                courseaccessrole__role=self._role_name,
-                courseaccessrole__org=self.org,
-                courseaccessrole__course_id=self.course_key
-            )
-        else:
-            entries = User.objects.filter(
-                courseaccessrole__role=self._role_name,
-                courseaccessrole__org=self.org
-            )
+        entries = User.objects.filter(
+            courseaccessrole__role=self._role_name,
+            courseaccessrole__org=self.org,
+            courseaccessrole__course_id=self.course_key
+        )
         return entries
 
 
