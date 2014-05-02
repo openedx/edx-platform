@@ -5,7 +5,7 @@ a release-master multitool
 from __future__ import print_function, unicode_literals
 import sys
 from path import path
-from git import Repo, Commit
+from git import Repo
 from git.refs.symbolic import SymbolicReference
 import argparse
 from datetime import date, timedelta
