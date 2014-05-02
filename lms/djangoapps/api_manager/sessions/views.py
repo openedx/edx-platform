@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.serializers import UserSerializer
+from api_manager.users.serializers import UserSerializer
 from student.models import LoginFailures
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -142,6 +142,4 @@ class SessionsDetail(APIView):
         user_id = session[SESSION_KEY]
         AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         session.flush()
-        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
-
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)

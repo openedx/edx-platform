@@ -411,14 +411,19 @@ class CoursesApiTests(TestCase):
         self.assertIsNotNone(self._find_item_by_class(sections, 'faq'))
 
         course_staff = self._find_item_by_class(sections, 'course-staff')
-        teachers = course_staff['articles']
-        self.assertEqual(len(teachers), 2)
-        self.assertEqual(teachers[0]['name'], "Staff Member #1")
-        self.assertEqual(teachers[0]['image_src'], "/images/pl-faculty.png")
-        self.assertIn("<p>Biography of instructor/staff member #1</p>", teachers[0]['bio'])
-        self.assertEqual(teachers[1]['name'], "Staff Member #2")
-        self.assertEqual(teachers[1]['image_src'], "/images/pl-faculty.png")
-        self.assertIn("<p>Biography of instructor/staff member #2</p>", teachers[1]['bio'])
+        staff = course_staff['articles']
+        self.assertEqual(len(staff), 3)
+        self.assertEqual(staff[0]['class'], "teacher")
+        self.assertEqual(staff[0]['name'], "Staff Member #1")
+        self.assertEqual(staff[0]['image_src'], "/images/pl-faculty.png")
+        self.assertIn("<p>Biography of instructor/staff member #1</p>", staff[0]['bio'])
+        self.assertEqual(staff[1]['class'], "teacher")
+        self.assertEqual(staff[1]['name'], "Staff Member #2")
+        self.assertEqual(staff[1]['image_src'], "/images/pl-faculty.png")
+        self.assertIn("<p>Biography of instructor/staff member #2</p>", staff[1]['bio'])
+        self.assertEqual(staff[2]['class'], "author")
+        body = staff[2]['body']
+        self.assertGreater(len(body), 0)
 
         about = self._find_item_by_class(sections, 'about')
         self.assertGreater(len(about['body']), 0)
@@ -558,7 +563,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_courses_users_list_get(self):
+    def test_courses_users_list_get_no_students(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)

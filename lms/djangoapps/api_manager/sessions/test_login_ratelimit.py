@@ -74,19 +74,13 @@ class SessionApiRateLimitingProtectionTest(TestCase):
         Post the login info
         """
         post_params, extra = {'username': username, 'password': password}, {}
-        if kwargs.get('email'):
-            post_params['email'] = kwargs.get('email')
-        if kwargs.get('first_name'):
-            post_params['first_name'] = kwargs.get('first_name')
-        if kwargs.get('last_name'):
-            post_params['last_name'] = kwargs.get('last_name')
 
         headers = {'X-Edx-Api-Key': TEST_API_KEY, 'Content-Type': 'application/json'}
         if kwargs.get('secure', False):
             extra['wsgi.url_scheme'] = 'https'
         return self.client.post(url, post_params, headers=headers, **extra)
 
-    def _assert_response(self, response, status=200, success=None, message=None):
+    def _assert_response(self, response, status=200, message=None):
         """
         Assert that the response had status 200 and returned a valid
         JSON-parseable dict.
@@ -98,15 +92,7 @@ class SessionApiRateLimitingProtectionTest(TestCase):
         value for 'message' in the JSON dict.
         """
         self.assertEqual(response.status_code, status)
-
-        try:
-            response_dict = json.loads(response.content)
-        except ValueError:
-            self.fail("Could not parse response content as JSON: %s"
-                      % str(response.content))
-
-        if success is not None:
-            self.assertEqual(response_dict['success'], success)
+        response_dict = json.loads(response.content)
 
         if message is not None:
             msg = ("'%s' did not contain '%s'" %

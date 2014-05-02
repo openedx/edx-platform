@@ -170,7 +170,7 @@ class SessionApiSecurityTest(TestCase):
         response, mock_audit_log = self._do_request(self.user_url, str(uuid.uuid4()), 'Test.Me64!',
                                                     email='test@edx.org', first_name='John',
                                                     last_name='Doe', secure=True,
-                                                    patched_audit_log='api_manager.users_views.AUDIT_LOG')
+                                                    patched_audit_log='api_manager.users.views.AUDIT_LOG')
         self._assert_response(response, status=201)
         self._assert_audit_log(mock_audit_log, 'info', [u'API::New account created with user-id'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
@@ -223,7 +223,7 @@ class SessionApiSecurityTest(TestCase):
         Make Post/Delete/Get requests with params
         """
         post_params, extra,  = {'username': username, 'password': password}, {}
-        patched_audit_log = 'api_manager.sessions_views.AUDIT_LOG'
+        patched_audit_log = 'api_manager.sessions.views.AUDIT_LOG'
         request_method = kwargs.get('request_method', 'POST')
         if kwargs.get('email'):
             post_params['email'] = kwargs.get('email')
@@ -243,12 +243,9 @@ class SessionApiSecurityTest(TestCase):
                 result = self.client.post(url, post_params, headers=headers, **extra)
             elif request_method == 'DELETE':
                 result = self.client.delete(url, post_params, headers=headers, **extra)
-            else:
-                result = self.client.get(url, post_params, headers=headers, **extra)
-
         return result, mock_audit_log
 
-    def _assert_response(self, response, status=200, success=None, message=None):
+    def _assert_response(self, response, status=200, message=None):
         """
         Assert that the response had status 200 and returned a valid
         JSON-parseable dict.
@@ -265,14 +262,7 @@ class SessionApiSecurityTest(TestCase):
         if response.status_code == 204:
             return
 
-        try:
-            response_dict = json.loads(response.content)
-        except ValueError:
-            self.fail("Could not parse response content as JSON: %s"
-                      % str(response.content))
-
-        if success is not None:
-            self.assertEqual(response_dict['success'], success)
+        response_dict = json.loads(response.content)
 
         if message is not None:
             msg = ("'%s' did not contain '%s'" %
