@@ -536,7 +536,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
             descriptor
         )
 
-        self.module = render.get_module(
+        return render.get_module(
             self.staff_user,
             self.request,
             location,
@@ -554,7 +554,14 @@ class ViewInStudioTest(ModuleStoreTestCase):
             category='vertical',
         )
 
-        self._get_module(course.id, descriptor, descriptor.location)
+        child_descriptor = ItemFactory.create(
+            category='vertical',
+            parent_location = descriptor.location
+        )
+
+        self.module = self._get_module(course.id, descriptor, descriptor.location)
+
+        self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
 
     def setup_xml_course(self):
         """
@@ -565,7 +572,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
         location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
         descriptor = modulestore().get_instance(course_id, location)
 
-        self._get_module(course_id, descriptor, location)
+        self.module = self._get_module(course_id, descriptor, location)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -580,6 +587,18 @@ class MongoViewInStudioTest(ViewInStudioTest):
         self.setup_mongo_course()
         result_fragment = self.module.render('student_view')
         self.assertIn('View Unit in Studio', result_fragment.content)
+
+    def test_view_in_studio_link_only_in_top_level_vertical(self):
+        """Regular Studio courses should not see 'View in Studio' for child verticals of verticals."""
+        self.setup_mongo_course()
+        # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
+        result_fragment = self.module.render('student_view')
+        # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
+        parts = result_fragment.content.split('xmodule_VerticalModule')
+        self.assertEqual(3, len(parts), "Did not find two vertical modules")
+        self.assertIn('View Unit in Studio', parts[0])
+        self.assertNotIn('View Unit in Studio', parts[1])
+        self.assertNotIn('View Unit in Studio', parts[2])
 
     def test_view_in_studio_link_xml_authored(self):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
