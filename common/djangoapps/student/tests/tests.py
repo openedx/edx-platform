@@ -31,9 +31,6 @@ from student.tests.factories import UserFactory, CourseModeFactory
 
 import shoppingcart
 
-COURSE_1 = 'edX/toy/2012_Fall'
-COURSE_2 = 'edx/full/6.002_Spring_2012'
-
 log = logging.getLogger(__name__)
 
 
