@@ -153,6 +153,32 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data[0]['name'], self.test_group_name)
         self.assertEqual(response.data[0]['data']['display_name'], 'My updated series')
 
+    def test_group_list_get_with_profile_no_name(self):
+        data = {
+            'group_type': 'series',
+            'data': {
+                'display_name': 'My first series'
+            }
+        }
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertGreater(response.data['id'], 0)
+        group_id = response.data['id']
+
+        # query for list of groups, but don't put the type filter
+        test_uri = self.base_groups_uri
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        # try again with filter
+        test_uri = self.base_groups_uri + '?type=series'
+        response = self.do_get(test_uri)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['group_id'], group_id)
+        self.assertEqual(response.data[0]['group_type'], 'series')
+        self.assertEqual(response.data[0]['data']['display_name'], 'My first series')
+
     def test_group_list_get_uses_base_group_name(self):
         data = {'name': ''}
         response = self.do_post(self.base_groups_uri, data)
