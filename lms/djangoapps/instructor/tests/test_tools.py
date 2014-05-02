@@ -87,10 +87,8 @@ class TestFindUnit(ModuleStoreTestCase):
         Fixtures.
         """
         course = CourseFactory.create()
-        week1 = ItemFactory.create()
-        homework = ItemFactory.create(parent_location=week1.location)
-        week1.children.append(homework.location)
-        course.children.append(week1.location)
+        week1 = ItemFactory.create(parent=course)
+        homework = ItemFactory.create(parent=week1)
 
         self.course = course
         self.homework = homework
@@ -122,15 +120,13 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due)
-        week2 = ItemFactory.create(due=due)
-        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string()]
+        week1 = ItemFactory.create(due=due, parent=course)
+        week2 = ItemFactory.create(due=due, parent=course)
 
         homework = ItemFactory.create(
-            parent_location=week1.location,
+            parent=week1,
             due=due
         )
-        week1.children = [homework.location.to_deprecated_string()]
 
         self.course = course
         self.week1 = week1
@@ -225,17 +221,14 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due)
-        week2 = ItemFactory.create(due=due)
-        week3 = ItemFactory.create(due=due)
-        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
-                           week3.location.to_deprecated_string()]
+        week1 = ItemFactory.create(due=due, parent=course)
+        week2 = ItemFactory.create(due=due, parent=course)
+        week3 = ItemFactory.create(due=due, parent=course)
 
         homework = ItemFactory.create(
-            parent_location=week1.location,
+            parent=week1,
             due=due
         )
-        week1.children = [homework.location.to_deprecated_string()]
 
         user1 = UserFactory.create()
         StudentModule(
