@@ -60,6 +60,10 @@ class OpaqueKey(object):
             of different KeyImplementation classes (even if the KEY_FIELDS match).
             These fields must be hashable.
 
+    OpaqueKeys will not have optional constructor parameters (due to the implementation of
+    KEY_FIELDS), by default. However, and implementation class can provide a default,
+    os long as it passes that default to a call to super().__init__.
+
     OpaqueKeys are immutable.
     """
     __metaclass__ = OpaqueKeyMetaclass
@@ -107,7 +111,8 @@ class OpaqueKey(object):
         """
         namespace, _, rest = serialized.partition(cls.NAMESPACE_SEPARATOR)
 
-        # No ':' found by partition, so it returns the input string
+        # If ':' isn't found in the string, then the source string
+        # is returned as the first result (i.e. namespace)
         if namespace == serialized:
             raise InvalidKeyError(cls, serialized)
 
