@@ -124,14 +124,19 @@ class ContainerViewTestCase(CourseTestCase):
         Verify that an xblock returns the expected HTML for a container preview
         """
         # First verify that the behavior is correct with a published container
+        self._test_preview_html(self.vertical)
         self._test_preview_html(self.child_vertical)
 
         # Now make the unit and its children into a draft and validate the preview again
-        modulestore('draft').convert_to_draft(self.vertical.location)
+        draft_unit = modulestore('draft').convert_to_draft(self.vertical.location)
         draft_container = modulestore('draft').convert_to_draft(self.child_vertical.location)
+        self._test_preview_html(draft_unit)
         self._test_preview_html(draft_container)
 
     def _test_preview_html(self, xblock):
+        """
+        Verify that the specified xblock has the expected HTML elements for container preview
+        """
         locator = loc_mapper().translate_location(self.course.id, xblock.location, published=False)
         publish_state = compute_publish_state(xblock)
         preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)

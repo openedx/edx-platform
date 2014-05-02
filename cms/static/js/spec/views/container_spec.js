@@ -8,7 +8,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
             describe("Supports reordering components", function () {
 
                 var model, containerView, mockContainerHTML, respondWithMockXBlockFragment, init, getComponent,
-                    getDragHandle, dragComponentVertically, dragComponentToY, dragComponentAbove, dragComponentBelow,
+                    getDragHandle, dragComponentVertically, dragComponentToY, dragComponentAbove,
                     verifyRequest, verifyNumReorderCalls, respondToRequest,
 
                     rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
@@ -91,11 +91,6 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                 dragComponentAbove = function (sourceLocator, targetLocator) {
                     var targetElement = getComponent(targetLocator);
                     dragComponentToY(sourceLocator, targetElement.offset().top + 1);
-                };
-
-                dragComponentBelow = function (sourceLocator, targetLocator) {
-                    var targetElement = containerView.$('[data-locator="' + targetLocator + '"]');
-                    dragComponentToY(sourceLocator, targetElement.offset().top + targetElement.height() - 1);
                 };
 
                 verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {

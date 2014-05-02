@@ -10,6 +10,7 @@ from ..pages.studio.overview import CourseOutlinePage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
+
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly

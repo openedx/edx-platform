@@ -131,11 +131,11 @@ class DiscussionPreviewTest(UniqueCourseTest):
 
         AutoAuthPage(self.browser, staff=True).visit()
         cop = CourseOutlinePage(
-                self.browser,
-                self.course_info['org'],
-                self.course_info['number'],
-                self.course_info['run']
-                )
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
         cop.visit()
         self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit')
         self.unit.go_to()

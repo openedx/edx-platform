@@ -59,7 +59,7 @@ class ContainerPage(PageObject):
         action = ActionChains(self.browser)
         action.click_and_hold(source).perform()  # pylint: disable=protected-access
         action.move_to_element_with_offset(
-            target, 0, target.size['height']/2 if after else 0
+            target, 0, target.size['height'] / 2 if after else 0
         ).perform()  # pylint: disable=protected-access
         action.release().perform()
         # TODO: should wait for "Saving" to go away so we know the operation is complete?
