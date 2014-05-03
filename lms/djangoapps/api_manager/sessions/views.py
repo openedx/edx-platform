@@ -12,7 +12,6 @@ from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,8 +19,9 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.users.serializers import UserSerializer
-from student.models import LoginFailures
-
+from student.models import (
+    LoginFailures, PasswordHistory
+)
 AUDIT_LOG = logging.getLogger("audit")
 
 
@@ -68,6 +68,15 @@ class SessionsList(APIView):
                 response_data['message'] = _('This account has been temporarily locked due to excessive login failures. '
                                              'Try again later.')
                 return Response(response_data, status=response_status)
+
+         # see if the user must reset his/her password due to any policy settings
+        if existing_user and PasswordHistory.should_user_reset_password_now(existing_user):
+            response_status = status.HTTP_403_FORBIDDEN
+            response_data['message'] = _(
+                'Your password has expired due to password policy on this account. '
+                'You must reset your password before you can log in again.'
+            )
+            return Response(response_data, status=response_status)
 
         if existing_user:
             user = authenticate(username=existing_user.username, password=request.DATA['password'])
