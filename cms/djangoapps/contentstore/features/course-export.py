@@ -46,9 +46,8 @@ def i_click_on_error_dialog(step):
     world.click_link_by_text('Correct failed component')
     assert_true(world.css_html("span.inline-error").startswith("Problem i4x://MITx/999/problem"))
     course_key = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
-    # Unfortunately we don't know the actual ID of the vertical. So we will need to strip off "dummy_id"
-    # and just check that we did go to a vertical page in the course (there should only be one).
-    vertical_usage_key = course_key.make_usage_key("vertical", "dummy_id")
+    # we don't know the actual ID of the vertical. So just check that we did go to a
+    # vertical page in the course (there should only be one).
+    vertical_usage_key = course_key.make_usage_key("vertical", "")
     vertical_url = reverse_usage_url('unit_handler', vertical_usage_key)
-    vertical_url = vertical_url.replace("dummy_id", "")
     assert_equal(1, world.browser.url.count(vertical_url))
