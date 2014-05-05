@@ -12,7 +12,6 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 
 from django.db import DatabaseError
 from django.contrib.auth.models import User
@@ -242,9 +241,6 @@ class FieldDataCache(object):
             return field_object
 
         if key.scope == Scope.user_state:
-            # When we start allowing block_scope_ids to be either Locations or Locators,
-            # this assertion will fail. Fix the code here when that happens!
-            assert(isinstance(key.block_scope_id, Location))
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),
