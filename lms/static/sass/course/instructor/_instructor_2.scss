@@ -34,6 +34,11 @@
   }
 
   // system feedback - messages
+
+  .wrapper-msg {
+    margin-bottom: ($baseline*1.5);
+  }
+
   .msg {
     border-radius: 1px;
     padding: $baseline/2 $baseline*0.75;
@@ -43,6 +48,10 @@
     .copy {
       font-weight: 600;
     }
+
+    &.is-shown {
+      display: block;
+    }
   }
 
   // TYPE: warning
@@ -51,6 +60,10 @@
     background: tint($warning-color,95%);
     display: none;
     color: $warning-color;
+
+    &.is-shown {
+      display: block;
+    }
   }
 
   // TYPE: confirm
@@ -59,6 +72,10 @@
     background: tint($confirm-color,95%);
     display: none;
     color: $confirm-color;
+
+    &.is-shown {
+      display: block;
+    }
   }
 
   // TYPE: confirm
@@ -68,6 +85,10 @@
 
     .copy {
       color: $error-color;
+    }
+
+    &.is-shown {
+      display: block;
     }
   }
 
@@ -110,6 +131,11 @@ section.instructor-dashboard-content-2 {
   //   border: 1px solid blue;
   // }
 
+  .wrap-instructor-info {
+    display: inline;
+    top: 0;
+  }
+
   .request-response-error {
     margin: 0;
     padding-bottom: ($baseline);
@@ -141,8 +167,10 @@ section.instructor-dashboard-content-2 {
 
   h1 {
     @extend .top-header;
+    display: inline-block;
     padding-bottom: 0;
     border-bottom: 0;
+    margin-bottom: ($baseline*.75);
   }
 
   input[type="button"] {
@@ -163,20 +191,29 @@ section.instructor-dashboard-content-2 {
   }
 
   .instructor-nav {
-    padding-bottom: 1em;
+    @extend %ui-no-list;
+    border-top: 1px solid $gray-l3;
+    border-bottom: 1px solid $gray-l3;
 
-    border-bottom: 1px solid #C8C8C8;
-    a {
-      margin-right: 1.2em;
-    }
+    .nav-item {
+      @extend %t-copy-base;
+      display: inline-block;
+      margin: ($baseline/2) $baseline;
 
-    .active-section {
-      color: #551A8B;
+      a {
+        display: block;
+        text-transform: uppercase;
+
+        &.active-section {
+          color: $black;
+        }
+      }
     }
   }
 
   section.idash-section {
     display: none;
+    margin-top: ($baseline*1.5);
     // background-color: #0f0;
 
     &.active-section {
@@ -560,14 +597,14 @@ section.instructor-dashboard-content-2 {
     float: left;
     clear: both;
     margin-top: 25px;
-  
+
     .metrics-left {
       position: relative;
       width: 30%;
       height: 640px;
       float: left;
       margin-right: 2.5%;
-    
+
       svg {
         width: 100%;
       }
@@ -579,33 +616,33 @@ section.instructor-dashboard-content-2 {
       float: left;
       margin-left: 2.5%;
       margin-bottom: 25px;
-	    
+
       svg {
         width: 100%;
       }
     }
-          
+
     svg {
       .stacked-bar {
         cursor: pointer;
       }
     }
-	
+
     .metrics-tooltip {
       width: 250px;
       background-color: lightgray;
       padding: 3px;
     }
-	
+
     .metrics-overlay {
-      position: absolute; 
-      top: 0; 
-      right: 0; 
-      bottom: 0; 
-      left: 0; 
-      background-color: rgba(255,255,255, .75); 
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(255,255,255, .75);
       display: none;
-	    
+
       .metrics-overlay-content-wrapper {
         position: relative;
         display: block;
@@ -616,23 +653,23 @@ section.instructor-dashboard-content-2 {
         border: 1px solid #000;
         border-radius: 25px;
         padding: 2.5%;
-              
+
         .metrics-overlay-title {
           display: block;
           height: 50px;
           margin-bottom: 10px;
           font-weight: bold;
         }
-              
+
         .metrics-overlay-content {
           width: 100%;
           height: 370px;
           overflow: auto;
           border: 1px solid #000;
-              
+
           table {
             width: 100%;
-                  
+
             .header {
               background-color: #ddd;
             }
@@ -641,18 +678,18 @@ section.instructor-dashboard-content-2 {
             }
           }
         }
-        
+
         .overflow-message {
           padding-top: 20px;
         }
-              
+
         .download-csv {
           position: absolute;
           display: none;
           right: 2%;
           bottom: 2%;
         }
-              
+
         .close-button {
           position: absolute;
           right: 1.5%;
@@ -661,27 +698,27 @@ section.instructor-dashboard-content-2 {
         }
       }
     }
-	
+
     .stacked-bar-graph-legend {
       fill: white;
     }
-	
+
     p.loading {
       padding-top: 100px;
       text-align: center;
     }
-	
+
     p.nothing {
       padding-top: 25px;
     }
-	
+
     h3.attention {
       padding: 10px;
       border: 1px solid #999;
       border-radius: 5px;
       margin-top: 25px;
     }
-	
+
     input#graph_reload {
       display: none;
     }

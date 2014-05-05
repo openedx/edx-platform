@@ -173,10 +173,13 @@
 
   .wrapper-msg {
     margin-bottom: ($baseline*1.5);
-    padding: ($baseline/2) $baseline;
 
     .msg {
       margin-bottom: 0;
+    }
+
+    .note {
+      margin: 0;
     }
   }
 
