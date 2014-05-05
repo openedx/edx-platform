@@ -75,8 +75,9 @@ class Command(BaseCommand):
                     for status in status_tally})
 
             mode_tally = GeneratedCertificate.objects.filter(
-                course_id__exact=course_id).values('mode').annotate(
-                dcount=Count('downloadable'))
+                course_id__exact=course_id,
+                status__exact='downloadable').values('mode').annotate(
+                dcount=Count('mode'))
             cert_data[course_id].update(
                 {mode['mode']: mode['dcount']
                     for mode in mode_tally})
