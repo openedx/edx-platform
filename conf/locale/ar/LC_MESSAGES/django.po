@@ -6,11 +6,12 @@
 # Translators:
 # abdallah_n <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# abdallah_n <abdoosh00@gmail.com>, 2013
+# abdallah_n <abdoosh00@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013-2014
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # a.nassif <a.nassif@sit-mena.com>, 2013
+# Hassan05 <hassan.upb@gmail.com>, 2014
 # khateeb <eng.elkhteeb@gmail.com>, 2013
 # khateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
@@ -40,10 +41,11 @@
 # Translators:
 # abdallah_n <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# abdallah_n <abdoosh00@gmail.com>, 2013
+# abdallah_n <abdoosh00@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013-2014
 # hani1460 <hani0a@hotmail.com>, 2014
+# Hassan05 <hassan.upb@gmail.com>, 2014
 # jkfreij <jkfreij@gmail.com>, 2014
 # khateeb <eng.elkhteeb@gmail.com>, 2013
 # khateeb <eng.elkhteeb@gmail.com>, 2013
@@ -59,9 +61,12 @@
 # Translators:
 # abdallah_n <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# abdallah_n <abdoosh00@gmail.com>, 2014
 # Safaa_fadl <fadlaoui_safaa@yahoo.fr>, 2014
+# Hassan05 <hassan.upb@gmail.com>, 2014
 # jkfreij <jkfreij@gmail.com>, 2014
 # khateeb <eng.elkhteeb@gmail.com>, 2013
+# may <may@qordoba.com>, 2014
 # najwan <najwanrousan@gmail.com>, 2013
 # sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -81,13 +86,16 @@
 # 
 # Translators:
 # Almaazon <Ahmed.Almaazon@hotmail.com>, 2014
+# Hassan05 <hassan.upb@gmail.com>, 2014
+# mabdelhaq <mabdelhaq@qou.edu>, 2014
+# SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
-"PO-Revision-Date: 2014-03-11 14:11+0000\n"
-"Last-Translator: Almaazon <Ahmed.Almaazon@hotmail.com>\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"PO-Revision-Date: 2014-05-04 11:18+0000\n"
+"Last-Translator: Hassan05 <hassan.upb@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -250,8 +258,13 @@ msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
+#, fuzzy
 msgid "Email or password is incorrect."
 msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"البريد الإلكتروني أو كلمة السر غير صحيحة\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"البريد الإلكتروني أو كلمة المرور غير صحيحة"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -847,7 +860,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1410,6 +1423,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgstr ""
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
@@ -2517,6 +2540,8 @@ msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
 msgstr ""
+"الرجاء زيارة <a href=\"{dashboard_link}\">صفحة المعلومات الرئيسية</a> الخاصة"
+" بك للاطلاع على المساقات التي تم تسجيلك بها مؤخراً."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
@@ -3135,8 +3160,15 @@ msgid "Password Reset Help"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
+#: cms/templates/login.html lms/templates/login-sidebar.html
+#: lms/templates/register-sidebar.html
+#, fuzzy
 msgid "Need Help?"
-msgstr "تحتاج إلى مساعدة؟"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"تحتاج إلى مساعدة؟\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"هل تحتاج مساعدة؟"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -4486,6 +4518,12 @@ msgid ""
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
 msgstr ""
+"{platform_name} هي منشأة غير ربحية تم تأسيسها من قبل الشركاء {Harvard} "
+"و{MIT}، الذين تتمثّل مهمتهم في تقديم أفضل مستويات الدراسات العليا وجعلها في "
+"متناول الطلاب من جميع الأعمار وفي أي مكان في العالم يتوفّر فيه الاتصال "
+"بالإنترنت. إن مساقات {platform_name} الضخمة المتاحة عبر الإنترنت والمقدّمة "
+"بشكلٍ مجاني هي مساقات تفاعلية، وتشمل عدة مواد من ضمنها علوم الحاسوب، الصحة "
+"العامة، و الذكاء الاصطناعي."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -4774,7 +4812,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
-msgstr ""
+msgstr "عنوان بريدك الإلكتروني أو كلمة السر غير صحيحين"
 
 #: lms/templates/login.html
 msgid ""
@@ -4811,8 +4849,22 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
+msgstr ""
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
 msgstr ""
 
 #: lms/templates/lti.html
@@ -4822,6 +4874,10 @@ msgstr ""
 #: lms/templates/lti.html
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
+msgstr ""
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
 msgstr ""
 
 #: lms/templates/lti_form.html
@@ -5127,7 +5183,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr ""
+msgstr "إنشئ حسابي على {platform_name}"
 
 #: lms/templates/register.html
 msgid "Welcome!"
@@ -5167,7 +5223,7 @@ msgstr ""
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr ""
+msgstr "الإسم الكامل"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
@@ -5623,10 +5679,6 @@ msgstr ""
 msgid "Download transcript"
 msgstr ""
 
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
-msgstr ""
-
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr ""
@@ -5902,11 +5954,11 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
-msgstr ""
+msgstr "تبدأ المساقات"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes End"
-msgstr ""
+msgstr "تنتهي المساقات"
 
 #: lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
@@ -9768,6 +9820,8 @@ msgid ""
 "Thank you for activating your account. You may now sign in and start using "
 "edX Studio to author courses."
 msgstr ""
+"نشكرك على تفعيل حسابك. بإمكانك الآن تسجيل الدخول و البدء باستعمال استوديو "
+"edX لتأليف المساقات."
 
 #: cms/templates/activation_invalid.html
 msgid "Your account activation is invalid"
@@ -10196,7 +10250,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "About Exporting Courses"
-msgstr ""
+msgstr "عن تصدير المساقات"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -10356,6 +10410,8 @@ msgstr ""
 msgid ""
 "Studio helps manage your courses online, so you can focus on teaching them"
 msgstr ""
+"يساعدك الاستوديو على إدارة مساقاتك عبر الإنترنت، مما يمكّنك من التركيز على "
+"عملية إعطاء هذه المقرّرات"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
@@ -10635,6 +10691,8 @@ msgid ""
 "Integrating your imported content into this course. This may take a while "
 "with larger courses."
 msgstr ""
+"يتم دمج المحتوى الذي قمت باستيراده في هذا المقرر. قد يستغرق ذلك وقتاً مع "
+"المساقات الكبيرة. "
 
 #: cms/templates/import.html
 msgid "Success"
@@ -10714,7 +10772,7 @@ msgstr ""
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
 msgid "My Courses"
-msgstr ""
+msgstr "مساقاتي"
 
 #: cms/templates/index.html
 msgid "New Course"
@@ -10731,6 +10789,7 @@ msgstr ""
 #: cms/templates/index.html
 msgid "Here are all of the courses you currently have access to in Studio:"
 msgstr ""
+"ستجد هنا قائمة بجميع المساقات التي لديك صلاحية الدخول عليها في الاستوديو:"
 
 #: cms/templates/index.html
 msgid "You currently aren't associated with any Studio Courses."
@@ -10817,7 +10876,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing Studio course?"
-msgstr ""
+msgstr "هل أنت ضمن طاقم أي من مساقات الاستوديو؟"
 
 #: cms/templates/index.html
 msgid ""
@@ -10846,6 +10905,10 @@ msgid ""
 "evaluate your request and provide you feedback within 24 hours during the "
 "work week."
 msgstr ""
+"EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
+"تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
+"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. سيقوم فريقنا "
+"بتقييم طلبك وإعطائك إجابةً بشأنه في غضون 24 ساعة خلال أسبوع العمل."
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status:"
@@ -10853,7 +10916,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Request the Ability to Create Courses"
-msgstr ""
+msgstr "طلب صلاحية إنشاء المساقات"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status"
@@ -10866,6 +10929,10 @@ msgid ""
 "edit, while course creator privileges are granted by edX. Our team is has "
 "completed evaluating your request."
 msgstr ""
+"EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
+"تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
+"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. لقد أنهى فريقنا"
+" عملية تقييم طلبك."
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator request is:"
@@ -10887,6 +10954,10 @@ msgid ""
 "edit, while course creator privileges are granted by edX. Our team is "
 "currently  evaluating your request."
 msgstr ""
+"EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
+"تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
+"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. طلبك قيد "
+"التقييم الآن من قبل فريقنا."
 
 #: cms/templates/index.html
 msgid ""
@@ -10896,7 +10967,7 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Need help?"
-msgstr ""
+msgstr "هل تحتاج إلى مساعدة؟"
 
 #: cms/templates/index.html
 msgid ""
@@ -10914,7 +10985,7 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
-msgstr ""
+msgstr "هل أستطيع إنشاء مساقات باستخدام برنامج استوديو؟"
 
 #: cms/templates/index.html
 msgid "In order to create courses in Studio, you must"
@@ -10932,7 +11003,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
+msgstr "الطلب الذي تقدمت به لتأليف المساقات في الاستوديو قد رفض. الرجاء"
 
 #: cms/templates/index.html
 msgid "contact edX Staff with further questions"
@@ -11251,7 +11322,7 @@ msgstr ""
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
+msgstr "قم بإنشاء حسابي و ابدأ بتأليف المساقات"
 
 #: cms/templates/register.html
 msgid "Common Studio Questions"
@@ -11960,6 +12031,9 @@ msgid ""
 "Take advantage of our documentation, help center, as well as our edX101 "
 "introduction course for course authors."
 msgstr ""
+"هل تحتاج مساعدة في استعمال برنامج استوديو؟ إن وضع مقررٍ ما هو أمرٌ معقد، "
+"لذلك فنحن هنا للمساعدة. استفد من التوثيق الكامل الذي نوفّره، ومن مركز "
+"المساعدة، وأيضاً من مقرر edX101 التمهيدي لمؤلفي المساقات."
 
 #: cms/templates/widgets/sock.html
 msgid "Download Studio Documentation"

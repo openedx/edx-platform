@@ -76,6 +76,8 @@
 # JRolland <julien.rolland33@gmail.com>, 2013
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
+# Manjari <mringuet@gmail.com>, 2014
+# Mtiana <mtiana8@gmail.com>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Yannick1 <yannick.petit@gmail.com>, 2013
@@ -125,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -907,7 +909,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1542,6 +1544,16 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "Une adresse YouTube ou un lien vers un fichier hébergé n'importe où sur le "
 "web."
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -5327,9 +5339,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "Ressource externe"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -5341,6 +5367,10 @@ msgid ""
 msgstr ""
 "Veuillez fournir launch_url. Cliquez sur \"Editer\" et remplissez les champs"
 " requis."
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
+msgstr ""
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -6195,10 +6225,6 @@ msgstr "Télécharger la vidéo"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/video.html

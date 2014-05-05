@@ -551,8 +551,6 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
-# Languages that don't have any reviewed strings are commented out;
-# see https://www.transifex.com/projects/p/edx-platform/
 LANGUAGES = (
     ('en', u'English'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
@@ -561,13 +559,14 @@ LANGUAGES = (
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('bn-in', u'বাংলা (ভারত)'),  # Bengali (India)
     ('bs', u'bosanski'),  # Bosnian
     ('ca', u'Català'),  # Catalan
     ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
+    ('da', u'dansk'),  # Danish
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
     ('el', u'Ελληνικά'),  # Greek
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
@@ -578,7 +577,6 @@ LANGUAGES = (
     ('es-es', u'Español (España)'),  # Spanish (Spain)
     ('es-mx', u'Español (México)'),  # Spanish (Mexico)
     ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
-    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
     ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
     ('eu-es', u'euskara (Espainia)'),  # Basque (Spain)
     ('fa', u'فارسی'),  # Persian
@@ -595,6 +593,7 @@ LANGUAGES = (
     ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
     ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
     ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('kn', u'ಕನ್ನಡ'),  # Kannada
     ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
@@ -606,6 +605,7 @@ LANGUAGES = (
     ('pl', u'Polski'),  # Polish
     ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
     ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ro', u'română'),  # Romanian
     ('ru', u'Русский'),  # Russian
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak

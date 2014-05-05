@@ -8,6 +8,7 @@
 # apardo <apardo@alabs.org>, 2013
 # ovnicraft <ovnicraft@gmail.com>, 2014
 # dsalazar <imdjsg@gmail.com>, 2014
+# dzepeda <davitzepeda@hotmail.com>, 2014
 # diegobe <diegobe@iadb.org>, 2014
 # dsalazar <imdjsg@gmail.com>, 2014
 # ferabra <ferabra@gmail.com>, 2014
@@ -46,6 +47,7 @@
 # apardo <apardo@alabs.org>, 2013
 # ovnicraft <ovnicraft@gmail.com>, 2013
 # dsalazar <imdjsg@gmail.com>, 2014
+# dzepeda <davitzepeda@hotmail.com>, 2014
 # dsalazar <imdjsg@gmail.com>, 2014
 # ferabra <ferabra@gmail.com>, 2013
 # ferabra <ferabra@gmail.com>, 2013
@@ -102,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
 "PO-Revision-Date: 2014-03-01 15:39+0000\n"
 "Last-Translator: ovnicraft <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -882,8 +884,8 @@ msgid "unanswered"
 msgstr "sin responder"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
-msgstr "en cola"
+msgid "processing"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -1506,6 +1508,16 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "Una dirección URL de YouTube o un vínculo a un archivo alojado en cualquier "
 "lugar de la Web."
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -5285,9 +5297,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "Recurso externo"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -5299,6 +5325,10 @@ msgid ""
 msgstr ""
 "Por favor proveer launch_url. Clic en \"Editar\", y completar los campos "
 "necesarios."
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
+msgstr ""
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -6154,10 +6184,6 @@ msgstr "Descargar video"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/video.html
