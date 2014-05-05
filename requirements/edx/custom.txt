@@ -1,0 +1,10 @@
+# Custom requirements to be customized by individual OpenEdX instances
+
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@cc2026a4da325937a2e9a7ba8678b75ce4ef5b68#egg=xblock-mentoring
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@9b01df4bca8aca89d300850a357fb1647cbd3173#egg=xblock-image-explorer
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@eaa8dd4d934a374738fd7385fc636cbb99575c40#egg=xblock-drag-and-drop
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@1e99a60c7f44c0c51f40b90069d911c61a35103b#egg=xblock-drag-and-drop-v2
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@10ededa58aab3f8893d98de36e2e5279890064bd#egg=xblock-ooyala
+-e git+https://github.com/edx-solutions/xblock-group-project.git@2b932de36e293bd08f6a59112daa9d6794a05c46#egg=xblock-group-project
+-e git+https://github.com/edx-solutions/xblock-discussion.git@5b14678ca85856b4db2bb612b69047ec82c11efb#egg=xblock-discussion
+-e git+https://github.com/edx-solutions/xblock-adventure.git@7b0b4fae3d1aeab665001a16f42782b9ef9f8ccd#egg=xblock-adventure
