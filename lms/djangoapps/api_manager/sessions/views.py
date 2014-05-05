@@ -4,7 +4,7 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -151,4 +151,5 @@ class SessionsDetail(APIView):
         user_id = session[SESSION_KEY]
         AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         session.flush()
+        logout(request)
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)

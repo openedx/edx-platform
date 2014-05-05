@@ -87,6 +87,15 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['first_name'], self.test_first_name)
         self.assertEqual(response.data['last_name'], self.test_last_name)
 
+    def test_user_list_post_inactive(self):
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name, 'is_active': False }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['is_active'], False)
+
+
     def test_user_list_post_duplicate(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -112,24 +121,32 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['username'], local_username)
         self.assertEqual(response.data['first_name'], self.test_first_name)
         self.assertEqual(response.data['last_name'], self.test_last_name)
+        self.assertEqual(response.data['is_active'], True)
         self.assertEqual(len(response.data['resources']), 2)
 
-    def test_user_detail_delete(self):
+    def test_user_detail_get_undefined(self):
+        test_uri = '/api/users/123456789'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_detail_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
-        response = self.do_delete(test_uri)
-        self.assertEqual(response.status_code, 204)
+        data = {'is_active': False }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['is_active'], False)
         response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-        response = self.do_delete(test_uri)  # User no longer exists, should get a 204 all the same
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['is_active'], False)
 
-    def test_user_detail_get_undefined(self):
-        test_uri = '/api/users/123456789'
-        response = self.do_get(test_uri)
+    def test_user_detail_post_invalid_user(self):
+        test_uri = '/api/users/123124124'
+        data = {'is_active': False }
+        response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_list_post(self):
