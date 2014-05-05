@@ -93,6 +93,12 @@ class DarkLangMiddlewareTests(TestCase):
             self.process_request(accept='rel;q=1.0, unrel;q=0.5')
         )
 
+    def test_accept_with_syslang(self):
+        self.assertAcceptEquals(
+            'en;q=1.0, rel;q=0.8',
+            self.process_request(accept='en;q=1.0, rel;q=0.8, unrel;q=0.5')
+        )
+
     def test_accept_multiple_released_langs(self):
         DarkLangConfig(
             released_languages=('rel, unrel'),

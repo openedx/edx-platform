@@ -88,6 +88,15 @@ TRACKING_BACKENDS.update({
     }
 })
 
+EVENT_TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'eventtracking.backends.mongodb.MongoBackend',
+        'OPTIONS': {
+            'database': 'track'
+        }
+    }
+})
+
 
 # Enable asset pipeline
 # Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`

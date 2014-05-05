@@ -64,29 +64,6 @@ edX Learning Management System
   problem answer was shown is now resolved. (BLD-993)
 
 
-  
-.. Links
 
-.. _edX Status: http://status.edx.org/
 
-.. _edX roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
-
-.. _Building and Running an edX Course: http://edx.readthedocs.org/projects/ca/en/latest/
-
-.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
-
-.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
-
-.. _Testing Your Course: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/view_course_content.html#testing-your-course
-
-.. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/view_course_content.html#view-your-live-course
-
-.. _Transcripts in Additional Languages: http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_video.html#transcripts-in-additional-languages
-
-.. _Working with Video Components: http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_video.html
-
-.. _Discussions: http://edx.readthedocs.org/projects/ca/en/latest/running_course/discussions.html#discussions
-
-.. _Bulk Email: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/course_launching.html#bulk-email
-
-.. _Enrollment: http://ca.readthedocs.org/en/latest/running_course/course_enrollment.html#enrollment
+.. include:: links.rst

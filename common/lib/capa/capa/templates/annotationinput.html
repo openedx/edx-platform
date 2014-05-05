@@ -52,13 +52,7 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    % if status == 'unsubmitted':
-    <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Unanswered</span></span>
-    % elif status == 'incomplete':
-    <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Incorrect</span></span>
-    % elif status == 'incorrect' and not has_options_value:
-    <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Incorrect</span></span>
-    % endif
+    <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"><span class="sr">${status.display_name}</span></span>
 
     <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>

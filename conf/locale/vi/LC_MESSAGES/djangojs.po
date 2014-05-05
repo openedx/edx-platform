@@ -24,15 +24,16 @@
 # hdvd2309 <huynq23091@gmail.com>, 2013-2014
 # hoad, 2013
 # ngocchung75 <ngocchung75@gmail.com>, 2013
+# An Walker <neyugn2909@gmail.com>, 2014
 # hdvd2309 <huynq23091@gmail.com>, 2014
 # ppanhh <vietnamesel10n@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-24 13:20+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-05-02 17:09-0400\n"
+"PO-Revision-Date: 2014-05-05 09:39+0000\n"
+"Last-Translator: An Walker <neyugn2909@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

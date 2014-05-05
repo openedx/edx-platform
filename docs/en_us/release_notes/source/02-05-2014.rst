@@ -2,32 +2,41 @@
 February 5, 2014
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `Google Instant Hangout Tool`_
+  * `Student Data`_
+  * `Grade and Answer Data`_
+  * `Multiple Choice and Numerical Input Problem`_
+
+
+* `edX Data Documentation`_
+
+
+* `edX Platform Developer Documentation`_
+
+
 
 
 *************
 edX Studio
 *************
 
-New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
-
-Recent documentation additions include:
-
-* `Using an Instant Hangout in Your Course <http://edx.readthedocs.org/projects/ca/en/latest/google_hangouts.html>`_
-* `Student Data <http://edx.readthedocs.org/projects/ca/en/latest/course_student.html>`_
-* `Grades <http://edx.readthedocs.org/projects/ca/en/latest/course_grades.html>`_
-* `Multiple Choice and Numerical Input Problem <http://edx.readthedocs.org/projects/ca/en/latest/additional_tools.html#multiple-choice-and-numerical-input>`_
-
-
-==========================
-Changes and Updates
-==========================
-
-* The Display Name of a component is now shown if the unit is Private or a draft. For more information, see the `updated documentation on components <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html#components>`_.
+* The Display Name of a component is now shown if the unit is Private or a draft. For more information, see the `Components`_ documentation.
 
 
 ***************************************
@@ -52,3 +61,5 @@ Discussions
 * Long discussion threads are now paginated. When a student opens the discussion thread, first 25 responses are loaded. The student can then load 100 more responses at a time. The field and button to submit a new response are always available at the bottom of the listed responses. (FOR-371)
 
 * When you hover the mouse button over a discussion thread in the left side bar, the pop-up tool-tip now correctly displays the number of unread comments you have in the thread. (FOR-434)
+
+.. include:: links.rst

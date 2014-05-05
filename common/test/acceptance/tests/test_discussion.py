@@ -5,7 +5,7 @@ Tests for discussion pages
 from uuid import uuid4
 
 from .helpers import UniqueCourseTest
-from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.discussion import (
     DiscussionTabSingleThreadPage,

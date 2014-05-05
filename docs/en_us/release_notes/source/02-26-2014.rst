@@ -2,32 +2,36 @@
 February 26, 2014
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `Getting Started`_
+  * `Beta Testing a Course`_
+  * `Import LaTeX Code into an HTML Component`_
+  * `Establishing a Grading Policy`_
 
 
-Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+* `edX Data Documentation`_
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+   Recent changes include:
 
-Recent changes to *Building a Course with edX Studio* include:
+   * `Tracking Logs`_ 
+   * `Wiki Data`_
+   * `Discussion Forum Data`_
 
-* `Getting Started with edX <http://edx.readthedocs.org/projects/ca/en/latest/accounts.html#getting-started-with-edx>`_
-
-* `Beta Testing a Course <http://edx.readthedocs.org/projects/ca/en/latest/beta_testing.html#beta-testing>`_
-
-* Updates to `Import LaTeX Code into an HTML Component <http://edx.readthedocs.org/projects/ca/en/latest/create_html_component.html#import-latex-code>`_
-
-* Updates to `Establishing a Grading Policy <http://edx.readthedocs.org/projects/ca/en/latest/establish_grading_policy.html#establish-a-grading-policy>`_
-
-Recent updates to *edX Data Documentation* include:
-
-* `Wiki Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/wiki_data.html#wiki-data>`_
-
-* `Discussion Forum Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/discussion_data.html#discussion-forums-data>`_
-
-* `Tracking Logs <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html#tracking-logs>`_
+* `edX Platform Developer Documentation`_
 
 
 
@@ -48,5 +52,8 @@ Discussions
 
 
 * Course staff can now delete comments made on discussion responses.
+  
+.. include:: links.rst
+
 
 

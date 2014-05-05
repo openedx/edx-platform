@@ -24,8 +24,11 @@ else:
 %>
 <div class="message message-status ${status_css_class} is-shown">
 
-% if cert_status['status'] == 'processing':
+% if cert_status['status'] == 'processing' and not course.may_certify():
       <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
+% elif course.may_certify() and cert_status['status'] == 'processing':
+      <!-- Certification is allowed but no cert requested, or cert unearned -->
+      <!-- <p class="message-copy">${_("Your final standing is unrequested or unavailable at this time.")}</p> -->
 % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
       <p class="message-copy">${_("Your final grade:")}
       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
@@ -49,7 +52,7 @@ else:
     % if cert_status['show_disabled_download_button']:
       <li class="action"><span class="disabled">
           ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}</span></li>
-    % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
+    % elif cert_status['show_download_url'] and (enrollment.mode == 'honor' or enrollment.mode == 'audit'):
       <li class="action action-certificate">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">

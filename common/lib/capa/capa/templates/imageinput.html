@@ -39,38 +39,11 @@
     (new ImageInput('${id}'));
   </script>
 
-  % if status == 'unsubmitted':
       <span
-        class="unanswered"
-        style="display: inline-block;"
+        class="status ${status.classname}"
         id="status_${id}"
         aria-describedby="input_${id}"
       >
-        <span class="sr">Status: unanswered</span>
+        <span class="sr">${status.display_name}</span>
       </span>
-  % elif status == 'correct':
-      <span
-        class="correct"
-        id="status_${id}"
-        aria-describedby="input_${id}"
-      >
-        <span class="sr">Status: correct</span>
-      </span>
-  % elif status == 'incorrect':
-      <span
-        class="incorrect"
-        id="status_${id}"
-        aria-describedby="input_${id}"
-      >
-        <span class="sr">Status: incorrect</span>
-      </span>
-  % elif status == 'incomplete':
-      <span
-        class="incorrect"
-        id="status_${id}"
-        aria-describedby="input_${id}"
-      >
-        <span class="sr">Status: incorrect</span>
-      </span>
-  % endif
 </div>

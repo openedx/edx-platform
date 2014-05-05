@@ -3,6 +3,7 @@ Tests of the LMS XBlock Runtime and associated utilities
 """
 
 from django.contrib.auth.models import User
+from django.conf import settings
 from ddt import ddt, data
 from mock import Mock
 from unittest import TestCase
@@ -86,6 +87,18 @@ class TestHandlerUrl(TestCase):
     def test_handler_name(self):
         self.assertIn('handler1', self._parsed_path('handler1'))
         self.assertIn('handler_a', self._parsed_path('handler_a'))
+
+    def test_thirdparty_fq(self):
+        """Testing the Fully-Qualified URL returned by thirdparty=True"""
+        parsed_fq_url = urlparse(self.runtime.handler_url(self.block, 'handler', thirdparty=True))
+        self.assertEqual(parsed_fq_url.scheme, 'https')
+        self.assertEqual(parsed_fq_url.hostname, settings.SITE_NAME)
+
+    def test_not_thirdparty_rel(self):
+        """Testing the Fully-Qualified URL returned by thirdparty=False"""
+        parsed_fq_url = urlparse(self.runtime.handler_url(self.block, 'handler', thirdparty=False))
+        self.assertEqual(parsed_fq_url.scheme, '')
+        self.assertIsNone(parsed_fq_url.hostname)
 
 
 class TestUserServiceAPI(TestCase):

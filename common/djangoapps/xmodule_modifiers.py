@@ -165,7 +165,7 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
     Does nothing if module is a SequenceModule.
     """
     # TODO: make this more general, eg use an XModule attribute instead
-    if isinstance(block, VerticalModule):
+    if isinstance(block, VerticalModule) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
         is_mongo_course = modulestore().get_modulestore_type(block.course_id) == MONGO_MODULESTORE_TYPE
         is_studio_course = block.course_edit_method == "Studio"

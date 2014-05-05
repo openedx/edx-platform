@@ -12,16 +12,17 @@ import pytz
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.test.client import RequestFactory
+from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponse
+from unittest.case import SkipTest
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
-from mock import Mock, patch, sentinel
+from mock import Mock, patch
 
 from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info,
@@ -146,12 +147,58 @@ class DashboardTest(TestCase):
     def setUp(self):
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
-        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
+        self.client = Client()
+
+    def check_verification_status_on(self, mode, value):
+        """
+        Check that the css class and the status message are in the dashboard html.
+        """
+        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        try:
+            response = self.client.get(reverse('dashboard'))
+        except NoReverseMatch:
+            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        self.assertContains(response, "class=\"course {0}\"".format(mode))
+        self.assertContains(response, value)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': True})
+    def test_verification_status_visible(self):
+        """
+        Test that the certificate verification status for courses is visible on the dashboard.
+        """
+        self.client.login(username="jack", password="test")
+        self.check_verification_status_on('verified', 'You\'re enrolled as a verified student')
+        self.check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self.check_verification_status_on('audit', 'You\'re auditing this course')
+
+    def check_verification_status_off(self, mode, value):
+        """
+        Check that the css class and the status message are not in the dashboard html.
+        """
+        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        try:
+            response = self.client.get(reverse('dashboard'))
+        except NoReverseMatch:
+            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        self.assertNotContains(response, "class=\"course {0}\"".format(mode))
+        self.assertNotContains(response, value)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    def test_verification_status_invisible(self):
+        """
+        Test that the certificate verification status for courses is not visible on the dashboard
+        if the verified certificates setting is off.
+        """
+        self.client.login(username="jack", password="test")
+        self.check_verification_status_off('verified', 'You\'re enrolled as a verified student')
+        self.check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
+        self.check_verification_status_off('audit', 'You\'re auditing this course')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(
@@ -192,14 +239,9 @@ class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""
 
     def setUp(self):
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
-
-        crum_patcher = patch('student.models.crum.get_current_request')
-        self.mock_get_current_request = crum_patcher.start()
-        self.addCleanup(crum_patcher.stop)
-        self.mock_get_current_request.return_value = sentinel.request
 
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
@@ -254,13 +296,12 @@ class EnrollInCourseTest(TestCase):
 
     def assert_no_events_were_emitted(self):
         """Ensures no events were emitted since the last event related assertion"""
-        self.assertFalse(self.mock_server_track.called)
-        self.mock_server_track.reset_mock()
+        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
+        self.mock_tracker.reset_mock()
 
     def assert_enrollment_event_was_emitted(self, user, course_id):
         """Ensures an enrollment event was emitted since the last event related assertion"""
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.activated',
             {
                 'course_id': course_id,
@@ -268,12 +309,11 @@ class EnrollInCourseTest(TestCase):
                 'mode': 'honor'
             }
         )
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.reset_mock()
 
     def assert_unenrollment_event_was_emitted(self, user, course_id):
         """Ensures an unenrollment event was emitted since the last event related assertion"""
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.deactivated',
             {
                 'course_id': course_id,
@@ -281,7 +321,7 @@ class EnrollInCourseTest(TestCase):
                 'mode': 'honor'
             }
         )
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.reset_mock()
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
@@ -445,8 +485,8 @@ class AnonymousLookupTable(TestCase):
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_for_unregistered_user(self):  # same path as for logged out user

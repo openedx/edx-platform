@@ -9,57 +9,39 @@ The following information reflects what is new in the edX Platform as of April
 edX Documentation
 **************************
 
-You can access the public edX `roadmap <https://edx-
-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for
+You can access the public `edX roadmap`_ for
 details about the currently planned product direction.
 
 The following documentation is available:
 
-* `Building and Running an edX Course.
-  <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download
-  the guide as a PDF from the edX Studio user interface.
+* `Building and Running an edX Course`_ 
 
-  Recent changes include:
+  You can also download the guide as a PDF from the edX Studio user interface.
 
-  * Expanded the `Grade and Answer Data <http://edx.readthedocs.org/projects/ca/
-    en/latest/running_course/course_grades.html>`_ chapter to include the new
-    `Student Answer Distribution <http://edx.readthedocs.org/projects/ca/en/late
-    st/running_course/course_grades.html#review-answers>`_ section.
+  Recent changes include: 
 
-  * Updated the `Releasing Your Course
-    <http://ca.readthedocs.org/en/latest/releasing_course/index.html#releasing-your-course-index>`_ section to include `Course Launching Activities <http://ca.readthedocs.org/en/latest/releasing_course/course_launching.html#launch>`_.
+  * Expanded the `Grade and Answer Data`_ chapter to include the new
+    `Student Answer Distribution`_ section.
 
-  * Updated the `Adding Pages to a Course <http://edx.readthedocs.org/projects/c
-    a/en/latest/creating_content/pages.html#adding-pages-to-a-course>`_ chapter
-    to reflect ability to `Show or Hide the Course Wiki Page <http://edx.readthe
-    docs.org/projects/ca/en/latest/creating_content/pages.html#show-or-hide-the-
-    course-wiki-page>`_.
+  * Updated the `Releasing Your Course`_ section to include `Course Launching Activities`_.
 
-  * Reorganized the sections `Building a Course <http://edx.readthedocs.org/proj
-    ects/ca/en/latest/building_course/index.html#building-a-course-index>`_ and
-    `Creating Course Content <http://edx.readthedocs.org/projects/ca/en/latest/c
-    reating_content/index.html#creating-course-content-index>`_ to better
+  * Updated the `Adding Pages to a Course`_ chapter
+    to reflect ability to `Show or Hide the Course Wiki Page`_.
+
+  * Reorganized the sections `Building a Course`_ and
+    `Creating Course Content`_ to better
     reflect the workflow of building a new course.
 
 
-* `edX Data Documentation
-  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+* `edX Data Documentation`_
 
   Recent changes include:
 
-  *  Added the `Data Czar/Data Team Selection and Responsibilities <http://edx.r
-     eadthedocs.org/projects/devdata/en/latest/internal_data_formats/data_czar.h
-     tml>`_ chapter.
+  *  Added the `Data Czar/Data Team Selection and Responsibilities`_ chapter.
 
-* `edX Platform Developer Documentation
-  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+* `edX Platform Developer Documentation`_
 
-  Recent changes include:
-
-  *  Added the `Custom JavaScript Display and Grading <http://edx.readthedocs.or
-     g/projects/userdocs/en/latest/extending_platform/javascript.html>`_
-     chapter.
-
+  *  Added the `Custom JavaScript Applications`_ chapter.
 
 
 *************
@@ -68,9 +50,7 @@ edX Studio
 
 * You can now choose to hide or show the Wiki in your course, by using a control
   in the list of course Pages.  For more information, see `Show or Hide the
-  Course Wiki Page
-  <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/pages.html
-  #show-or-hide-the-course-wiki-page>`_. (STUD-1375)
+  Course Wiki Page`_. (STUD-1375)
 
 * A new IFrame template is now available as an option when you create a
   new HTML component. An IFrame allows you to integrate ungraded exercises and
@@ -103,9 +83,7 @@ edX Learning Management System
 
   The report is automatically generated on a periodic basis, so the most
   recently updated version of the report is available on the Instructor
-  Dashboard. For more information, see `Student Answer Distribution
-  <http://ca.readthedocs.org/en/latest/running_course/course_grades.html#review-
-  answers>`_ . (AN-590)
+  Dashboard. For more information, see `Student Answer Distribution`_. (AN-590)
 
 * **Bulk Email for New Courses**
 
@@ -117,5 +95,7 @@ edX Learning Management System
   run. A history report of all email messages sent for your course is available.
   It includes the username of the sender, the recipients, the date and time
   sent, and the task status. For more information, see `Course Launching
-  Activities <http://ca.readthedocs.org/en/latest/releasing_course/course_launch
-  ing.html#launch>`_ . (LMS-1035)
+  Activities`_ . (LMS-1035)
+
+
+.. include:: links.rst

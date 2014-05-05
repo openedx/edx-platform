@@ -289,7 +289,6 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_info,
     )
 
-
     def __init__(self, field_data_cache):
         self._field_data_cache = field_data_cache
 

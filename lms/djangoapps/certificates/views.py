@@ -1,13 +1,44 @@
-import logging
-from certificates.models import GeneratedCertificate
-from certificates.models import CertificateStatuses as status
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-import json
+"""URL handlers related to certificate handling by LMS"""
 from dogapi import dog_stats_api
+import json
+import logging
+
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
+from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
+from certificates.queue import XQueueCertInterface
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
+
+
+@csrf_exempt
+def request_certificate(request):
+    """Request the on-demand creation of a certificate for some user, course.
+
+    A request doesn't imply a guarantee that such a creation will take place.
+    We intentionally use the same machinery as is used for doing certification
+    at the end of a course run, so that we can be sure users get graded and
+    then if and only if they pass, do they get a certificate issued.
+    """
+    if request.method == "POST":
+        if request.user.is_authenticated():
+            xqci = XQueueCertInterface()
+            username = request.user.username
+            student = User.objects.get(username=username)
+            course_id = request.POST.get('course_id')
+            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+
+            status = certificate_status_for_student(student, course_id)['status']
+            if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
+                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_id))
+                status = xqci.add_cert(student, course_id, course=course)
+            return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
+        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 
 
 @csrf_exempt
@@ -21,6 +52,7 @@ def update_certificate(request):
     This view should only ever be accessed by the xqueue server
     """
 
+    status = CertificateStatuses
     if request.method == "POST":
 
         xqueue_body = json.loads(request.POST.get('xqueue_body'))

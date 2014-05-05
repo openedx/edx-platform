@@ -2,23 +2,31 @@
 December 9, 2013
 ###################################
 
+**************************
+edX Documentation
+**************************
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+* `edX Data Documentation`_
+
+
+* `edX Platform Developer Documentation`_
+
+.. include:: links.rst
+
 *************
 edX Studio
 *************
 
-.. note:: You can now access the public edX roadmap_ for details about the currently planned product direction.
-
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
-
-=============
-New Features
-=============
-
 * You can now allow multiple strings as correct answers to text response problems. (BLD-474)
-
-==========================
-Changes and Updates
-==========================
 
 The following changes are included in this release: 
 

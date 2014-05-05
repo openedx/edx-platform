@@ -12,6 +12,12 @@ from eventtracking import tracker
 log = logging.getLogger(__name__)
 
 CONTEXT_NAME = 'edx.request'
+META_KEY_TO_CONTEXT_KEY = {
+    'REMOTE_ADDR': 'ip',
+    'SERVER_NAME': 'host',
+    'HTTP_USER_AGENT': 'agent',
+    'PATH_INFO': 'path'
+}
 
 
 class TrackMiddleware(object):
@@ -78,26 +84,58 @@ class TrackMiddleware(object):
         """
         Extract information from the request and add it to the tracking
         context.
+
+        The following fields are injected in to the context:
+
+        * session - The Django session key that identifies the user's session.
+        * user_id - The numeric ID for the logged in user.
+        * username - The username of the logged in user.
+        * ip - The IP address of the client.
+        * host - The "SERVER_NAME" header, which should be the name of the server running this code.
+        * agent - The client browser identification string.
+        * path - The path part of the requested URL.
         """
-        context = {}
+        context = {
+            'session': self.get_session_key(request),
+            'user_id': self.get_user_primary_key(request),
+            'username': self.get_username(request),
+        }
+        for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
+            context[context_key] = request.META.get(header_name, '')
+
         context.update(contexts.course_context_from_url(request.build_absolute_uri()))
-        try:
-            context['user_id'] = request.user.pk
-        except AttributeError:
-            context['user_id'] = ''
-            if settings.DEBUG:
-                log.error('Cannot determine primary key of logged in user.')
 
         tracker.get_tracker().enter_context(
             CONTEXT_NAME,
             context
         )
 
-    def process_response(self, request, response):  # pylint: disable=unused-argument
+    def get_session_key(self, request):
+        """Gets the Django session key from the request or an empty string if it isn't found"""
+        try:
+            return request.session.session_key
+        except AttributeError:
+            return ''
+
+    def get_user_primary_key(self, request):
+        """Gets the primary key of the logged in Django user"""
+        try:
+            return request.user.pk
+        except AttributeError:
+            return ''
+
+    def get_username(self, request):
+        """Gets the username of the logged in Django user"""
+        try:
+            return request.user.username
+        except AttributeError:
+            return ''
+
+    def process_response(self, _request, response):
         """Exit the context if it exists."""
         try:
             tracker.get_tracker().exit_context(CONTEXT_NAME)
-        except:  # pylint: disable=bare-except
+        except Exception:  # pylint: disable=broad-except
             pass
 
         return response
