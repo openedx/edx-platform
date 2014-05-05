@@ -59,6 +59,13 @@ mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSibli
 # not already be fetched.
 git fetch origin master:refs/remotes/origin/master
 
+# Reset the jenkins worker's ruby environment back to
+# the state it was in when the instance was spun up.
+if [ -e $HOME/edx-rbenv_clean.tar.gz ]; then
+    rm -rf $HOME/.rbenv
+    tar -C $HOME -xf $HOME/edx-rbenv_clean.tar.gz
+fi
+
 # Bootstrap Ruby requirements so we can run the tests
 bundle install
 
