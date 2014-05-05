@@ -35,7 +35,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.store_utilities import clone_course, delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -449,7 +449,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         content = None
         try:
-            location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+            location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
             content = content_store.find(location)
         except NotFoundError:
             pass
@@ -475,7 +475,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         This test will exercise the soft delete/restore functionality of the assets
         '''
         content_store, trash_store, thumbnail_location, _location = self._delete_asset_in_course()
-        asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+        asset_location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in store, but they should not be there any longer
         content = content_store.find(asset_location, throw_on_not_found=False)
@@ -519,7 +519,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         _, course_items = import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
-        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
         content = content_store.find(location, throw_on_not_found=False)
         thumbnail_location = content.thumbnail_location
         self.assertIsNotNone(content)
