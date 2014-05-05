@@ -127,14 +127,12 @@ function goto( mode)
       %endif
       <a class="instructor-info-action beta-button" href="${ standard_dashboard_url }">${_("Back To Standard Dashboard")}</a>
     </div>
-    
+
     <h1>${_("Instructor Dashboard")}</h1>
 
-    <div class="wrapper-msg urgency-low warning">
-      <div class="msg"
-        <p>${_("You are using the legacy instructor dashboard, which will be going away in the near future. Please use the Standard Dashboard. If it is missing functionality, please let us know.")}
-        <a href="${ standard_dashboard_url }">${_("Return to the Standard Dashboard")}  <i class="icon-angle-right"></i></a></p>
-      </div>
+    <div class="wrapper-msg urgency-low msg-warning is-shown">
+        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Standard Dashboard")} <i class="icon-double-angle-right"></i></a></p>
+          <p class="note">${_("If the Standard Dashboard is missing functionality, please let us know.")}</p>
     </div>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
