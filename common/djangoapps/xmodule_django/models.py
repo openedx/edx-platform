@@ -1,40 +1,97 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from types import NoneType
 
+from south.modelsinspector import add_introspection_rules
+add_introspection_rules([], ["^xmodule_django\.models\.CourseKeyField"])
+add_introspection_rules([], ["^xmodule_django\.models\.LocationKeyField"])
+
+
+class NoneToEmptyManager(models.Manager):
+    """
+    A :class:`django.db.models.Manager` that has a :class:`NoneToEmptyQuerySet`
+    as its `QuerySet`, initialized with a set of specified `field_names`.
+    """
+    def __init__(self):
+        """
+        Args:
+            field_names: The list of field names to initialize the :class:`NoneToEmptyQuerySet` with.
+        """
+        super(NoneToEmptyManager, self).__init__()
+
+    def get_query_set(self):
+        return NoneToEmptyQuerySet(self.model, using=self._db)
+
+
+class NoneToEmptyQuerySet(models.query.QuerySet):
+    """
+    A :class:`django.db.query.QuerySet` that replaces `None` values passed to `filter` and `exclude`
+    with the corresponding `Empty` value for all fields with an `Empty` attribute.
+
+    This is to work around Django automatically converting `exact` queries for `None` into
+    `isnull` queries before the field has a chance to convert them to queries for it's own
+    empty value.
+    """
+    def _filter_or_exclude(self, *args, **kwargs):
+        for name in self.model._meta.get_all_field_names():
+            field = self.model._meta.get_field(name)
+            if hasattr(field, 'Empty'):
+                for suffix in ('', '_exact'):
+                    key = '{}{}'.format(name, suffix)
+                    if key in kwargs and kwargs[key] is None:
+                        kwargs[key] = field.Empty
+        return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
+
 
 class CourseKeyField(models.CharField):
-    description = "A SlashSeparatedCourseKey object, saved to the DB in the form of a string"
+    description = "A SlashSeparatedCourseKey object, sFaved to the DB in the form of a string"
 
     __metaclass__ = models.SubfieldBase
 
-    def __init__(self, *args, **kwargs):
-        super(CourseKeyField, self).__init__(*args, **kwargs)
+    Empty = object()
 
     def to_python(self, value):
-        assert isinstance(value, (NoneType, basestring, SlashSeparatedCourseKey))
-        if not value:
+        if value is self.Empty or value is None:
+            return None
+
+        assert isinstance(value, (basestring, SlashSeparatedCourseKey))
+        if value == '':
             # handle empty string for models being created w/o fields populated
             return None
+
         if isinstance(value, basestring):
             return SlashSeparatedCourseKey.from_deprecated_string(value)
         else:
             return value
 
+    def get_prep_lookup(self, lookup, value):
+        if lookup == 'isnull':
+            raise TypeError('Use CourseKeyField.Empty rather than None to query for a missing CourseKeyField')
+
+        return super(CourseKeyField, self).get_prep_lookup(lookup, value)
+
     def get_prep_value(self, value):
-        assert isinstance(value, (NoneType, SlashSeparatedCourseKey))
-        return value.to_deprecated_string() if value else None
+        if value is self.Empty or value is None:
+            return ''
+
+        assert isinstance(value, SlashSeparatedCourseKey)
+        # CharFields should use '' as their empty value, rather than None
+        return value.to_deprecated_string()
 
     def validate(self, value, model_instance):
-        # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
-        # so we write custom validation that allows us to use SlashSeparatedCourseKeys
-        assert isinstance(value, (NoneType, basestring, SlashSeparatedCourseKey))
+        """Validate Empty values, otherwise defer to the parent"""
+        if not self.blank and value is self.Empty:
+            raise ValidationError(self.error_messages['blank'])
+        else:
+            return super(CourseKeyField, self).validate(value, model_instance)
 
     def run_validators(self, value):
-        # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
-        # so we write custom validation that allows us to use SlashSeparatedCourseKeys
-        if isinstance(value, SlashSeparatedCourseKey):
-            assert len(value.to_deprecated_string()) <= self.max_length
+        """Validate Empty values, otherwise defer to the parent"""
+        if value is self.Empty:
+            return
+
+        return super(CourseKeyField, self).run_validators(value)
 
 
 class LocationKeyField(models.CharField):
@@ -42,29 +99,45 @@ class LocationKeyField(models.CharField):
 
     __metaclass__ = models.SubfieldBase
 
-    def __init__(self, *args, **kwargs):
-        super(LocationKeyField, self).__init__(*args, **kwargs)
+    Empty = object()
 
     def to_python(self, value):
-        assert isinstance(value, (NoneType, basestring, Location))
-        if not value:
+        if value is self.Empty or value is None:
+            return value
+
+        assert isinstance(value, (basestring, Location))
+
+        if value == '':
             return None
+
         if isinstance(value, basestring):
             return Location.from_deprecated_string(value)
         else:
             return value
 
+    def get_prep_lookup(self, lookup, value):
+        if lookup == 'isnull':
+            raise TypeError('Use LocationKeyField.Empty rather than None to query for a missing LocationKeyField')
+
+        return super(LocationKeyField, self).get_prep_lookup(lookup, value)
+
     def get_prep_value(self, value):
+        if value is self.Empty:
+            return ''
+
         assert isinstance(value, Location)
-        return value.to_deprecated_string() if value else ''
+        return value.to_deprecated_string()
 
     def validate(self, value, model_instance):
-        # The default django CharField validator tries to call len() on Locations,
-        # so we write custom validation that allows us to use Locations
-        assert isinstance(value, (NoneType, basestring, Location))
+        """Validate Empty values, otherwise defer to the parent"""
+        if not self.blank and value is self.Empty:
+            raise ValidationError(self.error_messages['blank'])
+        else:
+            return super(LocationKeyField, self).validate(value, model_instance)
 
     def run_validators(self, value):
-        # The default django CharField validator tries to call len() on Locations,
-        # so we write custom validation that allows us to use Locations
-        if isinstance(value, Location):
-            assert len(value.to_deprecated_string()) <= self.max_length
+        """Validate Empty values, otherwise defer to the parent"""
+        if value is self.Empty:
+            return
+
+        return super(LocationKeyField, self).run_validators(value)
