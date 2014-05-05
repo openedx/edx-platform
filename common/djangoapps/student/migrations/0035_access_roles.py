@@ -35,6 +35,19 @@ class Migration(DataMigration):
         for role in ['staff', 'instructor', 'beta_testers', ]:
             query = query | Q(name__startswith=role)
         for group in orm['auth.Group'].objects.filter(query).all():
+            def _migrate_users(correct_course_key, lower_org):
+                """
+                Get all the users from the old group and migrate to this course key in the new table
+                """
+                for user in orm['auth.user'].objects.filter(groups=group).all():
+                    entry = orm['student.courseaccessrole'](
+                        role=parsed_entry.group('role_id'), user=user,
+                        org=correct_course_key.org, course_id=correct_course_key.to_deprecated_string()
+                    )
+                    entry.save()
+                orgs[lower_org] = correct_course_key.org
+                done.add(correct_course_key)
+
             # should this actually loop through all groups and log any which are not compliant? That is,
             # remove the above filter
             parsed_entry = self.GROUP_ENTRY_RE.match(group.name)
@@ -50,19 +63,17 @@ class Migration(DataMigration):
                         # is the downcased version, get the normal cased one. loc_mapper() has no
                         # methods taking downcased SSCK; so, need to do it manually here
                         correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection, done)
-                        for user in orm['auth.user'].objects.filter(groups=group).all():
-                            entry = orm['student.courseaccessrole'](
-                                role=parsed_entry.group('role_id'), user=user,
-                                org=correct_course_key.org, course_id=correct_course_key.to_deprecated_string()
-                            )
-                            entry.save()
+                        _migrate_users(correct_course_key, course_key.org)
                         done.add(course_key)
-                        done.add(correct_course_key)
-                        orgs[course_key.org] = correct_course_key.org
                 except InvalidKeyError:
-                    # not the slashed version
-                    if course_id_string not in done:
-                        hold[course_id_string] = group
+                    entry = loc_map_collection.find_one({'course_id': course_id_string})
+                    if entry is None:
+                        # not a course_id as far as we can tell
+                        if course_id_string not in done:
+                            hold[course_id_string] = group
+                    else:
+                        correct_course_key = self._cache_done_return_ssck(entry, done)
+                        _migrate_users(correct_course_key, entry['lower_id']['org'])
 
         # see if any in hold ere missed above
         for not_ssck, group in hold.iteritems():
@@ -98,18 +109,25 @@ class Migration(DataMigration):
         ])
         entry = loc_map_collection.find_one(course_son)
         if entry:
-            # cache that the dotted form is done too
-            if 'lower_course_id' in entry:
-                done.add(entry['lower_course_id'])
-            elif 'course_id' in entry:
-                done.add(entry['course_id'].lower())
-            elif 'lower_org' in entry:
-                done.add('{}.{}'.format(entry['lower_org'], entry['lower_offering']))
-            else:
-                done.add('{}.{}'.format(entry['org'].lower(), entry['offering'].lower()))
-            return SlashSeparatedCourseKey(*entry['_id'].values())
+            return self._cache_done_return_ssck(entry, done)
         else:
             return None
+
+    def _cache_done_return_ssck(self, entry, done):
+        """
+        Add all the various formats which auth may use to the done set and return the ssck for the entry
+        """
+        # cache that the dotted form is done too
+        if 'lower_course_id' in entry:
+            done.add(entry['lower_course_id'])
+        elif 'course_id' in entry:
+            done.add(entry['course_id'].lower())
+        elif 'lower_org' in entry:
+            done.add('{}.{}'.format(entry['lower_org'], entry['lower_offering']))
+        else:
+            done.add('{}.{}'.format(entry['org'].lower(), entry['offering'].lower()))
+        return SlashSeparatedCourseKey(*entry['_id'].values())
+
 
     models = {
         'auth.group': {
