@@ -22,6 +22,7 @@ Contents:
     public_sandboxes.rst
     analytics.rst
     process/index
+    testing/index
 
 APIs
 -----

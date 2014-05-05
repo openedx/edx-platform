@@ -18,7 +18,7 @@ and effort making a pull request.
 It’s also sometimes useful to submit a pull request even before the code is
 working properly, to make it easier to collect early feedback. To indicate to
 others that your pull request is not yet in a functional state, just prefix the
-pull request title with "WIP:" (which stands for Work In Progress).
+pull request title with "(WIP)" (which stands for Work In Progress).
 
 Once you’re ready to submit your changes in a pull request, check the following
 list of requirements to be sure that your pull request is ready to be reviewed:
@@ -94,6 +94,18 @@ even for reasons that are unrelated to the quality of your code change. However,
 if we do reject your pull request, we will explain why we aren’t taking it, and
 try to suggest other ways that you can accomplish the same result in a way that
 we will accept.
+
+Further Information
+-------------------
+For futher information on the pull request requirements, please see the following
+links:
+
+* :doc:`../testing`
+* :doc:`../testing/jenkins`
+* :doc:`../testing/code-coverage`
+* :doc:`../testing/code-quality`
+* `Python Guidelines <https://github.com/edx/edx-platform/wiki/Python-Guidelines>`_
+* `Javascript Guidelines <https://github.com/edx/edx-platform/wiki/Javascript-Guidelines>`_
 
 .. _contributor's agreement with edX: http://code.edx.org/individual-contributor-agreement.pdf
 .. _compatible licenses: https://github.com/edx/edx-platform/wiki/Licensing
