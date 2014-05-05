@@ -54,6 +54,7 @@ def _serialize_user(response_data, user):
     response_data['first_name'] = user.first_name
     response_data['last_name'] = user.last_name
     response_data['id'] = user.id
+    response_data['is_active'] = user.is_active
     return response_data
 
 def _save_module_position(request, user, course_id, course_descriptor, position):
@@ -104,6 +105,7 @@ class UsersList(APIView):
         password = request.DATA['password']
         first_name = request.DATA.get('first_name', '')
         last_name = request.DATA.get('last_name', '')
+        is_active = request.DATA.get('is_active', None)
 
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
@@ -138,12 +140,14 @@ class UsersList(APIView):
             user.set_password(password)
             user.first_name = first_name
             user.last_name = last_name
+            if is_active is not None:
+                user.is_active = is_active
             user.save()
 
             profile = UserProfile(user=user)
             profile.name = '{} {}'.format(first_name, last_name)
             profile.save()
-            
+
             UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
 
             # add this account creation to password history
@@ -179,7 +183,7 @@ class UsersDetail(APIView):
         response_data = {}
         base_uri = _generate_base_uri(request)
         try:
-            existing_user = User.objects.get(id=user_id, is_active=True)
+            existing_user = User.objects.get(id=user_id)
             _serialize_user(response_data, existing_user)
             response_data['uri'] = base_uri
             response_data['resources'] = []
@@ -191,36 +195,37 @@ class UsersDetail(APIView):
         except ObjectDoesNotExist:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request, user_id, format=None):
-        """
-        DELETE removes/inactivates/etc. an existing user
-        """
-        response_data = {}
-        try:
-            existing_user = User.objects.get(id=user_id, is_active=True)
-            existing_user.is_active = False
-            existing_user.save()
-        except ObjectDoesNotExist:
-            # It's ok if we don't find a match
-            pass
-        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
-
     def post(self, request, user_id, format=None):
+        """
+        POST provides the ability to update information about an existing user
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
+        response_data['uri'] = _generate_base_uri(request)
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
         limiter = BadRequestRateLimiter()
         if limiter.is_rate_limit_exceeded(request):
             AUDIT_LOG.warning("API::Rate limit exceeded in password_reset")
             response_data['message'] = _('Rate limit exceeded in password_reset.')
-            status_code = status.HTTP_403_FORBIDDEN
-            return Response(response_data, status=status_code)
+            return Response(response_data, status=status.HTTP_403_FORBIDDEN)
         try:
             existing_user = User.objects.get(id=user_id)
-            old_password_hash = existing_user.password
-            _serialize_user(response_data, existing_user)
-            password = request.DATA['password']
-            if existing_user:
+        except ObjectDoesNotExist:
+            limiter.tick_bad_request_counter(request)
+            existing_user = None
+        if existing_user:
+
+            is_active = request.DATA.get('is_active', None)
+            if is_active is not None:
+                existing_user.is_active = is_active
+                response_data['is_active'] = existing_user.is_active
+                existing_user.save()
+
+            password = request.DATA.get('password')
+            if password:
+                old_password_hash = existing_user.password
+                _serialize_user(response_data, existing_user)
+                password = request.DATA['password']
                 if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
                     try:
                         validate_password_length(password)
@@ -270,17 +275,12 @@ class UsersDetail(APIView):
                     password_history_entry = PasswordHistory()
                     password_history_entry.create(existing_user)
 
-                status_code = status.HTTP_201_CREATED
-                response_data['uri'] = base_uri
-                response_data['message'] = 'Password Reset Successful'
+            status_code = status.HTTP_200_OK
 
-            else:
-                status_code = status.HTTP_404_NOT_FOUND
-                response_data['message'] = 'User not exist'
+        else:
+            status_code = status.HTTP_404_NOT_FOUND
+            response_data['message'] = 'User not exist'
 
-        except ObjectDoesNotExist:
-            limiter.tick_bad_request_counter(request)
-            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
         return Response(response_data, status=status_code)
 
 

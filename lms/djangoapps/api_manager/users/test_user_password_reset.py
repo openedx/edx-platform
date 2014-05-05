@@ -63,7 +63,7 @@ class UserPasswordResetTest(TestCase):
             response = self._do_post_pass_reset_request(
                 pass_reset_url, password='Test.Me64@', secure=True
             )
-            self.assertEqual(response.status_code,  201)
+            self.assertEqual(response.status_code,  200)
 
             #login successful after reset password
             response = self._do_post_request(self.session_url, 'test2', 'Test.Me64@', secure=True)
@@ -88,20 +88,17 @@ class UserPasswordResetTest(TestCase):
         response = self._do_post_pass_reset_request(
             pass_reset_url, password='Test.Me64#', secure=True
         )
-        message = 'Password Reset Successful'
-        self._assert_response(response, status=201, message=message)
+        self._assert_response(response, status=200)
 
         response = self._do_post_pass_reset_request(
             pass_reset_url, password='Test.Me64@', secure=True
         )
-        message = 'Password Reset Successful'
-        self._assert_response(response, status=201, message=message)
+        self._assert_response(response, status=200)
 
         response = self._do_post_pass_reset_request(
             pass_reset_url, password='Test.Me64^', secure=True
         )
-        message = 'Password Reset Successful'
-        self._assert_response(response, status=201, message=message)
+        self._assert_response(response, status=200)
 
         #now use previously used password
         response = self._do_post_pass_reset_request(
@@ -116,15 +113,13 @@ class UserPasswordResetTest(TestCase):
         response = self._do_post_pass_reset_request(
             pass_reset_url, password='Test.Me64&', secure=True
         )
-        message = 'Password Reset Successful'
-        self._assert_response(response, status=201, message=message)
+        self._assert_response(response, status=200)
 
         #now use previously used password
         response = self._do_post_pass_reset_request(
             pass_reset_url, password='Test.Me64!', secure=True
         )
-        message = 'Password Reset Successful'
-        self._assert_response(response, status=201, message=message)
+        self._assert_response(response, status=200)
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 1})
     def test_is_password_reset_too_frequent(self):
@@ -154,8 +149,7 @@ class UserPasswordResetTest(TestCase):
             response = self._do_post_pass_reset_request(
                 pass_reset_url, password='NewP@ses34!', secure=True
             )
-            message = 'Password Reset Successful'
-            self._assert_response(response, status=201, message=message)
+            self._assert_response(response, status=200)
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
     def test_password_reset_rate_limiting_unblock(self):
@@ -191,7 +185,7 @@ class UserPasswordResetTest(TestCase):
             response = self._do_post_pass_reset_request(
                 pass_reset_url, password='Test.Me64@', secure=True
             )
-            self._assert_response(response, status=201)
+            self._assert_response(response, status=200)
 
     def _do_post_request(self, url, username, password, **kwargs):
         """
