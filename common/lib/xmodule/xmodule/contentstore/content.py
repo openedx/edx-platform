@@ -63,7 +63,7 @@ class StaticContent(object):
         return StaticContent.get_id_from_location(self.location)
 
     def get_url_path(self):
-        return StaticContent.get_url_path_from_location(self.location)
+        return self.location.to_deprecated_string()
 
     def get_deprecated_loc_list(self, location):
         """
@@ -83,15 +83,6 @@ class StaticContent(object):
         (?P<category>[^/]+)/
         (?P<name>[^/]+)
     """, re.VERBOSE | re.IGNORECASE)
-
-    ASSET_URL_FORMAT = u"/c4x/{0.org}/{0.course}/{0.category}/{0.name}"
-
-    @staticmethod
-    def get_url_path_from_location(location):
-        if location is not None:
-            return StaticContent.ASSET_URL_FORMAT.format(location)
-        else:
-            return None
 
     @staticmethod
     def is_c4x_path(path_string):
@@ -120,7 +111,7 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, SlashSeparatedCourseKey))
-        return StaticContent.get_url_path_from_location(course_key.make_usage_key('asset', ''))
+        return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
     def get_id_from_location(location):
@@ -138,8 +129,7 @@ class StaticContent(object):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        matched = StaticContent.ASSET_URL_RE.match(path)
-        return AssetLocation(matched.group('org'), matched.group('course'), None, matched.group('category'), matched.group('name'))
+        return AssetLocation.from_deprecated_string(path)
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
@@ -150,7 +140,7 @@ class StaticContent(object):
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
         loc = StaticContent.compute_location(course_id, orig_path)
-        loc_url = StaticContent.get_url_path_from_location(loc)
+        loc_url = loc.to_deprecated_string()
 
         # Reconstruct with new path
         return urlunparse((scheme, netloc, loc_url, params, query, fragment))

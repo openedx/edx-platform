@@ -102,8 +102,7 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
         # repoint children
         if module.has_children:
             new_children = []
-            for child_loc_url in module.children:
-                child_loc = original_loc.course_key.make_usage_key_from_deprecated_string(child_loc_url)
+            for child_loc in module.children:
                 child_loc = child_loc.map_into_course(dest_course_id)
                 new_children.append(child_loc)
 
