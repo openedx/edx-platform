@@ -211,6 +211,10 @@ class OpaqueKey(object):
             ', '.join(repr(getattr(self, key)) for key in self.KEY_FIELDS)  # pylint: disable=no-member
         )
 
+    def __len__(self):
+        """Return the number of characters in the serialized OpaqueKey"""
+        return len(unicode(self))
+
     @classmethod
     def _drivers(cls):
         """
