@@ -44,7 +44,7 @@ def make_populated_course(step):  # pylint: disable=unused-argument
         world.enroll_user(world.bulk_email_staff, world.bulk_email_course_id)
 
     # Make & register a student
-    world.register_by_course_id(
+    world.register_by_course_key(
         course.id,
         username='student',
         password='test',
