@@ -99,6 +99,7 @@ class DragAndDropTest(ContainerBase):
                         "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
                     for idx, expected in enumerate(expected_ordering.get(parent)):
                         self.assertEqual(expected, children[idx].name)
+                    break
 
     def drag_and_verify(self, source, target, expected_ordering, after=True):
         container = self.go_to_container_page(make_draft=True)

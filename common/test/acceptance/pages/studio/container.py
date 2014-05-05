@@ -62,7 +62,6 @@ class ContainerPage(PageObject):
             target, 0, target.size['height'] / 2 if after else 0
         ).perform()  # pylint: disable=protected-access
         action.release().perform()
-        # TODO: should wait for "Saving" to go away so we know the operation is complete?
 
 
 class XBlockWrapper(PageObject):
