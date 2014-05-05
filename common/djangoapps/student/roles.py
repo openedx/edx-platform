@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
 from student.models import CourseAccessRole
+from xmodule_django.models import CourseKeyField
 
 
 class AccessRole(object):
@@ -71,13 +72,17 @@ class RoleBase(AccessRole):
     """
     Roles by type (e.g., instructor, beta_user) and optionally org, course_key
     """
-    def __init__(self, role_name, org=None, course_key=None):
+    def __init__(self, role_name, org='', course_key=CourseKeyField.Empty):
         """
         Create role from required role_name w/ optional org and course_key. You may just provide a role
         name if it's a global role (not constrained to an org or course). Provide org if constrained to
         an org. Provide org and course if constrained to a course. Although, you should use the subclasses
         for all of these.
         """
+
+        if course_key is None:
+            raise TypeError('course_key must be CourseKeyField.Empty or a valid CourseKey')
+
         self.org = org
         self.course_key = course_key
         self._role_name = role_name
