@@ -58,12 +58,13 @@ class Command(BaseCommand):
 
         for course_id in ended_courses:
 
-            # find students who are enrolled
+            # find students who are active
+            # enrolled students are always downloable + notpassing
             print "Looking up certificate states for {0}".format(course_id)
-            enrolled_students = User.objects.filter(
+            active_students = User.objects.filter(
                     courseenrollment__course_id=course_id,
                     courseenrollment__is_active=True)
-            cert_data[course_id] = {'enrolled': enrolled_students.count()}
+            cert_data[course_id] = {'active': active_students.count()}
 
             tallies = GeneratedCertificate.objects.filter(
                         course_id__exact=course_id).values('status').annotate(
