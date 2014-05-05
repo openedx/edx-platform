@@ -19,11 +19,16 @@ def has_course_access(user, course_key, role=CourseStaffRole):
 
 def get_user_role(user, course_id):
     """
-    Return corresponding string if user has staff or instructor role in Studio.
+    What type of access: staff or instructor does this user have in Studio?
+
+    No code should use this for access control, only to quickly serialize the type of access
+    where this code knows that Instructor trumps Staff and assumes the user has one or the other.
+
     This will not return student role because its purpose for using in Studio.
 
     :param course_id: the course_id of the course we're interested in
     """
+    # afaik, this is only used in lti
     if auth.has_access(user, CourseInstructorRole(course_id)):
         return 'instructor'
     else:

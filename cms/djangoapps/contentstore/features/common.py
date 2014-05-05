@@ -1,13 +1,12 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
-import time
 import os
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
 from django.conf import settings
 
-from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole, GlobalStaff
+from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff
 from student.models import get_user
 
 from selenium.webdriver.common.keys import Keys
@@ -386,10 +385,10 @@ def create_other_user(_step, name, has_extra_perms, role_name):
                 roles = (CourseStaffRole, CourseInstructorRole)
             else:
                 roles = (CourseStaffRole,)
-            location = world.scenario_dict["COURSE"].id
+            course_key = world.scenario_dict["COURSE"].id
             global_admin = AdminFactory()
             for role in roles:
-                auth.add_users(global_admin, role(location), user)
+                auth.add_users(global_admin, role(course_key), user)
 
 
 @step('I log out')

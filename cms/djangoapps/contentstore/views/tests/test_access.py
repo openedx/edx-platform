@@ -13,7 +13,7 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 class RolesTest(TestCase):
     """
-    Tests for user roles.
+    Tests for lti user role serialization.
     """
     def setUp(self):
         """ Test case setup """
@@ -27,6 +27,11 @@ class RolesTest(TestCase):
         Verifies if user is instructor.
         """
         add_users(self.global_admin, CourseInstructorRole(self.course_key), self.instructor)
+        self.assertEqual(
+            'instructor',
+            get_user_role(self.instructor, self.course_key)
+        )
+        add_users(self.global_admin, CourseStaffRole(self.course_key), self.staff)
         self.assertEqual(
             'instructor',
             get_user_role(self.instructor, self.course_key)

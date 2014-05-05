@@ -8,7 +8,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore

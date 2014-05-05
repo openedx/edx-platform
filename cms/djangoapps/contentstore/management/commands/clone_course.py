@@ -5,9 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.course_module import CourseDescriptor
 from student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore import Location
 from xmodule.modulestore.keys import CourseKey
 
 
@@ -34,10 +32,6 @@ class Command(BaseCommand):
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 
         if clone_course(mstore, cstore, source_course_id, dest_course_id):
-            # be sure to recompute metadata inheritance after all those updates
-            # DO NOT MERGE: need to figure out how to handle the metadata inheritance refresh
-            mstore.refresh_cached_metadata_inheritance_tree(dest_course_id)
-
             print("copying User permissions...")
             # purposely avoids auth.add_user b/c it doesn't have a caller to authorize
             CourseInstructorRole(dest_course_id).add_users(

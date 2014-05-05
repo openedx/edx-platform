@@ -73,6 +73,12 @@ class TestGitExport(CourseTestCase):
                 call_command('git_export', 'foo/bar/baz', 'silly',
                              stderr=StringIO.StringIO())
         self.assertEqual(ex.exception.code, 1)
+        # Send bad course_id to get course not exported
+        with self.assertRaises(SystemExit) as ex:
+            with self.assertRaisesRegexp(CommandError, GitExportError.BAD_COURSE):
+                call_command('git_export', 'foo/bar:baz', 'silly',
+                             stderr=StringIO.StringIO())
+        self.assertEqual(ex.exception.code, 1)
 
     def test_bad_git_url(self):
         """
