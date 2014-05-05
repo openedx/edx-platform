@@ -3,6 +3,7 @@ from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from pkg_resources import resource_string
+from copy import copy
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -20,8 +21,11 @@ class VerticalModule(VerticalFields, XModule):
         fragment = Fragment()
         contents = []
 
+        child_context = {} if not context else copy(context)
+        child_context['child_of_vertical'] = True
+
         for child in self.get_display_items():
-            rendered_child = child.render('student_view', context)
+            rendered_child = child.render('student_view', child_context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
