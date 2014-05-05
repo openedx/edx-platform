@@ -4,9 +4,14 @@ from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.exceptions import ParseError
+from rest_framework.response import Response
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference
+from django_comment_common.models import Role
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -33,6 +38,30 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
+
+
+class ForumRoleUsersListView(generics.ListAPIView):
+    """
+    Forum roles are represented by a list of user dicts
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (ApiKeyHeaderPermission,)
+    serializer_class = UserSerializer
+    paginate_by = 10
+    paginate_by_param = "page_size"
+
+    def get_queryset(self):
+        """
+        Return a list of users with the specified role/course pair
+        """
+        name = self.kwargs['name']
+        course_id_string = self.request.QUERY_PARAMS.get('course_id')
+        if not course_id_string:
+            raise ParseError('course_id must be specified')
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
+        role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
+        users = role.users.all()
+        return users
 
 
 class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
