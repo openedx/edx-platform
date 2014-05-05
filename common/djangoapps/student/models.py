@@ -41,7 +41,7 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from xmodule.modulestore.keys import CourseKey
 from functools import total_ordering
 
@@ -60,6 +60,9 @@ class AnonymousUserId(models.Model):
     We generate anonymous_user_id using md5 algorithm,
     and use result in hex form, so its length is equal to 32 bytes.
     """
+
+    objects = NoneToEmptyManager()
+
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
@@ -972,9 +975,9 @@ class CourseAccessRole(models.Model):
     """
     user = models.ForeignKey(User)
     # blank org is for global group based roles such as course creator (may be deprecated)
-    org = models.CharField(max_length=64, db_index=True, blank=True, null=True)
+    org = models.CharField(max_length=64, db_index=True, blank=True)
     # blank course_id implies org wide role
-    course_id = CourseKeyField(max_length=255, db_index=True, blank=True, null=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
     class Meta:
