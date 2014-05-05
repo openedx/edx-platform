@@ -12,15 +12,41 @@ class Migration(SchemaMigration):
         db.create_table('student_courseaccessrole', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('org', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=64, blank=True, null=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('org', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=64, blank=True)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(db_index=True, max_length=255, blank=True)),
             ('role', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
         ))
         db.send_create_signal('student', ['CourseAccessRole'])
 
+        # Adding unique constraint on 'CourseAccessRole', fields ['user', 'org', 'course_id', 'role']
+        db.create_unique('student_courseaccessrole', ['user_id', 'org', 'course_id', 'role'])
+
+
+        # Changing field 'AnonymousUserId.course_id'
+        db.alter_column('student_anonymoususerid', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
+
+        # Changing field 'CourseEnrollment.course_id'
+        db.alter_column('student_courseenrollment', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
+
+        # Changing field 'CourseEnrollmentAllowed.course_id'
+        db.alter_column('student_courseenrollmentallowed', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
+
     def backwards(self, orm):
+        # Removing unique constraint on 'CourseAccessRole', fields ['user', 'org', 'course_id', 'role']
+        db.delete_unique('student_courseaccessrole', ['user_id', 'org', 'course_id', 'role'])
+
         # Deleting model 'CourseAccessRole'
         db.delete_table('student_courseaccessrole')
+
+
+        # Changing field 'AnonymousUserId.course_id'
+        db.alter_column('student_anonymoususerid', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'CourseEnrollment.course_id'
+        db.alter_column('student_courseenrollment', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'CourseEnrollmentAllowed.course_id'
+        db.alter_column('student_courseenrollmentallowed', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))
 
     models = {
         'auth.group': {
@@ -62,21 +88,21 @@ class Migration(SchemaMigration):
         'student.anonymoususerid': {
             'Meta': {'object_name': 'AnonymousUserId'},
             'anonymous_user_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'student.courseaccessrole': {
-            'Meta': {'object_name': 'CourseAccessRole'},
-            'course_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'Meta': {'unique_together': "(('user', 'org', 'course_id', 'role'),)", 'object_name': 'CourseAccessRole'},
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'org': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '64', 'blank': 'True', 'null': 'True'}),
+            'org': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '64', 'blank': 'True'}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'student.courseenrollment': {
             'Meta': {'ordering': "('user', 'course_id')", 'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
@@ -86,7 +112,7 @@ class Migration(SchemaMigration):
         'student.courseenrollmentallowed': {
             'Meta': {'unique_together': "(('email', 'course_id'),)", 'object_name': 'CourseEnrollmentAllowed'},
             'auto_enroll': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
