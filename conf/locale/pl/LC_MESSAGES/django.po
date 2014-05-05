@@ -30,7 +30,7 @@
 # lazarus_zamenhof <lazarus.zamenhof@gmail.com>, 2014
 # Cairath, 2014
 # Oninix <d.exax@hotmail.com>, 2014
-# rutek <rutek9314@gmail.com>, 2014
+# rutek <inactive+rutek@transifex.com>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
@@ -57,14 +57,15 @@
 # 
 # Translators:
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
+# AlinaG <musicalpreschool@hotmail.com>, 2014
 # Cairath, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
-"PO-Revision-Date: 2014-03-14 16:10+0000\n"
-"Last-Translator: Cairath\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"PO-Revision-Date: 2014-04-29 17:50+0000\n"
+"Last-Translator: AlinaG <musicalpreschool@hotmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -824,7 +825,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1387,6 +1388,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgstr ""
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
@@ -4792,8 +4803,22 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
+msgstr ""
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
 msgstr ""
 
 #: lms/templates/lti.html
@@ -4803,6 +4828,10 @@ msgstr ""
 #: lms/templates/lti.html
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
+msgstr ""
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
 msgstr ""
 
 #: lms/templates/lti_form.html
@@ -5603,10 +5632,6 @@ msgstr ""
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
 msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
-msgstr "{file_format}"
 
 #: lms/templates/video.html
 msgid "Download Handout"

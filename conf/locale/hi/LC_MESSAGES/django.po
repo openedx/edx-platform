@@ -10,6 +10,7 @@
 # agarwal <agarwal@cag.csail.mit.edu>, 2013
 # anantvima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# gvidushiin <gvidushiin@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
 # Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -34,6 +35,7 @@
 # anantvima <anant.vima@anu.edu.au>, 2014
 # Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# gvidushiin <gvidushiin@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -43,6 +45,7 @@
 # Translators:
 # ammubhave <ammubhave@gmail.com>, 2013
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# gvidushiin <gvidushiin@gmail.com>, 2014
 # Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -64,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
 "PO-Revision-Date: 2014-03-28 05:40+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -843,7 +846,7 @@ msgid "unanswered"
 msgstr "जवाब नहीं दिया हुआ"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1455,6 +1458,16 @@ msgstr ""
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "यूट्यूब यू आर एल या किसी फ़ाइल के लिए लिंक जो कि कहीं वेब पर उपलब्ध है।"
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -5203,9 +5216,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "बाहरी संसाधन"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -5215,6 +5242,10 @@ msgstr "संसाधन नई खिड़की में देखें"
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
 msgstr "कृपया launch_url दें। \"Edit\" क्लिक करें और आवश्यक फ़ील्ड्स भरें।"
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
+msgstr ""
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -6060,10 +6091,6 @@ msgstr "वीडियो को डाउनलोड करें"
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
 msgstr "प्रतिलिपि डाउनलोड करें"
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
-msgstr "{file_format}"
 
 #: lms/templates/video.html
 msgid "Download Handout"
