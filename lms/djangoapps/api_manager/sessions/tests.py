@@ -143,7 +143,7 @@ class SessionsApiTests(TestCase):
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = self.base_users_uri + str(response.data['user']['id'])
+        test_uri = self.base_sessions_uri + str(response.data['token'])
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
