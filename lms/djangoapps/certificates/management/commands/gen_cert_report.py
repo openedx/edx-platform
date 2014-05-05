@@ -64,14 +64,22 @@ class Command(BaseCommand):
             active_students = User.objects.filter(
                 courseenrollment__course_id=course_id,
                 courseenrollment__is_active=True)
+
             cert_data[course_id] = {'active': active_students.count()}
 
-            tallies = GeneratedCertificate.objects.filter(
+            status_tally = GeneratedCertificate.objects.filter(
                 course_id__exact=course_id).values('status').annotate(
                 dcount=Count('status'))
             cert_data[course_id].update(
                 {status['status']: status['dcount']
-                    for status in tallies})
+                    for status in status_tally})
+
+            mode_tally = GeneratedCertificate.objects.filter(
+                course_id__exact=course_id).values('mode').annotate(
+                dcount=Count('downloadable'))
+            cert_data[course_id].update(
+                {mode['mode']: mode['dcount']
+                    for mode in mode_tally})
 
         # all states we have seen far all courses
         status_headings = set(
