@@ -4,6 +4,7 @@
 Acceptance tests for Video.
 """
 
+import time
 from .helpers import UniqueCourseTest
 from ..pages.lms.video import VideoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -336,6 +337,67 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
+
+    def test_video_end_time(self):
+        """
+        Scenario: End time works for Youtube video
+        Given
+        And it has a video in "Youtube" mode with end time set to 00:00:02
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "0:02" position
+        """
+        data = {'end_time': '00:00:02'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        time.sleep(5)
+
+        self.assertEqual(self.video.position, '0:02')
+
+    def test_scenario11(self):
+        """
+        Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
+        And it has a video in "Youtube" mode  with end time set to 00:01:00
+        And I seek video to "0:58" position
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "1:00" position
+        """
+        data = {'end_time': '00:01:00'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.seek('0:58')
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        time.sleep(5)
+
+        self.assertEqual(self.video.position, '0:02')
+
+    def test_scenario12(self):
+        pass
+
+    def test_scenario13(self):
+        pass
+
+    def test_scenario14(self):
+        pass
+
+    def test_scenario15(self):
+        pass
+
+    def test_scenario16(self):
+        pass
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):

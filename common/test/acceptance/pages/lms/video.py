@@ -358,3 +358,12 @@ class VideoPage(PageObject):
 
         # wait until captions rendered completely
         self._wait_for_element(CSS_CLASS_NAMES['captions_rendered'], 'Captions Rendered')
+
+    @property
+    def position(self):
+        """
+        Extract the current seek position from where Video will start playing
+        :return: seek position in format min:sec
+        """
+        current_seek_position = self.q(css='.vidtime').text[0]
+        return current_seek_position.split('/')[0].strip()
