@@ -8,7 +8,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
             describe("Supports reordering components", function () {
 
                 var model, containerView, mockContainerHTML, respondWithMockXBlockFragment, init, getComponent,
-                    getDragHandle, dragComponentVertically, dragComponentToY, dragComponentAbove,
+                    getDragHandle, dragComponentVertically, dragComponentAbove,
                     verifyRequest, verifyNumReorderCalls, respondToRequest,
 
                     rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
@@ -26,7 +26,6 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                     groupBComponent2 = "locator-component-B2",
                     groupBComponent3 = "locator-component-B3";
 
-                rootLocator = 'testCourse/branch/draft/split_test/splitFFF';
                 mockContainerHTML = readFixtures('mock/mock-container-xblock.underscore');
 
                 respondWithMockXBlockFragment = function (requests, response) {
@@ -81,16 +80,13 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                     handle.simulate("drag", {dy: dy});
                 };
 
-                dragComponentToY = function (locator, y) {
-                    var handle = getDragHandle(locator),
-                        handleY = handle.offset().top + (handle.height() / 2),
-                        dy = y - handleY;
-                    handle.simulate("drag", {dy: dy});
-                };
-
                 dragComponentAbove = function (sourceLocator, targetLocator) {
-                    var targetElement = getComponent(targetLocator);
-                    dragComponentToY(sourceLocator, targetElement.offset().top + 1);
+                    var targetElement = getComponent(targetLocator),
+                        targetTop = targetElement.offset().top + 1,
+                        handle = getDragHandle(sourceLocator),
+                        handleY = handle.offset().top + (handle.height() / 2),
+                        dy = targetTop - handleY;
+                    handle.simulate("drag", {dy: dy});
                 };
 
                 verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {
@@ -137,10 +133,10 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                 it('can drag from one group to another', function () {
                     var requests = init(this);
-                    // Drag the first component in Group B to the first group.
+                    // Drag the first component in Group B to the top of group A.
                     dragComponentAbove(groupBComponent1, groupAComponent1);
 
-                    // Respond to the first request which will trigger a request to make the move
+                    // Respond to the two requests: add the component to Group A, then remove it from Group B.
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
 
