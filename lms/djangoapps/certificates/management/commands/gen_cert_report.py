@@ -30,20 +30,20 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('-c', '--course',
-            metavar='COURSE_ID',
-            dest='course',
-            default=None,
-            help='Only generate for COURSE_ID'),
+                    metavar='COURSE_ID',
+                    dest='course',
+                    default=None,
+                    help='Only generate for COURSE_ID'),
         )
 
     def _ended_courses(self):
         for course_id in [course  # all courses in COURSE_LISTINGS
-                for sub in settings.COURSE_LISTINGS
-                    for course in settings.COURSE_LISTINGS[sub]]:
-            course_loc = CourseDescriptor.id_to_location(course_id)
-            course = modulestore().get_instance(course_id, course_loc)
-            if course.has_ended():
-                yield course_id
+                          for sub in settings.COURSE_LISTINGS
+                          for course in settings.COURSE_LISTINGS[sub]]:
+                course_loc = CourseDescriptor.id_to_location(course_id)
+                course = modulestore().get_instance(course_id, course_loc)
+                if course.has_ended():
+                    yield course_id
 
     def handle(self, *args, **options):
 
@@ -62,26 +62,26 @@ class Command(BaseCommand):
             # enrolled students are always downloable + notpassing
             print "Looking up certificate states for {0}".format(course_id)
             active_students = User.objects.filter(
-                    courseenrollment__course_id=course_id,
-                    courseenrollment__is_active=True)
+                courseenrollment__course_id=course_id,
+                courseenrollment__is_active=True)
             cert_data[course_id] = {'active': active_students.count()}
 
             tallies = GeneratedCertificate.objects.filter(
-                        course_id__exact=course_id).values('status').annotate(
-                            dcount=Count('status'))
+                course_id__exact=course_id).values('status').annotate(
+                dcount=Count('status'))
             cert_data[course_id].update(
-                    {status['status']: status['dcount']
-                                        for status in tallies})
+                {status['status']: status['dcount']
+                    for status in tallies})
 
         # all states we have seen far all courses
         status_headings = set(
-                [status for course in cert_data
-                    for status in cert_data[course]])
+            [status for course in cert_data
+                for status in cert_data[course]])
 
         # print the heading for the report
         print "{:>20}".format("course ID"),
         print ' '.join(["{:>12}".format(heading)
-                            for heading in status_headings])
+                        for heading in status_headings])
 
         # print the report
         for course_id in cert_data:
