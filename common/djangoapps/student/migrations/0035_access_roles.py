@@ -66,7 +66,9 @@ class Migration(DataMigration):
                         _migrate_users(correct_course_key, course_key.org)
                         done.add(course_key)
                 except InvalidKeyError:
-                    entry = loc_map_collection.find_one({'course_id': course_id_string})
+                    entry = loc_map_collection.find_one({
+                        'course_id': re.compile(r'^{}$'.format(course_id_string), re.IGNORECASE)
+                    })
                     if entry is None:
                         # not a course_id as far as we can tell
                         if course_id_string not in done:
@@ -265,6 +267,7 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'db_index': 'True', 'symmetrical': 'False'})
         }
+    }
 
 
     complete_apps = ['student']
