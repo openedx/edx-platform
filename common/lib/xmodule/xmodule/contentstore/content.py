@@ -185,7 +185,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, course_iey, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of static assets for a course, followed by the total number of assets.
         By default all assets are returned, but start and maxresults can be provided to limit the query.

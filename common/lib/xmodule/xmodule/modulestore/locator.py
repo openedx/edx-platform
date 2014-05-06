@@ -52,7 +52,7 @@ class Locator(OpaqueKey):
         InvalidKeyError if the instance doesn't have a
         complete enough specification to generate a url
         """
-        raise InvalidKeyError()
+        raise NotImplementedError()
 
     def __str__(self):
         '''
@@ -67,7 +67,7 @@ class Locator(OpaqueKey):
         Raises InvalidKeyError if the instance
         doesn't have a complete enough specification.
         """
-        raise InvalidKeyError()
+        raise NotImplementedError()
 
     @classmethod
     def as_object_id(cls, value):
