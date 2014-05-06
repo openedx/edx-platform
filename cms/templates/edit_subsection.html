@@ -16,7 +16,7 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
-      <article class="subsection-body window" data-locator="${locator}">
+      <article class="subsection-body window" data-locator="${locator}" data-course-key="${locator.course_key}">
         <div class="subsection-name-input">
         <label>${_("Display Name:")}</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
@@ -31,7 +31,7 @@
     </div>
 
     <div class="sidebar">
-      <div class="unit-settings window id-holder" data-locator="${locator}">
+      <div class="unit-settings window id-holder" data-locator="${locator}" data-course-key="${locator.course_key}">
     <h4 class="header">${_("Subsection Settings")}</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">

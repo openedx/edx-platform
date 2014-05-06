@@ -40,13 +40,13 @@ def list_cohorts(request, course_id):
     {'success': True,
      'cohorts': [{'name': name, 'id': id}, ...]}
     """
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     all_cohorts = [{'name': c.name, 'id': c.id}
-               for c in cohorts.get_course_cohorts(course_id)]
+                   for c in cohorts.get_course_cohorts(course_id)]
 
     return json_http_response({'success': True,
-                            'cohorts': all_cohorts})
+                               'cohorts': all_cohorts})
 
 
 @ensure_csrf_cookie
@@ -63,7 +63,7 @@ def add_cohort(request, course_id):
     {'success': False,
      'msg': error_msg} if there's an error
     """
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     name = request.POST.get("name")
     if not name:
@@ -97,7 +97,7 @@ def users_in_cohort(request, course_id, cohort_id):
          'users': [{'username': ..., 'email': ..., 'name': ...}]
     }
     """
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     # this will error if called with a non-int cohort_id.  That's ok--it
     # shoudn't happen for valid clients.
@@ -119,12 +119,12 @@ def users_in_cohort(request, course_id, cohort_id):
     user_info = [{'username': u.username,
                   'email': u.email,
                   'name': '{0} {1}'.format(u.first_name, u.last_name)}
-                  for u in users]
+                 for u in users]
 
     return json_http_response({'success': True,
-                            'page': page,
-                            'num_pages': paginator.num_pages,
-                            'users': user_info})
+                               'page': page,
+                               'num_pages': paginator.num_pages,
+                               'users': user_info})
 
 
 @ensure_csrf_cookie
@@ -144,7 +144,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
      'present': [str1, str2, ...],    # already there
      'unknown': [str1, str2, ...]}
     """
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
 
@@ -175,10 +175,10 @@ def add_users_to_cohort(request, course_id, cohort_id):
             unknown.append(username_or_email)
 
     return json_http_response({'success': True,
-                            'added': added,
-                            'changed': changed,
-                            'present': present,
-                            'unknown': unknown})
+                               'added': added,
+                               'changed': changed,
+                               'present': present,
+                               'unknown': unknown})
 
 
 @ensure_csrf_cookie
@@ -193,12 +193,12 @@ def remove_user_from_cohort(request, course_id, cohort_id):
     {'success': False,
      'msg': error_msg}
     """
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     username = request.POST.get('username')
     if username is None:
         return json_http_response({'success': False,
-                                'msg': 'No username specified'})
+                                   'msg': 'No username specified'})
 
     cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
     try:
@@ -208,7 +208,7 @@ def remove_user_from_cohort(request, course_id, cohort_id):
     except User.DoesNotExist:
         log.debug('no user')
         return json_http_response({'success': False,
-                                'msg': "No user '{0}'".format(username)})
+                                   'msg': "No user '{0}'".format(username)})
 
 
 def debug_cohort_mgmt(request, course_id):
@@ -216,7 +216,7 @@ def debug_cohort_mgmt(request, course_id):
     Debugging view for dev.
     """
     # add staff check to make sure it's safe if it's accidentally deployed.
-    get_course_with_access(request.user, course_id, 'staff')
+    get_course_with_access(request.user, 'staff', course_id)
 
     context = {'cohorts_ajax_url': reverse('cohorts',
                                            kwargs={'course_id': course_id})}

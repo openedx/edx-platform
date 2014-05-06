@@ -130,7 +130,7 @@ class XQueueCertInterface(object):
 
         Arguments:
           student   - User.object
-          course_id - courseenrollment.course_id (string)
+          course_id - courseenrollment.course_id (CourseKey)
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
@@ -181,16 +181,15 @@ class XQueueCertInterface(object):
             mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
             user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
             user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)
-            course_id_dict = Location.parse_course_id(course_id)
             cert_mode = enrollment_mode
             if (mode_is_verified and user_is_verified and user_is_reverified):
-                template_pdf = "certificate-template-{org}-{course}-verified.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.run}-verified.pdf".format(id=course_id)
             elif (mode_is_verified and not (user_is_verified and user_is_reverified)):
-                template_pdf = "certificate-template-{org}-{course}.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.run}.pdf".format(id=course_id)
                 cert_mode = GeneratedCertificate.MODES.honor
             else:
                 # honor code and audit students
-                template_pdf = "certificate-template-{org}-{course}.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.offering}.pdf".format(id=course_id)
             if forced_grade:
                 grade['grade'] = forced_grade
 
@@ -219,7 +218,7 @@ class XQueueCertInterface(object):
                     contents = {
                         'action': 'create',
                         'username': student.username,
-                        'course_id': course_id,
+                        'course_id': course_id.to_deprecated_string(),
                         'name': profile.name,
                         'grade': grade['grade'],
                         'template_pdf': template_pdf,

@@ -9,9 +9,8 @@ and otherwise returns i4x://org/course/cat/name).
 from datetime import datetime
 
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.mongo.base import location_to_query, namedtuple_to_son, get_course_id_no_run, MongoModuleStore
+from xmodule.modulestore.mongo.base import location_to_query, location_to_son, MongoModuleStore
 import pymongo
 from pytz import UTC
 
@@ -24,14 +23,14 @@ def as_draft(location):
     """
     Returns the Location that is the draft for `location`
     """
-    return Location(location).replace(revision=DRAFT)
+    return location.replace(revision=DRAFT)
 
 
 def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return Location(location).replace(revision=None)
+    return location.replace(revision=None)
 
 
 def wrap_draft(item):
@@ -56,19 +55,19 @@ class DraftModuleStore(MongoModuleStore):
     their children) to published modules.
     """
 
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
+        Returns an XModuleDescriptor instance for the item at usage_key.
+        If usage_key.revision is None, returns the item with the most
         recent revision
 
-        If any segment of the location is None except revision, raises
+        If any segment of the usage_key is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
 
-        If no object is found at that location, raises
+        If no object is found at that usage_key, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        location: Something that can be passed to Location
+        usage_key: A :class:`.UsageKey` instance
 
         depth (int): An argument that some module stores may use to prefetch
             descendents of the queried modules for more efficient results later
@@ -77,20 +76,9 @@ class DraftModuleStore(MongoModuleStore):
         """
 
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=depth))
-
-    def get_instance(self, course_id, location, depth=0):
-        """
-        Get an instance of this location, with policy for course_id applied.
-        TODO (vshnayder): this may want to live outside the modulestore eventually
-        """
-
-        try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=depth))
-        except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """
@@ -101,37 +89,40 @@ class DraftModuleStore(MongoModuleStore):
         :param metadata: can be empty, the initial metadata for the kvs
         :param system: if you already have an xmodule from the course, the xmodule.system value
         """
-        draft_loc = as_draft(location)
-        if draft_loc.category in DIRECT_ONLY_CATEGORIES:
+        if location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(location)
+        draft_loc = as_draft(location)
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system, fields)
 
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_items(self, course_key, settings=None, content=None, **kwargs):
         """
-        Returns a list of XModuleDescriptor instances for the items
-        that match location. Any element of location that is None is treated
-        as a wildcard that matches any value
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_key
 
-        location: Something that can be passed to Location
+        NOTE: don't use this to look for courses
+        as the course_key is required. Use get_courses.
 
-        depth: An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of calls to
-            get_children() to cache. None indicates to cache all descendents
+        Args:
+            course_key (CourseKey): the course identifier
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                ``name`` is another commonly provided key (Location based stores)
         """
-        draft_loc = as_draft(location)
-
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=depth)
-        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=depth)
-
-        draft_locs_found = set(item.location.replace(revision=None) for item in draft_items)
-        non_draft_items = [
-            item
-            for item in items
-            if (item.location.revision != DRAFT
-                and item.location.replace(revision=None) not in draft_locs_found)
+        draft_items = [
+            wrap_draft(item) for item in
+            super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
         ]
-        return [wrap_draft(item) for item in draft_items + non_draft_items]
+        draft_items_locations = {item.location for item in draft_items}
+        non_draft_items = [
+            item for item in
+            super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
+            # filter out items that are not already in draft
+            if item.location not in draft_items_locations
+        ]
+        return draft_items + non_draft_items
 
     def convert_to_draft(self, source_location):
         """
@@ -139,22 +130,21 @@ class DraftModuleStore(MongoModuleStore):
 
         :param source: the location of the source (its revision must be None)
         """
-        original = self.collection.find_one(location_to_query(source_location))
+        original = self.collection.find_one(location_to_query(source_location, wildcard=False))
         draft_location = as_draft(source_location)
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
         if not original:
             raise ItemNotFoundError(source_location)
-        original['_id'] = namedtuple_to_son(draft_location)
+        original['_id'] = location_to_son(draft_location)
         try:
             self.collection.insert(original)
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(original['_id'])
 
-        self.refresh_cached_metadata_inheritance_tree(draft_location)
-        self.fire_updated_modulestore_signal(get_course_id_no_run(draft_location), draft_location)
+        self.refresh_cached_metadata_inheritance_tree(draft_location.course_key)
 
-        return self._load_items([original])[0]
+        return self._load_items(source_location.course_key, [original])[0]
 
     def update_item(self, xblock, user=None, allow_not_found=False):
         """
@@ -165,7 +155,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         draft_loc = as_draft(xblock.location)
         try:
-            if not self.has_item(None, draft_loc):
+            if not self.has_item(draft_loc):
                 self.convert_to_draft(xblock.location)
         except ItemNotFoundError:
             if not allow_not_found:
@@ -188,14 +178,6 @@ class DraftModuleStore(MongoModuleStore):
 
         return
 
-    def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
-
-        returns an iterable of things that can be passed to Location.
-        '''
-        return super(DraftModuleStore, self).get_parent_locations(location, course_id)
-
     def publish(self, location, published_by_id):
         """
         Save a current draft to the underlying modulestore
@@ -216,9 +198,10 @@ class DraftModuleStore(MongoModuleStore):
                 #   2) child moved
                 for child in original_published.children:
                     if child not in draft.children:
-                        rents = [Location(mom) for mom in self.get_parent_locations(child, None)]
-                        if (len(rents) == 1 and rents[0] == Location(location)):  # the 1 is this original_published
-                            self.delete_item(child, True)
+                        child_i4x = child
+                        rents = self.get_parent_locations(child_i4x)
+                        if (len(rents) == 1 and rents[0] == location):  # the 1 is this original_published
+                            self.delete_item(child_i4x, True)
         super(DraftModuleStore, self).update_item(draft, '**replace_user**')
         self.delete_item(location)
 
@@ -229,17 +212,19 @@ class DraftModuleStore(MongoModuleStore):
         self.convert_to_draft(location)
         super(DraftModuleStore, self).delete_item(location)
 
-    def _query_children_for_cache_children(self, items):
+    def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
-        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(items)
+        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(course_key, items)
 
         to_process_dict = {}
         for non_draft in to_process_non_drafts:
-            to_process_dict[Location(non_draft["_id"])] = non_draft
+            to_process_dict[self._location_from_id(non_draft["_id"], course_key.run)] = non_draft
 
         # now query all draft content in another round-trip
         query = {
-            '_id': {'$in': [namedtuple_to_son(as_draft(Location(item))) for item in items]}
+            '_id': {'$in': [
+                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item))) for item in items
+            ]}
         }
         to_process_drafts = list(self.collection.find(query))
 
@@ -247,7 +232,7 @@ class DraftModuleStore(MongoModuleStore):
         # with the draft. This is because the semantics of the DraftStore is to
         # always return the draft - if available
         for draft in to_process_drafts:
-            draft_loc = Location(draft["_id"])
+            draft_loc = self._location_from_id(draft["_id"], course_key.run)
             draft_as_non_draft_loc = draft_loc.replace(revision=None)
 
             # does non-draft exist in the collection

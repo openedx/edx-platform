@@ -438,7 +438,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if isinstance(self.location, Location):
                 self.wiki_slug = self.location.course
             elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.location.package_id or self.display_name
+                self.wiki_slug = self.id.offering or self.display_name
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),
@@ -810,32 +810,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def make_id(org, course, url_name):
         return '/'.join([org, course, url_name])
 
-    @staticmethod
-    def id_to_location(course_id):
-        '''Convert the given course_id (org/course/name) to a location object.
-        Throws ValueError if course_id is of the wrong format.
-        '''
-        course_id_dict = Location.parse_course_id(course_id)
-        course_id_dict['tag'] = 'i4x'
-        course_id_dict['category'] = 'course'
-        return Location(course_id_dict)
-
-    @staticmethod
-    def location_to_id(location):
-        '''Convert a location of a course to a course_id.  If location category
-        is not "course", raise a ValueError.
-
-        location: something that can be passed to Location
-        '''
-        loc = Location(location)
-        if loc.category != "course":
-            raise ValueError("{0} is not a course location".format(loc))
-        return "/".join([loc.org, loc.course, loc.name])
-
     @property
     def id(self):
         """Return the course_id for this course"""
-        return self.location_to_id(self.location)
+        return self.location.course_key
 
     @property
     def start_date_text(self):

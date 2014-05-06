@@ -4,6 +4,8 @@
 from lettuce import world, step
 from component_settings_editor_helpers import enter_xml_in_advanced_problem
 from nose.tools import assert_true, assert_equal
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from contentstore.utils import reverse_usage_url
 
 
 @step('I export the course$')
@@ -43,4 +45,9 @@ def get_an_error_dialog(step):
 def i_click_on_error_dialog(step):
     world.click_link_by_text('Correct failed component')
     assert_true(world.css_html("span.inline-error").startswith("Problem i4x://MITx/999/problem"))
-    assert_equal(1, world.browser.url.count("unit/MITx.999.Robot_Super_Course/branch/draft/block/vertical"))
+    course_key = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
+    # we don't know the actual ID of the vertical. So just check that we did go to a
+    # vertical page in the course (there should only be one).
+    vertical_usage_key = course_key.make_usage_key("vertical", "")
+    vertical_url = reverse_usage_url('unit_handler', vertical_usage_key)
+    assert_equal(1, world.browser.url.count(vertical_url))

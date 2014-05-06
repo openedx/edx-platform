@@ -42,7 +42,7 @@ class Command(BaseCommand):
         for course_id, course_modules in xml_module_store.modules.iteritems():
             course_path = course_id.replace('/', '_')
             for location, descriptor in course_modules.iteritems():
-                location_path = location.url().replace('/', '_')
+                location_path = location.to_deprecated_string().replace('/', '_')
                 data = {}
                 for field_name, field in descriptor.fields.iteritems():
                     try:

@@ -59,140 +59,138 @@
 
 <section class="container">
     <div class="notes-wrapper">
-    	<h1>${_('My Notes')}</h1>
-    	<div id="notesHolder"></div>
+        <h1>${_('My Notes')}</h1>
+        <div id="notesHolder"></div>
         <section id="catchDIV">
-        	<div class="annotationListContainer">${_('You do not have any notes.')}</div>
+            <div class="annotationListContainer">${_('You do not have any notes.')}</div>
         </section>
-    	<script>
+        <script>
 
-    	//Grab uri of the course
-    	var parts = window.location.href.split("/"), 
-    		uri = '',
-		courseid;
-	for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
-	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
+        //Grab uri of the course
+        var parts = window.location.href.split("/"),
+            uri = '';
+        for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
         var pagination = 100,
-		is_staff = false,
-        options = {
-        optionsAnnotator: {
-            permissions:{
-                user: {
-                    id:"${student.email}", 
-                    name:"${student.username}"
-                },
-                userString: function (user) {
-                    if (user && user.name) 
-                        return user.name;
-                    return user;
-                },
-                userId: function (user) {
-                    if (user && user.id) 
-                        return user.id;
-                    return user;
-                },
-                permissions: {
-                        'read':   [],
-                        'update': ["${student.email}"],
-                        'delete': ["${student.email}"],
-                        'admin':  ["${student.email}"]
-                },
-                showViewPermissionsCheckbox: true,
-                showEditPermissionsCheckbox: false,
-                userAuthorize: function(action, annotation, user) {
-                    var token, tokens, _i, _len;
-                    if (annotation.permissions) {
-                      tokens = annotation.permissions[action] || [];
-                      if (is_staff){
-                      	return true;
-                      }
-                      if (tokens.length === 0) {
-                        return true;
-                      }
-                      for (_i = 0, _len = tokens.length; _i < _len; _i++) {
-                        token = tokens[_i];
-                        
-                        if (this.userId(user) === token) {
+            is_staff = false,
+            options = {
+                optionsAnnotator: {
+                    permissions:{
+                        user: {
+                            id:"${student.email}",
+                            name:"${student.username}"
+                        },
+                        userString: function (user) {
+                            if (user && user.name)
+                                return user.name;
+                            return user;
+                        },
+                        userId: function (user) {
+                            if (user && user.id)
+                                return user.id;
+                            return user;
+                        },
+                        permissions: {
+                                'read':   [],
+                                'update': ["${student.email}"],
+                                'delete': ["${student.email}"],
+                                'admin':  ["${student.email}"]
+                        },
+                        showViewPermissionsCheckbox: true,
+                        showEditPermissionsCheckbox: false,
+                        userAuthorize: function(action, annotation, user) {
+                            var token, tokens, _i, _len;
+                            if (annotation.permissions) {
+                              tokens = annotation.permissions[action] || [];
+                              if (is_staff){
+                              	return true;
+                              }
+                              if (tokens.length === 0) {
+                                return true;
+                              }
+                              for (_i = 0, _len = tokens.length; _i < _len; _i++) {
+                                token = tokens[_i];
 
-                          return true;
+                                if (this.userId(user) === token) {
+
+                                  return true;
+                                }
+                              }
+
+                              return false;
+                            } else if (annotation.user) {
+                              if (user) {
+                                return this.userId(user) === this.userId(annotation.user);
+                              } else {
+                                return false;
+                              }
+                            }
+                            return true;
+                          },
+                    },
+                    auth: {
+                        tokenUrl: location.protocol+'//'+location.host+"/token?course_id=${course.id.to_deprecated_string()}"
+                    },
+                    store: {
+                        // The endpoint of the store on your server.
+                        prefix: "${storage}",
+
+                        annotationData: {},
+
+                        urls: {
+                            // These are the default URLs.
+                            create:  '/create',
+                            read:    '/read/:id',
+                            update:  '/update/:id',
+                            destroy: '/delete/:id',
+                            search:  '/search'
+                        },
+
+                        loadFromSearch:{
+                            limit:pagination,
+                            offset:0,
+                            uri:uri
                         }
-                      }
-
-                      return false;
-                    } else if (annotation.user) {
-                      if (user) {
-                        return this.userId(user) === this.userId(annotation.user);
-                      } else {
-                        return false;
-                      }
-                    }
-                    return true;
-                  },
-            },
-            auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
-            },
-            store: {
-                // The endpoint of the store on your server.
-                prefix: "${storage}",
-
-                annotationData: {},
-
-                urls: {
-                    // These are the default URLs.
-                    create:  '/create',
-                    read:    '/read/:id',
-                    update:  '/update/:id',
-                    destroy: '/delete/:id',
-                    search:  '/search'
+                    },
                 },
+                optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
+                optionsRS: {},
+                optionsOVA: {posBigNew:'none'},
+                optionsRichText: {
+                    tinymce:{
+                        selector: "li.annotator-item textarea",
+                        plugins: "media image insertdatetime link code",
+                        menubar: false,
+                        toolbar_items_size: 'small',
+                        extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
+                        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+                    }
+                },
+            };
 
-                loadFromSearch:{
-                    limit:pagination,
-                    offset:0,
-                    uri:uri
-                }
+        tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+        var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+
+        //remove old instances
+        if (Annotator._instances.length !== 0) {
+            $('#notesHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        var ova = new OpenVideoAnnotation.Annotator($('#notesHolder'),options);
+
+
+        //Catch
+        var annotator = ova.annotator,
+            catchOptions = {
+                media:'text',
+                externalLink:true,
+                imageUrlRoot:imgURLRoot,
+                showMediaSelector: true,
+                showPublicPrivate: true,
+                pagination:pagination,//Number of Annotations per load in the pagination,
+                flags:is_staff
             },
-        },
-        optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
-        optionsRS: {},
-        optionsOVA: {posBigNew:'none'},
-        optionsRichText: {
-            tinymce:{
-                selector: "li.annotator-item textarea",
-                plugins: "media image insertdatetime link code",
-                menubar: false,
-                toolbar_items_size: 'small',
-                extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
-            }
-        },
-    };
-	
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	
-	//remove old instances
-    if (Annotator._instances.length !== 0) {
-      $('#notesHolder').annotator("destroy");
-    }
-    delete ova;
-    //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#notesHolder'),options);
-    
-    
-    //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
-            media:'text',
-            externalLink:true,
-            imageUrlRoot:imgURLRoot,
-            showMediaSelector: true,
-            showPublicPrivate: true,
-            pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
         </script>
     </div>
 </section>

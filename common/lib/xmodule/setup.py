@@ -67,5 +67,17 @@ setup(
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
         ],
+        'course_key': [
+            'slashes = xmodule.modulestore.locations:SlashSeparatedCourseKey',
+            'course-locator = xmodule.modulestore.locator:CourseLocator',
+        ],
+        'usage_key': [
+            'location = xmodule.modulestore.locations:Location',
+            'edx = xmodule.modulestore.locator:BlockUsageLocator',
+        ],
+        'asset_key': [
+            'asset-location = xmodule.modulestore.locations:AssetLocation',
+            'edx = xmodule.modulestore.locator:BlockUsageLocator',
+        ],
     },
 )

@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
 from dogapi import dog_stats_api
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
 
 logger = logging.getLogger(__name__)
@@ -27,21 +28,23 @@ def update_certificate(request):
         xqueue_header = json.loads(request.POST.get('xqueue_header'))
 
         try:
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
+
             cert = GeneratedCertificate.objects.get(
-                   user__username=xqueue_body['username'],
-                   course_id=xqueue_body['course_id'],
-                   key=xqueue_header['lms_key'])
+                user__username=xqueue_body['username'],
+                course_id=course_key,
+                key=xqueue_header['lms_key'])
 
         except GeneratedCertificate.DoesNotExist:
             logger.critical('Unable to lookup certificate\n'
-                         'xqueue_body: {0}\n'
-                         'xqueue_header: {1}'.format(
-                                      xqueue_body, xqueue_header))
+                            'xqueue_body: {0}\n'
+                            'xqueue_header: {1}'.format(
+                                xqueue_body, xqueue_header))
 
             return HttpResponse(json.dumps({
-                            'return_code': 1,
-                            'content': 'unable to lookup key'}),
-                             mimetype='application/json')
+                'return_code': 1,
+                'content': 'unable to lookup key'}),
+                mimetype='application/json')
 
         if 'error' in xqueue_body:
             cert.status = status.error

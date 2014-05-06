@@ -13,6 +13,6 @@ def heartbeat(request):
     """
     output = {
         'date': datetime.now(UTC).isoformat(),
-        'courses': [course.location.url() for course in modulestore().get_courses()],
+        'courses': [course.location.to_deprecated_string() for course in modulestore().get_courses()],
     }
     return HttpResponse(json.dumps(output, indent=4))

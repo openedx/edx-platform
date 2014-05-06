@@ -35,9 +35,8 @@ class Command(BaseCommand):
 
             if 1:
                 try:
-                    location = CourseDescriptor.id_to_location(course_id)
                     course_dir = course_id.replace('/', '...')
-                    export_to_xml(ms, cs, location, root_dir, course_dir, modulestore())
+                    export_to_xml(ms, cs, course_id, root_dir, course_dir, modulestore())
                 except Exception as err:
                     print("="*30 + "> Oops, failed to export %s" % course_id)
                     print("Error:")

@@ -4,21 +4,19 @@ by reversing group name formats.
 """
 import random
 from chrono import Timer
-from unittest import skip
 
 from django.contrib.auth.models import Group
 from django.test import RequestFactory
 
 from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups
-from contentstore.utils import delete_course_and_groups
+from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
@@ -39,39 +37,20 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
 
-    def _create_course_with_access_groups(self, course_location, group_name_format='group_name_with_dots', user=None):
+    def _create_course_with_access_groups(self, course_location, user=None):
         """
-        Create dummy course with 'CourseFactory' and role (instructor/staff) groups with provided group_name_format
+        Create dummy course with 'CourseFactory' and role (instructor/staff) groups
         """
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
-            display_name=course_location.name
+            run=course_location.run
         )
 
-        for role in [CourseInstructorRole, CourseStaffRole]:
-            # pylint: disable=protected-access
-            groupnames = role(course_locator)._group_names
-            if group_name_format == 'group_name_with_course_name_only':
-                # Create role (instructor/staff) groups with course_name only: 'instructor_run'
-                group, __ = Group.objects.get_or_create(name=groupnames[2])
-            elif group_name_format == 'group_name_with_slashes':
-                # Create role (instructor/staff) groups with format: 'instructor_edX/Course/Run'
-                # Since "Group.objects.get_or_create(name=groupnames[1])" would have made group with lowercase name
-                # so manually create group name of old type
-                if role == CourseInstructorRole:
-                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course_location.course_id))
-                else:
-                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course_location.course_id))
-            else:
-                # Create role (instructor/staff) groups with format: 'instructor_edx.course.run'
-                group, __ = Group.objects.get_or_create(name=groupnames[0])
+        if user is not None:
+            for role in [CourseInstructorRole, CourseStaffRole]:
+                role(course.id).add_users(user)
 
-            if user is not None:
-                user.groups.add(group)
         return course
 
     def tearDown(self):
@@ -85,11 +64,11 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test getting courses with new access group format e.g. 'instructor_edx.course.run'
         """
-        request = self.factory.get('/course')
+        request = self.factory.get('/course/')
         request.user = self.user
 
-        course_location = Location(['i4x', 'Org1', 'Course1', 'course', 'Run1'])
-        self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
+        course_location = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -101,61 +80,15 @@ class TestCourseListing(ModuleStoreTestCase):
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
 
-    def test_get_course_list_with_old_group_formats(self):
-        """
-        Test getting all courses with old course role (instructor/staff) groups
-        """
-        request = self.factory.get('/course')
-        request.user = self.user
-
-        # create a course with new groups name format e.g. 'instructor_edx.course.run'
-        course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
-        self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
-
-        # create a course with old groups name format e.g. 'instructor_edX/Course/Run'
-        old_course_location = Location(['i4x', 'Org_2', 'Course_2', 'course', 'Run_2'])
-        self._create_course_with_access_groups(old_course_location, 'group_name_with_slashes', self.user)
-
-        # get courses through iterating all courses
-        courses_list = _accessible_courses_list(request)
-        self.assertEqual(len(courses_list), 2)
-
-        # get courses by reversing groups name
-        courses_list_by_groups = _accessible_courses_list_from_groups(request)
-        self.assertEqual(len(courses_list_by_groups), 2)
-
-        # create a new course with older group name format (with dots in names) e.g. 'instructor_edX/Course.name/Run.1'
-        old_course_location = Location(['i4x', 'Org.Foo.Bar', 'Course.number', 'course', 'Run.name'])
-        self._create_course_with_access_groups(old_course_location, 'group_name_with_slashes', self.user)
-        # get courses through iterating all courses
-        courses_list = _accessible_courses_list(request)
-        self.assertEqual(len(courses_list), 3)
-        # get courses by reversing group name formats
-        courses_list_by_groups = _accessible_courses_list_from_groups(request)
-        self.assertEqual(len(courses_list_by_groups), 3)
-
-        # create a new course with older group name format e.g. 'instructor_Run'
-        old_course_location = Location(['i4x', 'Org_3', 'Course_3', 'course', 'Run_3'])
-        self._create_course_with_access_groups(old_course_location, 'group_name_with_course_name_only', self.user)
-
-        # get courses through iterating all courses
-        courses_list = _accessible_courses_list(request)
-        self.assertEqual(len(courses_list), 4)
-
-        # should raise an exception for getting courses with older format of access group by reversing django groups
-        with self.assertRaises(ItemNotFoundError):
-            courses_list_by_groups = _accessible_courses_list_from_groups(request)
-
     def test_get_course_list_with_invalid_course_location(self):
         """
-        Test getting courses with invalid course location (course deleted from modulestore but
-        location exists in loc_mapper).
+        Test getting courses with invalid course location (course deleted from modulestore).
         """
         request = self.factory.get('/course')
         request.user = self.user
 
-        course_location = Location('i4x', 'Org', 'Course', 'course', 'Run')
-        self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
+        course_key = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -168,12 +101,9 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now delete this course and re-add user to instructor group of this course
-        delete_course_and_groups(course_location.course_id, commit=True)
+        delete_course_and_groups(course_key, commit=True)
 
-        course_locator = loc_mapper().translate_location(course_location.course_id, course_location)
-        instructor_group_name = CourseInstructorRole(course_locator)._group_names[0]  # pylint: disable=protected-access
-        group, __ = Group.objects.get_or_create(name=instructor_group_name)
-        self.user.groups.add(group)
+        CourseInstructorRole(course_key).add_users(self.user)
 
         # test that get courses through iterating all courses now returns no course
         courses_list = _accessible_courses_list(request)
@@ -203,11 +133,11 @@ class TestCourseListing(ModuleStoreTestCase):
             org = 'Org{0}'.format(number)
             course = 'Course{0}'.format(number)
             run = 'Run{0}'.format(number)
-            course_location = Location(['i4x', org, course, 'course', run])
+            course_location = SlashSeparatedCourseKey(org, course, run)
             if number in user_course_ids:
-                self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
+                self._create_course_with_access_groups(course_location, self.user)
             else:
-                self._create_course_with_access_groups(course_location, 'group_name_with_dots')
+                self._create_course_with_access_groups(course_location)
 
         # time the get courses by iterating through all courses
         with Timer() as iteration_over_courses_time_1:
@@ -245,8 +175,8 @@ class TestCourseListing(ModuleStoreTestCase):
         request.user = self.user
         self.client.login(username=self.user.username, password='test')
 
-        course_location_caps = Location(['i4x', 'Org', 'COURSE', 'course', 'Run'])
-        self._create_course_with_access_groups(course_location_caps, 'group_name_with_dots', self.user)
+        course_location_caps = SlashSeparatedCourseKey('Org', 'COURSE', 'Run')
+        self._create_course_with_access_groups(course_location_caps, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -259,34 +189,19 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now create another course with same course_id but different name case
-        course_location_camel = Location(['i4x', 'Org', 'Course', 'course', 'Run'])
-        self._create_course_with_access_groups(course_location_camel, 'group_name_with_dots', self.user)
+        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        self._create_course_with_access_groups(course_location_camel, self.user)
 
         # test that get courses through iterating all courses returns both courses
         courses_list = _accessible_courses_list(request)
         self.assertEqual(len(courses_list), 2)
 
-        # test that get courses by reversing group name formats returns only one course
+        # test that get courses by reversing group name formats returns both courses
         courses_list_by_groups = _accessible_courses_list_from_groups(request)
-        self.assertEqual(len(courses_list_by_groups), 1)
+        self.assertEqual(len(courses_list_by_groups), 2)
 
-        course_locator = loc_mapper().translate_location(course_location_caps.course_id, course_location_caps)
-        outline_url = course_locator.url_reverse('course/')
         # now delete first course (course_location_caps) and check that it is no longer accessible
-        delete_course_and_groups(course_location_caps.course_id, commit=True)
-        # add user to this course instructor group since he was removed from that group on course delete
-        instructor_group_name = CourseInstructorRole(course_locator)._group_names[0]  # pylint: disable=protected-access
-        group, __ = Group.objects.get_or_create(name=instructor_group_name)
-        self.user.groups.add(group)
-
-        # test viewing the index page which creates missing courses loc_map entries
-        resp = self.client.get_html('/course')
-        self.assertContains(
-            resp,
-            '<h1 class="page-header">My Courses</h1>',
-            status_code=200,
-            html=True
-        )
+        delete_course_and_groups(course_location_caps, commit=True)
 
         # test that get courses through iterating all courses now returns one course
         courses_list = _accessible_courses_list(request)
@@ -296,12 +211,12 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list_by_groups = _accessible_courses_list_from_groups(request)
         self.assertEqual(len(courses_list_by_groups), 1)
 
-        # now check that deleted course in not accessible
+        # now check that deleted course is not accessible
+        outline_url = reverse_course_url('course_handler', course_location_caps)
         response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
 
-        # now check that other course in accessible
-        course_locator = loc_mapper().translate_location(course_location_camel.course_id, course_location_camel)
-        outline_url = course_locator.url_reverse('course/')
+        # now check that other course is accessible
+        outline_url = reverse_course_url('course_handler', course_location_camel)
         response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)

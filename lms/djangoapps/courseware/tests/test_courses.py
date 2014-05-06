@@ -4,7 +4,6 @@ Tests for course access
 """
 import mock
 
-from django.http import Http404
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import get_default_store_name_for_current_request
@@ -14,16 +13,12 @@ from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
-    get_course_by_id,
-    get_course,
-    get_cms_course_link,
-    get_cms_block_link,
-    course_image_url,
-    get_course_info_section,
-    get_course_about_section
+    get_course_by_id, get_cms_course_link, course_image_url,
+    get_course_info_section, get_course_about_section, get_course
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 CMS_BASE_TEST = 'testcms'
@@ -34,25 +29,29 @@ class CoursesTest(ModuleStoreTestCase):
 
     def test_get_course_by_id_invalid_chars(self):
         """
-        Test that `get_course_by_id` throws a 404, rather than
-        an exception, when faced with unexpected characters
-        (such as unicode characters, and symbols such as = and ' ')
+        Test that `get_course` throws a 404, rather than an exception,
+        when faced with unexpected characters (such as unicode characters,
+        and symbols such as = and ' ')
         """
         with self.assertRaises(Http404):
-            get_course_by_id('MITx/foobar/statistics=introduction')
-            get_course_by_id('MITx/foobar/business and management')
-            get_course_by_id('MITx/foobar/NiñøJoséMaríáßç')
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+        with self.assertRaises(Http404):
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar' 'statistics=introduction'))
+        with self.assertRaises(Http404):
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
 
     def test_get_course_invalid_chars(self):
         """
-        Test that `get_course` throws a ValueError, rather than
-        a 404, when faced with unexpected characters
-        (such as unicode characters, and symbols such as = and ' ')
+        Test that `get_course` throws a ValueError, rather than a 404,
+        when faced with unexpected characters (such as unicode characters,
+        and symbols such as = and ' ')
         """
         with self.assertRaises(ValueError):
-            get_course('MITx/foobar/statistics=introduction')
-            get_course('MITx/foobar/business and management')
-            get_course('MITx/foobar/NiñøJoséMaríáßç')
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+        with self.assertRaises(ValueError):
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'statistics=introduction'))
+        with self.assertRaises(ValueError):
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
 
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
@@ -67,6 +66,7 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
+        cms_url = u"//{}/course/slashes:org+num+name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_course_link(self.course))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
@@ -146,10 +146,11 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
 
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
+    toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_course_info_section_render(self):
-        course = get_course_by_id('edX/toy/2012_Fall')
+        course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
 
         # Test render works okay
@@ -167,7 +168,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     @mock.patch('courseware.courses.get_request_for_thread')
     def test_get_course_about_section_render(self, mock_get_request):
-        course = get_course_by_id('edX/toy/2012_Fall')
+        course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
         mock_get_request.return_value = request
 

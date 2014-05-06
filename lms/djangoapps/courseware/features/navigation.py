@@ -5,6 +5,7 @@ from lettuce import world, step
 from common import course_id, course_location
 from problems_setup import PROBLEM_DICT
 from nose.tools import assert_in
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @step(u'I am viewing a course with multiple sections')
@@ -148,7 +149,7 @@ def create_course():
 
 
 def create_user_and_visit_course():
-    world.register_by_course_id('edx/999/Test_Course')
+    world.register_by_course_key(SlashSeparatedCourseKey('edx', '999', 'Test_Course'))
     world.log_in()
     world.visit('/courses/edx/999/Test_Course/courseware/')
 

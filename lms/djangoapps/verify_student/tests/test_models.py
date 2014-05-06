@@ -2,6 +2,7 @@
 from datetime import timedelta, datetime
 import json
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
 from mock import patch
 import pytz
@@ -218,7 +219,7 @@ class TestPhotoVerification(TestCase):
         old_key = orig_attempt.photo_id_key
 
         window = MidcourseReverificationWindowFactory(
-            course_id="ponies",
+            course_id=SlashSeparatedCourseKey("fake", "course", "id"),
             start_date=datetime.now(pytz.utc) - timedelta(days=5),
             end_date=datetime.now(pytz.utc) + timedelta(days=5)
         )
@@ -422,30 +423,29 @@ class TestPhotoVerification(TestCase):
 class TestMidcourseReverification(TestCase):
     """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
     def setUp(self):
-        self.course_id = "MITx/999/Robot_Super_Course"
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.user = UserFactory.create()
 
     def test_user_is_reverified_for_all(self):
 
         # if there are no windows for a course, this should return True
-        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
 
         # first, make three windows
         window1 = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course.id,
             start_date=datetime.now(pytz.UTC) - timedelta(days=15),
             end_date=datetime.now(pytz.UTC) - timedelta(days=13),
         )
 
         window2 = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course.id,
             start_date=datetime.now(pytz.UTC) - timedelta(days=10),
             end_date=datetime.now(pytz.UTC) - timedelta(days=8),
         )
 
         window3 = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course.id,
             start_date=datetime.now(pytz.UTC) - timedelta(days=5),
             end_date=datetime.now(pytz.UTC) - timedelta(days=3),
         )
@@ -466,7 +466,7 @@ class TestMidcourseReverification(TestCase):
         attempt2.save()
 
         # should return False because only 2 of 3 windows have verifications
-        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
 
         attempt3 = SoftwareSecurePhotoVerification(
             status="must_retry",
@@ -476,19 +476,19 @@ class TestMidcourseReverification(TestCase):
         attempt3.save()
 
         # should return False because the last verification exists BUT is not approved
-        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
 
         attempt3.status = "approved"
         attempt3.save()
 
         # should now return True because all windows have approved verifications
-        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
 
     def test_original_verification(self):
         orig_attempt = SoftwareSecurePhotoVerification(user=self.user)
         orig_attempt.save()
         window = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course.id,
             start_date=datetime.now(pytz.UTC) - timedelta(days=15),
             end_date=datetime.now(pytz.UTC) - timedelta(days=13),
         )
@@ -497,7 +497,7 @@ class TestMidcourseReverification(TestCase):
 
     def test_user_has_valid_or_pending(self):
         window = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course.id,
             start_date=datetime.now(pytz.UTC) - timedelta(days=15),
             end_date=datetime.now(pytz.UTC) - timedelta(days=13),
         )

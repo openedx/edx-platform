@@ -27,7 +27,8 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
-        context_id = self.item_descriptor.course_id
+        # TODO this course_id is actually a course_key; please change this ASAP!
+        context_id = self.item_descriptor.course_id.to_deprecated_string()
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
@@ -38,10 +39,6 @@ class TestLTI(BaseTestXmodule):
             user_id=user_id
         )
 
-        lis_outcome_service_url = 'https://{host}{path}'.format(
-            host=hostname,
-            path=self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'grade_handler', thirdparty=True).rstrip('/?')
-        )
         self.correct_headers = {
             u'user_id': user_id,
             u'oauth_callback': u'about:blank',

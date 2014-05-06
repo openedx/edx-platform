@@ -9,6 +9,7 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
                                    is_commentable_cohorted, get_cohort_by_name)
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 
@@ -84,13 +85,14 @@ class TestCohorts(django.test.TestCase):
         Make sure that course is reloaded every time--clear out the modulestore.
         """
         clear_existing_modulestores()
+        self.toy_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
 
     def test_get_cohort(self):
         """
         Make sure get_cohort() does the right thing when the course is cohorted
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertEqual(course.id, self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
         user = User.objects.create(username="test", email="a@b.com")
@@ -120,8 +122,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure get_cohort() does the right thing when the course is auto_cohorted
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
         user1 = User.objects.create(username="test", email="a@b.com")
@@ -168,8 +169,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure get_cohort() randomizes properly.
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
         groups = ["group_{0}".format(n) for n in range(5)]
@@ -194,8 +194,8 @@ class TestCohorts(django.test.TestCase):
             self.assertLess(num_users, 50)
 
     def test_get_course_cohorts(self):
-        course1_id = 'a/b/c'
-        course2_id = 'e/f/g'
+        course1_id = SlashSeparatedCourseKey('a', 'b', 'c')
+        course2_id = SlashSeparatedCourseKey('e', 'f', 'g')
 
         # add some cohorts to course 1
         cohort = CourseUserGroup.objects.create(name="TestCohort",
@@ -213,7 +213,7 @@ class TestCohorts(django.test.TestCase):
         self.assertEqual(cohorts, ['TestCohort', 'TestCohort2'])
 
     def test_is_commentable_cohorted(self):
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
         def to_id(name):

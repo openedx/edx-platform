@@ -168,12 +168,12 @@
           %if upgrade:
             <span class="help help-inline">${_("Missing something? You can always continue to audit this course instead.")}</span>
           %else:
-            <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(a_start='<a href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</span>
+            <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(a_start='<a href="{}">'.format(course_modes_choose_url), a_end="</a>")}</span>
           %endif
 
           <ol class="wizard-steps">
             <li class="wizard-step">
-            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}?upgrade=${upgrade}">${_("Go to Step 1: Take my Photo")}</a>
+            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${verify_student_url}?upgrade=${upgrade}">${_("Go to Step 1: Take my Photo")}</a>
             </li>
           </ol>
         </nav>

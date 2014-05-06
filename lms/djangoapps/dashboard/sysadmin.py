@@ -42,6 +42,7 @@ from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 log = logging.getLogger(__name__)
@@ -258,7 +259,7 @@ class Users(SysadminDashboardView):
         self.msg += u'<ol>'
         for (cdir, course) in courses.items():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(cdir), course.location.url())
+                escape(cdir), course.location.to_deprecated_string())
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -469,7 +470,7 @@ class Courses(SysadminDashboardView):
             course = self.def_ms.courses[os.path.abspath(gdir)]
             msg += _('Loaded course {0} {1}<br/>Errors:').format(
                 cdir, course.display_name)
-            errors = self.def_ms.get_item_errors(course.location)
+            errors = self.def_ms.get_course_errors(course.id)
             if not errors:
                 msg += u'None'
             else:
@@ -489,9 +490,7 @@ class Courses(SysadminDashboardView):
         courses = self.get_courses()
 
         for (cdir, course) in courses.items():
-            gdir = cdir
-            if '/' in cdir:
-                gdir = cdir.rsplit('/', 1)[1]
+            gdir = cdir.run
             data.append([course.display_name, cdir]
                         + self.git_info_for_course(gdir))
 
@@ -535,13 +534,14 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
             course_found = False
-            if course_id in courses:
+            if course_key in courses:
                 course_found = True
-                course = courses[course_id]
+                course = courses[course_key]
             else:
                 try:
-                    course = get_course_by_id(course_id)
+                    course = get_course_by_id(course_key)
                     course_found = True
                 except Exception, err:   # pylint: disable=broad-except
                     self.msg += _('Error - cannot get course with ID '
@@ -549,7 +549,7 @@ class Courses(SysadminDashboardView):
                                       course_id, escape(str(err))
                                   )
 
-            is_xml_course = (modulestore().get_modulestore_type(course_id) == XML_MODULESTORE_TYPE)
+            is_xml_course = (modulestore().get_modulestore_type(course_key) == XML_MODULESTORE_TYPE)
             if course_found and is_xml_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)
@@ -567,14 +567,13 @@ class Courses(SysadminDashboardView):
 
             elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
-                loc = course.location
                 content_store = contentstore()
                 commit = True
-                delete_course(self.def_ms, content_store, loc, commit)
+                delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
-                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), loc, course.id, course.display_name)
+                    u"<font color='red'>{0} {1} ({2})</font>".format(
+                        _('Deleted'), course.id.to_deprecated_string(), course.display_name)
             datatable = self.make_datatable()
 
         context = {
@@ -606,9 +605,9 @@ class Staffing(SysadminDashboardView):
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
-            datum += [CourseStaffRole(course.location).users_with_role().count()]
+            datum += [CourseStaffRole(course.id).users_with_role().count()]
             datum += [','.join([x.username for x in CourseInstructorRole(
-                course.location).users_with_role()])]
+                course.id).users_with_role()])]
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
@@ -640,7 +639,7 @@ class Staffing(SysadminDashboardView):
 
             for (cdir, course) in courses.items():  # pylint: disable=unused-variable
                 for role in roles:
-                    for user in role(course.location).users_with_role():
+                    for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
                                  user.profile.name]
                         data.append(datum)
@@ -667,6 +666,8 @@ class GitLogs(TemplateView):
         """Shows logs of imports that happened as a result of a git import"""
 
         course_id = kwargs.get('course_id')
+        if course_id:
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
@@ -709,16 +710,15 @@ class GitLogs(TemplateView):
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
-                    CourseInstructorRole(course.location).has_user(request.user) or
-                    CourseStaffRole(course.location).has_user(request.user)):
+                    CourseInstructorRole(course.id).has_user(request.user) or
+                    CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
-            cilset = CourseImportLog.objects.filter(
-                course_id=course_id).order_by('-created')
+            cilset = CourseImportLog.objects.filter(course_id=course_id).order_by('-created')
             log.debug('cilset length={0}'.format(len(cilset)))
         mdb.disconnect()
         context = {'cilset': cilset,
-                   'course_id': course_id,
+                   'course_id': course_id.to_deprecated_string() if course_id else None,
                    'error_msg': error_msg}
 
         return render_to_response(self.template_name, context)

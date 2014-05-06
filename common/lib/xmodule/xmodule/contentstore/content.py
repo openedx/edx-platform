@@ -1,3 +1,5 @@
+import bson.son
+import re
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 
@@ -8,7 +10,7 @@ import logging
 import StringIO
 from urlparse import urlparse, urlunparse
 
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -22,7 +24,7 @@ class StaticContent(object):
         self._data = data
         self.length = length
         self.last_modified_at = last_modified_at
-        self.thumbnail_location = Location(thumbnail_location) if thumbnail_location is not None else None
+        self.thumbnail_location = thumbnail_location
         # optional information about where this file was imported from. This is needed to support import/export
         # cycles
         self.import_path = import_path
@@ -39,44 +41,55 @@ class StaticContent(object):
             extension=XASSET_THUMBNAIL_TAIL_NAME,)
 
     @staticmethod
-    def compute_location(org, course, name, revision=None, is_thumbnail=False):
-        name = name.replace('/', '_')
-        return Location([XASSET_LOCATION_TAG, org, course, 'asset' if not is_thumbnail else 'thumbnail',
-                         Location.clean_keeping_underscores(name), revision])
+    def compute_location(course_key, path, revision=None, is_thumbnail=False):
+        """
+        Constructs a location object for static content.
+
+        - course_key: the course that this asset belongs to
+        - path: is the name of the static asset
+        - revision: is the object's revision information
+        - is_tumbnail: is whether or not we want the thumbnail version of this
+            asset
+        """
+        path = path.replace('/', '_')
+        return AssetLocation(
+            course_key.org, course_key.course, course_key.run,
+            'asset' if not is_thumbnail else 'thumbnail',
+            AssetLocation.clean_keeping_underscores(path),
+            revision
+        )
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
 
     def get_url_path(self):
-        return StaticContent.get_url_path_from_location(self.location)
+        return self.location.to_deprecated_string()
+
+    def get_deprecated_loc_list(self, location):
+        """
+        Thumbnail locations stored as lists [c4x, org, course, thumbnail, path, None]
+        :param location:
+        """
+        return ['c4x', location.org, location.course, 'thumbnail', location.name, None] if location is not None else None
 
     @property
     def data(self):
         return self._data
 
-    @staticmethod
-    def get_url_path_from_location(location):
-        if location is not None:
-            return u"/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
-        else:
-            return None
+    ASSET_URL_RE = re.compile(r"""
+        /?c4x/
+        (?P<org>[^/]+)/
+        (?P<course>[^/]+)/
+        (?P<category>[^/]+)/
+        (?P<name>[^/]+)
+    """, re.VERBOSE | re.IGNORECASE)
 
     @staticmethod
     def is_c4x_path(path_string):
         """
         Returns a boolean if a path is believed to be a c4x link based on the leading element
         """
-        return path_string.startswith(u'/{0}/'.format(XASSET_LOCATION_TAG))
-
-    @staticmethod
-    def renamespace_c4x_path(path_string, target_location):
-        """
-        Returns an updated string which incorporates a new org/course in order to remap an asset path
-        to a new namespace
-        """
-        location = StaticContent.get_location_from_path(path_string)
-        location = location.replace(org=target_location.org, course=target_location.course)
-        return StaticContent.get_url_path_from_location(location)
+        return StaticContent.ASSET_URL_RE.match(path_string) is not None
 
     @staticmethod
     def get_static_path_from_location(location):
@@ -88,28 +101,35 @@ class StaticContent(object):
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
-            return u"/static/{name}".format(**location.dict())
+            return u"/static/{name}".format(name=location.name)
         else:
             return None
 
     @staticmethod
-    def get_base_url_path_for_course_assets(loc):
-        if loc is not None:
-            return u"/c4x/{org}/{course}/asset".format(**loc.dict())
+    def get_base_url_path_for_course_assets(course_key):
+        if course_key is None:
+            return None
+
+        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
     def get_id_from_location(location):
-        return {'tag': location.tag, 'org': location.org, 'course': location.course,
-                'category': location.category, 'name': location.name,
-                'revision': location.revision}
+        """
+        Get the doc store's primary key repr for this location
+        """
+        return bson.son.SON([
+            ('tag', 'c4x'), ('org', location.org), ('course', location.course),
+            ('category', location.category), ('name', location.name),
+            ('revision', location.revision),
+        ])
 
     @staticmethod
     def get_location_from_path(path):
-        # remove leading / character if it is there one
-        if path.startswith('/'):
-            path = path[1:]
-
-        return Location(path.split('/'))
+        """
+        Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
+        """
+        return AssetLocation.from_deprecated_string(path)
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
@@ -117,12 +137,10 @@ class StaticContent(object):
         Returns a path to a piece of static content when we are provided with a filepath and
         a course_id
         """
-
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
-        course_id_dict = Location.parse_course_id(course_id)
-        loc = StaticContent.compute_location(course_id_dict['org'], course_id_dict['course'], orig_path)
-        loc_url = StaticContent.get_url_path_from_location(loc)
+        loc = StaticContent.compute_location(course_id, orig_path)
+        loc_url = loc.to_deprecated_string()
 
         # Reconstruct with new path
         return urlunparse((scheme, netloc, loc_url, params, query, fragment))
@@ -167,7 +185,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_iey, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of static assets for a course, followed by the total number of assets.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
@@ -192,13 +210,21 @@ class ContentStore(object):
         '''
         raise NotImplementedError
 
+    def delete_all_course_assets(self, course_key):
+        """
+        Delete all of the assets which use this course_key as an identifier
+        :param course_key:
+        """
+        raise NotImplementedError
+
     def generate_thumbnail(self, content, tempfile_path=None):
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
         thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
 
-        thumbnail_file_location = StaticContent.compute_location(content.location.org, content.location.course,
-                                                                 thumbnail_name, is_thumbnail=True)
+        thumbnail_file_location = StaticContent.compute_location(
+            content.location.course_key, thumbnail_name, is_thumbnail=True
+        )
 
         # if we're uploading an image, then let's generate a thumbnail so that we can
         # serve it up when needed without having to rescale on the fly

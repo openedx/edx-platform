@@ -6,7 +6,7 @@
 
 $(function () {
 
-  d3.json("${reverse('all_sequential_open_distrib', kwargs=dict(course_id=course_id))}", function(error, json) {
+  d3.json("${reverse('all_sequential_open_distrib', kwargs=dict(course_id=course_id.to_deprecated_string()))}", function(error, json) {
     var section, paramOpened, barGraphOpened, error;
     var i, curr_id;
     var errorMessage = gettext('Unable to retrieve data, please try again later.');
@@ -46,7 +46,7 @@ $(function () {
     }
   });
 
-  d3.json("${reverse('all_problem_grade_distribution', kwargs=dict(course_id=course_id))}", function(error, json) {
+  d3.json("${reverse('all_problem_grade_distribution', kwargs=dict(course_id=course_id.to_deprecated_string()))}", function(error, json) {
     var section, paramGrade, barGraphGrade, error;
     var i, curr_id;
     var errorMessage = gettext('Unable to retrieve data, please try again later.');

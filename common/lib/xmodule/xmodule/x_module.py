@@ -18,14 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.plugin import default_select
 from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -156,11 +154,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def course_id(self):
-        return self.runtime.course_id
-
-    @property
-    def id(self):
-        return self.location.url()
+        return self.location.course_key
 
     @property
     def category(self):
@@ -168,16 +162,11 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def location(self):
-        try:
-            return Location(self.scope_ids.usage_id)
-        except InvalidLocationError:
-            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
-                return self.scope_ids.usage_id
-            else:
-                return BlockUsageLocator(self.scope_ids.usage_id)
+        return self.scope_ids.usage_id
 
     @location.setter
     def location(self, value):
+        assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
             def_id=value,
             usage_id=value,
@@ -185,12 +174,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def url_name(self):
-        if isinstance(self.location, Location):
-            return self.location.name
-        elif isinstance(self.location, BlockUsageLocator):
-            return self.location.block_id
-        else:
-            raise InsufficientSpecificationError()
+        return self.location.name
 
     @property
     def display_name_with_default(self):
@@ -203,6 +187,15 @@ class XModuleMixin(XBlockMixin):
             name = self.url_name.replace('_', ' ')
         return name
 
+    @property
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
+        return self._field_data._kvs  # pylint: disable=protected-access
+
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
@@ -213,15 +206,6 @@ class XModuleMixin(XBlockMixin):
             if (field.scope == scope and field.is_set_on(self)):
                 result[field.name] = field.read_json(self)
         return result
-
-    @property
-    def xblock_kvs(self):
-        """
-        Use w/ caution. Really intended for use by the persistence layer.
-        """
-        # if caller wants kvs, caller's assuming it's up to date; so, decache it
-        self.save()
-        return self._field_data._kvs  # pylint: disable=protected-access
 
     def get_content_titles(self):
         """
@@ -1023,7 +1007,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        super(DescriptorSystem, self).__init__(**kwargs)
+        super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
 
         # This is used by XModules to write out separate files during xml export
         self.export_fs = None
@@ -1217,7 +1201,7 @@ class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        super(ModuleSystem, self).__init__(id_reader=None, field_data=field_data, **kwargs)
+        super(ModuleSystem, self).__init__(id_reader=OpaqueKeyReader(), field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.xqueue = xqueue

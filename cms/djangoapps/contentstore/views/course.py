@@ -4,10 +4,7 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
-import re
-import bson
 
-from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -20,18 +17,22 @@ from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
 from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, InvalidLocationError)
-from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
-    get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
-    get_modulestore)
+    get_lms_link_for_item,
+    add_extra_panel_tab,
+    remove_extra_panel_tab,
+    get_modulestore,
+    reverse_course_url
+)
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
@@ -41,16 +42,19 @@ from util.string_utils import _has_non_ascii_characters
 
 from .access import has_course_access
 from .component import (
-    OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY)
+    OPEN_ENDED_COMPONENT_TYPES,
+    NOTE_COMPONENT_TYPES,
+    ADVANCED_COMPONENT_POLICY_KEY
+)
 
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
 from student.models import CourseEnrollment
+from student.roles import CourseRole, UserBasedRole
 
 from xmodule.html_module import AboutDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
@@ -65,26 +69,20 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'textbooks_list_handler', 'textbooks_detail_handler']
 
 
-def _get_locator_and_course(package_id, branch, version_guid, block_id, user, depth=0):
+def _get_course_module(course_key, user, depth=0):
     """
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
-    if not has_course_access(user, locator):
+    if not has_course_access(user, course_key):
         raise PermissionDenied()
-
-    course_location = loc_mapper().translate_locator_to_location(locator)
-    if course_location is None:
-        raise PermissionDenied()
-
-    course_module = modulestore().get_item(course_location, depth=depth)
-    return locator, course_module
+    course_module = modulestore().get_course(course_key, depth=depth)
+    return course_module
 
 
 # pylint: disable=unused-argument
 @login_required
-def course_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def course_handler(request, course_key_string=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
@@ -102,20 +100,17 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id. Return same json as above.
+        offering. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            return JsonResponse(_course_json(request, package_id, branch, version_guid, block))
+            return JsonResponse(_course_json(request, CourseKey.from_string(course_key_string)))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
-        elif not has_course_access(
-            request.user,
-            BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-        ):
+        elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
             raise PermissionDenied()
         elif request.method == 'PUT':
             raise NotImplementedError()
@@ -124,36 +119,31 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        if package_id is None:
+        if course_key_string is None:
             return course_listing(request)
         else:
-            return course_index(request, package_id, branch, version_guid, block)
+            return course_index(request, CourseKey.from_string(course_key_string))
     else:
         return HttpResponseNotFound()
 
 
 @login_required
-def _course_json(request, package_id, branch, version_guid, block):
+def _course_json(request, course_key):
     """
     Returns a JSON overview of a course
     """
-    __, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user, depth=None
-    )
-    return _xmodule_json(course, course.location.course_id)
+    course_module = _get_course_module(course_key, request.user, depth=None)
+    return _xmodule_json(course_module, course_module.id)
 
 
 def _xmodule_json(xmodule, course_id):
     """
     Returns a JSON overview of an XModule
     """
-    locator = loc_mapper().translate_location(
-        course_id, xmodule.location, published=False, add_entry_if_missing=True
-    )
     is_container = xmodule.has_children
     result = {
         'display_name': xmodule.display_name,
-        'id': unicode(locator),
+        'id': unicode(xmodule.location),
         'category': xmodule.category,
         'is_draft': getattr(xmodule, 'is_draft', False),
         'is_container': is_container,
@@ -169,7 +159,7 @@ def _accessible_courses_list(request):
     """
     courses = modulestore('direct').get_courses()
 
-    # filter out courses that we don't have access too
+    # filter out courses that we don't have access to
     def course_filter(course):
         """
         Get courses to which this user has access
@@ -177,7 +167,7 @@ def _accessible_courses_list(request):
         if GlobalStaff().has_user(request.user):
             return course.location.course != 'templates'
 
-        return (has_course_access(request.user, course.location)
+        return (has_course_access(request.user, course.id)
                 # pylint: disable=fixme
                 # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
@@ -186,46 +176,25 @@ def _accessible_courses_list(request):
     return courses
 
 
-# pylint: disable=invalid-name
 def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
-    courses_list = []
-    course_ids = set()
+    courses_list = {}
 
-    user_staff_group_names = request.user.groups.filter(
-        Q(name__startswith='instructor_') | Q(name__startswith='staff_')
-    ).values_list('name', flat=True)
+    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
+    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    all_courses = instructor_courses | staff_courses
 
-    # we can only get course_ids from role names with the new format (instructor_org/number/run or
-    # instructor_org.number.run but not instructor_number).
-    for user_staff_group_name in user_staff_group_names:
-        # to avoid duplication try to convert all course_id's to format with dots e.g. "edx.course.run"
-        if user_staff_group_name.startswith("instructor_"):
-            # strip starting text "instructor_"
-            course_id = user_staff_group_name[11:]
-        else:
-            # strip starting text "staff_"
-            course_id = user_staff_group_name[6:]
+    for course_access in all_courses:
+        course_key = course_access.course_id
+        if course_key not in courses_list:
+            course = modulestore('direct').get_course(course_key)
+            if course is None:
+                raise ItemNotFoundError(course_key)
+            courses_list[course_key] = course
 
-        course_ids.add(course_id.replace('/', '.').lower())
-
-    for course_id in course_ids:
-        # get course_location with lowercase id
-        course_location = loc_mapper().translate_locator_to_location(
-            CourseLocator(package_id=course_id), get_course=True, lower_only=True
-        )
-        if course_location is None:
-            raise ItemNotFoundError(course_id)
-
-        course = modulestore('direct').get_course(course_location.course_id)
-        if course is None:
-            raise ItemNotFoundError(course_id)
-
-        courses_list.append(course)
-
-    return courses_list
+    return courses_list.values()
 
 
 @login_required
@@ -247,22 +216,13 @@ def course_listing(request):
             # so fallback to iterating through all courses
             courses = _accessible_courses_list(request)
 
-            # update location entry in "loc_mapper" for user courses (add keys 'lower_id' and 'lower_course_id')
-            for course in courses:
-                loc_mapper().create_map_entry(course.location)
-
     def format_course_for_view(course):
         """
         return tuple of the data which the view requires for each course
         """
-        # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
-        course_loc = loc_mapper().translate_location(
-            course.location.course_id, course.location, published=False, add_entry_if_missing=True
-        )
         return (
             course.display_name,
-            # note, couldn't get django reverse to work; so, wrote workaround
-            course_loc.url_reverse('course/', ''),
+            reverse_course_url('course_handler', course.id),
             get_lms_link_for_item(course.location),
             course.display_org_with_default,
             course.display_number_with_default,
@@ -280,26 +240,24 @@ def course_listing(request):
 
 @login_required
 @ensure_csrf_cookie
-def course_index(request, package_id, branch, version_guid, block):
+def course_index(request, course_key):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    locator, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user, depth=3
-    )
-    lms_link = get_lms_link_for_item(course.location)
-    sections = course.get_children()
+    course_module = _get_course_module(course_key, request.user, depth=3)
+    lms_link = get_lms_link_for_item(course_module.location)
+    sections = course_module.get_children()
+
 
     return render_to_response('overview.html', {
-        'context_course': course,
+        'context_course': course_module,
         'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(
-            CourseGradingModel.fetch(locator).graders
+            CourseGradingModel.fetch(course_key).graders
         ),
-        'parent_locator': locator,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'new_unit_category': 'vertical',
@@ -331,149 +289,128 @@ def create_new_course(request):
             )
 
     try:
-        dest_location = Location(u'i4x', org, number, u'course', run)
-    except InvalidLocationError as error:
-        return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
-                name=display_name, err=error.message)})
+        course_key = SlashSeparatedCourseKey(org, number, run)
 
-    # see if the course already exists
-    existing_course = None
-    try:
-        existing_course = modulestore('direct').get_item(dest_location)
-    except ItemNotFoundError:
-        pass
-    if existing_course is not None:
+        # see if the course already exists
+        existing_course_exists = False
+        try:
+            existing_course_exists = modulestore('direct').has_course(course_key, ignore_case=True)
+        except InsufficientSpecificationError:
+            pass
+
+        if existing_course_exists:
+            raise InvalidLocationError()
+
+        # instantiate the CourseDescriptor and then persist it
+        # note: no system to pass
+        if display_name is None:
+            metadata = {}
+        else:
+            metadata = {'display_name': display_name}
+
+        # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+        # existing xml courses this cannot be changed in CourseDescriptor.
+        ## TODO get rid of defining wiki slug in this org/course/run specific way
+        wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+        definition_data = {'wiki_slug': wiki_slug}
+
+        # Create the course then fetch it from the modulestore
+        # Check if role permissions group for a course named like this already exists
+        # Important because role groups are case insensitive
+        if CourseRole.course_group_already_exists(course_key):
+            raise InvalidLocationError()
+
+        fields = {}
+        fields.update(definition_data)
+        fields.update(metadata)
+
+        # Creating the course raises InvalidLocationError if an existing course with this org/name is found
+        modulestore('direct').create_course(
+            course_key.org,
+            course_key.offering,
+            fields=fields,
+        )
+
+        new_course = modulestore('direct').get_course(course_key)
+
+        # clone a default 'about' overview module as well
+        dest_about_location = new_course.location.replace(
+            category='about',
+            name='overview'
+        )
+        overview_template = AboutDescriptor.get_template('overview.yaml')
+        modulestore('direct').create_and_save_xmodule(
+            dest_about_location,
+            system=new_course.system,
+            definition_data=overview_template.get('data')
+        )
+
+        # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
+        # however, we can assume that b/c this user had authority to create the course, the user can add themselves
+        CourseInstructorRole(new_course.id).add_users(request.user)
+        auth.add_users(request.user, CourseStaffRole(new_course.id), request.user)
+
+        # seed the forums
+        seed_permissions_roles(new_course.id)
+
+        # auto-enroll the course creator in the course so that "View Live" will
+        # work.
+        CourseEnrollment.enroll(request.user, new_course.id)
+        _users_assign_default_role(new_course.id)
+
+        return JsonResponse({
+            'url': reverse_course_url('course_handler', new_course.id)
+        })
+
+    except InvalidLocationError:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
                 'organization, course number, and course run. Please '
-                'change either organization or course number to be '
-                'unique.'
+                'change either organization or course number to be unique.'
             ),
             'OrgErrMsg': _(
                 'Please change either the organization or '
-                'course number so that it is unique.'
-            ),
+                'course number so that it is unique.'),
             'CourseErrMsg': _(
                 'Please change either the organization or '
-                'course number so that it is unique.'
-            ),
+                'course number so that it is unique.'),
         })
-
-    # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
-    # file for new locators. get_items should accept a query rather than requiring it be a legal location
-    course_search_location = bson.son.SON({
-        '_id.tag': 'i4x',
-        # cannot pass regex to Location constructor; thus this hack
-        # pylint: disable=E1101
-        '_id.org': re.compile(u'^{}$'.format(dest_location.org), re.IGNORECASE | re.UNICODE),
-        # pylint: disable=E1101
-        '_id.course': re.compile(u'^{}$'.format(dest_location.course), re.IGNORECASE | re.UNICODE),
-        '_id.category': 'course',
-    })
-    courses = modulestore().collection.find(course_search_location, fields=('_id'))
-    if courses.count() > 0:
+    except InvalidKeyError as error:
         return JsonResponse({
-            'ErrMsg': _(
-                'There is already a course defined with the same '
-                'organization and course number. Please '
-                'change at least one field to be unique.'),
-            'OrgErrMsg': _(
-                'Please change either the organization or '
-                'course number so that it is unique.'),
-            'CourseErrMsg': _(
-                'Please change either the organization or '
-                'course number so that it is unique.'),
-        })
-
-    # instantiate the CourseDescriptor and then persist it
-    # note: no system to pass
-    if display_name is None:
-        metadata = {}
-    else:
-        metadata = {'display_name': display_name}
-
-    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
-    # cannot be changed in CourseDescriptor.
-    wiki_slug = u"{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
-    definition_data = {'wiki_slug': wiki_slug}
-
-    modulestore('direct').create_and_save_xmodule(
-        dest_location,
-        definition_data=definition_data,
-        metadata=metadata
-    )
-    new_course = modulestore('direct').get_item(dest_location)
-
-    # clone a default 'about' overview module as well
-    dest_about_location = dest_location.replace(
-        category='about',
-        name='overview'
-    )
-    overview_template = AboutDescriptor.get_template('overview.yaml')
-    modulestore('direct').create_and_save_xmodule(
-        dest_about_location,
-        system=new_course.system,
-        definition_data=overview_template.get('data')
-    )
-
-    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
-    # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
-    # however, we can assume that b/c this user had authority to create the course, the user can add themselves
-    CourseInstructorRole(new_location).add_users(request.user)
-    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
-
-    # seed the forums
-    seed_permissions_roles(new_course.location.course_id)
-
-    # auto-enroll the course creator in the course so that "View Live" will
-    # work.
-    CourseEnrollment.enroll(request.user, new_course.location.course_id)
-    _users_assign_default_role(new_course.location)
-
-    return JsonResponse({'url': new_location.url_reverse("course/", "")})
+            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=error.message)}
+        )
 
 
-def _users_assign_default_role(course_location):
+def _users_assign_default_role(course_id):
     """
     Assign 'Student' role to all previous users (if any) for this course
     """
-    enrollments = CourseEnrollment.objects.filter(course_id=course_location.course_id)
+    enrollments = CourseEnrollment.objects.filter(course_id=course_id)
     for enrollment in enrollments:
-        assign_default_role(course_location.course_id, enrollment.user)
+        assign_default_role(course_id, enrollment.user)
 
 
 # pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
-def course_info_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def course_info_handler(request, course_key_string):
     """
     GET
         html: return html for editing the course info handouts and updates.
     """
-    __, course_module = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        handouts_old_location = course_module.location.replace(category='course_info', name='handouts')
-        handouts_locator = loc_mapper().translate_location(
-            course_module.location.course_id, handouts_old_location, False, True
-        )
-
-        update_location = course_module.location.replace(category='course_info', name='updates')
-        update_locator = loc_mapper().translate_location(
-            course_module.location.course_id, update_location, False, True
-        )
 
         return render_to_response(
             'course_info.html',
             {
                 'context_course': course_module,
-                'updates_url': update_locator.url_reverse('course_info_update/'),
-                'handouts_locator': handouts_locator,
-                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.location) + '/'
+                'updates_url': reverse_course_url('course_info_update_handler', course_key),
+                'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
+                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
             }
         )
     else:
@@ -485,8 +422,7 @@ def course_info_handler(request, tag=None, package_id=None, branch=None, version
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def course_info_update_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None,
-                               provided_id=None):
+def course_info_update_handler(request, course_key_string, provided_id=None):
     """
     restful CRUD operations on course_info updates.
     provided_id should be none if it's new (create) and index otherwise.
@@ -500,26 +436,24 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
 
-    course_location = loc_mapper().translate_locator_to_location(
-        CourseLocator(package_id=package_id), get_course=True
-    )
-    updates_location = course_location.replace(category='course_info', name=block)
+    course_key = CourseKey.from_string(course_key_string)
+    usage_key = course_key.make_usage_key('course_info', 'updates')
     if provided_id == '':
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, updates_location):
+    if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     if request.method == 'GET':
-        course_updates = get_course_updates(updates_location, provided_id)
+        course_updates = get_course_updates(usage_key, provided_id)
         if isinstance(course_updates, dict) and course_updates.get('error'):
-            return JsonResponse(get_course_updates(updates_location, provided_id), course_updates.get('status', 400))
+            return JsonResponse(course_updates, course_updates.get('status', 400))
         else:
-            return JsonResponse(get_course_updates(updates_location, provided_id))
+            return JsonResponse(course_updates)
     elif request.method == 'DELETE':
         try:
-            return JsonResponse(delete_course_update(updates_location, request.json, provided_id, request.user))
+            return JsonResponse(delete_course_update(usage_key, request.json, provided_id, request.user))
         except:
             return HttpResponseBadRequest(
                 "Failed to delete",
@@ -528,7 +462,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            return JsonResponse(update_course_updates(updates_location, request.json, provided_id, request.user))
+            return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
         except:
             return HttpResponseBadRequest(
                 "Failed to save",
@@ -540,7 +474,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
 @expect_json
-def settings_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def settings_handler(request, course_key_string):
     """
     Course settings for dates and about pages
     GET
@@ -549,11 +483,10 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
     PUT
         json: update the Course and About xblocks through the CourseDetails model
     """
-    locator, course_module = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        upload_asset_url = locator.url_reverse('assets/')
+        upload_asset_url = reverse_course_url('assets_handler', course_key)
 
         # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
         # course about page should be editable in Studio
@@ -567,10 +500,10 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
 
         return render_to_response('settings.html', {
             'context_course': course_module,
-            'course_locator': locator,
-            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_module.location),
+            'course_locator': course_key,
+            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
             'course_image_url': utils.course_image_url(course_module),
-            'details_url': locator.url_reverse('/settings/details/'),
+            'details_url': reverse_course_url('settings_handler', course_key),
             'about_page_editable': about_page_editable,
             'short_description_editable': short_description_editable,
             'upload_asset_url': upload_asset_url
@@ -578,13 +511,13 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':
             return JsonResponse(
-                CourseDetails.fetch(locator),
+                CourseDetails.fetch(course_key),
                 # encoder serializes dates, old locations, and instances
                 encoder=CourseSettingsEncoder
             )
         else:  # post or put, doesn't matter.
             return JsonResponse(
-                CourseDetails.update_from_json(locator, request.json, request.user),
+                CourseDetails.update_from_json(course_key, request.json, request.user),
                 encoder=CourseSettingsEncoder
             )
 
@@ -593,7 +526,7 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def grading_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, grader_index=None):
+def grading_handler(request, course_key_string, grader_index=None):
     """
     Course Grading policy configuration
     GET
@@ -604,42 +537,41 @@ def grading_handler(request, tag=None, package_id=None, branch=None, version_gui
         json no grader_index: update the Course through the CourseGrading model
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
-    locator, course_module = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
 
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        course_details = CourseGradingModel.fetch(locator)
+        course_details = CourseGradingModel.fetch(course_key)
 
         return render_to_response('settings_graders.html', {
             'context_course': course_module,
-            'course_locator': locator,
+            'course_locator': course_key,
             'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
-            'grading_url': locator.url_reverse('/settings/grading/'),
+            'grading_url': reverse_course_url('grading_handler', course_key),
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':
             if grader_index is None:
                 return JsonResponse(
-                    CourseGradingModel.fetch(locator),
+                    CourseGradingModel.fetch(course_key),
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
             else:
-                return JsonResponse(CourseGradingModel.fetch_grader(locator, grader_index))
+                return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
         elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
             # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
             if grader_index is None:
                 return JsonResponse(
-                    CourseGradingModel.update_from_json(locator, request.json, request.user),
+                    CourseGradingModel.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder
                 )
             else:
                 return JsonResponse(
-                    CourseGradingModel.update_grader_from_json(locator, request.json, request.user)
+                    CourseGradingModel.update_grader_from_json(course_key, request.json, request.user)
                 )
         elif request.method == "DELETE" and grader_index is not None:
-            CourseGradingModel.delete_grader(locator, grader_index, request.user)
+            CourseGradingModel.delete_grader(course_key, grader_index, request.user)
             return JsonResponse()
 
 
@@ -698,7 +630,7 @@ def _config_course_advanced_components(request, course_module):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
 @expect_json
-def advanced_settings_handler(request, package_id=None, branch=None, version_guid=None, block=None, tag=None):
+def advanced_settings_handler(request, course_key_string):
     """
     Course settings configuration
     GET
@@ -709,15 +641,14 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
             metadata dicts. The dict can include a "unsetKeys" entry which is a list
             of keys whose values to unset: i.e., revert to default
     """
-    locator, course_module = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
         return render_to_response('settings_advanced.html', {
             'context_course': course_module,
             'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
-            'advanced_settings_url': locator.url_reverse('settings/advanced')
+            'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':
@@ -801,7 +732,7 @@ def assign_textbook_id(textbook, used_ids=()):
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def textbooks_list_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def textbooks_list_handler(request, course_key_string):
     """
     A RESTful handler for textbook collections.
 
@@ -813,15 +744,14 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
     PUT
         json: overwrite all textbooks in the course with the given list
     """
-    locator, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
     store = get_modulestore(course.location)
 
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         # return HTML page
-        upload_asset_url = locator.url_reverse('assets/', '')
-        textbook_url = locator.url_reverse('/textbooks')
+        upload_asset_url = reverse_course_url('assets_handler', course_key)
+        textbook_url = reverse_course_url('textbooks_list_handler', course_key)
         return render_to_response('textbooks.html', {
             'context_course': course,
             'textbooks': course.pdf_textbooks,
@@ -866,14 +796,18 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
             course.tabs.append(PDFTextbookTabs())
         store.update_item(course, request.user.id)
         resp = JsonResponse(textbook, status=201)
-        resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
+        resp["Location"] = reverse_course_url(
+            'textbooks_detail_handler',
+            course.id,
+            kwargs={'textbook_id': textbook["id"]}
+        )
         return resp
 
 
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def textbooks_detail_handler(request, course_key_string, textbook_id):
     """
     JSON API endpoint for manipulating a textbook via its internal ID.
     Used by the Backbone application.
@@ -885,12 +819,11 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
     DELETE
         json: remove textbook
     """
-    __, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
-    store = get_modulestore(course.location)
-    matching_id = [tb for tb in course.pdf_textbooks
-                   if unicode(tb.get("id")) == unicode(tid)]
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
+    store = get_modulestore(course_module.location)
+    matching_id = [tb for tb in course_module.pdf_textbooks
+                   if unicode(tb.get("id")) == unicode(textbook_id)]
     if matching_id:
         textbook = matching_id[0]
     else:
@@ -906,25 +839,25 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as err:
             return JsonResponse({"error": err.message}, status=400)
-        new_textbook["id"] = tid
+        new_textbook["id"] = textbook_id
         if textbook:
-            i = course.pdf_textbooks.index(textbook)
-            new_textbooks = course.pdf_textbooks[0:i]
+            i = course_module.pdf_textbooks.index(textbook)
+            new_textbooks = course_module.pdf_textbooks[0:i]
             new_textbooks.append(new_textbook)
-            new_textbooks.extend(course.pdf_textbooks[i + 1:])
-            course.pdf_textbooks = new_textbooks
+            new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+            course_module.pdf_textbooks = new_textbooks
         else:
-            course.pdf_textbooks.append(new_textbook)
-        store.update_item(course, request.user.id)
+            course_module.pdf_textbooks.append(new_textbook)
+        store.update_item(course_module, request.user.id)
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
         if not textbook:
             return JsonResponse(status=404)
-        i = course.pdf_textbooks.index(textbook)
-        remaining_textbooks = course.pdf_textbooks[0:i]
-        remaining_textbooks.extend(course.pdf_textbooks[i + 1:])
-        course.pdf_textbooks = remaining_textbooks
-        store.update_item(course, request.user.id)
+        i = course_module.pdf_textbooks.index(textbook)
+        remaining_textbooks = course_module.pdf_textbooks[0:i]
+        remaining_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+        course_module.pdf_textbooks = remaining_textbooks
+        store.update_item(course_module, request.user.id)
         return JsonResponse()
 
 

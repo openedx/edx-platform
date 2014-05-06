@@ -96,7 +96,7 @@ class CombinedOpenEndedRubric(object):
         if not success:
             #This is a staff_facing_error
             error_message = "Could not parse rubric : {0} for location {1}. Contact the learning sciences group for assistance.".format(
-                rubric_string, location.url())
+                rubric_string, location.to_deprecated_string())
             log.error(error_message)
             raise RubricParsingError(error_message)
 
