@@ -136,11 +136,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     mode = parent.data('mode');
                 event.preventDefault();
                 var $cheatsheet = $('.simple-editor-cheatsheet');
-                if ($cheatsheet.hasClass("shown")) {
-                    $(".CodeMirror").removeAttr("style");
-                    $(".modal-content").removeAttr("style");
-                    $cheatsheet.removeClass('shown');
-                }
+                $(".CodeMirror").css({"overflow": "none"});
+                $(".modal-content").removeAttr("style");
+                $cheatsheet.removeClass('shown');
                 this.selectMode(mode);
             },
 
