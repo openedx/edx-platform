@@ -11,7 +11,8 @@ import argparse
 from datetime import date, timedelta
 from dateutil.parser import parse as parse_datestring
 import re
-from collections import OrderedDict, defaultdict
+import collections
+import functools
 import textwrap
 import requests
 import json
@@ -26,6 +27,39 @@ PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
 PROJECT_ROOT = path(__file__).abspath().dirname()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
+
+
+class memoized(object):
+    """
+    Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+
+    https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize
+    """
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+            # uncacheable. a list, for instance.
+            # better to not cache than blow up.
+            return self.func(*args)
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            value = self.func(*args)
+            self.cache[args] = value
+            return value
+
+    def __repr__(self):
+        '''Return the function's docstring.'''
+        return self.func.__doc__
+
+    def __get__(self, obj, objtype):
+        '''Support instance methods.'''
+        return functools.partial(self.__call__, obj)
 
 
 def make_parser():
@@ -91,7 +125,7 @@ def get_github_creds():
     return None
 
 
-def ensure_github_creds():
+def ensure_github_creds(attempts=3):
     """
     Make sure that we have Github OAuth credentials. This will check the user's
     .netrc file, as well as the ~/.config/edx-release file. If no credentials
@@ -109,7 +143,7 @@ def ensure_github_creds():
           "Your credentials will not be stored.", file=sys.stderr)
     headers = {"User-Agent": "edx-release"}
     payload = {"note": "edx-release"}
-    for _ in range(3):  # three tries
+    for _ in range(attempts):
         username = raw_input("Github username: ")
         password = getpass.getpass("Github password: ")
         response = requests.post(
@@ -127,7 +161,7 @@ def ensure_github_creds():
             break
     if not response.ok:
         print("Too many invalid authentication attempts.", file=sys.stderr)
-        return modified
+        return False
 
     # got the token!
     token = response.json()["token"]
@@ -242,6 +276,7 @@ def get_merged_prs(start_ref, end_ref):
     return merged_prs
 
 
+@memoized
 def prs_by_email(start_ref, end_ref):
     """
     Returns an ordered dictionary of {email: pr_list}
@@ -249,7 +284,7 @@ def prs_by_email(start_ref, end_ref):
     The dictionary is alphabetically ordered by email address
     The pull request list is ordered by merge date
     """
-    unordered_data = defaultdict(set)
+    unordered_data = collections.defaultdict(set)
     for pr_num in get_merged_prs(start_ref, end_ref):
         ref = "refs/remotes/edx/pr/{num}".format(num=pr_num)
         branch = SymbolicReference(repo, ref)
@@ -265,7 +300,7 @@ def prs_by_email(start_ref, end_ref):
         else:
             unordered_data[merge.author.email].add((pr_num, merge))
 
-    ordered_data = OrderedDict()
+    ordered_data = collections.OrderedDict()
     for email in sorted(unordered_data.keys()):
         ordered = sorted(unordered_data[email], key=lambda pair: pair[1].authored_date)
         ordered_data[email] = [num for num, merge in ordered]
