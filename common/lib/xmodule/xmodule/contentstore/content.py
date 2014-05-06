@@ -1,4 +1,3 @@
-import bson.son
 import re
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
@@ -60,7 +59,7 @@ class StaticContent(object):
         )
 
     def get_id(self):
-        return StaticContent.get_id_from_location(self.location)
+        return self.location.to_deprecated_son(tag=XASSET_LOCATION_TAG)
 
     def get_url_path(self):
         return self.location.to_deprecated_string()
@@ -112,17 +111,6 @@ class StaticContent(object):
 
         assert(isinstance(course_key, SlashSeparatedCourseKey))
         return course_key.make_asset_key('asset', '').to_deprecated_string()
-
-    @staticmethod
-    def get_id_from_location(location):
-        """
-        Get the doc store's primary key repr for this location
-        """
-        return bson.son.SON([
-            ('tag', 'c4x'), ('org', location.org), ('course', location.course),
-            ('category', location.category), ('name', location.name),
-            ('revision', location.revision),
-        ])
 
     @staticmethod
     def get_location_from_path(path):
