@@ -227,11 +227,12 @@
 
   .action-item {
     display: inline-block;
+    vertical-align: middle;
 
     .action-button {
+      display: block;
       border-radius: 3px;
       padding: ($baseline/4) ($baseline/2);
-      height: ($baseline*1.5);
       color: $gray-l1;
 
       &:hover {
@@ -247,6 +248,15 @@
       &.delete-button:hover {
         background-color: $gray-l1;
       }
+    }
+
+    .drag-handle {
+      display: block;
+      float: none;
+      height: ($baseline*1.2);
+      width: ($baseline);
+      margin: 0;
+      background: transparent url("../img/drag-handles.png") no-repeat right center;
     }
   }
 }
