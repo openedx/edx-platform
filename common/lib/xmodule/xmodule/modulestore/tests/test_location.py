@@ -43,6 +43,27 @@ class TestLocations(TestCase):
             course_id.make_usage_key_from_deprecated_string(url).to_deprecated_string()
         )
 
+    def test_invalid_chars_ssck(self):
+        """
+        Test that the ssck constructor fails if given invalid chars
+        """
+        valid_base = SlashSeparatedCourseKey(u'org.dept-1%2', u'course.sub-2%3', u'run.faster-4%5')
+        for key in SlashSeparatedCourseKey.KEY_FIELDS:
+            with self.assertRaises(InvalidKeyError):
+                # this ends up calling the constructor where the legality check should occur
+                valid_base.replace(**{key: u'funny thing'})
+
+    def test_invalid_chars_location(self):
+        """
+        Test that the location constructor fails if given invalid chars
+        """
+        course_key = SlashSeparatedCourseKey(u'org.dept-1%2', u'course.sub-2%3', u'run.faster-4%5')
+        valid_base = course_key.make_usage_key('tomato-again%9', 'block-head:sub-4%9')
+        for key in SlashSeparatedCourseKey.KEY_FIELDS:
+            with self.assertRaises(InvalidKeyError):
+                # this ends up calling the constructor where the legality check should occur
+                valid_base.replace(**{key: u'funny thing'})
+
     @ddt.data(
         ((), {
             'org': 'org',
