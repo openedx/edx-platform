@@ -3,7 +3,9 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
+  from contentstore.context_processors import doc_url
 %>
+<%page args="online_help_token"/>
 
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -123,6 +125,10 @@
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
 
+        <%
+          help_doc_urls = get_online_help_info(online_help_token)
+        %>
+
         <ol>
           <li class="nav-item nav-account-help">
             <h3 class="title"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -131,7 +137,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-help-documentation">
-                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_("This is a PDF Document")}">${_("Studio Documentation")}</a>
+                    <a href="${help_doc_urls['pdf_url']}" title="${_("This is a PDF Document")}">${_("Studio Documentation")}</a>
                   </li>
                   <li class="nav-item nav-help-helpcenter">
                     <a href="http://help.edge.edx.org/" rel="external">${_("Studio Help Center")}</a>
@@ -139,6 +145,11 @@
                   <li class="nav-item nav-help-feedback">
                     <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}">${_("Contact Us")}</a>
                   </li>
+                  % if online_help_token:
+                      <li class="nav-item nav-help-online">
+                        <a href="${help_doc_urls['doc_url']}" title="${_("Contextual Online Help")}">${_("Online Help")}</a>
+                      </li>
+                  % endif
                 </ul>
               </div>
             </div>
