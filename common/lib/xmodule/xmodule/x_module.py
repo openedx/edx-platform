@@ -668,7 +668,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         xml = etree.tostring(node)
-        # TODO: change from_xml to not take org and course, it can use self.system.
         block = cls.from_xml(xml, runtime, id_generator)
         return block
 

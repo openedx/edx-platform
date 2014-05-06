@@ -104,8 +104,8 @@ class ModuleStoreRead(object):
         the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=pytz.UTC)
 
         Args:
-            fields (dict): either the json blob (from the db or get_explicitly_set_fields)
-                or the xblock.fields() value
+            fields_or_xblock (dict or XBlock): either the json blob (from the db or get_explicitly_set_fields)
+                or the xblock.fields() value or the XBlock from which to get those values
              qualifiers (dict): field: searchvalue pairs.
         '''
         if isinstance(fields_or_xblock, XBlock):
@@ -166,6 +166,9 @@ class ModuleStoreRead(object):
     def has_course(self, course_id, ignore_case=False):
         '''
         Look for a specific course id.  Returns whether it exists.
+        Args:
+            ignore_case (boolean): some modulestores are case-insensitive. Use this flag
+                to search for whether a potentially conflicting course exists in that case.
         '''
         pass
 
@@ -298,16 +301,16 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
 
-    def get_course_errors(self, course_id):
+    def get_course_errors(self, course_key):
         """
         Return list of errors for this :class:`.CourseKey`, if any.  Raise the same
-        errors as get_item if course_id isn't present.
+        errors as get_item if course_key isn't present.
         """
         # check that item is present and raise the promised exceptions if needed
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
-        assert(isinstance(course_id, CourseKey))
-        return self._course_errors[course_id].errors
+        assert(isinstance(course_key, CourseKey))
+        return self._course_errors[course_key].errors
 
     def get_errored_courses(self):
         """
@@ -321,9 +324,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
     def get_course(self, course_id, depth=None):
         """Default impl--linear search through course list"""
         assert(isinstance(course_id, CourseKey))
-        for c in self.get_courses():
-            if c.id == course_id:
-                return c
+        for course in self.get_courses():
+            if course.id == course_id:
+                return course
         return None
 
     def has_course(self, course_id, ignore_case=False):

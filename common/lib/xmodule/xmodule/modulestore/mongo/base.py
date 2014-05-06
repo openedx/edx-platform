@@ -733,14 +733,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         course, _, run = offering.partition('/')
         course_id = SlashSeparatedCourseKey(org, course, run)
 
-        # Check if a course with this org/run has been defined before
+        # Check if a course with this org/course has been defined before (case-insensitive)
         course_search_location = SON([
             ('_id.tag', 'i4x'),
-            # cannot pass regex to Location constructor; thus this hack
-            # pylint: disable=E1101
-            ('_id.org', course_id.org),
-            # pylint: disable=E1101
-            ('_id.course', course_id.course),
+            ('_id.org', re.compile(u'^{}$'.format(course_id.org), re.IGNORECASE)),
+            ('_id.course', re.compile(u'^{}$'.format(course_id.course), re.IGNORECASE)),
             ('_id.category', 'course'),
         ])
         courses = self.collection.find(course_search_location, fields=('_id'))

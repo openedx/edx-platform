@@ -197,11 +197,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         # substitution can be done.
         if not self.sources_list:
             if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
-                sources = ConditionalDescriptor.parse_sources(self.xml_attributes)
-                self.sources_list = [
-                    self.location.course_key.make_usage_key_from_deprecated_string(source)
-                    for source in sources
-                ]
+                self.sources_list = ConditionalDescriptor.parse_sources(self.xml_attributes)
 
     @staticmethod
     def parse_sources(xml_element):
@@ -234,7 +230,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             if child.tag == 'show':
                 locations = ConditionalDescriptor.parse_sources(child)
                 for location in locations:
-                    location = system.course_id.make_usage_key_from_deprecated_string(location)
                     children.append(location)
                     show_tag_list.append(location)
             else:
