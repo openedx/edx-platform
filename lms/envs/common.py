@@ -1176,7 +1176,6 @@ INSTALLED_APPS = (
     'instructor_task',
     'open_ended_grading',
     'psychometrics',
-    'licenses',
     'course_groups',
     'bulk_email',
 
