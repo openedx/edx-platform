@@ -127,7 +127,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Test that locked assets behave appropriately in case user is staff.
         """
-        # pylint: disable=E1101
         self.client.login(username=self.staff_usr, password=self.staff_pwd)
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200) # pylint: disable=E1103

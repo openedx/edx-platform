@@ -111,5 +111,5 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_id)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestCourse', 'Test', 'second_test_course'))
+        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
