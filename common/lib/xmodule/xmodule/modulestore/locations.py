@@ -36,6 +36,14 @@ class SlashSeparatedCourseKey(CourseKey):
     KEY_FIELDS = ('org', 'course', 'run')
     __slots__ = KEY_FIELDS
 
+    def __init__(self, org, course, run):
+        """
+        checks that the values are syntactically valid before creating object
+        """
+        for part in (org, course, run):
+            LocationBase._check_location_part(part, INVALID_CHARS)
+        super(SlashSeparatedCourseKey, self).__init__(org, course, run)
+
     @classmethod
     def _from_string(cls, serialized):
         serialized = serialized.replace("+", "/")
