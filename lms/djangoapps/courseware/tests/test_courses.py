@@ -14,7 +14,7 @@ from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
     get_course_by_id, get_cms_course_link, course_image_url,
-    get_course_info_section, get_course_about_section, get_course
+    get_course_info_section, get_course_about_section, get_cms_block_link
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
@@ -27,32 +27,6 @@ CMS_BASE_TEST = 'testcms'
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
 
-    def test_get_course_by_id_invalid_chars(self):
-        """
-        Test that `get_course` throws a 404, rather than an exception,
-        when faced with unexpected characters (such as unicode characters,
-        and symbols such as = and ' ')
-        """
-        with self.assertRaises(Http404):
-            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
-        with self.assertRaises(Http404):
-            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar' 'statistics=introduction'))
-        with self.assertRaises(Http404):
-            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
-
-    def test_get_course_invalid_chars(self):
-        """
-        Test that `get_course` throws a ValueError, rather than a 404,
-        when faced with unexpected characters (such as unicode characters,
-        and symbols such as = and ' ')
-        """
-        with self.assertRaises(ValueError):
-            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
-        with self.assertRaises(ValueError):
-            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'statistics=introduction'))
-        with self.assertRaises(ValueError):
-            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
-
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
     )
@@ -60,14 +34,13 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
-
-        cms_url = u"//{}/course/org.num.name/branch/draft/block/name".format(CMS_BASE_TEST)
         self.course = CourseFactory.create(
             org='org', number='num', display_name='name'
         )
 
         cms_url = u"//{}/course/slashes:org+num+name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_course_link(self.course))
+        cms_url = u"//{}/course/location:org+num+name+course+name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
     @mock.patch(
