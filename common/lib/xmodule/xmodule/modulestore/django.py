@@ -10,7 +10,6 @@ import re
 
 from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError
-from django.dispatch import Signal
 import django.utils
 
 from xmodule.modulestore.loc_mapper_store import LocMapperStore

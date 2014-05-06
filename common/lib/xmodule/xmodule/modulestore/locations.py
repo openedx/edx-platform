@@ -2,6 +2,7 @@
 
 import logging
 import re
+from bson.son import SON
 
 from opaque_keys import InvalidKeyError, OpaqueKey
 
@@ -239,6 +240,17 @@ class LocationBase(object):
     @property
     def course_key(self):
         return SlashSeparatedCourseKey(self.org, self.course, self.run)
+
+    def to_deprecated_son(self, prefix='', tag='i4x'):
+        """
+        Returns a SON object that represents this location
+        """
+        son = SON({prefix + 'tag': tag})
+        for field_name in self.KEY_FIELDS:
+            # Temporary filtering of run field
+            if field_name != 'run':
+                son[prefix + field_name] = getattr(self, field_name)
+        return son
 
 
 class Location(LocationBase, UsageKey, DefinitionKey):

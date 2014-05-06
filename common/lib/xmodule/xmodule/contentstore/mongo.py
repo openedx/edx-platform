@@ -2,7 +2,7 @@ import pymongo
 import gridfs
 from gridfs.errors import NoFile
 
-from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore, location_to_son
+from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
 import logging
@@ -67,9 +67,7 @@ class MongoContentStore(ContentStore):
             assert not self.fs.exists({"_id": content_id})
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
-        content_id = StaticContent.get_id_from_location(location)
-        # Use slow attr based lookup
-        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
+        content_id = self.asset_db_key(location)
         fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
         if fs_pointer is None:
             if throw_on_not_found:
@@ -108,9 +106,7 @@ class MongoContentStore(ContentStore):
                 return None
 
     def get_stream(self, location):
-        content_id = StaticContent.get_id_from_location(location)
-        # use slow attr based lookup
-        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
+        content_id = self.asset_db_key(location)
         fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
 
         try:
@@ -243,7 +239,7 @@ class MongoContentStore(ContentStore):
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
-        asset_db_key = {'_id': location_to_son(location, tag=XASSET_LOCATION_TAG)}
+        asset_db_key = self.asset_db_key(location)
         # FIXME remove fetch and use a form of update which fails if doesn't exist
         item = self.fs_files.find_one(asset_db_key)
         if item is None:
@@ -260,9 +256,10 @@ class MongoContentStore(ContentStore):
 
         :param location: a c4x asset location
         """
-        item = self.fs_files.find_one({'_id': location_to_son(location, tag=XASSET_LOCATION_TAG)})
+        asset_db_key = self.asset_db_key(location)
+        item = self.fs_files.find_one(asset_db_key)
         if item is None:
-            raise NotFoundError()
+            raise NotFoundError(asset_db_key)
         return item
 
     def delete_all_course_assets(self, course_key):
@@ -275,3 +272,10 @@ class MongoContentStore(ContentStore):
         matching_assets = self.fs_files.find(course_query)
         for asset in matching_assets:
             self.fs.delete(asset['_id'])
+
+    @staticmethod
+    def asset_db_key(location):
+        """
+        Returns the database query to find the given asset location.
+        """
+        return location.to_deprecated_son(tag=XASSET_LOCATION_TAG, prefix='_id.')
