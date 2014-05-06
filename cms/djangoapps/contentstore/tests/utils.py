@@ -128,7 +128,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         Reloads the course object from the database
         """
-        self.course = self.store.get_item(self.course.location)
+        self.course = self.store.get_course(self.course.id)
 
     def save_course(self):
         """

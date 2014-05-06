@@ -5,9 +5,9 @@ from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from courseware.courses import get_course_by_id
 from xmodule.tabs import CourseTabList, WikiTab
 from contentstore.utils import reverse_course_url
+from xmodule.modulestore.django import modulestore
 
 
 class TabsPageTests(CourseTestCase):
@@ -205,5 +205,5 @@ class PrimitiveTabEdit(TestCase):
         """Test course saving."""
         course = CourseFactory.create(org='edX', course='999')
         tabs.primitive_insert(course, 3, 'notes', 'aname')
-        course2 = get_course_by_id(course.id)
+        course2 = modulestore().get_course(course.id)
         self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})
