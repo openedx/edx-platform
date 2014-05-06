@@ -68,7 +68,7 @@ class MongoContentStore(ContentStore):
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = StaticContent.get_id_from_location(location)
-        # Use slow attr based lookup
+        # Use slow attr based lookup b/c we weren't careful to control the key order in _id before
         content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
         fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
         if fs_pointer is None:
@@ -109,7 +109,7 @@ class MongoContentStore(ContentStore):
 
     def get_stream(self, location):
         content_id = StaticContent.get_id_from_location(location)
-        # use slow attr based lookup
+        # use slow attr based lookup because we weren't careful to control the key order in _id before
         content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
         fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
 
@@ -145,9 +145,11 @@ class MongoContentStore(ContentStore):
         Export all of this course's assets to the output_directory. Export all of the assets'
         attributes to the policy file.
 
-        :param output_directory: the directory under which to put all the asset files
-        :param assets_policy_file: the filename for the policy file which should be in the same
-        directory as the other policy files.
+        Args:
+            course_key (CourseKey): the :class:`CourseKey` identifying the course
+            output_directory: the directory under which to put all the asset files
+            assets_policy_file: the filename for the policy file which should be in the same
+                directory as the other policy files.
         """
         policy = {}
         assets, __ = self.get_all_content_for_course(course_key)
@@ -215,7 +217,7 @@ class MongoContentStore(ContentStore):
         Raises NotFoundError if no such item exists
         Raises AttributeError is attr is one of the build in attrs.
 
-        :param location: an AssetKey
+        :param asset_key: an AssetKey
         :param attr: which attribute to set
         :param value: the value to set it to (any type pymongo accepts such as datetime, number, string)
         """
@@ -244,9 +246,7 @@ class MongoContentStore(ContentStore):
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key = {'_id': location_to_son(location, tag=XASSET_LOCATION_TAG)}
-        # FIXME remove fetch and use a form of update which fails if doesn't exist
-        item = self.fs_files.find_one(asset_db_key)
-        if item is None:
+        if self.fs_files.find(asset_db_key).count() == 0:
             raise NotFoundError(asset_db_key)
         self.fs_files.update(asset_db_key, {"$set": attr_dict})
 

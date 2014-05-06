@@ -130,7 +130,7 @@ class DraftModuleStore(MongoModuleStore):
 
         :param source: the location of the source (its revision must be None)
         """
-        original = self.collection.find_one(location_to_query(source_location, wildcard=False))
+        original = self.collection.find_one({'_id': location_to_son(source_location)})
         draft_location = as_draft(source_location)
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
