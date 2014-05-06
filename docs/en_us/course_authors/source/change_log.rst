@@ -2,6 +2,19 @@
 Change Log
 ############
 
+***********
+May, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 05/06/14
+     - Expanded the :ref:`Grades` chapter to include a topic on interpreting the score histograms for problems.
+
 ************
 May, 2014
 ************
