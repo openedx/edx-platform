@@ -68,8 +68,8 @@ Step 1. Add LTI to the Advanced Modules Policy Key
 ======================================================
 
 #. On the **Settings** menu, click **Advanced Settings**.
-#. On the **Advanced Settings** page, locate the **advanced_modules**
-   policy key (this key is at the top of the list).
+
+#. On the **Advanced Settings** page, locate the **advanced_modules** policy key (this key is at the top of the list).
 
 #. Under **Policy Value**, place your cursor between the brackets, and
    then enter ``“lti”``. Make sure to include the quotation marks, but

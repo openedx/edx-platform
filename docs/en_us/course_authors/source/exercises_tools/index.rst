@@ -35,6 +35,7 @@ Creating Exercises and Tools
    problem_in_latex
    protein_builder
    text_input
+   vitalsource
    word_cloud
    custom_python
    zooming_image
