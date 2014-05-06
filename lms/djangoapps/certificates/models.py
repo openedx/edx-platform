@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 from model_utils import Choices
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 """
 Certificates are created for a student and an offering of a course.
@@ -72,6 +72,9 @@ class CertificateWhitelist(models.Model):
     embargoed country restriction list
     (allow_certificate set to False in userprofile).
     """
+
+    objects = NoneToEmptyManager()
+
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     whitelist = models.BooleanField(default=0)
