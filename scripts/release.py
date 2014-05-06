@@ -75,6 +75,13 @@ def parse_ticket_references(text):
     return JIRA_RE.findall(text)
 
 
+class DoesNotExist(Exception):
+    def __init__(self, message, commit, branch):
+        self.message = message
+        self.commit = commit
+        self.branch = branch
+
+
 def get_merge_commit(commit, branch="master"):
     """
     Given a commit that was merged into the given branch, return the merge commit
@@ -89,9 +96,11 @@ def get_merge_commit(commit, branch="master"):
     for commit_hash in reversed(ancestry_paths):
         if commit_hash in both:
             return repo.commit(commit_hash)
-    raise ValueError("No merge commit for {commit} in {branch}!".format(
+    # no merge commit!
+    msg = "No merge commit for {commit} in {branch}!".format(
         commit=commit, branch=branch,
-    ))
+    )
+    raise DoesNotExist(msg, commit, branch)
 
 
 def get_pr_info(num):
@@ -140,8 +149,19 @@ def prs_by_email(start_ref, end_ref):
     for pr_num in get_merged_prs(start_ref, end_ref):
         ref = "refs/remotes/edx/pr/{num}".format(num=pr_num)
         branch = SymbolicReference(repo, ref)
-        merge = get_merge_commit(branch.commit, end_ref)
-        unordered_data[merge.author.email].add((pr_num, merge))
+        try:
+            merge = get_merge_commit(branch.commit, end_ref)
+        except DoesNotExist as err:
+            print(
+                "Warning: could not find merge commit for {commit}. The pull "
+                "request containing this commit will not be included in the "
+                "table.".format(
+                    commit=err.commit
+                ),
+                file=sys.stderr,
+            )
+        else:
+            unordered_data[merge.author.email].add((pr_num, merge))
 
     ordered_data = OrderedDict()
     for email in sorted(unordered_data.keys()):
