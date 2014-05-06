@@ -51,7 +51,8 @@ from django_comment_common.utils import are_permissions_roles_seeded
 
 from student import auth
 from student.models import CourseEnrollment
-from student.roles import CourseCreatorRole, CourseInstructorRole
+from student.roles import CourseCreatorRole, CourseInstructorRole, GlobalStaff
+from opaque_keys import InvalidKeyError
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -1340,15 +1341,22 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Checks that the course did not get created
         """
-        course_id = _get_course_id(self.course_data)
-        initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
+        test_enrollment = False
+        try:
+            course_id = _get_course_id(self.course_data)
+            initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
+            test_enrollment = True
+        except InvalidKeyError:
+            # b/c the intent of the test with bad chars isn't to test auth but to test the handler, ignore
+            pass
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['ErrMsg'], error_message)
-        # One test case involves trying to create the same course twice. Hence for that course,
-        # the user will be enrolled. In the other cases, initially_enrolled will be False.
-        self.assertEqual(initially_enrolled, CourseEnrollment.is_enrolled(self.user, course_id))
+        self.assertRegexpMatches(data['ErrMsg'], error_message)
+        if test_enrollment:
+            # One test case involves trying to create the same course twice. Hence for that course,
+            # the user will be enrolled. In the other cases, initially_enrolled will be False.
+            self.assertEqual(initially_enrolled, CourseEnrollment.is_enrolled(self.user, course_id))
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
@@ -1390,7 +1398,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
         self.assert_course_creation_failed(
-            "Unable to create course 'Robot Super Course'.\n\n<class 'xmodule.modulestore.locations.Location'>: Invalid characters in u'University of California, Berkeley'.")
+            r"(?s)Unable to create course 'Robot Super Course'.*: Invalid characters in u'University of California, Berkeley'")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
