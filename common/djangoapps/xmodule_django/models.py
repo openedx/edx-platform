@@ -35,12 +35,12 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
     """
     def _filter_or_exclude(self, *args, **kwargs):
         for name in self.model._meta.get_all_field_names():
-            field = self.model._meta.get_field(name)
-            if hasattr(field, 'Empty'):
+            field_object, model, direct, m2m = self.model._meta.get_field_by_name(name)
+            if direct and hasattr(field_object, 'Empty'):
                 for suffix in ('', '_exact'):
                     key = '{}{}'.format(name, suffix)
                     if key in kwargs and kwargs[key] is None:
-                        kwargs[key] = field.Empty
+                        kwargs[key] = field_object.Empty
         return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
 
 
