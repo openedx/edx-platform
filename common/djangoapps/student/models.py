@@ -973,6 +973,9 @@ class CourseAccessRole(models.Model):
     To establish a user as having a specific role over all courses in the org, create an entry
     without a course_id.
     """
+
+    objects = NoneToEmptyManager()
+
     user = models.ForeignKey(User)
     # blank org is for global group based roles such as course creator (may be deprecated)
     org = models.CharField(max_length=64, db_index=True, blank=True)
