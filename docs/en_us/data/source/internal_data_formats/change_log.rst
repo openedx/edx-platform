@@ -11,7 +11,7 @@ Change Log
 
    * - Date
      - Change
-   * - 05/0614
+   * - 05/06/14
      - Added enrollment event types to the :ref:`Tracking Logs` chapter. 
    * - 05/05/14
      - Removed information on the Poll module. `Polls <http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/poll.html>`_ are now covered in the *Building and Running an edX Course* guide.
