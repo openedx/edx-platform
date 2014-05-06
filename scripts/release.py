@@ -14,6 +14,10 @@ import re
 from collections import OrderedDict, defaultdict
 import textwrap
 import requests
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
 
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
@@ -152,14 +156,12 @@ def prs_by_email(start_ref, end_ref):
         try:
             merge = get_merge_commit(branch.commit, end_ref)
         except DoesNotExist as err:
-            print(
-                "Warning: could not find merge commit for {commit}. The pull "
-                "request containing this commit will not be included in the "
-                "table.".format(
-                    commit=err.commit
-                ),
-                file=sys.stderr,
+            message = (
+                "Warning: could not find merge commit for {commit}. "
+                "The pull request containing this commit will not be included "
+                "in the table.".format(commit=err.commit)
             )
+            print(colorize("red", message), file=sys.stderr)
         else:
             unordered_data[merge.author.email].add((pr_num, merge))
 
@@ -187,12 +189,11 @@ def generate_table(start_ref, end_ref):
                 body = pr_info["body"] or ""
                 author = pr_info["user"]["login"]
             except requests.exceptions.RequestException as e:
-                print(
-                    "Warning: could not fetch data for #{num}: {message}".format(
-                        num=pull_request, message=e.message
-                    ),
-                    file=sys.stderr,
+                message = (
+                    "Warning: could not fetch data for #{num}: "
+                    "{message}".format(num=pull_request, message=e.message)
                 )
+                print(colorize("red", message), file=sys.stderr)
                 title = "?"
                 body = "?"
                 author = ""
