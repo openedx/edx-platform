@@ -360,10 +360,6 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         Please record your notes on https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
         and add any bugs found to the Release Candidate Bugs section.
-
-        If you are a non-affiliated open-source contributor to edx-platform,
-        the edX employee who merged in your pull request will manually verify
-        your change(s), and you may disregard this message.
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
