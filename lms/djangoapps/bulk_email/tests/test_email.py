@@ -41,6 +41,7 @@ class MockCourseEmailResult(object):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailSendFromDashboard(ModuleStoreTestCase):
     """
     Test that emails send correctly.
@@ -76,7 +77,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
 
         # Select the Email view of the instructor dash
         session = self.client.session
-        session['idash_mode'] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_id)] = 'Email'
         session.save()
         response = self.client.get(self.url)
         selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
@@ -87,6 +88,20 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         Undo all patches.
         """
         patch.stopall()
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_email_disabled(self):
+        """
+        Test response when email is disabled for course.
+        """
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'myself',
+            'subject': 'test subject for myself',
+            'message': 'test message for myself'
+        }
+        response = self.client.post(self.url, test_email)
+        self.assertContains(response, "Email is not enabled for this course.")
 
     def test_send_to_self(self):
         """
