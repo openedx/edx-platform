@@ -4,6 +4,7 @@
 Acceptance tests for Video.
 """
 
+import time
 from .helpers import UniqueCourseTest
 from ..pages.lms.video import VideoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -336,6 +337,119 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
+
+    def test_video_end_time(self):
+        """
+        Scenario: End time works for Youtube video
+        Given
+        It has a video in "Youtube" mode with end time set to 00:00:02
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "0:02" position
+        """
+        data = {'end_time': '00:00:02'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        self.video.wait_for('pause')
+
+        self.assertEqual(self.video.position, '0:02')
+
+    def test_scenario11(self):
+        """
+        Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
+        Given
+        It has a video in "Youtube" mode  with end time set to 00:01:00
+        And I seek video to "0:58" position
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "1:00" position
+        """
+        data = {'end_time': '00:01:00'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.seek(58)
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        self.video.wait_for('pause')
+
+        self.assertEqual(self.video.position, '1:00')
+
+    def test_scenario12(self):
+        """
+        Scenario: Start time and end time work together for Youtube video
+        Given
+        It has a video in "Youtube" mode with start time set to 00:00:10 and end_time set to 00:00:12
+        And I click video button "play"
+        Then I see video slider at "0:10" position
+        And I wait until video stop playing
+        Then I see video slider at "0:12" position
+
+        """
+        data = {'start_time': '00:00:10', 'end_time': '00:00:12'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.assertEqual(self.video.position, '0:10')
+
+        # wait until video stop playing
+        self.video.wait_for('pause')
+
+        self.assertEqual(self.video.position, '0:12')
+
+    def test_scenario13(self):
+        """
+        Scenario: Youtube video after pausing at end time video plays to the end from end time
+        Given
+        It has a video in "Youtube" mode with start time set to 00:01:51 and end_time set to 00:01:52
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "1:52" position
+        And I click video button "play"
+        And I wait until video stop playing
+        Then I see video slider at "1:55" position
+        """
+        data = {'start_time': '00:01:51', 'end_time': '00:01:52'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        self.video.wait_for('pause')
+
+        self.assertEqual(self.video.position, '00:01:52')
+
+        self.video.click_player_button('play')
+
+        # wait until video stop playing
+        self.video.wait_for('finished')
+
+        self.assertEqual(self.video.position, '1:55')
+
+    def test_scenario14(self):
+        pass
+
+    def test_scenario15(self):
+        pass
+
+    def test_scenario16(self):
+        pass
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):

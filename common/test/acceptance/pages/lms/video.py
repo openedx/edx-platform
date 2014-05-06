@@ -230,7 +230,30 @@ class VideoPage(PageObject):
         :param button: key in VIDEO_BUTTONS dictionary, its value will give us the css selector for `button`
         """
         self.q(css=VIDEO_BUTTONS[button]).first.click()
+
+        if button == 'play':
+            # wait for video buffering
+            self._wait_for_video_play()
+
         wait_for_ajax(self.browser)
+
+    def _wait_for_video_play(self):
+        """
+        Wait until video starts playing
+        :param video_vertical_css (str): css selector video vertical
+        :return: BrokenPromise
+        """
+        css_playing = '{0}'.format(CSS_CLASS_NAMES['video_container'])
+        css_pause = '{0}'.format(VIDEO_BUTTONS['pause'])
+
+        def _check_promise():
+            """
+            Promise check
+            :return: bool
+            """
+            return 'is-playing' in self.q(css=css_playing).attrs('class')[0] and self.q(css=css_pause).present
+
+        EmptyPromise(_check_promise, 'Video is Playing', timeout=200).fulfill()
 
     def _get_element_dimensions(self, selector):
         """
@@ -358,3 +381,51 @@ class VideoPage(PageObject):
 
         # wait until captions rendered completely
         self._wait_for_element(CSS_CLASS_NAMES['captions_rendered'], 'Captions Rendered')
+
+    @property
+    def position(self):
+        """
+        Extract the current seek position from where Video will start playing
+        :return: seek position in format min:sec
+        """
+        css = '{}'.format(CSS_CLASS_NAMES['video_time'])
+        current_seek_position = self.q(css=css).text[0]
+        return current_seek_position.split('/')[0].strip()
+
+    def seek(self, seek_seconds):
+        """
+        Seek the video to position specified by `seek_value`.
+        :param seek_seconds: Integer value in seconds
+        """
+        seek_time = float(seek_seconds)
+        js_code = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(seek_time)
+        self.browser.execute_script(js_code)
+
+        self.wait_for_video_player_render()
+
+    def state(self):
+        """
+        Extract the current state(play, pause etc) of video
+        :param video_display_name (str):
+        :return: str
+        """
+        state_css = '{}'.format(CSS_CLASS_NAMES['video_container'])
+        current_state = self.q(css=state_css).attrs('class')[0]
+
+        if 'is-playing' in current_state:
+            return 'playing'
+        elif 'is-paused' in current_state:
+            return 'pause'
+        elif 'is-buffered' in current_state:
+            return 'buffering'
+        elif 'is-ended' in current_state:
+            return 'finished'
+
+    def wait_for(self, event):
+        """
+        Wait until `event` occurs
+        :param action str:
+        """
+        while True:
+            if self.state() == event:
+                break
