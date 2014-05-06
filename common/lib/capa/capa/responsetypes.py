@@ -1375,6 +1375,7 @@ class StringResponse(LoncapaResponse):
         Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
         Should be removed soon. When to remove it, is up to Lyla Fisher.
         """
+        _ = self.capa_system.i18n.ugettext
         # backward compatibility, should be removed in future.
         if self.backward:
             return self.check_string_backward(expected, given)
@@ -1386,7 +1387,10 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = '[courseware.capa.responsetypes.stringresponse] error: {}'.format(err.message)
+                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                    error=_(u'error'),
+                    message=err.message
+                )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)
             return bool(result)
@@ -1410,7 +1414,9 @@ class StringResponse(LoncapaResponse):
         return hints_to_show
 
     def get_answers(self):
-        return {self.answer_id: ' <b>or</b> '.join(self.correct_answer)}
+        _ = self.capa_system.i18n.ugettext
+        separator = u' <b>{}</b> '.format(_(u'or'))
+        return {self.answer_id: separator.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
 
