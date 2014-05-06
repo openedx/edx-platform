@@ -14,6 +14,8 @@ import re
 from collections import OrderedDict, defaultdict
 import textwrap
 import requests
+import json
+import getpass
 try:
     from pygments.console import colorize
 except ImportError:
@@ -48,9 +50,16 @@ def make_parser():
 
 
 def ensure_pr_fetch():
+    """
+    Make sure that the git repository contains a remote called "edx" that has
+    two fetch URLs; one for the main codebase, and one for pull requests.
+    Returns True if the environment was modified in any way, False otherwise.
+    """
+    modified = False
     remotes = git.remote().splitlines()
     if not "edx" in remotes:
         git.remote("add", "edx", "https://github.com/edx/edx-platform.git")
+        modified = True
     # it would be nice to use the git-python API to do this, but it doesn't seem
     # to support configurations with more than one value per key. :(
     edx_fetches = git.config("remote.edx.fetch", get_all=True).splitlines()
@@ -58,6 +67,92 @@ def ensure_pr_fetch():
     if pr_fetch not in edx_fetches:
         git.config("remote.edx.fetch", pr_fetch, add=True)
         git.fetch("edx")
+        modified = True
+    return modified
+
+
+def get_github_creds():
+    """
+    Returns Github credentials if they exist, as a two-tuple of (username, token).
+    Otherwise, return None.
+    """
+    netrc_auth = requests.utils.get_netrc_auth("https://api.github.com")
+    if netrc_auth:
+        return netrc_auth
+    config_file = path("~/.config/edx-release").expand()
+    if config_file.isfile():
+        with open(config_file) as f:
+            config = json.load(f)
+        github_creds = config.get("credentials", {}).get("api.github.com", {})
+        username = github_creds.get("username", "")
+        token = github_creds.get("token", "")
+        if username and token:
+            return (username, token)
+    return None
+
+
+def ensure_github_creds():
+    """
+    Make sure that we have Github OAuth credentials. This will check the user's
+    .netrc file, as well as the ~/.config/edx-release file. If no credentials
+    exist in either place, it will prompt the user to create OAuth credentials,
+    and store them in ~/.config/edx-release.
+
+    Returns False if we found credentials, True if we had to create them.
+    """
+    if get_github_creds():
+        return False
+
+    # Looks like we need to create the OAuth creds
+    # https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+    print("We need to set up OAuth authentication with Github's API. "
+          "Your credentials will not be stored.", file=sys.stderr)
+    headers = {"User-Agent": "edx-release"}
+    payload = {"note": "edx-release"}
+    for _ in range(3):  # three tries
+        username = raw_input("Github username: ")
+        password = getpass.getpass("Github password: ")
+        response = requests.post(
+            "https://api.github.com/authorizations",
+            auth=(username, password),
+            headers=headers, data=json.dumps(payload),
+        )
+        if not response.ok:
+            print(
+                "Invalid authentication: {}".format(response.json()["message"]),
+                file=sys.stderr,
+            )
+            continue
+        else:
+            break
+    if not response.ok:
+        print("Too many invalid authentication attempts.", file=sys.stderr)
+        return modified
+
+    # got the token!
+    token = response.json()["token"]
+
+    config_file = path("~/.config/edx-release").expand()
+    # make sure parent directory exists
+    config_file.parent.makedirs_p()
+    # read existing config if it exists
+    if config_file.isfile():
+        with open(config_file) as f:
+            config = json.load(f)
+    else:
+        config = {}
+    # update config
+    if not "credentials" in config:
+        config["credentials"] = {}
+    if not "api.github.com" in config["credentials"]:
+        config["credentials"]["api.github.com"] = {}
+    config["credentials"]["api.github.com"]["username"] = username
+    config["credentials"]["api.github.com"]["token"] = token
+    # write it back out
+    with open(config_file, "w") as f:
+        json.dump(config, f)
+
+    return True
 
 
 def default_release_date():
@@ -112,7 +207,12 @@ def get_pr_info(num):
     Returns the info from the Github API
     """
     url = "https://api.github.com/repos/edx/edx-platform/pulls/{num}".format(num=num)
-    response = requests.get(url)
+    credentials = get_github_creds()
+    headers = {
+        "Authorization": "token {}".format(credentials[1]),
+        "User-Agent": "edx-release",
+    }
+    response = requests.get(url, headers=headers)
     result = response.json()
     if not response.ok:
         raise requests.exceptions.RequestException(result["message"])
@@ -242,6 +342,8 @@ def main():
     if isinstance(args.date, basestring):
         # user passed in a custom date, so we need to parse it
         args.date = parse_datestring(args.date).date()
+
+    ensure_github_creds()
 
     if args.table:
         print(generate_table(args.previous, args.current))
