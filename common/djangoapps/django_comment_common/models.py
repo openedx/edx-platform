@@ -10,7 +10,7 @@ from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
@@ -49,6 +49,9 @@ def assign_default_role(course_id, user):
 
 
 class Role(models.Model):
+
+    objects = NoneToEmptyManager()
+
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
     course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
