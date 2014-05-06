@@ -4,6 +4,10 @@ Specific overrides to the base prod settings to make development easier.
 
 from .aws import * # pylint: disable=wildcard-import, unused-wildcard-import
 
+# Don't use S3 in devstack, fall back to filesystem
+del DEFAULT_FILE_STORAGE
+MEDIA_ROOT = "/edx/app/edxapp/media"
+
 DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
