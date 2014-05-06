@@ -12,6 +12,7 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 
 from django.db import DatabaseError
 from django.contrib.auth.models import User
@@ -59,6 +60,8 @@ class FieldDataCache(object):
         self.cache = {}
         self.descriptors = descriptors
         self.select_for_update = select_for_update
+
+        assert isinstance(course_id, SlashSeparatedCourseKey)
         self.course_id = course_id
         self.user = user
 
@@ -141,8 +144,8 @@ class FieldDataCache(object):
         if scope == Scope.user_state:
             return self._chunked_query(
                 StudentModule,
-                'module_state_key__in',
-                (str(descriptor.scope_ids.usage_id) for descriptor in self.descriptors),
+                'module_id__in',
+                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
                 course_id=self.course_id,
                 student=self.user.pk,
             )
@@ -150,7 +153,7 @@ class FieldDataCache(object):
             return self._chunked_query(
                 XModuleUserStateSummaryField,
                 'usage_id__in',
-                (str(descriptor.scope_ids.usage_id) for descriptor in self.descriptors),
+                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.preferences:
@@ -185,9 +188,9 @@ class FieldDataCache(object):
         Return the key used in the FieldDataCache for the specified KeyValueStore key
         """
         if key.scope == Scope.user_state:
-            return (key.scope, key.block_scope_id.url())
+            return (key.scope, key.block_scope_id)
         elif key.scope == Scope.user_state_summary:
-            return (key.scope, key.block_scope_id.url(), key.field_name)
+            return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.preferences:
             return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.user_info:
@@ -199,9 +202,15 @@ class FieldDataCache(object):
         field
         """
         if scope == Scope.user_state:
-            return (scope, field_object.module_state_key)
+            assert (field_object.module_state_key.org == self.course_id.org and
+                    field_object.module_state_key.course == self.course_id.course)
+
+            return (scope, field_object.module_state_key.map_into_course(self.course_id))
         elif scope == Scope.user_state_summary:
-            return (scope, field_object.usage_id, field_object.field_name)
+            assert (field_object.usage_id.org == self.course_id.org and
+                    field_object.usage_id.course == self.course_id.course)
+
+            return (scope, field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
         elif scope == Scope.preferences:
             return (scope, field_object.module_type, field_object.field_name)
         elif scope == Scope.user_info:
@@ -233,10 +242,13 @@ class FieldDataCache(object):
             return field_object
 
         if key.scope == Scope.user_state:
+            # When we start allowing block_scope_ids to be either Locations or Locators,
+            # this assertion will fail. Fix the code here when that happens!
+            assert(isinstance(key.block_scope_id, Location))
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),
-                module_state_key=key.block_scope_id.url(),
+                module_id=key.block_scope_id.replace(run=None),
                 defaults={
                     'state': json.dumps({}),
                     'module_type': key.block_scope_id.category,
@@ -245,7 +257,7 @@ class FieldDataCache(object):
         elif key.scope == Scope.user_state_summary:
             field_object, _ = XModuleUserStateSummaryField.objects.get_or_create(
                 field_name=key.field_name,
-                usage_id=key.block_scope_id.url()
+                usage_id=key.block_scope_id
             )
         elif key.scope == Scope.preferences:
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
