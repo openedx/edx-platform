@@ -1784,9 +1784,14 @@ class SymbolicResponse(CustomResponse):
                 debug=self.context.get('debug'),
             )
         except Exception as err:
-            log.error("oops in symbolicresponse (cfn) error %s", err)
+            log.error("oops in SymbolicResponse (cfn) error %s", err)
             log.error(traceback.format_exc())
-            raise Exception("oops in symbolicresponse (cfn) error %s", err)
+            _ = self.capa_system.i18n.ugettext
+            # Translators: 'SymbolicResponse' is a problem type and should not be translated.
+            msg = _(u"oops in SymbolicResponse (cfn) error {error_msg}").format(
+                error_msg=err,
+            )
+            raise Exception(msg)
         self.context['messages'][0] = self.clean_message_html(ret['msg'])
         self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
 
