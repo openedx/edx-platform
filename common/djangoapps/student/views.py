@@ -2,10 +2,8 @@
 Student Views
 """
 import datetime
-import json
 import logging
 import re
-import urllib
 import uuid
 import time
 from collections import defaultdict
@@ -17,7 +15,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
-from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
@@ -91,7 +88,6 @@ from third_party_auth import pipeline, provider
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-Article = namedtuple('Article', 'title url author image deck publication publish_date')
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
 def csrf_token(context):
@@ -135,19 +131,6 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
-day_pattern = re.compile(r'\s\d+,\s')
-multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
-
-
-def _get_date_for_press(publish_date):
-    # strip off extra months, and just use the first:
-    date = re.sub(multimonth_pattern, ", ", publish_date)
-    if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y").replace(tzinfo=UTC)
-    else:
-        date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
-    return date
-
 
 def embargo(_request):
     """
@@ -165,18 +148,7 @@ def embargo(_request):
 
 
 def press(request):
-    json_articles = cache.get("student_press_json_articles")
-    if json_articles is None:
-        if hasattr(settings, 'RSS_URL'):
-            content = urllib.urlopen(settings.PRESS_URL).read()
-            json_articles = json.loads(content)
-        else:
-            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
-            json_articles = json.loads(content)
-        cache.set("student_press_json_articles", json_articles)
-    articles = [Article(**article) for article in json_articles]
-    articles.sort(key=lambda item: _get_date_for_press(item.publish_date), reverse=True)
-    return render_to_response('static_templates/press.html', {'articles': articles})
+    return render_to_response('static_templates/press.html')
 
 
 def process_survey_link(survey_link, user):
