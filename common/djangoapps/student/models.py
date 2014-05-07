@@ -840,8 +840,6 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
-        # TODO: Is it worthwhile hardcoding in an assertion here?  Currently is_enrolled returns False
-        # when we're handed a string instead of a CourseKey, instead of triggering an error.
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
