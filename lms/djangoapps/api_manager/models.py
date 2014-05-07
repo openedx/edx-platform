@@ -5,9 +5,10 @@
 from django.contrib.auth.models import Group
 from django.db import models
 from django.utils import timezone
+from model_utils.models import TimeStampedModel
 
 
-class GroupRelationship(models.Model):
+class GroupRelationship(TimeStampedModel):
     """
     The GroupRelationship model contains information describing the relationships of a group,
     which allows us to utilize Django's user/group/permission
@@ -23,8 +24,6 @@ class GroupRelationship(models.Model):
                                            symmetrical=False,
                                            related_name="linked_to+"),
     record_active = models.BooleanField(default=True)
-    record_date_created = models.DateTimeField(default=timezone.now())
-    record_date_modified = models.DateTimeField(auto_now=True)
 
     def add_linked_group_relationship(self, to_group_relationship, symmetrical=True):
         """ Create a new group-group relationship """
@@ -66,7 +65,7 @@ class GroupRelationship(models.Model):
         return GroupRelationship.objects.filter(**query).exists()
 
 
-class LinkedGroupRelationship(models.Model):
+class LinkedGroupRelationship(TimeStampedModel):
     """
     The LinkedGroupRelationship model manages self-referential two-way
     relationships between group entities via the GroupRelationship model.
@@ -80,11 +79,9 @@ class LinkedGroupRelationship(models.Model):
                                               related_name="to_group_relationships",
                                               verbose_name="To Group")
     record_active = models.BooleanField(default=True)
-    record_date_created = models.DateTimeField(default=timezone.now())
-    record_date_modified = models.DateTimeField(auto_now=True)
 
 
-class CourseGroupRelationship(models.Model):
+class CourseGroupRelationship(TimeStampedModel):
     """
     The CourseGroupRelationship model contains information describing the
     link between a course and a group.  A typical use case for this table
@@ -92,9 +89,10 @@ class CourseGroupRelationship(models.Model):
     """
     course_id = models.CharField(max_length=255, db_index=True)
     group = models.ForeignKey(Group, db_index=True)
+    record_active = models.BooleanField(default=True)
 
 
-class GroupProfile(models.Model):
+class GroupProfile(TimeStampedModel):
     """
     This table will provide additional tables regarding groups. This has a foreign key to
     the auth_groups table
@@ -107,3 +105,4 @@ class GroupProfile(models.Model):
     group_type = models.CharField(null=True, max_length=32, db_index=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
+    record_active = models.BooleanField(default=True)
