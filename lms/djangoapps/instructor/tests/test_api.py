@@ -779,12 +779,6 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         # (comment because pylint C0103)
         # self.maxDiff = None
 
-    def addCleanup(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
     def test_missing_params(self):
         """ Test missing all query parameters. """
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})

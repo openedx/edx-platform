@@ -454,8 +454,6 @@ class TestGetEmailParams(TestCase):
             site,
         )
 
-        self.request = RequestFactory().request()
-
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
