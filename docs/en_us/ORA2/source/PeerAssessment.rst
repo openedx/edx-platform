@@ -57,8 +57,7 @@ In your problem, you'll also specify the **assessment type or types**. You can s
   :alt: Image of peer assessment with assessment steps and status labeled
   :width: 600
 
-
-.. note:: In this initial release, the type and order of assessments cannot be changed. Students must complete peer assessments followed by a self assessment.
+You can set the assignment to include a peer assessment only, a self assessment only, or a peer assessment followed by a self assessment.
 
 For more information, see :ref:`PA Specify Name and Assessment Types`.
 
@@ -236,7 +235,7 @@ Step 1. Create the Component
 Step 2. Specify the Problem Name and Assessment Types
 ========================================================
 
-To specify problem data such as the name and assessment types, you'll work with the XML at the top of the problem.
+To specify the name and assessment types for the problem, you'll work with the XML at the top of the problem.
 
 Locate the following XML near the top of the component editor:
 
@@ -252,17 +251,26 @@ Locate the following XML near the top of the component editor:
 This code specifies four elements:
 
 * **The title of the assignment**. In this example, because there is no text between the ``<title>`` tags, the assignment does not have a specified title.
-* **The type and order of the assessments**. This information is in the **name** attribute in the two ``<assessment>`` tags. The peer assessment runs, and then the student performs a self assessment. (Note that in this initial release, students must complete a peer assessment followed by a self assessment. The assessment types and order cannot be changed.) 
+* **The type and order of the assessments**. This information is in the **name** attribute in the two ``<assessment>`` tags. Assessments run in the order in which they're listed. In this example, the peer assessment runs, and then the student performs a self assessment.
 * **The number of responses that each student must assess** (for peer assessments). This information is in the **must_grade** attribute in the ``<assessment>`` tag for the peer assessment. In this example, each student must grade five peer responses before he receives the scores that his peers have given him. 
 * **The number of peer assessments each response must receive** (for peer assessments). This information is in the **must_be_graded_by** attribute in the ``<assessment>`` tag for the peer assessment. In this example, each response must receive assessments from three students before it can return to the student who submitted it. 
 
-To specify your problem data, follow these steps.
+To specify the name and assessment types, follow these steps.
 
 #. Between the ``<title>`` tags, add a name for the problem.
 
-#. In the ``<assessment>`` tag that contains "**peer-assessment**", replace the values for **must_grade** and **must_be_graded_by** with the numbers that you want.
+#. Specify the type of assessments you want students to complete.
 
-.. note:: The value for **must_grade** must be greater than or equal to the value for **must_be_graded_by**.
+   - If you want students to complete a peer assessment only, delete the ``<assessment name="self-assessment"/>`` tag.
+
+   - If you want students to complete a self assessment only, delete the ``<assessment name="peer-assessment" must_grade="5" must_be_graded_by="3""/>`` tag.
+
+   - If you want students to complete a peer assessment and then a self assessment, leave the default tags.
+
+#. If your students will complete a peer assessment, replace the values for **must_grade** and **must_be_graded_by** in the ``<assessment name="peer-assessment">`` tag with the numbers that you want.
+
+   .. note:: The value for **must_grade** must be greater than or equal to the value for **must_be_graded_by**.
+
 
 .. _PA Add Due Dates:
 
@@ -270,7 +278,7 @@ To specify your problem data, follow these steps.
 Step 3. Add Start and Due Dates (optional)
 ==========================================
 
-.. note:: Setting start and due dates is optional. If you don't specify dates, the deadline for all student responses and assessments is the due date that you set for the subsection that contains the peer assessment. If you do specify dates, those dates take precedence over the subsection due date.
+Setting start and due dates is optional. If you don't specify dates, the deadline for all student responses and assessments is the due date that you set for the subsection that contains the peer assessment. If you do specify dates, those dates take precedence over the subsection due date.
 
 To specify due dates and times, you'll add code that includes the date and time inside the XML tags for the problem and for each specific assessment. The date and time must be formatted as ``YYYY-MM-DDTHH:MM:SS``.
 
