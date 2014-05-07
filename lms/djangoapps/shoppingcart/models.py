@@ -29,6 +29,7 @@ from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 from util.query import use_read_replica_if_available
+from xmodule_django.models import CourseKeyField
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -310,7 +311,7 @@ class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
     """
-    course_id = models.CharField(max_length=128, db_index=True)
+    course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
 
     @classmethod
@@ -331,10 +332,9 @@ class PaidCourseRegistration(OrderItem):
         Returns the order item
         """
         # First a bunch of sanity checks
-        try:
-            course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
+        course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
                                                 # throw errors if it doesn't
-        except ItemNotFoundError:
+        if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
@@ -344,7 +344,7 @@ class PaidCourseRegistration(OrderItem):
                         .format(order.user.email, course_id, order.id))
             raise ItemAlreadyInCartException
 
-        if CourseEnrollment.is_enrolled(user=order.user, course_id=course_id):
+        if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
             log.warning("User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
@@ -385,18 +385,12 @@ class PaidCourseRegistration(OrderItem):
         in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
-        try:
-            course_loc = CourseDescriptor.id_to_location(self.course_id)
-            course_exists = modulestore().has_item(self.course_id, course_loc)
-        except ValueError:
+        course = course_from_id(self.course_id)
+        if not course:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
 
-        if not course_exists:
-            raise PurchasedCallbackException(
-                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
-
-        CourseEnrollment.enroll(user=self.user, course_id=self.course_id, mode=self.mode)
+        CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
@@ -430,18 +424,19 @@ class PaidCourseRegistrationAnnotation(models.Model):
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
     """
-    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        return u"{} : {}".format(self.course_id, self.annotation)
+        # pylint: disable=no-member
+        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
 
 
 class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates
     """
-    course_id = models.CharField(max_length=128, db_index=True)
+    course_id = CourseKeyField(max_length=128, db_index=True)
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
@@ -568,12 +563,17 @@ class CertificateItem(OrderItem):
     def single_item_receipt_context(self):
         course = course_from_id(self.course_id)
         return {
-            "course_id" : self.course_id,
+            "course_id": self.course_id,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "course_start_date_text": course.start_date_text,
             "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
+            "course_root_url": reverse(
+                'course_root',
+                kwargs={'course_id': self.course_id.to_deprecated_string()}  # pylint: disable=no-member
+            ),
+            "dashboard_url": reverse('dashboard'),
         }
 
     @property

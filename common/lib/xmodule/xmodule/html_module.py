@@ -121,7 +121,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({
-            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/',
+            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location.course_key),
             'enable_latex_compiler': self.use_latex_compiler,
             'editor': self.editor
         })

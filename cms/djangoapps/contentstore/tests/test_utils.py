@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
-from xmodule.modulestore import Location
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class LMSLinksTestCase(TestCase):
@@ -57,29 +57,27 @@ class LMSLinksTestCase(TestCase):
 
     def get_about_page_link(self):
         """ create mock course and return the about page link """
-        location = Location('i4x', 'mitX', '101', 'course', 'test')
-        return utils.get_lms_link_for_about_page(location)
+        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        return utils.get_lms_link_for_about_page(course_key)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        location = Location('i4x', 'mitX', '101', 'vertical', 'contacting_us')
-        link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
+        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        location = course_key.make_usage_key('vertical', 'contacting_us')
+        link = utils.get_lms_link_for_item(location, False)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
+
+        # test preview
+        link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
         )
 
-        # If no course_id is passed in, it is obtained from the location. This is the case for
-        # Studio dashboard.
-        location = Location('i4x', 'mitX', '101', 'course', 'test')
+        # now test with the course' location
+        location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
-        self.assertEquals(
-            link,
-            "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
-        )
-
+        self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
 
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """

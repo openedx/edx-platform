@@ -43,7 +43,7 @@ from django.conf import settings
           <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
         </div>
       % endif
-      
+
       <header>
         <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
@@ -51,7 +51,7 @@ from django.conf import settings
       %if settings.FEATURES.get("SHOW_PROGRESS_SUCCESS_BUTTON"):
         <%
           SUCCESS_BUTTON_URL = settings.PROGRESS_SUCCESS_BUTTON_URL.format(
-            course_id=course.id, student_id=student.id)
+            course_id=course.id.to_deprecated_string(), student_id=student.id)
           nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
           success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
         %>
@@ -83,7 +83,7 @@ from django.conf import settings
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
 
-              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
+              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section['url_name']))}">
                 ${ section['display_name'] }
                 %if total > 0 or earned > 0:
                   <span class="sr">

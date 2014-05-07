@@ -8,11 +8,12 @@ from django.core.urlresolvers import reverse
 
 from foldit.views import foldit_ops, verify_code
 from foldit.models import PuzzleComplete, Score
-from student.models import unique_id_for_user
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.models import unique_id_for_user, CourseEnrollment
+from student.tests.factories import UserFactory
 
 from datetime import datetime, timedelta
 from pytz import UTC
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -23,18 +24,14 @@ class FolditTestCase(TestCase):
         self.factory = RequestFactory()
         self.url = reverse('foldit_ops')
 
-        self.course_id = 'course/id/1'
-        self.course_id2 = 'course/id/2'
+        self.course_id = SlashSeparatedCourseKey('course', 'id', '1')
+        self.course_id2 = SlashSeparatedCourseKey('course', 'id', '2')
 
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
 
-        self.course_enrollment = CourseEnrollmentFactory.create(
-            user=self.user, course_id=self.course_id
-        )
-        self.course_enrollment2 = CourseEnrollmentFactory.create(
-            user=self.user2, course_id=self.course_id2
-        )
+        CourseEnrollment.enroll(self.user, self.course_id)
+        CourseEnrollment.enroll(self.user2, self.course_id2)
 
         now = datetime.now(UTC)
         self.tomorrow = now + timedelta(days=1)

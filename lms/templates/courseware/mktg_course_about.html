@@ -2,7 +2,6 @@
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
-  from courseware.access import has_access
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -34,7 +33,7 @@
           window.top.location.href = "${reverse('dashboard')}";
         }
       } else if (xhr.status == 403) {
-        window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
+        window.top.location.href = "${reverse('register_user')}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
@@ -74,7 +73,7 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="course_id" type="hidden" value="${course.id.to_deprecated_string()}">
         <input name="enrollment_action" type="hidden" value="enroll">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>

@@ -43,12 +43,12 @@ def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
         display_name='Test Course'
     )
 
-    world.course_id = 'edx/999/Test_Course'
+    world.course_id = course.id
     world.role = 'instructor'
     # Log in as the an instructor or staff for the course
     if role == 'instructor':
         # Make & register an instructor for the course
-        world.instructor = InstructorFactory(course=course.location)
+        world.instructor = InstructorFactory(course=world.course_id)
         world.enroll_user(world.instructor, world.course_id)
 
         world.log_in(
@@ -61,7 +61,7 @@ def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
     else:
         world.role = 'staff'
         # Make & register a staff member
-        world.staff = StaffFactory(course=course.location)
+        world.staff = StaffFactory(course=world.course_id)
         world.enroll_user(world.staff, world.course_id)
 
         world.log_in(

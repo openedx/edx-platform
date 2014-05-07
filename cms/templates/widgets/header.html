@@ -2,7 +2,6 @@
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
-  from xmodule.modulestore.django import loc_mapper
 %>
 
 <div class="wrapper-header wrapper" id="view-top">
@@ -14,20 +13,19 @@
 
       % if context_course:
       <%
-            ctx_loc = context_course.location
-            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-            index_url = location.url_reverse('course')
-            checklists_url = location.url_reverse('checklists')
-            course_team_url = location.url_reverse('course_team')
-            assets_url = location.url_reverse('assets')
-            textbooks_url = location.url_reverse('textbooks')
-            import_url = location.url_reverse('import')
-            course_info_url = location.url_reverse('course_info')
-            export_url = location.url_reverse('export')
-            settings_url = location.url_reverse('settings/details/')
-            grading_url = location.url_reverse('settings/grading/')
-            advanced_settings_url = location.url_reverse('settings/advanced/')
-            tabs_url = location.url_reverse('tabs')
+            course_key = context_course.id
+            index_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
+            checklists_url = reverse('contentstore.views.checklists_handler', kwargs={'course_key_string': unicode(course_key)})
+            course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
+            assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
+            textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
+            import_url = reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(course_key)})
+            course_info_url = reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(course_key)})
+            export_url = reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(course_key)})
+            settings_url = reverse('contentstore.views.settings_handler', kwargs={'course_key_string': unicode(course_key)})
+            grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
+            advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
+            tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -106,7 +104,7 @@
                   </li>
                   % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
-                    <a href="${reverse('export_git', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Export to Git")}</a>
+                    <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
                 </ul>

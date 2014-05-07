@@ -1,12 +1,8 @@
 from itertools import repeat
-
-from xmodule.course_module import CourseDescriptor
-
 from .exceptions import (ItemNotFoundError, NoPathToItem)
-from . import Location
 
 
-def path_to_location(modulestore, course_id, location):
+def path_to_location(modulestore, usage_key):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -55,41 +51,38 @@ def path_to_location(modulestore, course_id, location):
         # tuples (location, path-so-far).  To avoid lots of
         # copying, the path-so-far is stored as a lisp-style
         # list--nested hd::tl tuples, and flattened at the end.
-        queue = [(location, ())]
+        queue = [(usage_key, ())]
         while len(queue) > 0:
-            (loc, path) = queue.pop()  # Takes from the end
-            loc = Location(loc)
+            (next_usage, path) = queue.pop()  # Takes from the end
 
             # get_parent_locations should raise ItemNotFoundError if location
             # isn't found so we don't have to do it explicitly.  Call this
             # first to make sure the location is there (even if it's a course, and
             # we would otherwise immediately exit).
-            parents = modulestore.get_parent_locations(loc, course_id)
+            parents = modulestore.get_parent_locations(next_usage)
 
-            # print 'Processing loc={0}, path={1}'.format(loc, path)
-            if loc.category == "course":
-                # confirm that this is the right course
-                if course_id == CourseDescriptor.location_to_id(loc):
-                    # Found it!
-                    path = (loc, path)
-                    return flatten(path)
+            # print 'Processing loc={0}, path={1}'.format(next_usage, path)
+            if next_usage.definition_key.block_type == "course":
+                # Found it!
+                path = (next_usage, path)
+                return flatten(path)
 
             # otherwise, add parent locations at the end
-            newpath = (loc, path)
+            newpath = (next_usage, path)
             queue.extend(zip(parents, repeat(newpath)))
 
         # If we're here, there is no path
         return None
 
-    if not modulestore.has_item(course_id, location):
-        raise ItemNotFoundError
+    if not modulestore.has_item(usage_key):
+        raise ItemNotFoundError(usage_key)
 
     path = find_path_to_course()
     if path is None:
-        raise NoPathToItem(location)
+        raise NoPathToItem(usage_key)
 
     n = len(path)
-    course_id = CourseDescriptor.location_to_id(path[0])
+    course_id = path[0].course_key
     # pull out the location names
     chapter = path[1].name if n > 1 else None
     section = path[2].name if n > 2 else None
@@ -105,9 +98,9 @@ def path_to_location(modulestore, course_id, location):
     if n > 3:
         position_list = []
         for path_index in range(2, n - 1):
-            category = path[path_index].category
+            category = path[path_index].definition_key.block_type
             if category == 'sequential' or category == 'videosequence':
-                section_desc = modulestore.get_instance(course_id, path[path_index])
+                section_desc = modulestore.get_item(path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.

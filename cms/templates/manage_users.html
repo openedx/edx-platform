@@ -2,7 +2,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from student.roles import CourseInstructorRole %>
-<%! from xmodule.modulestore.django import loc_mapper %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
@@ -60,12 +59,16 @@
       %endif
 
       <ol class="user-list">
-        <% new_location = loc_mapper().translate_location(context_course.location.course_id, context_course.location, False, True) %>
         % for user in staff:
+          <% course_team_url = reverse(
+             'contentstore.views.course_team_handler',
+             kwargs={'course_key_string': unicode(context_course.id), 'email': user.email}
+          )
+          %>
 
-        <li class="user-item" data-email="${user.email}" data-url="${new_location.url_reverse('course_team/', user.email) }">
+        <li class="user-item" data-email="${user.email}" data-url="${course_team_url}">
 
-        <% is_instuctor = CourseInstructorRole(context_course.location).has_user(user) %>
+        <% is_instuctor = CourseInstructorRole(context_course.id).has_user(user) %>
           % if is_instuctor:
           <span class="wrapper-ui-badge">
             <span class="flag flag-role flag-role-admin is-hanging">
@@ -120,7 +123,7 @@
         % endfor
       </ol>
 
-      <% user_is_instuctor = CourseInstructorRole(context_course.location).has_user(request.user) %>
+      <% user_is_instuctor = CourseInstructorRole(context_course.id).has_user(request.user) %>
       % if user_is_instuctor and len(staff) == 1:
       <div class="notice notice-incontext notice-create has-actions">
         <div class="msg">
@@ -163,9 +166,7 @@ require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
     function($, _, gettext, PromptView) {
 
   var staffEmails = ${json.dumps([user.email for user in staff])};
-  var tplUserURL = "${loc_mapper().\
-      translate_location(context_course.location.course_id, context_course.location, False, True).\
-      url_reverse('course_team/', "@@EMAIL@@")}";
+  var tplUserURL = "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}"
 
   var unknownErrorMessage = gettext("Unknown");
 

@@ -5,19 +5,9 @@ adding users, removing users, and listing members
 
 from abc import ABCMeta, abstractmethod
 
-from django.contrib.auth.models import User, Group
-
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import CourseLocator, Locator
-
-
-class CourseContextRequired(Exception):
-    """
-    Raised when a course_context is required to determine permissions
-    """
-    pass
+from django.contrib.auth.models import User
+from student.models import CourseAccessRole
+from xmodule_django.models import CourseKeyField
 
 
 class AccessRole(object):
@@ -78,21 +68,24 @@ class GlobalStaff(AccessRole):
         raise Exception("This operation is un-indexed, and shouldn't be used")
 
 
-class GroupBasedRole(AccessRole):
+class RoleBase(AccessRole):
     """
-    A role based on membership to any of a set of groups.
+    Roles by type (e.g., instructor, beta_user) and optionally org, course_key
     """
-    def __init__(self, group_names):
+    def __init__(self, role_name, org='', course_key=CourseKeyField.Empty):
         """
-        Create a GroupBasedRole from a list of group names
-
-        The first element of `group_names` will be the preferred group
-        to use when adding a user to this Role.
-
-        If a user is a member of any of the groups in the list, then
-        they will be consider a member of the Role
+        Create role from required role_name w/ optional org and course_key. You may just provide a role
+        name if it's a global role (not constrained to an org or course). Provide org if constrained to
+        an org. Provide org and course if constrained to a course. Although, you should use the subclasses
+        for all of these.
         """
-        self._group_names = [name.lower() for name in group_names]
+
+        if course_key is None:
+            raise TypeError('course_key must be CourseKeyField.Empty or a valid CourseKey')
+
+        self.org = org
+        self.course_key = course_key
+        self._role_name = role_name
 
     def has_user(self, user):
         """
@@ -102,10 +95,13 @@ class GroupBasedRole(AccessRole):
             return False
 
         # pylint: disable=protected-access
-        if not hasattr(user, '_groups'):
-            user._groups = set(name.lower() for name in user.groups.values_list('name', flat=True))
+        if not hasattr(user, '_roles'):
+            user._roles = set(
+                CourseAccessRole.objects.filter(user=user).all()
+            )
 
-        return len(user._groups.intersection(self._group_names)) > 0
+        role = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
+        return role in user._roles
 
     def add_users(self, *users):
         """
@@ -113,87 +109,59 @@ class GroupBasedRole(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        users = [user for user in users if user.is_authenticated() and user.is_active]
-        group, _ = Group.objects.get_or_create(name=self._group_names[0])
-        group.user_set.add(*users)
-        # remove cache
         for user in users:
-            if hasattr(user, '_groups'):
-                del user._groups
+            if user.is_authenticated and user.is_active and not self.has_user(user):
+                entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
+                entry.save()
+                if hasattr(user, '_roles'):
+                    del user._roles
 
     def remove_users(self, *users):
         """
         Remove the supplied django users from this role.
         """
-        groups = Group.objects.filter(name__in=self._group_names)
-        for group in groups:
-            group.user_set.remove(*users)
-        # remove cache
+        entries = CourseAccessRole.objects.filter(
+            user__in=users, role=self._role_name, org=self.org, course_id=self.course_key
+        )
+        entries.delete()
         for user in users:
-            if hasattr(user, '_groups'):
-                del user._groups
+            if hasattr(user, '_roles'):
+                del user._roles
 
     def users_with_role(self):
         """
         Return a django QuerySet for all of the users with this role
         """
-        return User.objects.filter(groups__name__in=self._group_names)
+        entries = User.objects.filter(
+            courseaccessrole__role=self._role_name,
+            courseaccessrole__org=self.org,
+            courseaccessrole__course_id=self.course_key
+        )
+        return entries
 
 
-class CourseRole(GroupBasedRole):
+class CourseRole(RoleBase):
     """
     A named role in a particular course
     """
-    def __init__(self, role, location, course_context=None):
+    def __init__(self, role, course_key):
         """
-        Location may be either a Location, a string, dict, or tuple which Location will accept
-        in its constructor, or a CourseLocator. Handle all these giving some preference to
-        the preferred naming.
+        Args:
+            course_key (CourseKey)
         """
-        # TODO: figure out how to make the group name generation lazy so it doesn't force the
-        # loc mapping?
-        self.location = Locator.to_locator_or_location(location)
-        self.role = role
-        # direct copy from auth.authz.get_all_course_role_groupnames will refactor to one impl asap
-        groupnames = []
+        super(CourseRole, self).__init__(role, course_key.org, course_key)
 
-        if isinstance(self.location, Location):
-            try:
-                groupnames.append(u'{0}_{1}'.format(role, self.location.course_id))
-                course_context = self.location.course_id  # course_id is valid for translation
-            except InvalidLocationError:  # will occur on old locations where location is not of category course
-                if course_context is None:
-                    raise CourseContextRequired()
-                else:
-                    groupnames.append(u'{0}_{1}'.format(role, course_context))
-            try:
-                locator = loc_mapper().translate_location_to_course_locator(course_context, self.location)
-                groupnames.append(u'{0}_{1}'.format(role, locator.package_id))
-            except (InvalidLocationError, ItemNotFoundError):
-                # if it's never been mapped, the auth won't be via the Locator syntax
-                pass
-            # least preferred legacy role_course format
-            groupnames.append(u'{0}_{1}'.format(role, self.location.course))  # pylint: disable=E1101, E1103
-        elif isinstance(self.location, CourseLocator):
-            groupnames.append(u'{0}_{1}'.format(role, self.location.package_id))
-            # handle old Location syntax
-            old_location = loc_mapper().translate_locator_to_location(self.location, get_course=True)
-            if old_location:
-                # the slashified version of the course_id (myu/mycourse/myrun)
-                groupnames.append(u'{0}_{1}'.format(role, old_location.course_id))
-                # add the least desirable but sometimes occurring format.
-                groupnames.append(u'{0}_{1}'.format(role, old_location.course))  # pylint: disable=E1101, E1103
-
-        super(CourseRole, self).__init__(groupnames)
+    @classmethod
+    def course_group_already_exists(self, course_key):
+        return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
 
-class OrgRole(GroupBasedRole):
+class OrgRole(RoleBase):
     """
-    A named role in a particular org
+    A named role in a particular org independent of course
     """
-    def __init__(self, role, location):
-        location = Location(location)
-        super(OrgRole, self).__init__([u'{}_{}'.format(role, location.org)])
+    def __init__(self, role, org):
+        super(OrgRole, self).__init__(role, org)
 
 
 class CourseStaffRole(CourseRole):
@@ -207,6 +175,7 @@ class CourseStaffRole(CourseRole):
 class CourseInstructorRole(CourseRole):
     """A course Instructor"""
     ROLE = 'instructor'
+
     def __init__(self, *args, **kwargs):
         super(CourseInstructorRole, self).__init__(self.ROLE, *args, **kwargs)
 
@@ -214,6 +183,7 @@ class CourseInstructorRole(CourseRole):
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'
+
     def __init__(self, *args, **kwargs):
         super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
 
@@ -230,11 +200,73 @@ class OrgInstructorRole(OrgRole):
         super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
 
 
-class CourseCreatorRole(GroupBasedRole):
+class CourseCreatorRole(RoleBase):
     """
     This is the group of people who have permission to create new courses (we may want to eventually
     make this an org based role).
     """
     ROLE = "course_creator_group"
+
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)
+        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+class UserBasedRole(object):
+    """
+    Backward mapping: given a user, manipulate the courses and roles
+    """
+    def __init__(self, user, role):
+        """
+        Create a UserBasedRole accessor: for a given user and role (e.g., "instructor")
+        """
+        self.user = user
+        self.role = role
+
+    def has_course(self, course_key):
+        """
+        Return whether the role's user has the configured role access to the passed course
+        """
+        if not (self.user.is_authenticated() and self.user.is_active):
+            return False
+
+        # pylint: disable=protected-access
+        if not hasattr(self.user, '_roles'):
+            self.user._roles = list(
+                CourseAccessRole.objects.filter(user=self.user).all()
+            )
+
+        role = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
+        return role in self.user._roles
+
+    def add_course(self, *course_keys):
+        """
+        Grant this object's user the object's role for the supplied courses
+        """
+        if self.user.is_authenticated and self.user.is_active:
+            for course_key in course_keys:
+                entry = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
+                entry.save()
+            if hasattr(self.user, '_roles'):
+                del user._roles
+        else:
+            raise ValueError("user is not active. Cannot grant access to courses")
+
+    def remove_courses(self, *course_keys):
+        """
+        Remove the supplied courses from this user's configured role.
+        """
+        entries = CourseAccessRole.objects.filter(user=self.user, role=self.role, course_id__in=course_keys)
+        entries.delete()
+        if hasattr(self.user, '_roles'):
+            del self.user._roles
+
+    def courses_with_role(self):
+        """
+        Return a django QuerySet for all of the courses with this user x role. You can access
+        any of these properties on each result record:
+        * user (will be self.user--thus uninteresting)
+        * org
+        * course_id
+        * role (will be self.role--thus uninteresting)
+        """
+        return CourseAccessRole.objects.filter(role=self.role, user=self.user)

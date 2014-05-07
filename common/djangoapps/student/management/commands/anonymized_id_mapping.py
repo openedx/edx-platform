@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 for student in students:
                     csv_writer.writerow((
                         student.id,
-                        anonymous_id_for_user(student, ''),
+                        anonymous_id_for_user(student, None),
                         anonymous_id_for_user(student, course_id)
                     ))
         except IOError:

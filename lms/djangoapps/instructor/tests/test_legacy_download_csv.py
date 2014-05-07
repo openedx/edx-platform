@@ -20,6 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -30,7 +31,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
 
     def setUp(self):
         clear_existing_modulestores()
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        self.toy = modulestore().get_course(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -41,7 +42,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.id).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -49,7 +50,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
 
     def test_download_grades_csv(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         msg = "url = {0}\n".format(url)
         response = self.client.post(url, {'action': 'Download CSV of all student grades for this course'})
         msg += "instructor dashboard download csv grades: response = '{0}'\n".format(response)
@@ -58,7 +59,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
 
         cdisp = response['Content-Disposition']
         msg += "Content-Disposition = '%s'\n" % cdisp
-        self.assertEqual(cdisp, 'attachment; filename=grades_{0}.csv'.format(course.id), msg)
+        self.assertEqual(cdisp, 'attachment; filename=grades_{0}.csv'.format(course.id.to_deprecated_string()), msg)
 
         body = response.content.replace('\r', '')
         msg += "body = '{0}'\n".format(body)

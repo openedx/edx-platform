@@ -15,7 +15,7 @@ from pymongo import MongoClient
 from contentstore.tests.utils import CourseTestCase
 from django.test.utils import override_settings
 from django.conf import settings
-from xmodule.modulestore.django import loc_mapper
+from contentstore.utils import reverse_course_url
 
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -33,10 +33,7 @@ class ImportTestCase(CourseTestCase):
     """
     def setUp(self):
         super(ImportTestCase, self).setUp()
-        self.new_location = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
-        )
-        self.url = self.new_location.url_reverse('import/', '')
+        self.url = reverse_course_url('import_handler', self.course.id)
         self.content_dir = path(tempfile.mkdtemp())
 
         def touch(name):
@@ -88,9 +85,10 @@ class ImportTestCase(CourseTestCase):
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
         resp_status = self.client.get(
-            self.new_location.url_reverse(
-                'import_status',
-                os.path.split(self.bad_tar)[1]
+            reverse_course_url(
+                'import_status_handler',
+                self.course.id,
+                kwargs={'filename': os.path.split(self.bad_tar)[1]}
             )
         )
 
@@ -192,9 +190,10 @@ class ImportTestCase(CourseTestCase):
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
         resp_status = self.client.get(
-            self.new_location.url_reverse(
-                'import_status',
-                os.path.split(self.good_tar)[1]
+            reverse_course_url(
+                'import_status_handler',
+                self.course.id,
+                kwargs={'filename': os.path.split(self.good_tar)[1]}
             )
         )
         import_status = json.loads(resp_status.content)["ImportStatus"]
@@ -211,8 +210,7 @@ class ExportTestCase(CourseTestCase):
         Sets up the test course.
         """
         super(ExportTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.url = location.url_reverse('export/', '')
+        self.url = reverse_course_url('export_handler', self.course.id)
 
     def test_export_html(self):
         """
@@ -253,7 +251,7 @@ class ExportTestCase(CourseTestCase):
         Export failure.
         """
         ItemFactory.create(parent_location=self.course.location, category='aawefawef')
-        self._verify_export_failure('/course/MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course')
+        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):
         """
@@ -264,7 +262,8 @@ class ExportTestCase(CourseTestCase):
             parent_location=vertical.location,
             category='aawefawef'
         )
-        self._verify_export_failure(u'/unit/MITx.999.Robot_Super_Course/branch/draft/block/foo')
+
+        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+vertical+foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """

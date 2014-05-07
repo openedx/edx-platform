@@ -10,6 +10,7 @@ from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 from xmodule.modulestore.django import ModuleI18nService
 
@@ -17,6 +18,7 @@ from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
+from student.views import course_from_id
 from util.json_request import expect_json
 
 from open_ended_grading.utils import does_location_exist
@@ -233,8 +235,9 @@ def _check_access(user, course_id):
     """
     Raise 404 if user doesn't have staff access to course_id
     """
-    course_location = CourseDescriptor.id_to_location(course_id)
-    if not has_access(user, course_location, 'staff'):
+    course = course_from_id(course_id)
+
+    if not has_access(user, 'staff', course, course_id):
         raise Http404
 
     return
@@ -261,7 +264,9 @@ def get_next(request, course_id):
 
     'error': if success is False, will have an error message with more info.
     """
-    _check_access(request.user, course_id)
+    assert(isinstance(course_id, basestring))
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    _check_access(request.user, course_key)
 
     required = set(['location'])
     if request.method != 'POST':
@@ -275,7 +280,7 @@ def get_next(request, course_id):
     p = request.POST
     location = p['location']
 
-    return HttpResponse(json.dumps(_get_next(course_id, grader_id, location)),
+    return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
                         mimetype="application/json")
 
 def get_problem_list(request, course_id):
@@ -301,9 +306,11 @@ def get_problem_list(request, course_id):
 
         'error': if success is False, will have an error message with more info.
     """
-    _check_access(request.user, course_id)
+    assert(isinstance(course_id, basestring))
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    _check_access(request.user, course_key)
     try:
-        response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
+        response = staff_grading_service().get_problem_list(course_key, unique_id_for_user(request.user))
 
         # If 'problem_list' is in the response, then we got a list of problems from the ORA server.
         # If it is not, then ORA could not find any problems.
@@ -324,7 +331,7 @@ def get_problem_list(request, course_id):
                 problem_list[i] = json.loads(problem_list[i])
             except Exception:
                 pass
-            if does_location_exist(course_id, problem_list[i]['location']):
+            if does_location_exist(course_key.make_usage_key_from_deprecated_string(problem_list[i]['location'])):
                 valid_problem_list.append(problem_list[i])
         response['problem_list'] = valid_problem_list
         response = json.dumps(response)
@@ -372,7 +379,9 @@ def save_grade(request, course_id):
     Returns the same thing as get_next, except that additional error messages
     are possible if something goes wrong with saving the grade.
     """
-    _check_access(request.user, course_id)
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    _check_access(request.user, course_key)
 
     if request.method != 'POST':
         raise Http404
@@ -398,7 +407,7 @@ def save_grade(request, course_id):
     location = p['location']
 
     try:
-        result = staff_grading_service().save_grade(course_id,
+        result = staff_grading_service().save_grade(course_key,
                                                     grader_id,
                                                     p['submission_id'],
                                                     p['score'],

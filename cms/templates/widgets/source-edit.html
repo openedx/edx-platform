@@ -1,6 +1,6 @@
 <%
   import hashlib
-  hlskey = hashlib.md5(module.location.url()).hexdigest()
+  hlskey = hashlib.md5(module.location.to_deprecated_string()).hexdigest()
 %>
 
   <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >

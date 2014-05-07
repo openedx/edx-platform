@@ -111,18 +111,14 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
         self.subs_id = str(uuid4())
         filename = 'subs_{0}.srt.sjson'.format(self.subs_id)
-        self.content_location = StaticContent.compute_location(
-            self.org, self.number, filename
-        )
+        self.content_location = StaticContent.compute_location(self.course.id, filename)
 
         # incorrect  subs
         self.unjsonable_subs = set([1])  # set can't be serialized
 
         self.unjsonable_subs_id = str(uuid4())
         filename_unjsonable = 'subs_{0}.srt.sjson'.format(self.unjsonable_subs_id)
-        self.content_location_unjsonable = StaticContent.compute_location(
-            self.org, self.number, filename_unjsonable
-        )
+        self.content_location_unjsonable = StaticContent.compute_location(self.course.id, filename_unjsonable)
 
         self.clear_subs_content()
 
@@ -172,9 +168,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         """Remove, if subtitles content exists."""
         for subs_id in youtube_subs.values():
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
-            content_location = StaticContent.compute_location(
-                self.org, self.number, filename
-            )
+            content_location = StaticContent.compute_location(self.course.id, filename)
             try:
                 content = contentstore().find(content_location)
                 contentstore().delete(content.get_id())
@@ -218,9 +212,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         # Check assets status after importing subtitles.
         for subs_id in good_youtube_subs.values():
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
-            content_location = StaticContent.compute_location(
-                self.org, self.number, filename
-            )
+            content_location = StaticContent.compute_location(self.course.id, filename)
             self.assertTrue(contentstore().find(content_location))
 
         self.clear_subs_content(good_youtube_subs)
@@ -256,7 +248,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         for subs_id in bad_youtube_subs.values():
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
-                self.org, self.number, filename
+                self.course.id, filename
             )
             with self.assertRaises(NotFoundError):
                 contentstore().find(content_location)
@@ -282,7 +274,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         for subs_id in good_youtube_subs.values():
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
-                self.org, self.number, filename
+                self.course.id, filename
             )
             self.assertTrue(contentstore().find(content_location))
 
@@ -317,7 +309,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
         for subs_id in youtube_subs.values():
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
-                self.org, self.number, filename
+                self.course.id, filename
             )
             self.assertTrue(contentstore().find(content_location))
 

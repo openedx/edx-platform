@@ -1,8 +1,7 @@
 """ Unit tests for checklist methods in views.py. """
-from contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore, reverse_course_url
 from contentstore.views.checklist import expand_checklist_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import loc_mapper
 
 import json
 from contentstore.tests.utils import CourseTestCase
@@ -14,8 +13,11 @@ class ChecklistTestCase(CourseTestCase):
         """ Creates the test course. """
         super(ChecklistTestCase, self).setUp()
         self.course = CourseFactory.create(org='mitX', number='333', display_name='Checklists Course')
-        self.location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.checklists_url = self.location.url_reverse('checklists/', '')
+        self.checklists_url = self.get_url()
+
+    def get_url(self, checklist_index=None):
+        url_args = {'checklist_index': checklist_index} if checklist_index else None
+        return reverse_course_url('checklists_handler', self.course.id, kwargs=url_args)
 
     def get_persisted_checklists(self):
         """ Returns the checklists as persisted in the modulestore. """
@@ -41,7 +43,7 @@ class ChecklistTestCase(CourseTestCase):
         response = self.client.get(self.checklists_url)
         self.assertContains(response, "Getting Started With Studio")
         # Verify expansion of action URL happened.
-        self.assertContains(response, 'course_team/mitX.333.Checklists_Course')
+        self.assertContains(response, 'course_team/slashes:mitX+333+Checklists_Course')
         # Verify persisted checklist does NOT have expanded URL.
         checklist_0 = self.get_persisted_checklists()[0]
         self.assertEqual('ManageUsers', get_action_url(checklist_0, 0))
@@ -77,7 +79,7 @@ class ChecklistTestCase(CourseTestCase):
 
     def test_update_checklists_index_ignored_on_get(self):
         """ Checklist index ignored on get. """
-        update_url = self.location.url_reverse('checklists/', '1')
+        update_url = self.get_url(1)
 
         returned_checklists = json.loads(self.client.get(update_url).content)
         for pay, resp in zip(self.get_persisted_checklists(), returned_checklists):
@@ -90,14 +92,14 @@ class ChecklistTestCase(CourseTestCase):
 
     def test_update_checklists_index_out_of_range(self):
         """ Checklist index out of range, will error on post. """
-        update_url = self.location.url_reverse('checklists/', '100')
+        update_url = self.get_url(100)
 
         response = self.client.post(update_url)
         self.assertContains(response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index(self):
         """ Check that an update of a particular checklist works. """
-        update_url = self.location.url_reverse('checklists/', '1')
+        update_url = self.get_url(1)
 
         payload = self.course.checklists[1]
         self.assertFalse(get_first_item(payload).get('is_checked'))
@@ -114,7 +116,7 @@ class ChecklistTestCase(CourseTestCase):
 
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """
-        update_url = self.location.url_reverse('checklists/', '100')
+        update_url = self.get_url(100)
         response = self.client.delete(update_url)
         self.assertEqual(response.status_code, 405)
 
@@ -135,8 +137,8 @@ class ChecklistTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(checklist, index), stored)
 
-        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/mitX.333.Checklists_Course/branch/draft/block/Checklists_Course')
-        test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/mitX.333.Checklists_Course/branch/draft/block/Checklists_Course')
+        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/slashes:mitX+333+Checklists_Course/')
+        test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/slashes:mitX+333+Checklists_Course')
         test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
 
 

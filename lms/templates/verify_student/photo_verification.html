@@ -27,7 +27,7 @@
     <div class="msg-content">
       <h3 class="title">${_("No Webcam Detected")}</h3>
       <div class="copy">
-        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue registering, or select to {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue registering, or select to {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</p>
       </div>
     </div>
   </div>
@@ -182,7 +182,7 @@
                         %if upgrade:
                           <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
                         %else:
-                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
+                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</dd>
                         %endif
                       </dl>
                     </div>

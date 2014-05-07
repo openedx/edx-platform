@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from student.tests.factories import UserFactory
 from user_api import user_service
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class TestUserService(TestCase):
@@ -13,7 +14,7 @@ class TestUserService(TestCase):
     """
     def setUp(self):
         self.user = UserFactory.create()
-        self.course_id = 'test_org/test_course_number/test_run'
+        self.course_id = SlashSeparatedCourseKey('test_org', 'test_course_number', 'test_run')
         self.test_key = 'test_key'
 
     def test_get_set_course_tag(self):

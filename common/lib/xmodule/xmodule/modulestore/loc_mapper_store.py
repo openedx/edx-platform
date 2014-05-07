@@ -5,11 +5,12 @@ from random import randint
 import re
 import pymongo
 import bson.son
+import urllib
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import Location
-import urllib
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.keys import UsageKey
 
 
 class LocMapperStore(object):
@@ -27,6 +28,7 @@ class LocMapperStore(object):
     or dominant store, but that's not a requirement. This store creates its own connection.
     '''
 
+    SCHEMA_VERSION = 1
     def __init__(
         self, cache, host, db, collection, port=27017, user=None, password=None,
         **kwargs
@@ -39,6 +41,7 @@ class LocMapperStore(object):
                 host=host,
                 port=port,
                 tz_aware=True,
+                document_class=bson.son.SON,
                 **kwargs
             ),
             db
@@ -51,31 +54,21 @@ class LocMapperStore(object):
         self.cache = cache
 
     # location_map functions
-    def create_map_entry(self, course_location, package_id=None, draft_branch='draft', prod_branch='published',
+    def create_map_entry(self, course_key, org=None, offering=None, draft_branch='draft', prod_branch='published',
                          block_map=None):
         """
-        Add a new entry to map this course_location to the new style CourseLocator.package_id. If package_id is not
-        provided, it creates the default map of using org.course.name from the location if
-        the location.category = 'course'; otherwise, it uses org.course.
+        Add a new entry to map this SlashSeparatedCourseKey to the new style CourseLocator.org & offering. If
+        org and offering are not provided, it creates the default map of using the course_key.
 
-        You can create more than one mapping to the
-        same package_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
-        The use
-        case for more than one mapping is to map both org/course/run and org/course to the same new package_id thus
-        making a default for org/course. When querying for just org/course, the translator will prefer any entry
-        which does not have a name in the _id; otherwise, it will return an arbitrary match.
+        It never makes sense to use 2 different CourseLocator
+        keys to index the same old SlashSeparatedCourseKey. There's no checking to ensure you don't do this.
 
-        Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.package_id
-        keys to index the same old Locator org/course/.. pattern. There's no checking to ensure you don't do this.
-
-        NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
+        NOTE: if there's already an entry w the given course_key, this may either overwrite that entry or
         throw an error depending on how mongo is configured.
 
-        :param course_location: a Location preferably whose category is 'course'. Unlike the other
-        map methods, this one doesn't take the old-style course_id.  It should be called with
-        a course location not a block location; however, if called w/ a non-course Location, it creates
-        a "default" map for the org/course pair to a new package_id.
-        :param package_id: the CourseLocator style package_id
+        :param course_key (SlashSeparatedCourseKey): a SlashSeparatedCourseKey
+        :param org (string): the CourseLocator style org
+        :param offering (string): the CourseLocator offering
         :param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
         a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
         did not, however, require that a draft version exist. The new one, however, does require a draft to
@@ -85,54 +78,46 @@ class LocMapperStore(object):
         to publish).
         :param block_map: an optional map to specify preferred names for blocks where the keys are the
         Location block names and the values are the BlockUsageLocator.block_id.
+
+        Raises:
+            ValueError if one and only one of org and offering is provided. Provide either both or neither.
         """
-        if package_id is None:
-            if course_location.category == 'course':
-                package_id = u"{0.org}.{0.course}.{0.name}".format(course_location)
-            else:
-                package_id = u"{0.org}.{0.course}".format(course_location)
-        # very like _interpret_location_id but w/o the _id
-        location_id = self._construct_location_son(
-            course_location.org, course_location.course,
-            course_location.name if course_location.category == 'course' else None
-        )
-        # create location id with lower case
-        location_id_lower = self._construct_lower_location_son(
-            course_location.org, course_location.course,
-            course_location.name if course_location.category == 'course' else None
-        )
+        if org is None and offering is None:
+            assert(isinstance(course_key, SlashSeparatedCourseKey))
+            org = course_key.org
+            offering = u"{0.course}.{0.run}".format(course_key)
+        elif org is None or offering is None:
+            raise ValueError(
+                u"Either supply both org and offering or neither. Not just one: {}, {}".format(org, offering)
+            )
 
-        try:
-            self.location_map.insert({
-                '_id': location_id,
-                'lower_id': location_id_lower,
-                'course_id': package_id,
-                'lower_course_id': package_id.lower(),
-                'draft_branch': draft_branch,
-                'prod_branch': prod_branch,
-                'block_map': block_map or {},
-            })
-        except pymongo.errors.DuplicateKeyError:
-            # update old entry with 'lower_id' and 'lower_course_id'
-            location_update = {'lower_id': location_id_lower, 'lower_course_id': package_id.lower()}
-            self.location_map.update({'_id': location_id}, {'$set': location_update})
+        # very like _interpret_location_id but using mongo subdoc lookup (more performant)
+        course_son = self._construct_course_son(course_key)
 
-        return package_id
+        self.location_map.insert({
+            '_id': course_son,
+            'org': org,
+            'lower_org': org.lower(),
+            'offering': offering,
+            'lower_offering': offering.lower(),
+            'draft_branch': draft_branch,
+            'prod_branch': prod_branch,
+            'block_map': block_map or {},
+            'schema': self.SCHEMA_VERSION,
+        })
 
-    def translate_location(self, old_style_course_id, location, published=True,
+        return CourseLocator(org, offering)
+
+    def translate_location(self, location, published=True,
                            add_entry_if_missing=True, passed_block_id=None):
         """
-        Translate the given module location to a Locator. If the mapping has the run id in it, then you
-        should provide old_style_course_id with that run id in it to disambiguate the mapping if there exists more
-        than one entry in the mapping table for the org.course.
+        Translate the given module location to a Locator.
 
         The rationale for auto adding entries was that there should be a reasonable default translation
-        if the code just trips into this w/o creating translations. The downfall is that ambiguous course
-        locations may generate conflicting block_ids.
+        if the code just trips into this w/o creating translations.
 
         Will raise ItemNotFoundError if there's no mapping and add_entry_if_missing is False.
 
-        :param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
         :param location:  a Location pointing to a module
         :param published: a boolean to indicate whether the caller wants the draft or published branch.
         :param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
@@ -144,43 +129,32 @@ class LocMapperStore(object):
         NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
         of locations including course.
         """
-        location_id = self._interpret_location_course_id(old_style_course_id, location)
-        if old_style_course_id is None:
-            old_style_course_id = self._generate_location_course_id(location_id)
+        course_son = self._interpret_location_course_id(location.course_key)
 
-        cached_value = self._get_locator_from_cache(old_style_course_id, location, published)
+        cached_value = self._get_locator_from_cache(location, published)
         if cached_value:
             return cached_value
 
-        maps = self.location_map.find(location_id)
-        maps = list(maps)
-        if len(maps) == 0:
+        entry = self.location_map.find_one(course_son)
+        if entry is None:
             if add_entry_if_missing:
                 # create a new map
-                course_location = location.replace(category='course', name=location_id['_id']['name'])
-                self.create_map_entry(course_location)
-                entry = self.location_map.find_one(location_id)
+                self.create_map_entry(location.course_key)
+                entry = self.location_map.find_one(course_son)
             else:
                 raise ItemNotFoundError(location)
-        elif len(maps) == 1:
-            entry = maps[0]
         else:
-            # find entry w/o name, if any; otherwise, pick arbitrary
-            entry = maps[0]
-            for item in maps:
-                if 'name' not in item['_id']:
-                    entry = item
-                    break
+            entry = self._migrate_if_necessary([entry])[0]
 
         block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
         if block_id is None:
             if add_entry_if_missing:
                 block_id = self._add_to_block_map(
-                    location, location_id, entry['block_map'], passed_block_id
+                    location, course_son, entry['block_map'], passed_block_id
                 )
             else:
                 raise ItemNotFoundError(location)
-        elif isinstance(block_id, dict):
+        else:
             # jump_to_id uses a None category.
             if location.category is None:
                 if len(block_id) == 1:
@@ -191,22 +165,29 @@ class LocMapperStore(object):
             elif location.category in block_id:
                 block_id = block_id[location.category]
             elif add_entry_if_missing:
-                block_id = self._add_to_block_map(location, location_id, entry['block_map'])
+                block_id = self._add_to_block_map(location, course_son, entry['block_map'])
             else:
                 raise ItemNotFoundError(location)
-        else:
-            raise InvalidLocationError()
 
+        prod_course_locator = CourseLocator(
+            org=entry['org'],
+            offering=entry['offering'],
+            branch=entry['prod_branch']
+        )
         published_usage = BlockUsageLocator(
-            package_id=entry['course_id'], branch=entry['prod_branch'], block_id=block_id)
+            prod_course_locator,
+            block_id=block_id
+        )
         draft_usage = BlockUsageLocator(
-            package_id=entry['course_id'], branch=entry['draft_branch'], block_id=block_id)
+            prod_course_locator.for_branch(entry['draft_branch']),
+            block_id=block_id
+        )
         if published:
             result = published_usage
         else:
             result = draft_usage
 
-        self._cache_location_map_entry(old_style_course_id, location, published_usage, draft_usage)
+        self._cache_location_map_entry(location, published_usage, draft_usage)
         return result
 
     def translate_locator_to_location(self, locator, get_course=False, lower_only=False):
@@ -217,18 +198,19 @@ class LocMapperStore(object):
         the block's block_id was previously stored in the
         map (a side effect of translate_location or via add|update_block_location).
 
-        If get_course, then rather than finding the map for this locator, it finds the 'course' root
+        If get_course, then rather than finding the map for this locator, it returns the CourseKey
         for the mapped course.
 
         If there are no matches, it returns None.
 
-        If there's more than one location to locator mapping to the same package_id, it looks for the first
-        one with a mapping for the block block_id and picks that arbitrary course location.
-
         :param locator: a BlockUsageLocator
         """
         if get_course:
-            cached_value = self._get_course_location_from_cache(locator.package_id, lower_only)
+            cached_value = self._get_course_location_from_cache(
+                # if locator is already a course_key it won't have course_key attr
+                getattr(locator, 'course_key', locator),
+                lower_only
+            )
         else:
             cached_value = self._get_location_from_cache(locator)
         if cached_value:
@@ -237,90 +219,113 @@ class LocMapperStore(object):
         # This does not require that the course exist in any modulestore
         # only that it has a mapping entry.
         if lower_only:
-            maps = self.location_map.find({'lower_course_id': locator.package_id.lower()})
-        else:
-            maps = self.location_map.find({'course_id': locator.package_id})
-        # look for one which maps to this block block_id
-        if maps.count() == 0:
-            return None
-        result = None
-        for candidate in maps:
-            if get_course and 'name' in candidate['_id']:
-                candidate_id = candidate['_id']
-                return Location(
-                    'i4x', candidate_id['org'], candidate_id['course'], 'course', candidate_id['name']
+            # migrate any records which don't have the lower_org and lower_offering fields as
+            # this won't be able to find what it wants. (only needs to be run once ever per db,
+            # I'm not sure how to control that, but I'm putting some check here for once per launch)
+            if not getattr(self, 'lower_offering_migrated', False):
+                obsolete = self.location_map.find(
+                    {'lower_org': {"$exists": False}, "lower_offering": {"$exists": False}, }
                 )
-            old_course_id = self._generate_location_course_id(candidate['_id'])
-            for old_name, cat_to_usage in candidate['block_map'].iteritems():
-                for category, block_id in cat_to_usage.iteritems():
-                    # cache all entries and then figure out if we have the one we want
-                    # Always return revision=None because the
-                    # old draft module store wraps locations as draft before
-                    # trying to access things.
-                    location = Location(
-                        'i4x',
-                        candidate['_id']['org'],
-                        candidate['_id']['course'],
-                        category,
-                        self.decode_key_from_mongo(old_name),
-                        None)
+                self._migrate_if_necessary(obsolete)
+                setattr(self, 'lower_offering_migrated', True)
 
-                    if lower_only:
-                        candidate_key = "lower_course_id"
-                    else:
-                        candidate_key = "course_id"
+            entry = self.location_map.find_one(bson.son.SON([
+                ('lower_org', locator.org.lower()),
+                ('lower_offering', locator.offering.lower()),
+            ]))
+        else:
+            # migrate any records which don't have the lower_org and lower_offering fields as
+            # this won't be able to find what it wants. (only needs to be run once ever per db,
+            # I'm not sure how to control that, but I'm putting some check here for once per launch)
+            if not getattr(self, 'offering_migrated', False):
+                obsolete = self.location_map.find(
+                    {'org': {"$exists": False}, "offering": {"$exists": False}, }
+                )
+                self._migrate_if_necessary(obsolete)
+                setattr(self, 'offering_migrated', True)
 
-                    published_locator = BlockUsageLocator(
-                        candidate[candidate_key], branch=candidate['prod_branch'], block_id=block_id
-                    )
-                    draft_locator = BlockUsageLocator(
-                        candidate[candidate_key], branch=candidate['draft_branch'], block_id=block_id
-                    )
-                    self._cache_location_map_entry(old_course_id, location, published_locator, draft_locator)
+            entry = self.location_map.find_one(bson.son.SON([
+                ('org', locator.org),
+                ('lower_offering', locator.offering),
+            ]))
 
-                    if get_course and category == 'course':
-                        result = location
-                    elif not get_course and block_id == locator.block_id:
-                        result = location
-            if result is not None:
-                return result
+        # look for one which maps to this block block_id
+        if entry is None:
+            return None
+        old_course_id = self._generate_location_course_id(entry['_id'])
+        if get_course:
+            return old_course_id
+
+        for old_name, cat_to_usage in entry['block_map'].iteritems():
+            for category, block_id in cat_to_usage.iteritems():
+                # cache all entries and then figure out if we have the one we want
+                # Always return revision=None because the
+                # old draft module store wraps locations as draft before
+                # trying to access things.
+                location = old_course_id.make_usage_key(
+                    category,
+                    self.decode_key_from_mongo(old_name)
+                )
+
+                if lower_only:
+                    entry_org = "lower_org"
+                    entry_offering = "lower_offering"
+                else:
+                    entry_org = "org"
+                    entry_offering = "offering"
+
+                published_locator = BlockUsageLocator(
+                    CourseLocator(
+                        org=entry[entry_org], offering=entry[entry_offering],
+                        branch=entry['prod_branch']
+                    ),
+                    block_id=block_id
+                )
+                draft_locator = BlockUsageLocator(
+                    CourseLocator(
+                        org=entry[entry_org], offering=entry[entry_offering],
+                        branch=entry['draft_branch']
+                    ),
+                    block_id=block_id
+                )
+                self._cache_location_map_entry(location, published_locator, draft_locator)
+
+                if block_id == locator.block_id:
+                    return location
+
         return None
 
-    def translate_location_to_course_locator(self, old_style_course_id, location, published=True, lower_only=False):
+    def translate_location_to_course_locator(self, course_key, published=True):
         """
         Used when you only need the CourseLocator and not a full BlockUsageLocator. Probably only
         useful for get_items which wildcards name or category.
-
-        :param course_id: old style course id
         """
-        cached = self._get_course_locator_from_cache(old_style_course_id, published)
+        if isinstance(course_key, UsageKey):
+            course_key = course_key.course_key
+
+        cached = self._get_course_locator_from_cache(course_key, published)
         if cached:
             return cached
 
-        location_id = self._interpret_location_course_id(old_style_course_id, location, lower_only)
+        course_son = self._interpret_location_course_id(course_key)
 
-        maps = self.location_map.find(location_id)
-        maps = list(maps)
-        if len(maps) == 0:
-            raise ItemNotFoundError(location)
-        elif len(maps) == 1:
-            entry = maps[0]
-        else:
-            # find entry w/o name, if any; otherwise, pick arbitrary
-            entry = maps[0]
-            for item in maps:
-                if 'name' not in item['_id']:
-                    entry = item
-                    break
-        published_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['prod_branch'])
-        draft_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['draft_branch'])
-        self._cache_course_locator(old_style_course_id, published_course_locator, draft_course_locator)
+        entry = self.location_map.find_one(course_son)
+        if entry is None:
+            raise ItemNotFoundError(course_key)
+
+        published_course_locator = CourseLocator(
+            org=entry['org'], offering=entry['offering'], branch=entry['prod_branch']
+        )
+        draft_course_locator = CourseLocator(
+            org=entry['org'], offering=entry['offering'], branch=entry['draft_branch']
+        )
+        self._cache_course_locator(course_key, published_course_locator, draft_course_locator)
         if published:
             return published_course_locator
         else:
             return draft_course_locator
 
-    def _add_to_block_map(self, location, location_id, block_map, block_id=None):
+    def _add_to_block_map(self, location, course_son, block_map, block_id=None):
         '''add the given location to the block_map and persist it'''
         if block_id is None:
             if self._block_id_is_guid(location.name):
@@ -335,63 +340,33 @@ class LocMapperStore(object):
                 block_id = self._verify_uniqueness(location.name, block_map)
         encoded_location_name = self.encode_key_for_mongo(location.name)
         block_map.setdefault(encoded_location_name, {})[location.category] = block_id
-        self.location_map.update(location_id, {'$set': {'block_map': block_map}})
+        self.location_map.update(course_son, {'$set': {'block_map': block_map}})
         return block_id
 
-    def _interpret_location_course_id(self, course_id, location, lower_only=False):
+    def _interpret_location_course_id(self, course_key):
         """
-        Take the old style course id (org/course/run) and return a dict w/ a SON for querying the mapping table.
-        If the course_id is empty, it uses location, but this may result in an inadequate id.
+        Take a Location and return a SON for querying the mapping table.
 
-        :param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
-        :param location: a Location object which may be to a module or a course. Provides partial info
-        if course_id is omitted.
+        :param location: a Location object which may be to a module or a course.
         """
-        if course_id:
-            # re doesn't allow ?P<_id.org> and ilk
-            matched = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
-            if lower_only:
-                return {'lower_id': self._construct_lower_location_son(*matched.groups())}
-            return {'_id': self._construct_location_son(*matched.groups())}
-
-        if location.category == 'course':
-            if lower_only:
-                return {'lower_id': self._construct_lower_location_son(location.org, location.course, location.name)}
-            return {'_id': self._construct_location_son(location.org, location.course, location.name)}
-        else:
-            return bson.son.SON([('_id.org', location.org), ('_id.course', location.course)])
+        return {'_id': self._construct_course_son(course_key)}
 
     def _generate_location_course_id(self, entry_id):
         """
         Generate a Location course_id for the given entry's id.
         """
-        # strip id envelope if any
-        entry_id = entry_id.get('_id', entry_id)
-        if entry_id.get('name', False):
-            return u'{0[org]}/{0[course]}/{0[name]}'.format(entry_id)
-        elif entry_id.get('_id.org', False):
-            # the odd format one
-            return u'{0[_id.org]}/{0[_id.course]}'.format(entry_id)
-        else:
-            return u'{0[org]}/{0[course]}'.format(entry_id)
+        return SlashSeparatedCourseKey(entry_id['org'], entry_id['course'], entry_id['name'])
 
-    def _construct_location_son(self, org, course, name=None):
+    def _construct_course_son(self, course_id):
         """
-        Construct the SON needed to repr the location for either a query or an insertion
+        Construct the SON needed to repr the course_key for either a query or an insertion
         """
-        if name:
-            return bson.son.SON([('org', org), ('course', course), ('name', name)])
-        else:
-            return bson.son.SON([('org', org), ('course', course)])
-
-    def _construct_lower_location_son(self, org, course, name=None):
-        """
-        Construct the SON needed to represent the location with lower case
-        """
-        if name is not None:
-            name = name.lower()
-
-        return self._construct_location_son(org.lower(), course.lower(), name)
+        assert(isinstance(course_id, SlashSeparatedCourseKey))
+        return bson.son.SON([
+            ('org', course_id.org),
+            ('course', course_id.course),
+            ('name', course_id.run)
+        ])
 
     def _block_id_is_guid(self, name):
         """
@@ -434,11 +409,11 @@ class LocMapperStore(object):
         """
         return urllib.unquote(fieldname)
 
-    def _get_locator_from_cache(self, old_course_id, location, published):
+    def _get_locator_from_cache(self, location, published):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get(u'{}+{}'.format(old_course_id, location.url()))
+        entry = self.cache.get(u'{}+{}'.format(location.course_key, location))
         if entry is not None:
             if published:
                 return entry[0]
@@ -452,12 +427,12 @@ class LocMapperStore(object):
         """
         if not old_course_id:
             return None
-        entry = self.cache.get(old_course_id)
+        entry = self.cache.get(unicode(old_course_id))
         if entry is not None:
             if published:
-                return entry[0].as_course_locator()
+                return entry[0].course_key
             else:
-                return entry[1].as_course_locator()
+                return entry[1].course_key
 
     def _get_location_from_cache(self, locator):
         """
@@ -483,9 +458,9 @@ class LocMapperStore(object):
         """
         if not old_course_id:
             return
-        self.cache.set(old_course_id, (published_course_locator, draft_course_locator))
+        self.cache.set(unicode(old_course_id), (published_course_locator, draft_course_locator))
 
-    def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
+    def _cache_location_map_entry(self, location, published_usage, draft_usage):
         """
         Cache the mapping from location to the draft and published Locators in entry.
         Also caches the inverse. If the location is category=='course', it caches it for
@@ -497,25 +472,49 @@ class LocMapperStore(object):
             setmany[u'courseIdLower+{}'.format(published_usage.package_id.lower())] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
-        setmany[u'{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
-        setmany[old_course_id] = (published_usage, draft_usage)
+        setmany[unicode(location)] = (published_usage, draft_usage)
+        setmany[unicode(location.course_key)] = (published_usage, draft_usage)
         self.cache.set_many(setmany)
 
-    def delete_course_mapping(self, course_location):
+    def delete_course_mapping(self, course_key):
         """
         Remove provided course location from loc_mapper and cache.
 
         :param course_location: a Location whose category is 'course'.
         """
-        course_locator = self.translate_location(course_location.course_id, course_location)
-        course_locator_draft = self.translate_location(
-            course_location.course_id, course_location, published=False
-        )
+        self.location_map.remove(self._interpret_location_course_id(course_key))
 
-        self.location_map.remove({'course_id': course_locator.package_id})
-        self._delete_cache_location_map_entry(
-            course_location.course_id, course_location, course_locator, course_locator_draft
-        )
+        # Remove the location of course (draft and published) from cache
+        cached_key = self.cache.get(unicode(course_key))
+        if cached_key:
+            delete_keys = []
+            published_locator = unicode(cached_key[0].course_key)
+            course_location = self._course_location_from_cache(published_locator)
+            delete_keys.append(u'courseId+{}'.format(published_locator))
+            delete_keys.append(u'courseIdLower+{}'.format(unicode(cached_key[0].course_key).lower()))
+            delete_keys.append(published_locator)
+            delete_keys.append(unicode(cached_key[1].course_key))
+            delete_keys.append(unicode(course_location))
+            delete_keys.append(unicode(course_key))
+            self.cache.delete_many(delete_keys)
+
+    def _migrate_if_necessary(self, entries):
+        """
+        Run the entries through any applicable schema updates and return the updated entries
+        """
+        entries = [
+            # CODE REVIEW: should I do this recursively from self_SCHEMA_VERSION?
+            self._migrate[entry.get('schema', 0)](self, entry)
+            for entry in entries
+        ]
+        return entries
+
+    def _entry_id_to_son(self, entry_id):
+        return bson.son.SON([
+            ('org', entry_id['org']),
+            ('course', entry_id['course']),
+            ('name', entry_id['name'])
+        ])
 
     def _delete_cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
         """
@@ -528,6 +527,50 @@ class LocMapperStore(object):
 
         delete_keys.append(unicode(published_usage))
         delete_keys.append(unicode(draft_usage))
-        delete_keys.append(u'{}+{}'.format(old_course_id, location.url()))
+        delete_keys.append(u'{}+{}'.format(old_course_id, location.to_deprecated_string()))
         delete_keys.append(old_course_id)
         self.cache.delete_many(delete_keys)
+
+    def _migrate_top(self, entry, updated=False):
+        """
+        Current version, so a no data change until next update. But since it's the top
+        it's responsible for persisting the record if it changed.
+        """
+        if updated:
+            entry['schema'] = self.SCHEMA_VERSION
+            entry_id = self._entry_id_to_son(entry['_id'])
+            self.location_map.update({'_id': entry_id}, entry)
+
+        return entry
+
+    def _migrate_0(self, entry):
+        """
+        If entry had an '_id' without a run, remove the whole record.
+
+        Add fields: schema, org, offering, lower_org, and lower_offering
+        Remove: course_id, lower_course_id
+        :param entry:
+        """
+        if 'name' not in entry['_id']:
+            entry_id = entry['_id']
+            entry_id = bson.son.SON([
+                ('org', entry_id['org']),
+                ('course', entry_id['course']),
+            ])
+            self.location_map.remove({'_id': entry_id})
+            return None
+
+        # add schema, org, offering, etc, remove old fields
+        entry['schema'] = 0
+        entry.pop('course_id', None)
+        entry.pop('lower_course_id', None)
+        old_course_id = SlashSeparatedCourseKey(entry['_id']['org'], entry['_id']['course'], entry['_id']['name'])
+        entry['org'] = old_course_id.org
+        entry['lower_org'] = old_course_id.org.lower()
+        entry['offering'] = old_course_id.offering.replace('/', '+')
+        entry['lower_offering'] = entry['offering'].lower()
+        return self._migrate_1(entry, True)
+
+    # insert new migrations just before _migrate_top. _migrate_top sets the schema version and
+    # saves the record
+    _migrate = [_migrate_0, _migrate_top]
