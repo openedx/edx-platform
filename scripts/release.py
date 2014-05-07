@@ -425,7 +425,7 @@ def main():
     ensure_github_creds()
 
     if args.table:
-        print(generate_table(args.previous, args.current))
+        print(generate_pr_table(args.previous, args.current))
         return
 
     print("EMAIL:")
