@@ -43,18 +43,15 @@ def get_course(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
-    If course_id is not valid, raises a ValueError.  This is appropriate
+    If the course does not exist, raises a ValueError.  This is appropriate
     for internal use.
 
     depth: The number of levels of children for the modulestore to cache.
     None means infinite depth.  Default is to fetch no children.
     """
-    try:
-        return modulestore().get_course(course_id, depth=depth)
-    except (KeyError, ItemNotFoundError):
+    course = modulestore().get_course(course_id, depth=depth)
+    if course is None:
         raise ValueError(u"Course not found: {0}".format(course_id))
-    except InvalidLocationError:
-        raise ValueError(u"Invalid location: {0}".format(course_id))
 
 
 # TODO please rename this function to get_course_by_key at next opportunity!
@@ -62,20 +59,15 @@ def get_course_by_id(course_key, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
-    If course_id is not valid, raises a 404.
+    If such a course does not exist, raises a 404.
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    try:
-        course = modulestore().get_course(course_key, depth=depth)
-        if course:
-            return course
-        else:
-            raise Http404("Course not found.")
-    except (KeyError, ItemNotFoundError):
+    course = modulestore().get_course(course_key, depth=depth)
+    if course:
+        return course
+    else:
         raise Http404("Course not found.")
-    except InvalidLocationError:
-        raise Http404("Invalid location")
 
 
 def get_course_with_access(user, action, course_key, depth=0):
