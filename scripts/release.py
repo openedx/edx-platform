@@ -341,11 +341,11 @@ def generate_pr_table(start_ref, end_ref):
 @memoized
 def get_commits_not_in_prs(start_ref, end_ref):
     """
-    Return a list of commits that exist between start_ref and end_ref,
+    Return a tuple of commits that exist between start_ref and end_ref,
     but were not merged to the end_ref. If everyone is following the
-    pull request process correctly, this should return an empty list.
+    pull request process correctly, this should return an empty tuple.
     """
-    return list(Commit.iter_items(
+    return tuple(Commit.iter_items(
         repo,
         "{start}..{end}".format(start=start_ref, end=end_ref),
         first_parent=True, no_merges=True,
@@ -420,7 +420,7 @@ def main():
     )
     print("\n")
     print(generate_pr_table(args.previous, args.current))
-    commits_without_prs = list(get_commits_not_in_prs(args.previous, args.current))
+    commits_without_prs = get_commits_not_in_prs(args.previous, args.current)
     if commits_without_prs:
         num = len(commits_without_prs)
         plural = num > 1
