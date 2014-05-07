@@ -1874,10 +1874,12 @@ class CodeResponse(LoncapaResponse):
 
         self.initial_display = find_with_default(
             codeparam, 'initial_display', '')
+        _ = self.capa_system.i18n.ugettext
         self.answer = find_with_default(codeparam, 'answer_display',
-                                        'No answer provided.')
+                                        _(u'No answer provided.'))
 
     def get_score(self, student_answers):
+        _ = self.capa_system.i18n.ugettext
         try:
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
@@ -1893,7 +1895,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Error checking problem: no external queueing server is configured.')
+                     msg=_(u'Error checking problem: no external queueing server is configured.'))
             return cmap
 
         # Prepare xqueue request
