@@ -5,7 +5,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from api_manager.users import views as users_views
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'/*$^', users_views.UsersList.as_view()),
     url(r'^(?P<user_id>[0-9]+)$', users_views.UsersDetail.as_view()),
     url(r'^(?P<user_id>[0-9]+)/courses/*$', users_views.UsersCoursesList.as_view()),

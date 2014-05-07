@@ -2,10 +2,9 @@
 
 """
 Run these tests @ Devstack:
-    rake fasttest_lms[common/djangoapps/api_manager/tests/test_group_views.py]
+    rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
 import simplejson as json
-import unittest
 import uuid
 from random import randint
 
@@ -36,7 +35,6 @@ class CoursesApiTests(TestCase):
     """ Test suite for Courses API views """
 
     def setUp(self):
-        self.maxDiff = 3000
         self.test_server_prefix = 'https://testserver'
         self.base_courses_uri = '/api/courses'
         self.base_groups_uri = '/api/groups'
@@ -137,6 +135,7 @@ class CoursesApiTests(TestCase):
         return response
 
     def _find_item_by_class(self, items, class_name):
+        """Helper method to match a single matching item"""
         for item in items:
             if item['class'] == class_name:
                 return item
@@ -444,7 +443,7 @@ class CoursesApiTests(TestCase):
         #try a bogus course_id to test failure case
         test_course = CourseFactory.create()
         test_uri = '{}/{}/overview'.format(self.base_courses_uri, test_course.id)
-        test_updates = ItemFactory.create(
+        ItemFactory.create(
             category="about",
             parent_location=test_course.location,
             data='',
@@ -487,8 +486,7 @@ class CoursesApiTests(TestCase):
     def test_courses_updates_get_invalid_content(self):
         #try a bogus course_id to test failure case
         test_course = CourseFactory.create()
-        test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
-        test_updates = ItemFactory.create(
+        ItemFactory.create(
             category="course_info",
             parent_location=test_course.location,
             data='',
@@ -603,7 +601,6 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['enrollments']), 0)
-
 
     def test_courses_users_list_post_existing_user(self):
         # create a new user (note, this calls into the /users/ subsystem)
