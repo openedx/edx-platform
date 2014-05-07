@@ -5,7 +5,7 @@ a release-master multitool
 from __future__ import print_function, unicode_literals
 import sys
 from path import path
-from git import Repo
+from git import Repo, Commit
 from git.refs.symbolic import SymbolicReference
 import argparse
 from datetime import date, timedelta
@@ -290,13 +290,8 @@ def prs_by_email(start_ref, end_ref):
         branch = SymbolicReference(repo, ref)
         try:
             merge = get_merge_commit(branch.commit, end_ref)
-        except DoesNotExist as err:
-            message = (
-                "Warning: could not find merge commit for {commit}. "
-                "The pull request containing this commit will not be included "
-                "in the table.".format(commit=err.commit)
-            )
-            print(colorize("red", message), file=sys.stderr)
+        except DoesNotExist:
+            pass  # this commit will be included in the commits_without_prs table
         else:
             unordered_data[merge.author.email].add((pr_num, merge))
 
@@ -307,9 +302,9 @@ def prs_by_email(start_ref, end_ref):
     return ordered_data
 
 
-def generate_table(start_ref, end_ref):
+def generate_pr_table(start_ref, end_ref):
     """
-    Return a string corresponding to a commit table to embed in Confluence
+    Return a string corresponding to a pull request table to embed in Confluence
     """
     header = "|| Merged By || Author || Title || PR || JIRA || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
@@ -340,6 +335,41 @@ def generate_table(start_ref, end_ref):
                 jira=", ".join(parse_ticket_references(body)),
                 verified="",
             ))
+    return "\n".join(rows)
+
+
+@memoized
+def get_commits_not_in_prs(start_ref, end_ref):
+    """
+    Return a list of commits that exist between start_ref and end_ref,
+    but were not merged to the end_ref. If everyone is following the
+    pull request process correctly, this should return an empty list.
+    """
+    return list(Commit.iter_items(
+        repo,
+        "{start}..{end}".format(start=start_ref, end=end_ref),
+        first_parent=True, no_merges=True,
+    ))
+
+
+def generate_commit_table(start_ref, end_ref):
+    """
+    Return a string corresponding to a commit table to embed in Comfluence.
+    The commits in the table should only be commits that are not in the
+    pull request table.
+    """
+    header = "|| Author || Summary || Commit || JIRA || Verified? ||"
+    commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
+    rows = [header]
+    commits = get_commits_not_in_prs(start_ref, end_ref)
+    for commit in commits:
+        rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
+            author=commit.author.email,
+            summary=commit.summary.replace("|", "\|"),
+            commit=commit_link.format(sha=commit.hexsha),
+            jira=", ".join(parse_ticket_references(commit.message)),
+            verified="",
+        ))
     return "\n".join(rows)
 
 
@@ -389,7 +419,22 @@ def main():
         "in your release wiki page"
     )
     print("\n")
-    print(generate_table(args.previous, args.current))
+    print(generate_pr_table(args.previous, args.current))
+    commits_without_prs = list(get_commits_not_in_prs(args.previous, args.current))
+    if commits_without_prs:
+        num = len(commits_without_prs)
+        plural = num > 1
+        print("\n")
+        print(
+            "There {are} {num} {commits} in this release that did not come in "
+            "through pull requests!".format(
+                num=num, are="are" if plural else "is",
+                commits="commits" if plural else "commit"
+            )
+        )
+        print("\n")
+        print(generate_commit_table(args.previous, args.current))
+
 
 if __name__ == "__main__":
     main()
