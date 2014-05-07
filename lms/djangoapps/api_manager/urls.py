@@ -12,11 +12,12 @@ from django.conf.urls import include, patterns, url
 
 from api_manager.system import views as system_views
 
-urlpatterns = patterns('',
-                       url(r'^$', system_views.ApiDetail.as_view()),
-                       url(r'^system$', system_views.SystemDetail.as_view()),
-                       url(r'^users/*', include('api_manager.users.urls')),
-                       url(r'^groups/*', include('api_manager.groups.urls')),
-                       url(r'^sessions/*', include('api_manager.sessions.urls')),
-                       url(r'^courses/*', include('api_manager.courses.urls')),
-                       )
+urlpatterns = patterns(
+    '',
+    url(r'^$', system_views.ApiDetail.as_view()),
+    url(r'^system$', system_views.SystemDetail.as_view()),
+    url(r'^users/*', include('api_manager.users.urls')),
+    url(r'^groups/*', include('api_manager.groups.urls')),
+    url(r'^sessions/*', include('api_manager.sessions.urls')),
+    url(r'^courses/*', include('api_manager.courses.urls')),
+)

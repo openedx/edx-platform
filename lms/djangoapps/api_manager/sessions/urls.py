@@ -5,7 +5,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from api_manager.sessions import views as sessions_views
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'/*$^', sessions_views.SessionsList.as_view()),
     url(r'^(?P<session_id>[a-z0-9]+)$', sessions_views.SessionsDetail.as_view()),
 )

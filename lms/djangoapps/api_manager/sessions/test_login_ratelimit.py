@@ -19,7 +19,6 @@ TEST_API_KEY = str(uuid.uuid4())
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False})
-
 class SessionApiRateLimitingProtectionTest(TestCase):
     """
     Test api_manager.session.login.ratelimit
@@ -36,7 +35,6 @@ class SessionApiRateLimitingProtectionTest(TestCase):
         self.client = Client()
         cache.clear()
         self.session_url = '/api/sessions'
-
 
     def test_login_ratelimiting_protection(self):
         """ Try (and fail) login user 30 times on invalid password """
