@@ -630,7 +630,7 @@ def instructor_dashboard(request, course_id):
 
     elif 'Download CSV of all student profile data' in action:
         enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_key.to_deprecated_string(),
+            courseenrollment__course_id=course_key,
             courseenrollment__is_active=1,
         ).order_by('username').select_related("profile")
         profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
@@ -661,7 +661,7 @@ def instructor_dashboard(request, course_id):
         try:
             module_state_key = course_key.make_usage_key(block_type='problem', name=problem_to_dump)
             smdat = StudentModule.objects.filter(
-                course_id=course_key.to_deprecated_string(),
+                course_id=course_key,
                 module_state_key=module_state_key
             )
             smdat = smdat.order_by('student')
@@ -795,7 +795,7 @@ def instructor_dashboard(request, course_id):
     # enrollment
 
     elif action == 'List students who may enroll but may not have yet signed up':
-        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key.to_deprecated_string())
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
         datatable = {'header': ['StudentEmail']}
         datatable['data'] = [[x.email] for x in ceaset]
         datatable['title'] = action
@@ -1484,14 +1484,14 @@ def _do_enroll_students(course, course_key, students, overload=False, auto_enrol
     status = dict([x, 'unprocessed'] for x in new_students)
 
     if overload:  # delete all but staff
-        todelete = CourseEnrollment.objects.filter(course_id=course_key.to_deprecated_string())
+        todelete = CourseEnrollment.objects.filter(course_id=course_key)
         for ce in todelete:
             if not has_access(ce.user, 'staff', course) and ce.user.email.lower() not in new_students_lc:
                 status[ce.user.email] = 'deleted'
                 ce.deactivate()
             else:
                 status[ce.user.email] = 'is staff'
-        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key.to_deprecated_string())
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
         for cea in ceaset:
             status[cea.email] = 'removed from pending enrollment list'
         ceaset.delete()
