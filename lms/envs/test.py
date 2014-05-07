@@ -298,9 +298,6 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
 
-### QUERYABLE APP ###
-INSTALLED_APPS += ('queryable_student_module',)
-
 # set up some testing for microsites
 MICROSITE_CONFIGURATION = {
     "test_microsite": {
