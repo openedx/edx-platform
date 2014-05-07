@@ -125,6 +125,31 @@ def get_github_creds():
     return None
 
 
+def create_github_creds():
+    headers = {"User-Agent": "edx-release"}
+    payload = {"note": "edx-release"}
+    username = raw_input("Github username: ")
+    password = getpass.getpass("Github password: ")
+    response = requests.post(
+        "https://api.github.com/authorizations",
+        auth=(username, password),
+        headers=headers, data=json.dumps(payload),
+    )
+    # is the user using two-factor authentication?
+    otp_header = response.headers.get("X-GitHub-OTP")
+    if not response.ok and otp_header and otp_header.startswith("required;"):
+        # get two-factor code, redo the request
+        headers["X-GitHub-OTP"] = raw_input("Two-factor authentication code: ")
+        response = requests.post(
+            "https://api.github.com/authorizations",
+            auth=(username, password),
+            headers=headers, data=json.dumps(payload),
+        )
+    if not response.ok:
+        raise requests.exceptions.RequestException(response.json()["message"])
+    return (username, response.json()["token"])
+
+
 def ensure_github_creds(attempts=3):
     """
     Make sure that we have Github OAuth credentials. This will check the user's
@@ -140,31 +165,24 @@ def ensure_github_creds(attempts=3):
     # Looks like we need to create the OAuth creds
     # https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
     print("We need to set up OAuth authentication with Github's API. "
-          "Your credentials will not be stored.", file=sys.stderr)
-    headers = {"User-Agent": "edx-release"}
-    payload = {"note": "edx-release"}
+          "Your password will not be stored.", file=sys.stderr)
+    token = None
     for _ in range(attempts):
-        username = raw_input("Github username: ")
-        password = getpass.getpass("Github password: ")
-        response = requests.post(
-            "https://api.github.com/authorizations",
-            auth=(username, password),
-            headers=headers, data=json.dumps(payload),
-        )
-        if not response.ok:
+        try:
+            username, token = create_github_creds()
+        except requests.exceptions.RequestException as e:
             print(
-                "Invalid authentication: {}".format(response.json()["message"]),
+                "Invalid authentication: {}".format(e.message),
                 file=sys.stderr,
             )
             continue
         else:
             break
-    if not response.ok:
+    if token:
+        print("Successfully authenticated to Github", file=sys.stderr)
+    if not token:
         print("Too many invalid authentication attempts.", file=sys.stderr)
         return False
-
-    # got the token!
-    token = response.json()["token"]
 
     config_file = path("~/.config/edx-release").expand()
     # make sure parent directory exists
