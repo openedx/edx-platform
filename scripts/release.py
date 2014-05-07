@@ -404,12 +404,24 @@ def generate_email(start_ref, end_ref, release_date=None):
     email = """
         To: {emails}
 
-        You've made changes that are about to be released. All of the commits
-        that you either authored or committed are listed below. Please verify them on
-        stage.edx.org and stage-edge.edx.org.
+        You merged at least one pull request for edx-platform that is going out
+        in this upcoming release, and you are responsible for verifying those
+        changes on the staging servers before the code is released. Please go
+        to the release page to do so:
 
-        Please record your notes on https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
-        and add any bugs found to the Release Candidate Bugs section.
+        https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
+
+        The staging servers are:
+
+        https://www.stage.edx.org
+        https://stage-edge.edx.org
+
+        Note that you are responsible for verifying any pull requests that you
+        merged, whether you wrote the code or not. (If you didn't write the code,
+        you can and should try to get the person who wrote the code to help
+        verify the changes -- but even if you can't, you're still responsible!)
+        If you find any bugs, please notify me and record the bugs on the
+        release page. Thanks!
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
