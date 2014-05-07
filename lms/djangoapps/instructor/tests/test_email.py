@@ -116,7 +116,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     Check for email view on the new instructor dashboard
     """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey.from_deprecated_string('edX/toy/2012_Fall')
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # Create instructor account
         instructor = AdminFactory.create()

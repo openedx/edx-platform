@@ -779,7 +779,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         # (comment because pylint C0103)
         # self.maxDiff = None
 
-    def tearDown(self):
+    def addCleanup(self):
         """
         Undo all patches.
         """

@@ -56,6 +56,7 @@ class Command(BaseCommand):
         try:
             course = CourseKey.from_string(course_id)
         except InvalidKeyError:
+            log.warning("Course id %s could not be parsed as a CourseKey; falling back to SSCK.from_dep_str", course_id)
             course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         if options['add'] and options['del']:

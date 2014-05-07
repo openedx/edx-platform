@@ -33,7 +33,7 @@ from .test_tools import msk_from_problem_urlname
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('robot', 'fake', 'course')
+        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def test_mes_create(self):
         """
