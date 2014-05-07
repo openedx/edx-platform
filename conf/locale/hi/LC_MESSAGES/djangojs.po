@@ -6,6 +6,7 @@
 # Translators:
 # ammubhave <ammubhave@gmail.com>, 2013-2014
 # anantvima <anant.vima@anu.edu.au>, 2014
+# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # sarina <sarina@edx.org>, 2014
@@ -18,14 +19,15 @@
 # Translators:
 # anantvima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# ria1234 <contactpayal@yahoo.com.au>, 2014
 # Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
-"PO-Revision-Date: 2014-03-24 14:25+0000\n"
-"Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
+"POT-Creation-Date: 2014-04-27 11:10-0400\n"
+"PO-Revision-Date: 2014-04-26 15:31+0000\n"
+"Last-Translator: Chandra Shekhar Sharma <shekharsharma041@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,6 +37,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "ठीक"
@@ -43,6 +46,8 @@ msgstr "ठीक"
 #: cms/static/js/base.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -104,13 +109,13 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
-msgstr ""
+msgstr "जवाब छिपाएं"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr ""
+msgstr "जवाब देखें"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
@@ -274,7 +279,7 @@ msgstr "विडियो समाप्त"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s घंटे"
+msgstr[0] "%(value)s घंटा"
 msgstr[1] "%(value)s घंटे"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
@@ -355,6 +360,8 @@ msgstr " चर्चा दिखाएं"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "माफ़ करें"
@@ -417,22 +424,16 @@ msgid "vote"
 msgstr "वोट"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid ""
-"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
-msgid_plural ""
-"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgid "vote (click to remove your vote)"
+msgid_plural "votes (click to remove your vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s वोट (वोट हटाने के लिए क्लिक करें)%(endSrSpan)s"
 msgstr[1] ""
-"%(voteNum)s%(startSrSpan)s वोट (वोट हटाने के लिए क्लिक करें)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
-msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
+msgid "vote (click to vote)"
+msgid_plural "votes (click to vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s मतदान (मतदान के लिए क्लिक करें)%(endSrSpan)s"
 msgstr[1] ""
-"%(voteNum)s%(startSrSpan)s वोट (वोट करने के लिए क्लिक करें)%(endSrSpan)s "
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -498,6 +499,11 @@ msgid "Pin Thread"
 msgstr "इस कड़ी को इंगित करें"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid ""
+"The thread you selected has been deleted. Please select another thread."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
 msgstr "जवाब लोड करने में कुछ असुविधा हुई। कृपया दोबारा पेज लोड करें।"
 
@@ -532,6 +538,10 @@ msgstr "अगला जवाब %(numResponses)s लोड करें"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
 msgstr "क्या आप वाकई इस पोस्ट को हटाना चाहते हैं?"
+
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -568,7 +578,7 @@ msgstr "क्या आप वाकई इस जवाब को हटान
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr "अभी से पहले %s "
+msgstr "अभी से %s पहले "
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
@@ -595,8 +605,8 @@ msgstr "तकरीबन एक घंटा"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "तकरीबन %d घंटे"
-msgstr[1] "तकरीबन %d घंटा"
+msgstr[0] "तकरीबन %d घंटा"
+msgstr[1] "तकरीबन %d घंटे"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -857,11 +867,11 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
-msgstr ""
+msgstr "उपयोगकर्ता नाम"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Email"
-msgstr ""
+msgstr "ई-मेल"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -934,18 +944,19 @@ msgstr ""
 "बीटा परीक्षक के लिए पदोन्नत होने के लिए पहले उपयोगकर्ताओं के खाते को बनाना "
 "और सक्रिय करना ज़रूरी है।"
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
-msgstr "इन ई-मेल पते के साथ जुड़े उपयोगकर्ताओं को खोजा नहीं जा सका:"
+msgid "Could not find users associated with the following identifiers:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "उपयोगकर्ताओं का नामांकन/अनामांकन करने में त्रुटि। "
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
-msgstr "निम्नलिखित ई-मेल पते अमान्य हैं:"
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
@@ -1083,7 +1094,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem urlname."
-msgstr "कृपया समस्या का यू आर एल नाम दर्ज करें"
+msgstr "कृपया समस्या का यू आर एल दर्ज करें"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1203,13 +1214,13 @@ msgstr "इस छात्र और समस्या के काम के
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Type"
-msgstr ""
+msgstr "कार्य प्रकार"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task inputs"
-msgstr ""
+msgstr "टास्क इनपुट"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -1221,19 +1232,19 @@ msgstr ""
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Requester"
-msgstr ""
+msgstr "निवेदक"
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Submitted"
-msgstr ""
+msgstr "प्रस्तुत कर दिया गया"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Duration (sec)"
-msgstr ""
+msgstr "अवधि (sec)"
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
@@ -1251,7 +1262,7 @@ msgstr ""
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Progress"
-msgstr ""
+msgstr "कार्य प्रगति"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
@@ -1259,7 +1270,7 @@ msgstr "ग्रेड सेव किए गए। ग्रेड करन�
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr "प्रश्न का नाम"
+msgstr "समस्या का नाम"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
@@ -1319,21 +1330,17 @@ msgid "(Show)"
 msgstr "(दिखाएं)"
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgid "Insert Hyperlink"
 msgstr ""
-"यहां<p><b>हाइपरलिंक डालें</b></p><p>http://example.com/ \"optional "
-"title\"</p>"
+
+#. Translators: Please keep the quotation marks (") around this text
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
+msgid "\"optional title\""
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Image (upload file or type "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
+msgid "Insert Image (upload file or type url)"
 msgstr ""
-"<p><b>इमेज डालें ( फ़ाइल अपलोड करें या यू आर एल टाइप "
-"करें)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -1444,17 +1451,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "स्टूडियो को आपके काम को बचाने में परेशानी हो रही है|"
 
-#: cms/static/coffee/src/views/module_edit.js
-msgid "<em>Editing:</em> %s"
-msgstr "<em>संपादन:</em> %s "
-
-#: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
+#: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
 msgstr "संग्रह कर रहा है&hellip;"
 
@@ -1471,6 +1474,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
 msgstr ""
 
@@ -1478,19 +1482,19 @@ msgstr ""
 msgid "Adding&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
 msgstr "यह नष्ट करें?"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "इस घटक को हटाना स्थायी है और उसे बदला नहीं जा सकता है."
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr "हाँ, यह नष्ट करें"
 
@@ -1516,7 +1520,7 @@ msgstr "इस क्षेत्र में किसी भी रिक्�
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
+msgstr "कृपया इस क्षेत्र में खाली स्थान या विशेष अक्षरों का प्रयोग न करें।"
 
 #: cms/static/js/index.js
 msgid ""
@@ -1652,6 +1656,10 @@ msgstr "इस क्रिया को पूर्ववत नहीं क�
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "“<%= name %>” पर नयी पीडीऍफ़ अपलोड करें"
 
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
+msgstr ""
+
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
@@ -1669,6 +1677,10 @@ msgstr ""
 "फ़ाइल फॉर्मेट समर्थित नहीं है. कृपया <code>tar.gz</code> एक्सटेंशन की फाइल "
 "अपलोड करें."
 
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
+msgstr "फ़ाइल अपलोड करें"
+
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
 msgstr "सभी वर्गों को संक्षिप्त करें"
@@ -1679,7 +1691,7 @@ msgstr "सभी वर्गों का विस्तार करें"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr "रिलीज की तारीख:"
+msgstr "रीलीज़ की तारीख़:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
@@ -1687,7 +1699,7 @@ msgstr "{month}/{day}/{year} को {hour}:{minute} UTC बजे"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr "अनुभाग की रिलीज की तारीख संपादित करें"
+msgstr "अनुभाग की रीलीज़ की तारीख़ बदलें"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
@@ -1695,11 +1707,11 @@ msgstr "वर्गीकृत नहीं है"
 
 #: cms/static/js/views/paging.js
 msgid "ascending"
-msgstr "आरोही"
+msgstr "बड़ता हुआ"
 
 #: cms/static/js/views/paging.js
 msgid "descending"
-msgstr "अवरोही"
+msgstr "घटता हुआ"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
@@ -1733,6 +1745,10 @@ msgid "Deleting"
 msgstr "नष्ट हो रहा है"
 
 #: cms/static/js/views/uploads.js
+msgid "Upload"
+msgstr ""
+
+#: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
 msgstr "त्रुटि के लिए हमें खेद है"
 
@@ -1764,6 +1780,26 @@ msgstr "परिवर्तन सेव करें"
 msgid "Your changes have been saved."
 msgstr "आपके द्वारा किये गए परिवर्तन सेव किये जा चुके हैं."
 
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr "संपादक"
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Settings"
+msgstr "सेटिंग्स"
+
+#: cms/static/js/views/modals/base_modal.js
+msgid "Save"
+msgstr "सेव करें"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -1792,3 +1828,13 @@ msgstr "अपने पाठ्यक्रम की छवि अपलो�
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
 msgstr "फाइलें JPEG या PNG फॉर्मेट में होनी चाहियें."
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation"
+msgstr ""

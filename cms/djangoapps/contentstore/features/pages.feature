@@ -15,10 +15,6 @@ Feature: CMS.Pages
         When I confirm the prompt
         Then I should not see any static pages
 
-    Scenario: Users can see built-in pages
-        Given I have opened the pages page in a new course
-        Then I should see the default built-in pages
-
     # Safari won't update the name properly
     @skip_safari
     Scenario: Users can edit static pages
@@ -31,7 +27,36 @@ Feature: CMS.Pages
     @skip_safari
     Scenario: Users can reorder static pages
         Given I have created two different static pages
-        When I reorder the static tabs
-        Then the static tabs are in the reverse order
+        When I drag the first static page to the last
+        Then the static pages are switched
         And I reload the page
-        Then the static tabs are in the reverse order
+        Then the static pages are switched
+
+    Scenario: Users can reorder built-in pages
+        Given I have opened the pages page in a new course
+        Then the built-in pages are in the default order
+        When I drag the first page to the last
+        Then the built-in pages are switched
+        And I reload the page
+        Then the built-in pages are switched
+
+    Scenario: Users can reorder built-in pages amongst static pages
+        Given I have created two different static pages
+        Then the pages are in the default order
+        When I drag the first page to the last
+        Then the pages are switched
+        And I reload the page
+        Then the pages are switched
+
+    Scenario: Users can toggle visibility on hideable pages
+        Given I have opened the pages page in a new course
+        Then I should see the "wiki" page as "visible"
+        When I toggle the visibility of the "wiki" page
+        Then I should see the "wiki" page as "hidden"
+        And I reload the page
+        Then I should see the "wiki" page as "hidden"
+        When I toggle the visibility of the "wiki" page
+        Then I should see the "wiki" page as "visible"
+        And I reload the page
+        Then I should see the "wiki" page as "visible"
+

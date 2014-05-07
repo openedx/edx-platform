@@ -1,8 +1,8 @@
-define(["js/views/baseview", "underscore", "jquery", "js/views/edit_textbook", "js/views/show_textbook"],
-        function(BaseView, _, $, EditTextbookView, ShowTextbookView) {
+define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_textbook"],
+        function(BaseView, $, EditTextbookView, ShowTextbookView) {
     var ListTextbooks = BaseView.extend({
         initialize: function() {
-            this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
+            this.emptyTemplate = this.loadTemplate('no-textbooks');
             this.listenTo(this.collection, 'all', this.render);
             this.listenTo(this.collection, 'destroy', this.handleDestroy);
         },

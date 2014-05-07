@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
 import unittest
 from uuid import uuid4
@@ -548,3 +549,15 @@ class TestTranscript(unittest.TestCase):
     def test_convert_srt_to_sjson(self):
         with self.assertRaises(NotImplementedError):
             transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')
+
+
+class TestSubsFilename(unittest.TestCase):
+    """
+    Tests for subs_filename funtion.
+    """
+
+    def test_unicode(self):
+        name = transcripts_utils.subs_filename(u"˙∆©ƒƒƒ")
+        self.assertEqual(name, u'subs_˙∆©ƒƒƒ.srt.sjson')
+        name = transcripts_utils.subs_filename(u"˙∆©ƒƒƒ", 'uk')
+        self.assertEqual(name, u'uk_subs_˙∆©ƒƒƒ.srt.sjson')

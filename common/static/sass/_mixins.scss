@@ -106,6 +106,7 @@
 %ui-disabled {
   pointer-events: none;
   outline: none;
+  cursor: default;
 }
 
 // extends - UI - depth levels
@@ -268,6 +269,7 @@
 .ui-loading {
   @include animation(fadeIn $tmg-f2 linear 1);
   @extend %ui-well;
+  @extend %t-copy-base;
   opacity: .6;
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
@@ -281,6 +283,10 @@
   .copy {
     padding-left: ($baseline/4);
   }
+}
+
+.is-hidden {
+  display: none;
 }
 
 // ====================

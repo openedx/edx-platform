@@ -485,6 +485,7 @@ body.course.unit,.view-unit {
 
       .row {
         margin-bottom: 0px;
+        overflow: hidden;
       }
 
       // Module Actions, also used for Pages
@@ -608,6 +609,41 @@ body.course.unit,.view-unit {
     display: block;
   }
 
+  .file-uploader {
+    .upload-setting {
+      @extend %ui-btn-flat-outline;
+      @extend %t-action3;
+      @include box-sizing(border-box);
+      display: inline-block;
+      padding: ($baseline/2);
+      font-weight: 600;
+      width: 49%;
+      margin-right: 2%;
+    }
+
+    .download-setting {
+      @extend %ui-btn-non;
+      @extend %t-action4;
+      @include box-sizing(border-box);
+      display: inline-block;
+      padding: ($baseline/2);
+      font-weight: 600;
+      width: 49%;
+      text-align: center;
+      color: $blue;
+
+      &:hover {
+        background-color: $blue;
+      }
+    }
+
+    .wrapper-uploader-actions {
+      width: 45%;
+      display: inline-block;
+      min-width: ($baseline*5);
+    }
+  }
+
   //settings-list
   .list-input.settings-list {
     margin: 0;
@@ -632,13 +668,14 @@ body.course.unit,.view-unit {
 
     //component-setting-entry
     .field.comp-setting-entry {
-      background-color: $white;
-      padding: $baseline;
-      border-bottom: 1px solid $gray-l2;
       opacity: 0.7;
+      margin: 0 $baseline;
+      border-top: 1px solid $gray-l4;
+      background-color: $white;
+      padding: $baseline ($baseline/2);
 
-      &:last-child {
-        //margin-bottom: 0;
+      &:first-child {
+        border-top: 0;
       }
 
       //no required component settings currently
@@ -824,11 +861,6 @@ body.course.unit,.view-unit {
           }
         }
 
-        // actions
-        .create-action, .remove-action, .setting-clear {
-
-        }
-
         .setting-clear {
           vertical-align: top;
           margin-top: ($baseline/4);
@@ -845,11 +877,6 @@ body.course.unit,.view-unit {
           *[class^="icon-"] {
             margin-right: ($baseline/4);
           }
-
-          // STATE: disabled
-          &.is-disabled {
-
-          }
         }
 
         .remove-setting {
@@ -861,11 +888,6 @@ body.course.unit,.view-unit {
 
           &:hover {
             color: $blue;
-          }
-
-          // STATE: disabled
-          &.is-disabled {
-
           }
         }
       }
@@ -1051,6 +1073,7 @@ body.unit {
     padding: $baseline/2 $baseline;
   }
 
+
   .unit-actions {
     border-bottom: none;
     padding-bottom: 0;
@@ -1068,8 +1091,16 @@ body.unit {
     div {
       margin-top: 15px;
     }
-  }
 
+    // actions - publish/edit
+    .publish-draft {
+      @extend %action;
+    }
+
+    .create-draft {
+      @extend %action;
+    }
+  }
 
 
   input[type="radio"] {
@@ -1099,6 +1130,7 @@ body.unit {
 
   .delete-draft {
     display: inline-block;
+    vertical-align: top;
   }
 
   .delete-button,
@@ -1325,17 +1357,18 @@ body.unit {
 // ====================
 
 // Latex Compiler
+
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
 .launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
   background-color: $white;
   padding: $baseline/2 0 $baseline/2 $baseline;
   border-bottom: 1px solid $gray-l2;
-  opacity: 0.8;
-
-
-  &:hover {
-    @include transition(opacity $tmg-f2 ease-in-out 0s);
-    opacity: 1.0s;
-  }
 }
 
 //  hides latex compiler button if settings mode is-active
@@ -1354,7 +1387,6 @@ body.unit .xblock-type-container {
   box-shadow: none;
 
   &:hover {
-    @include transition(all $tmg-f2 linear 0s);
     border-color: $blue;
 
     .container-drag {
@@ -1364,7 +1396,6 @@ body.unit .xblock-type-container {
   }
 
   .xblock-header {
-    margin-bottom: 0;
     border-bottom: 0;
     border-radius: ($baseline/5);
 
@@ -1401,6 +1432,10 @@ body.unit .xblock-type-container {
 body.unit .component {
   .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
     margin-top: ($baseline*1.5);
+  }
+  .discussion-preview {
+    font-style: italic;
+    color: $mediumGrey;
   }
 }
 

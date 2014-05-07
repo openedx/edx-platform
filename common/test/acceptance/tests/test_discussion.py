@@ -2,96 +2,133 @@
 Tests for discussion pages
 """
 
+from uuid import uuid4
+
 from .helpers import UniqueCourseTest
 from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.lms.discussion_single_thread import DiscussionSingleThreadPage
-from ..fixtures.course import CourseFixture
-from ..fixtures.discussion import SingleThreadViewFixture, Thread, Response, Comment
+from ..pages.lms.courseware import CoursewarePage
+from ..pages.lms.discussion import (
+    DiscussionTabSingleThreadPage,
+    InlineDiscussionPage,
+    InlineDiscussionThreadPage,
+    DiscussionUserProfilePage
+)
+from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..fixtures.discussion import SingleThreadViewFixture, UserProfileViewFixture, Thread, Response, Comment
 
 
-class DiscussionSingleThreadTest(UniqueCourseTest):
+class DiscussionResponsePaginationTestMixin(object):
+    """
+    A mixin containing tests for response pagination for use by both inline
+    discussion and the discussion tab
+    """
+
+    def setup_thread(self, num_responses, **thread_kwargs):
+        """
+        Create a test thread with the given number of responses, passing all
+        keyword arguments through to the Thread fixture, then invoke
+        setup_thread_page.
+        """
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(id=thread_id, commentable_id=self.discussion_id, **thread_kwargs)
+        )
+        for i in range(num_responses):
+            thread_fixture.addResponse(Response(id=str(i), body=str(i)))
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+
+    def assert_response_display_correct(self, response_total, displayed_responses):
+        """
+        Assert that various aspects of the display of responses are all correct:
+        * Text indicating total number of responses
+        * Presence of "Add a response" button
+        * Number of responses actually displayed
+        * Presence and text of indicator of how many responses are shown
+        * Presence and text of button to load more responses
+        """
+        self.assertEqual(
+            self.thread_page.get_response_total_text(),
+            str(response_total) + " responses"
+        )
+        self.assertEqual(self.thread_page.has_add_response_button(), response_total != 0)
+        self.assertEqual(self.thread_page.get_num_displayed_responses(), displayed_responses)
+        self.assertEqual(
+            self.thread_page.get_shown_responses_text(),
+            (
+                None if response_total == 0 else
+                "Showing all responses" if response_total == displayed_responses else
+                "Showing first {} responses".format(displayed_responses)
+            )
+        )
+        self.assertEqual(
+            self.thread_page.get_load_responses_button_text(),
+            (
+                None if response_total == displayed_responses else
+                "Load all responses" if response_total - displayed_responses < 100 else
+                "Load next 100 responses"
+            )
+        )
+
+    def test_pagination_no_responses(self):
+        self.setup_thread(0)
+        self.assert_response_display_correct(0, 0)
+
+    def test_pagination_few_responses(self):
+        self.setup_thread(5)
+        self.assert_response_display_correct(5, 5)
+
+    def test_pagination_two_response_pages(self):
+        self.setup_thread(50)
+        self.assert_response_display_correct(50, 25)
+
+        self.thread_page.load_more_responses()
+        self.assert_response_display_correct(50, 50)
+
+    def test_pagination_exactly_two_response_pages(self):
+        self.setup_thread(125)
+        self.assert_response_display_correct(125, 25)
+
+        self.thread_page.load_more_responses()
+        self.assert_response_display_correct(125, 125)
+
+    def test_pagination_three_response_pages(self):
+        self.setup_thread(150)
+        self.assert_response_display_correct(150, 25)
+
+        self.thread_page.load_more_responses()
+        self.assert_response_display_correct(150, 125)
+
+        self.thread_page.load_more_responses()
+        self.assert_response_display_correct(150, 150)
+
+    def test_add_response_button(self):
+        self.setup_thread(5)
+        self.assertTrue(self.thread_page.has_add_response_button())
+        self.thread_page.click_add_response_button()
+
+    def test_add_response_button_closed_thread(self):
+        self.setup_thread(5, closed=True)
+        self.assertFalse(self.thread_page.has_add_response_button())
+
+
+class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
     """
 
     def setUp(self):
-        super(DiscussionSingleThreadTest, self).setUp()
+        super(DiscussionTabSingleThreadTest, self).setUp()
+        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
 
         # Create a course to register for
         CourseFixture(**self.course_info).install()
 
-        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-    def setup_thread(self, thread, num_responses):
-        view = SingleThreadViewFixture(thread=thread)
-        for i in range(num_responses):
-            view.addResponse(Response(id=str(i), body=str(i)))
-        view.push()
-
-    def test_no_responses(self):
-        self.setup_thread(Thread(id="0_responses"), 0)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "0_responses")
-        page.visit()
-        self.assertEqual(page.get_response_total_text(), "0 responses")
-        self.assertFalse(page.has_add_response_button())
-        self.assertEqual(page.get_num_displayed_responses(), 0)
-        self.assertEqual(page.get_shown_responses_text(), None)
-        self.assertIsNone(page.get_load_responses_button_text())
-
-    def test_few_responses(self):
-        self.setup_thread(Thread(id="5_responses"), 5)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "5_responses")
-        page.visit()
-        self.assertEqual(page.get_response_total_text(), "5 responses")
-        self.assertEqual(page.get_num_displayed_responses(), 5)
-        self.assertEqual(page.get_shown_responses_text(), "Showing all responses")
-        self.assertIsNone(page.get_load_responses_button_text())
-
-    def test_two_response_pages(self):
-        self.setup_thread(Thread(id="50_responses"), 50)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "50_responses")
-        page.visit()
-        self.assertEqual(page.get_response_total_text(), "50 responses")
-        self.assertEqual(page.get_num_displayed_responses(), 25)
-        self.assertEqual(page.get_shown_responses_text(), "Showing first 25 responses")
-        self.assertEqual(page.get_load_responses_button_text(), "Load all responses")
-
-        page.load_more_responses()
-        self.assertEqual(page.get_num_displayed_responses(), 50)
-        self.assertEqual(page.get_shown_responses_text(), "Showing all responses")
-        self.assertEqual(page.get_load_responses_button_text(), None)
-
-    def test_three_response_pages(self):
-        self.setup_thread(Thread(id="150_responses"), 150)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "150_responses")
-        page.visit()
-        self.assertEqual(page.get_response_total_text(), "150 responses")
-        self.assertEqual(page.get_num_displayed_responses(), 25)
-        self.assertEqual(page.get_shown_responses_text(), "Showing first 25 responses")
-        self.assertEqual(page.get_load_responses_button_text(), "Load next 100 responses")
-
-        page.load_more_responses()
-        self.assertEqual(page.get_num_displayed_responses(), 125)
-        self.assertEqual(page.get_shown_responses_text(), "Showing first 125 responses")
-        self.assertEqual(page.get_load_responses_button_text(), "Load all responses")
-
-        page.load_more_responses()
-        self.assertEqual(page.get_num_displayed_responses(), 150)
-        self.assertEqual(page.get_shown_responses_text(), "Showing all responses")
-        self.assertEqual(page.get_load_responses_button_text(), None)
-
-    def test_add_response_button(self):
-        self.setup_thread(Thread(id="5_responses"), 5)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "5_responses")
-        page.visit()
-        self.assertTrue(page.has_add_response_button())
-        page.click_add_response_button()
-
-    def test_add_response_button_closed_thread(self):
-        self.setup_thread(Thread(id="5_responses_closed", closed=True), 5)
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "5_responses_closed")
-        page.visit()
-        self.assertFalse(page.has_add_response_button())
+    def setup_thread_page(self, thread_id):
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
+        self.thread_page.visit()
 
 
 class DiscussionCommentDeletionTest(UniqueCourseTest):
@@ -119,7 +156,7 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
     def test_comment_deletion_as_student(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_deletable("comment_self_author"))
         self.assertTrue(page.is_comment_visible("comment_other_author"))
@@ -129,7 +166,7 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
     def test_comment_deletion_as_moderator(self):
         self.setup_user(roles=['Moderator'])
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_deletable("comment_self_author"))
         self.assertTrue(page.is_comment_deletable("comment_other_author"))
@@ -168,7 +205,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_edit_comment_as_student(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_visible("comment_other_author"))
@@ -178,7 +215,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_editable("comment_other_author"))
@@ -188,7 +225,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         original_body = page.get_comment_body("comment_self_author")
@@ -200,7 +237,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         """Only one editor should be visible at a time within a single response"""
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_editable("comment_other_author"))
@@ -224,3 +261,147 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         page.cancel_comment_edit("comment_self_author", original_body)
         self.assertFalse(page.is_comment_editor_visible("comment_self_author"))
         self.assertTrue(page.is_add_comment_visible("response1"))
+
+
+class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+    """
+    Tests for inline discussions
+    """
+
+    def setUp(self):
+        super(InlineDiscussionTest, self).setUp()
+        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+        CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                            metadata={"discussion_id": self.discussion_id}
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        CoursewarePage(self.browser, self.course_id).visit()
+        self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+
+    def setup_thread_page(self, thread_id):
+        self.discussion_page.expand_discussion()
+        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
+        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
+        self.thread_page.expand()
+
+    def test_initial_render(self):
+        self.assertFalse(self.discussion_page.is_discussion_expanded())
+
+    def test_expand_discussion_empty(self):
+        self.discussion_page.expand_discussion()
+        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
+
+
+class DiscussionUserProfileTest(UniqueCourseTest):
+    """
+    Tests for user profile page in discussion tab.
+    """
+
+    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PROFILED_USERNAME = "profiled-user"
+
+    def setUp(self):
+        super(DiscussionUserProfileTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        # The following line creates a user enrolled in our course, whose
+        # threads will be viewed, but not the one who will view the page.
+        # It isn't necessary to log them in, but using the AutoAuthPage 
+        # saves a lot of code.   
+        self.profiled_user_id = AutoAuthPage(
+            self.browser,
+            username=self.PROFILED_USERNAME,
+            course_id=self.course_id
+        ).visit().get_user_id()
+        # now create a second user who will view the profile.
+        self.user_id = AutoAuthPage(
+            self.browser,
+            course_id=self.course_id
+        ).visit().get_user_id()
+
+    def check_pages(self, num_threads):
+        # set up the stub server to return the desired amount of thread results
+        threads = [Thread(id=uuid4().hex) for _ in range(num_threads)]
+        UserProfileViewFixture(threads).push()
+        # navigate to default view (page 1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
+
+        current_page = 1
+        total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
+        all_pages = range(1, total_pages + 1)
+
+        def _check_page():
+            # ensure the page being displayed as "current" is the expected one 
+            self.assertEqual(page.get_current_page(), current_page)
+            # ensure the expected threads are being shown in the right order
+            threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]
+            self.assertEqual(page.get_shown_thread_ids(), [t["id"] for t in threads_expected])
+            # ensure the clickable page numbers are the expected ones
+            self.assertEqual(page.get_clickable_pages(), [
+                p for p in all_pages
+                if p != current_page
+                and p - 2 <= current_page <= p + 2
+                or (current_page > 2 and p == 1)
+                or (current_page < total_pages and p == total_pages)
+            ])
+            # ensure the previous button is shown, but only if it should be.
+            # when it is shown, make sure it works.
+            if current_page > 1:
+                self.assertTrue(page.is_prev_button_shown(current_page - 1))
+                page.click_prev_page()
+                self.assertEqual(page.get_current_page(), current_page - 1)
+                page.click_next_page()
+                self.assertEqual(page.get_current_page(), current_page)
+            else:
+                self.assertFalse(page.is_prev_button_shown())
+            # ensure the next button is shown, but only if it should be.
+            if current_page < total_pages:
+                self.assertTrue(page.is_next_button_shown(current_page + 1))
+            else:
+                self.assertFalse(page.is_next_button_shown())
+
+        # click all the way up through each page
+        for i in range(current_page, total_pages):
+            _check_page()
+            if current_page < total_pages:
+                page.click_on_page(current_page + 1)
+                current_page += 1
+
+        # click all the way back down
+        for i in range(current_page, 0, -1):
+            _check_page()
+            if current_page > 1:
+                page.click_on_page(current_page - 1)
+                current_page -= 1
+
+    def test_0_threads(self):
+        self.check_pages(0)
+
+    def test_1_thread(self):
+        self.check_pages(1)
+
+    def test_20_threads(self):
+        self.check_pages(20)
+
+    def test_21_threads(self):
+        self.check_pages(21)
+
+    def test_151_threads(self):
+        self.check_pages(151)

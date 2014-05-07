@@ -479,10 +479,14 @@ esac
 output "Installing edX pre-requirements"
 pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 
+output "Installing edX paver-requirements"
+pip install -r $BASE/edx-platform/requirements/edx/paver.txt
+
+
 output "Installing edX requirements"
 # Install prereqs
 cd $BASE/edx-platform
-rake install_prereqs
+paver install_prereqs
 
 # Final dependecy
 output "Finishing Touches"
@@ -490,7 +494,7 @@ cd $BASE
 pip install argcomplete
 cd $BASE/edx-platform
 bundle install
-rake install_prereqs
+paver install_prereqs
 
 mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
@@ -523,7 +527,7 @@ if [[ ! $quiet ]]; then
 
    To start the Django on port 8000
 
-        $ rake lms
+        $ paver lms
 
    Or to start Django on a different <port#>
 

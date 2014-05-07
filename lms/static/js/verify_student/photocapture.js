@@ -217,6 +217,9 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       // We do this in a recursive call on success because Firefox seems to
       // simply eat the request if you stack up two on top of each other before
       // the user has a chance to approve the first one.
+      //
+      // This appears to be necessary for older versions of Firefox (before 28).
+      // For more info, see https://github.com/edx/edx-platform/pull/3053
       initSnapshotHandler(names, hasHtml5CameraSupport);
     }, onVideoFail);
   }

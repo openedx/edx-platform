@@ -1,30 +1,29 @@
-******************
+##################
 Format cheat sheet
-******************
+##################
 
-Levels of Subheads
+Title: # above and below (as lines 1 and 3 above)
 
-####
-text
-####
+*********
+Heading 1
+*********
 
-****
-text
-****
+=========
+Heading 2
+=========
 
-text
-****
+Heading 3
+*********
 
-text
-====
+Heading 4
+=========
 
-text
-^^^^
+Heading 5
+^^^^^^^^^
 
-
-
-
-
+************
+Image Format
+************
 
 Image format, uses images as a reference from the soure/image file
 
@@ -34,13 +33,63 @@ Image format, uses images as a reference from the soure/image file
        .. image:: images/image009.png
        :width: 800  
 
-
-For references to edX1010 pages:
-
-        `Writing Exercises <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/d15cfeaff0af4dd7be4765cd0988d172/1>`_ has more in-depth discussion about problem types, and some general pedagogical considerations for adapting to the online format and a `Gallery of Response Types <https://edge.edx.org/accounts/login?next=/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/3ba055e760d04f389150a75edfecb844/1>`_
+****************
+Code Formatting
+****************
 
 To set text in a "Code format"
         ::
+-or-
+
+.. code-block:: xml
+
+(text in code-block:: xml is in different colors)
+
+****************
+Table Formatting
+****************
+
+With a header row
+
+.. list-table::
+   :widths: 10 80
+   :header-rows: 1
+ 
+   * - First Name
+     - Last Name
+     - Residence
+   * - Elizabeth
+     - Bennett
+     - Longbourne
+   * - Fitzwilliam
+     - Darcy
+     - Pemberley
+
+-- or --
+
+With a bolded first column
+
+.. list-table::
+   :widths: 10 80
+   :stub-columns: 1
+ 
+   * - First Name
+     - Elizabeth
+     - Fitzwilliam
+   * - Last Name
+     - Bennett
+     - Darcy
+   * - Residence
+     - Longboure
+     - Pemberley
+
+*******************
+Cross-References
+*******************
+
+For references to edX101 pages:
+
+        `Writing Exercises <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/d15cfeaff0af4dd7be4765cd0988d172/1>`_ has more in-depth discussion about problem types, and some general pedagogical considerations for adapting to the online format and a `Gallery of Response Types <https://edge.edx.org/accounts/login?next=/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/3ba055e760d04f389150a75edfecb844/1>`_
 
 To cross reference between sections of a document
 
@@ -54,6 +103,6 @@ To make the cross reference in text:
 
 External page reference
 
-        see `Create a Problem <Create_Problem.html>`_ 
+        see `Create a Problem <http://site.Create_Problem.html>`_ 
 
       

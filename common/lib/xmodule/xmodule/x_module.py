@@ -27,9 +27,12 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.exceptions import UndefinedContext
+from dogapi import dog_stats_api
 
 
 log = logging.getLogger(__name__)
+
+XMODULE_METRIC_NAME = 'edxapp.xmodule'
 
 
 def dummy_track(_event_type, _event):
@@ -64,10 +67,12 @@ class HTMLSnippet(object):
         # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
         coffee = cls.js.setdefault('coffee', [])
-        fragment = resource_string(__name__, 'js/src/xmodule.coffee')
+        js = cls.js.setdefault('js', [])
 
-        if fragment not in coffee:
-            coffee.insert(0, fragment)
+        fragment = resource_string(__name__, 'js/src/xmodule.js')
+
+        if fragment not in js:
+            js.insert(0, fragment)
 
         return cls.js
 
@@ -924,7 +929,52 @@ def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid
     raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")
 
 
-class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class MetricsMixin(object):
+    """
+    Mixin for adding metric logging for render and handle methods in the DescriptorSystem and ModuleSystem.
+    """
+
+    def render(self, block, view_name, context=None):
+        try:
+            status = "success"
+            return super(MetricsMixin, self).render(block, view_name, context=context)
+
+        except:
+            status = "failure"
+            raise
+
+        finally:
+            course_id = getattr(self, 'course_id', '')
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=[
+                u'view_name:{}'.format(view_name),
+                u'action:render',
+                u'action_status:{}'.format(status),
+                u'course_id:{}'.format(course_id),
+                u'block_type:{}'.format(block.scope_ids.block_type)
+            ])
+
+    def handle(self, block, handler_name, request, suffix=''):
+        handle = None
+        try:
+            status = "success"
+            return super(MetricsMixin, self).handle(block, handler_name, request, suffix=suffix)
+
+        except:
+            status = "failure"
+            raise
+
+        finally:
+            course_id = getattr(self, 'course_id', '')
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=[
+                u'handler_name:{}'.format(handler_name),
+                u'action:handle',
+                u'action_status:{}'.format(status),
+                u'course_id:{}'.format(course_id),
+                u'block_type:{}'.format(block.scope_ids.block_type)
+            ])
+
+
+class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
@@ -1084,7 +1134,7 @@ class XMLParsingSystem(DescriptorSystem):
         self.process_xml = process_xml
 
 
-class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,

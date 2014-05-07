@@ -22,8 +22,17 @@ PDF_BOOK = {
     "tab_title": "Textbook",
     "title": "A PDF Textbook",
     "chapters": [
-        { "title": "Chapter 1 for PDF", "url": "https://somehost.com/the_book/chap1.pdf" },
-        { "title": "Chapter 2 for PDF", "url": "https://somehost.com/the_book/chap2.pdf" },
+        {"title": "Chapter 1 for PDF", "url": "https://somehost.com/the_book/chap1.pdf"},
+        {"title": "Chapter 2 for PDF", "url": "https://somehost.com/the_book/chap2.pdf"},
+    ],
+}
+
+PORTABLE_PDF_BOOK = {
+    "tab_title": "Textbook",
+    "title": "A PDF Textbook",
+    "chapters": [
+        {"title": "Chapter 1 for PDF", "url": "/static/chap1.pdf"},
+        {"title": "Chapter 2 for PDF", "url": "/static/chap2.pdf"},
     ],
 }
 
@@ -31,8 +40,8 @@ HTML_BOOK = {
     "tab_title": "Textbook",
     "title": "An HTML Textbook",
     "chapters": [
-        { "title": "Chapter 1 for HTML", "url": "https://somehost.com/the_book/chap1.html" },
-        { "title": "Chapter 2 for HTML", "url": "https://somehost.com/the_book/chap2.html" },
+        {"title": "Chapter 1 for HTML", "url": "https://somehost.com/the_book/chap1.html"},
+        {"title": "Chapter 2 for HTML", "url": "https://somehost.com/the_book/chap2.html"},
     ],
 }
 
@@ -124,7 +133,7 @@ class StaticPdfBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for PDF")
         self.assertNotContains(response, "options.chapterNum =")
-        self.assertNotContains(response, "options.pageNum =")
+        self.assertNotContains(response, "page=")
 
     def test_book_chapter(self):
         # We can access a book at a particular chapter.
@@ -132,8 +141,8 @@ class StaticPdfBookTest(StaticBookTest):
         url = self.make_url('pdf_book', book_index=0, chapter=2)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
-        self.assertContains(response, "options.chapterNum = 2;")
-        self.assertNotContains(response, "options.pageNum =")
+        self.assertContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
+        self.assertNotContains(response, "page=")
 
     def test_book_page(self):
         # We can access a book at a particular page.
@@ -142,7 +151,7 @@ class StaticPdfBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for PDF")
         self.assertNotContains(response, "options.chapterNum =")
-        self.assertContains(response, "options.pageNum = 17;")
+        self.assertContains(response, "page=17")
 
     def test_book_chapter_page(self):
         # We can access a book at a particular chapter and page.
@@ -150,8 +159,8 @@ class StaticPdfBookTest(StaticBookTest):
         url = self.make_url('pdf_book', book_index=0, chapter=2, page=17)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
-        self.assertContains(response, "options.chapterNum = 2;")
-        self.assertContains(response, "options.pageNum = 17;")
+        self.assertContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
+        self.assertContains(response, "page=17")
 
     def test_bad_book_id(self):
         # If the book id isn't an int, we'll get a 404.
@@ -193,6 +202,33 @@ class StaticPdfBookTest(StaticBookTest):
         # It's no longer possible to use a non-integer page and a non-integer chapter.
         with self.assertRaises(NoReverseMatch):
             self.make_url('pdf_book', book_index=0, chapter='fooey', page='xyzzy')
+
+    def test_static_url_map_contentstore(self):
+        """
+        This ensure static  URL mapping is happening properly for
+        a course that uses the contentstore
+        """
+        self.make_course(pdf_textbooks=[PORTABLE_PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=0, chapter=1)
+        response = self.client.get(url)
+        self.assertNotContains(response, 'file={}'.format(PORTABLE_PDF_BOOK['chapters'][0]['url']))
+        self.assertContains(response, 'file=/c4x/{0.org}/{0.course}/asset/{1}'.format(
+            self.course.location,
+            PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', '')))
+
+    def test_static_url_map_static_asset_path(self):
+        """
+        Like above, but used when the course has set a static_asset_path
+        """
+        self.make_course(pdf_textbooks=[PORTABLE_PDF_BOOK], static_asset_path='awesomesauce')
+        url = self.make_url('pdf_book', book_index=0, chapter=1)
+        response = self.client.get(url)
+        self.assertNotContains(response, 'file={}'.format(PORTABLE_PDF_BOOK['chapters'][0]['url']))
+        self.assertNotContains(response, 'file=/c4x/{0.org}/{0.course}/asset/{1}'.format(
+            self.course.location,
+            PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', '')))
+        self.assertContains(response, 'file=/static/awesomesauce/{}'.format(
+            PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', '')))
 
 
 class StaticHtmlBookTest(StaticBookTest):

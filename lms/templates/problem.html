@@ -20,7 +20,7 @@
     <input class="save" type="button" value="${_('Save')}" />
     % endif
     % if check_button:
-    <input class="check ${ check_button } primary-button" type="button" value="${ check_button }" />
+    <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
     % endif
     % if answer_available:
     <button class="show"><span class="show-label" aria-hidden="true">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>

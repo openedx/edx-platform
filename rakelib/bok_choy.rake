@@ -23,6 +23,8 @@ BOK_CHOY_XUNIT_REPORT = File.join(BOK_CHOY_REPORT_DIR, "xunit.xml")
 BOK_CHOY_COVERAGE_RC = File.join(BOK_CHOY_DIR, ".coveragerc")
 directory BOK_CHOY_REPORT_DIR
 
+# Directory that videos are served from
+VIDEO_SOURCE_DIR = File.join(REPO_ROOT, "test_root", "data", "video")
 
 BOK_CHOY_SERVERS = {
     :lms => { :port =>  8003, :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_lms.log") },
@@ -46,7 +48,19 @@ BOK_CHOY_STUBS = {
     :comments => {
         :port => 4567,
         :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_comments.log")
+    },
+
+    :video => {
+        :port => 8777,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_video_sources.log"),
+        :config => "root_dir=#{VIDEO_SOURCE_DIR}"
+    },
+
+    :youtube => {
+        :port => 9080,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_youtube.log")
     }
+
 }
 
 # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
@@ -182,9 +196,7 @@ namespace :'test:bok_choy' do
         sh("#{REPO_ROOT}/scripts/reset-test-db.sh")
 
         # Collect static assets
-        Rake::Task["gather_assets"].invoke('lms', 'bok_choy')
-        Rake::Task["gather_assets"].reenable
-        Rake::Task["gather_assets"].invoke('cms', 'bok_choy')
+        sh("paver update_assets --settings=bok_choy")
     end
 
     desc "Run acceptance tests that use the bok-choy framework but skip setup"

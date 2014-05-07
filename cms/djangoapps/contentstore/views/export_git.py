@@ -45,7 +45,7 @@ def export_git(request, org, course, name):
                 msg = _('Course successfully exported to git repository')
             except git_export_utils.GitExportError as ex:
                 failed = True
-                msg = str(ex)
+                msg = unicode(ex)
 
     return render_to_response('export_git.html', {
         'context_course': course_module,

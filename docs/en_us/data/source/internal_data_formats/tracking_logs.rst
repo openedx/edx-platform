@@ -211,11 +211,11 @@ Navigational Event Types
 
 These event types are fired when a user selects a navigational control. 
 
-* ``seq_goto`` is fired when a user jumps between units in a sequence. 
+* ``seq_goto`` fires when a user jumps between units in a sequence. 
 
-* ``seq_next`` is fired when a user navigates to the next unit in a sequence. 
+* ``seq_next`` fires when a user navigates to the next unit in a sequence. 
 
-* ``seq_prev`` is fired when a user navigates to the previous unit in a sequence. 
+* ``seq_prev`` fires when a user navigates to the previous unit in a sequence. 
 
 **Component**: Sequence 
 
@@ -267,9 +267,9 @@ These event types can fire when a user works with a video.
 ``pause_video``, ``play_video``
 ---------------------------------
 
-* The ``pause_video`` event type is fired on video pause. 
+* The ``pause_video`` event type fires on video pause. 
 
-* The ``play_video`` event type is fired on video play. 
+* The ``play_video`` event type fires on video play. 
 
 ``event`` **Fields**: These event types have the same ``event`` fields.
 
@@ -292,7 +292,7 @@ These event types can fire when a user works with a video.
 ``seek_video``
 -----------------
 
-The ``seek_video`` event is fired when the user clicks the playback bar or transcript to go to a different point in the video file.
+The ``seek_video`` event fires when the user clicks the playback bar or transcript to go to a different point in the video file.
 
 +---------------------+---------------+---------------------------------------------------------------------+
 | Field               | Type          | Details                                                             |
@@ -308,7 +308,7 @@ The ``seek_video`` event is fired when the user clicks the playback bar or trans
 ``speed_change_video`` 
 ------------------------
 
-The ``speed_change_video`` event is fired when a user selects a different playing speed for the video. 
+The ``speed_change_video`` event fires when a user selects a different playing speed for the video. 
 
 **History**: Prior to 12 Feb 2014, this event fired when the user selected either the same speed or a different speed.  
 
@@ -329,27 +329,444 @@ The ``speed_change_video`` event is fired when a user selects a different playin
 
 .. _pdf:
 
-==============================
-PDF Interaction Event Types   
-==============================
+=================================
+Textbook Interaction Event Types   
+=================================
 
-The ``book``  event type is fired when a user is viewing a PDF book.  
+----------
+``book``
+----------
+
+The ``book`` event type fires when a user navigates within the PDF Viewer or the
+PNG Viewer.
+
+* For textbooks in PDF format, the URL in the common ``page`` field contains
+  '/pdfbook/'.
+* For textbooks in PNG format, the URL in the common ``page`` field contains
+  '/book/'.
+
+**Component**: PDF Viewer, PNG Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type changed on 16 Apr 2014 to include the ``name`` and
+``chapter`` fields.
+
+``event`` **Fields**: 
+
++-------------+---------+----------------------------------------------------------------------------------+
+| Field       | Type    | Details                                                                          |
++=============+=========+==================================================================================+
+| ``type``    | string  | 'gotopage' fires when a page loads after the student manually enters its number. |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | 'prevpage' fires when the next page button is clicked.                           |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | 'nextpage' fires when the previous page button is clicked.                       |
++-------------+---------+----------------------------------------------------------------------------------+
+| ``name``    | string  | For 'gotopage', set to ``textbook.pdf.page.loaded``.                             |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | For 'prevpage', set to ``textbook.pdf.page.navigatedprevious``.                  |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | For 'nextpage', set to ``textbook.pdf.page.navigatednext``.                      |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.         |
++-------------+---------+----------------------------------------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                                                        |
+|             |         +----------------------------------------------------------------------------------+
+|             |         | **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.         |
++-------------+---------+----------------------------------------------------------------------------------+
+| ``old``     | integer | The original page number. Applies to 'gotopage' event types only.                |
++-------------+---------+----------------------------------------------------------------------------------+
+| ``new``     | integer | Destination page number.                                                         |
++-------------+---------+----------------------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.thumbnails.toggled``
+------------------------------------
+
+The ``textbook.pdf.thumbnails.toggled`` event type fires when a user clicks
+on the icon to show or hide page thumbnails.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
+**History**: This event type was added on 16 Apr 2014.
+
 ``event`` **Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``type``            | string        | 'gotopage', 'prevpage', 'nextpage'                                  |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``old``             | integer       | Original page number.                                               |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new``             | integer       | Destination page number.                                            |
-+---------------------+---------------+---------------------------------------------------------------------+
++-------------+---------+---------------------------------------------------------------------+
+| Field       | Type    | Details                                                             |
++=============+=========+=====================================================================+
+| ``name``    | string  | ``textbook.pdf.thumbnails.toggled``                                 |
++-------------+---------+---------------------------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                                           |
++-------------+---------+---------------------------------------------------------------------+
+| ``page``    | integer | The number of the page that is open when the user clicks this icon. |
++-------------+---------+---------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.thumbnail.navigated``
+------------------------------------
+
+The ``textbook.pdf.thumbnail.navigated`` event type fires when a user clicks
+on a thumbnail image to navigate to a page.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++---------------------+---------+-------------------------------------------------+
+| Field               | Type    | Details                                         |
++=====================+=========+=================================================+
+| ``name``            | string  | ``textbook.pdf.thumbnail.navigated``            |
++---------------------+---------+-------------------------------------------------+
+| ``chapter``         | string  | The name of the PDF file.                       |
++---------------------+---------+-------------------------------------------------+
+| ``page``            | integer | The page number of the thumbnail clicked.       |
++---------------------+---------+-------------------------------------------------+
+| ``thumbnail_title`` | string  | The identifying name for the destination of the |
+|                     |         | thumbnail. For example, Page 2.                 |
++---------------------+---------+-------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.outline.toggled``
+------------------------------------
+
+The ``textbook.pdf.outline.toggled`` event type fires when a user clicks the
+outline icon to show or hide a list of the book's chapters. 
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------+---------+---------------------------------------------------------------------+
+| Field       | Type    | Details                                                             |
++=============+=========+=====================================================================+
+| ``name``    | string  | ``textbook.pdf.outline.toggled``                                    |
++-------------+---------+---------------------------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                                           |
++-------------+---------+---------------------------------------------------------------------+
+| ``page``    | integer | The number of the page that is open when the user clicks this link. |
++-------------+---------+---------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.chapter.navigated``
+------------------------------------
+
+The ``textbook.pdf.chapter.navigated`` event type fires when a user clicks on
+a link in the outline to navigate to a chapter.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------------+---------+-------------------------------------------------+
+| Field             | Type    | Details                                         |
++===================+=========+=================================================+
+| ``name``          | string  | ``textbook.pdf.chapter.navigated``              |
++-------------------+---------+-------------------------------------------------+
+| ``chapter``       | string  | The name of the PDF file.                       |
++-------------------+---------+-------------------------------------------------+
+| ``chapter_title`` | string  | The identifying name for the destination of the |
+|                   |         | outline link.                                   |
++-------------------+---------+-------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.page.navigated``
+------------------------------------
+
+The ``textbook.pdf.page.navigated`` event type fires when a user manually enters
+a page number.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------+---------+--------------------------------------------------+
+| Field       | Type    | Details                                          |
++=============+=========+==================================================+
+| ``name``    | string  | ``textbook.pdf.page.navigated``                  |
++-------------+---------+--------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                        |
++-------------+---------+--------------------------------------------------+
+| ``page``    | integer | The destination page number entered by the user. |
++-------------+---------+--------------------------------------------------+
+
+--------------------------------------
+``textbook.pdf.zoom.buttons.changed``
+--------------------------------------
+
+The ``textbook.pdf.zoom.buttons.changed`` event type fires when a user clicks
+either the Zoom In or Zoom Out icon.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++---------------+---------+--------------------------------------------------------------------+
+| Field         | Type    | Details                                                            |
++===============+=========+====================================================================+
+| ``name``      | string  | ``textbook.pdf.zoom.buttons.changed``                              |
++---------------+---------+--------------------------------------------------------------------+
+| ``direction`` | string  | 'in', 'out'                                                        |
++---------------+---------+--------------------------------------------------------------------+
+| ``chapter``   | string  | The name of the PDF file.                                          |
++---------------+---------+--------------------------------------------------------------------+
+| ``page``      | integer | The number of the page that is open when the user clicks the icon. |
++---------------+---------+--------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.zoom.menu.changed``
+------------------------------------
+
+The ``textbook.pdf.zoom.menu.changed`` event type fires when a user selects a
+magnification setting.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------+---------+--------------------------------------------------------------------------------+
+| Field       | Type    | Details                                                                        |
++=============+=========+================================================================================+
+| ``name``    | string  | ``textbook.pdf.zoom.menu.changed``                                             |
++-------------+---------+--------------------------------------------------------------------------------+
+| ``amount``  | string  | '1', '0.75', '1.5', 'custom', 'page_actual', 'auto', 'page_width', 'page_fit'. |
++-------------+---------+--------------------------------------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                                                      |
++-------------+---------+--------------------------------------------------------------------------------+
+| ``page``    | integer | The number of the page that is open when the user selects this value.          |
++-------------+---------+--------------------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.display.scaled``
+------------------------------------
+
+The ``textbook.pdf.display.scaled`` event type fires when the display
+magnification changes. These changes occur after a student selects a
+magnification setting from the zoom menu or resizes the browser window.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------+---------+-------------------------------------------------------------------+
+| Field       | Type    | Details                                                           |
++=============+=========+===================================================================+
+| ``name``    | string  | ``textbook.pdf.display.scaled``                                   |
++-------------+---------+-------------------------------------------------------------------+
+| ``amount``  | string  | The magnification setting; for example, 0.95 or 1.25.             |
++-------------+---------+-------------------------------------------------------------------+
+| ``chapter`` | string  | The name of the PDF file.                                         |
++-------------+---------+-------------------------------------------------------------------+
+| ``page``    | integer | The number of the page that is open when the scaling takes place. |
++-------------+---------+-------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.display.scrolled``
+------------------------------------
+
+The ``textbook.pdf.display.scrolled`` event type fires each time the displayed
+page changes while a user scrolls up or down.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++---------------+---------+---------------------------------------------------------------------+
+| Field         | Type    | Details                                                             |
++===============+=========+=====================================================================+
+| ``name``      | string  | ``textbook.pdf.display.scrolled``                                   |
++---------------+---------+---------------------------------------------------------------------+
+| ``chapter``   | string  | The name of the PDF file.                                           |
++---------------+---------+---------------------------------------------------------------------+
+| ``page``      | integer | The number of the page that is open when the scrolling takes place. |
++---------------+---------+---------------------------------------------------------------------+
+| ``direction`` | string  | 'up', 'down'                                                        |
++---------------+---------+---------------------------------------------------------------------+
+
+------------------------------------
+``textbook.pdf.search.executed``
+------------------------------------
+
+The ``textbook.pdf.search.executed`` event type fires when a user searches for a
+text value in the file. To reduce the number of events produced, instead of
+producing one event per entered character this event type defines a search
+string as the set of characters that are consecutively entered in the search
+field within 500ms of each other.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------------+---------+------------------------------------------------------------------+
+| Field             | Type    | Details                                                          |
++===================+=========+==================================================================+
+| ``name``          | string  | ``textbook.pdf.search.executed``                                 |
++-------------------+---------+------------------------------------------------------------------+
+| ``query``         | string  | The value in the search field.                                   |
++-------------------+---------+------------------------------------------------------------------+
+| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``status``        | string  | A "not found" status phrase for a search string that             |
+|                   |         | is unsuccessful. Blank for successful search strings.            |
++-------------------+---------+------------------------------------------------------------------+
+| ``chapter``       | string  | The name of the PDF file.                                        |
++-------------------+---------+------------------------------------------------------------------+
+| ``page``          | integer | The number of the page that is open when the search takes place. |
++-------------------+---------+------------------------------------------------------------------+
+
+---------------------------------------------
+``textbook.pdf.search.navigatednext``
+---------------------------------------------
+
+The ``textbook.pdf.search.navigatednext`` event type fires when a user clicks
+on the Find Next or Find Previous icons for an entered search string.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------------+---------+------------------------------------------------------------------+
+| Field             | Type    | Details                                                          |
++===================+=========+==================================================================+
+| ``name``          | string  | ``textbook.pdf.search.navigatednext``                            |
++-------------------+---------+------------------------------------------------------------------+
+| ``findprevious``  | string  | 'true' if the user clicks the Find Previous icon, 'false'        |
+|                   |         | if the user clicks the Find Next icon.                           |
++-------------------+---------+------------------------------------------------------------------+
+| ``query``         | string  | The value in the search field.                                   |
++-------------------+---------+------------------------------------------------------------------+
+| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``status``        | string  | A "not found" status phrase for a search string that             |
+|                   |         | is unsuccessful. Blank for successful search strings.            |
++-------------------+---------+------------------------------------------------------------------+
+| ``chapter``       | string  | The name of the PDF file.                                        |
++-------------------+---------+------------------------------------------------------------------+
+| ``page``          | integer | The number of the page that is open when the search takes place. |
++-------------------+---------+------------------------------------------------------------------+
+
+---------------------------------------------
+``textbook.pdf.search.highlight.toggled``
+---------------------------------------------
+
+The ``textbook.pdf.search.highlight.toggled`` event type fires when a user
+selects or clears the **Highlight All** option for a search.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------------+---------+------------------------------------------------------------------+
+| Field             | Type    | Details                                                          |
++===================+=========+==================================================================+
+| ``name``          | string  | ``textbook.pdf.search.highlight.toggled``                        |
++-------------------+---------+------------------------------------------------------------------+
+| ``query``         | string  | The value in the search field.                                   |
++-------------------+---------+------------------------------------------------------------------+
+| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``status``        | string  | A "not found" status phrase for a search string that is          |
+|                   |         | unsuccessful. Blank for successful search strings.               |
++-------------------+---------+------------------------------------------------------------------+
+| ``chapter``       | string  | The name of the PDF file.                                        |
++-------------------+---------+------------------------------------------------------------------+
+| ``page``          | integer | The number of the page that is open when the search takes place. |
++-------------------+---------+------------------------------------------------------------------+
+
+------------------------------------------------------
+``textbook.pdf.search.casesensitivity.toggled``
+------------------------------------------------------
+
+The ``textbook.pdf.search.casesensitivity.toggled`` event type fires when a
+user selects or clears the **Match Case** option for a search.
+
+**Component**: PDF Viewer 
+
+**Event Source**: Browser
+
+**History**: This event type was added on 16 Apr 2014.
+
+``event`` **Fields**: 
+
++-------------------+---------+------------------------------------------------------------------+
+| Field             | Type    | Details                                                          |
++===================+=========+==================================================================+
+| ``name``          | string  | ``textbook.pdf.search.casesensitivity.toggled``                  |
++-------------------+---------+------------------------------------------------------------------+
+| ``query``         | string  | The value in the search field.                                   |
++-------------------+---------+------------------------------------------------------------------+
+| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
+|                   |         | 'false' if this option is not selected.                          |
++-------------------+---------+------------------------------------------------------------------+
+| ``status``        | string  | A "not found" status phrase for a search string that             |
+|                   |         | is unsuccessful. Blank for successful search strings.            |
++-------------------+---------+------------------------------------------------------------------+
+| ``chapter``       | string  | The name of the PDF file.                                        |
++-------------------+---------+------------------------------------------------------------------+
+| ``page``          | integer | The number of the page that is open when the search takes place. |
++-------------------+---------+------------------------------------------------------------------+
 
 .. _problem:
 

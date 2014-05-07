@@ -7,7 +7,7 @@
     "CONTENTSTORE": {
         "DOC_STORE_CONFIG": {
             "collection": "modulestore",
-            "db": "edxapp",
+            "db": "test",
             "host": [
                 "localhost"
             ],
@@ -17,7 +17,7 @@
         },
         "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
         "OPTIONS": {
-            "db": "edxapp",
+            "db": "test",
             "host": [
                 "localhost"
             ],

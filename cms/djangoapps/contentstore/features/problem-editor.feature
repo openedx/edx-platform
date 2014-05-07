@@ -113,6 +113,11 @@ Feature: CMS.Problem Editor
     And I unpublish the unit
     Then I can edit the problem
 
+  Scenario: Cheat sheet visible on toggle
+    Given I have created a Blank Common Problem
+    And I can edit the problem
+    Then I can see cheatsheet
+
   # Disabled 11/13/2013 after failing in master
   # The screenshot showed that the LaTeX editor had the text "hi",
   # but Selenium timed out waiting for the text to appear.

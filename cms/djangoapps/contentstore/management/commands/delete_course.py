@@ -6,9 +6,6 @@ from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
 
 
-#
-# To run from command line: rake cms:delete_course LOC=edX/111/Foo1
-#
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
 

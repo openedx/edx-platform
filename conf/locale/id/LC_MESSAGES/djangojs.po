@@ -4,17 +4,19 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# asofyan <asofyan@niskala.net>, 2013
+# asofyan <asofyan@niskala.net>, 2013-2014
 # Al Firdaus, 2014
 # asofyan <asofyan@niskala.net>, 2013
 # fizdoonk, 2013
 # fizdoonk, 2013
+# sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# asofyan <asofyan@niskala.net>, 2014
 # Al Firdaus, 2014
 # asofyan <asofyan@niskala.net>, 2013
 # fizdoonk, 2013
@@ -22,8 +24,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
-"PO-Revision-Date: 2014-03-24 14:25+0000\n"
+"POT-Creation-Date: 2014-04-27 11:10-0400\n"
+"PO-Revision-Date: 2014-04-24 13:20+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/edx-platform/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -34,6 +36,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "OK"
@@ -42,6 +45,8 @@ msgstr "OK"
 #: cms/static/js/base.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -126,13 +131,13 @@ msgstr "Belum dibalas"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr ""
+msgstr "Status: belum dikirim"
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "You need to pick a rating before you can submit."
-msgstr ""
+msgstr "Anda perlu pilih peringkat sebelum mengajukan."
 
 #. Translators: this message appears when transitioning between openended
 #. grading
@@ -141,55 +146,60 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
-msgstr ""
+msgstr "Skor Anda belum memenuhi kriteria untuk menuju langkah berikutnya."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Submit"
-msgstr ""
+msgstr "Ajukan"
 
 #. Translators: one clicks this button after one has finished filling out the
 #. grading
 #. form for an openended assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit assessment"
-msgstr ""
+msgstr "Ajukan penilaian"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
 msgstr ""
+"Respon Anda telah diajukan. Harap cek kembali nanti untuk peringkat Anda."
 
 #. Translators: this button is clicked to submit a student's rating of
 #. an evaluator's assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit post-assessment"
-msgstr ""
+msgstr "Ajukan pasca-penilaian"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "Jawaban telah disimpan, namun belum diajukan."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
 msgstr ""
+"Harap konfirmasi bahwa Anda ingin mengajukan hasil kerja. Anda tidak dapat "
+"mengubah setelah pengajuan."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
+"Anda mencoba unggah berkas yang ukurannya terlalu besar bagi sistem kami. "
+"Harap pilih berkas di bawah 2MB atau tempel tautan pada kotak jawaban."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr ""
+msgstr "Anda yakin ingin menghapus respon sebelumnya atas pertanyaan ini?"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
-msgstr ""
+msgstr "Menuju langkah berikutnya."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -198,6 +208,10 @@ msgid ""
 " uploaded the image to another website, you can paste a link to it into the "
 "answer box."
 msgstr ""
+"Berkas yang diunggah diperlukan untuk pertanyaan ini, tapi tidak didukung "
+"peramban Anda. Coba peramban Google Chrome terbaru. Alternatifnya, jika "
+"pernah mengunggah gambar ke situs web lain, Anda dapat menempel tautannya di"
+" kotak jawaban."
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -217,6 +231,8 @@ msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"Kesalahan urutan! Tidak dapat mengarah ke tab %(tab_name)s pada "
+"SequenceModule saat ini. Harap hubungi staf kursus."
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
@@ -258,17 +274,17 @@ msgstr "Video berakhir"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
+msgstr[0] "%(value)s jam"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
+msgstr[0] "%(value)s menit"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
+msgstr[0] "%(value)s detik"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
@@ -336,6 +352,8 @@ msgstr "Tampilkan Diskusi"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Maaf"
@@ -398,21 +416,18 @@ msgid "vote"
 msgstr "voting"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid ""
-"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
-msgid_plural ""
-"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgid "vote (click to remove your vote)"
+msgid_plural "votes (click to remove your vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s voting (klik untuk menghapus voting)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
-msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
+msgid "vote (click to vote)"
+msgid_plural "votes (click to vote)"
 msgstr[0] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr ""
+msgstr "Muat lebih banyak"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
@@ -441,6 +456,8 @@ msgstr "Klik untuk menghapus laporan"
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
+"Pelaporan Penyalahgunaan%(start_sr_span)s, klik untuk menghapus "
+"laporan%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -466,6 +483,11 @@ msgstr "Sematkan"
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
 msgstr "Sematkan Topik"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid ""
+"The thread you selected has been deleted. Please select another thread."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -501,6 +523,10 @@ msgstr "Memuat %(numResponses)s tanggapan berikutnya"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -603,14 +629,17 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Ini adalah daftar %s yang tersedia. Anda bisa tentukan beberapa dengan "
+"memilih mereka pada kotak di bawah dan lalu klik panah \"Pilih\" di antara "
+"dua kotak. "
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Ketik pada kotak ini untuk menyaring daftar %s yang tersedia."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
-msgstr ""
+msgstr "Saring"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
@@ -637,6 +666,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Ini adalah daftar %s yang dipilih. Anda bisa menghapus beberapa dengan "
+"memilih pada kotak di bawah lalu klik panah \"Hapus\" di antara dua kotak."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove all"
@@ -656,6 +687,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Pembaruan Anda pada isian individual belum disimpan.  Jika Anda melanjutkan "
+"aksi ini, pembaruan  yang belum disimpan akan hilang."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -663,6 +696,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Anda telah memilih suatu aksi, tapi belum menyimpan perubahan Anda atas "
+"isian individual. Harap klik OK untuk menyimpan. Anda perlu menjalankan "
+"ulang aksinya."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -790,7 +826,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr ""
+msgstr "Pembuatan gelar mengalami kesalahan. Harap coba lagi."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -878,9 +914,10 @@ msgid ""
 "beta tester."
 msgstr ""
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -888,7 +925,7 @@ msgid "Error enrolling/unenrolling users."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
+msgid "The following email addresses and/or usernames are invalid:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -952,7 +989,7 @@ msgstr "Pesan tidak boleh kosong"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "Surel Anda berhasil masuk antrian untuk dikirimkan."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -978,18 +1015,21 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
+"Surel Anda berhasil masuk antrian untuk dikirimkan. Harap dicatat untuk "
+"kelas yang lebih besar, mungkin butuh satu jam (atau lebih jika kursus lain "
+"juga kirim email secara simultan) untuk mengirim semua email."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr ""
+msgstr "Terjadi kesalahan saat kirim surel."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr ""
+msgstr "Tidak ada surel yang lampau untuk kursus ini."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
-msgstr ""
+msgstr "Terjadi kesalahan saat mengambil surel yang lampau untuk kursus ini."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -997,13 +1037,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "Mohon isi alamat surel siswa atau nama pengguna."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%= student_id %>'. Check that the "
 "student identifier is spelled correctly."
 msgstr ""
+"Terjadi kesalahan saat mengambil url kemajuan untuk '<%= student_id %>'. Cek"
+" penanda siswa sudah dieja dengan benar."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1013,7 +1055,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem urlname."
-msgstr ""
+msgstr "Harap isi nama url masalah."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1162,19 +1204,19 @@ msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr ""
+msgstr "Nama Masalah"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr ""
+msgstr "Bergelar"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
-msgstr ""
+msgstr "Tersedia untuk Perolehan Gelar"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Required"
-msgstr ""
+msgstr "Dibutuhkan"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Progress"
@@ -1194,7 +1236,7 @@ msgstr "<%= num %> tersedia "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
-msgstr ""
+msgstr "peringkat <%= num %>"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
@@ -1202,15 +1244,15 @@ msgstr "<%= num %> lagi untuk memulai ML"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
-msgstr ""
+msgstr "Cek ulang untuk pengajuan"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state: <%= state %>"
-msgstr ""
+msgstr "Sistem berada di kondisi invalid: <%= state %>"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state for submission: "
-msgstr ""
+msgstr "Sistem berada di kondisi invalid untuk pengajuan:"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
@@ -1222,20 +1264,17 @@ msgid "(Show)"
 msgstr "(Tampilkan)"
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgid "Insert Hyperlink"
 msgstr ""
-"<p><b>Masukan Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+
+#. Translators: Please keep the quotation marks (") around this text
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
+msgid "\"optional title\""
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Image (upload file or type "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
+msgid "Insert Image (upload file or type url)"
 msgstr ""
-"<p><b>Masukan Gambar(upload file atau ketik "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -1319,7 +1358,7 @@ msgstr "masukan kode disini"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
-msgstr ""
+msgstr "Daftar Item"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading"
@@ -1339,167 +1378,172 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Ini mungkin terjadi karena ada kesalahan di server kami atau koneksi "
+"Internet Anda. Coba refresh halaman untuk memastikan Anda online."
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio mengalami kesulitan menyimpan hasil kerja Anda"
 
-#: cms/static/coffee/src/views/module_edit.js
-msgid "<em>Editing:</em> %s"
-msgstr ""
-
-#: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
+#: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
-msgstr ""
+msgstr "Menyimpan&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Component Confirmation"
-msgstr ""
+msgstr "Konfirmasi Penghapusan Komponen"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this component? This action cannot be "
 "undone."
 msgstr ""
+"Anda yakin ingin menghapus komponen ini? Aksi ini tidak dapat diulang."
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
-msgstr ""
+msgstr "Menghapus&hellip;"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Adding&hellip;"
-msgstr ""
+msgstr "Menambah&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
-msgstr ""
+msgstr "Menggandakan&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
-msgstr ""
+msgstr "Hapus komponen ini?"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "Menghapus komponen ini bersifat permanen dan tidak dapat diulang."
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
-msgstr ""
+msgstr "Ya, hapus komponen ini"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "Tautan ini akan terbuka di jendela modal"
 
 #: cms/static/js/base.js
 msgid "Delete this "
-msgstr ""
+msgstr "Hapus ini"
 
 #: cms/static/js/base.js
 msgid "Deleting this "
-msgstr ""
+msgstr "Menghapus ini"
 
 #: cms/static/js/base.js
 msgid "Yes, delete this "
-msgstr ""
+msgstr "Ya, hapus ini"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr ""
+msgstr "Mohon jangan gunakan spasi di field ini."
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
+msgstr "Harap tidak menggunakan spasi atau karakter khusus pada isian ini."
 
 #: cms/static/js/index.js
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr ""
+"Kombinasi panjang dari isian organisasi, nomor kursus, dan periode tidak "
+"boleh lebih dari 65 karakter."
 
 #: cms/static/js/index.js
 msgid "Required field."
-msgstr ""
+msgstr "Isian wajib."
 
 #: cms/static/js/sock.js
 msgid "Hide Studio Help"
-msgstr ""
+msgstr "Sembunyikan Bantuan Studio"
 
 #: cms/static/js/sock.js
 msgid "Looking for Help with Studio?"
-msgstr ""
+msgstr "Mencari Bantuan dengan Studio?"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "Anda harus tentukan sebuah nama"
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"Hanya berkas <%= fileTypes %> yang dapat diunggah. Harap pilih berkas dengan"
+" ekstensi <%= fileExtensions %> untuk diunggah."
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
+msgstr "atau"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr ""
+msgstr "Kursus harus memiliki tanggal mulai."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
-msgstr ""
+msgstr "Tanggal terakhir kursus tidak boleh sebelum tanggal mulai kursus."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
-msgstr ""
+msgstr "Tanggal mulai kursus tidak boleh sebelum tanggal mulai daftar."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
+"Tanggal mulai pendaftaran tidak boleh setelah tanggal terakhir pendaftaran."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
-msgstr ""
+msgstr "Tanggal akhir pendaftaran tidak boleh setelah tanggal akhir kursus."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr ""
+msgstr "Kunci harus mengandung huruf, angka, _, atau -"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr ""
+msgstr "Sudah ada jenis tugas lain dengan nama ini."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "Harap masukkan angka integer antara 0 dan 100."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "Mohon masukkan angka integer lebih besar dari 0."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
-msgstr ""
+msgstr "Mohon masukkan angka integer non-negatif."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
+msgstr "Tidak bisa men-drop <% attrs.types %> lebih dari yang ditugaskan."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "Waktu tenggang harus ditulis dalam format HH:MM. "
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
-msgstr ""
+msgstr "Konfirmasi Penghapusan Berkas"
 
 #: cms/static/js/views/asset.js
 msgid ""
@@ -1507,81 +1551,94 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
+"Anda yakin hendak menghapus item ini. Tidak bisa dikembalikan\n"
+"\n"
+"Juga setiap isi yang menaut/mengacu pada item tidak akan berjalan lagi (mis. gambar dan/atau tautan rusak)"
 
 #: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
 msgid "Delete"
-msgstr ""
+msgstr "Hapus"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "Berkas Anda telah dihapus"
 
 #: cms/static/js/views/assets.js
 msgid "Name"
-msgstr ""
+msgstr "Nama"
 
 #: cms/static/js/views/assets.js
 msgid "Date Added"
-msgstr ""
+msgstr "Tanggal Ditambahkan"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr ""
+msgstr "Anda yakin hendak menghapus pembaruan ini?"
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Aksi ini tidak bisa dibatalkan."
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
+msgstr "Unggah berkas PDF baru ke “<%= name %>”"
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
 msgstr ""
 
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
-msgstr ""
+msgstr "Menyimpan"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "Terjadi kesalahan dengan unggahnya"
 
 #: cms/static/js/views/import.js
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr ""
+"Format berkas tidak didukung. Mohon unggah berkas dengan ekstensi "
+"<code>tar.gz</code>."
+
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
+msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "Lipat Semua Bagian"
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr ""
+msgstr "Lebarkan Semua Bagian"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr ""
+msgstr "Tanggal rilis:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
+msgstr "{month}/{day}/{year} {hour}:{minute} UTC"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr ""
+msgstr "Sunting bagian tanggal rilis"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
-msgstr ""
+msgstr "Non Gelar"
 
 #: cms/static/js/views/paging.js
 msgid "ascending"
-msgstr ""
+msgstr "Urut Keatas"
 
 #: cms/static/js/views/paging.js
 msgid "descending"
-msgstr ""
+msgstr "Urut Kebawah"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
@@ -1589,56 +1646,88 @@ msgid ""
 "%(total_span)s%(total)s total%(end_span)s, sorted by "
 "%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
 msgstr ""
+"Menampilkan %(current_span)s%(start)s-%(end)s%(end_span)s dari "
+"%(total_span)s%(total)s total%(end_span)s, berdasarkan "
+"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"
-msgstr ""
+msgstr "Perubahan Anda tidak dapat disimpan"
 
 #: cms/static/js/views/section_edit.js
 msgid "Return and resolve this issue"
-msgstr ""
+msgstr "Kembali dan atasi masalah ini "
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr ""
+msgstr "Hapus “<%= name %>”?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
+"Menghapus buku teks tidak bisa dibatalkan dan sekali terhapus referensi "
+"apapun kepadanya dalam navigasi materi kursus juga akan dihapus.   "
 
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
+msgstr "Menghapus"
+
+#: cms/static/js/views/uploads.js
+msgid "Upload"
 msgstr ""
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "Kami mohon maaf, ada kesalahan"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr ""
+msgstr "Anda telah membuat beberapa perubahan"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
 msgstr ""
+"Perubahan Anda tidak akan berpengaruh hingga Anda menyimpan kemajuan Anda."
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
 msgstr ""
+"Anda telah menyimpan beberapa perubahan, tetapi ada beberapa kesalahan"
 
 #: cms/static/js/views/validation.js
 msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr ""
+"Harap atasi masalah pada halaman ini dahulu, lalu simpan kemajuan Anda."
 
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
-msgstr ""
+msgstr "Simpan Perubahan"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
+msgstr "Perubahan Anda telah disimpan."
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr ""
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Settings"
+msgstr ""
+
+#: cms/static/js/views/modals/base_modal.js
+msgid "Save"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -1646,10 +1735,13 @@ msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
 msgstr ""
+"Perubahan Anda tidak akan berpengaruh hingga Anda menyimpan kemajuan Anda. "
+"Hati-hati terhadap format kunci dan nilai, karena validasi belum "
+"diimplementasikan."
 
 #: cms/static/js/views/settings/advanced.js
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "Perubahan kebijakan Anda telah disimpan."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -1657,11 +1749,23 @@ msgid ""
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
 msgstr ""
+"Harap catat bahwa validasi terhadap pasangan kunci dan nilai kebijakan belum"
+" ada. Bila Anda mengalami kesulitan, harap tinjau pasangan kebijakan Anda."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr ""
+msgstr "Unggah gambar kursus Anda."
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
+msgstr "Berkas harus dalam format JPEG atau PNG."
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation"
 msgstr ""

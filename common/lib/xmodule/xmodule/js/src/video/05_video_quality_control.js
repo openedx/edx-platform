@@ -12,7 +12,7 @@ function () {
 
         // Changing quality for now only works for YouTube videos.
         if (state.videoType !== 'youtube') {
-            state.el.find('a.quality_control').remove();
+            state.el.find('a.quality-control').remove();
             return;
         }
 
@@ -36,7 +36,9 @@ function () {
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
+            fetchAvailableQualities: fetchAvailableQualities,
             onQualityChange: onQualityChange,
+            showQualityControl: showQualityControl,
             toggleQuality: toggleQuality
         };
 
@@ -49,17 +51,22 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoQualityControl.el = state.el.find('a.quality_control');
+        state.videoQualityControl.el = state.el.find('a.quality-control');
 
         state.videoQualityControl.el.show();
-        state.videoQualityControl.quality = null;
+        state.videoQualityControl.quality = 'large';
     }
 
     // function _bindHandlers(state)
     //
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
     function _bindHandlers(state) {
-        state.videoQualityControl.el.on('click', state.videoQualityControl.toggleQuality);
+        state.videoQualityControl.el.on('click',
+            state.videoQualityControl.toggleQuality
+        );
+        state.el.on('play',
+            _.once(state.videoQualityControl.fetchAvailableQualities)
+        );
     }
 
     // ***************************************************************
@@ -68,11 +75,48 @@ function () {
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
+    /*
+     * @desc Shows quality control. This function will only be called if HD
+     *       qualities are available.
+     *
+     * @public
+     */
+    function showQualityControl() {
+        this.videoQualityControl.el.removeClass('is-hidden');
+    }
+
+    // This function can only be called once as _.once has been used.
+    /*
+     * @desc Get the available qualities from YouTube API. Possible values are:
+             ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small'].
+             HD are: ['highres', 'hd1080', 'hd720'].
+     *
+     * @public
+     */
+    function fetchAvailableQualities() {
+        var qualities = this.videoPlayer.player.getAvailableQualityLevels();
+
+        this.config.availableHDQualities = _.intersection(
+            qualities, ['highres', 'hd1080', 'hd720']
+        );
+
+        // HD qualities are available, show video quality control.
+        if (this.config.availableHDQualities.length > 0) {
+            this.trigger('videoQualityControl.showQualityControl');
+        }
+        // On initialization, force the video quality to be 'large' instead of
+        // 'default'. Otherwise, the player will sometimes switch to HD
+        // automatically, for example when the iframe resizes itself.
+        this.trigger('videoPlayer.handlePlaybackQualityChange',
+            this.videoQualityControl.quality
+        );
+    }
+
     function onQualityChange(value) {
         var controlStateStr;
         this.videoQualityControl.quality = value;
 
-        if (_.indexOf(this.config.availableQualities, value) !== -1) {
+        if (_.contains(this.config.availableHDQualities, value)) {
             controlStateStr = gettext('HD on');
             this.videoQualityControl.el
                                     .addClass('active')
@@ -88,24 +132,15 @@ function () {
         }
     }
 
-    // This function change quality of video.
-    // Right now we haven't ability to choose quality of HD video,
-    // 'hd720' will be played by default as HD video(this thing is hardcoded).
-    // If suggested quality level is not available for the video,
-    // then the quality will be set to the next lowest level that is available.
-    // (large -> medium)
+    // This function toggles the quality of video only if HD qualities are
+    // available.
     function toggleQuality(event) {
-        var newQuality,
-            value = this.videoQualityControl.quality;
+        var newQuality, value = this.videoQualityControl.quality,
+            isHD = _.contains(this.config.availableHDQualities, value);
 
         event.preventDefault();
 
-        if (_.indexOf(this.config.availableQualities, value) !== -1) {
-            newQuality = 'large';
-        } else {
-            newQuality = 'hd720';
-        }
-
+        newQuality = isHD ? 'large' : 'highres';
         this.trigger('videoPlayer.handlePlaybackQualityChange', newQuality);
     }
 

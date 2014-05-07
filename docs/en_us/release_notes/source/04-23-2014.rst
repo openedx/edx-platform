@@ -1,0 +1,92 @@
+###################################
+April 23, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of April
+23, 2014.  See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the `edX Status`_ page to get an up-
+to-date status for all services on edx.org and edX Edge. The page also includes
+the Twitter feed for @edXstatus, which the edX Operations team uses to post
+updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include: 
+
+  * Updated `Testing Your Course`_ to include a section on how to `Switch Between Studio and Your Live Course`_.
+
+  * Updated `Transcripts in Additional Languages`_ in `Working with Video Components`_.
+
+  * In `Discussions`_, corrected the steps to Create Discussion Categories.
+
+  * Updated the `Bulk Email`_ section with information about the dashboard option to opt out of course email.
+
+  * Updated the `Enrollment`_ section to reflect feature changes.
+      
+
+* `edX Data Documentation`_
+
+* `edX Platform Developer Documentation`_
+
+
+*************
+edX Studio
+*************
+
+* A problem in the HTML editor that caused custom JavaScript and CSS code to be
+  corrupted when you saved an HTML component is now resolved. (STUD-1560)
+
+***************************************
+edX Learning Management System
+***************************************
+
+* This release includes several enhancements to the Beta Instructor Dashboard:
+  
+  * You can now enter either a username or an email address to batch add 
+    and enroll beta testers and students.
+  * The Auto Enroll option is now available when you add beta testers in batch.
+  * For the Batch Enrollment and the Batch Add Beta Testers features, the Auto
+    Enroll and Notify students by email options are now selected by default.
+
+* A problem that prevented MathJax from being displayed properly when the
+  problem answer was shown is now resolved. (BLD-993)
+
+
+  
+.. Links
+
+.. _edX Status: http://status.edx.org/
+
+.. _edX roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+
+.. _Building and Running an edX Course: http://edx.readthedocs.org/projects/ca/en/latest/
+
+.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
+
+.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+
+.. _Testing Your Course: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/view_course_content.html#testing-your-course
+
+.. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/view_course_content.html#view-your-live-course
+
+.. _Transcripts in Additional Languages: http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_video.html#transcripts-in-additional-languages
+
+.. _Working with Video Components: http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_video.html
+
+.. _Discussions: http://edx.readthedocs.org/projects/ca/en/latest/running_course/discussions.html#discussions
+
+.. _Bulk Email: http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/course_launching.html#bulk-email
+
+.. _Enrollment: http://ca.readthedocs.org/en/latest/running_course/course_enrollment.html#enrollment

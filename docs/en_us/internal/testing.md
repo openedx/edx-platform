@@ -5,6 +5,16 @@
 We maintain three kinds of tests: unit tests, integration tests,
 and acceptance tests.
 
+Overall, you want to write the tests that **maximize coverage**
+while **minimizing maintenance**.
+In practice, this usually means investing heavily
+in unit tests, which tend to be the most robust to changes in the code base.
+
+![Test Pyramid](test_pyramid.png)
+
+The pyramid above shows the relative number of unit tests, integration tests,
+and acceptance tests.  Most of our tests are unit tests or integration tests.
+
 ### Unit Tests
 
 * Each test case should be concise: setup, execute, check, and teardown.
@@ -31,8 +41,8 @@ You do not need to test every possible input--that's what unit
 tests are for.  Instead, focus on testing the "happy path"
 to verify that the components work together correctly.
 
-* Many of our tests use the [Django test client](https://docs.djangoproject.com/en/dev/topics/testing/overview/) to simulate
-HTTP requests to the server.
+* Many of our tests use the [Django test client](https://docs.djangoproject.com/en/dev/topics/testing/overview/)
+to simulate HTTP requests to the server.
 
 ### UI Acceptance Tests
 * Use these to test that major program features are working correctly.
@@ -41,15 +51,9 @@ HTTP requests to the server.
 these tests simulate user interactions through the browser using
 [splinter](http://splinter.cobrateam.info/).
 
-Overall, you want to write the tests that **maximize coverage**
-while **minimizing maintenance**.
-In practice, this usually means investing heavily
-in unit tests, which tend to be the most robust to changes in the code base.
-
-![Test Pyramid](test_pyramid.png)
-
-The pyramid above shows the relative number of unit tests, integration tests,
-and acceptance tests.  Most of our tests are unit tests or integration tests.
+* We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) to 
+write end-user acceptance tests directly in Python, using the framework to 
+maximize reliability and maintainability.
 
 ## Test Locations
 
@@ -65,9 +69,10 @@ and test.  For example, the test for `src/views/module.coffee`
 should be written in `spec/views/module_spec.coffee`.
 
 * UI acceptance tests:
-    - Set up and helper methods: `common/djangoapps/terrain`
-    - Tests: located in `features` subpackage within a Django app.
+    - Set up and helper methods, and stubs for external services: `common/djangoapps/terrain`
+    - Lettuce Tests: located in `features` subpackage within a Django app.
     For example: `lms/djangoapps/courseware/features`
+    - Bok Choy Tests: Artifacts are located under `common/test/acceptance`
 
 
 ## Factories
@@ -165,6 +170,13 @@ or to get html report:
 
 then browse reports/common/lib/xmodule/cover/index.html
 
+To run tests for stub servers, for example for
+[YouTube stub server](https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py),
+you can do one of:
+
+    rake fasttest_cms[common/djangoapps/terrain/stubs/tests/test_youtube_stub.py]
+    python -m coverage run --rcfile=cms/.coveragerc `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
 
@@ -192,7 +204,56 @@ To run JavaScript tests in your default browser:
 These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
 
-### Running Acceptance Tests
+### Running Bok Choy Acceptance Tests
+
+We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) for acceptance testing.
+Bok Choy is a UI-level acceptance test framework for writing robust [Selenium](http://docs.seleniumhq.org/) tests in [Python](https://www.python.org/).
+Bok Choy makes your acceptance tests reliable and maintainable by utilizing the Page Object and Promise design patterns.
+
+**Prerequisites**: 
+* These prerequisites are all automatically installed and available in [Devstack](https://github.com/edx/configuration/wiki/edX-Developer-Stack), 
+the supported development enviornment for the edX Platform.
+* Chromedriver and Chrome (see Running Lettuce Acceptance Tests below for the latest tested versions)
+* Mongo
+* Memcache
+* mySQL
+
+
+To run all the bok choy acceptance tests:
+
+    rake test:bok_choy
+
+Once the database has been set up and the static files collected, you can use the 'fast' 
+option to skip those tasks. This option can also be used with any of the test specs below:
+
+    rake test:bok_choy:fast
+
+To run single test, specify the name of the test file. For example:
+
+    rake test:bok_choy[test_lms.py]
+
+To run single test faster by not repeating setup tasks:
+
+    rake test:bok_choy:fast[test_lms.py]
+
+To test only a certain feature, specify the file and the testcase class:
+
+    rake test:bok_choy:fast[test_lms.py:RegistrationTest]
+
+To execute only a certain test case, specify the file name, class, and 
+test case method:
+
+    rake test:bok_choy:fast[test_lms.py:RegistrationTest.test_register]
+
+During acceptance test execution, log files and also screenshots of failed tests
+are captured in test_root/log.
+
+To put a debugging breakpoint in a test use:
+
+    from nose.tools import set_trace; set_trace()
+
+
+### Running Lettuce Acceptance Tests
 
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
 Most of our tests use [Splinter](http://splinter.cobrateam.info/)
@@ -201,8 +262,7 @@ uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver)
 installed to run the tests in Chrome.  The tests are confirmed to run
-with Chrome (not Chromium) version 28.0.1500.71 with ChromeDriver
-version 2.1.210398.
+with Chrome (not Chromium) version 34.0.1847.116 with ChromeDriver version 2.6.232917.
 
 To run all the acceptance tests:
     rake test:acceptance
@@ -234,6 +294,32 @@ as well as the port listed in cms/djangoapps/contentstore/feature/upload.py
 During acceptance test execution, Django log files are written to `test_root/log/lms_acceptance.log` and `test_root/log/cms_acceptance.log`.
 
 **Note**: The acceptance tests can *not* currently run in parallel.
+
+### Debugging Acceptance Tests on Vagrant
+
+If you are using a local Vagrant dev environment to run acceptance tests, then you will only get console text output. To actually see what is happening, you can turn on automatic screenshots. For each step two screenshots will be taken - before, and after. To do this, simply add the step:
+
+    Given I enable capturing of screenshots before and after each step
+
+to your scenario. This step can be added anywhere, and will enable automatic screenshots for all following steps for that scenario only. You can also use the step
+
+    Given I disable capturing of screenshots before and after each step
+
+to turn off auto screenshots for all steps following it.
+
+Screenshots will be placed in the folder `{TEST_ROOT}/log/auto_screenshots`. Each time you launch acceptance tests, this folder will be cleaned. Each screenshot will be named according to the template string `{scenario_number}__{step_number}__{step_function_name}__{"1_before"|"2_after"}`.
+
+If you don't want to have screenshots be captured for all steps, but rather want fine grained control, you can use the decorator
+
+    @capture_screenshot_before_after
+
+before any Python function in `feature_name.py` file. The decorator will capture two screenshots - one before the decorated function runs, and one after. Also, the function
+
+    from lettuce import world; world.capture_screenshot("image_name")
+
+is available, and can be inserted at any point in code to capture a screenshot specifically in that place. In both cases the captured screenshots will go to the same folder as when using the step method - `{TEST_ROOT}/log/auto_screenshot`.
+
+A totally different approach to visually seeing acceptance tests run in Vagrant is to redirect Vagrant X11 session to your local machine. Please see https://github.com/edx/edx-platform/wiki/Test-engineering-FAQ for instruction on how to achieve this.
 
 ## Viewing Test Coverage
 

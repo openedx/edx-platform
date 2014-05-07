@@ -160,8 +160,6 @@ if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
 
-    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
-    # them together.
     urlpatterns += (
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
@@ -524,3 +522,9 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
+
+# display error page templates, for testing purposes
+urlpatterns += (
+    url(r'404', handler404),
+    url(r'500', handler500),
+)

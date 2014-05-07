@@ -12,11 +12,12 @@ file and check it in at the same time as your model changes. To do that,
 
 """
 import logging
-from django.db import models, transaction
-from django.contrib.auth.models import User
-from html_to_text import html_to_text
-
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models, transaction
+
+from html_to_text import html_to_text
+from mail_utils import wrap_message
 
 log = logging.getLogger(__name__)
 
@@ -192,8 +193,8 @@ class CourseEmailTemplate(models.Model):
         message_body_tag = COURSE_EMAIL_MESSAGE_BODY_TAG.format()
         result = result.replace(message_body_tag, message_body, 1)
 
-        # finally, return the result, without converting to an encoded byte array.
-        return result
+        # finally, return the result, after wrapping long lines and without converting to an encoded byte array.
+        return wrap_message(result)
 
     def render_plaintext(self, plaintext, context):
         """

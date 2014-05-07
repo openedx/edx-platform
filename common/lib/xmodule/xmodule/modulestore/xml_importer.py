@@ -6,6 +6,8 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xmodule.x_module import XModuleDescriptor
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -174,6 +176,32 @@ def import_from_xml(
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
                     course_location = module.location
+                    course_prefix = u'{0.org}/{0.course}'.format(course_location)
+
+                    # Check to see if a course with the same
+                    # pseudo_course_id, but different run exists in
+                    # the passed store to avoid broken courses
+                    courses = store.get_courses()
+                    bad_run = False
+                    for course in courses:
+                        if course.location.course_id.startswith(course_prefix):
+                            log.debug('Import is overwriting existing course')
+                            # Importing over existing course, check
+                            # that runs match or fail
+                            if course.location.name != module.location.name:
+                                log.error(
+                                    'A course with ID %s exists, and this '
+                                    'course has the same organization and '
+                                    'course number, but a different term that '
+                                    'is fully identified as %s.',
+                                    course.location.course_id,
+                                    module.location.course_id
+                                )
+                                bad_run = True
+                                break
+                    if bad_run:
+                        # Skip this course, but keep trying to import courses
+                        continue
 
                     log.debug('======> IMPORTING course to location {loc}'.format(
                         loc=course_location
@@ -365,7 +393,8 @@ def import_course_draft(
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
         load_error_modules=False,
-        field_data=None,
+        mixins=xml_module_store.xblock_mixins,
+        field_data=KvsFieldData(kvs=DictKeyValueStore()),
     )
 
     # now walk the /vertical directory where each file in there
@@ -439,7 +468,11 @@ def import_course_draft(
             for descriptor in drafts[key]:
                 try:
                     def _import_module(module):
-                        module.location = module.location.replace(revision='draft')
+                        # Update the module's location to "draft" revision
+                        # We need to call this method (instead of updating the location directly)
+                        # to ensure that pure XBlock field data is updated correctly.
+                        _update_module_location(module, module.location.replace(revision='draft'))
+
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
@@ -488,11 +521,15 @@ def remap_namespace(module, target_location_namespace):
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
     if module.location.category != 'course':
-        module.location = module.location.replace(
-            tag=target_location_namespace.tag,
-            org=target_location_namespace.org,
-            course=target_location_namespace.course
+        _update_module_location(
+            module,
+            module.location.replace(
+                tag=target_location_namespace.tag,
+                org=target_location_namespace.org,
+                course=target_location_namespace.course
+            )
         )
+
     else:
         #
         # module is a course module
@@ -506,12 +543,13 @@ def remap_namespace(module, target_location_namespace):
         # There is more re-namespacing work we have to do when
         # importing course modules
 
-        # remap pdf_textbook urls
+        # remap pdf_textbook urls to portable static URLs
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    chapter['url'] = StaticContent.renamespace_c4x_path(
-                        chapter['url'], target_location_namespace
+                    chapter_loc = StaticContent.get_location_from_path(chapter['url'])
+                    chapter['url'] = StaticContent.get_static_path_from_location(
+                        chapter_loc
                     )
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
@@ -810,3 +848,42 @@ def perform_xlint(
         print("This course can be imported successfully.")
 
     return err_cnt
+
+
+def _update_module_location(module, new_location):
+    """
+    Update a module's location.
+
+    If the module is a pure XBlock (not an XModule), then its field data
+    keys will need to be updated to include the new location.
+
+    Args:
+        module (XModuleMixin): The module to update.
+        new_location (Location): The new location of the module.
+
+    Returns:
+        None
+
+    """
+    # Retrieve the content and settings fields that have been explicitly set
+    # to ensure that they are properly re-keyed in the XBlock field data.
+    if isinstance(module, XModuleDescriptor):
+        rekey_fields = []
+    else:
+        rekey_fields = (
+            module.get_explicitly_set_fields_by_scope(Scope.content).keys() +
+            module.get_explicitly_set_fields_by_scope(Scope.settings).keys()
+        )
+
+    module.location = new_location
+
+    # Pure XBlocks store the field data in a key-value store
+    # in which one component of the key is the XBlock's location (equivalent to "scope_ids").
+    # Since we've changed the XBlock's location, we need to re-save
+    # all the XBlock's fields so they will be stored using the new location in the key.
+    # However, since XBlocks only save "dirty" fields, we need to first
+    # explicitly set each field to its current value before triggering the save.
+    if len(rekey_fields) > 0:
+        for rekey_field_name in rekey_fields:
+            setattr(module, rekey_field_name, getattr(module, rekey_field_name))
+        module.save()

@@ -23,6 +23,8 @@
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
     <%static:css group='style-vendor'/>
+    <%static:css group='style-vendor-tinymce-content'/>
+    <%static:css group='style-vendor-tinymce-skin'/>
     <%static:css group='style-app'/>
     <%static:css group='style-app-extend1'/>
     <%static:css group='style-xmodule'/>
@@ -70,8 +72,8 @@
             "backbone": "js/vendor/backbone-min",
             "backbone.associations": "js/vendor/backbone-associations-min",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
-            "tinymce": "js/vendor/tiny_mce/tiny_mce",
-            "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
+            "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
+            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
             "xmodule": "/xmodule/xmodule",
             "xblock": "coffee/src/xblock",
             "utility": "js/src/utility",
@@ -80,7 +82,12 @@
             "URI": "js/vendor/URI.min",
 
             // externally hosted files
-            "tender": "//edxedge.tenderapp.com/tender_widget",
+            "tender": [
+                "//edxedge.tenderapp.com/tender_widget",
+                // if tender fails to load, fallback on a local file
+                // so that require doesn't fall over
+                "js/src/tender_fallback"
+            ],
             "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
             "youtube": [
                 // youtube URL does not end in ".js". We add "?noext" to the path so
@@ -168,6 +175,9 @@
             "backbone.paginator": {
                 deps: ["backbone"],
                 exports: "Backbone.Paginator"
+            },
+            "tender": {
+                exports: 'Tender'
             },
             "youtube": {
                 exports: "YT"

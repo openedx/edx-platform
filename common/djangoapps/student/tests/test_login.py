@@ -179,6 +179,32 @@ class LoginTest(TestCase):
         response, _audit_log = self._login_response('test@edx.org', 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
+    @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
+    def test_single_session(self):
+        creds = {'email': 'test@edx.org', 'password': 'test_password'}
+        client1 = Client()
+        client2 = Client()
+
+        response = client1.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
+
+        # second login should log out the first
+        response = client2.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        try:
+            # this test can be run with either lms or studio settings
+            # since studio does not have a dashboard url, we should
+            # look for another url that is login_required, in that case
+            url = reverse('dashboard')
+        except NoReverseMatch:
+            url = reverse('upload_transcripts')
+        response = client1.get(url)
+        # client1 will be logged out
+        self.assertEqual(response.status_code, 302)
+
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG'):
         ''' Post the login info '''
         post_params = {'email': email, 'password': password}

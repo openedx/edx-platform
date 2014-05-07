@@ -60,7 +60,7 @@ You can access this self-reported information for all of the students who are en
 
 The student data that is available to course staff always reflects the set of live, current enrollments. Students can register for your course throughout the defined enrollment period, and they can unregister from a course at any time, which unenrolls them. Students can also change their email addresses and full names at any time. As a result, you may want to download student data periodically to gain insights into how the student population changes over time. 
 
-**Note**: In the future, edX may also request that students select a language and location. This data is not collected at this time.
+.. note:: In the future, edX may also request that students select a language and location. This data is not collected at this time.
 
 .. _View and download student data:
 
@@ -70,7 +70,10 @@ Download or view student data
 
 You can download student data to learn about population demographics at a specific point in time, compare demographics at different points in time, and plot trends in the population over time. 
 
-**Important**: Do not navigate away from this page while you wait for the data to be prepared. The larger the enrollment for your course, the longer it takes to create and output the data. 
+In addition to the data for enrolled students, data for the course staff is
+included in the file or display.
+
+.. important:: Do not navigate away from this page while you wait for the data to be prepared. The larger the enrollment for your course, the longer it takes to create and output the data. 
 
 For smaller courses, you also have the option to view student data on the Instructor Dashboard. 
 
@@ -82,18 +85,18 @@ To download or view student data:
 
 #. Click **Data Download**.
 
-#. To download student enrollment data in a CSV file, click **Download profile information as a CSV**.
+#. To download data about enrolled students in a CSV file, click **Download profile information as a CSV**.
 
    You are prompted to open or save the enrolled_profiles.csv file. All student-supplied data is included without truncation.
 
-#. To display student enrollment data, click **List enrolled students' profile information**. (This option is available only for courses with an enrollment of less than 200.)
+#. To display data about enrolled students, click **List enrolled students' profile information**. (This option is available only for courses with an enrollment of less than 200.)
 
    A table of the student data displays, with one row for each enrolled student. Longer values, such as student goals, are truncated.
 
  .. image:: ../Images/StudentData_Table.png
   :alt: Table with columns for the collected data points and rows for each student on the Instructor Dashboard
 
-**Note**: In addition to the data for enrolled students, data for the course staff is included in the file or display.
+.. note:: The columns for language and location are included in this report for backward compatibility only. This data is no longer collected during student registration.
 
 ==========================================
 View demographic distributions

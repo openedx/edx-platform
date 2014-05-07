@@ -12,6 +12,7 @@
       runtime = new window[runtime]["v#{version}"]
       initFn = window[initFnName]
       block = initFn(runtime, element) ? {}
+      block.runtime = runtime
     else
       elementTag = $('<div>').append($element.clone()).html();
       console.log("Block #{elementTag} is missing data-runtime, data-runtime-version or data-init, and can't be initialized")

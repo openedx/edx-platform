@@ -6,18 +6,39 @@
 <% active_flags = " + ".join(waffle.get_flags(request)) %>
 
 <script type="text/javascript">
-  var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
+  // Asynchronously load Segment.io's analytics.js library
+  window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
   analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
 
   % if user.is_authenticated():
 
     analytics.identify("${ user.id }", {
-      email          : "${ user.email }",
-      username       : "${ user.username }",
-      "Active Flags" : "${ active_flags }",
+      "Registered"      : true,
+      email             : "${ user.email }",
+      username          : "${ user.username }",
+      // Count the number of courses in which the user is currently enrolled
+      "Enrollment Count": ${ sum(1 for course in user.courseenrollment_set.values() if course['is_active'] == True) },
+      "Active Flags"    : "${ active_flags }",
     });
 
   % endif
+
+  // Get current page URL and pull out the path
+  path = window.location.href.split("/")[3]
+  // Match on the current path and fire the appropriate pageview event
+  if (path == "register") {
+    // Registration page viewed
+    analytics.page("Registration");
+  } else if (path == "login") {
+    // Login page viewed
+    analytics.page("Login");
+  } else if (path == "dashboard") {
+    // Dashboard viewed
+    analytics.page("Dashboard");
+  } else {
+    // This event serves as a catch-all, firing when any other page is viewed
+    analytics.page("Other");
+  }
 </script>
 <!-- end Segment.io -->
 % else:

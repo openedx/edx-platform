@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
-from mock import patch, PropertyMock
+import json
+import unittest
+from collections import OrderedDict
+from mock import patch, PropertyMock, MagicMock
+
+from django.conf import settings
+
+from xblock.fields import ScopeIds
+from xblock.field_data import DictFieldData
+
+from xmodule.video_module import create_youtube_string
+from xmodule.tests import get_test_descriptor_system
+from xmodule.modulestore import Location
+from xmodule.video_module import VideoDescriptor
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from .test_video_handlers import TestVideo
-from django.conf import settings
-from xmodule.video_module import create_youtube_string
 
 
 class TestVideoYouTube(TestVideo):
@@ -30,6 +41,7 @@ class TestVideoYouTube(TestVideo):
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
             'show_captions': 'true',
+            'handout': None,
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -44,13 +56,13 @@ class TestVideoYouTube(TestVideo):
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
             'transcript_language': u'en',
-            'transcript_languages': '{"en": "English", "uk": "Ukrainian"}',
+            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk":  u"Українська"})),
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript'
-            ).rstrip('/?') + '/translation',
+                self.item_descriptor, 'transcript', 'translation'
+            ).rstrip('/?'),
             'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript'
-            ).rstrip('/?') + '/available_translations',
+                self.item_descriptor, 'transcript', 'available_translations'
+            ).rstrip('/?'),
         }
 
         self.assertEqual(
@@ -88,10 +100,12 @@ class TestVideoNonYouTube(TestVideo):
         }
 
         context = self.item_descriptor.render('student_view').content
+
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
@@ -112,11 +126,11 @@ class TestVideoNonYouTube(TestVideo):
             'transcript_language': u'en',
             'transcript_languages': '{"en": "English"}',
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript'
-            ).rstrip('/?') + '/translation',
+                self.item_descriptor, 'transcript', 'translation'
+            ).rstrip('/?'),
             'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript'
-            ).rstrip('/?') + '/available_translations',
+                self.item_descriptor, 'transcript', 'available_translations'
+            ).rstrip('/?')
         }
 
         self.assertEqual(
@@ -191,6 +205,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': None,
@@ -223,27 +238,26 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             self.initialize_module(data=DATA)
             track_url = self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript'
-            ).rstrip('/?') + '/download'
+                self.item_descriptor, 'transcript', 'download'
+            ).rstrip('/?')
 
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
                 'transcript_download_format': None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt',
-                'transcript_languages': '{"en": "English"}' if not data['transcripts'] else '{"uk": "Ukrainian"}',
+                'transcript_languages': '{"en": "English"}' if not data['transcripts'] else json.dumps({"uk": u'Українська'}),
                 'transcript_language': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript'
-                ).rstrip('/?') + '/translation',
+                    self.item_descriptor, 'transcript', 'translation'
+                ).rstrip('/?'),
                 'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript'
-                ).rstrip('/?') + '/available_translations',
+                    self.item_descriptor, 'transcript', 'available_translations'
+                ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
                 'id': self.item_descriptor.location.html_id(),
             })
-
             self.assertEqual(
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
@@ -313,6 +327,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': None,
@@ -345,11 +360,11 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             expected_context.update({
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript'
-                ).rstrip('/?') + '/translation',
+                    self.item_descriptor, 'transcript', 'translation'
+                ).rstrip('/?'),
                 'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript'
-                ).rstrip('/?') + '/available_translations',
+                    self.item_descriptor, 'transcript', 'available_translations'
+                ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'],
                 'id': self.item_descriptor.location.html_id(),
@@ -399,76 +414,82 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertTrue(self.item_descriptor.download_video)
         self.assertFalse(self.item_descriptor.source_visible)
 
-    @patch('xmodule.video_module.VideoDescriptor.editable_metadata_fields', new_callable=PropertyMock)
-    def test_download_video_is_explicitly_set(self, mock_editable_fields):
-        mock_editable_fields.return_value = {
-            'download_video': {
-                'default_value': False,
-                'explicitly_set': True,
-                'display_name': 'Video Download Allowed',
-                'help': 'Show a link beneath the video to allow students to download the video.',
-                'type': 'Boolean',
-                'value': False,
-                'field_name': 'download_video',
-                'options': [
-                    {'display_name': "True", "value": True},
-                    {'display_name': "False", "value": False}
-                ],
-            },
-            'html5_sources': {
-                'default_value': [],
-                'explicitly_set': False,
-                'display_name': 'Video Sources',
-                'help': 'A list of filenames to be used with HTML5 video.',
-                'type': 'List',
-                'value': [u'http://youtu.be/OEoXaMPEzfM.mp4'],
-                'field_name': 'html5_sources',
-                'options': [],
-            },
-            'source': {
-                'default_value': '',
-                'explicitly_set': False,
-                'display_name': 'Download Video',
-                'help': 'The external URL to download the video.',
-                'type': 'Generic',
-                'value': u'http://example.org/video.mp4',
-                'field_name': 'source',
-                'options': [],
-            },
-            'track': {
-                'default_value': '',
-                'explicitly_set': False,
-                'display_name': 'Download Transcript',
-                'help': 'The external URL to download the timed transcript track.',
-                'type': 'Generic',
-                'value': u'http://some_track.srt',
-                'field_name': 'track',
-                'options': [],
-            },
-            'download_track': {
-                'default_value': False,
-                'explicitly_set': False,
-                'display_name': 'Transcript Download Allowed',
-                'help': 'Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.',
-                'type': 'Generic',
-                'value': False,
-                'field_name': 'download_track',
-                'options': [],
+    def test_download_video_is_explicitly_set(self):
+        with patch(
+            'xmodule.editing_module.TabsEditingDescriptor.editable_metadata_fields',
+            new_callable=PropertyMock,
+            return_value={
+                'download_video': {
+                    'default_value': False,
+                    'explicitly_set': True,
+                    'display_name': 'Video Download Allowed',
+                    'help': 'Show a link beneath the video to allow students to download the video.',
+                    'type': 'Boolean',
+                    'value': False,
+                    'field_name': 'download_video',
+                    'options': [
+                        {'display_name': "True", "value": True},
+                        {'display_name': "False", "value": False}
+                    ],
+                },
+                'html5_sources': {
+                    'default_value': [],
+                    'explicitly_set': False,
+                    'display_name': 'Video Sources',
+                    'help': 'A list of filenames to be used with HTML5 video.',
+                    'type': 'List',
+                    'value': [u'http://youtu.be/OEoXaMPEzfM.mp4'],
+                    'field_name': 'html5_sources',
+                    'options': [],
+                },
+                'source': {
+                    'default_value': '',
+                    'explicitly_set': False,
+                    'display_name': 'Download Video',
+                    'help': 'The external URL to download the video.',
+                    'type': 'Generic',
+                    'value': u'http://example.org/video.mp4',
+                    'field_name': 'source',
+                    'options': [],
+                },
+                'track': {
+                    'default_value': '',
+                    'explicitly_set': False,
+                    'display_name': 'Download Transcript',
+                    'help': 'The external URL to download the timed transcript track.',
+                    'type': 'Generic',
+                    'value': u'http://some_track.srt',
+                    'field_name': 'track',
+                    'options': [],
+                },
+                'download_track': {
+                    'default_value': False,
+                    'explicitly_set': False,
+                    'display_name': 'Transcript Download Allowed',
+                    'help': 'Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.',
+                    'type': 'Generic',
+                    'value': False,
+                    'field_name': 'download_track',
+                    'options': [],
+                },
+                'transcripts': {},
+                'handout': {},
             }
-        }
-        metadata = {
-            'track': u'http://some_track.srt',
-            'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
-        }
+        ):
+            metadata = {
+                'track': u'http://some_track.srt',
+                'source': 'http://example.org/video.mp4',
+                'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+            }
 
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
+            self.initialize_module(metadata=metadata)
 
-        self.assertIn('source', fields)
-        self.assertFalse(self.item_descriptor.download_video)
-        self.assertTrue(self.item_descriptor.source_visible)
-        self.assertTrue(self.item_descriptor.download_track)
+            fields = self.item_descriptor.editable_metadata_fields
+            self.assertIn('source', fields)
+
+            self.assertFalse(self.item_descriptor.download_video)
+            self.assertTrue(self.item_descriptor.source_visible)
+            self.assertTrue(self.item_descriptor.download_track)
 
     def test_source_is_empty(self):
         metadata = {
@@ -481,3 +502,40 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
+
+
+class VideoDescriptorTest(unittest.TestCase):
+    """
+    Tests for video descriptor that requires access to django settings.
+    """
+
+    def setUp(self):
+        system = get_test_descriptor_system()
+        location = Location('i4x://org/course/video/name')
+        self.descriptor = system.construct_xblock_from_class(
+            VideoDescriptor,
+            scope_ids=ScopeIds(None, None, location, location),
+            field_data=DictFieldData({}),
+        )
+        self.descriptor.runtime.handler_url = MagicMock()
+
+    def test_get_context(self):
+        """"
+        Test get_context.
+
+        This test is located here and not in xmodule.tests because get_context calls editable_metadata_fields.
+        Which, in turn, uses settings.LANGUAGES from django setttings.
+        """
+        correct_tabs = [
+            {
+                'name': "Basic",
+                'template': "video/transcripts.html",
+                'current': True
+            },
+            {
+                'name': 'Advanced',
+                'template': 'tabs/metadata-edit-tab.html'
+            }
+        ]
+        rendered_context = self.descriptor.get_context()
+        self.assertListEqual(rendered_context['tabs'], correct_tabs)

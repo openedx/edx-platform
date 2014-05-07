@@ -6,10 +6,7 @@ Staff Debug Info
 
 The edX system keeps track of students' progress through a course -- recording
 when the student watches videos, responds to problems, and so on. If you are
-a staff member on a course, some of that data is visible to you for debugging
-purposes. Under every problem is a link called "Staff Debug Info": clicking
-that link causes a popup to appear that contains various metadata about the
-problem.
+a staff member on a course, some of that data is visible to you for debugging purposes. Under every problem is a **Staff Debug Info** button: clicking this button opens a popup with metadata about the problem.
 
 None of this information should be necessary for day-to-day usage of edX,
 but for the sake of clarity, some of these fields are documented here:

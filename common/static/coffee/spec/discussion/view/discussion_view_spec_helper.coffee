@@ -110,6 +110,12 @@ class @DiscussionViewSpecHelper
         button.trigger($.Event("keydown", {which: 32}))
         expect(spy).toHaveBeenCalled()
         
-
     @checkVoteButtonEvents = (view) ->
         @checkButtonEvents(view, "toggleVote", ".vote-btn")
+
+    @setNextResponseContent = (content) ->
+        $.ajax.andCallFake(
+            (params) =>
+                params.success({"content": content})
+                {always: ->}
+        )

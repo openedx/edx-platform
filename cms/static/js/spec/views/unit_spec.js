@@ -1,11 +1,13 @@
-define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon", "js/views/feedback_notification",
+define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/create_sinon", "js/views/feedback_notification",
     "jasmine-stealth"],
     function (UnitEditView, ModuleModel, create_sinon, NotificationView) {
         var verifyJSON = function (requests, json) {
             var request = requests[requests.length - 1];
             expect(request.url).toEqual("/xblock");
             expect(request.method).toEqual("POST");
-            expect(request.requestBody).toEqual(json);
+            // There was a problem with order of returned parameters in strings.
+            // Changed to compare objects instead strings.
+            expect(JSON.parse(request.requestBody)).toEqual(JSON.parse(json));
         };
 
         var verifyComponents = function (unit, locators) {
@@ -44,7 +46,7 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon"
                     </li> \
                   </ol> \
                 </div>';
-                
+
             var unit;
             var clickDuplicate = function (index) {
                 unit.$(".duplicate-button")[index].click();

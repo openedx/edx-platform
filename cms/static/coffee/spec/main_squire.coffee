@@ -24,8 +24,8 @@ requirejs.config({
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
-        "tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/tiny_mce",
-        "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
+        "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
+        "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
         "xblock/cms.runtime.v1": "coffee/src/xblock/cms.runtime.v1",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
@@ -174,5 +174,7 @@ requirejs.config({
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
 define([
-    "coffee/spec/views/assets_spec"
+    "coffee/spec/views/assets_spec",
+    "js/spec/video/translations_editor_spec",
+    "js/spec/video/file_uploader_editor_spec"
     ])

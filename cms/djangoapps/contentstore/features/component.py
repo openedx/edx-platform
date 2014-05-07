@@ -63,6 +63,8 @@ def see_a_multi_step_component(step, category):
                     '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
+                'Raw HTML':
+                    '<p>This template is similar to the Text template. The only difference is',
             }
             actual_html = world.css_html(selector, index=idx)
             assert_in(html_matcher[step_hash['Component']], actual_html)
@@ -169,11 +171,11 @@ def change_display_name(step, display_name):
     world.edit_component_and_select_settings()
     index = world.get_setting_entry_index(DISPLAY_NAME)
     world.set_field_value(index, display_name)
-    world.save_component(step)
+    world.save_component()
 
 
 @step(u'I unset the display name')
 def unset_display_name(step):
     world.edit_component_and_select_settings()
     world.revert_setting_entry(DISPLAY_NAME)
-    world.save_component(step)
+    world.save_component()

@@ -196,12 +196,6 @@ def forum_form_discussion(request, course_id):
             'page': query_params['page'],
         })
     else:
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
-
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             cohorts = get_course_cohorts(course_id)
             cohorted_commentables = get_cohorted_commentables(course_id)
@@ -243,12 +237,17 @@ def single_thread(request, course_id, discussion_id, thread_id):
     # Currently, the front end always loads responses via AJAX, even for this
     # page; it would be a nice optimization to avoid that extra round trip to
     # the comments service.
-    thread = cc.Thread.find(thread_id).retrieve(
-        recursive=request.is_ajax(),
-        user_id=request.user.id,
-        response_skip=request.GET.get("resp_skip"),
-        response_limit=request.GET.get("resp_limit")
-    )
+    try:
+        thread = cc.Thread.find(thread_id).retrieve(
+            recursive=request.is_ajax(),
+            user_id=request.user.id,
+            response_skip=request.GET.get("resp_skip"),
+            response_limit=request.GET.get("resp_limit")
+        )
+    except cc.utils.CommentClientRequestError as e:
+        if e.status_code == 404:
+            raise Http404
+        raise
 
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
@@ -283,12 +282,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         threads = [utils.safe_content(thread) for thread in threads]
 
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
-
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
@@ -321,7 +314,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return render_to_response('discussion/index.html', context)
 
-
+@require_GET
 @login_required
 def user_profile(request, course_id, user_id):
     nr_transaction = newrelic.agent.current_transaction()
@@ -360,6 +353,8 @@ def user_profile(request, course_id, user_id):
                 'threads': saxutils.escape(json.dumps(threads), escapedict),
                 'user_info': saxutils.escape(json.dumps(user_info), escapedict),
                 'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
+                'page': query_params['page'],
+                'num_pages': query_params['num_pages'],
 #                'content': content,
             }
 

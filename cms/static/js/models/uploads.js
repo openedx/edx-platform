@@ -9,10 +9,11 @@ var FileUpload = Backbone.Model.extend({
         "uploadedBytes": 0,
         "totalBytes": 0,
         "finished": false,
-        "mimeTypes": []
+        "mimeTypes": [],
+        "fileFormats": []
     },
     validate: function(attrs, options) {
-        if(attrs.selectedFile && !_.contains(this.attributes.mimeTypes, attrs.selectedFile.type)) {
+        if(attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
             return {
                 message: _.template(
                     gettext("Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload."),
@@ -24,17 +25,38 @@ var FileUpload = Backbone.Model.extend({
     },
     // Return a list of this uploader's valid file types
     fileTypes: function() {
-        return _.map(
-            this.attributes.mimeTypes,
-            function(type) {
-                return type.split('/')[1].toUpperCase();
-            }
-        );
+        var mimeTypes = _.map(
+                this.attributes.mimeTypes,
+                function(type) {
+                    return type.split('/')[1].toUpperCase();
+                }
+            ),
+            fileFormats = _.map(
+                this.attributes.fileFormats,
+                function(type) {
+                    return type.toUpperCase();
+                }
+            );
+
+        return mimeTypes.concat(fileFormats);
+    },
+    checkTypeValidity: function (file) {
+        var attrs = this.attributes,
+            getRegExp = function (formats) {
+                // Creates regular expression like: /(?:.+)\.(jpg|png|gif)$/i
+                return  RegExp(('(?:.+)\\.(' + formats.join('|') + ')$'), 'i');
+            };
+
+        return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0) ||
+                _.contains(attrs.mimeTypes, file.type) ||
+                getRegExp(attrs.fileFormats).test(file.name);
     },
     // Return strings for the valid file types and extensions this
     // uploader accepts, formatted as natural language
     formatValidTypes: function() {
-        if(this.attributes.mimeTypes.length === 1) {
+        var attrs = this.attributes;
+
+        if(attrs.mimeTypes.concat(attrs.fileFormats).length === 1) {
             return {
                 fileTypes: this.fileTypes()[0],
                 fileExtensions: '.' + this.fileTypes()[0].toLowerCase()

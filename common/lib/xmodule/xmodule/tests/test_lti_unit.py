@@ -59,9 +59,9 @@ class LTIModuleTest(LogicTest):
 
         self.user_id = self.xmodule.runtime.anonymous_student_id
         self.lti_id = self.xmodule.lti_id
-        self.module_id = '//MITx/999/lti/'
+        self.unquoted_resource_link_id= u'{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(self.xmodule.runtime.hostname)
 
-        sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.module_id, self.user_id))
+        sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
         self.DEFAULTS = {
             'sourcedId': sourcedId,
@@ -255,16 +255,20 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(real_outcome_service_url, expected_outcome_service_url)
 
     def test_resource_link_id(self):
-        with patch('xmodule.lti_module.LTIModule.id', new_callable=PropertyMock) as mock_id:
-            mock_id.return_value = self.module_id
-            expected_resource_link_id = unicode(urllib.quote(self.module_id))
+        with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock) as mock_location:
+            self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
+            expected_resource_link_id = unicode(urllib.quote(self.unquoted_resource_link_id))
             real_resource_link_id = self.xmodule.get_resource_link_id()
             self.assertEqual(real_resource_link_id, expected_resource_link_id)
 
     def test_lis_result_sourcedid(self):
-        with patch('xmodule.lti_module.LTIModule.id', new_callable=PropertyMock) as mock_id:
-            mock_id.return_value = self.module_id
-            expected_sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.module_id, self.user_id))
+        with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock) as mock_location:
+            self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
+            expected_sourcedId = u':'.join(urllib.quote(i) for i in (
+                self.system.course_id,
+                urllib.quote(self.unquoted_resource_link_id),
+                self.user_id
+            ))
             real_lis_result_sourcedid = self.xmodule.get_lis_result_sourcedid()
             self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
 
@@ -403,4 +407,8 @@ class LTIModuleTest(LogicTest):
         self.xmodule.graded = False
         self.assertEqual(self.xmodule.max_score(), 100.0)
 
-
+    def test_context_id(self):
+        """
+        Tests that LTI parameter context_id is equal to course_id.
+        """
+        self.assertEqual(self.system.course_id, self.xmodule.context_id)

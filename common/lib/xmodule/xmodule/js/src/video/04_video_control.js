@@ -277,7 +277,6 @@ function () {
             .attr('title', text)
             .text(text);
 
-        this.trigger('videoCaption.resize', null);
         this.el.trigger('fullscreen', [this.isFullScreen]);
     }
 

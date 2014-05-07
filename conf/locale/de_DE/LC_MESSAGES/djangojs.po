@@ -6,7 +6,9 @@
 # Translators:
 # AlecL <alexander.lohberg@paluno.uni-due.de>, 2013
 # AlecL <alexander.lohberg@paluno.uni-due.de>, 2013-2014
-# dabang <bang88@hotmail.de>, 2014
+# andreas.frey <andreas.frey@liip.ch>, 2014
+# dabang <inactive+dabang@transifex.com>, 2014
+# MasterCrumble <basti31@gmx.net>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2013
@@ -24,9 +26,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
-"PO-Revision-Date: 2014-03-24 14:25+0000\n"
-"Last-Translator: ramirezterrix <maximilian@kindshofer.net>\n"
+"POT-Creation-Date: 2014-04-27 11:10-0400\n"
+"PO-Revision-Date: 2014-04-24 13:20+0000\n"
+"Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,6 +38,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "OK"
@@ -44,6 +47,8 @@ msgstr "OK"
 #: cms/static/js/base.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -345,6 +350,8 @@ msgstr "Diskussion anzeigen"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Entschuldigung"
@@ -407,24 +414,16 @@ msgid "vote"
 msgstr "Stimme"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid ""
-"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
-msgid_plural ""
-"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgid "vote (click to remove your vote)"
+msgid_plural "votes (click to remove your vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s Stimme (klicken Sie hier um ihre Stimme zu "
-"entfernen)%(endSrSpan)s"
 msgstr[1] ""
-"%(voteNum)s%(startSrSpan)s Stimmen (klicken Sie hier um ihre Stimme zu "
-"entfernen)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
-msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
+msgid "vote (click to vote)"
+msgid_plural "votes (click to vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s Stimme (klicken um abzustimmen)%(endSrSpan)s"
 msgstr[1] ""
-"%(voteNum)s%(startSrSpan)s Stimmen (klicken um Abzustimmen)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -487,6 +486,11 @@ msgid "Pin Thread"
 msgstr "Markierte Themen"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid ""
+"The thread you selected has been deleted. Please select another thread."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
 msgstr ""
 "Es gab Probleme beim Laden der Antworten. Bitte laden Sie die Seite erneut."
@@ -524,6 +528,10 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
 msgstr "Sind Sie sich sicher das Sie den Beitrag löschen wollen?"
+
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -923,9 +931,10 @@ msgid ""
 "beta tester."
 msgstr ""
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -933,8 +942,8 @@ msgid "Error enrolling/unenrolling users."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
-msgstr "Die folgenden E-Mail Adressen sind ungültig"
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
@@ -1282,21 +1291,17 @@ msgid "(Show)"
 msgstr "(Anzeigen)"
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgid "Insert Hyperlink"
 msgstr ""
-"<p><b>Hyperlink einfügen</b></p><p>http://example.com/ \"optionaler "
-"Titel\"</p>"
+
+#. Translators: Please keep the quotation marks (") around this text
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
+msgid "\"optional title\""
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Image (upload file or type "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
+msgid "Insert Image (upload file or type url)"
 msgstr ""
-"<p><b>Bild einfügen (Datei hochladen orderURL "
-"eingeben)</b></p><p>http://example.com/images/diagram.jpg \"Optionaler "
-"Titel\"<br><br></p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -1408,17 +1413,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Studio's hat Probleme beim Speichern Ihrer Arbeit"
 
-#: cms/static/coffee/src/views/module_edit.js
-msgid "<em>Editing:</em> %s"
-msgstr "<em>Bearbeiten:</em> %s"
-
-#: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
+#: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
 msgstr "Speichern&hellip;"
 
@@ -1436,6 +1437,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
 msgstr "Löschen&hellip;"
 
@@ -1443,21 +1445,21 @@ msgstr "Löschen&hellip;"
 msgid "Adding&hellip;"
 msgstr "Hinzufügen&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr "Kopieren&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
 msgstr "Diese Komponente löschen?"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr ""
 "Das Löschen dieser Komponente ist endgültig und kann nicht rückgängig "
 "gemacht werden."
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr "Ja, diese Komponente löschen"
 
@@ -1614,6 +1616,10 @@ msgstr "Diese Aktion kann nicht widerrufen werden."
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "Neues PDf unter “<%= name %>” hochgeladen"
 
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
+msgstr ""
+
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
@@ -1630,6 +1636,10 @@ msgid ""
 msgstr ""
 "Das Dateiformat wird nicht unterstützt. Bitte laden Sie eine Datei mit der "
 "Endung <code>tar.gz</code> hoch."
+
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
+msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -1699,6 +1709,10 @@ msgid "Deleting"
 msgstr "Löscht gerade"
 
 #: cms/static/js/views/uploads.js
+msgid "Upload"
+msgstr ""
+
+#: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
 msgstr "Wir bitten um Entschuldigung, ein Fehler ist aufgetreten"
 
@@ -1731,6 +1745,26 @@ msgstr "Änderungen speichern"
 msgid "Your changes have been saved."
 msgstr "Ihre Änderungen wurden gespeichert."
 
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr ""
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Settings"
+msgstr ""
+
+#: cms/static/js/views/modals/base_modal.js
+msgid "Save"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -1761,3 +1795,13 @@ msgstr "Laden Sie Ihr Kursbild hoch."
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
 msgstr "Dateien müssen im JPEG oder PNG Format sein."
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation"
+msgstr ""

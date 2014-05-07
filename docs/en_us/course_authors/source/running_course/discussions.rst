@@ -35,7 +35,8 @@ This type of discussion is subject to the release date of the section that conta
 =====================================
 Create discussion categories
 =====================================
-All courses have a static page named **Discussion**. When you create a course, a discussion category named General is available for you to include by default. You can add more discussion categories to guide how students share and find information during your course. Categories might include Feedback, Troubleshooting, or Technical Help. Discussions in these categories can begin as soon as your course is available.
+
+All courses include a page named **Discussion**. When you create a course, a discussion category named General is available for you to include by default. You can add more discussion categories to guide how students share and find information during your course. Categories might include Feedback, Troubleshooting, or Technical Help. Discussions in these categories can begin as soon as your course is available.
 
 To create a discussion category:
 
@@ -45,52 +46,29 @@ To create a discussion category:
 
 #. Scroll down to the Policy Key labeled **discussion_topics**. By default, its Policy Value is:
 
- | {
- |    "General": {
- |        "id": "i4x-test_doc-SB101-course-2014_Jan"
- |    }
- | }
+ .. image:: ../Images/Discussion_Add_initial.png
+  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}}
 
-4. Add a comma between the two closing braces.
+4. Copy the three lines provided for the General discussion category and paste them above the closing brace:
 
- | {
- |    "General": {
- |        "id": "i4x-test_doc-SB101-course-2014_Jan"
- |    },
- | }
+ .. image:: ../Images/Discussion_Add_paste.png
+  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"} "General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}}
 
+5. Replace the second "General" with the quoted name of your new discussion category.
 
-5. Copy the three lines provided for the General discussion category and paste them above the closing brace:
+#. Change the second id value to a unique identifier. For example, append a reference to the category name.
 
-  | {
-  |   "General": {
-  |       "id": "i4x-test_doc-SB101-course-2014_Jan"
-  |   },
-  |   "General": {
-  |       "id": "i4x-test_doc-SB101-course-2014_Jan"
-  |   }
-  | }
+#. Add a comma after the first closing brace.
 
-6. Replace the second "General" with the quoted name of your new discussion category.
-
-#. Change the second id value to a unique identifier. For example, append a reference to the category name:
-
-
- | {
- |   "General": {
- |       "id": "i4x-test_doc-SB101-course-2014_Jan"
- |   },
- |    "Questions about the course": {
- |        "id": "i4x-test_doc-SB101-course-2014_Jan_faq"
- |    }
- | }
+ .. image:: ../Images/Discussion_Add_name.png
+  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}, "Course Q&A": {"id": "i4x-test_doc-SB101-course-2014_Jan_faq"}}
 
 8. Click **Save Changes**.
 
-When students click the **Discussion** static page for your course, the drop-down list includes this new category.
+When students click the **Discussion** page for your course, the drop-down list includes this new category.
 
  .. image:: ../Images/NewCategory_Discussion.png
-  :alt: Image of a new discussion category
+  :alt: Image of a new category named Course Q&A in the list of discussions
 
 .. _Assigning_discussion_roles:
 
@@ -207,7 +185,7 @@ For information on setting up moderators for your course, see :ref:`Assigning_di
 Provide guidelines for students
 ========================================
 
-You can develop a set of best practices for discussion participation and make them avaialbe to students as a course handout file or as a static page. These guidelines can define your expectations and optionally introduce features of edX discussions. 
+You can develop a set of best practices for discussion participation and make them available to students as a course handout file or on a defined page in your course. These guidelines can define your expectations and optionally introduce features of edX discussions. 
 
 .. For a template that you can use to develop your own guidelines, see :ref:`Discussion Forum Guidelines`.
 

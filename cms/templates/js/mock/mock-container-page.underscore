@@ -1,0 +1,42 @@
+<div id="content">
+
+    <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
+        <header class="mast has-actions has-navigation">
+            <h1 class="page-header">
+                <small class="navigation navigation-parents">
+
+                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
+                    <a href="#" class="navigation-link navigation-current">Nested Vertical Test</a>
+                </small>
+            </h1>
+
+            <nav class="nav-actions">
+                <h3 class="sr">Page Actions</h3>
+                <ul>
+                </ul>
+            </nav>
+        </header>
+    </div>
+
+    <div class="wrapper-content wrapper">
+        <div class="inner-wrapper">
+            <section class="content-area">
+
+                <article class="content-primary window">
+                    <section class="wrapper-xblock level-page" data-locator="TestCourse/branch/draft/block/vertical131">
+                    </section>
+                    <div class="no-container-content is-hidden">
+                        <p>This page has no content yet.</p>
+                    </div>
+                    <div class="ui-loading is-hidden">
+                        <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
+                    </div>
+                </article>
+                <aside class="content-supplementary" role="complimentary">
+                </aside>
+            </section>
+        </div>
+    </div>
+
+    <div id="page-notification"></div>
+</div>

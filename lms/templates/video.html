@@ -72,11 +72,11 @@
                   </ul>
                   <div class="secondary-controls">
                       <div class="speeds menu-container">
-                          <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
-                              <h3>${_('Speed')}</h3>
-                              <p class="active"></p>
+                          <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
+                              <span class="label">${_('Speed')}</span>
+                              <span class="value"></span>
                           </a>
-                          <ol class="video_speeds menu" role="menu"></ol>
+                          <ol class="video-speeds menu" role="menu"></ol>
                       </div>
                       <div class="volume">
                           <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
@@ -85,7 +85,7 @@
                           </div>
                       </div>
                       <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                      <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
+                      <a href="#" class="quality-control is-hidden" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
                       <div class="lang menu-container">
                         <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-
@@ -107,12 +107,12 @@
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
     % if sources.get('main'):
-        <li class="video-sources">
+        <li class="video-sources video-download-button">
             ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
         </li>
     % endif
     % if track:
-        <li class="video-tracks">
+        <li class="video-tracks video-download-button">
           % if transcript_download_format:
             ${('<a href="%s">' + _('Download transcript') + '</a>') % track
             }
@@ -125,8 +125,9 @@
                   % else:
                   <li class="a11y-menu-item">
                   % endif
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_('{file_format}'.format(file_format=item['display_name']))}" data-value="${item['value']}">
-                        ${_('{file_format}'.format(file_format=item['display_name']))}
+		      <% dname = item['display_name'] %>
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                        ${_(dname)}
                       </a>
                   </li>
                 % endfor
@@ -136,6 +137,11 @@
             ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
             }
           % endif
+        </li>
+    % endif
+    % if handout:
+        <li class="video-handout video-download-button">
+            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
         </li>
     % endif
   </ul>

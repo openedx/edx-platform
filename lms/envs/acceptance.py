@@ -27,6 +27,11 @@ import string
 def seed():
     return os.getppid()
 
+# Suppress error message "Cannot determine primary key of logged in user"
+# from track.middleware that gets triggered when using an auto_auth workflow
+# This is an ERROR level warning so we need to set the threshold at CRITICAL
+logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+
 # Use the mongo store for acceptance tests
 DOC_STORE_CONFIG = {
     'host': 'localhost',
@@ -93,13 +98,18 @@ STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
-# per-test control for acceptance tests
-# For consistency in user-experience, keep the value of this setting in sync with
-# the one in cms/envs/acceptance.py
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+# per-test control for lettuce acceptance tests.
+# If you are writing an acceptance test that needs the discussion service enabled,
+# do not write it in lettuce, but instead write it using bok-choy.
+# DO NOT CHANGE THIS SETTING HERE.
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# Third-party auth is enabled in lms/envs/test.py for unittests, but we don't
+# yet want it for acceptance tests.
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = False
 
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
@@ -176,6 +186,6 @@ XQUEUE_INTERFACE = {
 }
 
 # Point the URL used to test YouTube availability to our stub YouTube server
-YOUTUBE['API'] = 'youtube.com/iframe_api'
+YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

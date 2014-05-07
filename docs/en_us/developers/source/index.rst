@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to EdX's Dev documentation!
+edX Developer's Guide
 ===================================
 
 Contents:
@@ -14,7 +14,10 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    change_log
     overview.rst
+    extending_platform/index
+    process/index
 
 APIs
 -----
@@ -34,6 +37,8 @@ Internationalization
 
     i18n.rst
     i18n_translators_guide.rst
+    pavelib.rst
+    xblocks.rst
 
 Indices and tables
 ==================

@@ -1,0 +1,334 @@
+// studio - elements - modal-window
+// ========================
+
+// start with the view/body
+[class*="view-"] {
+
+  // basic modal content
+  .modal-window  {
+    @extend %ui-depth3;
+    @include box-sizing(border-box);
+    position: absolute;
+    width: 50%;
+    box-shadow: 0px 0px 7px $shadow-d1;
+    border-radius: ($baseline/5);
+    background-color: $gray-l4;
+    padding: 7px;
+    text-align: left;
+
+    .modal-content {
+      position: relative;
+      background-color: $white;
+      padding: 5%;
+    }
+
+    .title {
+      @extend %t-title5;
+      margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+      font-weight: 600;
+      color: $black;
+    }
+
+    .message {
+      @extend %t-copy-sub1;
+      margin: 0 0 $baseline 0;
+      color: $gray;
+    }
+
+    .message-status {
+      padding: 0;
+
+      &.error {
+        border: 0;
+        background-color: $white;
+        color: $red;
+      }
+
+      &.success {
+        border: 0;
+        background-color: $white;
+        color: $green-d1;
+      }
+    }
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .modal-chin,
+    .xblock-actions,
+    .modal-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+
+      .action-item {
+        @extend %t-action3;
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .action-primary {
+        @include blue-button();
+        @include font-size(14); // needed due to bad button mixins for now
+        border-color: $blue-d1;
+        color: $white;
+      }
+
+      a {
+        color: $blue;
+
+        &:hover {
+          color: $blue-s2;
+        }
+      }
+    }
+  }
+
+
+  // small modals - quick editors and dialogs
+  .modal-sm {
+    width: 30%;
+    min-width: ($baseline*15);
+
+    .modal-content {
+      padding: 5% 4%;
+    }
+  }
+
+  // medium modals - forms and interactives
+  .modal-med {
+    width: 40%;
+    min-width: ($baseline*18);
+
+    .modal-content {
+      padding: 4%;
+    }
+  }
+
+  // large modals - component editors and interactives
+  .modal-lg {
+    width: 70%;
+    min-width: ($baseline*27.5);
+    height: auto;
+
+    &.modal-editor {
+
+      .modal-header {
+        margin: ($baseline/4) ($baseline/2);
+
+        .title {
+          width: 47%;
+          display: inline-block;
+        }
+
+        .editor-modes {
+          width: 48%;
+          display: inline-block;
+          text-align: right;
+
+          .action-item {
+            display: inline-block;
+            margin-left: ($baseline/2);
+
+            .editor-button,
+            .settings-button {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+
+              &:hover {
+              }
+
+              &.is-set {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .modal-content {
+        height: 435px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0;
+      }
+    }
+  }
+
+
+
+  // specific modal overrides
+
+  // upload modal
+  .assetupload-modal {
+
+    .status-upload {
+      margin-top: $baseline;
+    }
+  }
+
+
+  // component editor
+  .modal-window {
+
+    .CodeMirror {
+      height: 365px;
+    }
+
+    .wrapper-comp-settings {
+
+      .list-input {
+
+        &.settings-list {
+          height: auto;
+          max-height: none;
+        }
+      }
+    }
+  }
+
+  // xblock custom actions
+  .modal-window .editor-with-buttons {
+    margin-bottom: ($baseline*3);
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .xblock-actions {
+      background-color: $gray-l4;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+    }
+
+
+
+  }
+
+
+  // special overrides for video module editor/hidden tab editors
+  .modal-lg.modal-type-video {
+
+    .modal-content {
+      box-shadow: none;
+      height: auto;
+      overflow-y: hidden;
+
+      // modal within a modal
+      .wrapper-modal-window-assetupload {
+
+        .modal-window {
+          top: 10% !important;
+          left: 10% !important;
+        }
+
+        .modal-header {
+          margin: ($baseline/2) 2%;
+
+          .title {
+            width: auto;
+            margin: 0 0 ($baseline/4) 0;
+          }
+
+          .editor-modes {
+            display: none;
+          }
+        }
+
+        .modal-content {
+          padding: 2%;
+
+          .message {
+            margin: 0 ($baseline/4) ($baseline/4) ($baseline/4);
+          }
+
+          input[type="file"] {
+            margin: 0;
+          }
+        }
+
+        .modal-actions {
+          padding: ($baseline/2) 0;
+        }
+      }
+    }
+
+    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
+
+      .edit-header {
+        border: 0;
+        background-color: $gray-l4;
+        padding: ($baseline/2);
+
+        .component-name {
+          @extend %t-title5;
+          display: inline-block;
+          vertical-align: middle;
+          width: 48%;
+          margin-left: ($baseline/2);
+          font-weight: 600;
+          color: $black;
+
+          em {
+            color: inherit;
+            display: inline;
+          }
+        }
+
+        .editor-tabs {
+          display: inline-block;
+          width: 48%;
+          position: relative;
+          top: auto;
+          right: auto;
+          padding: 0;
+          text-align: right;
+
+          .inner_tab_wrap {
+            padding: 0;
+
+            a.tab {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              background-image: none;
+              box-shadow: none;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+              font-weight: normal;
+
+              &.current {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .tabs-wrapper {
+        height: ($baseline*24);
+        overflow-y: scroll;
+        border: 1px solid $gray-l2;
+
+        .component-tab {
+          border-top: 0;
+        }
+      }
+    }
+  }
+
+  .modal-window-overlay {
+    @extend %ui-depth3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+  }
+}

@@ -52,6 +52,6 @@ def test_capa_system():
     return the_system
 
 
-def new_loncapa_problem(xml, capa_system=None):
+def new_loncapa_problem(xml, capa_system=None, seed=723):
     """Construct a `LoncapaProblem` suitable for unit tests."""
-    return LoncapaProblem(xml, id='1', seed=723, capa_system=capa_system or test_capa_system())
+    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system())

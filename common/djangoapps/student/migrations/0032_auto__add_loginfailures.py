@@ -113,6 +113,8 @@ class Migration(SchemaMigration):
         },
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
+            'city': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '6', 'null': 'True', 'blank': 'True'}),

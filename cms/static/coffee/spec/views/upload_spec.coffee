@@ -1,4 +1,4 @@
-define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/create_sinon"], (FileUpload, UploadDialog, Chapter, create_sinon) ->
+define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers"], (FileUpload, UploadDialog, Chapter, create_sinon, modal_helpers) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
 
@@ -6,8 +6,8 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
         tpl = readFixtures("upload-dialog.underscore")
 
         beforeEach ->
-            setFixtures($("<script>", {id: "upload-dialog-tpl", type: "text/template"}).text(tpl))
-            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
+            modal_helpers.installModalTemplates()
+            appendSetFixtures($("<script>", {id: "upload-dialog-tpl", type: "text/template"}).text(tpl))
             CMS.URL.UPLOAD_ASSET = "/upload"
 
             @model = new FileUpload(
@@ -16,6 +16,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
             @dialogResponse = dialogResponse = []
             @view = new UploadDialog(
               model: @model,
+              url:  CMS.URL.UPLOAD_ASSET,
               onSuccess: (response) =>
                 dialogResponse.push(response.response)
             )
@@ -36,11 +37,10 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
 
         afterEach ->
             delete CMS.URL.UPLOAD_ASSET
+            if (@view && modal_helpers.isShowingModal(@view))
+                @view.hide()
 
         describe "Basic", ->
-            it "should be shown by default", ->
-                expect(@view.options.shown).toBeTruthy()
-
             it "should render without a file selected", ->
                 @view.render()
                 expect(@view.$el).toContain("input[type=file]")
@@ -64,18 +64,6 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
                 expect(@view.$el).toContain("#upload_error")
                 expect(@view.$(".action-upload")).toHaveClass("disabled")
 
-            it "adds body class on show()", ->
-                @view.show()
-                expect(@view.options.shown).toBeTruthy()
-                # can't test: this blows up the spec runner
-                # expect($("body")).toHaveClass("dialog-is-shown")
-
-            it "removes body class on hide()", ->
-                @view.hide()
-                expect(@view.options.shown).toBeFalsy()
-                # can't test: this blows up the spec runner
-                # expect($("body")).not.toHaveClass("dialog-is-shown")
-
         describe "Uploads", ->
             beforeEach ->
                 @clock = sinon.useFakeTimers()
@@ -86,6 +74,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
             it "can upload correctly", ->
                 requests = create_sinon["requests"](this)
 
+                @view.render()
                 @view.upload()
                 expect(@model.get("uploading")).toBeTruthy()
                 expect(requests.length).toEqual(1)
@@ -102,6 +91,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
             it "can handle upload errors", ->
                 requests = create_sinon["requests"](this)
 
+                @view.render()
                 @view.upload()
                 requests[0].respond(500)
                 expect(@model.get("title")).toMatch(/error/)
@@ -110,9 +100,10 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
             it "removes itself after two seconds on successful upload", ->
                 requests = create_sinon["requests"](this)
 
+                @view.render()
                 @view.upload()
                 requests[0].respond(200, {"Content-Type": "application/json"},
                         '{"response": "dummy_response"}')
-                expect(@view.remove).not.toHaveBeenCalled()
+                expect(modal_helpers.isShowingModal(@view)).toBeTruthy();
                 @clock.tick(2001)
-                expect(@view.remove).toHaveBeenCalled()
+                expect(modal_helpers.isShowingModal(@view)).toBeFalsy();

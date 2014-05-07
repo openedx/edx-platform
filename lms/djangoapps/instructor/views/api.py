@@ -33,7 +33,7 @@ from django_comment_common.models import (
 )
 
 from courseware.models import StudentModule
-from student.models import unique_id_for_user
+from student.models import unique_id_for_user, CourseEnrollment
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
@@ -50,6 +50,10 @@ import analytics.basic
 import analytics.distributions
 import analytics.csvs
 import csv
+
+# Submissions is a Django app that is currently installed
+# from the edx-ora2 repo, although it will likely move in the future.
+from submissions import api as sub_api
 
 from bulk_email.models import CourseEmail
 
@@ -200,7 +204,7 @@ def require_level(level):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(action="enroll or unenroll", emails="stringified list of emails")
+@require_query_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
 def students_update_enrollment(request, course_id):
     """
     Enroll or unenroll students by email.
@@ -208,7 +212,7 @@ def students_update_enrollment(request, course_id):
 
     Query Parameters:
     - action in ['enroll', 'unenroll']
-    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - identifiers is string containing a list of emails and/or usernames separated by anything split_input_list can handle.
     - auto_enroll is a boolean (defaults to false)
         If auto_enroll is false, students will be allowed to enroll.
         If auto_enroll is true, students will be enrolled as soon as they register.
@@ -240,8 +244,8 @@ def students_update_enrollment(request, course_id):
     """
 
     action = request.GET.get('action')
-    emails_raw = request.GET.get('emails')
-    emails = _split_input_list(emails_raw)
+    identifiers_raw = request.GET.get('identifiers')
+    identifiers = _split_input_list(identifiers_raw)
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
     email_students = request.GET.get('email_students') in ['true', 'True', True]
 
@@ -251,23 +255,23 @@ def students_update_enrollment(request, course_id):
         email_params = get_email_params(course, auto_enroll)
 
     results = []
-    for email in emails:
+    for identifier in identifiers:
+        # First try to get a user object from the identifer
+        user = None
+        email = None
+        try:
+            user = get_student_from_identifier(identifier)
+        except User.DoesNotExist:
+            email = identifier
+        else:
+            email = user.email
+
         try:
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
-            validate_email(email)
-        except ValidationError:
-            # Flag this email as an error if invalid, but continue checking
-            # the remaining in the list
-            results.append({
-                'email': email,
-                'error': True,
-                'invalidEmail': True,
-            })
-            continue
+            validate_email(email)  # Raises ValidationError if invalid
 
-        try:
             if action == 'enroll':
                 before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
@@ -277,20 +281,29 @@ def students_update_enrollment(request, course_id):
                     "Unrecognized action '{}'".format(action)
                 ))
 
+        except ValidationError:
+            # Flag this email as an error if invalid, but continue checking
+            # the remaining in the list
             results.append({
-                'email': email,
-                'before': before.to_dict(),
-                'after': after.to_dict(),
+                'identifier': identifier,
+                'invalidIdentifier': True,
             })
-        # catch and log any exceptions
-        # so that one error doesn't cause a 500.
+
         except Exception as exc:  # pylint: disable=W0703
+            # catch and log any exceptions
+            # so that one error doesn't cause a 500.
             log.exception("Error while #{}ing student")
             log.exception(exc)
             results.append({
-                'email': email,
+                'identifier': identifier,
                 'error': True,
-                'invalidEmail': False,
+            })
+
+        else:
+            results.append({
+                'identifier': identifier,
+                'before': before.to_dict(),
+                'after': after.to_dict(),
             })
 
     response_payload = {
@@ -306,7 +319,7 @@ def students_update_enrollment(request, course_id):
 @require_level('instructor')
 @common_exceptions_400
 @require_query_params(
-    emails="stringified list of emails",
+    identifiers="stringified list of emails and/or usernames",
     action="add or remove",
 )
 def bulk_beta_modify_access(request, course_id):
@@ -314,26 +327,28 @@ def bulk_beta_modify_access(request, course_id):
     Enroll or unenroll users in beta testing program.
 
     Query parameters:
-    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - identifiers is string containing a list of emails and/or usernames separated by
+      anything split_input_list can handle.
     - action is one of ['add', 'remove']
     """
     action = request.GET.get('action')
-    emails_raw = request.GET.get('emails')
-    emails = _split_input_list(emails_raw)
+    identifiers_raw = request.GET.get('identifiers')
+    identifiers = _split_input_list(identifiers_raw)
     email_students = request.GET.get('email_students') in ['true', 'True', True]
+    auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
     results = []
     rolename = 'beta'
     course = get_course_by_id(course_id)
 
     email_params = {}
     if email_students:
-        email_params = get_email_params(course, auto_enroll=False)
+        email_params = get_email_params(course, auto_enroll=auto_enroll)
 
-    for email in emails:
+    for identifier in identifiers:
         try:
             error = False
             user_does_not_exist = False
-            user = User.objects.get(email=email)
+            user = get_student_from_identifier(identifier)
 
             if action == 'add':
                 allow_access(course, user, rolename)
@@ -356,10 +371,16 @@ def bulk_beta_modify_access(request, course_id):
             # If no exception thrown, see if we should send an email
             if email_students:
                 send_beta_role_email(action, user, email_params)
+            # See if we should autoenroll the student
+            if auto_enroll:
+                # Check if student is already enrolled
+                if not CourseEnrollment.is_enrolled(user, course_id):
+                    CourseEnrollment.enroll(user, course_id)
+
         finally:
             # Tabulate the action result of this email address
             results.append({
-                'email': email,
+                'identifier': identifier,
                 'error': error,
                 'userDoesNotExist': user_does_not_exist
             })
@@ -539,8 +560,9 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
 
-    # Scrape the query features for i18n - can't translate here because it breaks further queries
-    # and how the coffeescript works. The actual translation will be done in data_download.coffee
+    # Provide human-friendly and translatable names for these features. These names
+    # will be displayed in the table generated in data_download.coffee. It is not (yet)
+    # used as the header row in the CSV, but could be in the future.
     query_features_names = {
         'username': _('Username'),
         'name': _('Name'),
@@ -739,7 +761,11 @@ def reset_student_attempts(request, course_id):
         try:
             enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest("Module does not exist.")
+            return HttpResponseBadRequest(_("Module does not exist."))
+        except sub_api.SubmissionError:
+            # Trust the submissions API to log the error
+            error_msg = _("An error occurred while deleting the score.")
+            return HttpResponse(error_msg, status=500)
         response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
@@ -1078,7 +1104,7 @@ def update_forum_role_membership(request, course_id):
     target_is_instructor = has_access(user, course, 'instructor')
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
-        return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
+        return HttpResponseBadRequest("Cannot revoke instructor forum admin privileges.")
 
     try:
         update_forum_role(course_id, user, rolename, action)
@@ -1252,9 +1278,9 @@ def _msk_from_problem_urlname(course_id, urlname):
         urlname = urlname[:-4]
 
     # Combined open ended problems also have state that can be deleted.  However,
-    # appending "problem" will only allow capa problems to be reset.
-    # Get around this for combinedopenended problems.
-    if "combinedopenended" not in urlname:
+    # prepending "problem" will only allow capa problems to be reset.
+    # Get around this for xblock problems.
+    if "/" not in urlname:
         urlname = "problem/" + urlname
 
     parts = Location.parse_course_id(course_id)

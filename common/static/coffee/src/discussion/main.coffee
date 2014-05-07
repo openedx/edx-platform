@@ -21,7 +21,9 @@ if Backbone?
       threads = element.data("threads")
       user_info = element.data("user-info")
       window.user = new DiscussionUser(user_info)
-      new DiscussionUserProfileView(el: element, collection: threads)
+      page = element.data("page")
+      numPages = element.data("num-pages")
+      new DiscussionUserProfileView(el: element, collection: threads, page: page, numPages: numPages)
   $ ->
     $("section.discussion").each (index, elem) ->
       DiscussionApp.start(elem)

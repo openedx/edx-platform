@@ -3,9 +3,18 @@
 <%!
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
+  from xmodule.tabs import StaticTab
 %>
 <%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
+
+<%block name="header_extras">
+% for template_name in ["basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
 
 <%block name="jsextra">
 <script type='text/javascript'>
@@ -39,7 +48,10 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-        <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
         </li>
       </ul>
     </nav>
@@ -50,43 +62,82 @@
   <section class="content">
     <article class="content-primary" role="main">
 
+      <div class="notice-incontext">
+        <p class="copy">${_("Note: Pages are publicly visible. If users know the URL of a page, they can view the page even if they are not registered for or logged in to your course.")}</p>
+      </div>
+
+
       <div class="inner-wrapper">
         <article class="unit-body">
 
           <div class="tab-list">
-            <ol class="course-nav-tab-list components">
+            <ol class="course-nav-list course components">
 
-              % for tab in built_in_tabs:
-                <li class="course-nav-tab fixed">
-                  <div class="course-nav-tab-header">
-                    <h3 class="title">${_(tab.name)}</h3>
-                  </div>
-                  <div class="course-nav-tab-actions wrapper-actions-list">
-                    <ul class="actions-list">
+              % for tab in tabs_to_render:
+                <%
+                  css_class = "course-tab"
+                  if tab.is_movable:
+                    css_class = css_class + " is-movable"
+                  elif (not tab.is_movable) and (not tab.is_hideable):
+                    css_class = css_class + " is-fixed"
+                %>
 
-                    % if tab.is_hideable:
-                      <li class="action-item action-visible">
-                          <label for="[id]"><span class="sr">${_("Show this page")}</span></label>
-                          <input type="checkbox" id="[id]" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
-                          <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
-                      </li>
-                   %endif
+                % if isinstance(tab, StaticTab):
+                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
 
-                    </ul>
-                  </div>
-                  <div class="drag-handle is-fixed" data-tooltip="${_('Cannot be reordered')}">
-                    <span class="sr">${_("Fixed page")}</span>
-                  </div>
-                </li>
+                % else:
+                    <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">
+                      <div class="course-nav-item-header">
+
+                        % if tab.is_collection:
+
+                          <h3 class="title-sub">${_(tab.name)}</h3>
+                            <ul class="course-nav-item-children">
+                            % for item in tab.items(context_course):
+                              <li class="course-nav-item-child title">
+                                ${_(item.name)}
+                              </li>
+                            % endfor
+                            </ul>
+
+                        % else:
+                          <h3 class="title">${_(tab.name)}</h3>
+                        % endif
+                      </div>
+
+                      <div class="course-nav-item-actions wrapper-actions-list">
+                        <ul class="actions-list">
+
+                        % if tab.is_hideable:
+                          <li class="action-item action-visible">
+                            <label><span class="sr">${_("Show this page")}</span></label>
+                            % if tab.is_hidden:
+                              <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" checked />
+                            % else:
+                              <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
+                            % endif
+                            <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
+                          </li>
+                        % endif
+
+                        </ul>
+                      </div>
+
+                      % if tab.is_movable:
+                        <div class="drag-handle" data-tooltip="${_('Drag to reorder')}">
+                          <span class="sr">${_("Drag to reorder")}</span>
+                        </div>
+                      % else:
+                        <div class="drag-handle is-fixed" data-tooltip="${_('This page cannot be reordered')}">
+                          <span class="sr">${_("This page cannot be reordered")}</span>
+                        </div>
+                      % endif
+                    </li>
+
+                 % endif
               % endfor
 
-              % for locator in components:
-              <li class="component" data-locator="${locator}"></li>
-              % endfor
-
-              <li class="new-component-item">
-
-              </li>
+              <li class="new-component-item"></li>
             </ol>
           </div>
 

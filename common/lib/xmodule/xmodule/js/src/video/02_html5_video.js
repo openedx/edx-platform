@@ -275,12 +275,13 @@ function () {
 
             // Register the 'play' event.
             this.video.addEventListener('play', function () {
-                _this.playerState = HTML5Video.PlayerState.PLAYING;
+                _this.playerState = HTML5Video.PlayerState.BUFFERING;
                 _this.callStateChangeCallback();
             }, false);
 
             this.video.addEventListener('playing', function () {
                 _this.playerState = HTML5Video.PlayerState.PLAYING;
+                _this.callStateChangeCallback();
             }, false);
 
             // Register the 'pause' event.

@@ -38,7 +38,6 @@ Specific Problem Types
    course_data_formats/word_cloud/word_cloud.rst
    course_data_formats/custom_response.rst
    course_data_formats/symbolic_response.rst
-   course_data_formats/jsinput.rst
    course_data_formats/formula_equation_input.rst
 
 .. _Internal Data Formats:
@@ -51,6 +50,7 @@ These documents describe how we store course structure, student state/progress, 
    :maxdepth: 2
 
    internal_data_formats/change_log.rst
+   internal_data_formats/data_czar.rst
    internal_data_formats/sql_schema.rst
    internal_data_formats/discussion_data.rst
    internal_data_formats/wiki_data.rst

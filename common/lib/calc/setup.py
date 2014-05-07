@@ -5,7 +5,7 @@ setup(
     version="0.2",
     packages=["calc"],
     install_requires=[
-        "pyparsing==1.5.6",
+        "pyparsing==2.0.1",
         "numpy",
         "scipy"
     ],

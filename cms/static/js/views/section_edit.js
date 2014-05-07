@@ -9,7 +9,7 @@ define(["js/views/baseview", "underscore", "js/views/feedback_prompt", "js/views
             return this;
         },
         initialize: function() {
-            this.template = _.template($("#section-name-edit-tpl").text());
+            this.template = this.loadTemplate('section-name-edit');
             this.listenTo(this.model, "invalid", this.showInvalidMessage);
             this.render();
         },

@@ -43,9 +43,11 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    # for consistency in user-experience, keep the value of this setting in sync with the
-    # one in lms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,
 
     'AUTH_USE_CERTIFICATES': False,
 
@@ -91,6 +93,18 @@ FEATURES = {
 
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
+
+    # Turn off Advanced Security by default
+    'ADVANCED_SECURITY': False,
+
+    # Temporary feature flag for duplicating xblock leaves
+    'ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT': False,
+
+    # Temporary feature flag for deleting xblock leaves
+    'ENABLE_DELETE_XBLOCK_LEAF_COMPONENT': False,
 }
 ENABLE_JASMINE = False
 
@@ -236,10 +250,6 @@ XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
-
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
@@ -309,9 +319,23 @@ PIPELINE_CSS = {
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
-            'js/vendor/markitup/sets/wiki/style.css',
+            'js/vendor/markitup/sets/wiki/style.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-vendor-tinymce-content': {
+        'source_filenames': [
+            'css/tinymce-studio-content-fonts.css',
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'css/tinymce-studio-content.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-content.css',
+    },
+    'style-vendor-tinymce-skin': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
     'style-app': {
         'source_filenames': [
@@ -504,6 +528,9 @@ INSTALLED_APPS = (
     'django_openid_auth',
 
     'embargo',
+
+    # Monitoring signals
+    'monitoring',
 )
 
 
@@ -562,6 +589,7 @@ OPTIONAL_APPS = (
     'openassessment.xblock'
 )
 
+
 for app_name in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
@@ -574,3 +602,7 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
+
+### ADVANCED_SECURITY_CONFIG
+# Empty by default
+ADVANCED_SECURITY_CONFIG = {}

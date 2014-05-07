@@ -5,6 +5,7 @@ Settings for bok choy tests
 import os
 from path import path
 
+
 CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -22,7 +23,7 @@ from .aws import *  # pylint: disable=W0401, W0614
 
 ######################### Testing overrides ####################################
 
-# Needed for the `reset_db` management command
+# Needed for the reset database management command
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo
@@ -60,3 +61,9 @@ for log_name, log_level in LOG_OVERRIDES:
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
+
+# Point the URL used to test YouTube availability to our stub YouTube server
+YOUTUBE_PORT = 9080
+YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
+YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

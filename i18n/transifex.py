@@ -18,6 +18,8 @@ def push():
 
 def pull():
     print("Pulling languages from transifex...")
+    # Pull translations from all languages where there is
+    # at least 10% reviewed translations
     execute('tx pull --mode=reviewed --all')
     clean_translated_locales()
 
@@ -47,7 +49,13 @@ def clean_file(filename):
     Strips out the warning from a translated po file about being an English source file.
     Replaces warning with a note about coming from Transifex.
     """
-    po = pofile(filename)
+    try:
+        po = pofile(filename)
+    except Exception as exc:
+        # An exception can occur when a language is deleted from Transifex.
+        # Don't totally fail here.
+        print("Encountered error {} with filename {} - language project may no longer exist on Transifex".format(exc, filename))
+        return
     if po.header.find(EDX_MARKER) != -1:
         new_header = get_new_header(po)
         new = po.header.replace(EDX_MARKER, new_header)

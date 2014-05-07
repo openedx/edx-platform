@@ -289,30 +289,33 @@
                 site_domain = microsite.get_value('site_domain', 'www.edx.org')
                 platform_name = microsite.get_value('platform_name', 'edX')
 
-                tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+{number}+{title}+through+{account}:+{url}".format(
+                # Translators: This text will be automatically posted to the student's
+                # Twitter account. {url} should appear at the end of the text.
+                tweet_text = _("I just registered for {number} {title} through {account}: {url}").format(
                     number=course.number,
                     title=get_course_about_section(course, 'title'),
                     account=microsite.get_value('course_about_twitter_account', '@edxonline'),
-                    url="http://{domain}{path}".format(
+                    url=u"http://{domain}{path}".format(
                         domain=site_domain,
                         path=reverse('about_course', args=[course.id])
                     )
-                )
+                ).replace(u" ", u"+")
+                tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
 
                 facebook_link = microsite.get_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
 
-                email_subject = "mailto:?subject={subject}&body={body}".format(
-                    subject="Take a course with {platform} online".format(platform=platform_name),
-                    body="I just registered for {number} {title} through {platform} {url}".format(
+                email_subject = u"mailto:?subject={subject}&body={body}".format(
+                    subject=_("Take a course with {platform} online").format(platform=platform_name),
+                    body=_("I just registered for {number} {title} through {platform} {url}").format(
                         number=course.number,
                         title=get_course_about_section(course, 'title'),
                         platform=platform_name,
-                        url="http://{domain}{path}".format(
+                        url=u"http://{domain}{path}".format(
                             domain=site_domain,
                             path=reverse('about_course', args=[course.id]),
                         )
                     )
-                ).replace(" ", "%20")
+                ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
                 <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
