@@ -4,10 +4,12 @@ from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
-from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore import InvalidLocationError, InvalidKeyError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
+# TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
+# to change this file so instead of using course_id_partial, we're just using asset keys
 
 class StaticContentServer(object):
     def process_request(self, request):
@@ -15,7 +17,7 @@ class StaticContentServer(object):
         if request.path.startswith('/' + XASSET_LOCATION_TAG + '/'):
             try:
                 loc = StaticContent.get_location_from_path(request.path)
-            except InvalidLocationError:
+            except (InvalidLocationError, InvalidKeyError):
                 # return a 'Bad Request' to browser as we have a malformed Location
                 response = HttpResponse()
                 response.status_code = 400
@@ -47,9 +49,9 @@ class StaticContentServer(object):
             if getattr(content, "locked", False):
                 if not hasattr(request, "user") or not request.user.is_authenticated():
                     return HttpResponseForbidden('Unauthorized')
-                course_partial_id = "/".join([loc.org, loc.course])
                 if not request.user.is_staff and not CourseEnrollment.is_enrolled_by_partial(
-                        request.user, course_partial_id):
+                        request.user, loc.course_key
+                ):
                     return HttpResponseForbidden('Unauthorized')
 
             # convert over the DB persistent last modified timestamp to a HTTP compatible
