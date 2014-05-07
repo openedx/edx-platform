@@ -195,35 +195,25 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // group multiple choice answers
-      var choices = '';
-      var shuffle = false;
-      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
-        var options = match.split('\n');
-        for(var i = 0; i < options.length; i++) {
-          if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
-            var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
-            var correct = /x/i.test(inparens);
-            var fixed = '';
-            if(/@/.test(inparens)) {
-              fixed = ' fixed="true"';
-            }
-            if(/!/.test(inparens)) {
-              shuffle = true;
-            }
-            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
+      xml = xml.replace(/(^\s*\(.?\).*?$\n*)+/gm, function (match) {
+          var groupString = '<multiplechoiceresponse>\n',
+              value, correct, options;
+
+          groupString += '  <choicegroup type="MultipleChoice">\n';
+          options = match.split('\n');
+
+          for (i = 0; i < options.length; i += 1) {
+              if(options[i].length > 0) {
+                  value = options[i].split(/^\s*\(.?\)\s*/)[1];
+                  correct = /^\s*\(x\)/i.test(options[i]);
+                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+              }
           }
-        }
-        var result = '<multiplechoiceresponse>\n';
-        if(shuffle) {
-          result += '  <choicegroup type="MultipleChoice" shuffle="true">\n';
-        } else {
-          result += '  <choicegroup type="MultipleChoice">\n';
-        }
-        result += choices;
-        result += '  </choicegroup>\n';
-        result += '</multiplechoiceresponse>\n\n';
-        return result;
+
+          groupString += '  </choicegroup>\n';
+          groupString += '</multiplechoiceresponse>\n\n';
+
+          return groupString;
       });
 
       // group check answers

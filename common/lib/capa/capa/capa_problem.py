@@ -178,11 +178,6 @@ class LoncapaProblem(object):
         #   input_id string -> InputType object
         self.inputs = {}
 
-        # Run response late_transforms last (see MultipleChoiceResponse)
-        for response in self.responders.values():
-            if hasattr(response, 'late_transforms'):
-                response.late_transforms()
-
         self.extracted_tree = self._extract_html(self.tree)
 
     def do_reset(self):
@@ -424,85 +419,10 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
-    def do_targeted_feedback(self, tree):
-        """
-        Implements the targeted-feedback=N in-place on  <multiplechoiceresponse> --
-        choice-level explanations shown to a student after submission.
-        Does nothing if there is no targeted-feedback attribute.
-        """
-        for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
-            show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
-
-            # Avoid modifying the tree again if targeted_feedback has already run --
-            # do this by setting a targeted-done attribute in the tree.
-            if mult_choice_response.get('targeted-done') is not None:
-                continue
-            mult_choice_response.set('targeted-done', 'done')
-
-            # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
-            choicegroup = mult_choice_response.xpath('./choicegroup[@type="MultipleChoice"]')[0]
-            choices_list = list(choicegroup.iter('choice'))
-
-            # Find the student answer key that matches our <choicegroup> id
-            student_answer = self.student_answers.get(choicegroup.get('id'))
-            expl_id_for_student_answer = None
-
-            # Keep track of the explanation-id that corresponds to the student's answer
-            # Also, keep track of the solution-id
-            solution_id = None
-            for choice in choices_list:
-                if choice.get('name') == student_answer:
-                    expl_id_for_student_answer = choice.get('explanation-id')
-                if choice.get('correct') == 'true':
-                    solution_id = choice.get('explanation-id')
-
-            # Filter out targetedfeedback that doesn't correspond to the answer the student selected
-            # Note: following-sibling will grab all following siblings, so we just want the first in the list
-            targetedfeedbackset = mult_choice_response.xpath('./following-sibling::targetedfeedbackset')
-            if len(targetedfeedbackset) != 0:
-                targetedfeedbackset = targetedfeedbackset[0]
-                targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
-                for targetedfeedback in targetedfeedbacks:
-                    # Don't show targeted feedback if the student hasn't answer the problem
-                    # or if the target feedback doesn't match the student's (incorrect) answer
-                    if not self.done or targetedfeedback.get('explanation-id') != expl_id_for_student_answer:
-                        targetedfeedbackset.remove(targetedfeedback)
-
-            # Do not displace the solution under these circumstances
-            if not show_explanation or not self.done:
-                continue
-
-            # The next element should either be <solution> or <solutionset>
-            next_element = targetedfeedbackset.getnext()
-            parent_element = tree
-            solution_element = None
-            if next_element is not None and next_element.tag == 'solution':
-                solution_element = next_element
-            elif next_element is not None and next_element.tag == 'solutionset':
-                solutions = next_element.xpath('./solution')
-                for solution in solutions:
-                    if solution.get('explanation-id') == solution_id:
-                        parent_element = next_element
-                        solution_element = solution
-
-            # If could not find the solution element, then skip the remaining steps below
-            if solution_element is None:
-                continue
-
-            # Change our correct-choice explanation from a "solution explanation" to within
-            # the set of targeted feedback, which means the explanation will render on the page
-            # without the student clicking "Show Answer" or seeing a checkmark next to the correct choice
-            parent_element.remove(solution_element)
-
-            # Add our solution instead to the targetedfeedbackset and change its tag name
-            solution_element.tag = 'targetedfeedback'
-            targetedfeedbackset.append(solution_element)
-
     def get_html(self):
         """
         Main method called externally to get the HTML to be rendered for this capa Problem.
         """
-        self.do_targeted_feedback(self.tree)
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
@@ -678,7 +598,8 @@ class LoncapaProblem(object):
             # other than to examine .tag to see if it's a string. :(
             return
 
-        if (problemtree.tag == 'script' and problemtree.get('type') and 'javascript' in problemtree.get('type')):
+        if (problemtree.tag == 'script' and problemtree.get('type')
+            and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return deepcopy(problemtree)
 

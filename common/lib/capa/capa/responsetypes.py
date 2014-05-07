@@ -743,46 +743,19 @@ class MultipleChoiceResponse(LoncapaResponse):
     def mc_setup_response(self):
         """
         Initialize name attributes in <choice> stanzas in the <choicegroup> in this response.
-        Masks the choice names if applicable.
         """
         i = 0
         for response in self.xml.xpath("choicegroup"):
-            # Is Masking enabled? -- check for shuffle or answer-pool features
-            ans_str = response.get("answer-pool")
-            if response.get("shuffle") == "true" or (ans_str is not None and ans_str != "0"):
-                self.is_masked = True
-                self.mask_dict = {}
-                rng = random.Random(self.context["seed"])
-                # e.g. mask_ids = [3, 1, 0, 2]
-                mask_ids = range(len(response))
-                rng.shuffle(mask_ids)
             rtype = response.get('type')
             if rtype not in ["MultipleChoice"]:
                 # force choicegroup to be MultipleChoice if not valid
                 response.set("type", "MultipleChoice")
             for choice in list(response):
-                # The regular, non-masked name:
-                if choice.get("name") is not None:
-                    name = "choice_" + choice.get("name")
-                else:
-                    name = "choice_" + str(i)
+                if choice.get("name") is None:
+                    choice.set("name", "choice_" + str(i))
                     i += 1
-                # If using the masked name, e.g. mask_0, save the regular name
-                # to support unmasking later (for the logs).
-                if hasattr(self, "is_masked"):
-                    mask_name = "mask_" + str(mask_ids.pop())
-                    self.mask_dict[mask_name] = name
-                    choice.set("name", mask_name)
                 else:
-                    choice.set("name", name)
-
-    def late_transforms(self):
-        """Rearrangements run late in the __init__ process.
-            Cannot do these at response init time, as not enough
-            other stuff exists at that time.
-        """
-        self.do_shuffle(self.xml)
-        self.do_answer_pool(self.xml)
+                    choice.set("name", "choice_" + choice.get("name"))
 
     def get_score(self, student_answers):
         """
@@ -798,189 +771,6 @@ class MultipleChoiceResponse(LoncapaResponse):
 
     def get_answers(self):
         return {self.answer_id: self.correct_choices}
-
-    # Choice name Masking
-    # A feature where the regular names of multiplechoice choices
-    # choice_0 choice_1 ... are not used. Instead we use random masked names
-    # mask_2 mask_0 ... so that a view-source of the names reveals nothing about
-    # the original order. We introduce the masked names right at init time, so the
-    # whole software stack works with just the one system of naming.
-    # A response with masking has its .is_masked attribute set.
-    # We "unmask" the names, back to choice_0 style, only for the logs so they correspond
-    # to how the problems look to the author.
-    #
-    # Masking is enabled for the shuffle and answer-pool features.
-
-    def unmask_name(self, name):
-        """
-        Given a masked name, e.g. mask_2, returns the regular name, e.g. choice_0.
-        Fails loudly if called for a response that is not masking.
-        """
-        # We could check that masking is enabled, but I figure it's better to
-        # fail loudly so the upper layers are alerted to mis-use.
-        return self.mask_dict[name]
-
-    def unmask_order(self):
-        """
-        Returns a list of the choice names in the order displayed to the user,
-        using the regular (non-masked) names.
-        Fails loudly if called on a response that is not masking.
-        """
-        choicegroups = self.xml.xpath('//choicegroup')
-        return [self.unmask_name(choice.get("name")) for choice in choicegroups[0].getchildren()]
-
-    def do_shuffle(self, tree):
-        """
-        For a choicegroup with shuffle="true", shuffles the choices in-place in the given tree
-        based on the seed. Otherwise does nothing.
-        Does nothing if the tree has already been processed.
-        """
-        choicegroups = tree.xpath('//choicegroup[@shuffle="true"]')
-        if choicegroups:
-            if len(choicegroups) > 1:
-                raise LoncapaProblemError('We support at most one shuffled choicegroup')
-            choicegroup = choicegroups[0]
-            # Note that this tree has been processed.
-            if choicegroup.get('shuffle-done') is not None:
-                return
-            choicegroup.set('shuffle-done', 'done')
-            # Move elements from tree to list for shuffling, then put them back.
-            ordering = list(choicegroup.getchildren())
-            for choice in ordering:
-                choicegroup.remove(choice)
-            ordering = self.shuffle_choices(ordering)
-            for choice in ordering:
-                choicegroup.append(choice)
-
-    def shuffle_choices(self, choices):
-        """
-        Returns a list of choice nodes with the shuffling done.
-        Uses the context seed for the randomness of the shuffle.
-        Choices with 'fixed'='true' are held back from the shuffle.
-        """
-        # Separate out a list of the stuff to be shuffled
-        # vs. the head/tail of fixed==true choices to be held back from the shuffle.
-        # Rare corner case: A fixed==true choice "island" in the middle is lumped in
-        # with the tail group of fixed choices.
-        # Slightly tricky one-pass implementation using a state machine
-        head = []
-        middle = []  # only this one gets shuffled
-        tail = []
-        at_head = True
-        for choice in choices:
-            if at_head and choice.get('fixed') == 'true':
-                head.append(choice)
-                continue
-            at_head = False
-            if choice.get('fixed') == 'true':
-                tail.append(choice)
-            else:
-                middle.append(choice)
-        rng = random.Random(self.context['seed'])  # make one vs. messing with the global one
-        rng.shuffle(middle)
-        return head + middle + tail
-
-    def do_answer_pool(self, tree):
-        """
-        Implements the answer-pool subsetting operation in-place on the tree.
-        Allows for problem questions with a pool of answers, from which answer options shown to the student
-        and randomly selected so that there is always 1 correct answer and n-1 incorrect answers,
-        where the author specifies n as the value of the attribute "answer-pool" within <choicegroup>
-
-        The <choicegroup> tag must have an attribute 'answer-pool' giving the desired
-        pool size. If that attribute is zero or not present, no operation is performed.
-        Calling this a second time does nothing.
-        """
-        choicegroups = tree.xpath("//choicegroup[@answer-pool]")
-
-        # Uses self.seed -- but want to randomize every time reaches this problem,
-        # so problem's "randomization" should be set to "always"
-        rnd = random.Random(self.context['seed'])
-
-        for choicegroup in choicegroups:
-            num_str = choicegroup.get('answer-pool')
-            if num_str == '0':
-                break
-            # Note that this tree has been processed
-            if choicegroup.get('answer-pool-done') is not None:
-                break
-            choicegroup.set('answer-pool-done', 'done')
-            try:
-                num_choices = int(num_str)
-            except ValueError:
-                raise LoncapaProblemError("answer-pool value should be an integer")
-
-            choices_list = list(choicegroup.getchildren())
-
-            # Remove all choices in the choices_list (we will add some back in later)
-            for choice in choices_list:
-                choicegroup.remove(choice)
-
-            # Sample from the answer pool to get the subset choices and solution id
-            (solution_id, subset_choices) = self.sample_from_answer_pool(choices_list, rnd, num_choices)
-
-            # Add back in randomly selected choices
-            for choice in subset_choices:
-                choicegroup.append(choice)
-
-            # Filter out solutions that don't correspond to the correct answer we selected to show
-            # Note that this means that if the user simply provides a <solution> tag, nothing is filtered
-            solutionset = choicegroup.xpath('../following-sibling::solutionset')
-            if len(solutionset) != 0:
-                solutionset = solutionset[0]
-                solutions = solutionset.xpath('./solution')
-                for solution in solutions:
-                    if solution.get('explanation-id') != solution_id:
-                        solutionset.remove(solution)
-
-    def sample_from_answer_pool(self, choices, rnd, num_pool):
-        """
-        Takes in:
-            1. list of choices
-            2. random number generator
-            3. the requested size "answer-pool" number, in effect a max
-
-        Returns a tuple with 2 items:
-            1. the solution_id corresponding with the chosen correct answer
-            2. (subset) list of choice nodes with num-1 incorrect and 1 correct
-        """
-
-        correct_choices = []
-        incorrect_choices = []
-
-        for choice in choices:
-            if choice.get('correct') == 'true':
-                correct_choices.append(choice)
-            else:
-                incorrect_choices.append(choice)
-                # TODO: check if we should require correct == "false"
-
-        # We throw an error if the problem is highly ill-formed.
-        # There must be at least one correct and one incorrect choice.
-        # TODO: perhaps this makes more sense for *all* problems, not just down in this corner.
-        if len(correct_choices) < 1 or len(incorrect_choices) < 1:
-            raise responsetypes.LoncapaProblemError("Choicegroup must include at last 1 correct and 1 incorrect choice")
-
-        # Limit the number of incorrect choices to what we actually have
-        num_incorrect = num_pool - 1
-        num_incorrect = min(num_incorrect, len(incorrect_choices))
-
-        # Select the one correct choice
-        index = rnd.randint(0, len(correct_choices) - 1)
-        correct_choice = correct_choices[index]
-        solution_id = correct_choice.get('explanation-id')
-
-        # Put together the result, pushing most of the work onto rnd.shuffle()
-        subset_choices = [correct_choice]
-        rnd.shuffle(incorrect_choices)
-        subset_choices += incorrect_choices[:num_incorrect]
-        rnd.shuffle(subset_choices)
-
-        return (solution_id, subset_choices)
-
-
-
-
 
 
 @registry.register

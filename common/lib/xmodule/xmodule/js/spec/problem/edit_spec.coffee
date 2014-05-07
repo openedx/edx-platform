@@ -244,49 +244,6 @@ describe 'MarkdownEditingDescriptor', ->
         </div>
         </solution>
         </problem>""")
-    it 'converts multiple choice shuffle to xml', ->
-      data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
-        
-        One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
-        
-        What Apple device competed with the portable CD player?
-        (!x@) The iPad
-        (@) Napster
-        () The iPod
-        ( ) The vegetable peeler
-        ( ) Android
-        (@) The Beatles
-        
-        [Explanation]
-        The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
-        [Explanation]
-        """)
-      expect(data).toEqual("""<problem>
-        <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-        
-        <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
-        
-        <p>What Apple device competed with the portable CD player?</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="true" fixed="true">The iPad</choice>
-            <choice correct="false" fixed="true">Napster</choice>
-            <choice correct="false">The iPod</choice>
-            <choice correct="false">The vegetable peeler</choice>
-            <choice correct="false">Android</choice>
-            <choice correct="false" fixed="true">The Beatles</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-        
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-        
-        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
-
-        </div>
-        </solution>
-        </problem>""")
     it 'converts OptionResponse to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
 

@@ -147,12 +147,6 @@ class CapaFields(object):
     student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
-    last_submission_time = Date(help="Last submission time", scope=Scope.user_state)
-    submission_wait_seconds = Integer(
-        display_name="Timer Between Attempts",
-        help="Seconds a student must wait between submissions for a problem with multiple attempts.",
-        scope=Scope.settings,
-        default=0)
     weight = Float(
         display_name="Problem Weight",
         help=("Defines the number of points each problem is worth. "
@@ -318,12 +312,6 @@ class CapaMixin(CapaFields):
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
-
-    def set_last_submission_time(self):
-        """
-        Set the module's last submission time (when the problem was checked)
-        """
-        self.last_submission_time = datetime.datetime.now(UTC())
 
     def get_score(self):
         """
@@ -872,7 +860,7 @@ class CapaMixin(CapaFields):
 
         return {'grade': score['score'], 'max_grade': score['total']}
 
-    def check_problem(self, data, override_time=False):
+    def check_problem(self, data):
         """
         Checks whether answers to a problem are correct
 
@@ -887,11 +875,6 @@ class CapaMixin(CapaFields):
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
-
-        # Can override current time
-        current_time = datetime.datetime.now(UTC())
-        if override_time is not False:
-            current_time = override_time
 
         _ = self.runtime.service(self, "i18n").ugettext
 
@@ -909,20 +892,12 @@ class CapaMixin(CapaFields):
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
+            current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
-
             waittime_between_requests = self.runtime.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _(u"You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)
-                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
-
-        # Wait time between resets
-        if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-            if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
-                seconds_left = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
-                msg = u'You must wait at least {w} between submissions. {s} remaining.'.format(
-                    w=self.pretty_print_seconds(self.submission_wait_seconds), s=self.pretty_print_seconds(seconds_left))
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
@@ -930,10 +905,10 @@ class CapaMixin(CapaFields):
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
-            self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("StudentInputError in capa_module:problem_check", exc_info=True)
+            log.warning("StudentInputError in capa_module:problem_check",
+                        exc_info=True)
 
             # Save the user's state before failing
             self.set_state_from_lcp()
@@ -989,57 +964,10 @@ class CapaMixin(CapaFields):
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
 
-        return {'success': success, 'contents': html}
-
-    def unmask_log(self, event_info):
-        """
-        Translate the logging event_info to account for masking
-        and record the display_order.
-        This only changes names for responses that are masked, otherwise a NOP.
-        """
-        # answers is like: {u'i4x-Stanford-CS99-problem-dada976e76f34c24bc8415039dee1300_2_1': u'mask_0'}
-        # Each response values has an answer_id which matches the key in answers.
-        for response in self.lcp.responders.values():
-            if hasattr(response, 'is_masked'):
-                # Just programming defensively, we don't assume much about the structure of event_info,
-                # but check for the existence of each thing to unmask
-
-                # 1. answers/id
-                answer =  event_info.get('answers', {}).get(response.answer_id)
-                if answer is not None:
-                    event_info['answers'][response.answer_id] = response.unmask_name(answer)
-
-                # 2. state/student_answers/id
-                answer = event_info.get('state', {}).get('student_answers', {}).get(response.answer_id)
-                if answer is not None:
-                    event_info['state']['student_answers'][response.answer_id] = response.unmask_name(answer)
-
-                # 3. Record the shuffled ordering
-                event_info['display_order'] = {response.answer_id: response.unmask_order()}
-
-    def pretty_print_seconds(self, num_seconds):
-        """
-        Returns time formatted nicely.
-        """
-        if(num_seconds < 60):
-            plural = "s" if num_seconds > 1 else ""
-            return "%i second%s" % (num_seconds, plural)
-        elif(num_seconds < 60 * 60):
-            min_display = int(num_seconds / 60)
-            sec_display = num_seconds % 60
-            plural = "s" if min_display > 1 else ""
-            if sec_display == 0:
-                return "%i minute%s" % (min_display, plural)
-            else:
-                return "%i min, %i sec" % (min_display, sec_display)
-        else:
-            hr_display = int(num_seconds / 3600)
-            min_display = int((num_seconds % 3600) / 60)
-            sec_display = num_seconds % 60
-            if sec_display == 0:
-                return "%i hr, %i min" % (hr_display, min_display)
-            else:
-                return "%i hr, %i min, %i sec" % (hr_display, min_display, sec_display)
+        return {
+            'success': success,
+            'contents': html,
+        }
 
     def get_submission_metadata_safe(self, answers, correct_map):
         """
