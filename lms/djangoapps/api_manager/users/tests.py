@@ -90,11 +90,10 @@ class UsersApiTests(TestCase):
     def test_user_list_post_inactive(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name, 'is_active': False }
+        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name, 'is_active': False}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['is_active'], False)
-
 
     def test_user_list_post_duplicate(self):
         test_uri = '/api/users'
@@ -135,7 +134,7 @@ class UsersApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
-        data = {'is_active': False }
+        data = {'is_active': False}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['is_active'], False)
@@ -145,7 +144,7 @@ class UsersApiTests(TestCase):
 
     def test_user_detail_post_invalid_user(self):
         test_uri = '/api/users/123124124'
-        data = {'is_active': False }
+        data = {'is_active': False}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 

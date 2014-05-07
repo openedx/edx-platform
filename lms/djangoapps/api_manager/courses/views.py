@@ -27,6 +27,7 @@ from xmodule.modulestore import Location, InvalidLocationError
 
 log = logging.getLogger(__name__)
 
+
 def _generate_base_uri(request):
     """
     Constructs the protocol:host:path component of the resource uri
@@ -129,7 +130,7 @@ def _serialize_module_with_children(request, course_descriptor, descriptor, dept
                 request,
                 course_descriptor,
                 child,
-                depth-1
+                depth - 1
             ))
     return data
 
@@ -240,7 +241,7 @@ def _parse_updates_html(html):
 class ModulesList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, module_id=None, format=None):
+    def get(self, request, course_id, module_id=None):
         """
         GET retrieves the list of submodules for a given module
         We don't know where in the module hierarchy we are -- could even be the top
@@ -273,7 +274,7 @@ class ModulesList(APIView):
 class ModulesDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, module_id, format=None):
+    def get(self, request, course_id, module_id):
         """
         GET retrieves an existing module from the system
         """
@@ -308,7 +309,7 @@ class ModulesDetail(APIView):
 class CoursesList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         GET returns the list of available courses
         """
@@ -328,7 +329,7 @@ class CoursesList(APIView):
 class CoursesDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, format=None):
+    def get(self, request, course_id):
         """
         GET retrieves an existing course from the system and returns summary information about the submodules
         to the specified depth
@@ -365,7 +366,7 @@ class CoursesDetail(APIView):
 class CoursesGroupsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, course_id, format=None):
+    def post(self, request, course_id):
         """
         POST creates a new course-group relationship in the system
         """
@@ -402,7 +403,7 @@ class CoursesGroupsList(APIView):
 class CoursesGroupsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, group_id, format=None):
+    def get(self, request, course_id, group_id):
         """
         GET retrieves an existing course-group relationship from the system
         """
@@ -432,7 +433,7 @@ class CoursesGroupsDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, course_id, group_id, format=None):
+    def delete(self, request, course_id, group_id):
         """
         DELETE removes/inactivates/etc. an existing course-group relationship
         """
@@ -441,13 +442,15 @@ class CoursesGroupsDetail(APIView):
             existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group).delete()
         except ObjectDoesNotExist:
             pass
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        response_data = {}
+        response_data['uri'] = _generate_base_uri(request)
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
 class CoursesOverview(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, format=None):
+    def get(self, request, course_id):
         """
         GET retrieves the course overview module, which - in MongoDB - is stored with the following
         naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
@@ -474,7 +477,7 @@ class CoursesOverview(APIView):
 class CoursesUpdates(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, format=None):
+    def get(self, request, course_id):
         """
         GET retrieves the course overview module, which - in MongoDB - is stored with the following
         naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
@@ -561,7 +564,7 @@ class CoursesStaticTabsDetail(APIView):
 class CoursesUsersList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, course_id, format=None):
+    def post(self, request, course_id):
         """
         POST enrolls a student in the course. Note, this can be a user_id or
         just an email, in case the user does not exist in the system
@@ -603,11 +606,13 @@ class CoursesUsersList(APIView):
         else:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, course_id, format=None):
+    def get(self, request, course_id):
         """
         GET returns a list of users enrolled in the course_id
         """
         response_data = OrderedDict()
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -634,10 +639,11 @@ class CoursesUsersList(APIView):
                 response_data['pending_enrollments'].append(cea.email)
         return Response(response_data)
 
+
 class CoursesUsersDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, user_id, format=None):
+    def get(self, request, course_id, user_id):
         """
         GET identifies an ACTIVE course enrollment for the specified user
         """
@@ -671,11 +677,10 @@ class CoursesUsersDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, course_id, user_id, format=None):
+    def delete(self, request, course_id, user_id):
         """
         DELETE unenrolls the specified user from the specified course
         """
-        response_data = OrderedDict()
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -688,4 +693,7 @@ class CoursesUsersDetail(APIView):
             user = None
         if user:
             CourseEnrollment.unenroll(user, course_id)
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
