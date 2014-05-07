@@ -261,9 +261,9 @@ def get_pr_info(num):
     Returns the info from the Github API
     """
     url = "https://api.github.com/repos/edx/edx-platform/pulls/{num}".format(num=num)
-    credentials = get_github_creds()
+    username, token = get_github_creds()
     headers = {
-        "Authorization": "token {}".format(credentials[1]),
+        "Authorization": "token {}".format(token),
         "User-Agent": "edx-release",
     }
     response = requests.get(url, headers=headers)
