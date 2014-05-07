@@ -243,29 +243,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         return jsonfields
 
 
-def location_to_son(location, prefix='', tag='i4x'):
-    """
-    Converts a location into a SON object with the same key order
-    """
-    son = SON({prefix + 'tag': tag})
-    for field_name in location.KEY_FIELDS:
-        # Temporary filtering of run field
-        if field_name != 'run':
-            son[prefix + field_name] = getattr(location, field_name)
-    return son
-
-
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
 def location_to_query(location, wildcard=True, tag='i4x'):
     """
     Takes a Location and returns a SON object that will query for that location by subfields
-    rather than subdoc. Note: location_to_son is faster in mongo as it does subdoc equivalence.
-    Fields in location that are None are ignored in the query
+    rather than subdoc.
+    Fields in location that are None are ignored in the query.
 
     If `wildcard` is True, then a None in a location is treated as a wildcard
     query. Otherwise, it is searched for literally
     """
-    query = location_to_son(location, prefix='_id.', tag=tag)
+    query = location.to_deprecated_son(prefix='_id.', tag=tag)
 
     if wildcard:
         for key, value in query.items():
@@ -476,7 +464,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
+                course_key.make_usage_key_from_deprecated_string(item).to_deprecated_son() for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -596,7 +584,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         assert isinstance(location, Location)
         item = self.collection.find_one(
-            {'_id': location_to_son(location)},
+            {'_id': location.to_deprecated_son()},
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
@@ -877,7 +865,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         result = self.collection.update(
-            {'_id': location_to_son(location)},
+            {'_id': location.to_deprecated_son()},
             {'$set': update},
             multi=False,
             upsert=True,
@@ -964,7 +952,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
         # from overriding our default value set in the init method.
-        self.collection.remove({'_id': location_to_son(location)}, safe=self.collection.safe)
+        self.collection.remove({'_id': location.to_deprecated_son()}, safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(location.course_key)
 

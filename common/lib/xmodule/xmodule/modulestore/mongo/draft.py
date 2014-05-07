@@ -10,7 +10,7 @@ from datetime import datetime
 
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.mongo.base import location_to_query, location_to_son, MongoModuleStore
+from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore
 import pymongo
 from pytz import UTC
 
@@ -136,7 +136,7 @@ class DraftModuleStore(MongoModuleStore):
             raise InvalidVersionError(source_location)
         if not original:
             raise ItemNotFoundError(source_location)
-        original['_id'] = location_to_son(draft_location)
+        original['_id'] = draft_location.to_deprecated_son()
         try:
             self.collection.insert(original)
         except pymongo.errors.DuplicateKeyError:
@@ -223,7 +223,7 @@ class DraftModuleStore(MongoModuleStore):
         # now query all draft content in another round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item))) for item in items
+                as_draft(course_key.make_usage_key_from_deprecated_string(item)).to_deprecated_son() for item in items
             ]}
         }
         to_process_drafts = list(self.collection.find(query))

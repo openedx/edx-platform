@@ -65,7 +65,7 @@ def _clear_assets(location):
     for asset in assets:
         asset_location = MongoModuleStore._location_from_id(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
-        mongo_id = StaticContent.get_id_from_location(asset_location)
+        mongo_id = asset_location.to_deprecated_son()
         store.delete(mongo_id)
 
 
