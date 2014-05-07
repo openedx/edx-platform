@@ -1,7 +1,6 @@
 """ BASE API VIEWS """
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,11 +21,12 @@ def _generate_base_uri(request):
     )
     return resource_uri
 
+
 class SystemDetail(APIView):
+    """Manages system-level information about the Open edX API"""
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, format=None):
-        """Returns top-level descriptive information about the Open edX API"""
+    def get(self, request):
         base_uri = _generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX System API"
@@ -37,10 +37,10 @@ class SystemDetail(APIView):
 
 
 class ApiDetail(APIView):
+    """Manages top-level information about the Open edX API"""
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, format=None):
-        """Returns top-level descriptive information about the Open edX API"""
+    def get(self, request):
         base_uri = _generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX API"

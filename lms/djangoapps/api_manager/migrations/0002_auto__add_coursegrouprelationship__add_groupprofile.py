@@ -25,14 +25,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('api_manager', ['GroupProfile'])
 
-
     def backwards(self, orm):
         # Deleting model 'CourseGroupRelationship'
         db.delete_table('api_manager_coursegrouprelationship')
 
         # Deleting model 'GroupProfile'
         db.delete_table('auth_groupprofile')
-
 
     models = {
         'api_manager.coursegrouprelationship': {

@@ -38,7 +38,7 @@ def _generate_base_uri(request):
 class GroupsList(APIView):
     permissions_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, format=None):
+    def post(self, request):
         """
         POST creates a new group in the system
         """
@@ -74,7 +74,7 @@ class GroupsList(APIView):
         response_status = status.HTTP_201_CREATED
         return Response(response_data, status=response_status)
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         GET retrieves a list of groups in the system filtered by type
         """
@@ -103,7 +103,7 @@ class GroupsList(APIView):
 class GroupsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, group_id, format=None):
+    def post(self, request, group_id):
         response_data = {}
         base_uri = _generate_base_uri(request)
         print base_uri
@@ -124,7 +124,7 @@ class GroupsDetail(APIView):
         response_data['uri'] = _generate_base_uri(request)
         return Response(response_data, status=status.HTTP_201_CREATED)
 
-    def get(self, request, group_id, format=None):
+    def get(self, request, group_id):
         """
         GET retrieves an existing group from the system
         """
@@ -163,7 +163,7 @@ class GroupsDetail(APIView):
 class GroupsUsersList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, group_id, format=None):
+    def post(self, request, group_id):
         """
         POST creates a new group-user relationship in the system
         """
@@ -194,7 +194,7 @@ class GroupsUsersList(APIView):
             response_status = status.HTTP_409_CONFLICT
         return Response(response_data, status=response_status)
 
-    def get(self, request, group_id, format=None):
+    def get(self, request, group_id):
         """
         GET retrieves the list of users related to the specified group
         """
@@ -220,7 +220,7 @@ class GroupsUsersList(APIView):
 class GroupsUsersDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, group_id, user_id, format=None):
+    def get(self, request, group_id, user_id):
         """
         GET retrieves an existing group-user relationship from the system
         """
@@ -241,8 +241,7 @@ class GroupsUsersDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-
-    def delete(self, request, group_id, user_id, format=None):
+    def delete(self, request, group_id, user_id):
         """
         DELETE removes/inactivates/etc. an existing group-user relationship
         """
@@ -258,7 +257,7 @@ class GroupsUsersDetail(APIView):
 class GroupsGroupsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, group_id, format=None):
+    def post(self, request, group_id):
         """
         POST creates a new group-group relationship in the system
         """
@@ -290,8 +289,7 @@ class GroupsGroupsList(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-
-    def get(self, request, group_id, format=None):
+    def get(self, request, group_id):
         """
         GET retrieves the existing group-group relationships for the specified group
         """
@@ -333,7 +331,7 @@ class GroupsGroupsList(APIView):
 class GroupsGroupsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, group_id, related_group_id, format=None):
+    def get(self, request, group_id, related_group_id):
         """
         GET retrieves an existing group-group relationship from the system
         """
@@ -357,7 +355,7 @@ class GroupsGroupsDetail(APIView):
                     response_status = status.HTTP_200_OK
         return Response(response_data, response_status)
 
-    def delete(self, request, group_id, related_group_id, format=None):
+    def delete(self, request, group_id, related_group_id):
         """
         DELETE removes/inactivates/etc. an existing group-group relationship
         """
@@ -388,7 +386,7 @@ class GroupsGroupsDetail(APIView):
 class GroupsCoursesList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, group_id, format=None):
+    def post(self, request, group_id):
         """
         POST creates a new group-course relationship in the system
         """
@@ -422,7 +420,7 @@ class GroupsCoursesList(APIView):
             response_status = status.HTTP_409_CONFLICT
         return Response(response_data, status=response_status)
 
-    def get(self, request, group_id, format=None):
+    def get(self, request, group_id):
         """
         GET returns all courses that has a relationship to the group
         """
@@ -448,7 +446,7 @@ class GroupsCoursesList(APIView):
 class GroupsCoursesDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, group_id, course_id, format=None):
+    def get(self, request, group_id, course_id):
         """
         GET retrieves an existing group-course relationship from the system
         """
@@ -469,7 +467,7 @@ class GroupsCoursesDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, group_id, course_id, format=None):
+    def delete(self, request, group_id, course_id):
         """
         DELETE removes/inactivates/etc. an existing group-course relationship
         """
