@@ -219,7 +219,7 @@ class TestPhotoVerification(TestCase):
         old_key = orig_attempt.photo_id_key
 
         window = MidcourseReverificationWindowFactory(
-            course_id=SlashSeparatedCourseKey("fake", "course", "id"),
+            course_id=SlashSeparatedCourseKey("pony", "rainbow", "dash"),
             start_date=datetime.now(pytz.utc) - timedelta(days=5),
             end_date=datetime.now(pytz.utc) + timedelta(days=5)
         )

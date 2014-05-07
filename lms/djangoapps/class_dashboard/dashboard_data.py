@@ -100,7 +100,7 @@ def get_problem_set_grade_distrib(course_id, problem_set):
         course_id__exact=course_id,
         grade__isnull=False,
         module_type__exact="problem",
-        module_id__in=[location.replace(run=None) for location in problem_set],
+        module_id__in=problem_set,
     ).values(
         'module_id',
         'grade',

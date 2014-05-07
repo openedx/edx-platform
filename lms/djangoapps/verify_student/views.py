@@ -76,7 +76,6 @@ class VerifyView(View):
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
         # if the course doesn't have a verified mode, we want to kick them
         # from the flow
-        # TODO @flowerhack this might always choose the min price, not sure
         if not verify_mode:
             return redirect(reverse('dashboard'))
         if course_id.to_deprecated_string() in request.session.get("donation_for_course", {}):

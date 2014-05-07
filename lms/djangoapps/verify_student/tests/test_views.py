@@ -131,8 +131,7 @@ class TestMidCourseReverifyView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        course_id = 'Robot/999/Test_Course'
-        self.course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
         patcher = patch('student.models.server_track')
