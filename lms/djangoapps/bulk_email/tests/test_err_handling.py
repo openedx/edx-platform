@@ -177,6 +177,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101
+        # (?i) is a regex for ignore case
         with self.assertRaisesRegexp(ValueError, r"(?i)course not found"):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")  # pylint: disable=E1101
 

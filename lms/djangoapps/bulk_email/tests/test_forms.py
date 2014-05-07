@@ -85,9 +85,24 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = u'Error encountered (Course not found.)'
+        msg = u'COURSE NOT FOUND'
         msg += u' --- Entered course id was: "{0}". '.format(bad_id.to_deprecated_string())
-        msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
+        msg += 'Please recheck that you have supplied a valid course id.'
+        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+
+        with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
+            form.save()
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_form_invalid_key(self):
+        form_data = {'course_id': "asd::**!@#$%^&*())//foobar!!", 'email_enabled': True}
+        form = CourseAuthorizationAdminForm(data=form_data)
+        # Validation shouldn't work
+        self.assertFalse(form.is_valid())
+
+        msg = u'Course id invalid.'
+        msg += u' --- Entered course id was: "asd::**!@#$%^&*())//foobar!!". '
+        msg += 'Please recheck that you have supplied a valid course id.'
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
@@ -103,7 +118,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
         error_msg = form._errors['course_id'][0]
         self.assertIn(u'--- Entered course id was: "{0}". '.format(self.course.id.run), error_msg)
-        self.assertIn(u'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN', error_msg)
+        self.assertIn(u'Please recheck that you have supplied a valid course id.', error_msg)
 
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
             form.save()
