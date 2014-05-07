@@ -116,7 +116,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_key)
-        return store.get_items(course_key, **kwargs)
+        return store.get_items(course_key, settings, content, **kwargs)
 
     def get_courses(self):
         '''
