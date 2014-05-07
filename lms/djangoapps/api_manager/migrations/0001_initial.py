@@ -30,14 +30,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('api_manager', ['LinkedGroupRelationship'])
 
-
     def backwards(self, orm):
         # Deleting model 'GroupRelationship'
         db.delete_table('api_manager_grouprelationship')
 
         # Deleting model 'LinkedGroupRelationship'
         db.delete_table('api_manager_linkedgrouprelationship')
-
 
     models = {
         'api_manager.grouprelationship': {
