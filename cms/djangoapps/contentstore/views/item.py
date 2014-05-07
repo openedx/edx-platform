@@ -20,11 +20,9 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore import Location
 from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
@@ -39,6 +37,7 @@ from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
+from xmodule.modulestore.keys import UsageKey, CourseKey
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 
@@ -67,7 +66,7 @@ def hash_resource(resource):
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def xblock_handler(request, usage_key_string):
     """
     The restful handler for xblock requests.
 
@@ -82,7 +81,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: if xblock locator is specified, update the xblock instance. The json payload can contain
               these fields, all optional:
                 :data: the new value for the data.
-                :children: the locator ids of children for this xblock.
+                :children: the unicode representation of the UsageKeys of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
@@ -90,7 +89,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
-              if xblock locator is not specified, create a new xblock instance, either by duplicating
+              if usage_key_string is not specified, create a new xblock instance, either by duplicating
               an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
                 :parent_locator: parent for new xblock, required for both duplicate and create new instance
@@ -99,13 +98,12 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
                      if duplicate_source_locator is not present
-              The locator (and old-style id) for the created xblock (minus children) is returned.
+              The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
-    if package_id is not None:
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-        if not has_course_access(request.user, locator):
+    if usage_key_string:
+        usage_key = UsageKey.from_string(usage_key_string)
+        if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
-        old_location = loc_mapper().translate_locator_to_location(locator)
 
         if request.method == 'GET':
             accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
@@ -114,9 +112,9 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 fields = request.REQUEST.get('fields', '').split(',')
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
-                    return JsonResponse(CourseGradingModel.get_section_grader_type(locator))
+                    return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
                 # TODO: pass fields to _get_module_info and only return those
-                rsp = _get_module_info(locator)
+                rsp = _get_module_info(usage_key)
                 return JsonResponse(rsp)
             else:
                 return HttpResponse(status=406)
@@ -125,18 +123,11 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
-            return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
-        else:  # Since we have a package_id, we are updating an existing xblock.
-            if block == 'handouts' and old_location is None:
-                # update handouts location in loc_mapper
-                course_location = loc_mapper().translate_locator_to_location(locator, get_course=True)
-                old_location = course_location.replace(category='course_info', name=block)
-                locator = loc_mapper().translate_location(course_location.course_id, old_location)
-
+            return _delete_item_at_location(usage_key, delete_children, delete_all_versions, request.user)
+        else:  # Since we have a usage_key, we are updating an existing xblock.
             return _save_item(
                 request,
-                locator,
-                old_location,
+                usage_key,
                 data=request.json.get('data'),
                 children=request.json.get('children'),
                 metadata=request.json.get('metadata'),
@@ -146,27 +137,22 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
-            parent_locator = BlockUsageLocator(request.json['parent_locator'])
-            duplicate_source_locator = BlockUsageLocator(request.json['duplicate_source_locator'])
+            parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
+            duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
 
-            # _duplicate_item is dealing with locations to facilitate the recursive call for
-            # duplicating children.
-            parent_location = loc_mapper().translate_locator_to_location(parent_locator)
-            duplicate_source_location = loc_mapper().translate_locator_to_location(duplicate_source_locator)
-            dest_location = _duplicate_item(
-                parent_location,
-                duplicate_source_location,
+            dest_usage_key = _duplicate_item(
+                parent_usage_key,
+                duplicate_source_usage_key,
                 request.json.get('display_name'),
                 request.user,
             )
-            course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
-            dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
-            return JsonResponse({"locator": unicode(dest_locator)})
+
+            return JsonResponse({"locator": unicode(dest_usage_key)})
         else:
             return _create_item(request)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a package_id.",
+            "Only instance creation is supported without a usage key.",
             content_type="text/plain"
         )
 
@@ -174,7 +160,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
 @require_http_methods(("GET"))
 @login_required
 @expect_json
-def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, version_guid=None, block=None):
+def xblock_view_handler(request, usage_key_string, view_name):
     """
     The restful handler for requests for rendered xblock views.
 
@@ -183,20 +169,19 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, locator):
+    usage_key = UsageKey.from_string(usage_key_string)
+    if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
-    old_location = loc_mapper().translate_locator_to_location(locator)
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
     if 'application/json' in accept_header:
-        store = get_modulestore(old_location)
-        component = store.get_item(old_location)
+        store = get_modulestore(usage_key)
+        component = store.get_item(usage_key)
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime'))
+        component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
 
         if view_name == 'studio_view':
             try:
@@ -216,7 +201,7 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
             # which links to the new container page.
             html = render_to_string('container_xblock_component.html', {
                 'xblock': component,
-                'locator': locator,
+                'locator': usage_key,
                 'reordering_enabled': True,
             })
             return JsonResponse({
@@ -263,30 +248,28 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
         return HttpResponse(status=406)
 
 
-def _save_item(request, usage_loc, item_location, data=None, children=None, metadata=None, nullout=None,
+def _save_item(request, usage_key, data=None, children=None, metadata=None, nullout=None,
                grader_type=None, publish=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
-
-    The item_location is still the old-style location whereas usage_loc is a BlockUsageLocator
     """
-    store = get_modulestore(item_location)
+    store = get_modulestore(usage_key)
 
     try:
-        existing_item = store.get_item(item_location)
+        existing_item = store.get_item(usage_key)
     except ItemNotFoundError:
-        if item_location.category in CREATE_IF_NOT_FOUND:
+        if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            store.create_and_save_xmodule(item_location)
-            existing_item = store.get_item(item_location)
+            store.create_and_save_xmodule(usage_key)
+            existing_item = store.get_item(usage_key)
         else:
             raise
     except InvalidLocationError:
         log.error("Can't find item by location.")
-        return JsonResponse({"error": "Can't find item by location: " + str(item_location)}, 404)
+        return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
     old_metadata = own_metadata(existing_item)
 
@@ -305,12 +288,12 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
         data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
     if children is not None:
-        children_ids = [
-            loc_mapper().translate_locator_to_location(BlockUsageLocator(child_locator)).url()
-            for child_locator
+        children_usage_keys = [
+            UsageKey.from_string(child)
+            for child
             in children
         ]
-        existing_item.children = children_ids
+        existing_item.children = children_usage_keys
 
     # also commit any metadata which might have been passed along
     if nullout is not None or metadata is not None:
@@ -344,7 +327,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
     store.update_item(existing_item, request.user.id)
 
     result = {
-        'id': unicode(usage_loc),
+        'id': unicode(usage_key),
         'data': data,
         'metadata': own_metadata(existing_item)
     }
@@ -377,17 +360,16 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 @expect_json
 def _create_item(request):
     """View for create items."""
-    parent_locator = BlockUsageLocator(request.json['parent_locator'])
-    parent_location = loc_mapper().translate_locator_to_location(parent_locator)
+    usage_key = UsageKey.from_string(request.json['parent_locator'])
     category = request.json['category']
 
     display_name = request.json.get('display_name')
 
-    if not has_course_access(request.user, parent_location):
+    if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    parent = get_modulestore(category).get_item(parent_location)
-    dest_location = parent_location.replace(category=category, name=uuid4().hex)
+    parent = get_modulestore(category).get_item(usage_key)
+    dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
 
     # get the metadata, display_name, and definition from the request
     metadata = {}
@@ -405,7 +387,7 @@ def _create_item(request):
         metadata['display_name'] = display_name
 
     get_modulestore(category).create_and_save_xmodule(
-        dest_location,
+        dest_usage_key,
         definition_data=data,
         metadata=metadata,
         system=parent.runtime,
@@ -413,23 +395,21 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(dest_location.url())
+        parent.children.append(dest_usage_key)
         get_modulestore(parent.location).update_item(parent, request.user.id)
 
-    course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
-    locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
-    return JsonResponse({"locator": unicode(locator)})
+    return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
 
 
-def _duplicate_item(parent_location, duplicate_source_location, display_name=None, user=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
     """
-    Duplicate an existing xblock as a child of the supplied parent_location.
+    Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
-    store = get_modulestore(duplicate_source_location)
-    source_item = store.get_item(duplicate_source_location)
+    store = get_modulestore(duplicate_source_usage_key)
+    source_item = store.get_item(duplicate_source_usage_key)
     # Change the blockID to be unique.
-    dest_location = duplicate_source_location.replace(name=uuid4().hex)
-    category = dest_location.category
+    dest_usage_key = duplicate_source_usage_key.replace(name=uuid4().hex)
+    category = dest_usage_key.category
 
     # Update the display name to indicate this is a duplicate (unless display name provided).
     duplicate_metadata = own_metadata(source_item)
@@ -442,45 +422,45 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
             duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
     get_modulestore(category).create_and_save_xmodule(
-        dest_location,
+        dest_usage_key,
         definition_data=source_item.data if hasattr(source_item, 'data') else None,
         metadata=duplicate_metadata,
         system=source_item.runtime,
     )
 
-    dest_module = get_modulestore(category).get_item(dest_location)
+    dest_module = get_modulestore(category).get_item(dest_usage_key)
     # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
     # Because DAGs are not fully supported, we need to actually duplicate each child as well.
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dupe = _duplicate_item(dest_location, Location(child), user=user)
-            dest_module.children.append(dupe.url())
-        get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
+            dupe = _duplicate_item(dest_usage_key, child, user=user)
+            dest_module.children.append(dupe)
+        get_modulestore(dest_usage_key).update_item(dest_module, user.id if user else None)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
-        parent = get_modulestore(parent_location).get_item(parent_location)
+        parent = get_modulestore(parent_usage_key).get_item(parent_usage_key)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
-        if duplicate_source_location.url() in parent.children:
-            source_index = parent.children.index(duplicate_source_location.url())
-            parent.children.insert(source_index + 1, dest_location.url())
+        if duplicate_source_usage_key in parent.children:
+            source_index = parent.children.index(duplicate_source_usage_key)
+            parent.children.insert(source_index + 1, dest_usage_key)
         else:
-            parent.children.append(dest_location.url())
-        get_modulestore(parent_location).update_item(parent, user.id if user else None)
+            parent.children.append(dest_usage_key)
+        get_modulestore(parent_usage_key).update_item(parent, user.id if user else None)
 
-    return dest_location
+    return dest_usage_key
 
 
-def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False, user=None):
+def _delete_item_at_location(item_usage_key, delete_children=False, delete_all_versions=False, user=None):
     """
     Deletes the item at with the given Location.
 
     It is assumed that course permissions have already been checked.
     """
-    store = get_modulestore(item_location)
+    store = get_modulestore(item_usage_key)
 
-    item = store.get_item(item_location)
+    item = store.get_item(item_usage_key)
 
     if delete_children:
         _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions=delete_all_versions))
@@ -489,12 +469,11 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:
-        parent_locs = modulestore('direct').get_parent_locations(item_location, None)
+        parent_locs = modulestore('direct').get_parent_locations(item_usage_key)
 
-        item_url = item_location.url()
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
-            parent.children.remove(item_url)
+            parent.children.remove(item_usage_key)
             modulestore('direct').update_item(parent, user.id if user else None)
 
     return JsonResponse()
@@ -503,65 +482,59 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, course_key_string):
     """
     View for handling orphan related requests. GET gets all of the current orphans.
     DELETE removes all orphans (requires is_staff access)
 
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
-
-    :param request:
-    :param package_id: Locator syntax package_id
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    # DHM: when split becomes back-end, move or conditionalize this conversion
-    old_location = loc_mapper().translate_locator_to_location(location)
+    course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
-        if has_course_access(request.user, old_location):
-            return JsonResponse(modulestore().get_orphans(old_location, 'draft'))
+        if has_course_access(request.user, course_usage_key):
+            return JsonResponse(modulestore().get_orphans(course_usage_key))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location, 'draft')
+            items = modulestore().get_orphans(course_usage_key)
             for itemloc in items:
-                modulestore('draft').delete_item(itemloc, delete_all_versions=True)
+                # get_orphans returns the deprecated string format
+                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
+                modulestore('draft').delete_item(usage_key, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()
 
 
-def _get_module_info(usage_loc, rewrite_static_links=True):
+def _get_module_info(usage_key, rewrite_static_links=True):
     """
     metadata, data, id representation of a leaf module fetcher.
-    :param usage_loc: A BlockUsageLocator
+    :param usage_key: A UsageKey
     """
-    old_location = loc_mapper().translate_locator_to_location(usage_loc)
-    store = get_modulestore(old_location)
+    store = get_modulestore(usage_key)
     try:
-        module = store.get_item(old_location)
+        module = store.get_item(usage_key)
     except ItemNotFoundError:
-        if old_location.category in CREATE_IF_NOT_FOUND:
+        if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
-            store.create_and_save_xmodule(old_location)
-            module = store.get_item(old_location)
+            store.create_and_save_xmodule(usage_key)
+            module = store.get_item(usage_key)
         else:
             raise
 
     data = getattr(module, 'data', '')
     if rewrite_static_links:
-        # we pass a partially bogus course_id as we don't have the RUN information passed yet
-        # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
         data = replace_static_urls(
             data,
             None,
-            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
+            course_id=usage_key.course_key
         )
 
     # Note that children aren't being returned until we have a use case.
     return {
-        'id': unicode(usage_loc),
+        'id': unicode(usage_key),
         'data': data,
         'metadata': own_metadata(module)
     }

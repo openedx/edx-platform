@@ -37,7 +37,7 @@
             % for child in module.get_children():
             <li class="${module.scope_ids.block_type}">
               <a href="#" class="module-edit"
-                 data-id="${child.location.url()}"
+                 data-id="${child.location}"
                  data-type="${child.js_module_name}"
                  data-preview-type="${child.module_class.js_module_name}">${child.display_name_with_default}</a>
               <a href="#" class="draggable">handle</a>

@@ -47,11 +47,12 @@ class Command(BaseCommand):
         _, course_items = import_from_xml(
             mstore, data_dir, course_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
-            do_import_static=do_import_static
+            do_import_static=do_import_static,
+            create_new_course=True,
         )
 
-        for module in course_items:
-            course_id = module.location.course_id
+        for course in course_items:
+            course_id = course.id
             if not are_permissions_roles_seeded(course_id):
                 self.stdout.write('Seeding forum roles for course {0}\n'.format(course_id))
                 seed_permissions_roles(course_id)

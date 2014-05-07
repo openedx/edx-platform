@@ -140,10 +140,10 @@ def xml_only_video(step):
     # Wait for the new unit to be created and to load the page
     world.wait(1)
 
-    location = world.scenario_dict['COURSE'].location
-    store = get_modulestore(location)
+    course = world.scenario_dict['COURSE']
+    store = get_modulestore(course.location)
 
-    parent_location = store.get_items(Location(category='vertical', revision='draft'))[0].location
+    parent_location = store.get_items(course.id, category='vertical', revision='draft')[0].location
 
     youtube_id = 'ABCDEFG'
     world.scenario_dict['YOUTUBE_ID'] = youtube_id

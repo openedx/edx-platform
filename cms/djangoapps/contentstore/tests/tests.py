@@ -7,9 +7,9 @@ import unittest
 
 from django.test.utils import override_settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -235,13 +235,13 @@ class AuthTestCase(ContentStoreTestCase):
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
         auth_pages = (
-            '/course',
+            '/course/',
         )
 
         # These are pages that should just load when the user is logged in
         # (no data needed)
         simple_auth_pages = (
-            '/course',
+            '/course/',
         )
 
         # need an activated user
@@ -267,7 +267,7 @@ class AuthTestCase(ContentStoreTestCase):
     def test_index_auth(self):
 
         # not logged in.  Should return a redirect.
-        resp = self.client.get_html('/course')
+        resp = self.client.get_html('/course/')
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
@@ -284,16 +284,17 @@ class AuthTestCase(ContentStoreTestCase):
         self.login(self.email, self.pw)
 
         # make sure we can access courseware immediately
-        resp = self.client.get_html('/course')
+        course_url = '/course/'
+        resp = self.client.get_html(course_url)
         self.assertEquals(resp.status_code, 200)
 
         # then wait a bit and see if we get timed out
         time.sleep(2)
 
-        resp = self.client.get_html('/course')
+        resp = self.client.get_html(course_url)
 
         # re-request, and we should get a redirect to login page
-        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/course')
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/course/')
 
 
 class ForumTestCase(CourseTestCase):

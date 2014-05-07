@@ -3,9 +3,10 @@ Test finding orphans via the view and django config
 """
 import json
 from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.django import loc_mapper
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+from contentstore.utils import reverse_course_url
+
 
 class TestOrphan(CourseTestCase):
     """
@@ -27,6 +28,8 @@ class TestOrphan(CourseTestCase):
         self._create_item('about', 'overview', "<p>overview</p>", {}, None, None, runtime)
         self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, runtime)
 
+        self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
+
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
         location = self.course.location.replace(category=category, name=name)
         store = modulestore('direct')
@@ -35,39 +38,34 @@ class TestOrphan(CourseTestCase):
             # add child to parent in mongo
             parent_location = self.course.location.replace(category=parent_category, name=parent_name)
             parent = store.get_item(parent_location)
-            parent.children.append(location.url())
+            parent.children.append(location)
             store.update_item(parent, self.user.id)
 
     def test_mongo_orphan(self):
         """
         Test that old mongo finds the orphans
         """
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        orphan_url = locator.url_reverse('orphan/', '')
-
         orphans = json.loads(
             self.client.get(
-                orphan_url,
+                self.orphan_url,
                 HTTP_ACCEPT='application/json'
             ).content
         )
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course.location.replace(category='chapter', name='OrphanChapter')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
         location = self.course.location.replace(category='vertical', name='OrphanVert')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
         location = self.course.location.replace(category='html', name='OrphanHtml')
-        self.assertIn(location.url(), orphans)
+        self.assertIn(location.to_deprecated_string(), orphans)
 
     def test_mongo_orphan_delete(self):
         """
         Test that old mongo deletes the orphans
         """
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        orphan_url = locator.url_reverse('orphan/', '')
-        self.client.delete(orphan_url)
+        self.client.delete(self.orphan_url)
         orphans = json.loads(
-            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
+            self.client.get(self.orphan_url, HTTP_ACCEPT='application/json').content
         )
         self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
 
@@ -76,10 +74,8 @@ class TestOrphan(CourseTestCase):
         Test that auth restricts get and delete appropriately
         """
         test_user_client, test_user = self.create_non_staff_authed_user_client()
-        CourseEnrollment.enroll(test_user, self.course.location.course_id)
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        orphan_url = locator.url_reverse('orphan/', '')
-        response = test_user_client.get(orphan_url)
+        CourseEnrollment.enroll(test_user, self.course.id)
+        response = test_user_client.get(self.orphan_url)
         self.assertEqual(response.status_code, 403)
-        response = test_user_client.delete(orphan_url)
+        response = test_user_client.delete(self.orphan_url)
         self.assertEqual(response.status_code, 403)
