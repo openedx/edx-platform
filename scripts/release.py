@@ -126,6 +126,9 @@ def get_github_creds():
 
 
 def create_github_creds():
+    """
+    https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+    """
     headers = {"User-Agent": "edx-release"}
     payload = {"note": "edx-release"}
     username = raw_input("Github username: ")
@@ -163,7 +166,6 @@ def ensure_github_creds(attempts=3):
         return False
 
     # Looks like we need to create the OAuth creds
-    # https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
     print("We need to set up OAuth authentication with Github's API. "
           "Your password will not be stored.", file=sys.stderr)
     token = None
