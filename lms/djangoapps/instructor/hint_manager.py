@@ -140,7 +140,7 @@ def location_to_problem_name(course_id, loc):
     problem it wraps around.  Return None if the hinter no longer exists.
     """
     try:
-        descriptor = modulestore().get_item(loc)[0]
+        descriptor = modulestore().get_item(loc)
         return descriptor.get_children()[0].display_name
     except ItemNotFoundError:
         # Sometimes, the problem is no longer in the course.  Just

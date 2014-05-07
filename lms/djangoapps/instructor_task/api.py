@@ -53,6 +53,7 @@ def get_instructor_task_history(course_id, usage_key=None, student=None, task_ty
     return instructor_tasks.order_by('-id')
 
 
+# Disabling invalid-name because this fn name is longer than 30 chars.
 def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: disable=invalid-name
     """
     Request a problem to be rescored as a background task.
