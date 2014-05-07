@@ -7,7 +7,7 @@ var StaffDebug = (function(){
 
   get_url = function(action){
     var pathname = this.get_current_url();
-    var url = pathname.substr(0,pathname.indexOf('/courseware')) + '/instructor_dashboard/api/' + action;
+    var url = pathname.substr(0,pathname.indexOf('/courseware')) + '/instructor/api/' + action;
     return url;
   }
 

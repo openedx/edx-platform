@@ -1,5 +1,6 @@
-## NOTE: This is the template for the legacy instructor dashboard
-## We are no longer supporting this file or accepting changes into it.
+## NOTE: This is the template for the LEGACY instructor dashboard         ##
+## We are no longer supporting this file or accepting changes into it.    ##
+## Please see lms/templates/instructor for instructor dashboard templates ##
 
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
@@ -125,15 +126,18 @@ function goto( mode)
       %if studio_url:
         <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
       %endif
-      <a class="instructor-info-action beta-button" href="${ standard_dashboard_url }">${_("Back To Standard Dashboard")}</a>
+      <a class="instructor-info-action beta-button" href="${ standard_dashboard_url }">${_("Back To Instructor Dashboard")}</a>
     </div>
 
     <h1>${_("Instructor Dashboard")}</h1>
 
+    %if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+    ## Only show this banner on the edx.org website (other sites may choose to show this if they wish)
     <div class="wrapper-msg urgency-low msg-warning is-shown">
-        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Standard Dashboard")} <i class="icon-double-angle-right"></i></a></p>
-          <p class="note">${_("If the Standard Dashboard is missing functionality, please let us know.")}</p>
+        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon-double-angle-right"></i></a></p>
+          <p class="note">${_("If the Instructor Dashboard is missing functionality, please contact your PM to let us know.")}</p>
     </div>
+    %endif
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
