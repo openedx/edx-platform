@@ -287,62 +287,6 @@ describe 'MarkdownEditingDescriptor', ->
         </div>
         </solution>
         </problem>""")
-
-    it 'converts a series of multiplechoice to xml', ->
-      data = MarkdownEditingDescriptor.markdownToXml("""bleh
-        (!x) a
-        () b
-        () c
-        yatta
-        ( ) x
-        ( ) y
-        (x) z
-        testa
-        (!) i
-        ( ) ii
-        (x) iii
-        [Explanation]
-        When the student is ready, the explanation appears.
-        [Explanation]
-        """)
-      expect(data).toEqual("""<problem>
-        <p>bleh</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="true">a</choice>
-            <choice correct="false">b</choice>
-            <choice correct="false">c</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-        
-        <p>yatta</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice">
-            <choice correct="false">x</choice>
-            <choice correct="false">y</choice>
-            <choice correct="true">z</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-        
-        <p>testa</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="false">i</choice>
-            <choice correct="false">ii</choice>
-            <choice correct="true">iii</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-        
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-        
-        <p>When the student is ready, the explanation appears.</p>
-        
-        </div>
-        </solution>
-        </problem>""")
-
     it 'converts OptionResponse to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
 
