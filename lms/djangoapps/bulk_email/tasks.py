@@ -370,13 +370,12 @@ def _get_source_address(course_id, course_title):
     """
     course_title_no_quotes = re.sub(r'"', '', course_title)
 
-    # The course_id is assumed to be in the form 'org/course_num/run',
-    # so pull out the course_num.  Then make sure that it can be used
+    # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
     from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
         course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.run),
+        re.sub(r"[^\w.-]", '_', course_id.course),
         settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
     )
     return from_addr

@@ -191,6 +191,17 @@ class TestEmailErrors(ModuleStoreTestCase):
         with self.assertRaisesRegexp(Exception, 'Unexpected bulk email TO_OPTION found: IDONTEXIST'):
             perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")  # pylint: disable=E1101
 
+    def test_wrong_course_id_in_task(self):
+        """
+        Tests exception when the course_id in task is not the same as one explicitly passed in.
+        """
+        email = CourseEmail(course_id=self.course.id, to_option=SEND_TO_ALL)
+        email.save()
+        entry = InstructorTask.create("bogus_task_id", "task_type", "task_key", "task_input", self.instructor)
+        task_input = {"email_id": email.id}  # pylint: disable=E1101
+        with self.assertRaisesRegexp(ValueError, 'does not match task value'):
+            perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")  # pylint: disable=E1101
+
     def test_wrong_course_id_in_email(self):
         """
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
