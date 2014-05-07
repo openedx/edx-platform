@@ -8,7 +8,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from api_manager.courses import views as courses_views
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'/*$^', courses_views.CoursesList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)$', courses_views.CoursesDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)/submodules/*$', courses_views.ModulesList.as_view()),

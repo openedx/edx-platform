@@ -30,6 +30,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
+
 def _generate_base_uri(request):
     """
     Constructs the protocol:host:path component of the resource uri
@@ -44,6 +45,7 @@ def _generate_base_uri(request):
     )
     return resource_uri
 
+
 def _serialize_user(response_data, user):
     """
     Loads the object data into the response dict
@@ -56,6 +58,7 @@ def _serialize_user(response_data, user):
     response_data['id'] = user.id
     response_data['is_active'] = user.is_active
     return response_data
+
 
 def _save_module_position(request, user, course_id, course_descriptor, position):
     """
@@ -94,7 +97,7 @@ def _save_module_position(request, user, course_id, course_descriptor, position)
 class UsersList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, format=None):
+    def post(self, request):
         """
         POST creates a new user in the system
         """
@@ -176,7 +179,7 @@ class UsersList(APIView):
 class UsersDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, user_id, format=None):
+    def get(self, request, user_id):
         """
         GET retrieves an existing user from the system
         """
@@ -195,7 +198,7 @@ class UsersDetail(APIView):
         except ObjectDoesNotExist:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, user_id, format=None):
+    def post(self, request, user_id):
         """
         POST provides the ability to update information about an existing user
         """
@@ -287,7 +290,7 @@ class UsersDetail(APIView):
 class UsersGroupsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, user_id, format=None):
+    def post(self, request, user_id):
         """
         POST creates a new user-group relationship in the system
         """
@@ -320,7 +323,7 @@ class UsersGroupsList(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def get(self, request, user_id, format=None):
+    def get(self, request, user_id):
         """
         GET retrieves the list of groups related to the specified user
         """
@@ -328,8 +331,10 @@ class UsersGroupsList(APIView):
             existing_user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
-        groups = existing_user.groups.all()
         response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        groups = existing_user.groups.all()
         response_data['groups'] = []
         for group in groups:
             group_profile = GroupProfile.objects.get(group_id=group.id)
@@ -344,12 +349,11 @@ class UsersGroupsList(APIView):
 class UsersGroupsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, user_id, group_id, format=None):
+    def get(self, request, user_id, group_id):
         """
         GET retrieves an existing user-group relationship from the system
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
         try:
             existing_user = User.objects.get(id=user_id, is_active=True)
             existing_relationship = existing_user.groups.get(id=group_id)
@@ -359,13 +363,13 @@ class UsersGroupsDetail(APIView):
         if existing_user and existing_relationship:
             response_data['user_id'] = existing_user.id
             response_data['group_id'] = existing_relationship.id
-            response_data['uri'] = base_uri
+            response_data['uri'] = _generate_base_uri(request)
             response_status = status.HTTP_200_OK
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, user_id, group_id, format=None):
+    def delete(self, request, user_id, group_id):
         """
         DELETE removes/inactivates/etc. an existing user-group relationship
         """
@@ -378,7 +382,7 @@ class UsersGroupsDetail(APIView):
 class UsersCoursesList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, user_id, format=None):
+    def post(self, request, user_id):
         """
         POST creates a new course enrollment for a user
         """
@@ -404,7 +408,7 @@ class UsersCoursesList(APIView):
             status_code = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=status_code)
 
-    def get(self, request, user_id, format=None):
+    def get(self, request, user_id):
         """
         GET creates the list of enrolled courses for a user
         """
@@ -435,7 +439,7 @@ class UsersCoursesList(APIView):
 class UsersCoursesDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, user_id, course_id, format=None):
+    def post(self, request, user_id, course_id):
         """
         POST creates an ACTIVE course enrollment for the specified user
         """
@@ -465,7 +469,7 @@ class UsersCoursesDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def get(self, request, user_id, course_id, format=None):
+    def get(self, request, user_id, course_id):
         """
         GET identifies an ACTIVE course enrollment for the specified user
         """
@@ -495,7 +499,7 @@ class UsersCoursesDetail(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, user_id, course_id, format=None):
+    def delete(self, request, user_id, course_id):
         """
         DELETE unenrolls the specified user from a course
         """

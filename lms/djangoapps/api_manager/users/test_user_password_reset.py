@@ -12,7 +12,9 @@ from django.core.cache import cache
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from pytz import UTC
+
 TEST_API_KEY = str(uuid.uuid4())
+
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
@@ -52,7 +54,7 @@ class UserPasswordResetTest(TestCase):
         reset_time = timezone.now() + timedelta(days=5)
         with patch.object(timezone, 'now', return_value=reset_time):
             response = self._do_post_request(self.session_url, 'test2', 'Test.Me64!', secure=True)
-            message =_(
+            message = _(
                 'Your password has expired due to password policy on this account. '
                 'You must reset your password before you can log in again.'
             )
@@ -63,7 +65,7 @@ class UserPasswordResetTest(TestCase):
             response = self._do_post_pass_reset_request(
                 pass_reset_url, password='Test.Me64@', secure=True
             )
-            self.assertEqual(response.status_code,  200)
+            self.assertEqual(response.status_code, 200)
 
             #login successful after reset password
             response = self._do_post_request(self.session_url, 'test2', 'Test.Me64@', secure=True)
@@ -167,11 +169,13 @@ class UserPasswordResetTest(TestCase):
         pass_reset_url = '{}/{}'.format(self.user_url, user_id)
 
         for i in xrange(30):
-                password = u'test_password{0}'.format(i)
-                response = self._do_post_pass_reset_request(
-                    '{}/{}'.format(self.user_url, i+200), password=password, secure=True
-                )
-                self._assert_response(response, status=404)
+            password = u'test_password{0}'.format(i)
+            response = self._do_post_pass_reset_request(
+                '{}/{}'.format(self.user_url, i + 200),
+                password=password,
+                secure=True
+            )
+            self._assert_response(response, status=404)
 
         response = self._do_post_pass_reset_request(
             '{}/{}'.format(self.user_url, '31'), password='Test.Me64@', secure=True
@@ -215,13 +219,10 @@ class UserPasswordResetTest(TestCase):
             extra['wsgi.url_scheme'] = 'https'
         return self.client.post(url, post_params, headers=headers, **extra)
 
-    def _assert_response(self, response, status=200, success=None, message=None):
+    def _assert_response(self, response, status=200, message=None):
         """
         Assert that the response had status 200 and returned a valid
         JSON-parseable dict.
-
-        If success is provided, assert that the response had that
-        value for 'success' in the JSON dict.
 
         If message is provided, assert that the response contained that
         value for 'message' in the JSON dict.
@@ -233,4 +234,3 @@ class UserPasswordResetTest(TestCase):
             msg = ("'%s' did not contain '%s'" %
                    (response_dict['message'], message))
             self.assertTrue(message in response_dict['message'], msg)
-
