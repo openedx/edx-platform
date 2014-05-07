@@ -4,6 +4,8 @@
 Acceptance tests for Video.
 """
 
+import json
+import requests
 from .helpers import UniqueCourseTest
 from ..pages.lms.video import VideoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -13,6 +15,8 @@ from ..pages.lms.course_info import CourseInfoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 VIDEO_SOURCE_PORT = 8777
+YOUTUBE_STUB_PORT = 9080
+YOUTUBE_STUB_URL = 'http://127.0.0.1:{}/'.format(YOUTUBE_STUB_PORT)
 
 HTML5_SOURCES = [
     'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
@@ -23,6 +27,13 @@ HTML5_SOURCES = [
 HTML5_SOURCES_INCORRECT = [
     'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
 ]
+
+
+class YouTubeConfigError(Exception):
+    """
+    Error occurred while configuring YouTube Stub Server.
+    """
+    pass
 
 
 class VideoBaseTest(UniqueCourseTest):
@@ -50,6 +61,10 @@ class VideoBaseTest(UniqueCourseTest):
         self.metadata = None
         self.assets = []
         self.verticals = None
+        self.youtube_configuration = {}
+
+        # reset youtube stub server
+        self.addCleanup(self._reset_youtube_stub_server)
 
     def navigate_to_video(self):
         """ Prepare the course and get to the video and render it """
@@ -75,6 +90,9 @@ class VideoBaseTest(UniqueCourseTest):
         chapter = XBlockFixtureDesc('chapter', 'Test Chapter').add_children(chapter_sequential)
         self.course_fixture.add_children(chapter)
         self.course_fixture.install()
+
+        if len(self.youtube_configuration) > 0:
+            self._configure_youtube_stub_server(self.youtube_configuration)
 
     def _add_course_verticals(self):
         """
@@ -125,6 +143,39 @@ class VideoBaseTest(UniqueCourseTest):
         """ Wait for the video Xmodule but not for rendering """
         self._navigate_to_courseware_video()
         self.video.wait_for_video_class()
+
+    def _configure_youtube_stub_server(self, config):
+        """
+        Allow callers to configure the stub server using the /set_config URL.
+        :param config: Configuration dictionary.
+        The request should have PUT data, such that:
+            Each PUT parameter is the configuration key.
+            Each PUT value is a JSON-encoded string value for the configuration.
+        :raise YouTubeConfigError:
+        """
+        youtube_stub_config_url = YOUTUBE_STUB_URL + 'set_config'
+
+        config_data = {param: json.dumps(value) for param, value in config.items()}
+        response = requests.put(youtube_stub_config_url, data=config_data)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                    youtube_stub_config_url, config, response.status_code))
+
+    def _reset_youtube_stub_server(self):
+        """
+        Reset YouTube Stub Server Configurations using the /del_config URL.
+        :raise YouTubeConfigError:
+        """
+        youtube_stub_config_url = YOUTUBE_STUB_URL + 'del_config'
+
+        response = requests.delete(youtube_stub_config_url)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                    youtube_stub_config_url, response.status_code))
 
     def metadata_for_mode(self, player_mode, additional_data=None):
         """
@@ -336,6 +387,55 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
+
+    def test_video_rendering_with_default_response_time(self):
+        """
+        Scenario: Video is rendered in Youtube mode when the YouTube Server responds quickly
+        Given the YouTube server response time less than 1.5 seconds
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "Youtube" mode
+        """
+        # configure youtube server
+        self.youtube_configuration['time_to_response'] = 0.4
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('youtube'))
+
+    def test_video_rendering_wo_default_response_time(self):
+        """
+        Scenario: Video is rendered in HTML5 when the YouTube Server responds slowly
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        """
+        # configure youtube server
+        self.youtube_configuration['time_to_response'] = 2.0
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+    def test_video_with_youtube_blocked(self):
+        """
+        Scenario: Video is rendered in HTML5 mode when the YouTube API is blocked
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the YouTube API is blocked
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'time_to_response': 2.0,
+            'youtube_api_blocked': True,
+        })
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
