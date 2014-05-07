@@ -826,8 +826,8 @@ class MultipleChoiceResponse(LoncapaResponse):
         using the regular (non-masked) names.
         Fails loudly if called on a response that is not masking.
         """
-        choices = self.xml.xpath('choicegroup/choice')
-        return [self.unmask_name(choice.get("name")) for choice in choices]
+        choicegroups = self.xml.xpath('//choicegroup')
+        return [self.unmask_name(choice.get("name")) for choice in choicegroups[0].getchildren()]
 
     def do_shuffle(self, tree):
         """
@@ -835,12 +835,10 @@ class MultipleChoiceResponse(LoncapaResponse):
         based on the seed. Otherwise does nothing.
         Does nothing if the tree has already been processed.
         """
-        # The tree is already pared down to this <multichoiceresponse> so this query just
-        # gets the child choicegroup (i.e. no leading //)
-        choicegroups = tree.xpath('choicegroup[@shuffle="true"]')
+        choicegroups = tree.xpath('//choicegroup[@shuffle="true"]')
         if choicegroups:
             if len(choicegroups) > 1:
-                raise LoncapaProblemError('We support one shuffled choicegroup per response')
+                raise LoncapaProblemError('We support at most one shuffled choicegroup')
             choicegroup = choicegroups[0]
             # Note that this tree has been processed.
             if choicegroup.get('shuffle-done') is not None:
@@ -893,16 +891,11 @@ class MultipleChoiceResponse(LoncapaResponse):
         pool size. If that attribute is zero or not present, no operation is performed.
         Calling this a second time does nothing.
         """
-        choicegroups = tree.xpath("choicegroup[@answer-pool]")
+        choicegroups = tree.xpath("//choicegroup[@answer-pool]")
 
         # Uses self.seed -- but want to randomize every time reaches this problem,
         # so problem's "randomization" should be set to "always"
         rnd = random.Random(self.context['seed'])
-        
-        # TODO: currently, each choicegroup uses the seed from the problem.
-        # This has the unfortunate effect of making choicegroups look similar
-        # when we have many in one problem. Could perturb the rnd a little
-        # per choicegroup so they look different.
 
         for choicegroup in choicegroups:
             num_str = choicegroup.get('answer-pool')

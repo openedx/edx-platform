@@ -245,37 +245,3 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'A'.*'Mid'.*'Mid'.*'C'.*'D'.*\].*</div>")
-
-    def test_multiple_shuffle_responses(self):
-        xml_str = textwrap.dedent("""
-            <problem>
-            <multiplechoiceresponse>
-              <choicegroup type="MultipleChoice" shuffle="true">
-                <choice correct="false">Apple</choice>
-                <choice correct="false">Banana</choice>
-                <choice correct="false">Chocolate</choice>
-                <choice correct ="true">Donut</choice>
-              </choicegroup>
-            </multiplechoiceresponse>
-            <p>Here is some text</p>
-            <multiplechoiceresponse>
-              <choicegroup type="MultipleChoice" shuffle="true">
-                <choice correct="false">A</choice>
-                <choice correct="false">B</choice>
-                <choice correct="false">C</choice>
-                <choice correct ="true">D</choice>
-              </choicegroup>
-            </multiplechoiceresponse>
-            </problem>
-        """)
-        problem = new_loncapa_problem(xml_str, seed=0)
-        orig_html = problem.get_html()
-        self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
-        html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
-        self.assertRegexpMatches(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
-                                       r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*\].*</div>")
-        responses = problem.responders.values()
-        self.assertTrue(hasattr(responses[0], 'is_masked'))
-        self.assertTrue(hasattr(responses[1], 'is_masked'))
-        self.assertEqual(responses[0].unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
-        self.assertEqual(responses[1].unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])

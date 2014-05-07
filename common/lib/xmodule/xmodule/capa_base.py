@@ -1055,9 +1055,7 @@ class CapaMixin(CapaFields):
                     event_info['state']['student_answers'][response.answer_id] = response.unmask_name(answer)
 
                 # 3. Record the shuffled ordering
-                if not 'display_order' in event_info:
-                    event_info['display_order'] = {}
-                event_info['display_order'][response.answer_id] = response.unmask_order()
+                event_info['display_order'] = {response.answer_id: response.unmask_order()}
 
     def pretty_print_seconds(self, num_seconds):
         """
