@@ -79,7 +79,7 @@ class SysadminDashboardView(TemplateView):
         """ Get an iterable list of courses."""
 
         courses = self.def_ms.get_courses()
-        courses = dict([c.to_deprecated_string(), c] for c in courses)  # no course directory
+        courses = dict([c.id.to_deprecated_string(), c] for c in courses)  # no course directory
 
         return courses
 
