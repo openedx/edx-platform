@@ -63,7 +63,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('robot', 'fake', 'course')
+        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
         """

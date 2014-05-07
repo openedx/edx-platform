@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
         if len(args) == 4:
             course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            location = UsageKey.from_string(args[1])
+            location = course_id.make_usage_key_from_deprecated_string(args[1])
             students_ids = [line.strip() for line in open(args[2])]
             hostname = args[3]
         else:

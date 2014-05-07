@@ -68,7 +68,10 @@ class TestGradebook(ModuleStoreTestCase):
                     module_id=item.location
                 )
 
-        self.response = self.client.get(reverse('gradebook', args=(SlashSeparatedCourseKey.to_deprecated_string(self.course.id),)))
+        self.response = self.client.get(reverse(
+            'gradebook',
+            args=(self.course.id.to_deprecated_string(),)
+        ))
 
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)
