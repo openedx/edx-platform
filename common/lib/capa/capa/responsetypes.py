@@ -1511,6 +1511,7 @@ class CustomResponse(LoncapaResponse):
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         """
+        _ = self.capa_system.i18n.ugettext
 
         log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
@@ -1520,9 +1521,16 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = ('[courseware.capa.responsetypes.customresponse] error getting'
-                   ' student answer from %s' % student_answers)
-            msg += '\n idset = %s, error = %s' % (idset, err)
+            msg = _(
+                "[courseware.capa.responsetypes.customresponse] error getting"
+                " student answer from {student_answers}"
+                "\n idset = {idset}, error = {err}"
+            ).format(
+                student_answers=student_answers,
+                idset=idset,
+                err=err
+            );
+
             log.error(msg)
             raise Exception(msg)
 
@@ -1535,7 +1543,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = ('<span class="inline-error">No answer entered!</span>'
+            msg = (u'<span class="inline-error">{0}</span>'.format(_(u'No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
