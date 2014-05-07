@@ -75,7 +75,8 @@ def get_sequential_open_distrib(course_id):
     # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
-        sequential_open_distrib[row['module_id']] = row['count_sequential']
+        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_id'])
+        sequential_open_distrib[row_loc] = row['count_sequential']
 
     return sequential_open_distrib
 
@@ -244,8 +245,8 @@ def get_d3_sequential_open_distrib(course_id):
             subsection_name = own_metadata(subsection).get('display_name', '')
 
             num_students = 0
-            if subsection.location.to_deprecated_string() in sequential_open_distrib:
-                num_students = sequential_open_distrib[subsection.location.to_deprecated_string()]
+            if subsection.location in sequential_open_distrib:
+                num_students = sequential_open_distrib[subsection.location]
 
             stack_data = []
             tooltip = _("{num_students} student(s) opened Subsection {subsection_num}: {subsection_name}").format(
