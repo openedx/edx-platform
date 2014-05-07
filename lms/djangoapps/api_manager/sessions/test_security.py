@@ -222,7 +222,7 @@ class SessionApiSecurityTest(TestCase):
         """
         Make Post/Delete/Get requests with params
         """
-        post_params, extra,  = {'username': username, 'password': password}, {}
+        post_params, extra, = {'username': username, 'password': password}, {}
         patched_audit_log = 'api_manager.sessions.views.AUDIT_LOG'
         request_method = kwargs.get('request_method', 'POST')
         if kwargs.get('email'):

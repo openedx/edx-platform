@@ -43,7 +43,7 @@ def _generate_base_uri(request):
 class SessionsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def post(self, request, format=None):
+    def post(self, request):
         """
         POST creates a new system session, supported authentication modes:
         1. Open edX username/password
@@ -116,7 +116,7 @@ class SessionsList(APIView):
 class SessionsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, session_id, format=None):
+    def get(self, request, session_id):
         """
         GET retrieves an existing system session
         """
@@ -140,7 +140,7 @@ class SessionsDetail(APIView):
         else:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request, session_id, format=None):
+    def delete(self, request, session_id):
         """
         DELETE flushes an existing system session from the system
         """
