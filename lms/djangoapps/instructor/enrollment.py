@@ -28,7 +28,6 @@ SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
     def __init__(self, course_id, email):
-        course_id = course_id
         exists_user = User.objects.filter(email=email).exists()
         if exists_user:
             user = User.objects.get(email=email)

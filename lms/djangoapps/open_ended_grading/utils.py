@@ -46,8 +46,6 @@ def generate_problem_url(problem_url_parts, base_course_url):
     @param base_course_url: Base url of a given course
     @return: A path to the problem
     """
-    print problem_url_parts
-    print base_course_url
     problem_url = base_course_url + "/"
     for i, part in enumerate(problem_url_parts):
         if part is not None:

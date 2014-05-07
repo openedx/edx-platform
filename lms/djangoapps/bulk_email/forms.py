@@ -67,18 +67,10 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 
-
-        try:
-            # Prepare message
+        if not modulestore().has_course(course_id):
             msg = u'COURSE NOT FOUND'
             msg += u' --- Entered course id was: "{0}". '.format(course_id.to_deprecated_string())
             msg += 'Please recheck that you have supplied a valid course id.'
-
-            # Try to get the course. If this returns None, it's not a real course.
-            course = modulestore().get_course(course_id)
-        except ValueError:
-            raise forms.ValidationError(msg)
-        if not course:
             raise forms.ValidationError(msg)
 
         # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses

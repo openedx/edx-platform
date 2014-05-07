@@ -385,8 +385,7 @@ class PaidCourseRegistration(OrderItem):
         in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
-        course = course_from_id(self.course_id)
-        if not course:
+        if not modulestore().has_course(self.course_id):
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
 

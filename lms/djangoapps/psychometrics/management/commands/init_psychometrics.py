@@ -33,8 +33,7 @@ class Command(BaseCommand):
 
         for sm in smset:
             url = sm.module_state_key
-            def_key = UsageKey.from_string(url).definition_key()
-            if not def_key.block_type() == "problem":
+            if not UsageKey.from_string(url).block_type == "problem":
                 continue
             try:
                 state = json.loads(sm.state)

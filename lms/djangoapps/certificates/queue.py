@@ -183,13 +183,13 @@ class XQueueCertInterface(object):
             user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)
             cert_mode = enrollment_mode
             if (mode_is_verified and user_is_verified and user_is_reverified):
-                template_pdf = "certificate-template-{id.org}-{id.offering}-verified.pdf".format(id=course_id)
+                template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
             elif (mode_is_verified and not (user_is_verified and user_is_reverified)):
-                template_pdf = "certificate-template-{id.org}-{id.offering}.pdf".format(id=course_id)
+                template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
                 cert_mode = GeneratedCertificate.MODES.honor
             else:
                 # honor code and audit students
-                template_pdf = "certificate-template-{id.org}-{id.offering}.pdf".format(id=course_id)
+                template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
             if forced_grade:
                 grade['grade'] = forced_grade
 

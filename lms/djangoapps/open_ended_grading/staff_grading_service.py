@@ -235,9 +235,7 @@ def _check_access(user, course_id):
     """
     Raise 404 if user doesn't have staff access to course_id
     """
-    course = course_from_id(course_id)
-
-    if not has_access(user, 'staff', course, course_id):
+    if not has_access(user, 'staff', course_id):
         raise Http404
 
     return

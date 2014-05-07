@@ -275,6 +275,6 @@ def course_ids_between(start_word, end_word):
     valid_courses = []
     for course in modulestore().get_courses():
         course_id = course.id.to_deprecated_string()
-        if (start_word.lower() <= course_id.lower() <= end_word.lower()) and (get_course_by_id(course.id) is not None):
+        if start_word.lower() <= course_id.lower() <= end_word.lower():
             valid_courses.append(course.id)
     return valid_courses
