@@ -319,7 +319,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
         """
@@ -343,10 +343,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.')
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
 
         # select language with code "zh"
-        self.video.select_language('zh')
+        self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
@@ -354,7 +354,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_fullscreen_video_alignment_on_transcript_toggle(self):
         """
@@ -437,6 +437,59 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertTrue(self.video.is_video_rendered('html5'))
 
+    def test_download_transcript_button_works_correctly(self):
+        """
+        Scenario: Download Transcript button works correctly
+        Given the course has Video components A and B in "Youtube" mode
+        And Video component C in "HTML5" mode
+        And I have defined downloadable transcripts for the videos
+        Then I can download a transcript for Video A in "srt" format
+        And I can download a transcript for Video A in "txt" format
+        And I can download a transcript for Video B in "txt" format
+        And the Download Transcript menu does not exist for Video C
+        """
+
+        data_a = {'sub': 'OEoXaMPEzfM', 'download_track': True}
+        youtube_a_metadata = self.metadata_for_mode('youtube', additional_data=data_a)
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+
+        data_b = {'youtube_id_1_0': 'b7xgknqkQk8', 'sub': 'b7xgknqkQk8', 'download_track': True}
+        youtube_b_metadata = self.metadata_for_mode('youtube', additional_data=data_b)
+        self.assets.append('subs_b7xgknqkQk8.srt.sjson')
+
+        data_c = {'track': 'http://example.org/', 'download_track': True}
+        html5_c_metadata = self.metadata_for_mode('html5', additional_data=data_c)
+
+        self.verticals = [
+            [{'display_name': 'A', 'metadata': youtube_a_metadata}],
+            [{'display_name': 'B', 'metadata': youtube_b_metadata}],
+            [{'display_name': 'C', 'metadata': html5_c_metadata}]
+        ]
+
+        # open the section with videos (open video "A")
+        self.navigate_to_video()
+
+        # check if we can download transcript in "srt" format that has text "00:00:00,270"
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,270'))
+
+        # select the transcript format "txt"
+        self.assertTrue(self.video.select_transcript_format('txt'))
+
+        # check if we can download transcript in "txt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Hi, welcome to Edx.'))
+
+        # open video "B"
+        self.course_nav.go_to_sequential('B')
+
+        # check if we can download transcript in "txt" format that has text "Equal transcripts"
+        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
+
+        # open video "C"
+        self.course_nav.go_to_sequential('C')
+
+        # menu "download_transcript" doesn't exist
+        self.assertFalse(self.video.is_menu_exist('download_transcript'))
+
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
@@ -517,7 +570,7 @@ class Html5VideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
         """
@@ -541,10 +594,10 @@ class Html5VideoTest(VideoBaseTest):
         self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.')
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
 
         # select language with code "zh"
-        self.video.select_language('zh')
+        self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
@@ -553,7 +606,7 @@ class Html5VideoTest(VideoBaseTest):
 
         #Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_full_screen_video_alignment_with_transcript_visible(self):
         """
