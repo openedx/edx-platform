@@ -408,11 +408,14 @@ class UsersGroupsList(APIView):
         try:
             existing_user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
-            return Response({}, status.HTTP_404_NOT_FOUND)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        group_type = request.QUERY_PARAMS.get('type', None)
         response_data = {}
         base_uri = _generate_base_uri(request)
         response_data['uri'] = base_uri
         groups = existing_user.groups.all()
+        if group_type:
+            groups = groups.filter(groupprofile__group_type=group_type)
         response_data['groups'] = []
         for group in groups:
             group_profile = GroupProfile.objects.get(group_id=group.id)
