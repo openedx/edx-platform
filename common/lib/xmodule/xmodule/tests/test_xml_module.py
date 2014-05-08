@@ -538,14 +538,14 @@ class TestXmlAttributes(XModuleXmlImportTest):
         # name)
         assert_in('attempts', seq.xml_attributes)
 
-    def test_inheritable_attribute(self):
-        # days_early_for_beta isn't a basic attribute of Sequence
-        assert_false(hasattr(SequenceDescriptor, 'days_early_for_beta'))
+    def check_inheritable_attribute(self, attribute, value):
+        # `attribute` isn't a basic attribute of Sequence
+        assert_false(hasattr(SequenceDescriptor, attribute))
 
-        # days_early_for_beta is added by InheritanceMixin
-        assert_true(hasattr(InheritanceMixin, 'days_early_for_beta'))
+        # `attribute` is added by InheritanceMixin
+        assert_true(hasattr(InheritanceMixin, attribute))
 
-        root = SequenceFactory.build(policy={'days_early_for_beta': '2'})
+        root = SequenceFactory.build(policy={attribute: str(value)})
         ProblemFactory.build(parent=root)
 
         # InheritanceMixin will be used when processing the XML
@@ -556,10 +556,14 @@ class TestXmlAttributes(XModuleXmlImportTest):
         assert_equals(seq.unmixed_class, SequenceDescriptor)
         assert_not_equals(type(seq), SequenceDescriptor)
 
-        # days_early_for_beta is added to the constructed sequence, because
+        # `attribute` is added to the constructed sequence, because
         # it's in the InheritanceMixin
-        assert_equals(2, seq.days_early_for_beta)
+        assert_equals(value, getattr(seq, attribute))
 
-        # days_early_for_beta is a known attribute, so we shouldn't include it
+        # `attribute` is a known attribute, so we shouldn't include it
         # in xml_attributes
-        assert_not_in('days_early_for_beta', seq.xml_attributes)
+        assert_not_in(attribute, seq.xml_attributes)
+
+    def test_inheritable_attributes(self):
+        self.check_inheritable_attribute('days_early_for_beta', 2)
+        self.check_inheritable_attribute('max_attempts', 5)
