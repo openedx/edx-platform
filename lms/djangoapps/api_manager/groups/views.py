@@ -20,113 +20,182 @@ from xmodule.modulestore import Location, InvalidLocationError
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
 
-def _generate_base_uri(request):
+def _generate_base_uri(request, include_query_string=True):
     """
     Constructs the protocol:host:path component of the resource uri
     """
     protocol = 'http'
     if request.is_secure():
         protocol = protocol + 's'
+    if include_query_string:
+        path_to_use = request.get_full_path()
+    else:
+        path_to_use = request.path_info
     resource_uri = '{}://{}{}'.format(
         protocol,
         request.get_host(),
-        request.get_full_path()
+        path_to_use
     )
     return resource_uri
 
 
 class GroupsList(APIView):
+    """
+    ### The GroupsList view allows clients to retrieve/append a list of Group entities
+    - URI: ```/api/groups/```
+    - GET: Returns a JSON representation (array) of the set of Group entities
+        * type: __required__, Set filtering parameter
+    - POST: Provides the ability to append to the Group entity set
+        * name: The name of the group being added
+        * type: __required__, Client-specified Group entity type, used for set filtering
+        * data: Free-form, JSON-formatted metadata attached to this Group entity
+    - POST Example:
+
+            {
+                "name" : "Alpha Series",
+                "type" : "series",
+                "data" : {
+                    "display_name" : "Demo Program",
+                    "start_date" : "2014-01-01",
+                    "end_date" : "2014-12-31"
+                }
+            }
+    ### Use Cases/Notes:
+    * GET requests for _all_ groups are not currently allowed via the API
+    * If no 'type' parameter is specified during GET, the server will return a 400 Bad Request
+    * 'type' is a free-form field used to tag/filter group entities.
+    * Some sample of types include:
+        ** workgroup: a group of users working on a project together
+        ** series: a group of related courses
+        ** company: a group of groups (such as departments)
+    * 'data' is a free-form field containing type-specific metadata in JSON format, which bypasses the need for extensive database modeling
+    * Some sample 'data' elements include:
+        ** series: display_name, start_date, end_date
+        ** organization: display_name, contact_name, phone, email
+    * Ultimately, both 'type' and 'data' are determined by the client/caller.  Open edX has no type or data specifications at the present time.
+    """
     permissions_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request):
         """
-        POST creates a new group in the system
+        POST /api/groups
         """
+        group_type = request.DATA.get('type', None)
+        if group_type is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
         response_data = {}
         base_uri = _generate_base_uri(request)
         # Group name must be unique, but we need to support dupes
         group = Group.objects.create(name=str(uuid.uuid4()))
-        if request.DATA.get('name'):
-            original_group_name = request.DATA.get('name')
-        else:
+        original_group_name = request.DATA.get('name', None)
+        if original_group_name is None or len(original_group_name) == 0:
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         group.name = '{:04d}: {}'.format(group.id, original_group_name)
         group.record_active = True
-        group.record_date_created = timezone.now()
-        group.record_date_modified = timezone.now()
         group.save()
 
         # Create a corresponding relationship management record
         GroupRelationship.objects.create(group_id=group.id, parent_group=None)
 
         # Create a corresponding profile record (for extra meta info)
-        group_type = request.DATA.get('group_type', None)
-        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else {}
-        profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, name=original_group_name, data=data)
+        data = request.DATA.get('data', {})
+        profile, _ = GroupProfile.objects.get_or_create(
+            group_id=group.id,
+            group_type=group_type,
+            name=original_group_name,
+            data=json.dumps(data)
+        )
 
         response_data = {
             'id': group.id,
-            'name': original_group_name,
-            'type': group_type,
+            'name': profile.name,
         }
         base_uri = _generate_base_uri(request)
-        response_data['uri'] = '{}/{}'.format(base_uri, group.id)
+        response_data['uri'] = '{}/{}'.format(_generate_base_uri(request, False), group.id)
         response_status = status.HTTP_201_CREATED
         return Response(response_data, status=response_status)
 
     def get(self, request):
         """
-        GET retrieves a list of groups in the system filtered by type
+        GET /api/groups
         """
         response_data = []
-        if 'type' in request.GET:
-            profiles = GroupProfile.objects.filter(group_type=request.GET['type'])
-        else:
-            profiles = GroupProfile.objects.all()
+        group_type = request.QUERY_PARAMS.get('type', None)
+        if group_type is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        profiles = GroupProfile.objects.filter(group_type=request.GET['type']).select_related('group')
         for profile in profiles:
             item_data = {}
-            item_data['group_id'] = profile.group_id
+            item_data['id'] = profile.group_id
             if profile.name and len(profile.name):
                 group_name = profile.name
             else:
-                group = Group.objects.get(id=profile.group_id)
-                group_name = group.name
+                group_name = profile.group.name
             item_data['name'] = group_name
-            if profile.group_type:
-                item_data['group_type'] = profile.group_type
+            item_data['type'] = profile.group_type
             if profile.data:
                 item_data['data'] = json.loads(profile.data)
+            item_data['uri'] = '{}/{}'.format(_generate_base_uri(request, False), profile.group_id)
             response_data.append(item_data)
         return Response(response_data, status=status.HTTP_200_OK)
 
 
 class GroupsDetail(APIView):
+    """
+    ### The GroupsDetail view allows clients to interact with a specific Group entity
+    - URI: ```/api/groups/{group_id}```
+    - GET: Returns a JSON representation of the specified Group entity
+    - POST: Provides the ability to modify specific fields for this Group entity
+        * type: Client-specified Group entity type
+        * data: Free-form, JSON-formatted metadata attached to this Group entity
+    - POST Example:
+
+            {
+                "type" : "series",
+                "data" : {
+                    "display_name" : "Demo Program",
+                    "start_date" : "2014-01-01",
+                    "end_date" : "2014-12-31"
+                }
+            }
+    ### Use Cases/Notes:
+    * Use the GroupsDetail view to obtain the current state for a specific Group
+    * For POSTs, you may include only those parameters you wish to modify, for example:
+        ** Modifying the start_date for a 'series' without changing the 'type' field
+    * A GET response will additionally include a list of URIs to available sub-resources:
+        ** Related Users (/api/groups/{group_id}/users)
+        ** Related Courses (/api/groups/{group_id}/courses)
+        ** Related Groups(/api/groups/{group_id}/groups)
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
+        """
+        POST /api/groups/{group_id}
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
-        print base_uri
         try:
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
-        group_type = request.DATA.get('group_type')
-        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
-        if not group_type and not data:
-            return Response({}, status.HTTP_400_BAD_REQUEST)
         profile, _ = GroupProfile.objects.get_or_create(group_id=group_id)
-        profile.group_type = group_type
-        profile.data = data
+        group_type = request.DATA.get('type', None)
+        if group_type:
+            profile.group_type = group_type
+        data = request.DATA.get('data', None)
+        if data:
+            profile.data = json.dumps(data)
         profile.save()
         response_data['id'] = existing_group.id
         response_data['name'] = profile.name
+        response_data['type'] = profile.group_type
         response_data['uri'] = _generate_base_uri(request)
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, group_id):
         """
-        GET retrieves an existing group from the system
+        GET /api/groups/{group_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -141,6 +210,8 @@ class GroupsDetail(APIView):
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/groups'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/courses'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
         try:
             group_profile = GroupProfile.objects.get(group_id=group_id)
         except ObjectDoesNotExist:
@@ -151,7 +222,7 @@ class GroupsDetail(APIView):
             else:
                 response_data['name'] = existing_group.name
             if group_profile.group_type:
-                response_data['group_type'] = group_profile.group_type
+                response_data['type'] = group_profile.group_type
             data = group_profile.data
             if data:
                 response_data['data'] = json.loads(data)
@@ -161,11 +232,27 @@ class GroupsDetail(APIView):
 
 
 class GroupsUsersList(APIView):
+    """
+    ### The GroupsUserList view allows clients to interact with the set of User entities related to the specified Group
+    - URI: ```/api/groups/{group_id}/users/```
+    - GET: Returns a JSON representation (array) of the set of related User entities
+    - POST: Append a User entity to the set of related User entities for the specified group
+        * user_id: __required__, The identifier for the User being added
+    - POST Example:
+
+            {
+                "user_id" : 123
+            }
+    ### Use Cases/Notes:
+    * Use the GroupsUsersList view to manage User membership for a specific Group
+    * For example, as a newly-added member of a 'workgroup' group, a User could be presented with a list of their peers
+    * Once a User Group exists, you can additionally link to Courses and other Groups (see GroupsCoursesList, GroupsGroupsList)
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
-        POST creates a new group-user relationship in the system
+        POST /api/groups/{group_id}/users/
         """
         base_uri = _generate_base_uri(request)
         try:
@@ -178,7 +265,7 @@ class GroupsUsersList(APIView):
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
         try:
-            existing_relationship = Group.objects.get(user=existing_user)
+            existing_relationship = Group.objects.filter(id=existing_group.id).get(user=existing_user)
         except ObjectDoesNotExist:
             existing_relationship = None
         response_data = {}
@@ -196,7 +283,7 @@ class GroupsUsersList(APIView):
 
     def get(self, request, group_id):
         """
-        GET retrieves the list of users related to the specified group
+        GET /api/groups/{group_id}/users/
         """
         try:
             existing_group = Group.objects.get(id=group_id)
@@ -218,11 +305,20 @@ class GroupsUsersList(APIView):
 
 
 class GroupsUsersDetail(APIView):
+    """
+    ### The GroupsUsersDetail view allows clients to interact with a specific Group-User relationship
+    - URI: ```/api/groups/{group_id}/users/{user_id}```
+    - GET: Returns a JSON representation of the specified Group-User relationship
+    - DELETE: Removes an existing Group-User relationship
+    ### Use Cases/Notes:
+    * Use the GroupsUsersDetail to validate that a User is a member of a specific Group
+    * Cancelling a User's membership in a Group is as simple as calling DELETE on the URI
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, user_id):
         """
-        GET retrieves an existing group-user relationship from the system
+        GET /api/groups/{group_id}/users/{user_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -255,11 +351,41 @@ class GroupsUsersDetail(APIView):
 
 
 class GroupsGroupsList(APIView):
+    """
+    ### The GroupsGroupsList view allows clients to interact with the set of Groups related to the specified Group
+    - URI: ```/api/groups/{group_id}/groups/```
+    - GET: Returns a JSON representation (array) of the set of related Group entities
+    - POST: Provides the ability to append to the related Group entity set
+        * group_id: __required__, The name of the Group being added
+        * relationship_type: __required__, Relationship paradigm, select from the following values:
+            ** 'g', _graph_, create a graph(aka, linked) relationship with the specified Group
+            ** 'h', _hierarchical_, create a parent-child relationship with the specified Group
+    - POST Example:
+
+            {
+                "group_id" : 1234,
+                "relationship_type" : "g"
+            }
+    ### Use Cases/Notes:
+    * Use a graph-type relationship when you simply want to indicate a link between two groups:
+        ** Linking a course series with a particular company
+        ** Linking a user workgroup with a particular course series
+    * Use a hierarchical-type relationship when you want to enforce a parent-child link between two groups:
+        ** Linking a company (parent) to a department (child)
+        ** Linking a user workgroup (parent) to a breakout user workgroup (child)
+    * Note that posting a new hierarchical relationship for a child group having a parent will overwrite the current relationship:
+        ** POST /groups/123/groups { "group_id": 246}
+        ** GET /groups/123/groups/246 -> 200 OK
+        ** POST /groups/987/groups {"group_id": 246}
+        ** GET /groups/123/groups/246 -> 404 NOT FOUND
+        ** GET /groups/987/groups/246 -> 200 OK
+    * Once a Group Group exists, you can additionally link to Users and Courses (see GroupsUsersList, GroupsCoursesList)
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
-        POST creates a new group-group relationship in the system
+        POST /api/groups/{group_id}/groups/{related_group_id}
         """
         response_data = {}
         to_group_id = request.DATA['group_id']
@@ -291,7 +417,7 @@ class GroupsGroupsList(APIView):
 
     def get(self, request, group_id):
         """
-        GET retrieves the existing group-group relationships for the specified group
+        GET /api/groups/{group_id}/groups/{related_group_id}
         """
         try:
             from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
@@ -329,11 +455,22 @@ class GroupsGroupsList(APIView):
 
 
 class GroupsGroupsDetail(APIView):
+    """
+    ### The GroupsGroupsDetail view allows clients to interact with a specific Group-Group relationship
+    - URI: ```/api/groups/{group_id}/groups/{related_group_id}```
+    - GET: Returns a JSON representation of the specified Group-Group relationship
+    - DELETE: Removes an existing Group-Group relationship
+    ### Use Cases/Notes:
+    * Use the GroupsGroupsDetail operation to confirm that a relationship exists between two Groups
+        ** Is the current workgroup linked to the specified company?
+        ** Is the current course series linked to the specified workgroup?
+    * To remove an existing Group-Group relationship, simply call DELETE on the URI
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, related_group_id):
         """
-        GET retrieves an existing group-group relationship from the system
+        GET /api/groups/{group_id}/groups/{related_group_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -357,7 +494,7 @@ class GroupsGroupsDetail(APIView):
 
     def delete(self, request, group_id, related_group_id):
         """
-        DELETE removes/inactivates/etc. an existing group-group relationship
+        DELETE /api/groups/{group_id}/groups/{related_group_id}
         """
         try:
             from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
@@ -384,11 +521,26 @@ class GroupsGroupsDetail(APIView):
 
 
 class GroupsCoursesList(APIView):
+    """
+    ### The GroupsCoursesList view allows clients to interact with the set of Courses related to the specified Group
+    - URI: ```/api/groups/{group_id}/courses/```
+    - GET: Returns a JSON representation (array) of the set of related Course entities
+    - POST: Provides the ability to append to the related Course entity set
+        * course_id: __required__, The name of the Course being added
+    - POST Example:
+
+            {
+                "course_id" : "edx/demo/course",
+            }
+    ### Use Cases/Notes:
+    * Create a Group of Courses to model cases such as an academic program or topical series
+    * Once a Course Group exists, you can additionally link to Users and other Groups (see GroupsUsersList, GroupsGroupsList)
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
-        POST creates a new group-course relationship in the system
+        POST /api/groups/{group_id}/courses/{course_id}
         """
         response_data = {}
         try:
@@ -422,7 +574,7 @@ class GroupsCoursesList(APIView):
 
     def get(self, request, group_id):
         """
-        GET returns all courses that has a relationship to the group
+        GET /api/groups/{group_id}/courses/{course_id}
         """
         response_data = {}
         try:
@@ -431,24 +583,36 @@ class GroupsCoursesList(APIView):
             return Response({}, status.HTTP_404_NOT_FOUND)
         store = modulestore()
         members = CourseGroupRelationship.objects.filter(group=existing_group)
-        response_data['courses'] = []
+        response_data = []
         for member in members:
             course = store.get_course(member.course_id)
             course_data = {
                 'course_id': member.course_id,
                 'display_name': course.display_name
             }
-            response_data['courses'].append(course_data)
+            response_data.append(course_data)
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
 
 
 class GroupsCoursesDetail(APIView):
+    """
+    ### The GroupsCoursesDetail view allows clients to interact with a specific Group-Course relationship
+    - URI: ```/api/groups/{group_id}/courses/{course_id}```
+    - GET: Returns a JSON representation of the specified Group-Course relationship
+    - DELETE: Removes an existing Group-Course relationship
+    ### Use Cases/Notes:
+    * Use the GroupsCoursesDetail to validate that a Course is linked to a specific Group
+        * Is Course part of the specified series?
+        * Is Course linked to the specified workgroup?
+    * Removing a Course from a Group is as simple as calling DELETE on the URI
+        * Remove a course from the specified academic program
+    """
     permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, course_id):
         """
-        GET retrieves an existing group-course relationship from the system
+        GET /api/groups/{group_id}/courses/{course_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -469,7 +633,7 @@ class GroupsCoursesDetail(APIView):
 
     def delete(self, request, group_id, course_id):
         """
-        DELETE removes/inactivates/etc. an existing group-course relationship
+        DELETE /api/groups/{group_id}/courses/{course_id}
         """
         try:
             existing_group = Group.objects.get(id=group_id)

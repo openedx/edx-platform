@@ -31,6 +31,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
+
 def _generate_base_uri(request):
     """
     Constructs the protocol:host:path component of the resource uri
@@ -57,6 +58,7 @@ def _serialize_user_profile(response_data, user_profile):
 
     return response_data
 
+
 def _serialize_user(response_data, user):
     """
     Loads the object data into the response dict
@@ -70,14 +72,15 @@ def _serialize_user(response_data, user):
     response_data['is_active'] = user.is_active
     return response_data
 
-def _save_module_position(request, user, course_id, course_descriptor, position):
+
+def _save_content_position(request, user, course_id, course_descriptor, position):
     """
     Records the indicated position for the specified course
     Really no reason to generalize this out of user_courses_detail aside from pylint complaining
     """
     field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-    if course_id == position['parent_module_id']:
-        parent_module = get_module_for_descriptor(
+    if course_id == position['parent_content_id']:
+        parent_content = get_module_for_descriptor(
             user,
             request,
             course_descriptor,
@@ -85,23 +88,23 @@ def _save_module_position(request, user, course_id, course_descriptor, position)
             course_id
         )
     else:
-        parent_module = module_render.get_module(
+        parent_content = module_render.get_module(
             user,
             request,
-            position['parent_module_id'],
+            position['parent_content_id'],
             field_data_cache,
             course_id
         )
-    child_module = module_render.get_module(
+    child_content = module_render.get_module(
         user,
         request,
-        position['child_module_id'],
+        position['child_content_id'],
         field_data_cache,
         course_id
     )
-    save_child_position(parent_module, child_module.location.name)
-    saved_module = get_current_child(parent_module)
-    return saved_module.id
+    save_child_position(parent_content, child_content.location.name)
+    saved_content = get_current_child(parent_content)
+    return saved_content.id
 
 
 class UsersList(APIView):
@@ -539,7 +542,7 @@ class UsersCoursesDetail(APIView):
             response_data['course_id'] = course_id
             response_status = status.HTTP_201_CREATED
             if request.DATA['position']:
-                response_data['position'] = _save_module_position(
+                response_data['position'] = _save_content_position(
                     request,
                     user,
                     course_id,
@@ -568,13 +571,13 @@ class UsersCoursesDetail(APIView):
             response_data['course_id'] = course_id
             response_data['uri'] = base_uri
             field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-            course_module = module_render.get_module(
+            course_content = module_render.get_module(
                 user,
                 request,
                 course_descriptor.location,
                 field_data_cache,
                 course_id)
-            response_data['position'] = course_module.position
+            response_data['position'] = course_content.position
             response_status = status.HTTP_200_OK
         else:
             response_status = status.HTTP_404_NOT_FOUND
