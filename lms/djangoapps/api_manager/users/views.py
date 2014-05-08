@@ -28,6 +28,9 @@ from util.password_policy_validators import (
 )
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
+from courseware import grades
+from courseware.courses import get_course
+
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -600,3 +603,41 @@ class UsersCoursesDetail(APIView):
         if user:
             CourseEnrollment.unenroll(user, course_id)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+class UsersCoursesGradesDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, user_id, course_id):
+        """
+        GET returns the current gradebook for the user in a course
+        """
+
+        # @TODO: Add authorization check here once we get caller identity
+        # Only student can get his/her own information *or* course staff
+        # can get everyone's grades
+
+        try:
+            # get the full course tree with depth=None which reduces the number of
+            # round trips to the database
+            course = get_course(course_id, depth=None)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+        # The pre-fetching of groups is done to make auth checks not require an
+        # additional DB lookup (this kills the Progress page in particular).
+        try:
+            student = User.objects.prefetch_related("groups").get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        courseware_summary = grades.progress_summary(student, request, course)
+        grade_summary = grades.grade(student, request, course)
+
+        response_data = {
+            'courseware_summary': courseware_summary,
+            'grade_summary': grade_summary
+        }
+
+        return Response(response_data)
