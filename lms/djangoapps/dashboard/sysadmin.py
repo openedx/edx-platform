@@ -78,10 +78,7 @@ class SysadminDashboardView(TemplateView):
     def get_courses(self):
         """ Get an iterable list of courses."""
 
-        courses = self.def_ms.get_courses()
-        courses = dict([c.id.to_deprecated_string(), c] for c in courses)  # no course directory
-
-        return courses
+        return self.def_ms.get_courses()
 
     def return_csv(self, filename, header, data):
         """
@@ -247,7 +244,6 @@ class Users(SysadminDashboardView):
         """Returns the datatable used for this view"""
 
         self.datatable = {}
-        courses = self.get_courses()
 
         self.datatable = dict(header=[_('Statistic'), _('Value')],
                               title=_('Site statistics'))
@@ -257,9 +253,9 @@ class Users(SysadminDashboardView):
         self.msg += u'<h2>{0}</h2>'.format(
             _('Courses loaded in the modulestore'))
         self.msg += u'<ol>'
-        for (cdir, course) in courses.items():
+        for course in self.get_courses():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(cdir), course.location.to_deprecated_string())
+                escape(course.id.to_deprecated_string()), course.location.to_deprecated_string())
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -487,11 +483,10 @@ class Courses(SysadminDashboardView):
         """Creates course information datatable"""
 
         data = []
-        courses = self.get_courses()
 
-        for (cdir, course) in courses.items():
-            gdir = cdir.run
-            data.append([course.display_name, cdir]
+        for course in self.get_courses():
+            gdir = course.id.run
+            data.append([course.display_name, course.id.to_deprecated_string()]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'), _('Directory/ID'),
@@ -525,7 +520,7 @@ class Courses(SysadminDashboardView):
         track.views.server_track(request, action, {},
                                  page='courses_sysdashboard')
 
-        courses = self.get_courses()
+        courses = {course.id: course for course in self.get_courses()}
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
@@ -544,10 +539,12 @@ class Courses(SysadminDashboardView):
                     course = get_course_by_id(course_key)
                     course_found = True
                 except Exception, err:   # pylint: disable=broad-except
-                    self.msg += _('Error - cannot get course with ID '
-                                  '{0}<br/><pre>{1}</pre>').format(
-                                      course_id, escape(str(err))
-                                  )
+                    self.msg += _(
+                        'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
+                    ).format(
+                        course_key,
+                        escape(str(err))
+                    )
 
             is_xml_course = (modulestore().get_modulestore_type(course_key) == XML_MODULESTORE_TYPE)
             if course_found and is_xml_course:
@@ -599,9 +596,7 @@ class Staffing(SysadminDashboardView):
             raise Http404
         data = []
 
-        courses = self.get_courses()
-
-        for (cdir, course) in courses.items():  # pylint: disable=unused-variable
+        for course in self.get_courses():  # pylint: disable=unused-variable
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
@@ -635,9 +630,7 @@ class Staffing(SysadminDashboardView):
             data = []
             roles = [CourseInstructorRole, CourseStaffRole, ]
 
-            courses = self.get_courses()
-
-            for (cdir, course) in courses.items():  # pylint: disable=unused-variable
+            for course in self.get_courses():  # pylint: disable=unused-variable
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
