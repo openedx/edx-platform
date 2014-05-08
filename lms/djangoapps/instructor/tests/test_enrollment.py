@@ -297,9 +297,9 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_id=msk, state=original_state)
+        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
         # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=user, course_id=self.course_key, module_id=msk)
+        module = lambda: StudentModule.objects.get(student=user, course_id=self.course_key, module_state_key=msk)
         self.assertEqual(json.loads(module().state)['attempts'], 32)
         reset_student_attempts(self.course_key, user, msk)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
@@ -308,10 +308,10 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_id=msk, state=original_state)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_id=msk).count(), 1)
+        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
+        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 1)
         reset_student_attempts(self.course_key, user, msk, delete_module=True)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_id=msk).count(), 0)
+        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 0)
 
     def test_delete_submission_scores(self):
         user = UserFactory()

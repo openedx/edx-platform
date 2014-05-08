@@ -81,7 +81,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
     students_with_graded_submissions = []  # pylint: disable=invalid-name
     students_with_no_state = []
 
-    student_modules = StudentModule.objects.filter(module_id=location, student__in=students).order_by('student')
+    student_modules = StudentModule.objects.filter(module_state_key=location, student__in=students).order_by('student')
     print "Total student modules: {0}".format(student_modules.count())
 
     for index, student_module in enumerate(student_modules):

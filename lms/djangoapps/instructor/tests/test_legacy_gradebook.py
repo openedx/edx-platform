@@ -65,7 +65,7 @@ class TestGradebook(ModuleStoreTestCase):
                     max_grade=1,
                     student=user,
                     course_id=self.course.id,
-                    module_id=item.location
+                    module_state_key=item.location
                 )
 
         self.response = self.client.get(reverse(

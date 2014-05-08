@@ -198,7 +198,7 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     module_to_reset = StudentModule.objects.get(
         student_id=student.id,
         course_id=course_id,
-        module_id=module_state_key
+        module_state_key=module_state_key
     )
 
     if delete_module:

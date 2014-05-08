@@ -116,7 +116,7 @@ def answer_distributions(course_key):
             continue
 
         try:
-            url, display_name = url_and_display_name(module.module_id.map_into_course(course_key))
+            url, display_name = url_and_display_name(module.module_state_key.map_into_course(course_key))
             # Each problem part has an ID that is derived from the
             # module.module_state_key (with some suffix appended)
             for problem_part_id, raw_answer in raw_answers.items():
@@ -210,7 +210,7 @@ def _grade(student, request, course, keep_raw_scores):
                 with manual_transaction():
                     should_grade_section = StudentModule.objects.filter(
                         student=student,
-                        module_id__in=[
+                        module_state_key__in=[
                             descriptor.location for descriptor in section['xmoduledescriptors']
                         ]
                     ).exists()
@@ -447,7 +447,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         student_module = StudentModule.objects.get(
             student=user,
             course_id=course_id,
-            module_id=problem_descriptor.location
+            module_state_key=problem_descriptor.location
         )
     except StudentModule.DoesNotExist:
         student_module = None

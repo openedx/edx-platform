@@ -40,31 +40,13 @@ class StudentModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_id = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
-    # TODO: This is a lie; course_id now represents something more like a course_key.  We may
-    # or may not want to change references to this to something like course_key or course_key_field in
-    # this file.  (Certain changes would require a DB migration which is probably not what we want.)
-    # Someone should look at this and reevaluate before the final merge into master.
+
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    @property
-    def module_state_key(self):
-        """
-        Returns a Location based on module_id and course_id
-        """
-        return self.course_id.make_usage_key(self.module_id.category, self.module_id.name)
-
-    @module_state_key.setter
-    def module_state_key(self, usage_key):
-        """
-        Set the module_id and course_id from the passed UsageKey
-        """
-        self.course_id = usage_key.course_key
-        self.module_id = usage_key
-
     class Meta:
-        unique_together = (('student', 'module_id', 'course_id'),)
+        unique_together = (('student', 'module_state_key', 'course_id'),)
 
     ## Internal state of the object
     state = models.TextField(null=True, blank=True)

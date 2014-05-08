@@ -401,7 +401,7 @@ def instructor_dashboard(request, course_id):
                     student_module = StudentModule.objects.get(
                         student_id=student.id,
                         course_id=course_key,
-                        module_id=module_state_key
+                        module_state_key=module_state_key
                     )
                     msg += _("Found module.  ")
 

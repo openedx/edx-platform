@@ -128,7 +128,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         for student in students:
             CourseEnrollmentFactory.create(course_id=self.course.id, user=student)
             StudentModuleFactory.create(course_id=self.course.id,
-                                        module_id=self.location,
+                                        module_state_key=self.location,
                                         student=student,
                                         grade=grade,
                                         max_grade=max_grade,
@@ -140,7 +140,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         for student in students:
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_id=self.location)
+                                               module_state_key=self.location)
             state = json.loads(module.state)
             self.assertEquals(state['attempts'], num_attempts)
 
@@ -357,7 +357,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         for student in students:
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_id=self.location)
+                                               module_state_key=self.location)
             state = json.loads(module.state)
             self.assertEquals(state['attempts'], initial_attempts)
 
@@ -383,7 +383,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         for index, student in enumerate(students):
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_id=self.location)
+                                               module_state_key=self.location)
             state = json.loads(module.state)
             if index == 3:
                 self.assertEquals(state['attempts'], 0)
@@ -430,11 +430,11 @@ class TestDeleteStateInstructorTask(TestInstructorTasks):
         for student in students:
             StudentModule.objects.get(course_id=self.course.id,
                                       student=student,
-                                      module_id=self.location)
+                                      module_state_key=self.location)
         self._test_run_with_task(delete_problem_state, 'deleted', num_students)
         # confirm that no state can be found anymore:
         for student in students:
             with self.assertRaises(StudentModule.DoesNotExist):
                 StudentModule.objects.get(course_id=self.course.id,
                                           student=student,
-                                          module_id=self.location)
+                                          module_state_key=self.location)
