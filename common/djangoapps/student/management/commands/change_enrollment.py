@@ -63,7 +63,7 @@ class Command(BaseCommand):
             if '@' in options['user']:
                 user = User.objects.get(email=options['user'])
             else:
-                user = User.objects.get(user=options['user'])
+                user = User.objects.get(username=options['user'])
             filter_args['user'] = user
         enrollments = CourseEnrollment.objects.filter(**filter_args)
         if options['noop']:
