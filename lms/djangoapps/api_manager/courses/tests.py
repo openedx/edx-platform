@@ -50,16 +50,30 @@ class CoursesApiTests(TestCase):
             display_name="Overview"
         )
 
-        self.module = ItemFactory.create(
+        self.course_project = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            display_name="Group Project"
+        )
+
+        self.course_project2 = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            display_name="Group Project2"
+        )
+
+        self.course_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.chapter.location,
             data=self.test_data,
             display_name="Video_Sequence"
         )
 
-        self.submodule = ItemFactory.create(
+        self.content_child = ItemFactory.create(
             category="video",
-            parent_location=self.module.location,
+            parent_location=self.course_content.location,
             data=self.test_data,
             display_name="Video_Resources"
         )
@@ -98,10 +112,11 @@ class CoursesApiTests(TestCase):
         self.test_course_number = self.course.number
         self.test_course_org = self.course.org
         self.test_chapter_id = self.chapter.id
-        self.test_module_id = self.module.id
-        self.test_submodule_id = self.submodule.id
-        self.base_modules_uri = '/api/courses/' + self.test_course_id + '/modules'
-        self.base_chapters_uri = self.base_modules_uri + '?type=chapter'
+        self.test_course_content_id = self.course_content.id
+        self.test_bogus_content_id = "j5y://foo/bar/baz"
+        self.test_content_child_id = self.content_child.id
+        self.base_course_content_uri = '/api/courses/' + self.test_course_id + '/content'
+        self.base_chapters_uri = self.base_course_content_uri + '?type=chapter'
 
         self.client = SecureClient()
         cache.clear()
@@ -169,7 +184,7 @@ class CoursesApiTests(TestCase):
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
 
-    def test_courses_detail_get_with_submodules(self):
+    def test_courses_detail_get_with_child_content(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '?depth=100'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -180,7 +195,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['org'], self.test_course_org)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertGreater(len(response.data['modules']), 0)
+        self.assertGreater(len(response.data['content']), 0)
 
     def test_courses_detail_get_notfound(self):
         test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id
@@ -195,17 +210,17 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['category'], 'course')
         self.assertEqual(response.data['name'], self.course.display_name)
-        self.assertEqual(len(response.data['modules']), 1)
+        self.assertEqual(len(response.data['content']), 3)
 
-        chapter = response.data['modules'][0]
+        chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['modules']), 1)
+        self.assertEqual(len(chapter['children']), 1)
 
-        sequence = chapter['modules'][0]
+        sequence = chapter['children'][0]
         self.assertEqual(sequence['category'], 'videosequence')
         self.assertEqual(sequence['name'], 'Video_Sequence')
-        self.assertNotIn('modules', sequence)
+        self.assertNotIn('children', sequence)
 
     def test_courses_tree_get_root(self):
         # query the course tree to quickly get naviation information
@@ -215,7 +230,7 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['category'], 'course')
         self.assertEqual(response.data['name'], self.course.display_name)
-        self.assertNotIn('modules', response.data)
+        self.assertNotIn('content', response.data)
 
     def test_chapter_list_get(self):
         test_uri = self.base_chapters_uri
@@ -227,81 +242,86 @@ class CoursesApiTests(TestCase):
             if matched_chapter is False and chapter['id'] == self.test_chapter_id:
                 self.assertIsNotNone(chapter['uri'])
                 self.assertGreater(len(chapter['uri']), 0)
-                confirm_uri = self.test_server_prefix + self.base_modules_uri + '/' + chapter['id']
+                confirm_uri = self.test_server_prefix + self.base_course_content_uri + '/' + chapter['id']
                 self.assertEqual(chapter['uri'], confirm_uri)
                 matched_chapter = True
         self.assertTrue(matched_chapter)
 
     def test_chapter_detail_get(self):
-        test_uri = self.base_modules_uri + '/' + self.test_chapter_id
+        test_uri = self.base_course_content_uri + '/' + self.test_chapter_id
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['id']), 0)
         self.assertEqual(response.data['id'], self.test_chapter_id)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertGreater(len(response.data['modules']), 0)
+        self.assertGreater(len(response.data['children']), 0)
 
-    def test_modules_list_get(self):
-        test_uri = self.base_modules_uri + '/' + self.test_module_id
+    def test_course_content_list_get(self):
+        test_uri = '{}/{}/children'.format(self.base_course_content_uri, self.test_course_content_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
-        matched_submodule = False
-        for submodule in response.data['modules']:
-            if matched_submodule is False and submodule['id'] == self.test_submodule_id:
-                self.assertIsNotNone(submodule['uri'])
-                self.assertGreater(len(submodule['uri']), 0)
-                confirm_uri = self.test_server_prefix + self.base_modules_uri + '/' + submodule['id']
-                self.assertEqual(submodule['uri'], confirm_uri)
-                matched_submodule = True
-        self.assertTrue(matched_submodule)
+        matched_child = False
+        for child in response.data:
+            if matched_child is False and child['id'] == self.test_content_child_id:
+                self.assertIsNotNone(child['uri'])
+                self.assertGreater(len(child['uri']), 0)
+                confirm_uri = self.test_server_prefix + self.base_course_content_uri + '/' + child['id']
+                self.assertEqual(child['uri'], confirm_uri)
+                matched_child = True
+        self.assertTrue(matched_child)
 
-    def test_modules_detail_get(self):
-        test_uri = self.base_modules_uri + '/' + self.test_module_id
+    def test_course_content_list_get_invalid_content(self):
+        test_uri = '{}/{}/children'.format(self.base_course_content_uri, self.test_bogus_content_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_detail_get(self):
+        test_uri = self.base_course_content_uri + '/' + self.test_course_content_id
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
-        self.assertEqual(response.data['id'], self.test_module_id)
+        self.assertEqual(response.data['id'], self.test_course_content_id)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertGreater(len(response.data['modules']), 0)
+        self.assertGreater(len(response.data['children']), 0)
 
-    def test_modules_detail_get_course(self):
-        test_uri = self.base_modules_uri + '/' + self.test_course_id
+    def test_course_content_detail_get_course(self):
+        test_uri = self.base_course_content_uri + '/' + self.test_course_id
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['id'], self.test_course_id)
         confirm_uri = self.test_server_prefix + self.base_courses_uri + '/' + self.test_course_id
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertGreater(len(response.data['modules']), 0)
+        self.assertGreater(len(response.data['content']), 0)
 
-    def test_modules_detail_get_notfound(self):
-        test_uri = self.base_modules_uri + '/' + '2p38fp2hjfp9283'
+    def test_course_content_detail_get_notfound(self):
+        test_uri = self.base_course_content_uri + '/' + self.test_bogus_content_id
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_modules_list_get_filtered_submodules_for_module(self):
-        test_uri = self.base_modules_uri + '/' + self.test_module_id + '/submodules?type=video'
+    def test_course_content_list_get_filtered_children_for_child(self):
+        test_uri = self.base_course_content_uri + '/' + self.test_course_content_id + '/children?type=video'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
-        matched_submodule = False
-        for submodule in response.data:
-            if matched_submodule is False and submodule['id'] == self.test_submodule_id:
-                confirm_uri = self.test_server_prefix + self.base_modules_uri + '/' + submodule['id']
-                self.assertEqual(submodule['uri'], confirm_uri)
-                matched_submodule = True
-        self.assertTrue(matched_submodule)
+        matched_child = False
+        for child in response.data:
+            if matched_child is False and child['id'] == self.test_content_child_id:
+                confirm_uri = '{}{}/{}'.format(self.test_server_prefix, self.base_course_content_uri, child['id'])
+                self.assertEqual(child['uri'], confirm_uri)
+                matched_child = True
+        self.assertTrue(matched_child)
 
-    def test_modules_list_get_notfound(self):
-        test_uri = self.base_modules_uri + '/2p38fp2hjfp9283/submodules?type=video'
+    def test_course_content_list_get_notfound(self):
+        test_uri = '{}{}/children?type=video'.format(self.base_course_content_uri, self.test_bogus_content_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_courses_groups_list_post(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
 
@@ -320,7 +340,7 @@ class CoursesApiTests(TestCase):
         course_fail_uri = '{}/{}/groups'.format(self.base_courses_uri, '/ed/Open_DemoX/edx_demo_course')
         for i in xrange(2):
             data_dict = {
-                'name': 'Alpha Group {}'.format(i), 'group_type': 'Programming',
+                'name': 'Alpha Group {}'.format(i), 'type': 'Programming',
             }
             response = self.do_post(self.base_groups_uri, data_dict)
             group_id = response.data['id']
@@ -329,7 +349,7 @@ class CoursesApiTests(TestCase):
             response = self.do_post(test_uri, data)
             self.assertEqual(response.status_code, 201)
 
-        data_dict['group_type'] = 'Calculus'
+        data_dict['type'] = 'Calculus'
         response = self.do_post(self.base_groups_uri, data_dict)
         group_id = response.data['id']
         data = {'group_id': group_id}
@@ -360,7 +380,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_courses_groups_list_post_duplicate(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = '{}/{}/groups'.format(self.base_courses_uri, self.test_course_id)
@@ -377,7 +397,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_courses_groups_detail_get(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = '{}/{}/groups'.format(self.base_courses_uri, self.test_course_id)
@@ -402,7 +422,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['group_id'], group_id)
 
     def test_courses_groups_detail_delete(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         test_uri = '{}/{}/groups'.format(self.base_courses_uri, self.test_course_id)
         data = {'group_id': response.data['id']}
@@ -426,7 +446,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_courses_groups_detail_get_undefined(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = '{}/{}/groups/{}'.format(self.base_courses_uri, self.test_course_id, group_id)
@@ -792,3 +812,187 @@ class CoursesApiTests(TestCase):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users/213432'
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
+
+    def test_course_content_groups_list_post(self):
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        confirm_uri = self.test_server_prefix + test_uri + '/' + str(group_id)
+        self.assertEqual(response.data['uri'], confirm_uri)
+        self.assertEqual(response.data['course_id'], str(self.test_course_id))
+        self.assertEqual(response.data['content_id'], str(self.course_project.id))
+        self.assertEqual(response.data['group_id'], str(group_id))
+
+    def test_course_content_groups_list_post_duplicate(self):
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 409)
+
+    def test_course_content_groups_list_post_invalid_course(self):
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_bogus_course_id,
+            self.course_project.id
+        )
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_post_invalid_content(self):
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.test_bogus_content_id
+        )
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_post_invalid_group(self):
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.course_project.id
+        )
+        data = {'group_id': '12398721'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_post_missing_group(self):
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.course_project.id
+        )
+        response = self.do_post(test_uri, {})
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_get(self):
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        test_uri = test_uri + '?type=project'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_course_content_groups_list_get_invalid_course(self):
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_bogus_course_id,
+            self.course_project.id
+        )
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_get_invalid_content(self):
+        test_uri = '{}/{}/content/{}/groups'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.test_bogus_content_id
+        )
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_list_get_filter_by_type(self):
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['group_id'], 2)
+
+    def test_course_content_groups_detail_get(self):
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(response.data['uri'])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['group_id'], str(group_id))
+
+    def test_course_content_groups_detail_get_invalid_relationship(self):
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        group_id = response.data['id']
+        test_uri = '{}/{}/groups/{}'.format(self.base_course_content_uri, self.course_project.id, group_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_detail_get_invalid_course(self):
+        test_uri = '{}/{}/content/{}/groups/123456'.format(
+            self.base_courses_uri,
+            self.test_bogus_course_id,
+            self.course_project.id
+        )
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_detail_get_invalid_content(self):
+        test_uri = '{}/{}/content/{}/groups/123456'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.test_bogus_content_id
+        )
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_content_groups_detail_get_invalid_group(self):
+        test_uri = '{}/{}/content/{}/groups/123456'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            self.course_project.id
+        )
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
