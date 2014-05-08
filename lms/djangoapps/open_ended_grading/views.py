@@ -92,11 +92,9 @@ def find_peer_grading_module(course):
     found_module = False
     problem_url = ""
 
-    # Get the course id and split it.
-    peer_grading_query = course.location.replace(category='peergrading', name=None)
     # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
     items = modulestore().get_items(course.id, category='peergrading')
-    #See if any of the modules are centralized modules (ie display info from multiple problems)
+    # See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     # Loop through all potential peer grading modules, and find the first one that has a path to it.
     for item in items:

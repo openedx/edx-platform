@@ -32,8 +32,8 @@ class Command(BaseCommand):
         smset = StudentModule.objects.using(db).exclude(max_grade=None)
 
         for sm in smset:
-            url = sm.module_state_key
-            if not UsageKey.from_string(url).block_type == "problem":
+            usage_key = sm.module_state_key
+            if not usage_key.block_type == "problem":
                 continue
             try:
                 state = json.loads(sm.state)
