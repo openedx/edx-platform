@@ -304,7 +304,7 @@ class GroupsGroupsList(APIView):
             child_groups = GroupRelationship.objects.filter(parent_group_id=group_id)
             linked_groups = from_group_relationship.get_linked_group_relationships()
             if group_type:
-                profiles = GroupProfile.objects.filter(group_type=request.GET['type']).values_list('group_id', flat=True)
+                profiles = GroupProfile.objects.filter(group_type=group_type).values_list('group_id', flat=True)
                 if profiles:
                     child_groups = child_groups.filter(group_id__in=profiles)
                     linked_groups = linked_groups.filter(to_group_relationship__in=profiles)
