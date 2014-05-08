@@ -55,6 +55,7 @@ def get_course(course_id, depth=0):
         raise ValueError(u"Course not found: {0}".format(course_id))
     except InvalidLocationError:
         raise ValueError(u"Invalid location: {0}".format(course_id))
+    return course
 
 
 # TODO please rename this function to get_course_by_key at next opportunity!
