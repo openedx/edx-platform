@@ -75,7 +75,7 @@ class GroupsApiTests(TestCase):
         return response
 
     def test_group_list_post(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
@@ -84,12 +84,12 @@ class GroupsApiTests(TestCase):
         self.assertGreater(len(response.data['name']), 0)
 
     def test_group_list_get_with_profile(self):
+        group_type = 'series'
+        profile_data = {'display_name': 'My first series'}
         data = {
             'name': self.test_group_name,
-            'group_type': 'series',
-            'data': {
-                'display_name': 'My first series'
-            }
+            'type': group_type,
+            'data': profile_data
         }
         response = self.do_post(self.base_groups_uri, data)
         self.assertGreater(response.data['id'], 0)
@@ -98,45 +98,41 @@ class GroupsApiTests(TestCase):
         # query for list of groups, but don't put the type filter
         test_uri = self.base_groups_uri
         response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
 
         # try again with filter
-        test_uri = self.base_groups_uri + '?type=series'
+        test_uri = '{}?type={}'.format(self.base_groups_uri, group_type)
         response = self.do_get(test_uri)
-
         self.assertEqual(response.status_code, 200)
+
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['group_id'], group_id)
-        self.assertEqual(response.data[0]['group_type'], 'series')
+        self.assertEqual(response.data[0]['id'], group_id)
+        self.assertEqual(response.data[0]['type'], 'series')
         self.assertEqual(response.data[0]['name'], self.test_group_name)
-        self.assertEqual(response.data[0]['data']['display_name'], 'My first series')
+        response_profile_data = response.data[0]['data']
+        self.assertEqual(response_profile_data['display_name'], 'My first series')
 
         # query the group detail
-        test_uri = self.base_groups_uri + '/' + str(group_id)
+        test_uri = '{}/{}'.format(self.base_groups_uri, str(group_id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['id'], group_id)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['name'], self.test_group_name)
-        self.assertEqual(response.data['group_type'], 'series')
-        self.assertEqual(response.data['data']['display_name'], 'My first series')
+        self.assertEqual(response.data['type'], 'series')
+        response_profile_data = response.data['data']
+        self.assertEqual(response_profile_data['display_name'], 'My first series')
 
         # update the profile
-
-        # first with missing data
-        response = self.do_post(test_uri, {})
-        self.assertEqual(response.status_code, 400)
-
+        profile_data = {'display_name': 'My updated series'}
         data = {
             'name': self.test_group_name,
-            'group_type': 'seriesX',
-            'data': {
-                'display_name': 'My updated series'
-            }
+            'type': 'seriesX',
+            'data': profile_data
         }
         response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
 
         # requery the filter
         test_uri = self.base_groups_uri + '?type=series'
@@ -148,35 +144,42 @@ class GroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['group_id'], group_id)
-        self.assertEqual(response.data[0]['group_type'], 'seriesX')
+        self.assertEqual(response.data[0]['id'], group_id)
+        self.assertEqual(response.data[0]['type'], 'seriesX')
         self.assertEqual(response.data[0]['name'], self.test_group_name)
-        self.assertEqual(response.data[0]['data']['display_name'], 'My updated series')
+        response_profile_data = response.data[0]['data']
+        self.assertEqual(response_profile_data['display_name'], 'My updated series')
 
     def test_group_list_post_invalid_name(self):
+        data = {'name': '', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_group_list_post_missing_type(self):
         data = {'name': ''}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_group_list_get_uses_base_group_name(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
         profile = GroupProfile.objects.get(group_id=group_id)
         profile.name = ''
         profile.save()
-        response = self.do_get(self.base_groups_uri)
+        test_uri = '{}?type=test'.format(self.base_groups_uri)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
         profile.name = None
         profile.save()
-        response = self.do_get(self.base_groups_uri)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
@@ -190,7 +193,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['name'], self.test_group_name)
 
     def test_group_detail_get_uses_base_group_name(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
@@ -207,7 +210,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get_with_missing_profile(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
@@ -227,7 +230,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_detail_post(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = response.data['uri']
@@ -235,13 +238,13 @@ class GroupsApiTests(TestCase):
         group_type = 'seriesX'
         data = {
             'name': self.test_group_name,
-            'group_type': group_type,
+            'type': group_type,
             'data': {
                 'display_name': 'My updated series'
             }
         }
         response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['id'], group_id)
         self.assertEqual(response.data['name'], self.test_group_name)
         self.assertEqual(response.data['uri'], test_uri)
@@ -251,7 +254,7 @@ class GroupsApiTests(TestCase):
         group_type = 'seriesX'
         data = {
             'name': self.test_group_name,
-            'group_type': group_type,
+            'type': group_type,
             'data': {
                 'display_name': 'My updated series'
             }
@@ -270,7 +273,7 @@ class GroupsApiTests(TestCase):
         }
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = self.base_groups_uri + '/' + str(group_id)
@@ -289,7 +292,7 @@ class GroupsApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         test_uri = self.base_groups_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
@@ -308,7 +311,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_users_list_post_invalid_user(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         test_uri = '{}/{}/users'.format(self.base_groups_uri, str(response.data['id']))
         data = {'user_id': "98723896"}
@@ -326,7 +329,7 @@ class GroupsApiTests(TestCase):
         }
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = self.base_groups_uri + '/' + str(group_id)
@@ -355,7 +358,7 @@ class GroupsApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = self.base_groups_uri + '/' + str(response.data['id'])
@@ -377,7 +380,7 @@ class GroupsApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         test_uri = self.base_groups_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
@@ -398,7 +401,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_group_users_detail_delete_invalid_user(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         test_uri = self.base_groups_uri + '/' + str(response.data['id'])
         test_uri = test_uri + '/users/123124'
@@ -410,7 +413,7 @@ class GroupsApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         group_id = response.data['id']
         test_uri = self.base_groups_uri + '/' + str(group_id) + '/users/' + str(user_id)
@@ -418,13 +421,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_groups_list_post_hierarchical(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -440,13 +443,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     def test_group_groups_list_post_linked(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -462,13 +465,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     def test_group_groups_list_post_linked_duplicate(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -489,13 +492,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_groups_list_post_invalid_relationship_type(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -506,13 +509,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 406)
 
     def test_group_groups_list_get(self):
-        data = {'name': 'Bravo Group'}
+        data = {'name': 'Bravo Group', 'type': 'test'}
         bravo_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(bravo_response.status_code, 201)
         bravo_group_id = bravo_response.data['id']
         bravo_groups_uri = bravo_response.data['uri'] + '/groups'
 
-        data = {'name': 'Charlie Group'}
+        data = {'name': 'Charlie Group', 'type': 'test'}
         charlie_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(charlie_response.status_code, 201)
         charlie_group_id = charlie_response.data['id']
@@ -521,7 +524,7 @@ class GroupsApiTests(TestCase):
         response = self.do_post(bravo_groups_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        data = {'name': 'Foxtrot Group'}
+        data = {'name': 'Foxtrot Group', 'type': 'test'}
         foxtrot_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(foxtrot_response.status_code, 201)
         foxtrot_group_id = foxtrot_response.data['id']
@@ -530,7 +533,7 @@ class GroupsApiTests(TestCase):
         response = self.do_post(bravo_groups_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        data = {'name': 'Tango Group'}
+        data = {'name': 'Tango Group', 'type': 'test'}
         tango_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(tango_response.status_code, 201)
         tango_group_id = tango_response.data['id']
@@ -555,13 +558,13 @@ class GroupsApiTests(TestCase):
         self.assertEqual(relationship_count, len(group_idlist))
 
     def test_group_groups_list_get_with_profile_type(self):
-        data = {'name': 'Bravo Group'}
+        data = {'name': 'Bravo Group', 'type': 'test'}
         bravo_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(bravo_response.status_code, 201)
         bravo_group_id = bravo_response.data['id']
         bravo_groups_uri = bravo_response.data['uri'] + '/groups?type=test_group'
 
-        data = {'name': 'Charlie Group', 'group_type': 'test_group'}
+        data = {'name': 'Charlie Group', 'type': 'test_group'}
         charlie_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(charlie_response.status_code, 201)
         charlie_group_id = charlie_response.data['id']
@@ -570,7 +573,7 @@ class GroupsApiTests(TestCase):
         response = self.do_post(bravo_groups_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        data = {'name': 'Foxtrot Group', 'group_type': 'test_group'}
+        data = {'name': 'Foxtrot Group', 'type': 'test_group'}
         foxtrot_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(foxtrot_response.status_code, 201)
         foxtrot_group_id = foxtrot_response.data['id']
@@ -579,7 +582,7 @@ class GroupsApiTests(TestCase):
         response = self.do_post(bravo_groups_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        data = {'name': 'Tango Group'}
+        data = {'name': 'Tango Group', 'type': 'test'}
         tango_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(tango_response.status_code, 201)
         tango_uri = tango_response.data['uri']
@@ -608,14 +611,14 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_groups_detail_get_hierarchical(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         alpha_group_id = alpha_response.data['id']
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -635,14 +638,14 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     def test_group_groups_detail_get_linked(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         alpha_group_id = alpha_response.data['id']
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         delta_group_id = delta_response.data['id']
         self.assertEqual(delta_response.status_code, 201)
@@ -665,7 +668,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     def test_group_groups_detail_get_notfound(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups/gaois89sdf98'
@@ -673,16 +676,16 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_groups_detail_delete_hierarchical(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
-        data = {'name': 'Gamma Group'}
+        data = {'name': 'Gamma Group', 'type': 'test'}
         gamma_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(gamma_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -704,16 +707,16 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_groups_detail_delete_linked(self):
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        data = {'name': 'Beta Group'}
+        data = {'name': 'Beta Group', 'type': 'test'}
         beta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(beta_response.status_code, 201)
-        data = {'name': 'Delta Group'}
+        data = {'name': 'Delta Group', 'type': 'test'}
         delta_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(delta_response.status_code, 201)
-        data = {'name': 'Gamma Group'}
+        data = {'name': 'Gamma Group', 'type': 'test'}
         gamma_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(gamma_response.status_code, 201)
         test_uri = alpha_response.data['uri'] + '/groups'
@@ -738,7 +741,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_courses_list_post(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
@@ -752,7 +755,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['course_id'], self.test_course_id)
 
     def test_group_courses_list_post_duplicate(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses'
@@ -769,7 +772,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_courses_list_post_invalid_course(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses'
@@ -778,7 +781,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_courses_list_get(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
@@ -792,9 +795,9 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['course_id'], self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['courses']), 1)
-        self.assertEqual(response.data['courses'][0]['course_id'], self.test_course_id)
-        self.assertEqual(response.data['courses'][0]['display_name'], self.course.display_name)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['course_id'], self.test_course_id)
+        self.assertEqual(response.data[0]['display_name'], self.course.display_name)
 
     def test_group_courses_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/courses'
@@ -802,7 +805,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_courses_detail_get(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
@@ -824,7 +827,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['course_id'], self.test_course_id)
 
     def test_group_courses_detail_delete(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses'
@@ -845,7 +848,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_group_courses_detail_delete_invalid_course(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses/123124'
@@ -853,7 +856,7 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_group_courses_detail_get_undefined(self):
-        data = {'name': self.test_group_name}
+        data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/courses/{}'.format(response.data['uri'], self.course.id)

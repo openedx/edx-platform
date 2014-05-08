@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.models import CourseGroupRelationship, GroupProfile
+from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
 from courseware.model_data import FieldDataCache
@@ -42,90 +42,101 @@ def _generate_base_uri(request):
     return resource_uri
 
 
-def _get_module_submodules(module, submodule_type=None):
+def _get_content_children(content, content_type=None):
     """
-    Parses the provided module looking for child modules
-    Matches on submodule type (category) when specified
+    Parses the provided content object looking for children
+    Matches on child type (category) when specified
     """
-    submodules = []
-    if hasattr(module, 'children'):
-        child_modules = module.get_children()
-        for child_module in child_modules:
-            if submodule_type:
-                if getattr(child_module, 'category') == submodule_type:
-                    submodules.append(child_module)
+    children = []
+    if hasattr(content, 'children'):
+        child_content = content.get_children()
+        for child in child_content:
+            if content_type:
+                if getattr(child, 'category') == content_type:
+                    children.append(child)
             else:
-                submodules.append(child_module)
-    return submodules
+                children.append(child)
+    return children
 
 
-def _serialize_module(request, course_id, module):
+def _serialize_content(request, course_id, content):
     """
-    Loads the specified module data into the response dict
+    Loads the specified content object into the response dict
     This should probably evolve to use DRF serializers
     """
     data = {}
 
-    if getattr(module, 'id') == course_id:
-        module_id = module.id
+    if getattr(content, 'id') == course_id:
+        content_id = content.id
     else:
-        module_id = module.location.url()
-    data['id'] = module_id
+        content_id = content.location.url()
+    data['id'] = content_id
 
-    if hasattr(module, 'display_name'):
-        data['name'] = module.display_name
+    if hasattr(content, 'display_name'):
+        data['name'] = content.display_name
 
-    data['category'] = module.location.category
+    data['category'] = content.location.category
 
     protocol = 'http'
     if request.is_secure():
         protocol = protocol + 's'
-    module_uri = '{}://{}/api/courses/{}'.format(
+    content_uri = '{}://{}/api/courses/{}'.format(
         protocol,
         request.get_host(),
         course_id.encode('utf-8')
     )
 
-    # Some things we do only if the module is a course
-    if (course_id == module_id):
-        data['number'] = module.location.course
-        data['org'] = module.location.org
+    # Some things we do only if the content object is a course
+    if (course_id == content_id):
+        data['number'] = content.location.course
+        data['org'] = content.location.org
 
-    # Other things we do only if the module is not a course
+    # Other things we do only if the content object is not a course
     else:
-        module_uri = '{}/modules/{}'.format(module_uri, module_id)
-    data['uri'] = module_uri
+        content_uri = '{}/content/{}'.format(content_uri, content_id)
+    data['uri'] = content_uri
 
     return data
 
 
-def _serialize_module_submodules(request, course_id, submodules):
+def _serialize_content_children(request, course_id, children):
     """
-    Loads the specified module submodule data into the response dict
+    Loads the specified content child data into the response dict
     This should probably evolve to use DRF serializers
     """
     data = []
-    if submodules:
-        for submodule in submodules:
-            submodule_data = _serialize_module(
+    if children:
+        for child in children:
+            child_data = _serialize_content(
                 request,
                 course_id,
-                submodule
+                child
             )
-            data.append(submodule_data)
+            data.append(child_data)
     return data
 
 
-def _serialize_module_with_children(request, course_descriptor, descriptor, depth):
-    data = _serialize_module(
+def _serialize_content_groups(request, course_id, content_id, groups):
+    """
+    Loads the specified content group data into the response dict
+    This should probably evolve to use DRF serializers
+    """
+    return [
+        {'course_id': course_id, 'content_id': content_id, 'group_id': group.group_id}
+        for group in groups
+    ]
+
+
+def _serialize_content_with_children(request, course_descriptor, descriptor, depth):
+    data = _serialize_content(
         request,
         course_descriptor.id,
         descriptor
     )
     if depth > 0:
-        data['modules'] = []
+        data['children'] = []
         for child in descriptor.get_children():
-            data['modules'].append(_serialize_module_with_children(
+            data['children'].append(_serialize_content_with_children(
                 request,
                 course_descriptor,
                 child,
@@ -237,32 +248,32 @@ def _parse_updates_html(html):
     return result
 
 
-class ModulesList(APIView):
+class CourseContentList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, module_id=None):
+    def get(self, request, course_id, content_id=None):
         """
-        GET retrieves the list of submodules for a given module
-        We don't know where in the module hierarchy we are -- could even be the top
+        GET retrieves the list of children for a given content object
+        We don't know where in the content hierarchy we are -- could even be the top
         """
-        if module_id is None:
-            module_id = course_id
+        if content_id is None:
+            content_id = course_id
         response_data = []
-        submodule_type = request.QUERY_PARAMS.get('type', None)
+        content_type = request.QUERY_PARAMS.get('type', None)
         store = modulestore()
-        if course_id != module_id:
+        if course_id != content_id:
             try:
-                module = store.get_instance(course_id, Location(module_id))
+                content = store.get_instance(course_id, Location(content_id))
             except InvalidLocationError:
-                module = None
+                content = None
         else:
-            module = get_course(course_id)
-        if module:
-            submodules = _get_module_submodules(module, submodule_type)
-            response_data = _serialize_module_submodules(
+            content = get_course(course_id)
+        if content:
+            children = _get_content_children(content, content_type)
+            response_data = _serialize_content_children(
                 request,
                 course_id,
-                submodules
+                children
             )
             status_code = status.HTTP_200_OK
         else:
@@ -270,34 +281,36 @@ class ModulesList(APIView):
         return Response(response_data, status=status_code)
 
 
-class ModulesDetail(APIView):
+class CourseContentDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
-    def get(self, request, course_id, module_id):
+    def get(self, request, course_id, content_id):
         """
-        GET retrieves an existing module from the system
+        GET retrieves an existing content object from the system
         """
         store = modulestore()
         response_data = {}
-        submodule_type = request.QUERY_PARAMS.get('type', None)
-        if course_id != module_id:
+        content_type = request.QUERY_PARAMS.get('type', None)
+        if course_id != content_id:
+            element_name = 'children'
             try:
-                module = store.get_instance(course_id, Location(module_id))
+                content = store.get_instance(course_id, Location(content_id))
             except InvalidLocationError:
-                module = None
+                content = None
         else:
-            module = get_course(course_id)
-        if module:
-            response_data = _serialize_module(
+            element_name = 'content'
+            content = get_course(course_id)
+        if content:
+            response_data = _serialize_content(
                 request,
                 course_id,
-                module
+                content
             )
-            submodules = _get_module_submodules(module, submodule_type)
-            response_data['modules'] = _serialize_module_submodules(
+            children = _get_content_children(content, content_type)
+            response_data[element_name] = _serialize_content_children(
                 request,
                 course_id,
-                submodules
+                children
             )
             status_code = status.HTTP_200_OK
         else:
@@ -316,7 +329,7 @@ class CoursesList(APIView):
         store = modulestore()
         course_descriptors = store.get_courses()
         for course_descriptor in course_descriptors:
-            course_data = _serialize_module(
+            course_data = _serialize_content(
                 request,
                 course_descriptor.id,
                 course_descriptor
@@ -330,8 +343,8 @@ class CoursesDetail(APIView):
 
     def get(self, request, course_id):
         """
-        GET retrieves an existing course from the system and returns summary information about the submodules
-        to the specified depth
+        GET retrieves an existing course from the system and returns
+        summary information about its content children to the specified depth
         """
         depth = request.QUERY_PARAMS.get('depth', 0)
         depth_int = int(depth)
@@ -343,14 +356,16 @@ class CoursesDetail(APIView):
             course_descriptor = None
         if course_descriptor:
             if depth_int > 0:
-                response_data = _serialize_module_with_children(
+                response_data = _serialize_content_with_children(
                     request,
                     course_descriptor,
                     course_descriptor,  # Primer for recursive function
                     depth_int
                 )
+                response_data['content'] = response_data['children']
+                response_data.pop('children')
             else:
-                response_data = _serialize_module(
+                response_data = _serialize_content(
                     request,
                     course_descriptor.id,
                     course_descriptor
@@ -472,7 +487,7 @@ class CoursesOverview(APIView):
 
     def get(self, request, course_id):
         """
-        GET retrieves the course overview module, which - in MongoDB - is stored with the following
+        GET retrieves the course overview content, which - in MongoDB - is stored with the following
         naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
         """
         response_data = OrderedDict()
@@ -499,7 +514,7 @@ class CoursesUpdates(APIView):
 
     def get(self, request, course_id):
         """
-        GET retrieves the course overview module, which - in MongoDB - is stored with the following
+        GET retrieves the course overview content, which - in MongoDB - is stored with the following
         naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
         """
         response_data = OrderedDict()
@@ -685,13 +700,13 @@ class CoursesUsersDetail(APIView):
             user = None
         if user and CourseEnrollment.is_enrolled(user, course_id):
             field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-            course_module = module_render.get_module(
+            course_content = module_render.get_module(
                 user,
                 request,
                 course_descriptor.location,
                 field_data_cache,
                 course_id)
-            response_data['position'] = course_module.position
+            response_data['position'] = course_content.position
             response_status = status.HTTP_200_OK
         else:
             response_status = status.HTTP_404_NOT_FOUND
@@ -717,3 +732,111 @@ class CoursesUsersDetail(APIView):
         base_uri = _generate_base_uri(request)
         response_data['uri'] = base_uri
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseContentGroupsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, course_id, content_id):
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        store = modulestore()
+        try:
+            existing_content = store.get_instance(course_id, Location(content_id))
+        except InvalidLocationError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        group_id = request.DATA.get('group_id')
+        if group_id is None:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            existing_group = GroupProfile.objects.get(group_id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            existing_relationship = CourseContentGroupRelationship.objects.get(
+                course_id=course_id,
+                content_id=content_id,
+                group=existing_group
+            )
+        except ObjectDoesNotExist:
+            existing_relationship = None
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, existing_group.group_id)
+        if existing_relationship:
+            response_data['message'] = "Relationship already exists."
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
+        CourseContentGroupRelationship.objects.create(
+            course_id=course_id,
+            content_id=content_id,
+            group=existing_group
+        )
+        response_data['course_id'] = course_descriptor.id
+        response_data['content_id'] = existing_content.id
+        response_data['group_id'] = str(existing_group.group_id)
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    def get(self, request, course_id, content_id):
+        """
+        GET retrieves the list of groups for a given content object.
+        The 'type' query parameter is available for filtering by group_type
+        """
+        response_data = []
+        group_type = request.QUERY_PARAMS.get('type')
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            store = modulestore()
+            existing_content = store.get_instance(course_id, Location(content_id))
+        except InvalidLocationError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        groups = CourseContentGroupRelationship.objects.filter(
+            course_id=course_id,
+            content_id=content_id
+        )
+        if group_type:
+            groups = groups.filter(group__group_type=group_type)
+        response_data = _serialize_content_groups(
+            request,
+            course_id,
+            content_id,
+            groups
+        )
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+class CourseContentGroupsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, content_id, group_id):
+        """
+        GET retrieves an existing content-group relationship from the system
+        """
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            store = modulestore()
+            existing_content = store.get_instance(course_id, Location(content_id))
+        except InvalidLocationError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            groups = CourseContentGroupRelationship.objects.get(
+                course_id=course_id,
+                content_id=content_id,
+                group=group_id
+            )
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        response_data = {
+            'course_id': course_id,
+            'content_id': content_id,
+            'group_id': group_id,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
