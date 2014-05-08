@@ -1,63 +1,63 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div class="annotatable-wrapper">
-	<div class="annotatable-header">
-		% if display_name is not UNDEFINED and display_name is not None:
-			<div class="annotatable-title">${display_name}</div>
-		% endif
-	</div>
-	% if instructions_html is not UNDEFINED and instructions_html is not None:
-	<div class="annotatable-section shaded">
-		<div class="annotatable-section-title">
-		    ${_('Instructions')}
-		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
-		</div>
-		<div class="annotatable-section-body annotatable-instructions">
-		    ${instructions_html}
-		</div>
-	</div>
-	% endif
-	<div class="annotatable-section">
-		<div class="annotatable-content">
-		    <div id="textHolder">${content_html}</div>
-			<div id="sourceCitation">${_('Source:')} ${source}</div>
-			<div id="catchDIV">
-				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
-			</div>
-		</div>
-	</div>
+    <div class="annotatable-header">
+        % if display_name is not UNDEFINED and display_name is not None:
+            <div class="annotatable-title">${display_name}</div>
+        % endif
+    </div>
+    % if instructions_html is not UNDEFINED and instructions_html is not None:
+    <div class="annotatable-section shaded">
+        <div class="annotatable-section-title">
+            ${_('Instructions')}
+            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
+        </div>
+        <div class="annotatable-section-body annotatable-instructions">
+            ${instructions_html}
+        </div>
+    </div>
+    % endif
+    <div class="annotatable-section">
+        <div class="annotatable-content">
+            <div id="textHolder">${content_html}</div>
+            <div id="sourceCitation">${_('Source:')} ${source}</div>
+            <div id="catchDIV">
+                <div class="annotationListContainer">${_('You do not have any notes.')}</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
 <script>
-	function onClickHideInstructions(){
-		//Reset function if there is more than one event handler
-		$(this).off();
-		$(this).on('click',onClickHideInstructions);
-		var hide = $(this).html()=='Collapse Instructions'?true:false,
-			cls, txt,slideMethod;
-		txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
-		cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
-		slideMethod = (hide ? 'slideUp' : 'slideDown');
-		$(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
-		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
-	}
-	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-	
-	//Grab uri of the course
+    function onClickHideInstructions(){
+        //Reset function if there is more than one event handler
+        $(this).off();
+        $(this).on('click',onClickHideInstructions);
+        var hide = $(this).html()=='Collapse Instructions'?true:false,
+            cls, txt,slideMethod;
+        txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
+        cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
+        slideMethod = (hide ? 'slideUp' : 'slideDown');
+        $(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
+        $(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
+    }
+    $('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
+    
+    //Grab uri of the course
     var parts = window.location.href.split("/"), 
-    	uri = '';
-	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
-	//Change uri in cms
-	var lms_location = $('.sidebar .preview-button').attr('href');
-	if (typeof lms_location!='undefined'){
-		uri = window.location.protocol;
-		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
-	}
+        uri = '';
+    for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+    //Change uri in cms
+    var lms_location = $('.sidebar .preview-button').attr('href');
+    if (typeof lms_location!='undefined'){
+        uri = window.location.protocol;
+        for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
+    }
     var unit_id = $('#sequence-list').find('.active').attr("data-element");
     uri += unit_id;
-	var pagination = 100,
-		is_staff = !('${user.is_staff}'=='False'),
+    var pagination = 100,
+        is_staff = !('${user.is_staff}'=='False'),
         options = {
         optionsAnnotator: {
             permissions:{
@@ -88,7 +88,7 @@
                     if (annotation.permissions) {
                       tokens = annotation.permissions[action] || [];
                       if (is_staff){
-                      	return true;
+                          return true;
                       }
                       if (tokens.length === 0) {
                         return true;
@@ -139,7 +139,7 @@
                     offset:0,
                     uri:uri,
                     media:'text',
-		    userid:'${user.email}',
+                    userid:'${user.email}',
                 }
             },
             highlightTags:{
@@ -164,10 +164,10 @@
         },
     };
 
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	
-	//remove old instances
+    var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    
+    //remove old instances
     if (Annotator._instances.length !== 0) {
       $('#textHolder').annotator("destroy");
     }
@@ -183,7 +183,7 @@
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	        userId:'${user.email}',
+            userId:'${user.email}',
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },

@@ -56,9 +56,9 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.user = ""
+        self.user_email = ""
         if self.runtime.get_real_user is not None:
-            self.user = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
+            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -93,7 +93,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'poster': self.poster_url,
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
-            'token': retrieve_token(self.user, self.annotation_token_secret),
+            'token': retrieve_token(self.user_email, self.annotation_token_secret),
         }
 
         return self.system.render_template('videoannotation.html', context)

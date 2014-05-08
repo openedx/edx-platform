@@ -1,11 +1,11 @@
 Annotator.Plugin.Auth.prototype.haveValidToken = function() {
-    var allFields;
-    allFields = this._unsafeToken && this._unsafeToken.d.issuedAt && this._unsafeToken.d.ttl && this._unsafeToken.d.consumerKey;
-    if (allFields && this.timeToExpiry() > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    return (
+      this._unsafeToken &&
+      this._unsafeToken.d.issuedAt &&
+      this._unsafeToken.d.ttl &&
+      this._unsafeToken.d.consumerKey &&
+      this.timeToExpiry() > 0
+    );
 };
 
 Annotator.Plugin.Auth.prototype.timeToExpiry = function() {
