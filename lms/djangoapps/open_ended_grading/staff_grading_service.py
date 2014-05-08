@@ -18,8 +18,6 @@ from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
-from student.views import course_from_id
-from util.json_request import expect_json
 
 from open_ended_grading.utils import does_location_exist
 from dogapi import dog_stats_api
