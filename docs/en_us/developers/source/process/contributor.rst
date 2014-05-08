@@ -101,7 +101,6 @@ For futher information on the pull request requirements, please see the followin
 links:
 
 * :doc:`../code-considerations`
-* :doc:`../testing`
 * :doc:`../testing/jenkins`
 * :doc:`../testing/code-coverage`
 * :doc:`../testing/code-quality`
