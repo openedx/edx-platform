@@ -17,6 +17,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -42,7 +43,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         clear_existing_modulestores()
         courses = modulestore().get_courses()
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
 
         # Create two accounts
@@ -54,7 +55,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.id).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -67,7 +68,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
 
     def test_add_forum_admin_users_for_unknown_user(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'unknown'
         for action in ['Add', 'Remove']:
             for rolename in FORUM_ROLES:
@@ -76,7 +77,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
 
     def test_add_forum_admin_users_for_missing_roles(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u1'
         for action in ['Add', 'Remove']:
             for rolename in FORUM_ROLES:
@@ -86,7 +87,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
     def test_remove_forum_admin_users_for_missing_users(self):
         course = self.toy
         self.initialize_roles(course.id)
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u1'
         action = 'Remove'
         for rolename in FORUM_ROLES:
@@ -96,20 +97,20 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
     def test_add_and_remove_forum_admin_users(self):
         course = self.toy
         self.initialize_roles(course.id)
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u2'
         for rolename in FORUM_ROLES:
             response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id.to_deprecated_string(), rolename))
             self.assertTrue(has_forum_access(username, course.id, rolename))
             response = self.client.post(url, {'action': action_name('Remove', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id.to_deprecated_string(), rolename))
             self.assertFalse(has_forum_access(username, course.id, rolename))
 
     def test_add_and_read_forum_admin_users(self):
         course = self.toy
         self.initialize_roles(course.id)
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u2'
         for rolename in FORUM_ROLES:
             # perform an add, and follow with a second identical add:
@@ -121,7 +122,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
     def test_add_nonstaff_forum_admin_users(self):
         course = self.toy
         self.initialize_roles(course.id)
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u1'
         rolename = FORUM_ROLE_ADMINISTRATOR
         response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
@@ -130,7 +131,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
     def test_list_forum_admin_users(self):
         course = self.toy
         self.initialize_roles(course.id)
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         username = 'u2'
         added_roles = [FORUM_ROLE_STUDENT]  # u2 is already added as a student to the discussion forums
         self.assertTrue(has_forum_access(username, course.id, 'Student'))

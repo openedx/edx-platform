@@ -62,7 +62,7 @@ class Command(BaseCommand):
             student = User.objects.get(username=user, courseenrollment__course_id=course_id)
 
         print "Fetching course data for {0}".format(course_id)
-        course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+        course = modulestore().get_course(course_id, depth=2)
 
         if not options['noop']:
             # Add the certificate request to the queue

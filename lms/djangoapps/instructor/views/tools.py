@@ -88,7 +88,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if node.location.url() == url:
+        if node.location.to_deprecated_string() == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -132,7 +132,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = node.location.url()
+        title = node.location.to_deprecated_string()
     return title
 
 
@@ -148,7 +148,7 @@ def set_due_date_extension(course, unit, student, due_date):
             student_module = StudentModule.objects.get(
                 student_id=student.id,
                 course_id=course.id,
-                module_state_key=node.location.url()
+                module_id=node.location
             )
 
             state = json.loads(student_module.state)
@@ -173,7 +173,7 @@ def dump_module_extensions(course, unit):
     header = [_("Username"), _("Full Name"), _("Extended Due Date")]
     query = StudentModule.objects.filter(
         course_id=course.id,
-        module_state_key=unit.location.url())
+        module_id=unit.location)
     for module in query:
         state = json.loads(module.state)
         extended_due = state.get("extended_due")
@@ -202,7 +202,7 @@ def dump_student_extensions(course, student):
     data = []
     header = [_("Unit"), _("Extended Due Date")]
     units = get_units_with_due_date(course)
-    units = dict([(u.location.url(), u) for u in units])
+    units = dict([(u.location, u) for u in units])
     query = StudentModule.objects.filter(
         course_id=course.id,
         student_id=student.id)

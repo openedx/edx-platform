@@ -1,6 +1,5 @@
 import time
 import random
-import os
 import os.path
 import logging
 import urlparse
@@ -13,12 +12,11 @@ import django_comment_client.settings as cc_settings
 
 from django.core import exceptions
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST
 from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_string
 from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
@@ -26,6 +24,8 @@ from django_comment_client.utils import JsonResponse, JsonError, extract, add_co
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from courseware.access import has_access
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +41,8 @@ def permitted(fn):
             else:
                 content = None
             return content
-        if check_permissions_by_view(request.user, kwargs['course_id'], fetch_content(), request.view_name):
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
+        if check_permissions_by_view(request.user, course_key, fetch_content(), request.view_name):
             return fn(request, *args, **kwargs)
         else:
             return JsonError("unauthorized", status=401)
@@ -49,10 +50,6 @@ def permitted(fn):
 
 
 def ajax_content_response(request, course_id, content):
-    context = {
-        'course_id': course_id,
-        'content': content,
-    }
     user_info = cc.User.from_django_user(request.user).to_dict()
     annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
     return JsonResponse({
@@ -70,7 +67,8 @@ def create_thread(request, course_id, commentable_id):
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
-    course = get_course_with_access(request.user, course_id, 'load')
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_id)
     post = request.POST
 
     if course.allow_anonymous:
@@ -93,7 +91,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'user_id': request.user.id,
     })
 
@@ -152,23 +150,24 @@ def update_thread(request, course_id, thread_id):
     thread.update_attributes(**extract(request.POST, ['body', 'title']))
     thread.save()
     if request.is_ajax():
-        return ajax_content_response(request, course_id, thread.to_dict())
+        return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread.to_dict())
     else:
         return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
-def _create_comment(request, course_id, thread_id=None, parent_id=None):
+def _create_comment(request, course_key, thread_id=None, parent_id=None):
     """
     given a course_id, thread_id, and parent_id, create a comment,
     called from create_comment to do the actual creation
     """
+    assert isinstance(course_key, CourseKey)
     post = request.POST
 
     if 'body' not in post or not post['body'].strip():
         return JsonError(_("Body can't be empty"))
     comment = cc.Comment(**extract(post, ['body']))
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_key)
     if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
@@ -183,7 +182,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'user_id': request.user.id,
-        'course_id': course_id,
+        'course_id': course_key,
         'thread_id': thread_id,
         'parent_id': parent_id,
     })
@@ -192,7 +191,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, comment.to_dict())
+        return ajax_content_response(request, course_key, comment.to_dict())
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
@@ -208,7 +207,7 @@ def create_comment(request, course_id, thread_id):
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH < 0:
             return JsonError(_("Comment level too deep"))
-    return _create_comment(request, course_id, thread_id=thread_id)
+    return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread_id=thread_id)
 
 
 @require_POST
@@ -238,7 +237,7 @@ def update_comment(request, course_id, comment_id):
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
     if request.is_ajax():
-        return ajax_content_response(request, course_id, comment.to_dict())
+        return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), comment.to_dict())
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
@@ -271,7 +270,7 @@ def openclose_thread(request, course_id, thread_id):
     thread = thread.to_dict()
     return JsonResponse({
         'content': utils.safe_content(thread),
-        'ability': utils.get_ability(course_id, thread, request.user),
+        'ability': utils.get_ability(SlashSeparatedCourseKey.from_deprecated_string(course_id), thread, request.user),
     })
 
 
@@ -286,7 +285,7 @@ def create_sub_comment(request, course_id, comment_id):
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
             return JsonError(_("Comment level too deep"))
-    return _create_comment(request, course_id, parent_id=comment_id)
+    return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), parent_id=comment_id)
 
 
 @require_POST
@@ -366,10 +365,11 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     ajax only
     """
     user = cc.User.from_django_user(request.user)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
     thread = cc.Thread.find(thread_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
-    thread.unFlagAbuse(user, thread, removeAll)
+    remove_all = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, 'staff', course)
+    thread.unFlagAbuse(user, thread, remove_all)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
@@ -396,10 +396,11 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     ajax only
     """
     user = cc.User.from_django_user(request.user)
-    course = get_course_by_id(course_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key)
+    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
     comment = cc.Comment.find(comment_id)
-    comment.unFlagAbuse(user, comment, removeAll)
+    comment.unFlagAbuse(user, comment, remove_all)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
 

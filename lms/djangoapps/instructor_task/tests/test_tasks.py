@@ -13,6 +13,7 @@ from mock import Mock, MagicMock, patch
 from celery.states import SUCCESS, FAILURE
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.locations import i4xEncoder
 
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
@@ -37,21 +38,21 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         super(InstructorTaskModuleTestCase, self).setUp()
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
-        self.problem_url = InstructorTaskModuleTestCase.problem_location(PROBLEM_URL_NAME)
+        self.location = InstructorTaskModuleTestCase.problem_location(PROBLEM_URL_NAME)
 
     def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None):
         """Creates a InstructorTask entry for testing."""
         task_id = str(uuid4())
         task_input = {}
         if use_problem_url:
-            task_input['problem_url'] = self.problem_url
+            task_input['problem_url'] = self.location
         if student_ident is not None:
             task_input['student'] = student_ident
 
         course_id = course_id or self.course.id
         instructor_task = InstructorTaskFactory.create(course_id=course_id,
                                                        requester=self.instructor,
-                                                       task_input=json.dumps(task_input),
+                                                       task_input=json.dumps(task_input, cls=i4xEncoder),
                                                        task_key='dummy value',
                                                        task_id=task_id)
         return instructor_task
@@ -127,7 +128,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         for student in students:
             CourseEnrollmentFactory.create(course_id=self.course.id, user=student)
             StudentModuleFactory.create(course_id=self.course.id,
-                                        module_state_key=self.problem_url,
+                                        module_id=self.location,
                                         student=student,
                                         grade=grade,
                                         max_grade=max_grade,
@@ -139,7 +140,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         for student in students:
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_state_key=self.problem_url)
+                                               module_id=self.location)
             state = json.loads(module.state)
             self.assertEquals(state['attempts'], num_attempts)
 
@@ -356,7 +357,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         for student in students:
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_state_key=self.problem_url)
+                                               module_id=self.location)
             state = json.loads(module.state)
             self.assertEquals(state['attempts'], initial_attempts)
 
@@ -382,7 +383,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         for index, student in enumerate(students):
             module = StudentModule.objects.get(course_id=self.course.id,
                                                student=student,
-                                               module_state_key=self.problem_url)
+                                               module_id=self.location)
             state = json.loads(module.state)
             if index == 3:
                 self.assertEquals(state['attempts'], 0)
@@ -429,11 +430,11 @@ class TestDeleteStateInstructorTask(TestInstructorTasks):
         for student in students:
             StudentModule.objects.get(course_id=self.course.id,
                                       student=student,
-                                      module_state_key=self.problem_url)
+                                      module_id=self.location)
         self._test_run_with_task(delete_problem_state, 'deleted', num_students)
         # confirm that no state can be found anymore:
         for student in students:
             with self.assertRaises(StudentModule.DoesNotExist):
                 StudentModule.objects.get(course_id=self.course.id,
                                           student=student,
-                                          module_state_key=self.problem_url)
+                                          module_id=self.location)

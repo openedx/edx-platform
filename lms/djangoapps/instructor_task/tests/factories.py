@@ -5,13 +5,14 @@ from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory as StudentUserFactory
 from instructor_task.models import InstructorTask
 from celery.states import PENDING
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class InstructorTaskFactory(DjangoModelFactory):
     FACTORY_FOR = InstructorTask
 
     task_type = 'rescore_problem'
-    course_id = "MITx/999/Robot_Super_Course"
+    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
     task_input = json.dumps({})
     task_key = None
     task_id = None
