@@ -108,16 +108,16 @@ class BaseInstructorTask(Task):
         Note that there is no way to record progress made within the task (e.g. attempted,
         succeeded, etc.) when such failures occur.
         """
-        TASK_LOG.debug('Task %s: failure returned', task_id)
+        TASK_LOG.debug(u'Task %s: failure returned', task_id)
         entry_id = args[0]
         try:
             entry = InstructorTask.objects.get(pk=entry_id)
         except InstructorTask.DoesNotExist:
             # if the InstructorTask object does not exist, then there's no point
             # trying to update it.
-            TASK_LOG.error("Task (%s) has no InstructorTask object for id %s", task_id, entry_id)
+            TASK_LOG.error(u"Task (%s) has no InstructorTask object for id %s", task_id, entry_id)
         else:
-            TASK_LOG.warning("Task (%s) failed: %s %s", task_id, einfo.exception, einfo.traceback)
+            TASK_LOG.warning(u"Task (%s) failed", task_id, exc_info=True)
             entry.task_output = InstructorTask.create_output_for_failure(einfo.exception, einfo.traceback)
             entry.task_state = FAILURE
             entry.save_now()
@@ -296,7 +296,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         num_attempted += 1
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
-        with dog_stats_api.timer('instructor_tasks.module.time.step', tags=['action:{name}'.format(name=action_name)]):
+        with dog_stats_api.timer('instructor_tasks.module.time.step', tags=[u'action:{name}'.format(name=action_name)]):
             update_status = update_fcn(module_descriptor, module_to_update)
             if update_status == UPDATE_STATUS_SUCCEEDED:
                 # If the update_fcn returns true, then it performed some kind of work.

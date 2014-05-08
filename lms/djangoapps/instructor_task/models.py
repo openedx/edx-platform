@@ -160,7 +160,7 @@ class InstructorTask(models.Model):
         Truncation is indicated by adding "..." to the end of the value.
         """
         tag = '...'
-        task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
+        task_progress = {'exception': type(exception).__name__, 'message': unicode(exception.message)}
         if traceback_string is not None:
             # truncate any traceback that goes into the InstructorTask model:
             task_progress['traceback'] = traceback_string
