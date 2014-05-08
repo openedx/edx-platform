@@ -357,7 +357,7 @@ class CoursesDetail(APIView):
         # get_course_by_id raises an Http404 if the requested course is invalid
         # Rather than catching it, we just let it bubble up
         try:
-            course_descriptor = get_course(course_id)
+            course_descriptor = get_course(course_id, depth=depth_int)
         except ValueError:
             course_descriptor = None
         if course_descriptor:
@@ -791,6 +791,7 @@ class CourseContentGroupsList(APIView):
         """
         response_data = []
         group_type = request.QUERY_PARAMS.get('type')
+
         try:
             course_descriptor = get_course(course_id)
         except ValueError:
