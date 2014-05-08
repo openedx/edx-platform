@@ -11,6 +11,7 @@ from webob import Response
 
 from xblock.core import XBlock
 
+from xmodule.course_module import CourseDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
@@ -22,6 +23,7 @@ from .transcripts_utils import (
     youtube_speed_dict,
     Transcript,
     save_to_store,
+    subs_filename
 )
 
 
@@ -171,6 +173,39 @@ class VideoStudentViewHandlers(object):
 
         return content, filename, Transcript.mime_types[transcript_format]
 
+    def get_static_transcript(self, request):
+        """
+        Courses that are imported with the --nostatic flag do not show
+        transcripts/captions properly even if those captions are stored inside
+        their static folder. This adds a last resort method of redirecting to
+        the static asset path of the course if the transcript can't be found
+        inside the contentstore and the course has the static_asset_path field
+        set.
+        """
+        response = Response(status=404)
+        # Only do redirect for English
+        if not self.transcript_language == 'en':
+            return response
+
+        video_id = request.GET.get('videoId', None)
+        if video_id:
+            transcript_name = video_id
+        else:
+            transcript_name = self.sub
+
+        if transcript_name:
+            course_location = CourseDescriptor.id_to_location(self.course_id)
+            course = self.descriptor.runtime.modulestore.get_item(course_location)
+            if course.static_asset_path:
+                response = Response(
+                    status=307,
+                    location='/static/{0}/{1}'.format(
+                        course.static_asset_path,
+                        subs_filename(transcript_name, self.transcript_language)
+                    )
+                )
+        return response
+
     @XBlock.handler
     def transcript(self, request, dispatch):
         """
@@ -206,13 +241,17 @@ class VideoStudentViewHandlers(object):
 
             if language != self.transcript_language:
                 self.transcript_language = language
+
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
+            except NotFoundError, ex:
+                log.info(ex.message)
+                # Try to return static URL redirection as last resort
+                # if no translation is required
+                return self.get_static_transcript(request)
             except (
                 TranscriptException,
-                NotFoundError,
                 UnicodeDecodeError,
-                TranscriptException,
                 TranscriptsGenerationException
             ) as ex:
                 log.info(ex.message)
