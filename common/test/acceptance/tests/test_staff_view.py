@@ -16,6 +16,7 @@ class StaffDebugTest(UniqueCourseTest):
     Tests that verify the staff debug info.
     """
     USERNAME = "STAFF_TESTER"
+    EMAIL = "johndoe@example.com"
 
     def setUp(self):
         super(StaffDebugTest, self).setUp()
@@ -49,7 +50,7 @@ class StaffDebugTest(UniqueCourseTest):
 
         # Auto-auth register for the course.
         # Do this as global staff so that you will see the Staff View
-        AutoAuthPage(self.browser, username=self.USERNAME,
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=True).visit()
 
     def _goto_staff_page(self):
@@ -63,15 +64,14 @@ class StaffDebugTest(UniqueCourseTest):
 
     def test_reset_attempts_empty(self):
         """
-        Test that we fail properly when there is no student state
+        Test that we reset even when there is no student state
         """
 
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
         staff_debug_page.reset_attempts()
         msg = staff_debug_page.idash_msg[0]
-        self.assertIn((u"Found a single student. Found module. Couldn't "
-                       "reset module state for {0}/").format(self.USERNAME),
-                      msg)
+        self.assertEqual(u'Successfully reset the attempts '
+                         'for user {}'.format(self.USERNAME), msg)
 
     def test_delete_state_empty(self):
         """
@@ -80,8 +80,8 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
         staff_debug_page.delete_state()
         msg = staff_debug_page.idash_msg[0]
-        self.assertIn((u"Found a single student. Found module. "
-                       "Deleted student module state for"), msg)
+        self.assertEqual(u'Successfully deleted student state '
+                         'for user {}'.format(self.USERNAME), msg)
 
     def test_reset_attempts_state(self):
         """
@@ -93,10 +93,25 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.reset_attempts()
         msg = staff_debug_page.idash_msg[0]
-        self.assertIn((u"Found a single student. Found module. Module "
-                       "state successfully reset!"), msg)
+        self.assertEqual(u'Successfully reset the attempts '
+                         'for user {}'.format(self.USERNAME), msg)
 
-    def test_student_state_state(self):
+    def test_rescore_state(self):
+        """
+        Rescore the student
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.rescore()
+        msg = staff_debug_page.idash_msg[0]
+        # Since we aren't running celery stuff, this will fail badly
+        # for now, but is worth excercising that bad of a response
+        self.assertEqual(u'Unsuccessfully rescored problem. '
+                         'Unknown Error Occurred.', msg)
+
+    def test_student_state_delete(self):
         """
         Successfully delete the student state with an answer
         """
@@ -106,5 +121,31 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state()
         msg = staff_debug_page.idash_msg[0]
-        self.assertIn((u"Found a single student. Found module. "
-                       "Deleted student module state for"), msg)
+        self.assertEqual(u'Successfully deleted student state '
+                         'for user {}'.format(self.USERNAME), msg)
+
+    def test_student_by_email(self):
+        """
+        Successfully reset the student attempts using their email address
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.reset_attempts(self.EMAIL)
+        msg = staff_debug_page.idash_msg[0]
+        self.assertEqual(u'Successfully reset the attempts '
+                         'for user {}'.format(self.EMAIL), msg)
+
+    def test_bad_student(self):
+        """
+        Test negative response with invalid user
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.delete_state('INVALIDUSER')
+        msg = staff_debug_page.idash_msg[0]
+        self.assertEqual(u'Unsuccessfully deleted student state. '
+                         'User does not exist.', msg)

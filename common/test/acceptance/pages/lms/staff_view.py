@@ -66,6 +66,15 @@ class StaffDebugPage(PageObject):
             self.q(css='input[id^=sd_fu_]').fill(user)
         self.q(css='section.staff-modal a#staff-debug-sdelete').click()
 
+    def rescore(self, user=None):
+        """
+        This clicks on the reset attempts link with an optionally
+        specified user.
+        """
+        if user:
+            self.q(css='input[id^=sd_fu_]').first.fill(user)
+        self.q(css='section.staff-modal a#staff-debug-rescore').click()
+
     @property
     def idash_msg(self):
         """
