@@ -2,6 +2,7 @@
 
 import logging
 import re
+from bson.son import SON
 
 from opaque_keys import InvalidKeyError, OpaqueKey
 
@@ -240,6 +241,25 @@ class LocationBase(object):
     def course_key(self):
         return SlashSeparatedCourseKey(self.org, self.course, self.run)
 
+    def to_deprecated_son(self, prefix='', tag='i4x'):
+        """
+        Returns a SON object that represents this location
+        """
+        # adding tag b/c deprecated form used it
+        son = SON({prefix + 'tag': tag})
+        for field_name in self.KEY_FIELDS:
+            # Temporary filtering of run field because deprecated form left it out
+            if field_name != 'run':
+                son[prefix + field_name] = getattr(self, field_name)
+        return son
+
+    @classmethod
+    def _from_deprecated_son(cls, id_dict, run):
+        """
+        Return the Location decoding this id_dict and run
+        """
+        return cls(id_dict['org'], id_dict['course'], run, id_dict['category'], id_dict['name'], id_dict['revision'])
+
 
 class Location(LocationBase, UsageKey, DefinitionKey):
     """
@@ -312,6 +332,14 @@ class AssetLocation(LocationBase, AssetKey):
             A new :class:`CourseObjectMixin` instance.
         """
         return AssetLocation(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)
+
+    def to_deprecated_list_repr(self):
+        """
+        Thumbnail locations are stored as lists [c4x, org, course, thumbnail, path, None] in contentstore.mongo
+        That should be the only use of this method, but the method is general enough to provide the pre-opaque
+        Location fields as an array in the old order with the tag.
+        """
+        return ['c4x', self.org, self.course, self.block_type, self.name, None]
 
 
 class i4xEncoder(json.JSONEncoder):

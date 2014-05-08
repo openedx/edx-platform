@@ -291,16 +291,6 @@ def create_new_course(request):
     try:
         course_key = SlashSeparatedCourseKey(org, number, run)
 
-        # see if the course already exists
-        existing_course_exists = False
-        try:
-            existing_course_exists = modulestore('direct').has_course(course_key, ignore_case=True)
-        except InsufficientSpecificationError:
-            pass
-
-        if existing_course_exists:
-            raise InvalidLocationError()
-
         # instantiate the CourseDescriptor and then persist it
         # note: no system to pass
         if display_name is None:
@@ -310,7 +300,8 @@ def create_new_course(request):
 
         # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
         # existing xml courses this cannot be changed in CourseDescriptor.
-        ## TODO get rid of defining wiki slug in this org/course/run specific way
+        # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
+        # w/ xmodule.course_module.CourseDescriptor.__init__
         wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
         definition_data = {'wiki_slug': wiki_slug}
 
@@ -325,24 +316,10 @@ def create_new_course(request):
         fields.update(metadata)
 
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-        modulestore('direct').create_course(
+        new_course = modulestore('direct').create_course(
             course_key.org,
             course_key.offering,
             fields=fields,
-        )
-
-        new_course = modulestore('direct').get_course(course_key)
-
-        # clone a default 'about' overview module as well
-        dest_about_location = new_course.location.replace(
-            category='about',
-            name='overview'
-        )
-        overview_template = AboutDescriptor.get_template('overview.yaml')
-        modulestore('direct').create_and_save_xmodule(
-            dest_about_location,
-            system=new_course.system,
-            definition_data=overview_template.get('data')
         )
 
         # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
