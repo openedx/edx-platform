@@ -198,7 +198,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         email = CourseEmail(course_id=self.course.id, to_option=SEND_TO_ALL)
         email.save()
-        entry = InstructorTask.create("bogus_task_id", "task_type", "task_key", "task_input", self.instructor)
+        entry = InstructorTask.create("bogus/task/id", "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101
         with self.assertRaisesRegexp(ValueError, 'does not match task value'):
             perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")  # pylint: disable=E1101
