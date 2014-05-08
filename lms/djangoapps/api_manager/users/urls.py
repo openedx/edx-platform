@@ -10,7 +10,8 @@ urlpatterns = patterns(
     url(r'/*$^', users_views.UsersList.as_view()),
     url(r'^(?P<user_id>[0-9]+)$', users_views.UsersDetail.as_view()),
     url(r'^(?P<user_id>[0-9]+)/courses/*$', users_views.UsersCoursesList.as_view()),
-    url(r'^(?P<user_id>[0-9]+)/courses/(?P<course_id>[a-zA-Z0-9/_:]+)$', users_views.UsersCoursesDetail.as_view()),
+    url(r'^(?P<user_id>[0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)$', users_views.UsersCoursesDetail.as_view()),
+    url(r'^(?P<user_id>[0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grades$', users_views.UsersCoursesGradesDetail.as_view()),
     url(r'^(?P<user_id>[0-9]+)/groups/*$', users_views.UsersGroupsList.as_view()),
     url(r'^(?P<user_id>[0-9]+)/groups/(?P<group_id>[0-9]+)$', users_views.UsersGroupsDetail.as_view()),
 )
