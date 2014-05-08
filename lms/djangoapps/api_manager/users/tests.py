@@ -8,7 +8,8 @@ from random import randint
 import simplejson as json
 import unittest
 import uuid
-
+from mock import patch
+from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -22,7 +23,9 @@ TEST_API_KEY = str(uuid.uuid4())
 
 
 class SecureClient(Client):
+
     """ Django test client using a "secure" connection. """
+
     def __init__(self, *args, **kwargs):
         kwargs = kwargs.copy()
         kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
@@ -31,7 +34,9 @@ class SecureClient(Client):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
+@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False})
 class UsersApiTests(TestCase):
+
     """ Test suite for Users API views """
 
     def setUp(self):
@@ -41,6 +46,7 @@ class UsersApiTests(TestCase):
         self.test_email = str(uuid.uuid4()) + '@test.org'
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
+        self.test_city = str(uuid.uuid4())
 
         self.client = SecureClient()
         cache.clear()
@@ -52,7 +58,8 @@ class UsersApiTests(TestCase):
         }
         json_data = json.dumps(data)
 
-        response = self.client.post(uri, headers=headers, content_type='application/json', data=json_data)
+        response = self.client.post(
+            uri, headers=headers, content_type='application/json', data=json_data)
         return response
 
     def do_get(self, uri):
@@ -76,11 +83,13 @@ class UsersApiTests(TestCase):
     def test_user_list_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
-        confirm_uri = self.test_server_prefix + test_uri + '/' + str(response.data['id'])
+        confirm_uri = self.test_server_prefix + \
+            test_uri + '/' + str(response.data['id'])
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['email'], self.test_email)
         self.assertEqual(response.data['username'], local_username)
@@ -90,7 +99,9 @@ class UsersApiTests(TestCase):
     def test_user_list_post_inactive(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name, 'is_active': False}
+        data = {
+            'email': self.test_email, 'username': local_username, 'password': self.test_password,
+            'first_name': self.test_first_name, 'last_name': self.test_last_name, 'is_active': False}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['is_active'], False)
@@ -98,7 +109,8 @@ class UsersApiTests(TestCase):
     def test_user_list_post_duplicate(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 409)
@@ -108,7 +120,8 @@ class UsersApiTests(TestCase):
     def test_user_detail_get(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
@@ -131,7 +144,8 @@ class UsersApiTests(TestCase):
     def test_user_detail_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
         data = {'is_active': False}
@@ -141,6 +155,81 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['is_active'], False)
+
+    def test_user_detail_post_username(self):
+        """
+        Create two users, then pass the same first username in request in order to update username of second user.
+        Must return bad request against username, Already exist!
+        """
+        lst_username = []
+        test_uri = '/api/users'
+        for i in xrange(2):
+            local_username = self.test_username + str(i)
+            lst_username.append(local_username)
+            data = {
+                'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
+                'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male'}
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        data["username"] = lst_username[0]
+
+        test_uri = test_uri + '/' + str(response.data['id'])
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 409)
+
+        # Pass an invalid username in order to update username.
+        # Must return bad request against. invalid username!
+
+        data["username"] = '@'
+        response = self.do_post(test_uri, data)
+        message = _(
+            'Username should only consist of A-Z and 0-9, with no spaces.')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['message'], message)
+
+    def test_user_detail_post_user_profile_added_updated(self):
+        """
+        Create a user, then add the user profile
+        Must be added
+        """
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {
+            'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = test_uri + '/' + str(response.data['id'])
+        response = self.do_get(test_uri)
+        self.is_user_profile_created_updated(response, data)
+
+        # Testing profile updating scenario.
+        # Must be updated
+
+        data["country"] = "US"
+        data["year_of_birth"] = "1990"
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.is_user_profile_created_updated(response, data)
+
+    def test_user_detail_post_profile_added_invalid_year(self):
+        """
+        Create a user, then add the user profile with invalid year of birth
+        Profile Must be added with year_of_birth will be none
+        """
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {
+            'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': 'abcd', "gender": 'male'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri_1 = test_uri + '/' + str(response.data['id'])
+        response = self.do_get(test_uri_1)
+        data["year_of_birth"] = 'None'
+        self.is_user_profile_created_updated(response, data)
 
     def test_user_detail_post_invalid_user(self):
         test_uri = '/api/users/123124124'
@@ -155,7 +244,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(response.data['id'])
@@ -177,7 +267,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
@@ -206,7 +297,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(response.data['id'])
@@ -233,7 +325,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(response.data['id']) + '/groups'
@@ -255,7 +348,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id']) + '/groups'
         data = {'group_id': group_id}
@@ -265,7 +359,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.do_delete(test_uri)  # Relationship no longer exists, should get a 204 all the same
+        response = self.do_delete(
+            test_uri)  # Relationship no longer exists, should get a 204 all the same
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
@@ -282,7 +377,8 @@ class UsersApiTests(TestCase):
         group_id = response.data['id']
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '/api/users/' + str(user_id) + '/groups/' + str(group_id)
@@ -293,7 +389,8 @@ class UsersApiTests(TestCase):
         course = CourseFactory.create()
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
@@ -317,7 +414,8 @@ class UsersApiTests(TestCase):
     def test_user_courses_list_post_undefined_course(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
@@ -329,7 +427,8 @@ class UsersApiTests(TestCase):
         course = CourseFactory.create(display_name="TEST COURSE")
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
@@ -372,7 +471,8 @@ class UsersApiTests(TestCase):
         )
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
@@ -423,7 +523,8 @@ class UsersApiTests(TestCase):
         )
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
@@ -452,7 +553,8 @@ class UsersApiTests(TestCase):
         )
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
@@ -485,7 +587,8 @@ class UsersApiTests(TestCase):
         course = CourseFactory.create()
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '/api/users/' + str(user_id) + '/courses/' + str(course.id)
@@ -496,7 +599,8 @@ class UsersApiTests(TestCase):
         course = CourseFactory.create()
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         post_uri = test_uri + '/' + str(user_id) + '/courses'
@@ -510,7 +614,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.do_post(post_uri, data)  # Re-enroll the student in the course
+        response = self.do_post(post_uri, data)
+                                # Re-enroll the student in the course
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -522,16 +627,31 @@ class UsersApiTests(TestCase):
     def test_user_courses_detail_delete_undefined_user(self):
         course = CourseFactory.create()
         user_id = '2134234'
-        test_uri = '/api/users/{}/courses/{}'.format(str(user_id), str(course.id))
+        test_uri = '/api/users/{}/courses/{}'.format(
+            str(user_id), str(course.id))
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
     def test_user_courses_detail_delete_undefined_course(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/oasdf987sdf'.format(test_uri, str(user_id))
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def is_user_profile_created_updated(self, response, data):
+        """This function compare response with user profile data """
+
+        fullname = '{} {}'.format(self.test_first_name, self.test_last_name)
+        self.assertEqual(response.data['full_name'], fullname)
+        self.assertEqual(response.data['city'], data["city"])
+        self.assertEqual(response.data['country'], data["country"])
+        self.assertEqual(response.data['gender'], data["gender"])
+        self.assertEqual(
+            response.data['level_of_education'], data["level_of_education"])
+        self.assertEqual(
+            str(response.data['year_of_birth']), data["year_of_birth"])
