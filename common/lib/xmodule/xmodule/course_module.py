@@ -540,6 +540,11 @@ class CourseFields(object):
                                        default=False,
                                        scope=Scope.settings)
 
+    invitation_only = Boolean(display_name=_("Invitation Only"),
+                              help="Whether to restrict enrollment to invitation by the course staff.",
+                              default=False,
+                              scope=Scope.settings)
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 
