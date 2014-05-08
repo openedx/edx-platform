@@ -10,8 +10,6 @@ from collections import namedtuple
 from path import path
 from lazy import lazy
 
-from xmodule.modulestore.
-
 from . import STUDIO_BASE_URL
 
 
