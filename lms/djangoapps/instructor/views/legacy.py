@@ -601,7 +601,7 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, "list-staff", {}, page="idashboard")
 
     elif 'List course instructors' in action and GlobalStaff().has_user(request.user):
-        role = CourseInstructorRole(course.location)
+        role = CourseInstructorRole(course.id)
         datatable = _role_members_table(role, _("List of Instructors"), course_key)
         track.views.server_track(request, "list-instructors", {}, page="idashboard")
 
