@@ -4,38 +4,35 @@ courses
 """
 import logging
 import os
-import tarfile
-import shutil
 import re
-from tempfile import mkdtemp
+import shutil
+import tarfile
 from path import path
+from tempfile import mkdtemp
 
 from django.conf import settings
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie
-from django.core.servers.basehttp import FileWrapper
-from django.core.files.temp import NamedTemporaryFile
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
-from django.http import HttpResponseNotFound
-from django.views.decorators.http import require_http_methods, require_GET
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods, require_GET
 
+from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
-
-from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.exceptions import SerializationError
-
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
-from .access import has_course_access
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_exporter import export_to_xml
 
-from util.json_request import JsonResponse
+from .access import has_course_access
 from extract_tar import safetar_extractall
-from student.roles import CourseInstructorRole, CourseStaffRole
 from student import auth
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from util.json_request import JsonResponse
 
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
@@ -231,10 +228,6 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
 
                     session_status[key] = 3
                     request.session.modified = True
-
-                    auth.add_users(request.user, CourseInstructorRole(new_location), request.user)
-                    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
-                    logging.debug('created all course groups at {0}'.format(new_location))
 
                 # Send errors to client with stage at which error occurred.
                 except Exception as exception:   # pylint: disable=W0703

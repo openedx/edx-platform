@@ -1,24 +1,27 @@
 """
 Unit tests for course import and export
 """
+import copy
+import json
+import logging
 import os
 import shutil
 import tarfile
 import tempfile
-import copy
 from path import path
-import json
-import logging
-from uuid import uuid4
 from pymongo import MongoClient
+from uuid import uuid4
 
-from contentstore.tests.utils import CourseTestCase
 from django.test.utils import override_settings
 from django.conf import settings
-from xmodule.modulestore.django import loc_mapper
 
 from xmodule.contentstore.django import _CONTENTSTORE
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import ItemFactory
+
+from contentstore.tests.utils import CourseTestCase
+from student import auth
+from student.roles import CourseInstructorRole, CourseStaffRole
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -106,6 +109,46 @@ class ImportTestCase(CourseTestCase):
             resp = self.client.post(self.url, args)
 
         self.assertEquals(resp.status_code, 200)
+
+    def test_import_in_existing_course(self):
+        """
+        Check that course is imported successfully in existing course and users have their access roles
+        """
+        # Create a non_staff user and add it to course staff only
+        __, nonstaff_user = self.create_non_staff_authed_user_client(authenticate=False)
+        auth.add_users(self.user, CourseStaffRole(self.course.location), nonstaff_user)
+
+        course = self.store.get_item(self.course_location)
+        self.assertIsNotNone(course)
+        display_name_before_import = course.display_name
+
+        # Check that global staff user can import course
+        with open(self.good_tar) as gtar:
+            args = {"name": self.good_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+
+        course = self.store.get_item(self.course_location)
+        self.assertIsNotNone(course)
+        display_name_after_import = course.display_name
+
+        # Check that course display name have changed after import
+        self.assertNotEqual(display_name_before_import, display_name_after_import)
+
+        # Now check that non_staff user has his same role
+        self.assertFalse(CourseInstructorRole(self.course_location).has_user(nonstaff_user))
+        self.assertTrue(CourseStaffRole(self.course_location).has_user(nonstaff_user))
+
+        # Now course staff user can also successfully import course
+        self.client.login(username=nonstaff_user.username, password='foo')
+        with open(self.good_tar) as gtar:
+            args = {"name": self.good_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+
+        # Now check that non_staff user has his same role
+        self.assertFalse(CourseInstructorRole(self.course_location).has_user(nonstaff_user))
+        self.assertTrue(CourseStaffRole(self.course_location).has_user(nonstaff_user))
 
     ## Unsafe tar methods #####################################################
     # Each of these methods creates a tarfile with a single type of unsafe
