@@ -80,7 +80,7 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_grade.text gettext("Please enter a problem location.")
       send_data =
         unique_student_identifier: unique_student_identifier
         problem_to_reset: problem_to_reset
@@ -104,7 +104,7 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_grade.text gettext("Please enter a problem location.")
       confirm_message = gettext("Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?")
       full_confirm_message = _.template(confirm_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
@@ -133,7 +133,7 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_grade.text gettext("Please enter a problem location.")
       send_data =
         unique_student_identifier: unique_student_identifier
         problem_to_reset: problem_to_reset
@@ -156,10 +156,10 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_grade.text gettext("Please enter a problem location.")
       send_data =
         unique_student_identifier: unique_student_identifier
-        problem_urlname: problem_to_reset
+        problem_location_str: problem_to_reset
       error_message = gettext("Error getting task history for problem '<%= problem_id %>' and student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
       full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
@@ -175,7 +175,7 @@ class StudentAdmin
     @$btn_reset_attempts_all.click =>
       problem_to_reset = @$field_problem_select_all.val()
       if not problem_to_reset
-        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_all.text gettext("Please enter a problem location.")
       confirm_message = gettext("Reset attempts for all students on problem '<%= problem_id %>'?")
       full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
       if window.confirm full_confirm_message
@@ -201,7 +201,7 @@ class StudentAdmin
     @$btn_rescore_problem_all.click =>
       problem_to_reset = @$field_problem_select_all.val()
       if not problem_to_reset
-        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
+        return @$request_response_error_all.text gettext("Please enter a problem location.")
       confirm_message = gettext("Rescore problem '<%= problem_id %>' for all students?")
       full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
       if window.confirm full_confirm_message
@@ -226,10 +226,10 @@ class StudentAdmin
     # list task history for problem
     @$btn_task_history_all.click =>
       send_data =
-        problem_urlname: @$field_problem_select_all.val()
+        problem_location_str: @$field_problem_select_all.val()
 
-      if not send_data.problem_urlname
-        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
+      if not send_data.problem_location_str
+        return @$request_response_error_all.text gettext("Please enter a problem location.")
 
       $.ajax
         dataType: 'json'

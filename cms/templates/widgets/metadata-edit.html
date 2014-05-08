@@ -5,7 +5,7 @@
   import hashlib
   import copy
   import json
-  hlskey = hashlib.md5(module.location.url().encode('utf-8')).hexdigest()
+  hlskey = hashlib.md5(module.location.to_deprecated_string().encode('utf-8')).hexdigest()
 %>
 
 ## js templates

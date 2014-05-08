@@ -9,6 +9,8 @@ from collections import namedtuple
 from django.utils.translation import ugettext as _
 from django.db.models import Q
 
+from xmodule_django.models import CourseKeyField
+
 Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_datetime'])
 
 class CourseMode(models.Model):
@@ -17,7 +19,7 @@ class CourseMode(models.Model):
 
     """
     # the course that this mode is attached to
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     # the reference to this mode that can be used by Enrollments to generate
     # similar behavior for the same slug across courses

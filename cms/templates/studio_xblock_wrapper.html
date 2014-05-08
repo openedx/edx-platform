@@ -3,7 +3,7 @@
 
 % if xblock.location != xblock_context['root_xblock'].location:
   <% section_class = "level-nesting" if xblock.has_children else "level-element" %>
-<section class="wrapper-xblock ${section_class}" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
+<section class="wrapper-xblock ${section_class}" data-locator="${xblock.location}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}" data-course-key="${xblock.location.course_key}">
 % endif
 
     <header class="xblock-header">

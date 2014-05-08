@@ -25,6 +25,8 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata, compute_inherited_metadata
 from xblock.fields import Scope
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 FILTER_LIST = ['xml_attributes', 'checklists']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes', 'checklists']
@@ -66,7 +68,11 @@ class Command(BaseCommand):
 
         # Get the course data
 
-        course_id = args[0]
+        try:
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        except InvalidKeyError:
+            raise CommandError("Invalid course_id")
+
         course = store.get_course(course_id)
         if course is None:
             raise CommandError("Invalid course_id")
@@ -90,12 +96,12 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
 
     destination = destination if destination else {}
 
-    items = own_metadata(module).iteritems()
-    filtered_metadata = {k: v for k, v in items if k not in FILTER_LIST}
+    items = own_metadata(module)
+    filtered_metadata = {k: v for k, v in items.iteritems() if k not in FILTER_LIST}
 
-    destination[module.location.url()] = {
+    destination[module.location.to_deprecated_string()] = {
         'category': module.location.category,
-        'children': [str(child) for child in getattr(module, 'children', [])],
+        'children': [child.to_deprecated_string() for child in getattr(module, 'children', [])],
         'metadata': filtered_metadata,
     }
 
@@ -116,7 +122,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
                 return field.values != field.default
 
         inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}
-        destination[module.location.url()]['inherited_metadata'] = inherited_metadata
+        destination[module.location.to_deprecated_string()]['inherited_metadata'] = inherited_metadata
 
     for child in module.get_children():
         dump_module(child, destination, inherited, defaults)

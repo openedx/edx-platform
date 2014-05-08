@@ -5,6 +5,7 @@ Tests for instructor.basic
 from django.test import TestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from analytics.basic import enrolled_students_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 
@@ -13,14 +14,14 @@ class TestAnalyticsBasic(TestCase):
     """ Test basic analytics functions. """
 
     def setUp(self):
-        self.course_id = 'some/robot/course/id'
+        self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
-        self.ces = tuple(CourseEnrollment.enroll(user, self.course_id)
+        self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_id, ['username'])
+        userreports = enrolled_students_features(self.course_key, ['username'])
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(userreport.keys(), ['username'])
@@ -30,7 +31,7 @@ class TestAnalyticsBasic(TestCase):
         query_features = ('username', 'name', 'email')
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_id, query_features)
+        userreports = enrolled_students_features(self.course_key, query_features)
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))

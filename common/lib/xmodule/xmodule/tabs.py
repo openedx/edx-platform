@@ -456,7 +456,7 @@ class StaticTab(CourseTab):
         super(StaticTab, self).__init__(
             name=tab_dict['name'] if tab_dict else name,
             tab_id='static_tab_{0}'.format(self.url_slug),
-            link_func=lambda course, reverse_func: reverse_func(self.type, args=[course.id, self.url_slug]),
+            link_func=lambda course, reverse_func: reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug]),
         )
 
     def __getitem__(self, key):
@@ -537,7 +537,7 @@ class TextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook.title,
                 tab_id='textbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('book', args=[course.id, index]),
+                link_func=lambda course, reverse_func: reverse_func('book', args=[course.id.to_deprecated_string(), index]),
             )
 
 
@@ -557,7 +557,7 @@ class PDFTextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook['tab_title'],
                 tab_id='pdftextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('pdf_book', args=[course.id, index]),
+                link_func=lambda course, reverse_func: reverse_func('pdf_book', args=[course.id.to_deprecated_string(), index]),
             )
 
 
@@ -577,7 +577,7 @@ class HtmlTextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook['tab_title'],
                 tab_id='htmltextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('html_book', args=[course.id, index]),
+                link_func=lambda course, reverse_func: reverse_func('html_book', args=[course.id.to_deprecated_string(), index]),
             )
 
 
@@ -884,7 +884,7 @@ def link_reverse_func(reverse_name):
     Returns a function that takes in a course and reverse_url_func,
     and calls the reverse_url_func with the given reverse_name and course' ID.
     """
-    return lambda course, reverse_url_func: reverse_url_func(reverse_name, args=[course.id])
+    return lambda course, reverse_url_func: reverse_url_func(reverse_name, args=[course.id.to_deprecated_string()])
 
 
 def link_value_func(value):

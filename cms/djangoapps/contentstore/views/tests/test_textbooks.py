@@ -1,7 +1,7 @@
 import json
 from unittest import TestCase
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import get_modulestore
+from contentstore.utils import reverse_course_url
 
 from contentstore.views.course import (
     validate_textbooks_json, validate_textbook_json, TextbookValidationError)
@@ -12,7 +12,7 @@ class TextbookIndexTestCase(CourseTestCase):
     def setUp(self):
         "Set the URL for tests"
         super(TextbookIndexTestCase, self).setUp()
-        self.url = self.course_locator.url_reverse('textbooks')
+        self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
     def test_view_index(self):
         "Basic check that the textbook index page responds correctly"
@@ -110,7 +110,8 @@ class TextbookCreateTestCase(CourseTestCase):
     def setUp(self):
         "Set up a url and some textbook content for tests"
         super(TextbookCreateTestCase, self).setUp()
-        self.url = self.course_locator.url_reverse('textbooks')
+        self.url = reverse_course_url('textbooks_list_handler', self.course.id)
+
         self.textbook = {
             "tab_title": "Economics",
             "chapters": {
@@ -177,7 +178,8 @@ class TextbookDetailTestCase(CourseTestCase):
                 "url": "/a/b/c/ch1.pdf",
             }
         }
-        self.url1 = self.course_locator.url_reverse("textbooks", "1")
+        self.url1 = self.get_details_url("1")
+
         self.textbook2 = {
             "tab_title": "Algebra",
             "id": 2,
@@ -186,12 +188,22 @@ class TextbookDetailTestCase(CourseTestCase):
                 "url": "/a/b/ch11.pdf",
             }
         }
-        self.url2 = self.course_locator.url_reverse("textbooks", "2")
+        self.url2 = self.get_details_url("2")
         self.course.pdf_textbooks = [self.textbook1, self.textbook2]
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         self.save_course()
-        self.url_nonexist = self.course_locator.url_reverse("textbooks", "20")
+        self.url_nonexist = self.get_details_url("1=20")
+
+    def get_details_url(self, textbook_id):
+        """
+        Returns the URL for textbook detail handler.
+        """
+        return reverse_course_url(
+            'textbooks_detail_handler',
+            self.course.id,
+            kwargs={'textbook_id': textbook_id}
+        )
 
     def test_get_1(self):
         "Get the first textbook"
@@ -233,7 +245,7 @@ class TextbookDetailTestCase(CourseTestCase):
             "url": "supercool.pdf",
             "id": "1supercool",
         }
-        url = self.course_locator.url_reverse("textbooks", "1supercool")
+        url = self.get_details_url("1supercool")
         resp = self.client.post(
             url,
             data=json.dumps(textbook),

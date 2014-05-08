@@ -30,16 +30,13 @@
   </p>
   <br>
 
-  <p> ${_('Specify a particular problem in the course here by its url:')}
-  <input type="text" name="problem-select-single" placeholder="${_("Problem urlname")}">
+  <p> ${_('Specify a particular problem in the course here by its location:')}
+  <input type="text" name="problem-select-single" placeholder="${_("Problem location")}">
   </p>
 
   <p>
-    ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
-    location1="<tt>i4x://university/course/problem/problemname</tt>",
-    urlname1="<tt>problemname</tt>",
-    location2="<tt>i4x://university/course/notaproblem/someothername</tt>",
-    urlname2="<tt>notaproblem/someothername</tt>")
+    ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
+    location="<tt>location:edX+Open_DemoX+problem+78c98390884243b89f6023745231c525</tt>")
     }
   </p>
 
@@ -81,15 +78,12 @@
     <div class="request-response-error"></div>
 
     <p>
-      ${_("Specify a particular problem in the course here by its url:")}
-      <input type="text" name="problem-select-all" size="60">
+      ${_("Specify a particular problem in the course here by its location:")}
+      <input type="text" name="problem-select-all" size="60" placeholder="${_("Problem location")}">
     </p>
     <p>
-      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
-      location1="<tt>i4x://university/course/problem/problemname</tt>",
-      urlname1="<tt>problemname</tt>",
-      location2="<tt>i4x://university/course/notaproblem/someothername</tt>",
-      urlname2="<tt>notaproblem/someothername</tt>")
+      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
+      location="<tt>location:edX+Open_DemoX+problem+78c98390884243b89f6023745231c525</tt>")
       }
     </p>
     <p>

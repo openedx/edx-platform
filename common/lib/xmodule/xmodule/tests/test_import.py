@@ -12,12 +12,13 @@ from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location, only_xmodules
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
@@ -34,7 +35,7 @@ class DummySystem(ImportSystem):
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
-        course_id = "/".join([ORG, COURSE, 'test_run'])
+        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()
@@ -48,7 +49,6 @@ class DummySystem(ImportSystem):
             load_error_modules=load_error_modules,
             mixins=(InheritanceMixin, XModuleMixin),
             field_data=KvsFieldData(DictKeyValueStore()),
-            id_reader=LocationReader(),
         )
 
     def render_template(self, _template, _context):
@@ -343,7 +343,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print("Checking {0}".format(node.location.url()))
+            print("Checking {0}".format(node.location.to_deprecated_string()))
             self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
                 check_for_key(key, c, value)
@@ -386,9 +386,10 @@ class ImportTestCase(BaseCourseTestCase):
         toy_id = "edX/toy/2012_Fall"
         two_toy_id = "edX/toy/TT_2012_Fall"
 
-        location = Location(["i4x", "edX", "toy", "video", "Welcome"])
-        toy_video = modulestore.get_instance(toy_id, location)
-        two_toy_video = modulestore.get_instance(two_toy_id, location)
+        location = Location("edX", "toy", "2012_Fall", "video", "Welcome", None)
+        toy_video = modulestore.get_item(location)
+        location = Location("edX", "toy", "TT_2012_Fall", "video", "Welcome", None)
+        two_toy_video = modulestore.get_item(location)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")
 
@@ -401,10 +402,9 @@ class ImportTestCase(BaseCourseTestCase):
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
-        course_id = course.id
 
         print("course errors:")
-        for (msg, err) in modulestore.get_item_errors(course.location):
+        for (msg, err) in modulestore.get_course_errors(course.id):
             print(msg)
             print(err)
 
@@ -416,13 +416,12 @@ class ImportTestCase(BaseCourseTestCase):
 
         print("Ch2 location: ", ch2.location)
 
-        also_ch2 = modulestore.get_instance(course_id, ch2.location)
+        also_ch2 = modulestore.get_item(ch2.location)
         self.assertEquals(ch2, also_ch2)
 
         print("making sure html loaded")
-        cloc = course.location
-        loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
-        html = modulestore.get_instance(course_id, loc)
+        loc = course.id.make_usage_key('html', 'secret:toylab')
+        html = modulestore.get_item(loc)
         self.assertEquals(html.display_name, "Toy lab")
 
     def test_unicode(self):
@@ -442,12 +441,16 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Expect to find an error/exception about characters in "®esources"
         expect = "Invalid characters"
-        errors = [(msg.encode("utf-8"), err.encode("utf-8"))
-                    for msg, err in
-                    modulestore.get_item_errors(course.location)]
+        errors = [
+            (msg.encode("utf-8"), err.encode("utf-8"))
+            for msg, err
+            in modulestore.get_course_errors(course.id)
+        ]
 
-        self.assertTrue(any(expect in msg or expect in err
-            for msg, err in errors))
+        self.assertTrue(any(
+            expect in msg or expect in err
+            for msg, err in errors
+        ))
         chapters = course.get_children()
         self.assertEqual(len(chapters), 4)
 
@@ -458,7 +461,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = "edX/toy/2012_Fall"
+        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         course = modulestore.get_course(toy_id)
         chapters = course.get_children()
@@ -484,20 +487,12 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(len(sections), 1)
 
-        location = course.location
-
-        conditional_location = Location(
-            location.tag, location.org, location.course,
-            'conditional', 'condone'
-        )
-        module = modulestore.get_instance(course.id, conditional_location)
+        conditional_location = course.id.make_usage_key('conditional', 'condone')
+        module = modulestore.get_item(conditional_location)
         self.assertEqual(len(module.children), 1)
 
-        poll_location = Location(
-            location.tag, location.org, location.course,
-            'poll_question', 'first_poll'
-        )
-        module = modulestore.get_instance(course.id, poll_location)
+        poll_location = course.id.make_usage_key('poll_question', 'first_poll')
+        module = modulestore.get_item(poll_location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.voted, False)
         self.assertEqual(module.poll_answer, '')
@@ -528,8 +523,8 @@ class ImportTestCase(BaseCourseTestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
 
         sa_id = "edX/gst_test/2012_Fall"
-        location = Location(["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
-        gst_sample = modulestore.get_instance(sa_id, location)
+        location = Location("edX", "gst_test", "2012_Fall", "graphical_slider_tool", "sample_gst", None)
+        gst_sample = modulestore.get_item(location)
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
@@ -545,12 +540,8 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(len(sections), 1)
 
-        location = course.location
-        location = Location(
-            location.tag, location.org, location.course,
-            'word_cloud', 'cloud1'
-        )
-        module = modulestore.get_instance(course.id, location)
+        location = course.id.make_usage_key('word_cloud', 'cloud1')
+        module = modulestore.get_item(location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.num_inputs, 5)
         self.assertEqual(module.num_top_words, 250)
@@ -561,7 +552,7 @@ class ImportTestCase(BaseCourseTestCase):
         """
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = "edX/toy/2012_Fall"
+        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         course = modulestore.get_course(toy_id)
 

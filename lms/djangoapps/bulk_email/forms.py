@@ -8,9 +8,10 @@ from django.core.exceptions import ValidationError
 
 from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization
 
-from courseware.courses import get_course_by_id
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -57,22 +58,26 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
 
     def clean_course_id(self):
         """Validate the course id"""
-        course_id = self.cleaned_data["course_id"]
+        cleaned_id = self.cleaned_data["course_id"]
         try:
-            # Just try to get the course descriptor.
-            # If we can do that, it's a real course.
-            get_course_by_id(course_id, depth=1)
-        except Exception as exc:
-            msg = 'Error encountered ({0})'.format(str(exc).capitalize())
-            msg += u' --- Entered course id was: "{0}". '.format(course_id)
-            msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
+        except InvalidKeyError:
+            msg = u'Course id invalid.' 
+            msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
+            msg += 'Please recheck that you have supplied a valid course id.'
+            raise forms.ValidationError(msg)
+
+        if not modulestore().has_course(course_id):
+            msg = u'COURSE NOT FOUND'
+            msg += u' --- Entered course id was: "{0}". '.format(course_id.to_deprecated_string())
+            msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 
         # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
         is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
         if not is_studio_course:
             msg = "Course Email feature is only available for courses authored in Studio. "
-            msg += '"{0}" appears to be an XML backed course.'.format(course_id)
+            msg += '"{0}" appears to be an XML backed course.'.format(course_id.to_deprecated_string())
             raise forms.ValidationError(msg)
 
-        return course_id
+        return course_id.to_deprecated_string()

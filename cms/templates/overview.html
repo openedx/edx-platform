@@ -3,8 +3,7 @@
   import logging
   from util.date_utils import get_default_time_display
   from django.utils.translation import ugettext as _
-  from django.core.urlresolvers import reverse
-  from xmodule.modulestore.django import loc_mapper
+  from contentstore.utils import reverse_usage_url
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -56,7 +55,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
           <h3 class="section-name">
             <form class="section-name-form">
               <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-              <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+              <input type="submit" class="new-section-name-save" data-parent="${context_course.location}"
                      data-category="${new_section_category}" value="${_('Save')}" />
               <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" />
             </form>
@@ -76,7 +75,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
         <span class="section-name-span">${_('Add a new section name')}</span>
         <form class="section-name-form">
           <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-          <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+          <input type="submit" class="new-section-name-save" data-parent="${context_course.id}"
                  data-category="${new_section_category}" value="${_('Save')}" />
           <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
         </form>
@@ -148,16 +147,12 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
           <div class="wrapper-dnd">
             <%
-              course_locator = loc_mapper().translate_location(
-                context_course.location.course_id, context_course.location, False, True
-              )
+              course_locator = context_course.location
             %>
-            <article class="courseware-overview" data-locator="${course_locator}">
+            <article class="courseware-overview" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
               % for section in sections:
               <%
-                section_locator = loc_mapper().translate_location(
-                  context_course.location.course_id, section.location, False, True
-                )
+                section_locator = section.location
               %>
               <section class="courseware-section is-collapsible is-draggable" data-parent="${course_locator}"
                        data-locator="${section_locator}">
@@ -207,9 +202,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                   <ol class="sortable-subsection-list">
                     % for subsection in section.get_children():
                       <%
-                        subsection_locator = loc_mapper().translate_location(
-                          context_course.location.course_id, subsection.location, False, True
-                        )
+                        subsection_locator = subsection.location
                       %>
                     <li class="courseware-subsection collapsed id-holder is-draggable is-collapsible "
                         data-parent="${section_locator}" data-locator="${subsection_locator}">
@@ -219,7 +212,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                       <div class="section-item">
                         <div class="details">
                         <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse expand"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
-                          <a href="${subsection_locator.url_reverse('subsection')}">
+                          <a href="${reverse_usage_url('subsection_handler', subsection_locator)}">
                             <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                           </a>
                         </div>

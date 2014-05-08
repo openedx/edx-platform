@@ -16,6 +16,7 @@ from courseware.models import StudentModule
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
+from .test_tools import msk_from_problem_urlname
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -35,29 +36,36 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
 
     def test_delete_student_state_resets_scores(self):
-        item_id = 'i4x://MITx/999/openassessment/b3dce2586c9c4876b73e7f390e42ef8f'
+        problem_location = msk_from_problem_urlname(
+            self.course.id,
+            'b3dce2586c9c4876b73e7f390e42ef8f',
+            block_type='openassessment'
+        )
 
         # Create a student module for the user
         StudentModule.objects.create(
-            student=self.student, course_id=self.course.id, module_state_key=item_id, state=json.dumps({})
+            student=self.student,
+            course_id=self.course.id,
+            module_state_key=problem_location,
+            state=json.dumps({})
         )
 
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(self.student, self.course.id),
             'course_id': self.course.id,
-            'item_id': item_id,
+            'item_id': problem_location,
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
             'action': 'Delete student state for module',
             'unique_student_identifier': self.student.email,
-            'problem_for_student': 'openassessment/b3dce2586c9c4876b73e7f390e42ef8f',
+            'problem_for_student': str(problem_location),
         })
 
         self.assertEqual(response.status_code, 200)
