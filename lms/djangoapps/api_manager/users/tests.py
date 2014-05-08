@@ -313,6 +313,53 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['groups'][0]['id'], group_id)
         self.assertEqual(response.data['groups'][0]['name'], str(group_name))
 
+    def test_user_groups_list_get_with_query_params(self):
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {
+            'email': self.test_email, 'username': local_username, 'password': self.test_password,
+            'first_name': self.test_first_name, 'last_name': self.test_last_name
+        }
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+        test_uri = '{}/{}'.format(test_uri, str(user_id))
+        fail_user_id_group_uri = '{}/{}/groups'.format(test_uri, '22')
+
+        group_url = '/api/groups'
+        group_name = 'Alpha Group'
+        data = {'name': group_name, 'group_type': 'Engineer'}
+        response = self.do_post(group_url, data)
+        group_id = response.data['id']
+        user_groups_uri = '{}/groups'.format(test_uri)
+        data = {'group_id': group_id}
+        response = self.do_post(user_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        group_name = 'Beta Group'
+        data = {'name': group_name, 'group_type': 'Architect'}
+        response = self.do_post(group_url, data)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(user_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(fail_user_id_group_uri)
+        self.assertEqual(response.status_code, 404)
+
+        response = self.do_get(user_groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 2)
+
+        group_type_uri = '{}?type={}'.format(user_groups_uri, 'Engineer')
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 1)
+
+        error_type_uri = '{}?type={}'.format(user_groups_uri, 'error_type')
+        response = self.do_get(error_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 0)
+
     def test_user_groups_list_get_invalid_user(self):
         test_uri = '/api/users/123124/groups'
         response = self.do_get(test_uri)

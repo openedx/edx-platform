@@ -10,12 +10,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.models import CourseGroupRelationship
+from api_manager.models import CourseGroupRelationship, GroupProfile
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
 from courseware.model_data import FieldDataCache
@@ -399,6 +398,27 @@ class CoursesGroupsList(APIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
+    def get(self, request, course_id):
+        """
+        GET retrieves the list of groups related to the specified course
+        """
+        try:
+            get_course(course_id)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        group_type = request.QUERY_PARAMS.get('type', None)
+        course_groups = CourseGroupRelationship.objects.filter(course_id=course_id)
+
+        if group_type:
+            course_groups = course_groups.filter(group__groupprofile__group_type=group_type)
+        response_data = {'groups': []}
+        for course_group in course_groups:
+            group_profile = GroupProfile.objects.get(group_id=course_group.group_id)
+            group_data = {'id': course_group.group_id, 'name': group_profile.name}
+            response_data['groups'].append(group_data)
+        response_status = status.HTTP_200_OK
+        return Response(response_data, status=response_status)
 
 class CoursesGroupsDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
