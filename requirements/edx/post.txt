@@ -5,4 +5,4 @@
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
 # This must be installed after distribute has been updated.
-MySQL-python==1.2.4
+MySQL-python==1.2.5
