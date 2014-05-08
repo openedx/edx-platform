@@ -315,6 +315,50 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['course_id'], str(self.test_course_id))
         self.assertEqual(response.data['group_id'], str(group_id))
 
+    def test_courses_groups_list_get(self):
+        test_uri = '{}/{}/groups'.format(self.base_courses_uri, self.test_course_id)
+        course_fail_uri = '{}/{}/groups'.format(self.base_courses_uri, '/ed/Open_DemoX/edx_demo_course')
+        for i in xrange(2):
+            data_dict = {
+                'name': 'Alpha Group {}'.format(i), 'group_type': 'Programming',
+            }
+            response = self.do_post(self.base_groups_uri, data_dict)
+            group_id = response.data['id']
+            data = {'group_id': group_id}
+            self.assertEqual(response.status_code, 201)
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        data_dict['group_type'] = 'Calculus'
+        response = self.do_post(self.base_groups_uri, data_dict)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        self.assertEqual(response.status_code, 201)
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 3)
+
+        courses_groups_uri = '{}?type={}'.format(test_uri, 'Programming')
+        response = self.do_get(courses_groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 2)
+
+        group_type_uri = '{}?type={}'.format(test_uri, 'Calculus')
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 1)
+
+        error_group_type_uri = '{}?type={}'.format(test_uri, 'error_type')
+        response = self.do_get(error_group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 0)
+
+        response = self.do_get(course_fail_uri)
+        self.assertEqual(response.status_code, 404)
+
     def test_courses_groups_list_post_duplicate(self):
         data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
