@@ -246,7 +246,7 @@ def add_user_to_cohort(cohort, username_or_email):
     previous_cohort = None
 
     course_cohorts = CourseUserGroup.objects.filter(
-        course_id=cohort.course_key,
+        course_id=cohort.course_id,
         users__id=user.id,
         group_type=CourseUserGroup.COHORT
     )
