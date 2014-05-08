@@ -102,7 +102,6 @@ class CourseNavPage(PageObject):
         self.q(css=subsection_css).first.click()
         self._on_section_promise(section_title, subsection_title).fulfill()
 
-
     def go_to_sequential(self, sequential_title):
         """
         Within a section/subsection, navigate to the sequential with `sequential_title`.

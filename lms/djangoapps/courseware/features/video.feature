@@ -67,28 +67,6 @@ Feature: LMS.Video component
     And I select language with code "en"
     And I see "Hi, welcome to Edx." text in the captions
 
-  # 5
-  Scenario: Download Transcript button works correctly in Video component
-    Given I am registered for the course "test_course"
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video "A" in "Youtube" mode in position "1" of sequential:
-      | sub         | download_track |
-      | OEoXaMPEzfM | true           |
-    And a video "B" in "Youtube" mode in position "2" of sequential:
-      | sub         | download_track |
-      | OEoXaMPEzfM | true           |
-    And a video "C" in "Youtube" mode in position "3" of sequential:
-      | track               | download_track |
-      | http://example.org/ | true           |
-    And I open the section with videos
-    Then I can download transcript in "srt" format that has text "00:00:00,270"
-    And I select the transcript format "txt"
-    Then I can download transcript in "txt" format that has text "Hi, welcome to Edx."
-    When I open video "B"
-    Then I can download transcript in "txt" format that has text "Hi, welcome to Edx."
-    When I open video "C"
-    Then menu "download_transcript" doesn't exist
-
   # 9
 #  Scenario: Youtube video has correct transcript if fields for other speeds are filled
 #    Given I am registered for the course "test_course"
