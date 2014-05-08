@@ -11,6 +11,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from api_manager.models import GroupProfile
 from api_manager.permissions import ApiKeyHeaderPermission
@@ -30,7 +31,6 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
-
 def _generate_base_uri(request):
     """
     Constructs the protocol:host:path component of the resource uri
@@ -46,6 +46,17 @@ def _generate_base_uri(request):
     return resource_uri
 
 
+def _serialize_user_profile(response_data, user_profile):
+    """This function serialize user profile """
+    response_data['full_name'] = user_profile.name
+    response_data['city'] = user_profile.city
+    response_data['country'] = user_profile.country.code
+    response_data['level_of_education'] = user_profile.level_of_education
+    response_data['year_of_birth'] = user_profile.year_of_birth
+    response_data['gender'] = user_profile.gender
+
+    return response_data
+
 def _serialize_user(response_data, user):
     """
     Loads the object data into the response dict
@@ -58,7 +69,6 @@ def _serialize_user(response_data, user):
     response_data['id'] = user.id
     response_data['is_active'] = user.is_active
     return response_data
-
 
 def _save_module_position(request, user, course_id, course_descriptor, position):
     """
@@ -109,6 +119,11 @@ class UsersList(APIView):
         first_name = request.DATA.get('first_name', '')
         last_name = request.DATA.get('last_name', '')
         is_active = request.DATA.get('is_active', None)
+        city = request.DATA.get('city', '')
+        country = request.DATA.get('country', '')
+        level_of_education = request.DATA.get('level_of_education', '')
+        year_of_birth = request.DATA.get('year_of_birth', '')
+        gender = request.DATA.get('gender', '')
 
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
@@ -149,6 +164,18 @@ class UsersList(APIView):
 
             profile = UserProfile(user=user)
             profile.name = '{} {}'.format(first_name, last_name)
+            profile.city = city
+            profile.country = country
+            profile.level_of_education = level_of_education
+            profile.gender = gender
+
+            try:
+                profile.year_of_birth = int(year_of_birth)
+            except ValueError:
+                # If they give us garbage, just ignore it instead
+                # of asking them to put an integer.
+                profile.year_of_birth = None
+
             profile.save()
 
             UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
@@ -170,7 +197,7 @@ class UsersList(APIView):
             response_data['uri'] = '{}/{}'.format(base_uri, str(user.id))
         else:
             status_code = status.HTTP_409_CONFLICT
-            response_data['message'] = "User '%s' already exists", username
+            response_data['message'] = "User '%s' already exists" % (username)
             response_data['field_conflict'] = "username"
 
         return Response(response_data, status=status_code)
@@ -194,6 +221,11 @@ class UsersDetail(APIView):
             response_data['resources'].append({'uri': resource_uri})
             resource_uri = '{}/courses'.format(base_uri)
             response_data['resources'].append({'uri': resource_uri})
+
+            existing_user_profile = UserProfile.objects.get(user_id=user_id)
+            if existing_user_profile:
+                _serialize_user_profile(response_data, existing_user_profile)
+
             return Response(response_data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
@@ -203,6 +235,15 @@ class UsersDetail(APIView):
         POST provides the ability to update information about an existing user
         """
         response_data = {}
+
+        first_name = request.DATA.get('first_name', '')
+        last_name = request.DATA.get('last_name', '')
+        city = request.DATA.get('city', '')
+        country = request.DATA.get('country', '')
+        level_of_education = request.DATA.get('level_of_education', '')
+        year_of_birth = request.DATA.get('year_of_birth', '')
+        gender = request.DATA.get('gender', '')
+
         base_uri = _generate_base_uri(request)
         response_data['uri'] = _generate_base_uri(request)
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
@@ -217,6 +258,26 @@ class UsersDetail(APIView):
             limiter.tick_bad_request_counter(request)
             existing_user = None
         if existing_user:
+            username = request.DATA.get('username', None)
+            if username:
+                try:
+                    validate_slug(username)
+                except ValidationError:
+                    status_code = status.HTTP_400_BAD_REQUEST
+                    response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
+                    return Response(response_data, status=status_code)
+
+                existing_username = User.objects.filter(username=username).filter(~Q(id=user_id))
+                if existing_username:
+                    status_code = status.HTTP_409_CONFLICT
+                    response_data['message'] = "User '%s' already exists" % (username)
+                    response_data['field_conflict'] = "username"
+                    return Response(response_data, status=status_code)
+
+                existing_user.username = username
+                response_data['username'] = existing_user.username
+                existing_user.save()
+
 
             is_active = request.DATA.get('is_active', None)
             if is_active is not None:
@@ -277,6 +338,23 @@ class UsersDetail(APIView):
                     # NOTE, this will be a NOP unless the feature has been turned on in configuration
                     password_history_entry = PasswordHistory()
                     password_history_entry.create(existing_user)
+
+            existing_user_profile = UserProfile.objects.get(user_id=user_id)
+            if existing_user_profile:
+                existing_user_profile.name = '{} {}'.format(first_name, last_name)
+                existing_user_profile.city = city
+                existing_user_profile.country = country
+                existing_user_profile.level_of_education = level_of_education
+                existing_user_profile.gender = gender
+
+                try:
+                    existing_user_profile.year_of_birth = int(year_of_birth)
+                except ValueError:
+                    # If they give us garbage, just ignore it instead
+                    # of asking them to put an integer.
+                    existing_user_profile.year_of_birth = None
+
+                existing_user_profile.save()
 
             status_code = status.HTTP_200_OK
 
