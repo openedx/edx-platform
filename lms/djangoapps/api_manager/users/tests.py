@@ -715,6 +715,84 @@ class UsersApiTests(TestCase):
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_user_course_grades_course_not_found(self):
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+        test_uri = '/api/users/{}/courses/{}/grades'.format(
+            user_id, 'some/unknown/course')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_course_grades_user_not_found(self):
+        course = CourseFactory.create()
+        test_uri = '/api/users/{}/courses/{}/grades'.format(
+            '9999999', course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_grades(self):
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+
+        course = CourseFactory.create()
+        test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+        chapter1 = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=test_data,
+            display_name="Chapter 1"
+        )
+        chapter2 = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=test_data,
+            display_name="Chapter 2"
+        )
+        ItemFactory.create(
+            category="sequential",
+            parent_location=chapter1.location,
+            data=test_data,
+            display_name="Sequence 1",
+        )
+        ItemFactory.create(
+            category="sequential",
+            parent_location=chapter2.location,
+            data=test_data,
+            display_name="Sequence 2",
+        )
+
+        test_uri = '/api/users/{}/courses/{}/grades'.format(
+            user_id, course.id)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        print 'data type == ' + response.data.__class__.__name__
+        print 'data = {}'.format(response.data)
+
+        courseware_summary = response.data['courseware_summary']
+        self.assertEqual(len(courseware_summary), 2)
+        self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
+        self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
+
+        sections = courseware_summary[0]['sections']
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0]['display_name'], 'Sequence 1')
+        self.assertEqual(sections[0]['graded'], False)
+
+        sections = courseware_summary[1]['sections']
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0]['display_name'], 'Sequence 2')
+        self.assertEqual(sections[0]['graded'], False)
+
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
