@@ -106,3 +106,20 @@ class GroupProfile(TimeStampedModel):
     name = models.CharField(max_length=255, null=True, blank=True)
     data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
     record_active = models.BooleanField(default=True)
+
+
+class CourseContentGroupRelationship(TimeStampedModel):
+    """
+    The CourseContentGroupRelationship model contains information describing the
+    link between a particular courseware element (chapter, unit, video, etc.)
+    and a group.  A typical use case for this table is to support the concept
+    of a student workgroup for a given course, where the project is actually
+    a Chapter courseware element.
+    """
+    course_id = models.CharField(max_length=255, db_index=True)
+    content_id = models.CharField(max_length=255, db_index=True)
+    group = models.ForeignKey(GroupProfile, db_index=True)
+    record_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("course_id", "content_id", "group")
