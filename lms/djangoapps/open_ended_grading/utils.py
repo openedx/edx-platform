@@ -75,11 +75,9 @@ def does_location_exist(usage_key):
         return False
     except NoPathToItem:
         # If the problem can be found, but there is no path to it, then we assume it is a draft.
-        # Log a warning if the problem is not a draft (location does not end in "draft").
-        # TODO: This is very wrong
-        if not usage_key.endswith("draft"):
-            log.warn(("Got an unexpected NoPathToItem error in staff grading with a non-draft location {0}. "
-                      "Ensure that the location is valid.").format(usage_key))
+        # Log a warning in any case.
+        log.warn("Got an unexpected NoPathToItem error in staff grading with location %s. "
+                 "This is ok if it is a draft; ensure that the location is valid.", usage_key)
         return False
 
 

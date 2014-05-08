@@ -179,7 +179,6 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
-            print problem_url_name
             return Location.from_deprecated_string(problem_url_name)
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
