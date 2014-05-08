@@ -30,12 +30,17 @@ You can add files that you want students to access in the course. After you add
 a file, you must link to it from a component, a course update, or in the course
 handouts. A file is only visible to students if you create a link to it.
 
-.. note:: Because the file name becomes part of the URL, students can see the
- name of the file when they open it. Avoid using file names such as
- AnswerKey.pdf.
+Because the file name becomes part of the URL, students can see the name of the
+file when they open it. Avoid using file names such as AnswerKey.pdf.
+
+.. warning:: 
+ For PDF and image files, edX recommends that you use standard compression tools to reduce the file size before adding them to your course.
+
+ If you have files that are larger than 50 MB after compression and need them for your course, contact your edX Program Manager.
+
+ Furthermore, do not add video or audio files, or large data sets that are to be used by students. You should use YouTube or another hosting service to host multimedia files for your course. For storing large data sets for student use, contact your edX Program Manager.
   
-.. warning:: If you upload a file with the same name as an existing course file,
- the original file is overwritten without warning.
+
 
 To add files:
  
@@ -44,6 +49,11 @@ To add files:
 #. In the **Upload New File** dialog box, click **Choose File**.
 #. In the **Open** dialog box, select one more files that you want to upload,
    then click **Open**.
+
+   .. note:: 
+     If you upload a file with the same name as an existing course file
+     the original file is overwritten without warning.
+
 #. To add more file, click **Load Another File** and repeat the previous step.
 #. To close the dialog box, click the **x** in the top right corner. 
 
