@@ -161,7 +161,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
         format_msg = u"Course id conflict: explicit value %r does not match task value %r"
-        log.warning("Task %s: " + format_msg, task_id, course_id, entry.course_id)
+        log.warning(u"Task %s: " + format_msg, task_id, course_id, entry.course_id)
         raise ValueError(format_msg % (course_id, entry.course_id))
 
     # Fetch the CourseEmail.
@@ -171,7 +171,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     except CourseEmail.DoesNotExist:
         # The CourseEmail object should be committed in the view function before the task
         # is submitted and reaches this point.
-        log.warning("Task %s: Failed to get CourseEmail with id %s", task_id, email_id)
+        log.warning(u"Task %s: Failed to get CourseEmail with id %s", task_id, email_id)
         raise
 
     # Check to see if email batches have already been defined.  This seems to
@@ -182,21 +182,22 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # So we just return right away.  We don't raise an exception, because we want
     # the current task to be marked with whatever it had been marked with before.
     if len(entry.subtasks) > 0 and len(entry.task_output) > 0:
-        log.warning("Task %s has already been processed for email %s!  InstructorTask = %s", task_id, email_id, entry)
+        log.warning(u"Task %s has already been processed for email %s!  InstructorTask = %s", task_id, email_id, entry)
         progress = json.loads(entry.task_output)
         return progress
 
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
         format_msg = u"Course id conflict: explicit value %r does not match email value %r"
-        log.warning("Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
+        log.warning(u"Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
         raise ValueError(format_msg % (course_id, email_obj.course_id))
+
 
     # Fetch the course object.
     course = get_course(course_id)
 
     if course is None:
-        msg = "Task %s: course not found: %s"
+        msg = u"Task %s: course not found: %s"
         log.error(msg, task_id, course_id)
         raise ValueError(msg % (task_id, course_id))
 
@@ -282,7 +283,7 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     subtask_status = SubtaskStatus.from_dict(subtask_status_dict)
     current_task_id = subtask_status.task_id
     num_to_send = len(to_list)
-    log.info("Preparing to send email %s to %d recipients as subtask %s for instructor task %d: context = %s, status=%s",
+    log.info(u"Preparing to send email %s to %d recipients as subtask %s for instructor task %d: context = %s, status=%s",
              email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
 
     # Check that the requested subtask is actually known to the current InstructorTask entry.
@@ -660,7 +661,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         )
     except RetryTaskError as retry_error:
         # If the retry call is successful, update with the current progress:
-        log.exception('Task %s: email with id %d caused send_course_email task to retry.',
+        log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
                       task_id, email_id)
         return subtask_status, retry_error
     except Exception as retry_exc:
@@ -669,7 +670,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         # (and put it in retry_exc just in case it's different, but it shouldn't be),
         # and update status as if it were any other failure.  That means that
         # the recipients still in the to_list are counted as failures.
-        log.exception('Task %s: email with id %d caused send_course_email task to fail to retry. To list: %s',
+        log.exception(u'Task %s: email with id %d caused send_course_email task to fail to retry. To list: %s',
                       task_id, email_id, [i['email'] for i in to_list])
         num_failed = len(to_list)
         subtask_status.increment(subtask_status, failed=num_failed, state=FAILURE)
@@ -680,5 +681,5 @@ def _statsd_tag(course_title):
     """
     Calculate the tag we will use for DataDog.
     """
-    tag = u"course_email:{0}".format(course_title)
+    tag = u"course_email:{0}".format(course_title).encode('utf-8')
     return tag[:200]
