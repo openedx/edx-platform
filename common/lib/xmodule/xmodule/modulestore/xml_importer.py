@@ -154,12 +154,12 @@ def import_from_xml(
     # of course modules. It will be left as a TBD to implement that
     # method on XmlModuleStore.
     course_items = []
-    for course_id in xml_module_store.modules.keys():
+    for course_key in xml_module_store.modules.keys():
 
         if target_course_id is not None:
             dest_course_id = target_course_id
         else:
-            dest_course_id = course_id
+            dest_course_id = course_key
 
         if create_new_course:
             if store.has_course(dest_course_id, ignore_case=True):
@@ -180,17 +180,17 @@ def import_from_xml(
             course_data_path = None
 
             if verbose:
-                log.debug("Scanning {0} for course module...".format(course_id))
+                log.debug("Scanning {0} for course module...".format(course_key))
 
             # Quick scan to get course module as we need some info from there.
             # Also we need to make sure that the course module is committed
             # first into the store
-            for module in xml_module_store.modules[course_id].itervalues():
+            for module in xml_module_store.modules[course_key].itervalues():
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
 
-                    log.debug(u'======> IMPORTING course {course_id}'.format(
-                        course_id=course_id,
+                    log.debug(u'======> IMPORTING course {course_key}'.format(
+                        course_key=course_key,
                     ))
 
                     if not do_import_static:
@@ -205,7 +205,7 @@ def import_from_xml(
 
                     course = import_module(
                         module, store,
-                        course_id,
+                        course_key,
                         dest_course_id,
                         do_import_static=do_import_static
                     )
@@ -219,13 +219,13 @@ def import_from_xml(
                     # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
                     # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
                     # values then remap it so that the wiki does not point to the old wiki.
-                    if course_id != course.id:
+                    if course_key != course.id:
                         original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
-                            course_id.org,
-                            course_id.course,
-                            course_id.run
+                            course_key.org,
+                            course_key.course,
+                            course_key.run
                         )
-                        if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_id.course:
+                        if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
                             course.wiki_slug = u'{0}.{1}.{2}'.format(
                                 course.id.org,
                                 course.id.course,
@@ -279,7 +279,7 @@ def import_from_xml(
                 )
 
             # finally loop through all the modules
-            for module in xml_module_store.modules[course_id].itervalues():
+            for module in xml_module_store.modules[course_key].itervalues():
                 if module.scope_ids.block_type == 'course':
                     # we've already saved the course module up at the top
                     # of the loop so just skip over it in the inner loop
@@ -292,7 +292,7 @@ def import_from_xml(
 
                 import_module(
                     module, store,
-                    course_id,
+                    course_key,
                     dest_course_id,
                     do_import_static=do_import_static,
                     system=course.runtime
@@ -306,7 +306,7 @@ def import_from_xml(
                     draft_store,
                     course_data_path,
                     static_content_store,
-                    course_id,
+                    course_key,
                     dest_course_id,
                     course.runtime
                 )

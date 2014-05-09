@@ -126,11 +126,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
+        course_key: the course for which everything in this runtime will be relative
+
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
 
         default_class: The default_class to use when loading an
             XModuleDescriptor from the module_data
+
+        cached_metadata: the cache for handling inheritance computation. internal use only
 
         resources_fs: a filesystem, as per MakoDescriptorSystem
 
