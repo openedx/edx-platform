@@ -87,12 +87,6 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 return sortInfo.displayName;
             },
 
-            sortDirectionName: function() {
-                var collection = this.collection,
-                    ascending = collection.sortDirection === 'asc';
-                return ascending ? gettext("ascending") : gettext("descending");
-            },
-
             setInitialSortColumn: function(sortColumn) {
                 var collection = this.collection,
                     sortInfo = this.sortableColumns[sortColumn];
