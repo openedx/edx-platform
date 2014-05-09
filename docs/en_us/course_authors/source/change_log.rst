@@ -12,6 +12,9 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/09/14
+     - Updated :ref:`Assigning_discussion_roles` with a note about course staff requiring
+       explicit granting of discussion administration roles.
    * - 05/08/14
      - Added warnings to :ref:`Add a File` about file size.
    * - 05/07/14
