@@ -77,7 +77,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
 
         # Select the Email view of the instructor dash
         session = self.client.session
-        session[u'idash_mode:{0}'.format(self.course.location.course_id)] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
         session.save()
         response = self.client.get(self.url)
         selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'

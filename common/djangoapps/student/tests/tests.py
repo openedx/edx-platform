@@ -157,7 +157,7 @@ class DashboardTest(TestCase):
         """
         Check that the css class and the status message are in the dashboard html.
         """
-        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
         try:
             response = self.client.get(reverse('dashboard'))
         except NoReverseMatch:
@@ -179,7 +179,7 @@ class DashboardTest(TestCase):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
-        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
         try:
             response = self.client.get(reverse('dashboard'))
         except NoReverseMatch:

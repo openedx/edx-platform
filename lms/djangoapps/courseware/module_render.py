@@ -530,7 +530,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Do not check access when it's a noauth request.
     if getattr(user, 'known', True):
         # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, descriptor, 'load', course_id):
+        if not has_access(user, 'load', descriptor, course_id):
             return None
 
     (system, student_data) = get_module_system_for_user(

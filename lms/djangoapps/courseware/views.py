@@ -853,13 +853,18 @@ def get_course_lti_endpoints(request, course_id):
         (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
     """
     try:
-        course = get_course(course_id, depth=2)
-    except ValueError:  # get_course raises ValueError if course_id is invalid or doesn't refer to a course
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    except InvalidKeyError:
+        return HttpResponse(status=404)
+
+    try:
+        course = get_course(course_key, depth=2)
+    except ValueError:
         return HttpResponse(status=404)
 
     anonymous_user = AnonymousUser()
     anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
-    lti_descriptors = modulestore().get_items(Location("i4x", course.org, course.number, "lti", None), course.id)
+    lti_descriptors = modulestore().get_items(course.id, category='lti')
 
     lti_noauth_modules = [
         get_module_for_descriptor(
@@ -867,11 +872,11 @@ def get_course_lti_endpoints(request, course_id):
             request,
             descriptor,
             FieldDataCache.cache_for_descriptor_descendents(
-                course_id,
+                course_key,
                 anonymous_user,
                 descriptor
             ),
-            course_id
+            course_key
         )
         for descriptor in lti_descriptors
     ]

@@ -89,14 +89,14 @@ class TestVerifiedView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="abc", password="test")
         self.client.login(username="abc", password="test")
-        self.course_id = "MITx/999.1x/Verified_Course"
         self.course = CourseFactory.create(org='MITx', number='999.1x', display_name='Verified Course')
+        self.course_id = self.course.id
 
     def test_verified_course_mode_none(self):
         """
         Test VerifiedView when there is no active verified mode for course.
         """
-        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id})
+        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id.to_deprecated_string()})
 
         verify_mode = CourseMode.mode_for_course(self.course_id, "verified")
         # Verify mode should be None.
@@ -161,8 +161,8 @@ class TestPhotoVerificationResultsCallback(TestCase):
     Tests for the results_callback view.
     """
     def setUp(self):
-        self.course_id = 'Robot/999/Test_Course'
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course_id = self.course.id
         self.user = UserFactory.create()
         self.attempt = SoftwareSecurePhotoVerification(
             status="submitted",

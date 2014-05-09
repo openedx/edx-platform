@@ -409,25 +409,25 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     def test_refund_cert_callback_before_expiration_email(self):
         """ Test that refund emails are being sent correctly. """
-        course_id = "refund_before_expiration/test/one"
+        course = CourseFactory.create(org='refund_before_expiration', number='test', run='course', display_name='one')
+        course_key = course.id
         many_days = datetime.timedelta(days=60)
 
-        CourseFactory.create(org='refund_before_expiration', number='test', run='course', display_name='one')
-        course_mode = CourseMode(course_id=course_id,
+        course_mode = CourseMode(course_id=course_key,
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
                                  expiration_datetime=datetime.datetime.now(pytz.utc) + many_days)
         course_mode.save()
 
-        CourseEnrollment.enroll(self.user, course_id, 'verified')
+        CourseEnrollment.enroll(self.user, course_key, 'verified')
         cart = Order.get_cart_for_user(user=self.user)
-        CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
+        CertificateItem.add_to_order(cart, course_key, self.cost, 'verified')
         cart.purchase()
 
         mail.outbox = []
         with patch('shoppingcart.models.log.error') as mock_error_logger:
-            CourseEnrollment.unenroll(self.user, course_id)
+            CourseEnrollment.unenroll(self.user, course_key)
             self.assertFalse(mock_error_logger.called)
             self.assertEquals(len(mail.outbox), 1)
             self.assertEquals('[Refund] User-Requested Refund', mail.outbox[0].subject)

@@ -925,9 +925,10 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         return render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
-            self.problem.id,
+            self.problem.location,
             field_data_cache,
-            self.course.id)._xmodule
+            self.course.id
+        )._xmodule
 
     def set_module_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
@@ -938,7 +939,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
     def test_xmodule_runtime_publish(self):
         """Tests the publish mechanism"""
         self.set_module_grade_using_publish(self.grade_dict)
-        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.location)
         self.assertEqual(student_module.grade, self.grade_dict['value'])
         self.assertEqual(student_module.max_grade, self.grade_dict['max_value'])
 
@@ -946,7 +947,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         """Test deleting the grade using the publish mechanism"""
         module = self.set_module_grade_using_publish(self.grade_dict)
         module.system.publish(module, 'grade', self.delete_dict)
-        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.location)
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
@@ -973,7 +974,7 @@ class TestRebindModule(TestSubmittingProblems):
         return render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
-            self.lti.id,
+            self.lti.location,
             field_data_cache,
             self.course.id)._xmodule
 

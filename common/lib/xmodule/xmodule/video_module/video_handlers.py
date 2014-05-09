@@ -194,8 +194,7 @@ class VideoStudentViewHandlers(object):
             transcript_name = self.sub
 
         if transcript_name:
-            course_location = CourseDescriptor.id_to_location(self.course_id)
-            course = self.descriptor.runtime.modulestore.get_item(course_location)
+            course = self.descriptor.runtime.modulestore.get_course(self.course_id)
             if course.static_asset_path:
                 response = Response(
                     status=307,
