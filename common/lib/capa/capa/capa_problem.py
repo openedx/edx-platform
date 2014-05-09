@@ -429,16 +429,16 @@ class LoncapaProblem(object):
 
     def do_targeted_feedback(self, tree):
         """
-        Implements the targeted-feedback=N in-place on  <multiplechoiceresponse> --
+        Implements targeted-feedback in-place on  <multiplechoiceresponse> --
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
-            # Note that the modifications has been done, avoiding problems if called twice.
-            if hasattr(self, 'has_targeted'):
-                continue
-            self.has_targeted = True  # pylint: disable=W0201
+        # Note that the modifications has been done, avoiding problems if called twice.
+        if hasattr(self, 'has_targeted'):
+            return
+        self.has_targeted = True  # pylint: disable=W0201
 
+        for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
             show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
 
             # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)

@@ -14,7 +14,7 @@ import requests
 import mock
 import itertools
 
-from . import new_loncapa_problem, test_capa_system
+from . import new_loncapa_problem, test_capa_system, load_fixture
 import calc
 
 from capa.responsetypes import LoncapaProblemError, \
@@ -225,7 +225,7 @@ class SymbolicResponseTest(ResponseTest):
 
         for (input_str, input_mathml, server_fixture) in correct_inputs:
             print "Testing input: {0}".format(input_str)
-            server_resp = self._load_fixture(server_fixture)
+            server_resp = load_fixture(server_fixture)
             self._assert_symbolic_grade(
                 problem, input_str, input_mathml,
                 'correct', snuggletex_resp=server_resp
@@ -254,8 +254,8 @@ class SymbolicResponseTest(ResponseTest):
             options=["matrix", "imaginary"]
         )
 
-        correct_snuggletex = self._load_fixture('snuggletex_correct.html')
-        dynamath_input = self._load_fixture('dynamath_input.txt')
+        correct_snuggletex = load_fixture('snuggletex_correct.html')
+        dynamath_input = load_fixture('dynamath_input.txt')
         student_response = "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]"
 
         self._assert_symbolic_grade(
@@ -270,7 +270,7 @@ class SymbolicResponseTest(ResponseTest):
                                      expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
                                      options=["matrix", "imaginary"])
 
-        wrong_snuggletex = self._load_fixture('snuggletex_wrong.html')
+        wrong_snuggletex = load_fixture('snuggletex_wrong.html')
         dynamath_input = textwrap.dedent("""
             <math xmlns="http://www.w3.org/1998/Math/MathML">
               <mstyle displaystyle="true"><mn>2</mn></mstyle>
@@ -315,18 +315,6 @@ class SymbolicResponseTest(ResponseTest):
             self.assertEqual(
                 correct_map.get_correctness('1_2_1'), expected_correctness
             )
-
-    @staticmethod
-    def _load_fixture(relpath):
-        """
-        Return a `unicode` object representing the contents
-        of the fixture file at `relpath` (relative to the test files dir)
-        """
-        abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
-        with open(abspath) as fixture_file:
-            contents = fixture_file.read()
-
-        return contents.decode('utf8')
 
 
 class OptionResponseTest(ResponseTest):
