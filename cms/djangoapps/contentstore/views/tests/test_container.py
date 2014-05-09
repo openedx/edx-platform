@@ -53,8 +53,6 @@ class ContainerViewTestCase(CourseTestCase):
             parent_location=published_xblock_with_child.location,
             category="html", display_name="Child HTML"
         )
-<<<<<<< HEAD
-        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         expected_breadcrumbs = (
             r'<a href="/unit/{unit_location}"\s*'
             r'class="navigation-link navigation-parent">Unit</a>\s*'
@@ -65,9 +63,6 @@ class ContainerViewTestCase(CourseTestCase):
             unit_location=unicode(self.vertical.location).replace("+", "\\+"),
             child_vertical_location=unicode(self.child_vertical.location).replace("+", "\\+"),
         )
-=======
-        branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
->>>>>>> edx/master
         self._test_html_content(
             published_xblock_with_child,
             expected_location_in_section_tag=published_xblock_with_child.location,

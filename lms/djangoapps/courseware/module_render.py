@@ -233,18 +233,10 @@ def get_module_system_for_user(user, field_data_cache,
     to allow an existing module to be re-bound to a user.  Most of the user bindings happen when creating the
     closures that feed the instantiation of ModuleSystem.
 
-<<<<<<< HEAD
-    # Do not check access when it's a noauth request.
-    if getattr(user, 'known', True):
-        # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
-=======
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
     and field_data_cache, and those don't and are just present so that ModuleSystem can be instantiated, which
     are all the other arguments.  Ultimately, this isn't too different than how get_module_for_descriptor_internal
     was before refactoring.
->>>>>>> edx/master
 
     Arguments:
         see arguments for get_module()

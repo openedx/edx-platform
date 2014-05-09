@@ -577,11 +577,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
         location = course_key.make_usage_key('chapter', 'Overview')
         descriptor = modulestore().get_item(location)
 
-<<<<<<< HEAD
-        self._get_module(course_key, descriptor, location)
-=======
-        self.module = self._get_module(course_id, descriptor, location)
->>>>>>> edx/master
+        self.module = self._get_module(course_key, descriptor, location)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

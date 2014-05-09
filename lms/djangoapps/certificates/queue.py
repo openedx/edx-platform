@@ -229,16 +229,10 @@ class XQueueCertInterface(object):
                     contents = {
                         'action': 'create',
                         'username': student.username,
-<<<<<<< HEAD
                         'course_id': course_id.to_deprecated_string(),
-                        'name': profile.name,
-                        'grade': grade['grade'],
-=======
-                        'course_id': course_id,
                         'course_name': course_name,
                         'name': profile_name,
                         'grade': grade_contents,
->>>>>>> edx/master
                         'template_pdf': template_pdf,
                     }
                     if template_file:

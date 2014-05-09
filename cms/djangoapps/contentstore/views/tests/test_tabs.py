@@ -24,13 +24,8 @@ class TabsPageTests(CourseTestCase):
         self.url = reverse_course_url('tabs_handler', self.course.id)
 
         # add a static tab to the course, for code coverage
-<<<<<<< HEAD
-        ItemFactory.create(
-            parent_location=self.course.location,
-=======
         self.test_tab = ItemFactory.create(
-            parent_location=self.course_location,
->>>>>>> edx/master
+            parent_location=self.course.location,
             category="static_tab",
             display_name="Static_1"
         )

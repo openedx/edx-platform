@@ -844,40 +844,23 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
-<<<<<<< HEAD
-        try:
-            # Create the CourseEmail object.  This is saved immediately, so that
-            # any transaction that has been pending up to this point will also be
-            # committed.
-            email = CourseEmail.create(
-                course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
-            )
-
-            # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-            submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
-
-        except Exception as err:  # pylint: disable=broad-except
-            # Catch any errors and deliver a message to the user
-            error_msg = "Failed to send email! ({0})".format(err)
-            msg += "<font color='red'>" + error_msg + "</font>"
-            log.exception(error_msg)
-=======
-        if bulk_email_is_enabled_for_course(course_id):
+        if bulk_email_is_enabled_for_course(course_key):
             try:
                 # Create the CourseEmail object.  This is saved immediately, so that
                 # any transaction that has been pending up to this point will also be
                 # committed.
-                email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
+                email = CourseEmail.create(
+                    course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
+                )
 
                 # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-                submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
 
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 # Catch any errors and deliver a message to the user
                 error_msg = "Failed to send email! ({0})".format(err)
                 msg += "<font color='red'>" + error_msg + "</font>"
                 log.exception(error_msg)
->>>>>>> edx/master
 
             else:
                 # If sending the task succeeds, deliver a success message to the user.
@@ -1005,12 +988,7 @@ def instructor_dashboard(request, course_id):
     # 1. Feature flag is on
     # 2. We have explicitly enabled email for the given course via django-admin
     # 3. It is NOT an XML course
-<<<<<<< HEAD
-    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       CourseAuthorization.instructor_email_enabled(course_key) and is_studio_course:
-=======
-    if bulk_email_is_enabled_for_course(course_id):
->>>>>>> edx/master
+    if bulk_email_is_enabled_for_course(course_key):
         show_email_tab = True
 
     # display course stats only if there is no other table to display:

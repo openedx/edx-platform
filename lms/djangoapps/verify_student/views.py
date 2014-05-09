@@ -121,7 +121,10 @@ class VerifiedView(View):
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
-<<<<<<< HEAD
+
+        if verify_mode is None:
+            return redirect(reverse('dashboard'))
+
         chosen_price = request.session.get(
             "donation_for_course",
             {}
@@ -129,14 +132,6 @@ class VerifiedView(View):
             course_id.to_deprecated_string(),
             verify_mode.min_price
         )
-=======
-        if verify_mode is None:
-            return redirect(reverse('dashboard'))
-        if course_id in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id]
-        else:
-            chosen_price = verify_mode.min_price.format("{:g}")
->>>>>>> edx/master
 
         course = course_from_id(course_id)
         context = {
@@ -276,10 +271,7 @@ def results_callback(request):
     # If this is a reverification, log an event
     if attempt.window:
         course_id = attempt.window.course_id
-<<<<<<< HEAD
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-=======
->>>>>>> edx/master
         course = course_from_id(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)

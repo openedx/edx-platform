@@ -5,19 +5,14 @@ import logging
 
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-<<<<<<< HEAD
-import json
-from dogapi import dog_stats_api
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-=======
 from django.views.decorators.csrf import csrf_exempt
 
->>>>>>> edx/master
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
 from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
 from certificates.queue import XQueueCertInterface
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 logger = logging.getLogger(__name__)
 

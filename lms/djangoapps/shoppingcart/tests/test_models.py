@@ -353,13 +353,8 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
         # verify that we are still enrolled
-<<<<<<< HEAD
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
-        self.mock_server_track.reset_mock()
-=======
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
         self.mock_tracker.reset_mock()
->>>>>>> edx/master
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
         self.assertEquals(enrollment.mode, u'verified')
@@ -460,13 +455,8 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
 
         with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
-<<<<<<< HEAD
             CourseEnrollment.unenroll(self.user, course_key)
-            self.assertTrue(error_logger.called)
-=======
-            CourseEnrollment.unenroll(self.user, course_id)
             self.assertTrue(error_logger.call_args[0][0].startswith('Failed sending email'))
->>>>>>> edx/master
 
     def test_refund_cert_callback_after_expiration(self):
         # If the expiration date has passed, the user cannot get a refund

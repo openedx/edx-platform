@@ -38,20 +38,11 @@ class Command(BaseCommand):
 
     def _ended_courses(self):
         for course_id in [course  # all courses in COURSE_LISTINGS
-<<<<<<< HEAD
-                for sub in settings.COURSE_LISTINGS
-                    for course in settings.COURSE_LISTINGS[sub]]:
+                          for sub in settings.COURSE_LISTINGS
+                          for course in settings.COURSE_LISTINGS[sub]]:
             course = modulestore().get_course(course_id)
             if course.has_ended():
                 yield course_id
-=======
-                          for sub in settings.COURSE_LISTINGS
-                          for course in settings.COURSE_LISTINGS[sub]]:
-                course_loc = CourseDescriptor.id_to_location(course_id)
-                course = modulestore().get_instance(course_id, course_loc)
-                if course.has_ended():
-                    yield course_id
->>>>>>> edx/master
 
     def handle(self, *args, **options):
 

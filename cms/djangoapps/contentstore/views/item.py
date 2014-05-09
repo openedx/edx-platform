@@ -177,14 +177,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
     if 'application/json' in accept_header:
-<<<<<<< HEAD
         store = get_modulestore(usage_key)
         component = store.get_item(usage_key)
-=======
-        store = get_modulestore(old_location)
-        component = store.get_item(old_location)
         is_read_only = _xblock_is_read_only(component)
->>>>>>> edx/master
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -215,12 +210,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             html = render_to_string('container_xblock_component.html', {
                 'xblock_context': context,
                 'xblock': component,
-<<<<<<< HEAD
                 'locator': usage_key,
-                'reordering_enabled': True,
-=======
-                'locator': locator,
->>>>>>> edx/master
             })
             return JsonResponse({
                 'html': html,
@@ -265,9 +255,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-<<<<<<< HEAD
-def _save_item(request, usage_key, data=None, children=None, metadata=None, nullout=None,
-=======
 def _xblock_is_read_only(xblock):
     """
     Returns true if the specified xblock is read-only, meaning that it cannot be edited.
@@ -279,8 +266,7 @@ def _xblock_is_read_only(xblock):
     return component_publish_state == PublishState.public
 
 
-def _save_item(request, usage_loc, item_location, data=None, children=None, metadata=None, nullout=None,
->>>>>>> edx/master
+def _save_item(request, usage_key, data=None, children=None, metadata=None, nullout=None,
                grader_type=None, publish=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
