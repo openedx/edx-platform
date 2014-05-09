@@ -12,8 +12,8 @@ from edxmako.shortcuts import render_to_string
 from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore, loc_mapper, ModuleI18nService
-from xmodule.modulestore.locator import Locator
+from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.keys import UsageKey
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -21,7 +21,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
 from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code
@@ -29,7 +28,6 @@ from util.sandboxing import can_execute_unsafe_code
 import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
-from ..utils import get_course_for_item
 
 from contentstore.views.access import get_user_role
 
@@ -39,19 +37,17 @@ log = logging.getLogger(__name__)
 
 
 @login_required
-def preview_handler(request, usage_id, handler, suffix=''):
+def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
 
-    usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+    usage_key_string: The usage_key_string-id of the block to dispatch to, passed through `quote_slashes`
     handler: The handler to execute
     suffix: The remainder of the url to be passed to the handler
     """
-    # Note: usage_id is currently the string form of a Location, but in the
-    # future it will be the string representation of a Locator.
-    location = unquote_slashes(usage_id)
+    usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(location)
+    descriptor = modulestore().get_item(usage_key)
     instance = _load_preview_module(request, descriptor)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
@@ -88,7 +84,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
-            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+            'usage_key_string': unicode(block.location),
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
@@ -106,16 +102,12 @@ def _preview_module_system(request, descriptor):
     descriptor: An XModuleDescriptor
     """
 
-    if isinstance(descriptor.location, Locator):
-        course_location = loc_mapper().translate_locator_to_location(descriptor.location, get_course=True)
-        course_id = course_location.course_id
-    else:
-        course_id = get_course_for_item(descriptor.location).location.course_id
+    course_id = descriptor.location.course_key
     display_name_only = (descriptor.category == 'static_tab')
 
     wrappers = [
         # This wrapper wraps the module in the template specified above
-        partial(wrap_xblock, 'PreviewRuntime', display_name_only=display_name_only),
+        partial(wrap_xblock, 'PreviewRuntime', display_name_only=display_name_only, usage_id_serializer=unicode),
 
         # This wrapper replaces urls in the output that start with /static
         # with the correct course-specific url for the static content
@@ -141,9 +133,7 @@ def _preview_module_system(request, descriptor):
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         error_descriptor_class=ErrorDescriptor,
-        # get_user_role accepts a location or a CourseLocator.
-        # If descriptor.location is a CourseLocator, course_id is unused.
-        get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
+        get_user_role=lambda: get_user_role(request.user, course_id),
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),
@@ -173,11 +163,9 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
     if context.get('container_view', None) and view == 'student_view':
-        locator = loc_mapper().translate_location(xblock.course_id, xblock.location, published=False)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
-            'locator': locator,
             'content': frag.content,
         }
         if xblock.category == 'vertical':

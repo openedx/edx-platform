@@ -4,6 +4,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
+from xmodule.modulestore.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -11,9 +12,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1 and len(args) != 2:
-            raise CommandError("delete_course requires one or more arguments: <location> |commit|")
+            raise CommandError("delete_course requires one or more arguments: <course_id> |commit|")
 
-        course_id = args[0]
+        course_id = CourseKey.from_string(args[0])
 
         commit = False
         if len(args) == 2:

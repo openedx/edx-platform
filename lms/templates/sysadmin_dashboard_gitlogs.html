@@ -76,9 +76,10 @@ textarea {
 	  </thead>
 	  <tbody>
 		%for cil in cilset[:10]:
+        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 		%endfor
@@ -103,9 +104,10 @@ textarea {
 	  </thead>
 	  <tbody>
 		% for cil in cilset[:2]:
+        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 	

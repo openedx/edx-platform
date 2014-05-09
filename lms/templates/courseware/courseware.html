@@ -58,7 +58,7 @@ ${page_title_breadcrumbs(course_name())}
   % endif
 
   <script type="text/javascript">
-    var $$course_id = "${course.id}";
+    var $$course_id = "${course.id.to_deprecated_string()}";
 
     $(function(){
         $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {

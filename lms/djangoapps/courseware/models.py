@@ -18,6 +18,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from xmodule_django.models import CourseKeyField, LocationKeyField
+
 
 class StudentModule(models.Model):
     """
@@ -38,12 +40,31 @@ class StudentModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    module_id = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    # TODO: This is a lie; course_id now represents something more like a course_key.  We may
+    # or may not want to change references to this to something like course_key or course_key_field in
+    # this file.  (Certain changes would require a DB migration which is probably not what we want.)
+    # Someone should look at this and reevaluate before the final merge into master.
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    @property
+    def module_state_key(self):
+        """
+        Returns a Location based on module_id and course_id
+        """
+        return self.course_id.make_usage_key(self.module_id.category, self.module_id.name)
+
+    @module_state_key.setter
+    def module_state_key(self, usage_key):
+        """
+        Set the module_id and course_id from the passed UsageKey
+        """
+        self.course_id = usage_key.course_key
+        self.module_id = usage_key
 
     class Meta:
-        unique_together = (('student', 'module_state_key', 'course_id'),)
+        unique_together = (('student', 'module_id', 'course_id'),)
 
     ## Internal state of the object
     state = models.TextField(null=True, blank=True)
@@ -110,7 +131,7 @@ class StudentModuleHistory(models.Model):
     max_grade = models.FloatField(null=True, blank=True)
 
     @receiver(post_save, sender=StudentModule)
-    def save_history(sender, instance, **kwargs):
+    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument
         if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
             history_entry = StudentModuleHistory(student_module=instance,
                                                  version=None,
@@ -133,7 +154,7 @@ class XModuleUserStateSummaryField(models.Model):
     field_name = models.CharField(max_length=64, db_index=True)
 
     # The definition id for the module
-    usage_id = models.CharField(max_length=255, db_index=True)
+    usage_id = LocationKeyField(max_length=255, db_index=True)
 
     # The value of the field. Defaults to None dumped as json
     value = models.TextField(default='null')
@@ -221,7 +242,7 @@ class OfflineComputedGrade(models.Model):
     Table of grades computed offline for a given user and course.
     """
     user = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
@@ -244,10 +265,10 @@ class OfflineComputedGradeLog(models.Model):
         ordering = ["-created"]
         get_latest_by = "created"
 
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return "[OCGLog] %s: %s" % (self.course_id, self.created)
+        return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member

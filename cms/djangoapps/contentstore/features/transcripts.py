@@ -165,8 +165,7 @@ def remove_transcripts_from_store(_step, subs_id):
     """Remove from store, if transcripts content exists."""
     filename = 'subs_{0}.srt.sjson'.format(subs_id.strip())
     content_location = StaticContent.compute_location(
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
+        world.scenario_dict['COURSE'].id,
         filename
     )
     try:

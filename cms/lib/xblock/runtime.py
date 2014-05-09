@@ -4,8 +4,6 @@ XBlock runtime implementations for edX Studio
 
 from django.core.urlresolvers import reverse
 
-from lms.lib.xblock.runtime import quote_slashes
-
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
@@ -16,7 +14,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         raise NotImplementedError("edX Studio doesn't support third-party xblock handler urls")
 
     url = reverse('component_handler', kwargs={
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'usage_key_string': unicode(block.scope_ids.usage_id).encode('utf-8'),
         'handler': handler_name,
         'suffix': suffix,
     }).rstrip('/')

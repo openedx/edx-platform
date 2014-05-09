@@ -20,6 +20,7 @@ from courseware.access import has_access
 from student.models import CourseEnrollment
 from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class ChooseModeView(View):
@@ -35,7 +36,9 @@ class ChooseModeView(View):
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
 
-        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
@@ -47,13 +50,13 @@ class ChooseModeView(View):
         if enrollment_mode is not None and upgrade is False:
             return redirect(reverse('dashboard'))
 
-        modes = CourseMode.modes_for_course_dict(course_id)
+        modes = CourseMode.modes_for_course_dict(course_key)
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(course_id, None)
+        chosen_price = donation_for_course.get(course_key, None)
 
-        course = course_from_id(course_id)
+        course = course_from_id(course_key)
         context = {
-            "course_id": course_id,
+            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
             "modes": modes,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
@@ -72,25 +75,26 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def post(self, request, course_id):
         """ Takes the form submission from the page and parses it """
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollement,
         # but I don't really have the time to refactor it more nicely and test.
-        course = course_from_id(course_id)
-        if not has_access(user, course, 'enroll'):
+        course = course_from_id(course_key)
+        if not has_access(user, 'enroll', course):
             error_msg = _("Enrollment is closed")
-            return self.get(request, course_id, error=error_msg)
+            return self.get(request, course_key, error=error_msg)
 
         upgrade = request.GET.get('upgrade', False)
 
         requested_mode = self.get_requested_mode(request.POST)
 
-        allowed_modes = CourseMode.modes_for_course_dict(course_id)
+        allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode in ("audit", "honor"):
-            CourseEnrollment.enroll(user, course_id, requested_mode)
+            CourseEnrollment.enroll(user, course_key, requested_mode)
             return redirect('dashboard')
 
         mode_info = allowed_modes[requested_mode]
@@ -104,25 +108,25 @@ class ChooseModeView(View):
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
-                return self.get(request, course_id, error=error_msg)
+                return self.get(request, course_key, error=error_msg)
 
             # Check for minimum pricing
             if amount_value < mode_info.min_price:
                 error_msg = _("No selected price or selected price is too low.")
-                return self.get(request, course_id, error=error_msg)
+                return self.get(request, course_key, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_id] = amount_value
+            donation_for_course[course_key] = amount_value
             request.session["donation_for_course"] = donation_for_course
             if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
                 return redirect(
                     reverse('verify_student_verified',
-                            kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade)
+                            kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
                 )
 
             return redirect(
                 reverse('verify_student_show_requirements',
-                        kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade))
+                        kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade))
 
     def get_requested_mode(self, request_dict):
         """

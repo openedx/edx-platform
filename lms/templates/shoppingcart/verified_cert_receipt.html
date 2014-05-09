@@ -1,5 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
 <%! from student.views import course_from_id %>
 
 <%inherit file="../main.html" />
@@ -113,7 +112,7 @@
                     </td>
                     <td class="options">
                       %if course_has_started:
-                          <a class="action action-course" href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a>
+                          <a class="action action-course" href="${course_root_url}">${_("Go to Course")}</a>
                       %else:
                       %endif
                     </td>
@@ -123,7 +122,7 @@
                 <tfoot>
                   <tr class="course-actions">
                     <td colspan="3">
-                      <a class="action action-dashboard" href="${reverse('dashboard')}">${_("Go to your Dashboard")}</a>
+                      <a class="action action-dashboard" href="${dashboard_url}">${_("Go to your Dashboard")}</a>
                     </td>
                   </tr>
                 </tfoot>

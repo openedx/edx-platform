@@ -34,30 +34,30 @@
 
 <style type="text/css">
 table.stat_table {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
 }
 table.stat_table th {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
 }
 table.stat_table td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
 }
 .divScroll {
-	height: 200px;
-	overflow: scroll;
+    height: 200px;
+    overflow: scroll;
 }
 
 a.selectedmode { background-color: yellow; }
@@ -126,7 +126,7 @@ function goto( mode)
         <a class="instructor-info-action beta-button" href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a>
       %endif
     </div>
-    
+
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
@@ -147,7 +147,7 @@ function goto( mode)
           %if settings.FEATURES.get('CLASS_DASHBOARD'):
              | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">${_("Metrics")}</a>
           %endif
-	  ]
+      ]
     </h2>
 
     <form name="idashform" method="POST">
@@ -187,11 +187,11 @@ function goto( mode)
     % endif
 
     <p>
-    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
-    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
+    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
     </p>
 
     <p>
@@ -253,15 +253,13 @@ function goto( mode)
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
-      ${_("Specify a particular problem in the course here by its url:")}
+      ${_("Specify a particular problem in the course here by its location:")}
       <input type="text" name="problem_for_all_students" size="60">
     </p>
     <p>
-      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. '
-          '(For example, if the location is <tt>i4x://university/course/problem/problemname</tt>, '
-          'then just provide the <tt>problemname</tt>. '
-          'If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then '
-          'provide <tt>notaproblem/someothername</tt>.)')}
+      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
+      location="<tt>location:edX+Open_DemoX+problem+78c98390884243b89f6023745231c525</tt>")
+      }
     </p>
     <p>
       ${_("Then select an action:")}
@@ -288,16 +286,15 @@ function goto( mode)
       <input type="submit" name="action" value="Get link to student's progress page">
     </p>
     <p>
-      ${_("Specify a particular problem in the course here by its url:")}
+      ${_("Specify a particular problem in the course here by its location:")}
       <input type="text" name="problem_for_student" size="60">
     </p>
     <p>
-      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. '
-          '(For example, if the location is <tt>i4x://university/course/problem/problemname</tt>, '
-          'then just provide the <tt>problemname</tt>. '
-          'If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then '
-          'provide <tt>notaproblem/someothername</tt>.)')}
+      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
+      location="<tt>location:edX+Open_DemoX+problem+78c98390884243b89f6023745231c525</tt>")
+      }
     </p>
+
     <p>
       ${_("Then select an action:")}
       <input type="submit" name="action" value="Reset student's attempts">
@@ -401,7 +398,7 @@ function goto( mode)
   %else:
   <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
-  
+
   <br />
   <h2>${_("Explanation of Roles:")}</h2>
   <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
@@ -562,9 +559,9 @@ function goto( mode)
         <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
       </ul>
       <div class="submit-email-warning">
-	<p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
-	  ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
-	<b>${_("A queued email CANNOT be cancelled.")}</b></p>
+        <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+          ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+        <b>${_("A queued email CANNOT be cancelled.")}</b></p>
       </div>
       <br />
       <input type="submit" name="action" value="Send email">
@@ -686,7 +683,7 @@ function goto( mode)
     </script>
 
     <div id="metrics"></div>
-    
+
     <h3 class="attention">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
 
     %for i in range(0,len(metrics_results['section_display_name'])):
@@ -817,16 +814,16 @@ function goto( mode)
       <h2>${datatable['title'] | h}</h2>
       <table class="stat_table">
         <tr>
-	%for hname in datatable['header']:
-	  <th>${hname | h}</th>
-	%endfor
-	</tr>
+        %for hname in datatable['header']:
+          <th>${hname | h}</th>
+        %endfor
+        </tr>
         %for row in datatable['data']:
           <tr>
-	    %for value in row:
-	      <td>${value | h}</td>
-	    %endfor
-	  </tr>
+          %for value in row:
+            <td>${value | h}</td>
+          %endfor
+          </tr>
         %endfor
       </table>
     </p>
@@ -851,8 +848,8 @@ function goto( mode)
         </tr>
       %for tasknum, instructor_task in enumerate(instructor_tasks):
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
-	    data-task-id="${instructor_task.task_id}"
-	    data-in-progress="true">
+            data-task-id="${instructor_task.task_id}"
+            data-in-progress="true">
           <td>${instructor_task.task_type}</td>
           <td>${instructor_task.task_input}</td>
           <td class="task-id">${instructor_task.task_id}</td>
@@ -880,16 +877,16 @@ function goto( mode)
       <h2>${course_stats['title'] | h}</h2>
       <table class="stat_table">
         <tr>
-	%for hname in course_stats['header']:
-	  <th>${hname | h}</th>
-	%endfor
-	</tr>
+        %for hname in course_stats['header']:
+          <th>${hname | h}</th>
+        %endfor
+        </tr>
         %for row in course_stats['data']:
           <tr>
-	    %for value in row:
-	      <td>${value | h}</td>
-	    %endfor
-	  </tr>
+            %for value in row:
+              <td>${value | h}</td>
+            %endfor
+          </tr>
         %endfor
       </table>
     </p>

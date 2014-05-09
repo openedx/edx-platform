@@ -2,7 +2,6 @@
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
-  from courseware.access import has_access
   from django.conf import settings
   from edxmako.shortcuts import marketing_link
 
@@ -60,7 +59,7 @@
       };
       $("#add_to_cart_post").click(function(event){
         $.ajax({
-          url: "${reverse('add_course_to_cart', args=[course.id])}",
+          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
           type: "POST",
           /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
           complete: add_course_complete_handler
@@ -83,7 +82,7 @@
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id])}?course_id=${course.id}&enrollment_action=enroll";
+        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
         $('#register_error').html("${perms_error}").css("display", "block");
       } else {
@@ -104,7 +103,7 @@
           location.href = xhr.responseText;
         }
       } else if (xhr.status == 403) {
-        location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
+        location.href = "${reverse('register_user')}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
@@ -250,7 +249,7 @@
                     account=microsite.get_value('course_about_twitter_account', '@edxonline'),
                     url=u"http://{domain}{path}".format(
                         domain=site_domain,
-                        path=reverse('about_course', args=[course.id])
+                        path=reverse('about_course', args=[course.id.to_deprecated_string()])
                     )
                 ).replace(u" ", u"+")
                 tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
@@ -265,7 +264,7 @@
                         platform=platform_name,
                         url=u"http://{domain}{path}".format(
                             domain=site_domain,
-                            path=reverse('about_course', args=[course.id]),
+                            path=reverse('about_course', args=[course.id.to_deprecated_string()]),
                         )
                     )
                 ).replace(u" ", u"%20")
@@ -340,7 +339,7 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="course_id" type="hidden" value="${course.id.to_deprecated_string()}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">

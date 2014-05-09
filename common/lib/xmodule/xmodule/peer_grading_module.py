@@ -8,7 +8,6 @@ from xblock.fields import Dict, String, Scope, Boolean, Float, Reference
 
 from xmodule.capa_module import ComplexEncoder
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.raw_module import RawDescriptor
 from xmodule.timeinfo import TimeInfo
@@ -261,7 +260,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
-                        self.system.location.url(), self.system.anonymous_student_id
+                        self.system.location.to_deprecated_string(), self.system.anonymous_student_id
                     ))
                 return None
             count_graded = response['count_graded']
@@ -563,7 +562,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         good_problem_list = []
         for problem in problem_list:
-            problem_location = Location(problem['location'])
+            problem_location = problem['location']
             try:
                 descriptor = self._find_corresponding_module_for_location(problem_location)
             except (NoPathToItem, ItemNotFoundError):
@@ -588,7 +587,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
-            'course_id': self.course_id,
             'ajax_url': ajax_url,
             'success': success,
             'problem_list': good_problem_list,
@@ -611,10 +609,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error(
                     "Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
-            problem_location = Location(self.link_to_location)
+            problem_location = self.link_to_location
 
         elif data.get('location') is not None:
-            problem_location = Location(data.get('location'))
+            problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
 
         module = self._find_corresponding_module_for_location(problem_location)
 

@@ -37,6 +37,13 @@ class DuplicateItemError(Exception):
         self.store = store
         self.collection = collection
 
+    def __str__(self, *args, **kwargs):
+        """
+        Print info about what's duplicated
+        """
+        return '{0.store}[{0.collection}] already has {0.element_id}'.format(
+            self, Exception.__str__(self, *args, **kwargs)
+        )
 
 class VersionConflictError(Exception):
     """

@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from xmodule.modulestore import parsers
 
 # There is a course creators admin table.
 from ratelimitbackend import admin
@@ -16,10 +15,10 @@ urlpatterns = patterns('',  # nopep8
     url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
     url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
 
-    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+    url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
 
-    url(r'^xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+    url(r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.component_handler', name='component_handler'),
 
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
@@ -67,31 +66,30 @@ urlpatterns += patterns(
     url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
-    # (?ix) == ignore case and verbose (multiline regex)
-    url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
-    url(r'(?ix)^course_info/{}$'.format(parsers.URL_RE_SOURCE), 'course_info_handler'),
+    url(r'^course_team/(?P<course_key_string>[^/]+)/(?P<email>.+)?$', 'course_team_handler'),
+    url(r'^course_info/(?P<course_key_string>[^/]+)$', 'course_info_handler'),
     url(
-        r'(?ix)^course_info_update/{}(/)?(?P<provided_id>\d+)?$'.format(parsers.URL_RE_SOURCE),
+        r'^course_info_update/(?P<course_key_string>[^/]+)/(?P<provided_id>\d+)?$',
         'course_info_update_handler'
-        ),
-    url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
-    url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
-    url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
-    url(r'(?ix)^container($|/){}$'.format(parsers.URL_RE_SOURCE), 'container_handler'),
-    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
-    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
-    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
-    url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
-    url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
-    url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
-    url(r'(?ix)^xblock/{}/(?P<view_name>[^/]+)$'.format(parsers.URL_RE_SOURCE), 'xblock_view_handler'),
-    url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
-    url(r'(?ix)^tabs/{}$'.format(parsers.URL_RE_SOURCE), 'tabs_handler'),
-    url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
-    url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
-    url(r'(?ix)^settings/advanced/{}$'.format(parsers.URL_RE_SOURCE), 'advanced_settings_handler'),
-    url(r'(?ix)^textbooks/{}$'.format(parsers.URL_RE_SOURCE), 'textbooks_list_handler'),
-    url(r'(?ix)^textbooks/{}/(?P<tid>\d[^/]*)$'.format(parsers.URL_RE_SOURCE), 'textbooks_detail_handler'),
+    ),
+    url(r'^course/(?P<course_key_string>[^/]+)?$', 'course_handler'),
+    url(r'^subsection/(?P<usage_key_string>[^/]+)$', 'subsection_handler'),
+    url(r'^unit/(?P<usage_key_string>[^/]+)$', 'unit_handler'),
+    url(r'^container/(?P<usage_key_string>[^/]+)$', 'container_handler'),
+    url(r'^checklists/(?P<course_key_string>[^/]+)/(?P<checklist_index>\d+)?$', 'checklists_handler'),
+    url(r'^orphan/(?P<course_key_string>[^/]+)$', 'orphan_handler'),
+    url(r'^assets/(?P<course_key_string>[^/]+)/(?P<asset_key_string>.+)?$', 'assets_handler'),
+    url(r'^import/(?P<course_key_string>[^/]+)$', 'import_handler'),
+    url(r'^import_status/(?P<course_key_string>[^/]+)/(?P<filename>.+)$', 'import_status_handler'),
+    url(r'^export/(?P<course_key_string>[^/]+)$', 'export_handler'),
+    url(r'^xblock/(?P<usage_key_string>[^/]+)/(?P<view_name>[^/]+)$', 'xblock_view_handler'),
+    url(r'^xblock/(?P<usage_key_string>[^/]+)?$', 'xblock_handler'),
+    url(r'^tabs/(?P<course_key_string>[^/]+)$', 'tabs_handler'),
+    url(r'^settings/details/(?P<course_key_string>[^/]+)$', 'settings_handler'),
+    url(r'^settings/grading/(?P<course_key_string>[^/]+)(/)?(?P<grader_index>\d+)?$', 'grading_handler'),
+    url(r'^settings/advanced/(?P<course_key_string>[^/]+)$', 'advanced_settings_handler'),
+    url(r'^textbooks/(?P<course_key_string>[^/]+)$', 'textbooks_list_handler'),
+    url(r'^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
 )
 
 js_info_dict = {
@@ -107,7 +105,7 @@ urlpatterns += patterns('',
 
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+    urlpatterns += (url(r'^export_git/(?P<course_key_string>[^/]+)$',
                         'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):

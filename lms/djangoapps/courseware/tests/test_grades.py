@@ -9,6 +9,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from courseware.grades import grade, iterate_grades_for
 
@@ -62,7 +63,7 @@ class TestGradeIteration(ModuleStoreTestCase):
         should be raised. This is a horrible crossing of abstraction boundaries
         and should be fixed, but for now we're just testing the behavior. :-("""
         with self.assertRaises(Http404):
-            gradeset_results = iterate_grades_for("I/dont/exist", [])
+            gradeset_results = iterate_grades_for(SlashSeparatedCourseKey("I", "dont", "exist"), [])
             gradeset_results.next()
 
     def test_all_empty_grades(self):
