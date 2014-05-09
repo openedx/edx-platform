@@ -81,6 +81,34 @@ class TestVerifyView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestVerifiedView(TestCase):
+    """
+    Tests for VerifiedView.
+    """
+    def setUp(self):
+        self.user = UserFactory.create(username="abc", password="test")
+        self.client.login(username="abc", password="test")
+        self.course_id = "MITx/999.1x/Verified_Course"
+        self.course = CourseFactory.create(org='MITx', number='999.1x', display_name='Verified Course')
+
+    def test_verified_course_mode_none(self):
+        """
+        Test VerifiedView when there is no active verified mode for course.
+        """
+        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id})
+
+        verify_mode = CourseMode.mode_for_course(self.course_id, "verified")
+        # Verify mode should be None.
+        self.assertEquals(verify_mode, None)
+
+        response = self.client.get(url)
+        # Status code should be 302.
+        self.assertTrue(response.status_code, 302)
+        # Location should contains dashboard.
+        self.assertIn('dashboard', response._headers.get('location')[1])
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestReverifyView(TestCase):
     """
     Tests for the reverification views
