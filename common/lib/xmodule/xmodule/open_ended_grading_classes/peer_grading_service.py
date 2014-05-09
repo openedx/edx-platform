@@ -85,7 +85,7 @@ class PeerGradingService(GradingService):
         return result
 
     def get_problem_list(self, course_id, grader_id):
-        params = {'course_id': course_id, 'student_id': grader_id}
+        params = {'course_id': course_id.to_deprecated_string(), 'student_id': grader_id}
         result = self.get(self.get_problem_list_url, params)
 
         if 'problem_list' in result:
@@ -100,7 +100,7 @@ class PeerGradingService(GradingService):
         return result
 
     def get_notifications(self, course_id, grader_id):
-        params = {'course_id': course_id, 'student_id': grader_id}
+        params = {'course_id': course_id.to_deprecated_string(), 'student_id': grader_id}
         result = self.get(self.get_notifications_url, params)
         self._record_result(
             'get_notifications',
