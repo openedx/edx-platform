@@ -6,6 +6,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.annotator_token import retrieve_token
 
 import textwrap
 
@@ -30,7 +31,7 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='Text Annotation',
     )
-    tags = String(
+    instructor_tags = String(
         display_name="Tags for Assignments",
         help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
         scope=Scope.settings,
@@ -43,6 +44,7 @@ class AnnotatableFields(object):
         default='None',
     )
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+    annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -59,15 +61,9 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        return etree.tostring(xmltree, encoding='unicode')
+        self.user_email = ""
+        if self.runtime.get_real_user is not None:
+            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -82,13 +78,13 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
-            'tag': self.tags,
+            'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
-            'content_html': self._render_content(),
-            'annotation_storage': self.annotation_storage_url
+            'content_html': self.content,
+            'annotation_storage': self.annotation_storage_url,
+            'token': retrieve_token(self.user_email, self.annotation_token_secret),
         }
-
         return self.system.render_template('textannotation.html', context)
 
 
@@ -101,6 +97,7 @@ class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(TextAnnotationDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            TextAnnotationDescriptor.annotation_storage_url
+            TextAnnotationDescriptor.annotation_storage_url,
+            TextAnnotationDescriptor.annotation_token_secret,
         ])
         return non_editable_fields
