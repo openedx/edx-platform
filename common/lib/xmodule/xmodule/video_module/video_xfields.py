@@ -79,7 +79,7 @@ class VideoFields(object):
         default=False
     )
     html5_sources = List(
-        help="The URL or URLs where you’ve posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, set Video Download Allowed to True.",
+        help="The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, set Video Download Allowed to True.",
         display_name="Video File URLs",
         scope=Scope.settings,
     )
