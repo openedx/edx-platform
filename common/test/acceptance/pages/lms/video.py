@@ -32,7 +32,8 @@ CSS_CLASS_NAMES = {
     'video_xmodule': '.xmodule_VideoModule',
     'video_init': '.is-initialized',
     'video_time': 'div.vidtime',
-    'video_display_name': '.vert h2'
+    'video_display_name': '.vert h2',
+    'captions_lang_list': '.langs-list li'
 }
 
 VIDEO_MODES = {
@@ -246,39 +247,62 @@ class VideoPage(PageObject):
         selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS[button_id])
         return self.q(css=selector).visible
 
-    @wait_for_js
     def show_captions(self, video_display_name=None):
         """
-        Show the video captions.
+        Make Captions Visible.
 
         Arguments:
             video_display_name (str or None): Display name of a Video.
 
         """
-        subtitle_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['closed_captions'])
+        self._captions_visibility(True, video_display_name)
 
-        def _is_subtitles_open():
+    def hide_captions(self, video_display_name=None):
+        """
+        Make Captions Invisible.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        """
+        self._captions_visibility(False, video_display_name)
+
+    @wait_for_js
+    def _captions_visibility(self, captions_new_state, video_display_name=None):
+        """
+        Set the video captions visibility state.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+            captions_new_state (bool): True means show captions, False means hide captions
+
+        """
+        states = {True: 'Shown', False: 'Hidden'}
+        state = states[captions_new_state]
+
+        caption_state_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['closed_captions'])
+
+        def _captions_current_state():
             """
-            Check if subtitles are opened
+            Get current visibility sate of captions.
 
             Returns:
-                bool: Subtitles Visibility
+                bool: True means captions are visible, False means captions are not visible
 
             """
-            is_open = not self.q(css=subtitle_selector).present
-            return is_open
+            return not self.q(css=caption_state_selector).present
 
         # Make sure that the CC button is there
-        EmptyPromise(lambda: self.is_button_shown('CC', video_display_name),
+        EmptyPromise(lambda: self.is_button_shown('CC'),
                      "CC button is shown").fulfill()
 
-        # Check if the captions are already open and click if not
-        if _is_subtitles_open() is False:
-            self.click_player_button('CC', video_display_name)
+        # toggle captions visibility state if needed
+        if _captions_current_state() != captions_new_state:
+            self.click_player_button('CC')
 
-        # Verify that they are now open
-        EmptyPromise(_is_subtitles_open,
-                     "Subtitles are shown").fulfill()
+            # Verify that captions state is toggled/changed
+            EmptyPromise(lambda: _captions_current_state() == captions_new_state,
+                         "Captions are {state}".format(state=state)).fulfill()
 
     @property
     def captions_text(self, video_display_name=None):
@@ -594,3 +618,34 @@ class VideoPage(PageObject):
             return False
 
         return True
+
+    def sources(self, video_display_name=None):
+        """
+        Extract all video source urls on current page.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            list: Video Source URLs.
+
+        """
+        sources_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['video_sources'])
+        return self.q(css=sources_selector).map(lambda el: el.get_attribute('src').split('?')[0]).results
+
+    def caption_languages(self, video_display_name=None):
+        """
+        Get caption languages available for a video.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            dict: Language Codes('en', 'zh' etc) as keys and Language Names as Values('English', 'Chinese' etc)
+
+        """
+        languages_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['captions_lang_list'])
+        language_codes = self.q(css=languages_selector).attrs('data-lang-code')
+        language_names = self.q(css=languages_selector).attrs('textContent')
+
+        return dict(zip(language_codes, language_names))
