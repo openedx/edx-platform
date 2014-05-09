@@ -8,9 +8,10 @@ from bson.objectid import ObjectId
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
 from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
-from ddt import ddt
+from ddt import ddt, data
 
 
+@ddt
 class LocatorTest(TestCase):
     """
     Tests for subclasses of Locator.
@@ -49,7 +50,7 @@ class LocatorTest(TestCase):
         self.assertEqual(str(testobj_2.version_guid), test_id_2_loc)
         self.assertEqual(testobj_2._to_string(), VERSION_PREFIX + test_id_2_loc)
 
-    @ddt.data(
+    @data(
         ' mit.eecs',
         'mit.eecs ',
         VERSION_PREFIX + 'mit.eecs',
@@ -79,7 +80,7 @@ class LocatorTest(TestCase):
         with self.assertRaises(InvalidKeyError):
             CourseLocator.from_string('course-locator:' + bad_id)
 
-    @ddt.data('course-locator:', 'course-locator:/mit.eecs', 'http:mit.eecs', 'course-locator//mit.eecs')
+    @data('course-locator:', 'course-locator:/mit.eecs', 'http:mit.eecs', 'course-locator//mit.eecs')
     def test_course_constructor_bad_url(self, bad_url):
         with self.assertRaises(InvalidKeyError):
             CourseLocator.from_string(bad_url)
