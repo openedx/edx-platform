@@ -6,6 +6,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
 from . import BASE_URL
 
+from selenium.webdriver.common.action_chains import ActionChains
 
 class ContainerPage(PageObject):
     """
@@ -44,6 +45,24 @@ class ContainerPage(PageObject):
         return self.q(css=XBlockWrapper.BODY_SELECTOR).map(
             lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
 
+    def drag(self, source_index, target_index, after=True):
+        """
+        Gets the drag handle with index source_index (relative to the vertical layout of the page)
+        and drags it to the location of the drag handle with target_index.
+
+        This should drag the element with the source_index drag handle AFTER the
+        one with the target_index drag handle, unless 'after' is set to False.
+        """
+        draggables = self.q(css='.drag-handle')
+        source = draggables[source_index]
+        target = draggables[target_index]
+        action = ActionChains(self.browser)
+        action.click_and_hold(source).perform()  # pylint: disable=protected-access
+        action.move_to_element_with_offset(
+            target, 0, target.size['height'] / 2 if after else 0
+        ).perform()  # pylint: disable=protected-access
+        action.release().perform()
+
 
 class XBlockWrapper(PageObject):
     """
@@ -77,6 +96,22 @@ class XBlockWrapper(PageObject):
             return titles[0]
         else:
             return None
+
+    @property
+    def children(self):
+        """
+        Will return any first-generation descendant xblocks of this xblock.
+        """
+        descendants = self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
+            lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
+
+        # Now remove any non-direct descendants.
+        grandkids = []
+        for descendant in descendants:
+            grandkids.extend(descendant.children)
+
+        grand_locators = [grandkid.locator for grandkid in grandkids]
+        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
 
     @property
     def preview_selector(self):

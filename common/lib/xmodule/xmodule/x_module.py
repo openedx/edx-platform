@@ -1119,7 +1119,7 @@ class XMLParsingSystem(DescriptorSystem):
         self.process_xml = process_xml
 
 
-class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -1139,7 +1139,7 @@ class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
-            field_data=None, get_user_role=None,
+            field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
             **kwargs):
         """
         Create a closure around the system environment.
@@ -1198,6 +1198,9 @@ class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint
             for LMS and Studio.
 
         field_data - the `FieldData` to use for backing XBlock storage.
+
+        rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
+           modules, which have an anonymous handler, to set legitimate users' data
         """
 
         # Usage_store is unused, and field_data is often supplanted with an
@@ -1236,6 +1239,7 @@ class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint
 
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
+        self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""

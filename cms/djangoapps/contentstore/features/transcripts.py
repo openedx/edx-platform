@@ -17,16 +17,16 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 DELAY = 0.5
 
 ERROR_MESSAGES = {
-    'url_format': u'Incorrect url format.',
-    'file_type': u'Link types should be unique.',
+    'url_format': u'Incorrect URL format.',
+    'file_type': u'Video file types must be unique.',
 }
 
 STATUSES = {
     'found': u'Timed Transcript Found',
     'not found': u'No Timed Transcript',
     'replace': u'Timed Transcript Conflict',
-    'uploaded_successfully': u'Timed Transcript uploaded successfully',
-    'use existing': u'Timed Transcript Not Updated',
+    'uploaded_successfully': u'Timed Transcript Uploaded Successfully',
+    'use existing': u'Confirm Timed Transcript',
 }
 
 SELECTORS = {
@@ -39,11 +39,11 @@ SELECTORS = {
 
 # button type , button css selector, button message
 TRANSCRIPTS_BUTTONS = {
-    'import': ('.setting-import',  'Import from YouTube'),
-    'download_to_edit': ('.setting-download', 'Download to Edit'),
-    'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download to Edit'),
+    'import': ('.setting-import',  'Import YouTube Transcript'),
+    'download_to_edit': ('.setting-download', 'Download Transcript for Editing'),
+    'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download Transcript for Editing'),
     'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcript'),
-    'replace': ('.setting-replace', 'Yes, Replace EdX Timed Transcript with YouTube Timed Transcript'),
+    'replace': ('.setting-replace', 'Yes, replace the edX transcript with the YouTube transcript'),
     'choose': ('.setting-choose', 'Timed Transcript from {}'),
     'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcript'),
 }

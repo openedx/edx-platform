@@ -66,6 +66,7 @@ from .tools import (
     parse_datetime,
     set_due_date_extension,
     strip_if_string,
+    bulk_email_is_enabled_for_course,
 )
 from xmodule.modulestore import Location
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
@@ -1065,7 +1066,14 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
+<<<<<<< HEAD
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+=======
+
+    if not bulk_email_is_enabled_for_course(course_id):
+        return HttpResponseForbidden("Email is not enabled for this course.")
+
+>>>>>>> edx/master
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")

@@ -39,6 +39,7 @@ class EmailTestException(Exception):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.

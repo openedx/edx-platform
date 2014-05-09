@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Add drag-and-drop support to the container page. STUD-1309.
+
 Common: Add extensible third-party auth module.
 
 Blades: Handle situation if no response were sent from XQueue to LMS in Matlab

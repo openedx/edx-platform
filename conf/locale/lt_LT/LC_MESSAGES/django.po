@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Riina <ciairdabar@yahoo.com>, 2014
 # Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2014
 # zzygis <zzygis@gmail.com>, 2013
@@ -55,8 +56,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
-"PO-Revision-Date: 2014-02-13 21:00+0000\n"
+"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"PO-Revision-Date: 2014-04-30 21:00+0000\n"
 "Last-Translator: Edukometrija <jolitad@mruni.eu>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)\n"
 "MIME-Version: 1.0\n"
@@ -826,7 +827,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1388,6 +1389,16 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr "URL nuoroda į vaizdo įrašą YouTube arba kitoje vietoje Internete."
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -4876,8 +4887,22 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
+msgstr ""
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
 msgstr ""
 
 #: lms/templates/lti.html
@@ -4887,6 +4912,10 @@ msgstr ""
 #: lms/templates/lti.html
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
+msgstr ""
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
 msgstr ""
 
 #: lms/templates/lti_form.html
@@ -5686,10 +5715,6 @@ msgstr ""
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/video.html

@@ -9,6 +9,7 @@
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # dabang <inactive+dabang@transifex.com>, 2014
 # MasterCrumble <basti31@gmx.net>, 2014
+# s6lidaem <linda.daemmer@web.de>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2013
@@ -20,15 +21,16 @@
 # 
 # Translators:
 # AlecL <alexander.lohberg@paluno.uni-due.de>, 2013
+# s6lidaem <linda.daemmer@web.de>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-24 13:20+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-05-02 17:09-0400\n"
+"PO-Revision-Date: 2014-04-29 14:20+0000\n"
+"Last-Translator: s6lidaem <linda.daemmer@web.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

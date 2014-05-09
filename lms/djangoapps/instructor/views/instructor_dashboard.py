@@ -26,8 +26,12 @@ from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
+<<<<<<< HEAD
 from .tools import get_units_with_due_date, title_or_url
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+=======
+from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
+>>>>>>> edx/master
 
 
 @ensure_csrf_cookie
@@ -62,9 +66,14 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
+<<<<<<< HEAD
     if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_key):
         sections.append(_section_send_email(course_key, access, course))
+=======
+    if bulk_email_is_enabled_for_course(course_id):
+        sections.append(_section_send_email(course_id, access, course))
+>>>>>>> edx/master
 
     # Gate access to Metrics tab by featue flag and staff authorization
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:

@@ -20,6 +20,7 @@ Creating Exercises and Tools
    full_screen_image
    gene_explorer
    google_hangouts
+   iframe
    image_mapped_input
    lti_component
    math_expression_input
@@ -34,6 +35,7 @@ Creating Exercises and Tools
    problem_in_latex
    protein_builder
    text_input
+   vitalsource
    word_cloud
    custom_python
    zooming_image

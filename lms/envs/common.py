@@ -172,6 +172,9 @@ FEATURES = {
     # Enable instructor dash beta version link
     'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
 
+    # Toggle to enable certificates of courses on dashboard
+    'ENABLE_VERIFIED_CERTIFICATES': False,
+
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
@@ -351,8 +354,6 @@ LIB_URL = '/static/js/'
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
-# RSS_URL = r'lms/templates/feed.rss'
-# PRESS_URL = r''
 RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages
@@ -394,7 +395,7 @@ LMS_MIGRATION_ALLOWED_IPS = []
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000
+TRACK_MAX_EVENT = 50000
 
 DEBUG_TRACK_LOG = False
 
@@ -407,19 +408,43 @@ TRACKING_BACKENDS = {
     }
 }
 
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+
+EVENT_TRACKING_ENABLED = True
+EVENT_TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking',
+            'max_event_size': TRACK_MAX_EVENT,
+        }
+    }
+}
+EVENT_TRACKING_PROCESSORS = [
+    {
+        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
+    }
+]
+
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
-# In the future, adding the backend to TRACKING_BACKENDS enough.
+# In the future, adding the backend to TRACKING_BACKENDS should be enough.
 if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
         }
     })
+    EVENT_TRACKING_BACKENDS.update({
+        'sql': {
+            'ENGINE': 'track.backends.django.DjangoBackend'
+        }
+    })
 
-# We're already logging events, and we don't want to capture user
-# names/passwords.  Heartbeat events are likely not interesting.
-TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
-TRACKING_ENABLED = True
+######################## GOOGLE ANALYTICS ###########################
+GOOGLE_ANALYTICS_ACCOUNT = 'GOOGLE_ANALYTICS_ACCOUNT_DUMMY'
+GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -496,7 +521,6 @@ SITE_ID = 1
 SITE_NAME = "edx.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
-IGNORABLE_404_ENDS = ('favicon.ico')
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
 # Platform Email
@@ -527,8 +551,6 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
-# Languages that don't have any reviewed strings are commented out;
-# see https://www.transifex.com/projects/p/edx-platform/
 LANGUAGES = (
     ('en', u'English'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
@@ -537,13 +559,14 @@ LANGUAGES = (
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('bn-in', u'বাংলা (ভারত)'),  # Bengali (India)
     ('bs', u'bosanski'),  # Bosnian
     ('ca', u'Català'),  # Catalan
     ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
+    ('da', u'dansk'),  # Danish
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
     ('el', u'Ελληνικά'),  # Greek
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
@@ -554,7 +577,6 @@ LANGUAGES = (
     ('es-es', u'Español (España)'),  # Spanish (Spain)
     ('es-mx', u'Español (México)'),  # Spanish (Mexico)
     ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
-    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
     ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
     ('eu-es', u'euskara (Espainia)'),  # Basque (Spain)
     ('fa', u'فارسی'),  # Persian
@@ -571,6 +593,7 @@ LANGUAGES = (
     ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
     ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
     ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('kn', u'ಕನ್ನಡ'),  # Kannada
     ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
@@ -582,6 +605,7 @@ LANGUAGES = (
     ('pl', u'Polski'),  # Polish
     ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
     ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ro', u'română'),  # Romanian
     ('ru', u'Русский'),  # Russian
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak

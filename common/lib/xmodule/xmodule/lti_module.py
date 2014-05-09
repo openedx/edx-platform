@@ -22,6 +22,11 @@ A resource to test the LTI protocol (PHP realization):
 
     http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 
+We have also begun to add support for LTI 1.2/2.0.  We will keep this
+docstring in synch with what support is available.  The first LTI 2.0
+feature to be supported is the REST API results service, see specification
+at
+http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html
 
 What is supported:
 ------------------
@@ -30,9 +35,20 @@ What is supported:
 2.) Multiple LTI components on a single page.
 3.) The use of multiple LTI providers per course.
 4.) Use of advanced LTI component that provides back a grade.
-    a.) The LTI provider sends back a grade to a specified URL.
-    b.) Currently only action "update" is supported. "Read", and "delete"
-        actions initially weren't required.
+    A) LTI 1.1.1 XML endpoint
+        a.) The LTI provider sends back a grade to a specified URL.
+        b.) Currently only action "update" is supported. "Read", and "delete"
+            actions initially weren't required.
+    B) LTI 2.0 Result Service JSON REST endpoint
+       (http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html)
+        a.) Discovery of all such LTI http endpoints for a course.  External tools GET from this discovery
+            endpoint and receive URLs for interacting with individual grading units.
+            (see lms/djangoapps/courseware/views.py:get_course_lti_endpoints)
+        b.) GET, PUT and DELETE in LTI Result JSON binding
+            (http://www.imsglobal.org/lti/ltiv2p0/mediatype/application/vnd/ims/lis/v2/result+json/index.html)
+            for a provider to synchronize grades into edx-platform.  Reading, Setting, and Deleteing
+            Numeric grades between 0 and 1 and text + basic HTML feedback comments are supported, via
+            GET / PUT / DELETE HTTP methods respectively
 """
 
 import logging
@@ -42,6 +58,7 @@ import hashlib
 import base64
 import urllib
 import textwrap
+import bleach
 from lxml import etree
 from webob import Response
 import mock
@@ -51,15 +68,18 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
 from xmodule.course_module import CourseDescriptor
+from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List, XBlock
 from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
 
-
-class LTIError(Exception):
-    pass
+DOCS_ANCHOR_TAG = (
+    "<a target='_blank'"
+    "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
+    "the edX LTI documentation</a>"
+)
 
 
 class LTIFields(object):
@@ -82,22 +102,95 @@ class LTIFields(object):
 
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
-    display_name = String(display_name="Display Name", help="Display name for this module", scope=Scope.settings, default="LTI")
-    lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
-    launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
-    custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
-    open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
-    graded = Boolean(help="Grades will be considered in overall score.", default=False, scope=Scope.settings)
+    display_name = String(
+        display_name="Display Name",
+        help=(
+            "Enter the name that students see for this component.  "
+            "Analytics reports may also use the display name to identify this component."
+        ),
+        scope=Scope.settings,
+        default="LTI",
+    )
+    lti_id = String(
+        display_name="LTI ID",
+        help=(
+            "Enter the LTI ID for the external LTI provider.  "
+            "This value must be the same LTI ID that you entered in the "
+            "LTI Passports setting on the Advanced Settings page."
+            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+        ),
+        default='',
+        scope=Scope.settings
+    )
+    launch_url = String(
+        display_name="LTI URL",
+        help=(
+            "Enter the URL of the external tool that this component launches. "
+            "This setting is only used when Hide External Tool is set to False."
+            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+        ),
+        default='http://www.example.com',
+        scope=Scope.settings)
+    custom_parameters = List(
+        display_name="Custom Parameters",
+        help=(
+            "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
+            "the background color for this component."
+            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+        ),
+        scope=Scope.settings)
+    open_in_a_new_page = Boolean(
+        display_name="Open in New Page",
+        help=(
+            "Select True if you want students to click a link that opens the LTI tool in a new window. "
+            "Select False if you want the LTI content to open in an IFrame in the current page. "
+            "This setting is only used when Hide External Tool is set to False.  "
+        ),
+        default=True,
+        scope=Scope.settings
+    )
+    has_score = Boolean(
+        display_name="Scored",
+        help=(
+            "Select True if this component will receive a numerical score from the external LTI system."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
     weight = Float(
-        help="Weight for student grades.",
+        display_name="Weight",
+        help=(
+            "Enter the number of points possible for this component.  "
+            "The default value is 1.0.  "
+            "This setting is only used when Scored is set to True."
+        ),
         default=1.0,
         scope=Scope.settings,
         values={"min": 0},
     )
-    has_score = Boolean(help="Does this LTI module have score?", default=False, scope=Scope.settings)
+    module_score = Float(
+        help="The score kept in the xblock KVS -- duplicate of the published score in django DB",
+        default=None,
+        scope=Scope.user_state
+    )
+    score_comment = String(
+        help="Comment as returned from grader, LTI2.0 spec",
+        default="",
+        scope=Scope.user_state
+    )
+    hide_launch = Boolean(
+        display_name="Hide External Tool",
+        help=(
+            "Select True if you want to use this component as a placeholder for syncing with an external grading  "
+            "system rather than launch an external tool.  "
+            "This setting hides the Launch button and any IFrames for this component."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
 
 
-class LTIModule(LTIFields, XModule):
+class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
     Module provides LTI integration to course.
 
@@ -247,6 +340,18 @@ class LTIModule(LTIFields, XModule):
         """
         Returns a context.
         """
+        # use bleach defaults. see https://github.com/jsocol/bleach/blob/master/bleach/__init__.py
+        # ALLOWED_TAGS are
+        # ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',  'strong', 'ul']
+        #
+        # ALLOWED_ATTRIBUTES are
+        #     'a': ['href', 'title'],
+        #     'abbr': ['title'],
+        #     'acronym': ['title'],
+        #
+        # This lets all plaintext through.
+        sanitized_comment = bleach.clean(self.score_comment)
+
         return {
             'input_fields': self.get_input_fields(),
 
@@ -257,6 +362,11 @@ class LTIModule(LTIFields, XModule):
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,
             'form_url': self.runtime.handler_url(self, 'preview_handler').rstrip('/?'),
+            'hide_launch': self.hide_launch,
+            'has_score': self.has_score,
+            'weight': self.weight,
+            'module_score': self.module_score,
+            'comment': sanitized_comment,
         }
 
     def get_html(self):
@@ -278,7 +388,7 @@ class LTIModule(LTIFields, XModule):
         assert user_id is not None
         return unicode(urllib.quote(user_id))
 
-    def get_outcome_service_url(self):
+    def get_outcome_service_url(self, service_name="grade_handler"):
         """
         Return URL for storing grades.
 
@@ -286,14 +396,10 @@ class LTIModule(LTIFields, XModule):
 
         While testing locally and on Jenkins, mock_lti_server use http.referer
         to obtain scheme, so it is ok to have http(s) anyway.
+
+        The scheme logic is handled in lms/lib/xblock/runtime.py
         """
-        scheme = 'http' if 'sandbox' in self.system.hostname or self.system.debug else 'https'
-        uri = '{scheme}://{host}{path}'.format(
-            scheme=scheme,
-            host=self.system.hostname,
-            path=self.runtime.handler_url(self, 'grade_handler', thirdparty=True).rstrip('/?')
-        )
-        return uri
+        return self.runtime.handler_url(self, service_name, thirdparty=True).rstrip('/?')
 
     def get_resource_link_id(self):
         """
@@ -451,9 +557,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
     def max_score(self):
         return self.weight if self.has_score else None
 
-
     @XBlock.handler
-    def grade_handler(self, request, dispatch):
+    def grade_handler(self, request, suffix):  # pylint: disable=unused-argument
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
@@ -552,15 +657,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
         if action == 'replaceResultRequest':
-            self.system.publish(
-                self,
-                'grade',
-                {
-                    'value': score * self.max_score(),
-                    'max_value': self.max_score(),
-                    'user_id': real_user.id,
-                }
-            )
+            self.set_user_module_score(real_user, score, self.max_score())
 
             values = {
                 'imsx_codeMajor': 'success',
@@ -605,7 +702,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         return imsx_messageIdentifier, sourcedId, score, action
 
-    def verify_oauth_body_sign(self, request):
+    def verify_oauth_body_sign(self, request, content_type='application/x-www-form-urlencoded'):
         """
         Verify grade request from LTI provider using OAuth body signing.
 
@@ -623,26 +720,26 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         client_key, client_secret = self.get_client_key_secret()
         headers = {
-            'Authorization':unicode(request.headers.get('Authorization')),
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': unicode(request.headers.get('Authorization')),
+            'Content-Type': content_type,
         }
 
         sha1 = hashlib.sha1()
         sha1.update(request.body)
         oauth_body_hash = base64.b64encode(sha1.digest())
-
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
-        oauth_headers =dict(oauth_params)
+        oauth_headers = dict(oauth_params)
         oauth_signature = oauth_headers.pop('oauth_signature')
-
         mock_request = mock.Mock(
             uri=unicode(urllib.unquote(request.url)),
             http_method=unicode(request.method),
             params=oauth_headers.items(),
             signature=oauth_signature
         )
+
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
             raise LTIError("OAuth body hash verification is failed.")
+
         if not signature.verify_hmac_sha1(mock_request, client_secret):
             raise LTIError("OAuth signature verification is failed.")
 
@@ -672,3 +769,6 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     module_class = LTIModule
     grade_handler = module_attr('grade_handler')
     preview_handler = module_attr('preview_handler')
+    lti_2_0_result_rest_handler = module_attr('lti_2_0_result_rest_handler')
+    clear_user_module_score = module_attr('clear_user_module_score')
+    get_outcome_service_url = module_attr('get_outcome_service_url')

@@ -472,19 +472,19 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = [microsite.get_value(
-            'payment_support_email',
-            settings.PAYMENT_SUPPORT_EMAIL
-        )]
+        from_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
-        except (smtplib.SMTPException, BotoServerError):
-            err_str = 'Failed sending email to billing request a refund for verified certiciate (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})'
+        except Exception as exception:  # pylint: disable=broad-except
+            err_str = ('Failed sending email to billing to request a refund for verified certificate'
+                       ' (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})\n{exception}')
             log.error(err_str.format(
                 user=course_enrollment.user,
                 course=course_enrollment.course_id,
                 ce_id=course_enrollment.id,
-                order=order_number))
+                order=order_number,
+                exception=exception,
+            ))
 
         return target_cert
 

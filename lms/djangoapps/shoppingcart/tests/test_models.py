@@ -344,21 +344,22 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  min_price=self.cost)
         course_mode.save()
 
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
-        crum_patcher = patch('student.models.crum.get_current_request')
-        self.mock_get_current_request = crum_patcher.start()
-        self.addCleanup(crum_patcher.stop)
-        self.mock_get_current_request.return_value = sentinel.request
 
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_key)
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
         # verify that we are still enrolled
+<<<<<<< HEAD
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
         self.mock_server_track.reset_mock()
+=======
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+        self.mock_tracker.reset_mock()
+>>>>>>> edx/master
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
         self.assertEquals(enrollment.mode, u'verified')
@@ -411,6 +412,33 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertTrue(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'refunded')
 
+    def test_refund_cert_callback_before_expiration_email(self):
+        """ Test that refund emails are being sent correctly. """
+        course_id = "refund_before_expiration/test/one"
+        many_days = datetime.timedelta(days=60)
+
+        CourseFactory.create(org='refund_before_expiration', number='test', run='course', display_name='one')
+        course_mode = CourseMode(course_id=course_id,
+                                 mode_slug="verified",
+                                 mode_display_name="verified cert",
+                                 min_price=self.cost,
+                                 expiration_datetime=datetime.datetime.now(pytz.utc) + many_days)
+        course_mode.save()
+
+        CourseEnrollment.enroll(self.user, course_id, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
+        cart.purchase()
+
+        mail.outbox = []
+        with patch('shoppingcart.models.log.error') as mock_error_logger:
+            CourseEnrollment.unenroll(self.user, course_id)
+            self.assertFalse(mock_error_logger.called)
+            self.assertEquals(len(mail.outbox), 1)
+            self.assertEquals('[Refund] User-Requested Refund', mail.outbox[0].subject)
+            self.assertEquals(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
+            self.assertIn('has requested a refund on Order', mail.outbox[0].body)
+
     @patch('shoppingcart.models.log.error')
     def test_refund_cert_callback_before_expiration_email_error(self, error_logger):
         # If there's an error sending an email to billing, we need to log this error
@@ -432,8 +460,13 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
 
         with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+<<<<<<< HEAD
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertTrue(error_logger.called)
+=======
+            CourseEnrollment.unenroll(self.user, course_id)
+            self.assertTrue(error_logger.call_args[0][0].startswith('Failed sending email'))
+>>>>>>> edx/master
 
     def test_refund_cert_callback_after_expiration(self):
         # If the expiration date has passed, the user cannot get a refund

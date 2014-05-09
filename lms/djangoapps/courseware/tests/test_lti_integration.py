@@ -1,11 +1,23 @@
 """LTI integration tests"""
 
 import oauthlib
-from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 import urllib
+import json
 
+from django.test.utils import override_settings
+from django.core.urlresolvers import reverse
+from django.conf import settings
+
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import Location
+
+from courseware.tests import BaseTestXmodule
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.views import get_course_lti_endpoints
+from lms.lib.xblock.runtime import quote_slashes
 
 class TestLTI(BaseTestXmodule):
     """
@@ -68,7 +80,13 @@ class TestLTI(BaseTestXmodule):
             'element_id': self.item_descriptor.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
-            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'preview_handler').rstrip('/?'),
+            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,
+                                                                         'preview_handler').rstrip('/?'),
+            'hide_launch': False,
+            'has_score': False,
+            'module_score': None,
+            'comment': u'',
+            'weight': 1.0,
         }
 
         def mocked_sign(self, *args, **kwargs):
@@ -92,10 +110,111 @@ class TestLTI(BaseTestXmodule):
 
     def test_lti_constructor(self):
         generated_content = self.item_descriptor.render('student_view').content
-        expected_content =  self.runtime.render_template('lti.html', self.expected_context)
+        expected_content = self.runtime.render_template('lti.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
 
     def test_lti_preview_handler(self):
         generated_content = self.item_descriptor.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestLTIModuleListing(ModuleStoreTestCase):
+    """
+    a test for the rest endpoint that lists LTI modules in a course
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+
+    def setUp(self):
+        """Create course, 2 chapters, 2 sections"""
+        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.chapter1 = ItemFactory.create(
+            parent_location=self.course.location,
+            display_name="chapter1",
+            category='chapter')
+        self.section1 = ItemFactory.create(
+            parent_location=self.chapter1.location,
+            display_name="section1",
+            category='sequential')
+        self.chapter2 = ItemFactory.create(
+            parent_location=self.course.location,
+            display_name="chapter2",
+            category='chapter')
+        self.section2 = ItemFactory.create(
+            parent_location=self.chapter2.location,
+            display_name="section2",
+            category='sequential')
+
+        self.published_location_dict = {'tag': 'i4x',
+                                        'org': self.course.location.org,
+                                        'category': 'lti',
+                                        'course': self.course.location.course,
+                                        'name': 'lti_published'}
+        self.draft_location_dict = {'tag': 'i4x',
+                                    'org': self.course.location.org,
+                                    'category': 'lti',
+                                    'course': self.course.location.course,
+                                    'name': 'lti_draft',
+                                    'revision': 'draft'}
+        # creates one draft and one published lti module, in different sections
+        self.lti_published = ItemFactory.create(
+            parent_location=self.section1.location,
+            display_name="lti published",
+            category="lti",
+            location=Location(self.published_location_dict)
+        )
+        self.lti_draft = ItemFactory.create(
+            parent_location=self.section2.location,
+            display_name="lti draft",
+            category="lti",
+            location=Location(self.draft_location_dict)
+        )
+
+    def expected_handler_url(self, handler):
+        """convenience method to get the reversed handler urls"""
+        return "https://{}{}".format(settings.SITE_NAME, reverse(
+            'courseware.module_render.handle_xblock_callback_noauth',
+            args=[
+                self.course.id,
+                quote_slashes(unicode(self.lti_published.scope_ids.usage_id).encode('utf-8')),
+                handler
+            ]
+        ))
+
+    def test_lti_rest_bad_course(self):
+        """Tests what happens when the lti listing rest endpoint gets a bad course_id"""
+        bad_ids = [u"sf", u"dne/dne/dne", u"fo/ey/\u5305"]
+        request = mock.Mock()
+        request.method = 'GET'
+        for bad_course_id in bad_ids:
+            response = get_course_lti_endpoints(request, bad_course_id)
+            self.assertEqual(404, response.status_code)
+
+    def test_lti_rest_listing(self):
+        """tests that the draft lti module is not a part of the endpoint response, but the published one is"""
+        request = mock.Mock()
+        request.method = 'GET'
+        response = get_course_lti_endpoints(request, self.course.id)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('application/json', response['Content-Type'])
+
+        expected = {
+            "lti_1_1_result_service_xml_endpoint": self.expected_handler_url('grade_handler'),
+            "lti_2_0_result_service_json_endpoint":
+            self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
+            "display_name": self.lti_published.display_name
+        }
+        self.assertEqual([expected], json.loads(response.content))
+
+    def test_lti_rest_non_get(self):
+        """tests that the endpoint returns 404 when hit with NON-get"""
+        DISALLOWED_METHODS = ("POST", "PUT", "DELETE", "HEAD", "OPTIONS")  # pylint: disable=invalid-name
+        for method in DISALLOWED_METHODS:
+            request = mock.Mock()
+            request.method = method
+            response = get_course_lti_endpoints(request, self.course.id)
+            self.assertEqual(405, response.status_code)

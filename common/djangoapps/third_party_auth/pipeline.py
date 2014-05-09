@@ -350,7 +350,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
     user_inactive = user and not user.is_active
     user_unset = user is None
-    dispatch_to_login = (is_login and user_unset) or user_inactive
+    dispatch_to_login = is_login and (user_unset or user_inactive)
 
     if is_dashboard:
         return

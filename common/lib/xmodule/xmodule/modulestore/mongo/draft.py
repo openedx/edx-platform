@@ -147,7 +147,11 @@ class DraftModuleStore(MongoModuleStore):
 
         self.refresh_cached_metadata_inheritance_tree(draft_location.course_key)
 
+<<<<<<< HEAD
         return self._load_items(source_location.course_key, [original])[0]
+=======
+        return wrap_draft(self._load_items([original])[0])
+>>>>>>> edx/master
 
     def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
         """

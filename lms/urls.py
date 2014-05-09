@@ -12,6 +12,7 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 urlpatterns = ('',  # nopep8
     # certificate view
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
+    url(r'^request_certificate$', 'certificates.views.request_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^token$', 'student.views.token', name="token"),
@@ -67,6 +68,9 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
+    
+    # Feedback Form endpoint
+    url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
@@ -121,9 +125,6 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Favicon
         (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-
-        url(r'^submit_feedback$', 'util.views.submit_feedback'),
-
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -326,6 +327,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes$', 'notes.views.notes', name='notes'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes/', include('notes.urls')),
 
+        # LTI endpoints listing
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/lti_rest_endpoints/',
+            'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
     )
 
     # allow course staff to change to student view of courseware

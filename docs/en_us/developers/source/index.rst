@@ -17,7 +17,12 @@ Contents:
     change_log
     overview.rst
     extending_platform/index
+    xblocks.rst
+    pavelib.rst
+    public_sandboxes.rst
+    analytics.rst
     process/index
+    testing/index
 
 APIs
 -----
@@ -37,8 +42,6 @@ Internationalization
 
     i18n.rst
     i18n_translators_guide.rst
-    pavelib.rst
-    xblocks.rst
 
 Indices and tables
 ==================

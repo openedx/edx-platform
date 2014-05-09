@@ -23,11 +23,12 @@
       %endfor
     </select>
   </p>
+  <% format_string="MM/DD/YYYY HH:MM" %>
   <p>
-    ${_("Specify the extension due date and time "
-        "(in UTC; please specify MM/DD/YYYY HH:MM)")}
-    <input type="text" name="due_datetime" 
-           placeholder="MM/DD/YYYY HH:MM"/>
+    ## Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the format the system requires.
+    ${_("Specify the extension due date and time (in UTC; please specify {format_string}).").format(format_string=format_string)}</p>
+  <p><input type="text" name="due_datetime" 
+           placeholder="${format_string}"/>
   </p>
   <p class="request-response"></p>
   <p class="request-response-error"></p>
@@ -61,7 +62,7 @@
            data-endpoint="${section_data['show_unit_extensions_url']}">
   </p>
   <p>
-    ${_("Specify a specific student to see all of that student's extensions.")}
+    ${_("Specify a student to see all of that student's extensions.")}
   </p>
   <p>
     ${_("Specify the {platform_name} email address or username of a student "
