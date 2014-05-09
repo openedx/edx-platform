@@ -24,6 +24,10 @@ def path_to_location(modulestore, usage_key):
     If the section is a sequential or vertical, position will be the children index
     of this location under that sequence.
     '''
+    if not modulestore.has_item(usage_key):
+        raise ItemNotFoundError(usage_key)
+
+    usage_key = usage_key.replace(revision=None)
 
     def flatten(xs):
         '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
@@ -71,9 +75,6 @@ def path_to_location(modulestore, usage_key):
 
         # If we're here, there is no path
         return None
-
-    if not modulestore.has_item(usage_key):
-        raise ItemNotFoundError(usage_key)
 
     path = find_path_to_course()
     if path is None:
