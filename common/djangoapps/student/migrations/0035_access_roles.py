@@ -9,6 +9,7 @@ from opaque_keys import InvalidKeyError
 import bson.son
 import logging
 from django.db.models.query_utils import Q
+from django.db.utils import IntegrityError
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +31,6 @@ class Migration(DataMigration):
         # course only once. The below datastructures help ensure that.
         hold = {}  # key of course_id_strings with array of group objects. Should only be org scoped entries
         # or deleted courses
-        done = {}  # key to set of done role names
         orgs = {}  # downcased org to last recorded normal case of the org
         query = Q(name='course_creator_group')
         for role in ['staff', 'instructor', 'beta_testers', ]:
@@ -40,15 +40,17 @@ class Migration(DataMigration):
                 """
                 Get all the users from the old group and migrate to this course key in the new table
                 """
-                if role not in done.get(correct_course_key, {}):
-                    for user in orm['auth.user'].objects.filter(groups=group).all():
-                        entry = orm['student.courseaccessrole'](
-                            role=role, user=user,
-                            org=correct_course_key.org, course_id=correct_course_key
-                        )
+                for user in orm['auth.user'].objects.filter(groups=group).all():
+                    entry = orm['student.courseaccessrole'](
+                        role=role, user=user,
+                        org=correct_course_key.org, course_id=correct_course_key
+                    )
+                    try:
                         entry.save()
-                    orgs[lower_org] = correct_course_key.org
-                    done.setdefault(correct_course_key, set()).add(role)
+                    except IntegrityError:
+                        # already stored
+                        pass
+                orgs[lower_org] = correct_course_key.org
 
             parsed_entry = self.GROUP_ENTRY_RE.match(group.name)
             role = parsed_entry.group('role_id')
@@ -60,13 +62,11 @@ class Migration(DataMigration):
                 course_id_string = parsed_entry.group('course_id_string')
                 try:
                     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
-                    if role not in done.get(course_key, {}):
-                        # course_key is the downcased version, get the normal cased one. loc_mapper() has no
-                        # methods taking downcased SSCK; so, need to do it manually here
-                        correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection)
-                        if correct_course_key is not None:
-                            _migrate_users(correct_course_key, role, course_key.org)
-                        done.setdefault(course_key, set()).add(role)
+                    # course_key is the downcased version, get the normal cased one. loc_mapper() has no
+                    # methods taking downcased SSCK; so, need to do it manually here
+                    correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection)
+                    if correct_course_key is not None:
+                        _migrate_users(correct_course_key, role, course_key.org)
                 except InvalidKeyError:
                     entry = loc_map_collection.find_one({
                         'course_id': re.compile(r'^{}$'.format(course_id_string), re.IGNORECASE)
