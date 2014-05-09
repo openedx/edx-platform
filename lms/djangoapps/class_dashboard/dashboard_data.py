@@ -32,13 +32,13 @@ def get_problem_grade_distribution(course_id):
         course_id__exact=course_id,
         grade__isnull=False,
         module_type__exact="problem",
-    ).values('module_id', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
+    ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
 
     prob_grade_distrib = {}
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        curr_problem = course_id.make_usage_key_from_deprecated_string(row['module_id'])
+        curr_problem = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
 
         # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
@@ -70,12 +70,12 @@ def get_sequential_open_distrib(course_id):
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         module_type__exact="sequential",
-    ).values('module_id').annotate(count_sequential=Count('module_id'))
+    ).values('module_state_key').annotate(count_sequential=Count('module_state_key'))
 
     # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_id'])
+        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
         sequential_open_distrib[row_loc] = row['count_sequential']
 
     return sequential_open_distrib
@@ -101,18 +101,18 @@ def get_problem_set_grade_distrib(course_id, problem_set):
         course_id__exact=course_id,
         grade__isnull=False,
         module_type__exact="problem",
-        module_id__in=problem_set,
+        module_state_key__in=problem_set,
     ).values(
-        'module_id',
+        'module_state_key',
         'grade',
         'max_grade',
-    ).annotate(count_grade=Count('grade')).order_by('module_id', 'grade')
+    ).annotate(count_grade=Count('grade')).order_by('module_state_key', 'grade')
 
     prob_grade_distrib = {}
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_id'])
+        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
         if row_loc not in prob_grade_distrib:
             prob_grade_distrib[row_loc] = {
                 'max_grade': 0,
@@ -418,12 +418,12 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_id = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students
     students = models.StudentModule.objects.select_related('student').filter(
-        module_id__exact=module_id,
+        module_state_key__exact=module_state_key,
         module_type__exact='sequential',
     ).values('student__username', 'student__profile__name').order_by('student__profile__name')
 
@@ -468,12 +468,12 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_id = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "problem grades" students
     students = models.StudentModule.objects.select_related('student').filter(
-        module_id__exact=module_id,
+        module_state_key=module_state_key,
         module_type__exact='problem',
         grade__isnull=False,
     ).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')

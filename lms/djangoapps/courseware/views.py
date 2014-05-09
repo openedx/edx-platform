@@ -755,7 +755,7 @@ def submission_history(request, course_id, student_username, location):
         student = User.objects.get(username=student_username)
         student_module = StudentModule.objects.get(
             course_id=course_key,
-            module_id=usage_key,
+            module_state_key=usage_key,
             student_id=student.id
         )
     except User.DoesNotExist:

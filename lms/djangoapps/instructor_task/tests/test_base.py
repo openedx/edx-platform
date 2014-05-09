@@ -215,5 +215,5 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         return StudentModule.objects.get(course_id=self.course.id,
                                          student=User.objects.get(username=username),
                                          module_type=descriptor.location.category,
-                                         module_id=descriptor.location,
+                                         module_state_key=descriptor.location,
                                          )
