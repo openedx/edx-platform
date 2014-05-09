@@ -1,6 +1,6 @@
-<div class="transcripts-message-status"><i class="icon-ok"></i><%= gettext("Timed Transcript uploaded successfully") %></div>
+<div class="transcripts-message-status"><i class="icon-ok"></i><%= gettext("Timed Transcript Uploaded Successfully") %></div>
 <p class="transcripts-message">
-<%= gettext("We have a timed transcript on edX for this video. You can upload a new .srt file to replace it or download to edit.") %>
+<%= gettext("EdX has a timed transcript for this video. If you want to replace this transcript, upload a new .srt transcript file. If you want to edit this transcript, you can download, edit, and re-upload the existing transcript.") %>
 </p>
 <div class="transcripts-file-uploader"></div>
 <p class="transcripts-error-message is-invisible">
@@ -10,7 +10,7 @@
     <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcript") %>" data-tooltip="<%= gettext("Upload New Timed Transcript") %>">
         <span><%= gettext("Upload New Timed Transcript") %></span>
     </button>
-    <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download to Edit") %>">
-        <span><%= gettext("Download to Edit") %></span>
+    <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
+        <span><%= gettext("Download Transcript for Editing") %></span>
     </a>
 </div>

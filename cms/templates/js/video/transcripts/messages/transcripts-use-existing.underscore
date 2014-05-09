@@ -1,10 +1,10 @@
 <div class="transcripts-message-status status-error">
     <i class="icon-remove"></i>
-    <%= gettext("Timed Transcript Not Updated") %>
+    <%= gettext("Confirm Timed Transcript") %>
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("You changed a video source, but did not update the timed transcript file. Do you want to upload new timed transcript?") %>
+    <%= gettext("You changed a video URL, but did not change the timed transcript file. Do you want to use the current timed transcript or upload a new .srt transcript file?") %>
 </p>
 
 <div class="transcripts-file-uploader"></div>
@@ -18,11 +18,11 @@
         class="action setting-use-existing"
         type="button"
         name="setting-use-existing"
-        value="<%= gettext("Use Existing Timed Transcript") %>"
-        data-tooltip="<%= gettext("Use Existing Timed Transcript") %>"
+        value="<%= gettext("Use Current Timed Transcript") %>"
+        data-tooltip="<%= gettext("Use Current Timed Transcript") %>"
     >
         <span>
-            <%= gettext("Use Existing Timed Transcript") %>
+            <%= gettext("Use Current Timed Transcript") %>
         </span>
     </button>
     <button
