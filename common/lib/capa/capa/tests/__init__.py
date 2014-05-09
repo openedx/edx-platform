@@ -57,3 +57,15 @@ def test_capa_system():
 def new_loncapa_problem(xml, capa_system=None, seed=723):
     """Construct a `LoncapaProblem` suitable for unit tests."""
     return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system())
+
+
+def load_fixture(relpath):
+    """
+    Return a `unicode` object representing the contents
+    of the fixture file at the given path within a test_files directory
+    in the same directory as the test file.
+    """
+    abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
+    with open(abspath) as fixture_file:
+        contents = fixture_file.read()
+    return contents.decode('utf8')
