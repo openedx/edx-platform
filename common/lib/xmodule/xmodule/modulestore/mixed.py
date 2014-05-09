@@ -182,7 +182,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
     def delete_course(self, course_key, user_id=None):
         """
-        Remove the given course from its modulestore.
+        See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
         assert(isinstance(course_key, CourseKey))
         store = self._get_modulestore_for_courseid(course_key)
