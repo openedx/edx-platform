@@ -33,10 +33,10 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
         messageHtml: function() {
             var message;
             if (this.view.collection.sortDirection === 'asc') {
-                // Translators: sample result: "Showing 0-9 out of 25, sorted by name ascending"
+                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added ascending"
                 message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s ascending');
             } else {
-                // Translators: sample result: "Showing 0-9 out of 25, sorted by name descending"
+                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added descending"
                 message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s descending');
             }
             return '<p>' + interpolate(message, {
@@ -60,6 +60,7 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
 
         totalItemsCountLabel: function() {
             var totalItemsLabel;
+            // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
             totalItemsLabel = interpolate(gettext('%(total_items)s total'), {
                 total_items: this.view.collection.totalCount
             }, true);
