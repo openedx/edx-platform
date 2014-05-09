@@ -209,7 +209,7 @@ def dump_student_extensions(course, student):
     for module in query:
         state = json.loads(module.state)
         # temporary hack: module_state_key is missing the run but units are not. fix module_state_key
-        module_loc = module.map_into_course(module.course_id)
+        module_loc = module.module_state_key.map_into_course(module.course_id)
         if module_loc not in units:
             continue
         extended_due = state.get("extended_due")
