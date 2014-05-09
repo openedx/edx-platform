@@ -72,6 +72,7 @@ class VideoPage(PageObject):
             promise_desc (str): Description of the Promise, used in log messages.
 
         """
+
         def _is_element_present():
             """
             Check if web-element present in DOM.
@@ -649,3 +650,94 @@ class VideoPage(PageObject):
         language_names = self.q(css=languages_selector).attrs('textContent')
 
         return dict(zip(language_codes, language_names))
+
+    @property
+    def position(self, video_display_name=None):
+        """
+        Gets current video slider position.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            str: current seek position in format min:sec.
+
+        """
+        selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['video_time'])
+        current_seek_position = self.q(css=selector).text[0]
+        return current_seek_position.split('/')[0].strip()
+
+    def state(self, video_display_name=None):
+        """
+        Extract the current state(play, pause etc) of video.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            str: current video state
+
+        """
+        state_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['video_container'])
+        current_state = self.q(css=state_selector).attrs('class')[0]
+
+        if 'is-playing' in current_state:
+            return 'playing'
+        elif 'is-paused' in current_state:
+            return 'pause'
+        elif 'is-buffered' in current_state:
+            return 'buffering'
+        elif 'is-ended' in current_state:
+            return 'finished'
+
+    def wait_for_event(self, event, video_display_name=None):
+        """
+        Wait until `event` occurs.
+
+        Arguments:
+            event (str): event we wait for.
+            video_display_name (str or None): Display name of a Video.
+
+        """
+        def _check_event():
+            """
+            Event occurred promise check.
+
+            Returns:
+                bool: is event occurred.
+
+            """
+            return self.state(video_display_name) == event
+
+        EmptyPromise(_check_event, 'Event is {event}'.format(event=event), timeout=200).fulfill()
+
+    def _parse_time_str(self, time_str):
+        """
+        Parse a string of the form 1:23 into seconds (int).
+
+        Arguments:
+            time_str (str): seek value
+
+        Returns:
+            int: seek value in seconds
+
+        """
+        time_obj = time.strptime(time_str, '%M:%S')
+        return time_obj.tm_min * 60 + time_obj.tm_sec
+
+    def seek(self, seek_value, video_display_name=None):
+        """
+        Seek the video to position specified by `seek_value`.
+
+        Arguments:
+            seek_value (str): seek value
+            video_display_name (str or None): Display name of a Video.
+
+        """
+        seek_time = self._parse_time_str(seek_value)
+        seek_selector = self.get_element_selector(video_display_name, ' .video')
+        js_code = "$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
+            seek_selector=seek_selector, seek_time=seek_time)
+        self.browser.execute_script(js_code)
+
+        self.wait_for_video_player_render()
