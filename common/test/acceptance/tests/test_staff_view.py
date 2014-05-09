@@ -108,7 +108,7 @@ class StaffDebugTest(UniqueCourseTest):
         msg = staff_debug_page.idash_msg[0]
         # Since we aren't running celery stuff, this will fail badly
         # for now, but is worth excercising that bad of a response
-        self.assertEqual(u'Unsuccessfully rescored problem. '
+        self.assertEqual(u'Failed to rescore problem. '
                          'Unknown Error Occurred.', msg)
 
     def test_student_state_delete(self):
@@ -147,5 +147,5 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state('INVALIDUSER')
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Unsuccessfully deleted student state. '
+        self.assertEqual(u'Failed to delete student state. '
                          'User does not exist.', msg)

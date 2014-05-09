@@ -31,11 +31,8 @@ var StaffDebug = (function(){
         data: pdata,
         success: function(data){
             var text = _.template(
-                gettext('Successfully {action} for user {user}'),
-                {
-                    action: action.description, 
-                    user: data.student
-                },
+                action.success_msg,
+                {user: data.student},
                 {interpolate: /\{(.+?)\}/g}
             )
             var html = _.template(
@@ -53,10 +50,10 @@ var StaffDebug = (function(){
                 response_json = { error: gettext('Unknown Error Occurred.') };
             }
             var text = _.template(
-                gettext('Unsuccessfully {action}. {error}'),
+                '{error_msg} {error}',
                 {
-                    error: response_json.error,
-                    action: action.description
+                    error_msg: action.error_msg,
+                    error: response_json.error
                 },
                 {interpolate: /\{(.+?)\}/g}
             )
@@ -75,7 +72,8 @@ var StaffDebug = (function(){
     this.do_idash_action({
         location: locname,
         method: 'reset_student_attempts',
-        description: gettext('reset the attempts'),
+        success_msg: gettext('Successfully reset the attempts for user {user}'),
+        error_msg: gettext('Failed to reset attempts.'),
         delete_module: false
     });
   }
@@ -84,7 +82,8 @@ var StaffDebug = (function(){
     this.do_idash_action({
         location: locname,
         method: 'reset_student_attempts',
-        description: gettext('deleted student state'),
+        success_msg: gettext('Successfully deleted student state for user {user}'),
+        error_msg: gettext('Failed to delete student state.'),
         delete_module: true
     });
   }
@@ -93,7 +92,8 @@ var StaffDebug = (function(){
     this.do_idash_action({
         location: locname,
         method: 'rescore_problem',
-        description: gettext('rescored problem'),
+        success_msg: gettext('Successfully rescored problem for user {user}'),
+        error_msg: gettext('Failed to rescore problem.'),
         delete_module: false
     });
   }
