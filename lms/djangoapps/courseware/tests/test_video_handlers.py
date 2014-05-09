@@ -21,6 +21,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsGenerationException,
 )
 from xmodule.modulestore.mongo.base import MongoModuleStore
+from xmodule.modulestore.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0
@@ -63,7 +64,7 @@ def _clear_assets(location):
 
     assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
-        asset_location = MongoModuleStore._location_from_id(asset["_id"], location.course_key.run)
+        asset_location = AssetLocation._from_deprecated_son(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
         mongo_id = StaticContent.get_id_from_location(asset_location)
         store.delete(mongo_id)
