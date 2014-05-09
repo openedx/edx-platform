@@ -86,7 +86,11 @@ You can designate a team of people to help you run course discussions. Different
 
 * Discussion admins have the same options for working with discussions as moderators. Admins can also assign these discussion management roles to more people while your course is running, or remove a role from a user whenever necessary. Responses and comments made by admins are marked as "Staff".
 
-.. note:: Discussion responses and comments made by course staff and instructors are also marked as "Staff".
+.. note:: 
+  Course staff and instructors that you set up in Studio are not automatically
+  granted discussion administration roles. You must explicitly grant discussion
+  administration roles to course staff and instructors if they intend to
+  administer course discussions.
 
 Before you can assign roles to your discussion administrators, you need their email addresses or usernames. 
 
