@@ -168,7 +168,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             'courseware.module_render.handle_xblock_callback_noauth',
             args=[
                 self.course.id.to_deprecated_string(),
-                quote_slashes(unicode(self.lti_published.scope_ids.usage_id).encode('utf-8')),
+                quote_slashes(unicode(self.lti_published.scope_ids.usage_id.to_deprecated_string()).encode('utf-8')),
                 handler
             ]
         ))

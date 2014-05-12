@@ -381,11 +381,9 @@ class SSLClientTest(ModuleStoreTestCase):
         user = User.objects.get(email=self.USER_EMAIL)
         CourseEnrollment.enroll(user, course.id)
 
-        CourseStaffRole(course.location).add_users(user)
-        location = Location(['i4x', 'MITx', '999', 'course',
-                             Location.clean('Robot Super Course'), None])
+        CourseStaffRole(course.id).add_users(user)
         new_location = loc_mapper().translate_location(
-            location.course_id, location, True, True
+            course.location, True, True
         )
         course_private_url = new_location.url_reverse('course/', '')
         self.assertFalse(SESSION_KEY in self.client.session)

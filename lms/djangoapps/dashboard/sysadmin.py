@@ -573,7 +573,7 @@ class Courses(SysadminDashboardView):
                 # don't delete user permission groups, though
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), loc, course.id.to_deprecated_string(), course.display_name)
+                        _('Deleted'), course.location.to_deprecated_string(), course.id.to_deprecated_string(), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),

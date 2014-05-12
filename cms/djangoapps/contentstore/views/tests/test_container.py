@@ -128,7 +128,7 @@ class ContainerViewTestCase(CourseTestCase):
         """
         Verify that the specified xblock has the expected HTML elements for container preview
         """
-        locator = loc_mapper().translate_location(self.course.id, xblock.location, published=False)
+        locator = loc_mapper().translate_location(xblock.location, published=False)
         publish_state = compute_publish_state(xblock)
         preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
 
