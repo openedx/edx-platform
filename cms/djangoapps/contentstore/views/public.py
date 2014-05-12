@@ -44,15 +44,11 @@ def login_page(request):
         # SSL login doesn't require a login view, so redirect
         # to course now that the user is authenticated via
         # the decorator.
-<<<<<<< HEAD
-        return redirect('/course/')
-=======
         next_url = request.GET.get('next')
         if next_url:
             return redirect(next_url)
         else:
-            return redirect('/course')
->>>>>>> edx/master
+            return redirect('/course/')
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))

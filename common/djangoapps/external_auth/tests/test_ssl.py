@@ -16,22 +16,19 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import Mock
 
+import external_auth.views
 from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
-import external_auth.views
+from opaque_keys import InvalidKeyError
+from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
-<<<<<<< HEAD
-from opaque_keys import InvalidKeyError
-=======
-from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
                                                     mixed_store_config)
 from xmodule.modulestore.tests.factories import CourseFactory
->>>>>>> edx/master
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True

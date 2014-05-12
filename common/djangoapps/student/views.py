@@ -1856,7 +1856,6 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
-<<<<<<< HEAD
 
 
 @login_required
@@ -1880,5 +1879,3 @@ def token(request):
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
     return response
-=======
->>>>>>> edx/master

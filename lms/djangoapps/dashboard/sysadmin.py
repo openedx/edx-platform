@@ -488,17 +488,9 @@ class Courses(SysadminDashboardView):
 
         data = []
 
-<<<<<<< HEAD
         for course in self.get_courses():
-            gdir = course.id.run
+            gdir = course.id.course
             data.append([course.display_name, course.id.to_deprecated_string()]
-=======
-        for (cdir, course) in courses.items():
-            gdir = cdir
-            if '/' in cdir:
-                gdir = cdir.split('/')[1]
-            data.append([course.display_name, cdir]
->>>>>>> edx/master
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'), _('Directory/ID'),
@@ -580,14 +572,8 @@ class Courses(SysadminDashboardView):
                 delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
-<<<<<<< HEAD
-                    u"<font color='red'>{0} {1} ({2})</font>".format(
-                        _('Deleted'), course.id.to_deprecated_string(), course.display_name)
-            datatable = self.make_datatable()
-=======
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), loc, course.id, course.display_name)
->>>>>>> edx/master
+                        _('Deleted'), loc, course.id.to_deprecated_string(), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),
