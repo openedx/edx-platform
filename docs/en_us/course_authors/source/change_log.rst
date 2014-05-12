@@ -12,9 +12,13 @@ May, 2014
 
    * - Date
      - Change
-   * - 05/13/14
+   * - 05/14/14
      - Updated the :ref:`Enrollment` section to reflect that usernames or email
        addresses can be used to batch enroll students.
+   * - 
+     - Updated the :ref:`Grades` section to reflect new features on the problem
+       **Staff Debug** viewer for rescoring, resetting attempts, and deleting
+       student state.
    * - 05/09/14
      - Updated :ref:`Assigning_discussion_roles` with a note about course staff
        requiring explicit granting of discussion administration roles.
