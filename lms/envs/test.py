@@ -37,6 +37,8 @@ FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
+FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
+
 # Enable this feature for course staff grade downloads, to enable acceptance tests
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
@@ -315,3 +317,9 @@ FEATURES['USE_MICROSITES'] = True
 
 ######### LinkedIn ########
 LINKEDIN_API['COMPANY_ID'] = '0000000'
+
+# Setting for the testing of Software Secure Result Callback
+VERIFY_STUDENT["SOFTWARE_SECURE"] = {
+        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+}

@@ -17,6 +17,7 @@ function (VideoPlayer) {
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
+            window.Video.previousState = null;
             if (state.storage) {
                 state.storage.clear();
             }
@@ -178,6 +179,11 @@ function (VideoPlayer) {
 
             it('autoplay the first video', function () {
                 expect(state.videoPlayer.play).not.toHaveBeenCalled();
+            });
+
+
+            it('invalid endTime is reset to null', function () {
+                expect(state.videoPlayer.endTime).toBe(null);
             });
         });
 
@@ -752,17 +758,6 @@ function (VideoPlayer) {
                     isFlashMode: jasmine.createSpy().andReturn(false)
                 };
             });
-
-            it('invalid endTime is reset to null', function () {
-                VideoPlayer.prototype.updatePlayTime.call(state, 0);
-
-                expect(state.videoPlayer.figureOutStartingTime).toHaveBeenCalled();
-
-                VideoPlayer.prototype.figureOutStartEndTime.call(state, 60);
-                VideoPlayer.prototype.figureOutStartingTime.call(state, 60);
-
-                expect(state.videoPlayer.endTime).toBe(null);
-            });
         });
 
         describe('toggleFullScreen', function () {
@@ -1087,9 +1082,12 @@ function (VideoPlayer) {
                     isHtml5Mode: jasmine.createSpy().andReturn(true),
                     isYoutubeType: jasmine.createSpy().andReturn(true),
                     setPlayerMode: jasmine.createSpy(),
+                    trigger: jasmine.createSpy(),
                     videoPlayer: {
                         currentTime: 60,
                         isPlaying: jasmine.createSpy(),
+                        seekTo: jasmine.createSpy(),
+                        duration: jasmine.createSpy().andReturn(60),
                         updatePlayTime: jasmine.createSpy(),
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', [
@@ -1115,6 +1113,12 @@ function (VideoPlayer) {
                 state.videoPlayer.isPlaying.andReturn(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
+                expect(state.videoPlayer.seekTo).toHaveBeenCalledWith(60);
+                expect(state.trigger).toHaveBeenCalledWith(
+                    'videoProgressSlider.updateStartEndTimeRegion',
+                    {
+                        duration: 60
+                    });
                 expect(state.videoPlayer.player.cueVideoById)
                     .toHaveBeenCalledWith('videoId', 60);
             });

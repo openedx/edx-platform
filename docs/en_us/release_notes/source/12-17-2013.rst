@@ -2,23 +2,29 @@
 December 18, 2013
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
 
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+* `edX Data Documentation`_
+
+
+* `edX Platform Developer Documentation`_
+
+.. include:: links.rst
 
 *************
 edX Studio
 *************
-
-New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
-
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
-
-
-==========================
-Changes and Updates
-==========================
 
 The following changes are included in this release: 
 
@@ -58,4 +64,3 @@ The following changes are included in this release:
 
 * The text formatting buttons in the forum post editor are now keyboard accessible. 
   Students and staff can tab through the buttons and activate a button with the Enter or space key.
-

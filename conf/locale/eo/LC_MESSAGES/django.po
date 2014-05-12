@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-28 11:26-0400\n"
-"PO-Revision-Date: 2014-04-28 15:26:13.087798\n"
+"POT-Creation-Date: 2014-05-05 09:26-0400\n"
+"PO-Revision-Date: 2014-05-05 13:26:48.373471\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -830,8 +830,8 @@ msgid "unanswered"
 msgstr "ünänswéréd Ⱡ#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
-msgstr "qüéüéd Ⱡ'σяєм ιρѕ#"
+msgid "processing"
+msgstr "pröçéssïng Ⱡ#"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -5399,9 +5399,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr "Sïgn ïn wïth {provider_name} Ⱡ'σ#"
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "Éxtérnäl résöürçé Ⱡ'σ#"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr "{points} / {total_points} pöïnts Ⱡ'σ#"
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr "{total_points} pöïnts pössïßlé Ⱡ'σя#"
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -5413,6 +5427,10 @@ msgid ""
 msgstr ""
 "Pléäsé prövïdé läünçh_ürl. Çlïçk \"Édït\", änd fïll ïn thé réqüïréd fïélds. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
+msgstr "Féédßäçk ön ýöür wörk fröm thé grädér: Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -7352,6 +7370,12 @@ msgid ""
 msgstr ""
 "Fïnäl çöürsé détäïls äré ßéïng wräppéd üp ät thïs tïmé. Ýöür fïnäl ständïng "
 "wïll ßé äväïläßlé shörtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+"Ýöür fïnäl ständïng ïs ünréqüéstéd ör ünäväïläßlé ät thïs tïmé. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"

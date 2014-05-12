@@ -13,7 +13,7 @@ from uuid import uuid4
 import textwrap
 import urllib
 import re
-from oauthlib.oauth1.rfc5849 import signature
+from oauthlib.oauth1.rfc5849 import signature, parameters
 import oauthlib.oauth1
 import hashlib
 import base64
@@ -46,7 +46,16 @@ class StubLtiHandler(StubHttpRequestHandler):
             status_message = 'LTI consumer (edX) responded with XML content:<br>' + self.server.grade_data['TC answer']
             content = self._create_content(status_message)
             self.send_response(200, content)
-
+        elif 'lti2_outcome' in self.path and self._send_lti2_outcome().status_code == 200:
+            status_message = 'LTI consumer (edX) responded with HTTP {}<br>'.format(
+                self.server.grade_data['status_code'])
+            content = self._create_content(status_message)
+            self.send_response(200, content)
+        elif 'lti2_delete' in self.path and self._send_lti2_delete().status_code == 200:
+            status_message = 'LTI consumer (edX) responded with HTTP {}<br>'.format(
+                self.server.grade_data['status_code'])
+            content = self._create_content(status_message)
+            self.send_response(200, content)
         # Respond to request with correct lti endpoint
         elif self._is_correct_lti_request():
             params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
@@ -57,7 +66,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                 # Set data for grades what need to be stored as server data
                 if 'lis_outcome_service_url' in self.post_dict:
                     self.server.grade_data = {
-                        'callback_url': self.post_dict.get('lis_outcome_service_url'),
+                        'callback_url': self.post_dict.get('lis_outcome_service_url').replace('https', 'http'),
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
 
@@ -122,16 +131,75 @@ class StubLtiHandler(StubHttpRequestHandler):
         self.server.grade_data['TC answer'] = response.content
         return response
 
+    def _send_lti2_outcome(self):
+        """
+        Send a grade back to consumer
+        """
+        payload = textwrap.dedent("""
+        {{
+         "@context" : "http://purl.imsglobal.org/ctx/lis/v2/Result",
+         "@type" : "Result",
+         "resultScore" : {score},
+         "comment" : "This is awesome."
+        }}
+        """)
+        data = payload.format(score=0.8)
+        return self._send_lti2(data)
+
+    def _send_lti2_delete(self):
+        """
+        Send a delete back to consumer
+        """
+        payload = textwrap.dedent("""
+        {
+         "@context" : "http://purl.imsglobal.org/ctx/lis/v2/Result",
+         "@type" : "Result"
+        }
+        """)
+        return self._send_lti2(payload)
+
+    def _send_lti2(self, payload):
+        """
+        Send lti2 json result service request.
+        """
+        ### We compute the LTI V2.0 service endpoint from the callback_url (which is set by the launch call)
+        url = self.server.grade_data['callback_url']
+        url_parts = url.split('/')
+        url_parts[-1] = "lti_2_0_result_rest_handler"
+        anon_id = self.server.grade_data['sourcedId'].split(":")[-1]
+        url_parts.extend(["user", anon_id])
+        new_url = '/'.join(url_parts)
+
+        content_type = 'application/vnd.ims.lis.v2.result+json'
+        headers = {
+            'Content-Type': content_type,
+            'Authorization': self._oauth_sign(new_url, payload,
+                                              method='PUT',
+                                              content_type=content_type)
+        }
+
+        # Send request ignoring verifirecation of SSL certificate
+        response = requests.put(new_url, data=payload, headers=headers, verify=False)
+        self.server.grade_data['status_code'] = response.status_code
+        self.server.grade_data['TC answer'] = response.content
+        return response
+
     def _create_content(self, response_text, submit_url=None):
         """
         Return content (str) either for launch, send grade or get result from TC.
         """
         if submit_url:
             submit_form = textwrap.dedent("""
-                <form action="{}/grade" method="post">
+                <form action="{submit_url}/grade" method="post">
                     <input type="submit" name="submit-button" value="Submit">
                 </form>
-            """).format(submit_url)
+                <form action="{submit_url}/lti2_outcome" method="post">
+                    <input type="submit" name="submit-lti2-button" value="Submit">
+                </form>
+                <form action="{submit_url}/lti2_delete" method="post">
+                    <input type="submit" name="submit-lti2-delete-button" value="Submit">
+                </form>
+            """).format(submit_url=submit_url)
         else:
             submit_form = ''
 
@@ -169,9 +237,9 @@ class StubLtiHandler(StubHttpRequestHandler):
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         return lti_endpoint in self.path
 
-    def _oauth_sign(self, url, body):
+    def _oauth_sign(self, url, body, content_type=u'application/x-www-form-urlencoded', method=u'POST'):
         """
-        Signs request and returns signed body and headers.
+        Signs request and returns signed Authorization header.
         """
         client_key = self.server.config.get('client_key', self.DEFAULT_CLIENT_KEY)
         client_secret = self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET)
@@ -181,21 +249,27 @@ class StubLtiHandler(StubHttpRequestHandler):
         )
         headers = {
             # This is needed for body encoding:
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': content_type,
         }
 
         # Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
         sha1.update(body)
-        oauth_body_hash = base64.b64encode(sha1.digest())
-        __, headers, __ = client.sign(
-            unicode(url.strip()),
-            http_method=u'POST',
-            body={u'oauth_body_hash': oauth_body_hash},
-            headers=headers
+        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))  # pylint: disable=too-many-function-args
+        params = client.get_oauth_params()
+        params.append((u'oauth_body_hash', oauth_body_hash))
+        mock_request = mock.Mock(
+            uri=unicode(urllib.unquote(url)),
+            headers=headers,
+            body=u"",
+            decoded_body=u"",
+            oauth_params=params,
+            http_method=unicode(method),
         )
-        headers = headers['Authorization'] + ', oauth_body_hash="{}"'.format(oauth_body_hash)
-        return headers
+        sig = client.get_oauth_signature(mock_request)
+        mock_request.oauth_params.append((u'oauth_signature', sig))
+        new_headers = parameters.prepare_headers(mock_request.oauth_params, headers, realm=None)
+        return new_headers['Authorization']
 
     def _check_oauth_signature(self, params, client_signature):
         """

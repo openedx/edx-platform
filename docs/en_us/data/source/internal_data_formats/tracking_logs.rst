@@ -19,7 +19,9 @@ The sections in this chapter describe:
 Sample Event
 *************************
 
-A sample event from an edX.log file follows. The JSON documents that include the event data are included in the log file as raw data, so they appear in this compact format.
+A sample event from an edX.log file follows. The JSON documents that include
+event data are delivered in a compact, machine-readable format that can be
+difficult to read at a glance.
 
 .. code-block:: json
 

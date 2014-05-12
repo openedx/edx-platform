@@ -7,6 +7,7 @@ import os.path
 import fs.osfs
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
+from capa.inputtypes import Status
 from mock import Mock, MagicMock
 
 import xml.sax.saxutils as saxutils
@@ -47,6 +48,7 @@ def test_capa_system():
         render_template=tst_render_template,
         seed=0,
         STATIC_URL='/dummy-static/',
+        STATUS_CLASS=Status,
         xqueue={'interface': xqueue_interface, 'construct_callback': calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
     )
     return the_system

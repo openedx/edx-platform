@@ -7,7 +7,7 @@ from unittest import skip
 
 from bok_choy.promise import Promise, BrokenPromise
 from ..pages.lms.peer_confirm import PeerConfirmPage
-from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage

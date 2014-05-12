@@ -4,11 +4,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# AleksandraS. <a_serafimovska@hotmail.com>, 2014
+# lillith, 2014
 # gianlorenzo <gianlo86@gmail.com>, 2013
 # gianlorenzo <gianlo86@gmail.com>, 2013
 # gimbo <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # gimbo <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # caesar2164, 2014
+# lillith, 2014
 # marcore <mrc.re@tiscali.it>, 2014
 # Monica Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Crapanzano <m.crapanzano@estartup.it>, 2013
@@ -19,6 +22,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# AleksandraS. <a_serafimovska@hotmail.com>, 2014
 # funkoolow <funkoolow@gmail.com>, 2014
 # gianlorenzo <gianlo86@gmail.com>, 2013
 # gimbo <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
@@ -30,9 +34,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-24 13:00+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-05-02 17:09-0400\n"
+"PO-Revision-Date: 2014-04-29 22:40+0000\n"
+"Last-Translator: AleksandraS. <a_serafimovska@hotmail.com>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/projects/p/edx-platform/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

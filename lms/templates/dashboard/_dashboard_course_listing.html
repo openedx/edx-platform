@@ -11,7 +11,7 @@
   cert_name_short = course.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
-  
+
   cert_name_long = course.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
@@ -21,7 +21,11 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
-  <article class="course ${enrollment.mode}">
+  % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+    <article class="course ${enrollment.mode}">
+  % else:
+    <article class="course">
+  %endif
     <%
       course_target = reverse('info', args=[course.id])
     %>
@@ -35,13 +39,24 @@
         <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
       </div>
     % endif
-
-    % if enrollment.mode == "verified":
-      <span class="sts-enrollment">
-        <span class="label">${_("Enrolled as: ")}</span>
-        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
-        <span class="sts-enrollment-value">${_("ID Verified")}</span>
-      </span>
+    % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+        % if enrollment.mode == "verified":
+          <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
+            <span class="sts-enrollment-value">${_("Verified")}</span>
+          </span>
+        % elif enrollment.mode == "honor":
+          <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Honor Code")}</span>
+          </span>
+        % elif enrollment.mode == "audit":
+          <span class="sts-enrollment" title="${_("You're auditing this course")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Auditing")}</span>
+          </span>
+        % endif
     % endif
 
     <section class="info">
@@ -67,7 +82,7 @@
         </h3>
       </hgroup>
 
-      % if course.has_ended() and cert_status and not enrollment.mode == 'audit':
+      % if course.may_certify() and cert_status:
       <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 

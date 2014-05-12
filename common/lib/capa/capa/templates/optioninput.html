@@ -13,10 +13,10 @@
     </select>
 
   <span id="answer_${id}"></span>  
-  <span class="status ${status_class}"
+  <span class="status ${status.classname}"
       id="status_${id}"
       aria-describedby="input_${id}">
-    <span class="sr">${value|h} - ${status_display}</span>
+    <span class="sr">${value|h} - ${status.display_name}</span>
   </span>
 
   % if msg:

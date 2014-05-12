@@ -71,7 +71,6 @@ To create this problem in the Advanced Editor, click the **Advanced** tab in the
 .. code-block:: xml
 
   <problem>
-  <startouttext/>
     <p>Learning about the benefits of preventative healthcare can be particularly difficult. Check all of the reasons below why this may be the case.</p>
 
   <choiceresponse>
@@ -81,6 +80,7 @@ To create this problem in the Advanced Editor, click the **Advanced** tab in the
       <choice correct="true"><text>If others are immunized, fewer people will fall sick regardless of a particular individual's choice to get immunized or not.</text></choice>
       <choice correct="true"><text>Trust in healthcare professionals and government officials is fragile.</text></choice>
     </checkboxgroup>
+  </choiceresponse>
 
    <solution>
    <div class="detailed-solution">
@@ -88,7 +88,6 @@ To create this problem in the Advanced Editor, click the **Advanced** tab in the
    <p>People who are not immunized against a disease may still not fall sick from the disease. If someone is trying to learn whether or not preventative measures against the disease have any impact, he or she may see these people and conclude, since they have remained healthy despite not being immunized, that immunizations have no effect. Consequently, he or she would tend to believe that immunization (or other preventative measures) have fewer benefits than they actually do.</p>
    </div>
    </solution>
-  </choiceresponse>
   </problem>
 
 .. _Checkbox Problem XML:
@@ -104,7 +103,6 @@ Template
 .. code-block:: xml
 
   <problem>
-  <startouttext/>
     <p>Question text</p>
 
   <choiceresponse>
@@ -113,6 +111,7 @@ Template
   <choice correct="false"><text>Answer option 1 (incorrect)</text></choice>
   <choice correct="true"><text>Answer option 2 (correct)</text></choice>
   </checkboxgroup>
+  </choiceresponse>
 
    <solution>
    <div class="detailed-solution">
@@ -121,7 +120,6 @@ Template
    </div>
    </solution>
 
-  </choiceresponse>
   </problem>
 
 ======
