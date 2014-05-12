@@ -19,6 +19,9 @@ May, 2014
      - Updated the :ref:`Grades` section to reflect new features on the problem
        **Staff Debug** viewer for rescoring, resetting attempts, and deleting
        student state.
+   * - 
+     - Updated the :ref:`Course_Staffing` section to state the labelling
+       differences between Studio and the LMS with respect to course team roles.
    * - 05/09/14
      - Updated :ref:`Assigning_discussion_roles` with a note about course staff
        requiring explicit granting of discussion administration roles.
