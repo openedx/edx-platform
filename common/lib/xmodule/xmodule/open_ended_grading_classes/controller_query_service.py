@@ -37,7 +37,7 @@ class ControllerQueryService(GradingService):
     def check_combined_notifications(self, course_id, student_id, user_is_staff, last_time_viewed):
         params = {
             'student_id': student_id,
-            'course_id': course_id,
+            'course_id': course_id.to_deprecated_string(),
             'user_is_staff': user_is_staff,
             'last_time_viewed': last_time_viewed,
         }
