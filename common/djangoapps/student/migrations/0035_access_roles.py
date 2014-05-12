@@ -77,7 +77,7 @@ class Migration(DataMigration):
                         correct_course_key = SlashSeparatedCourseKey(*entry['_id'].values())
                         _migrate_users(correct_course_key, role, entry['lower_id']['org'])
 
-        # see if any in hold ere missed above
+        # see if any in hold were missed above
         for held_auth_scope, groups in hold.iteritems():
             # orgs indexed by downcased org
             held_auth_scope = held_auth_scope.lower()
@@ -93,7 +93,7 @@ class Migration(DataMigration):
                         )
                         entry.save()
             else:
-                # should this just log or really make an effort to do the conversion?
+                # don't silently skip unexpected roles
                 log.warn("Didn't convert roles %s", [group.name for group in groups])
 
     def backwards(self, orm):
@@ -114,7 +114,8 @@ class Migration(DataMigration):
         ])
         entry = loc_map_collection.find_one(course_son)
         if entry:
-            return SlashSeparatedCourseKey(*entry['_id'].values())
+            idpart = entry['_id']
+            return SlashSeparatedCourseKey(idpart['org'], idpart['course'], idpart['name'])
         else:
             return None
 
