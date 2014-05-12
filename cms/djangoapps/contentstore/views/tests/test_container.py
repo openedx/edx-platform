@@ -7,7 +7,7 @@ import json
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.helpers import xblock_studio_url
-from xmodule.modulestore.django import loc_mapper, modulestore
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
@@ -128,9 +128,8 @@ class ContainerViewTestCase(CourseTestCase):
         """
         Verify that the specified xblock has the expected HTML elements for container preview
         """
-        locator = loc_mapper().translate_location(xblock.location, published=False)
         publish_state = compute_publish_state(xblock)
-        preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
+        preview_url = '/xblock/{}/container_preview'.format(xblock.location)
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)

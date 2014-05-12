@@ -178,8 +178,7 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        locator = loc_mapper().translate_location(self.test_tab.location)
-        preview_url = '/xblock/{locator}/student_view'.format(locator=unicode(locator))
+        preview_url = '/xblock/{}/student_view'.format(self.test_tab.location)
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
