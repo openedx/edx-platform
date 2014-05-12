@@ -17,12 +17,13 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 DELAY = 0.5
 
 ERROR_MESSAGES = {
-    'url_format': u'Incorrect URL format.',
-    'file_type': u'Video file types must be unique.',
+    'url_format': u'Incorrect url format.',
+    'file_type': u'Link types should be unique.',
 }
 
 STATUSES = {
     'found': u'Timed Transcript Found',
+    'not found on edx': u'No EdX Timed Transcript',
     'not found': u'No Timed Transcript',
     'replace': u'Timed Transcript Conflict',
     'uploaded_successfully': u'Timed Transcript Uploaded Successfully',
@@ -39,13 +40,13 @@ SELECTORS = {
 
 # button type , button css selector, button message
 TRANSCRIPTS_BUTTONS = {
-    'import': ('.setting-import',  'Import YouTube Transcript'),
+    'import': ('.setting-import', 'Import YouTube Transcript'),
     'download_to_edit': ('.setting-download', 'Download Transcript for Editing'),
     'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download Transcript for Editing'),
-    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcript'),
+    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Transcript'),
     'replace': ('.setting-replace', 'Yes, replace the edX transcript with the YouTube transcript'),
     'choose': ('.setting-choose', 'Timed Transcript from {}'),
-    'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcript'),
+    'use_existing': ('.setting-use-existing', 'Use Current Transcript'),
 }
 
 
@@ -210,7 +211,8 @@ def check_text_in_the_captions(_step, text):
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
     world.select_editor_tab('Advanced')
-    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
+    tab = world.css_find('#settings-tab').first;
+    field_id = '#' + tab.find_by_xpath('.//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
     assert any(values_list)
     world.select_editor_tab('Basic')
@@ -228,8 +230,9 @@ def open_tab(_step, tab_name):
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')
 def set_value_transcripts_field(_step, value, field_name):
-    XPATH = '//label[text()="{name}"]'.format(name=field_name)
-    SELECTOR = '#' + world.browser.find_by_xpath(XPATH)[0]['for']
+    tab = world.css_find('#settings-tab').first;
+    XPATH = './/label[text()="{name}"]'.format(name=field_name)
+    SELECTOR = '#' + tab.find_by_xpath(XPATH)[0]['for']
     element = world.css_find(SELECTOR).first
     if element['type'] == 'text':
         SCRIPT = '$("{selector}").val("{value}").change()'.format(
