@@ -326,10 +326,12 @@ class TestMongoModuleStore(object):
         self.content_store.find(location)
 
         root_dir = path(mkdtemp())
-        export_to_xml(self.store, self.content_store, course_location, root_dir, 'test_export')
-        assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
-        assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
-        shutil.rmtree(root_dir)
+        try:
+            export_to_xml(self.store, self.content_store, course_location, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+            assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
 
     def test_export_course_image_nondefault(self):
         """
@@ -340,10 +342,12 @@ class TestMongoModuleStore(object):
         assert_true(course.course_image, 'just_a_test.jpg')
 
         root_dir = path(mkdtemp())
-        export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
-        assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
-        assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
-        shutil.rmtree(root_dir)
+        try:
+            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
+            assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
 
     def test_course_without_image(self):
         """
@@ -352,10 +356,12 @@ class TestMongoModuleStore(object):
         """
         course = self.get_course_by_id('edX/simple_with_draft/2012_Fall')
         root_dir = path(mkdtemp())
-        export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
-        assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
-        assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
-        shutil.rmtree(root_dir)
+        try:
+            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+            assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
 
 
 
