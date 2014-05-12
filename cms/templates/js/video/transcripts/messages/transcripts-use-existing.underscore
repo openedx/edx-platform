@@ -18,22 +18,22 @@
         class="action setting-use-existing"
         type="button"
         name="setting-use-existing"
-        value="<%= gettext("Use Current Timed Transcript") %>"
-        data-tooltip="<%= gettext("Use Current Timed Transcript") %>"
+        value="<%= gettext("Use Current Transcript") %>"
+        data-tooltip="<%= gettext("Use Current Transcript") %>"
     >
         <span>
-            <%= gettext("Use Current Timed Transcript") %>
+            <%= gettext("Use Current Transcript") %>
         </span>
     </button>
     <button
         class="action setting-upload"
         type="button"
         name="setting-upload"
-        value="<%= gettext("Upload New Timed Transcript") %>"
-        data-tooltip="<%= gettext("Upload New Timed Transcript") %>"
+        value="<%= gettext("Upload New Transcript") %>"
+        data-tooltip="<%= gettext("Upload New Transcript") %>"
     >
         <span>
-            <%= gettext("Upload New Timed Transcript") %>
+            <%= gettext("Upload New Transcript") %>
         </span>
     </button>
 </div>

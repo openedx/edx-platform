@@ -7,8 +7,8 @@
 <%= gettext("Error.") %>
 </p>
 <div class="wrapper-transcripts-buttons">
-    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcript") %>" data-tooltip="<%= gettext("Upload New Timed Transcript") %>">
-        <span><%= gettext("Upload New Timed Transcript") %></span>
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Transcript") %>" data-tooltip="<%= gettext("Upload New Transcript") %>">
+        <span><%= gettext("Upload New Transcript") %></span>
     </button>
     <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
         <span><%= gettext("Download Transcript for Editing") %></span>
