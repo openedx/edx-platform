@@ -1053,7 +1053,10 @@ def send_email(request, course_id):
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
-    response_payload = {'course_id': course_id}
+    response_payload = {
+        'course_id': course_id,
+        'success': True,
+    }
     return JsonResponse(response_payload)
 
 

@@ -169,8 +169,10 @@ FEATURES = {
     # Enable instructor to assign individual due dates
     'INDIVIDUAL_DUE_DATES': False,
 
-    # Enable instructor dash beta version link
-    'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
+    # Enable legacy instructor dashboard
+    'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
+    # Is this an edX-owned domain? (used on instructor dashboard)
+    'IS_EDX_DOMAIN': False,
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
