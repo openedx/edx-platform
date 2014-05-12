@@ -9,7 +9,6 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 from xmodule.modulestore.django import ModuleI18nService
@@ -116,7 +115,7 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        params = {'course_id': course_id, 'grader_id': grader_id}
+        params = {'course_id': course_id.to_deprecated_string(), 'grader_id': grader_id}
         result = self.get(self.get_problem_list_url, params)
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('get_problem_list', result, tags)
@@ -148,7 +147,7 @@ class StaffGradingService(GradingService):
             self.get(
                 self.get_next_url,
                 params={
-                    'location': location,
+                    'location': location.to_deprecated_string(),
                     'grader_id': grader_id
                 }
             )
@@ -170,7 +169,7 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError if there's a problem connecting.
         """
-        data = {'course_id': course_id,
+        data = {'course_id': course_id.to_deprecated_string(),
                 'submission_id': submission_id,
                 'score': score,
                 'feedback': feedback,
@@ -186,7 +185,7 @@ class StaffGradingService(GradingService):
         return result
 
     def get_notifications(self, course_id):
-        params = {'course_id': course_id}
+        params = {'course_id': course_id.to_deprecated_string()}
         result = self.get(self.get_notifications_url, params)
         tags = [
             u'course_id:{}'.format(course_id),
@@ -274,7 +273,7 @@ def get_next(request, course_id):
             ', '.join(missing)))
     grader_id = unique_id_for_user(request.user)
     p = request.POST
-    location = p['location']
+    location = course_key.make_usage_key_from_deprecated_string(p['location'])
 
     return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
                         mimetype="application/json")
@@ -400,7 +399,7 @@ def save_grade(request, course_id):
 
     grader_id = unique_id_for_user(request.user)
 
-    location = p['location']
+    location = course_key.make_usage_key_from_deprecated_string(p['location'])
 
     try:
         result = staff_grading_service().save_grade(course_key,
