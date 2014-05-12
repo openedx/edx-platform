@@ -42,8 +42,8 @@ EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverif
 EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY = 'edx.course.enrollment.reverify.submitted'
 EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE = 'edx.course.enrollment.reverify.reviewed'
 
-class VerifyView(View):
 
+class VerifyView(View):
     @method_decorator(login_required)
     def get(self, request, course_id):
         """
@@ -54,7 +54,6 @@ class VerifyView(View):
               before proceeding to payment
         """
         upgrade = request.GET.get('upgrade', False)
-
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
@@ -99,7 +98,7 @@ class VerifyView(View):
             "min_price": verify_mode.min_price,
             "upgrade": upgrade,
         }
-
+        context['retake'] = request.GET.get('retake', False)
         return render_to_response('verify_student/photo_verification.html', context)
 
 
@@ -108,6 +107,7 @@ class VerifiedView(View):
     View that gets shown once the user has already gone through the
     verification flow
     """
+
     @method_decorator(login_required)
     def get(self, request, course_id):
         """
@@ -145,9 +145,14 @@ def create_order(request):
     """
     if not SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         attempt = SoftwareSecurePhotoVerification(user=request.user)
-        b64_face_image = request.POST['face_image'].split(",")[1]
-        b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
-
+        try:
+            b64_face_image = request.POST['face_image'].split(",")[1]
+            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
+        except IndexError:
+            context = {
+                'success': False,
+            }
+            return HttpResponse(json.dumps(context), content_type="text/json")
         attempt.upload_face_image(b64_face_image.decode('base64'))
         attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
         attempt.mark_ready()
@@ -182,7 +187,7 @@ def create_order(request):
     CertificateItem.add_to_order(cart, course_id, amount, 'verified')
 
     params = get_signed_purchase_params(cart)
-
+    params['success'] = True
     return HttpResponse(json.dumps(params), content_type="text/json")
 
 
@@ -298,6 +303,7 @@ class ReverifyView(View):
     Does not need to be attached to a particular course.
     Does not need to worry about pricing
     """
+
     @method_decorator(login_required)
     def get(self, request):
         """
@@ -351,6 +357,7 @@ class MidCourseReverifyView(View):
 
     Does not need to worry about pricing
     """
+
     @method_decorator(login_required)
     def get(self, request, course_id):
         """
@@ -425,8 +432,7 @@ def midcourse_reverify_dash(request):
         try:
             course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+            log.error("User {0} enrolled in non-existent course {1}".format(user.username, enrollment.course_id))
 
     statuses = ["approved", "pending", "must_reverify", "denied"]
 
@@ -451,7 +457,6 @@ def toggle_failed_banner_off(request):
     user_id = request.user.id
     SoftwareSecurePhotoVerification.display_off(user_id)
     return HttpResponse('Success')
-
 
 
 @login_required
