@@ -1,6 +1,15 @@
   
 .. Links
 
+.. _edX Edge: https://edge.edx.org
+
+.. _edx.org: http://edx.org
+
+.. _Sphinx: http://sphinx-doc.org/
+.. _LaTeX: http://www.latex-project.org/
+.. _GitHub Flow: https://github.com/blog/1557-github-flow-in-the-browser
+.. _RST: http://docutils.sourceforge.net/rst.html
+
 .. _edX Status: http://status.edx.org/
 
 .. _edX roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
@@ -137,6 +146,10 @@
 
 .. _Problem with Adaptive Hint: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/problem_with_hint.html
 
+.. _IFrame Tool: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/iframe.html
+
+.. _Drag and Drop Problem: http://ca.readthedocs.org/en/latest/exercises_tools/drag_and_drop.html
+
 .. DATA DOCUMENTATION
 
 .. _Student Info and Progress Data: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info
@@ -158,3 +171,5 @@
 .. Developer Doc
 
 .. _Contributing to Open edX: http://edx.readthedocs.org/projects/userdocs/en/latest/process/index.html
+
+.. _edX XBlock Documentation: http://edx.readthedocs.org/projects/xblock/en/latest/
