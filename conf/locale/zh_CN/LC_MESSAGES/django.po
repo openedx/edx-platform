@@ -6,6 +6,7 @@
 # Translators:
 # vingte <411029240@qq.com>, 2014
 # Bookman <bookman@vip.163.com>, 2013
+# PeterWang.Dut <peterwang.dut@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
@@ -14,9 +15,11 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jie <jie.li@anu.edu.au>, 2013
 # Jie <jie.li@anu.edu.au>, 2013
+# Joe99_Du <joe99.du@gmail.com>, 2014
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # csc <am15501@163.com>, 2014
+# riceball <snowyu.lee@gmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
 # thinxer <me@thinxer.com>, 2013
 # vicapple22 <vicapple22@gmail.com>, 2013
@@ -162,7 +165,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-04-24 12:34+0000\n"
 "Last-Translator: pku9104038 <pku9104038@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -183,7 +186,7 @@ msgstr "开放问题面板"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
-msgstr "荣誉证书"
+msgstr "诚信准则证书"
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
@@ -381,7 +384,7 @@ msgstr "错误(401 {field})，请给我们发送电子邮件。"
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr "您必须遵循荣誉准则才能注册。"
+msgstr "您必须遵循诚信准则才能注册。"
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
@@ -409,7 +412,7 @@ msgstr "需要接受服务条款"
 
 #: common/djangoapps/student/views.py
 msgid "Agreeing to the Honor Code is required"
-msgstr "需要同意荣誉法则"
+msgstr "需要同意诚信准则"
 
 #: common/djangoapps/student/views.py
 msgid "A level of education is required"
@@ -1025,8 +1028,43 @@ msgid ""
 msgstr "工作人员对此问题的解答存在问题：空白边界。"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr "错误"
+
+#: common/lib/capa/capa/responsetypes.py
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr "或者"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+"[courseware.capa.responsetypes.customresponse] 从{student_answers}获取学生答案时发生错误\n"
+" idset = {idset}, 错误 = {err}"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "没有输入答案！"
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr "客户端响应：检查函数返回无效字典！"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "未提供答案。"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
+msgstr "问题检查失败：没有配置外部队列服务器。"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1504,8 +1542,10 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
-msgstr "一个YouTube URL或者一个任意地址的网络文件的链接。"
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
+msgstr ""
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
@@ -1954,6 +1994,7 @@ msgstr "任务已在运行中。"
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -2776,7 +2817,7 @@ msgstr "旁听注册"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Honor Code Enrollment"
-msgstr "荣誉注册"
+msgstr "诚信准则注册"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Verified Enrollment"
@@ -4063,6 +4104,13 @@ msgstr "页面无法找到"
 msgid "close"
 msgstr "关闭"
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr "拖动以重排序"
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4199,11 +4247,11 @@ msgstr "帮助"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
-msgstr ""
+msgstr "更新您的注册到 {} | 选择您的学习轨道"
 
 #: common/templates/course_modes/choose.html
 msgid "Register for {} | Choose Your Track"
-msgstr ""
+msgstr "注册到 {} | 选择学习轨道"
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
@@ -4211,7 +4259,7 @@ msgstr "对不起，当尝试注册时发生错误"
 
 #: common/templates/course_modes/choose.html
 msgid "Select your track:"
-msgstr ""
+msgstr "选择学习轨道："
 
 #: common/templates/course_modes/choose.html
 msgid "Certificate of Achievement (ID Verified)"
@@ -4275,11 +4323,11 @@ msgid ""
 " below, and then click the 'Select Certificate' button to complete your "
 "registration."
 msgstr ""
-"如果你无法支付最低费用或者没有满足最低要求，你可以旁听或者选择诚信条例证书而无需付费。如果你希望获得诚信条例证书，请点击“诚信条例证书”，并在下方告诉我们你不能获得身份认证证书的原因，然后点击‘选择证书’按钮来完成你的注册。"
+"如果你无法支付最低费用或者没有满足最低要求，你可以旁听或者选择诚信准则证书而无需付费。如果你希望获得诚信准则证书，请点击“诚信准则证书”，并在下方告诉我们你不能获得身份认证证书的原因，然后点击‘选择证书’按钮来完成你的注册。"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
-msgstr "选择诚信条例证书"
+msgstr "选择诚信准则证书"
 
 #: common/templates/course_modes/choose.html
 msgid "Explain your situation: "
@@ -4289,7 +4337,7 @@ msgstr "解释你的情况："
 msgid ""
 "Please write a few sentences about why you'd like to opt out of the paid "
 "verified certificate to pursue the honor code certificate:"
-msgstr "请简短描述你选择诚信条例证书而不选择付费课程认证证书的原因；"
+msgstr "请简短描述你选择诚信准则证书而不选择付费课程认证证书的原因；"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -4324,11 +4372,7 @@ msgid ""
 "An ID Verified Certificate requires proof of your identity through your "
 "photo and ID and is checked throughout the course to verify that it is you "
 "who earned the passing grade."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "or"
-msgstr "或者"
+msgstr "身份认证证书通过获取您身份、头像和ID的相关证据并在课程学习过程中检查核对以确认是您本人通过自身努力完成课程学习，通过课程考核。"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -4763,7 +4807,7 @@ msgstr "&copy; 2014 {platform_name}，一些权利被保留。"
 
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
-msgstr "服务条款和荣誉准则"
+msgstr "服务条款和诚信准则"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
@@ -5362,7 +5406,7 @@ msgstr "我同意{link_start}服务条款{link_end}"
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "我同意{link_start}诚信条例{link_end}"
+msgstr "我同意{link_start}诚信准则{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -5541,7 +5585,7 @@ msgid ""
 "You have re-enabled forum notification emails from {platform_name}. Click "
 "{dashboard_link_start}here{link_end} to return to your dashboard. "
 msgstr ""
-"您已经同意接收{dashboard_link_start}论坛邮件提醒，请单击{dashboard_link_start}此处{link_end}返回您的控制面板。"
+"您已重新启用 {platform_name}论坛邮件通知功能。请单击{dashboard_link_start}此处{link_end}返回您的工作台。"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -5651,6 +5695,24 @@ msgstr "添加评论"
 msgid "Staff Debug"
 msgstr "工作人员调试"
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr "重置学生的尝试次数"
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr "对学生的提交记录重新评分"
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr "模块域"
@@ -5692,7 +5754,7 @@ msgstr "下一页"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Sysadmin Dashboard"
-msgstr ""
+msgstr "系统管理员工作台"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5702,8 +5764,9 @@ msgstr "用户"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Staffing and Enrollment"
-msgstr ""
+msgstr "教员配备及学生选课"
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5732,7 +5795,7 @@ msgstr "下载所有用户列表 (csv 格式)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Check and repair external authentication map"
-msgstr ""
+msgstr "检查修复外部认证映射"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid ""
@@ -5753,21 +5816,24 @@ msgid "Administer Courses"
 msgstr "管理课程"
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr "仓库位置"
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr "仓库分支(可选)"
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr "从github载入新的课程"
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr "课程编号或目录"
@@ -5775,10 +5841,6 @@ msgstr "课程编号或目录"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "从网站中删除课程"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
-msgstr "Django进程ID"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -5796,17 +5858,16 @@ msgstr "日期"
 msgid "Course ID"
 msgstr "课程编号"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Git动作"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
 msgstr "近期的git加载活动"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
-msgstr "Git动作"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -5843,7 +5904,7 @@ msgid ""
 "you did not mean to do this, click {undo_link_start}here{link_end} to re-"
 "subscribe."
 msgstr ""
-"您不将再接收到{dashboard_link_start}论坛邮件提醒，请单击{dashboard_link_start}此处{link_end}返回您的控制面板。如果您不是有意取消，请单击{undo_link_start}此处{link_end}重新订阅消息。"
+"您不将再接收到{platform_name}论坛邮件提醒，请单击{dashboard_link_start}此处{link_end}返回您的工作台。如果您不是有意取消，请单击{undo_link_start}此处{link_end}重新订阅消息。"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -6149,7 +6210,8 @@ msgid ""
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
 " register button again. Please visit the {start_help_tag}help page{end_tag} "
 "for a possible solution."
-msgstr "当前登录用户的账号没有参加此课程的权限，建议您登出后尝试重新注册，请访问帮助页面查找解决方法。"
+msgstr ""
+"当前登录用户的账号没有参加此课程的权限，建议您{start_logout_tag}登出{end_tag}后尝试重新注册，请访问{start_help_tag}帮助页面{end_tag}查找解决方法。"
 
 #: lms/templates/courseware/course_about.html
 msgid "About {course.display_number_with_default}"
@@ -6165,12 +6227,13 @@ msgstr "进入课程"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
-msgstr ""
+msgstr "这个课程已经进入您的 <a href=\"{cart_link}\">购物车</a>。"
 
 #: lms/templates/courseware/course_about.html
 msgid ""
 "Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
 msgstr ""
+"添加 {course.display_number_with_default} 到购物车 ({currency_symbol}{cost})"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -6309,7 +6372,7 @@ msgstr "操作"
 
 #: lms/templates/courseware/courseware.html
 msgid "parallel resistors function"
-msgstr ""
+msgstr "并联电阻功能"
 
 #: lms/templates/courseware/courseware.html
 msgid "Functions"
@@ -6357,7 +6420,7 @@ msgid ""
 " fix it as soon as possible. Please email us at {link_to_support_email} to "
 "report any problems or downtime."
 msgstr ""
-"非常抱歉，该模块暂时无法使用，我们的教员正在努力尽快修复问题。要报告您发现的任何问题或遇到网站停摆，请向{tech_support_email}发送邮件"
+"非常抱歉，该模块暂时无法使用，我们的工作人员正在努力尽快修复问题。发现任何问题或遇到网站停摆，请及时向{link_to_support_email}发送邮件报告。"
 
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6398,11 +6461,8 @@ msgid "Course Handouts"
 msgstr "课程讲义"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
-msgstr "授课教师面板"
+msgid "Legacy Instructor Dashboard"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6410,8 +6470,30 @@ msgid "View Course in Studio"
 msgstr "在职员界面查看课程"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "尝试新控制面板"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr "授课教师面板"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6439,7 +6521,7 @@ msgstr "度量"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
-msgstr ""
+msgstr "成绩下载"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6910,6 +6992,10 @@ msgid ""
 msgstr "课程数据正在处理中，你将很快能看到最终的成绩。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr "您的最终名次目前无法查询。"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "您的最终成绩："
 
@@ -6958,7 +7044,7 @@ msgid ""
 "{cert_name_long} was generated, we could not grant you a verified "
 "{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
-"由于你{cert_name_long}的身份认证时没有提供一组有效的照片，所以无法授予你{cert_name_short}验证的证书。作为替代只能授予一个诚信条例证书给你{cert_name_short}"
+"由于您{cert_name_long}的身份认证时没有提供一组有效的照片，所以无法授予您{cert_name_short}认证证书。作为替代只能授予一个诚信准则证书给您{cert_name_short}"
 " 。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6981,16 +7067,36 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} 封面图片"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr "作为一名已认证的学生，你已成功注册。"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "登记为："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
-msgstr "ID验证"
+msgid "Verified"
+msgstr "已验证"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr "您已登记为本课程诚信准则学员"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "诚信准则"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr "你正在旁听这门课程"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
+msgstr "旁听"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -7027,12 +7133,12 @@ msgid ""
 "your achievement. {link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"您仍然可以选修该课程，虽然该课程曾经是您的身份验证付费课程{cert_name_long} "
-"。如果您计划完成整个课程，这是一种体现您成就感的极好方式。点击{a_start}了解更多关于验证证书{cert_name_long}的信息{a_end}。"
+"您依然可以注册本课程的身份认证 {cert_name_long} "
+"。如果您计划完成整个课程，这是体现您学习成果的一个很好的方式。点击{link_start}了解更多关于身份认证{cert_name_long}的信息{link_end}。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified Track"
-msgstr ""
+msgstr "更新为身份认证学习轨道"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -7505,7 +7611,7 @@ msgstr "接收更新"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Toggle Notifications Setting"
-msgstr ""
+msgstr "切换通知设置"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid ""
@@ -7558,7 +7664,7 @@ msgstr "折叠论坛话题"
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
-msgstr ""
+msgstr "该帖已被工作人员置顶。"
 
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -7877,6 +7983,7 @@ msgid ""
 "button will result in a 30 minute wait to be able to grade this submission "
 "again."
 msgstr ""
+"请注意，当你在此查看一个提交的作业时，它已被临时性移出评分池。如果超过30分钟还没有写入任何评分意见，则它会自动退回评分池。点击返回按钮，该提交的作业必须等待30分钟之后，才可以重新被评分。"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Prompt"
@@ -7978,7 +8085,7 @@ msgstr "分数线："
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
-msgstr ""
+msgstr "下表显示所有活动任务的状态。"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
@@ -8102,11 +8209,13 @@ msgstr "现在，您可以将一些特殊的单元小节单独授权给个别的
 msgid "Choose the graded unit:"
 msgstr "请选择等级单元"
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
-msgstr "请输入新增的截止日期与时间(UTC，请用MM/DD/YYYY HH:MM格式)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8133,8 +8242,8 @@ msgid "List all students with due date extensions"
 msgstr "列出所有拥有到期扩展应用的学生"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
-msgstr "确定一个能够查看所有学生扩展内容的特殊学生"
+msgid "Specify a student to see all of that student's extensions."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8149,15 +8258,22 @@ msgid ""
 "Resetting a problem's due date rescinds a due date extension for a student "
 "on a particular unit. This will revert the due date for the student back to "
 "the problem's original due date."
-msgstr ""
+msgstr "重设一个问题的截止日期，将取消学生在指定单元上的截止日期扩展，使截止日期还原为问题的原始截止日期。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "重置学生的结束时间"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
-msgstr "返回标准控制面板"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8435,6 +8551,20 @@ msgid "Show Email Task History"
 msgstr "显示邮件任务历史"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "特定学生分数检查和调整"
 
@@ -8470,15 +8600,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Next, select an action to perform for the given user and problem:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "重置学生的尝试次数"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "对学生的提交记录重新评分"
+msgstr "下一步，为指定用户和问题选择一项操作："
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -8550,7 +8672,7 @@ msgstr "看不到你语言？{link_start}欢迎志愿成为一个翻译人员!{l
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/modal/accessible_confirm.html
 msgid "modal open"
-msgstr ""
+msgstr "模式开启"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -8939,7 +9061,14 @@ msgstr "你现在注册："
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Registered as: "
-msgstr ""
+msgstr "注册为:"
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
+msgstr "ID验证"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -9035,7 +9164,7 @@ msgstr "进入课程"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
-msgstr ""
+msgstr "前往您的工作台"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Verified Status"
@@ -9118,11 +9247,6 @@ msgid ""
 "taking."
 msgstr ""
 "我们的系统检测到访问edX课程的源IP地址来自美国经贸制裁的国家。非常不幸，此时edX必须遵守国家的出口控制法律，因此我们无法允许您访问某些特定的课程。这不是您的错，请放心浏览我们的课程目录以便寻找其它您可能感兴趣的课程。"
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "诚信条例"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -9234,7 +9358,7 @@ msgstr "请阅读 {a_start}我们FAQs中关于认证的问题与评论{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
-msgstr ""
+msgstr "更新您的注册信息于"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
@@ -9401,7 +9525,7 @@ msgstr "确认你的面部进入有效区域"
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Can we match the photo you took with the one on your ID?"
-msgstr ""
+msgstr "是否可以将您拍摄的相片与身份关联？"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -9509,6 +9633,9 @@ msgstr "提交照片与amp；重新验证"
 msgid "Re-Verification Submission Confirmation"
 msgstr "重新验证提交的确认"
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -9623,7 +9750,7 @@ msgid ""
 " be able to correct a failed verification</strong>. If you think there was "
 "an error in the review, please contact us at {email}"
 msgstr ""
-"由于重新认证的开放时间很短，你<strong>可能无法修正失败失败<strong>。如果你认为审核可能存在问题，请通过{email}联系我们"
+"由于重新认证的开放时间很短，您<strong>可能无法解决认证失败</strong>。如果您认为审核可能存在问题，请通过{email}联系我们"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Re-Verification"
@@ -9660,7 +9787,7 @@ msgstr "使用你的摄像头拍摄一个你面部照片来匹配你的ID。"
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Once you verify your photo looks good, you can move on to step 2."
-msgstr ""
+msgstr "如果确认您拍摄的相片合适，请进入第2步骤。"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Go to Step 2: Re-Take ID Photo"
@@ -9870,11 +9997,11 @@ msgstr "复查这些我们将采用的照片"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Check Your Contribution Level"
-msgstr ""
+msgstr "确定您的捐助额度"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Please confirm your contribution for this course (min. $"
-msgstr ""
+msgstr "请确认您对本课程的捐助(最小$"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid ""
@@ -9987,7 +10114,7 @@ msgstr "摄像头"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "A webcam and a modern browser"
-msgstr ""
+msgstr "网络摄像头和新版浏览器"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -10284,12 +10411,6 @@ msgstr "复制该组件"
 #: cms/templates/component.html
 msgid "Delete this component"
 msgstr "删除此组件"
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
-msgstr "拖动以重排序"
 
 #: cms/templates/container.html
 msgid "Container"
