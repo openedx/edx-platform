@@ -13,6 +13,7 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
+            window.Video.previousState = null;
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -37,7 +38,7 @@
             });
 
             it('add ARIA attributes to time control', function () {
-                var timeControl = $('div.slider>a');
+                var timeControl = $('div.slider > a');
 
                 expect(timeControl).toHaveAttrs({
                     'role': 'slider',
@@ -135,8 +136,6 @@
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);
-
-                    state.storage.clear();
                 });
             });
 
@@ -389,7 +388,7 @@
                 runs(function () {
                     state = jasmine.initializePlayer({
                         end: 20,
-                    savedVideoPosition: 'a'
+                        savedVideoPosition: 'a'
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').andReturn(60);

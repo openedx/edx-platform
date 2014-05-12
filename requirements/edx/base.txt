@@ -35,6 +35,7 @@ django-method-override==0.1.0
 djangorestframework==2.3.5
 django==1.4.12
 feedparser==5.1.3
+firebase-token-generator==1.3.2
 fs==0.4.0
 GitPython==0.3.2.RC1
 glob2==0.3

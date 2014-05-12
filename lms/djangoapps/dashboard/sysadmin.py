@@ -27,6 +27,7 @@ from django.views.decorators.http import condition
 from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
+from path import path
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
@@ -330,8 +331,12 @@ class Courses(SysadminDashboardView):
         cmd = ''
         gdir = settings.DATA_DIR / cdir
         info = ['', '', '']
-        if not os.path.exists(gdir):
-            return info
+
+        # Try the data dir, then try to find it in the git import dir
+        if not gdir.exists():
+            gdir = path(git_import.GIT_REPO_DIR) / cdir
+            if not gdir.exists():
+                return info
 
         cmd = ['git', 'log', '-1',
                '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
@@ -345,7 +350,7 @@ class Courses(SysadminDashboardView):
 
         return info
 
-    def get_course_from_git(self, gitloc, branch, datatable):
+    def get_course_from_git(self, gitloc, branch):
         """This downloads and runs the checks for importing a course in git"""
 
         if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
@@ -356,7 +361,7 @@ class Courses(SysadminDashboardView):
         if self.is_using_mongo:
             return self.import_mongo_course(gitloc, branch)
 
-        return self.import_xml_course(gitloc, branch, datatable)
+        return self.import_xml_course(gitloc, branch)
 
     def import_mongo_course(self, gitloc, branch):
         """
@@ -408,7 +413,7 @@ class Courses(SysadminDashboardView):
         msg += "<pre>{0}</pre>".format(escape(ret))
         return msg
 
-    def import_xml_course(self, gitloc, branch, datatable):
+    def import_xml_course(self, gitloc, branch):
         """Imports a git course into the XMLModuleStore"""
 
         msg = u''
@@ -475,8 +480,7 @@ class Courses(SysadminDashboardView):
                     msg += u'<li><pre>{0}: {1}</pre></li>'.format(escape(summary),
                                                                   escape(err))
                 msg += u'</ul>'
-            datatable['data'].append([course.display_name, cdir]
-                                     + self.git_info_for_course(cdir))
+
         return msg
 
     def make_datatable(self):
@@ -484,9 +488,17 @@ class Courses(SysadminDashboardView):
 
         data = []
 
+<<<<<<< HEAD
         for course in self.get_courses():
             gdir = course.id.run
             data.append([course.display_name, course.id.to_deprecated_string()]
+=======
+        for (cdir, course) in courses.items():
+            gdir = cdir
+            if '/' in cdir:
+                gdir = cdir.split('/')[1]
+            data.append([course.display_name, cdir]
+>>>>>>> edx/master
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'), _('Directory/ID'),
@@ -524,8 +536,7 @@ class Courses(SysadminDashboardView):
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
-            datatable = self.make_datatable()
-            self.msg += self.get_course_from_git(gitloc, branch, datatable)
+            self.msg += self.get_course_from_git(gitloc, branch)
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
@@ -569,12 +580,17 @@ class Courses(SysadminDashboardView):
                 delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
+<<<<<<< HEAD
                     u"<font color='red'>{0} {1} ({2})</font>".format(
                         _('Deleted'), course.id.to_deprecated_string(), course.display_name)
             datatable = self.make_datatable()
+=======
+                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
+                        _('Deleted'), loc, course.id, course.display_name)
+>>>>>>> edx/master
 
         context = {
-            'datatable': datatable,
+            'datatable': self.make_datatable(),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},

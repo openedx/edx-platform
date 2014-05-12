@@ -26,6 +26,7 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
 from django.template.response import TemplateResponse
@@ -43,7 +44,6 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
-from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -328,7 +328,7 @@ def signin_user(request):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
@@ -361,7 +361,7 @@ def register_user(request, extra_context=None):
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
 
     context = {
         'course_id': request.GET.get('course_id'),
@@ -676,6 +676,7 @@ def _get_course_enrollment_domain(course_id):
     return course.enrollment_domain
 
 
+@never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
     """
@@ -685,9 +686,9 @@ def accounts_login(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so redirect
-        # to branding and allow that to process the login.
-        return redirect(reverse('root'))
+        # SSL login doesn't require a view, so login
+        # directly here
+        return external_auth.views.ssl_login(request)
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
@@ -1855,6 +1856,7 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+<<<<<<< HEAD
 
 
 @login_required
@@ -1878,3 +1880,5 @@ def token(request):
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
     return response
+=======
+>>>>>>> edx/master

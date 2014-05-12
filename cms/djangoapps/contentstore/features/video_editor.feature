@@ -15,7 +15,7 @@ Feature: CMS Video Component Editor
     Given I have created a Video component
     And I edit the component
     And I open tab "Advanced"
-    Then I can modify the display name
+    Then I can modify video display name
     And my video display name change is persisted on save
 
   # 3
