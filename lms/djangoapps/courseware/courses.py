@@ -110,14 +110,15 @@ def course_image_url(course):
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
         # return the default static path.
+        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
         if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
-            return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + '/' + course.course_image
+            url += '/' + course.course_image
         else:
-            return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
+            url += '/images/course_image.jpg'
     else:
         loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
-        _path = StaticContent.get_url_path_from_location(loc)
-        return _path
+        url = StaticContent.get_url_path_from_location(loc)
+    return url
 
 
 def find_file(filesystem, dirs, filename):
