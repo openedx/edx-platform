@@ -285,7 +285,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
             StringEndsWithMatcher('/users/{}/active_threads'.format(self.profiled_user.id)),
             data=None,
             params=PartialDictMatcher({
-                "course_id": self.course.id,
+                "course_id": self.course.id.to_deprecated_string(),
                 "page": params.get("page", 1),
                 "per_page": views.THREADS_PER_PAGE
                 }),
