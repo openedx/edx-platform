@@ -152,7 +152,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         if lazy:
             for block in new_module_data.itervalues():
-                block['definition'] = DefinitionLazyLoader(self, block['definition'])
+                block['definition'] = DefinitionLazyLoader(self, block['category'], block['definition'])
         else:
             # Load all descendants by id
             descendent_definitions = self.db_connection.find_matching_definitions({
@@ -242,11 +242,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         :param course_locator: any subclass of CourseLocator
         '''
-        # NOTE: if and when this uses cache, the update if changed logic will break if the cache
-        # holds the same objects as the descriptors!
-        if not course_locator.is_fully_specified():
-            raise InsufficientSpecificationError('Not fully specified: %s' % course_locator)
-
         if course_locator.org and course_locator.offering and course_locator.branch:
             # use the course id
             index = self.db_connection.get_course_index(course_locator)
@@ -258,6 +253,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if course_locator.version_guid is not None and version_guid != course_locator.version_guid:
                 # This may be a bit too touchy but it's hard to infer intent
                 raise VersionConflictError(course_locator, version_guid)
+        elif course_locator.version_guid is None:
+            raise InsufficientSpecificationError(course_locator)
         else:
             # TODO should this raise an exception if branch was provided?
             version_guid = course_locator.version_guid
@@ -322,9 +319,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     def get_course(self, course_id, depth=None):
         '''
         Gets the course descriptor for the course identified by the locator
-        which may or may not be a blockLocator.
-
-        raises InsufficientSpecificationError
         '''
         assert(isinstance(course_id, CourseLocator))
         course_entry = self._lookup_course(course_id)
@@ -458,6 +452,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return [
             BlockUsageLocator.make_relative(
                 locator,
+                block_type=course['structure']['blocks'][parent_id].get('category'),
                 block_id=LocMapperStore.decode_key_from_mongo(parent_id),
             )
             for parent_id in items
@@ -471,12 +466,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         course = self._lookup_course(course_key)
         items = {LocMapperStore.decode_key_from_mongo(block_id) for block_id in course['structure']['blocks'].keys()}
         items.remove(course['structure']['root'])
-        for block_id, block_data in course['structure']['blocks'].iteritems():
+        blocks = course['structure']['blocks']
+        for block_id, block_data in blocks.iteritems():
             items.difference_update(block_data.get('fields', {}).get('children', []))
             if block_data['category'] in detached_categories:
                 items.discard(LocMapperStore.decode_key_from_mongo(block_id))
         return [
-            BlockUsageLocator(course_key=course_key, block_id=block_id)
+            BlockUsageLocator(course_key=course_key, block_type=blocks[block_id]['category'], block_id=block_id)
             for block_id in items
         ]
 
@@ -613,11 +609,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # convert the results value sets to locators
         for k, versions in result.iteritems():
             result[k] = [
-                BlockUsageLocator(CourseLocator(version_guid=version), block_id=block_id)
+                block_locator.for_version(version)
                 for version in versions
             ]
         return VersionTree(
-            BlockUsageLocator(CourseLocator(version_guid=possible_roots[0]), block_id=block_id),
+            block_locator.for_version(possible_roots[0]),
             result
         )
 
@@ -650,7 +646,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'schema_version': self.SCHEMA_VERSION,
         }
         self.db_connection.insert_definition(document)
-        definition_locator = DefinitionLocator(new_id)
+        definition_locator = DefinitionLocator(category, new_id)
         return definition_locator
 
     def update_definition_from_data(self, definition_locator, new_def_data, user_id):
@@ -685,7 +681,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
             old_definition['schema_version'] = self.SCHEMA_VERSION
             self.db_connection.insert_definition(old_definition)
-            return DefinitionLocator(old_definition['_id']), True
+            return DefinitionLocator(old_definition['category'], old_definition['_id']), True
         else:
             return definition_locator, False
 
@@ -829,11 +825,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 self._update_head(index_entry, course_or_parent_locator.branch, new_id)
             item_loc = BlockUsageLocator(
                 course_or_parent_locator.version_agnostic(),
+                block_type=category,
                 block_id=new_block_id,
             )
         else:
             item_loc = BlockUsageLocator(
                 CourseLocator(version_guid=new_id),
+                block_type=category,
                 block_id=new_block_id,
             )
 
@@ -1029,7 +1027,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 course_key = CourseLocator(version_guid=new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
-            new_locator = BlockUsageLocator(course_key, descriptor.location.block_id)
+            new_locator = descriptor.location.map_into_course(course_key)
             return self.get_item(new_locator)
         else:
             # nothing changed, just return the one sent in
@@ -1101,18 +1099,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 self._update_head(index_entry, xblock.location.branch, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
-            return self.get_item(
-                BlockUsageLocator(
-                    xblock.location.course_key.for_version(new_id),
-                    block_id=xblock.location.block_id,
-                )
-            )
+            return self.get_item(xblock.location.for_version(new_id))
         else:
             return xblock
 
     def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
         new_def_data = self._filter_special_fields(xblock.get_explicitly_set_fields_by_scope(Scope.content))
+        is_updated = False
         if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
                 new_def_data, xblock.category, user_id)
@@ -1134,9 +1128,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         else:
             is_new = False
             encoded_block_id = LocMapperStore.encode_key_for_mongo(xblock.location.block_id)
-            is_updated = is_updated or (
-                xblock.has_children and structure_blocks[encoded_block_id]['fields']['children'] != xblock.children
-            )
 
         children = []
         if xblock.has_children:
@@ -1147,6 +1138,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     children.append(child_block.location.block_id)
                 else:
                     children.append(child)
+            is_updated = is_updated or structure_blocks[encoded_block_id]['fields']['children'] != children
 
         block_fields = xblock.get_explicitly_set_fields_by_scope(Scope.settings)
         if not is_new and not is_updated:
@@ -1419,9 +1411,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if isinstance(definition, DefinitionLazyLoader):
             return definition.definition_locator
         elif '_id' not in definition:
-            return DefinitionLocator(LocalId())
+            return DefinitionLocator(definition.get('category'), LocalId())
         else:
-            return DefinitionLocator(definition['_id'])
+            return DefinitionLocator(definition['category'], definition['_id'])
 
     def get_modulestore_type(self, course_id):
         """

@@ -7,7 +7,7 @@ import lxml
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore import parsers
+from xmodule.modulestore.locator import Locator
 
 
 class TestCourseIndex(CourseTestCase):
@@ -38,7 +38,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/slashes:{0}'.format(parsers.ALLOWED_ID_CHARS)
+                'course/slashes:{0}'.format(Locator.ALLOWED_ID_CHARS)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')

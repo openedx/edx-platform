@@ -12,7 +12,6 @@ from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@unittest.skip("Not fixing split until we land opaque-keys 0.9")
 class TemplateTests(unittest.TestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
@@ -55,25 +54,25 @@ class TemplateTests(unittest.TestCase):
 
     def test_factories(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            course_id='testx.tempcourse', org='testx',
+            offering='tempcourse', org='testx',
             display_name='fun test course', user_id='testbot'
         )
         self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
-        index_info = modulestore('split').get_course_index_info(test_course.location)
+        index_info = modulestore('split').get_course_index_info(test_course.id)
         self.assertEqual(index_info['org'], 'testx')
-        self.assertEqual(index_info['_id'], 'testx.tempcourse')
+        self.assertEqual(index_info['offering'], 'tempcourse')
 
         test_chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
-        test_course = modulestore('split').get_course(test_course.id)
+        test_course = modulestore('split').get_course(test_course.id.version_agnostic())
         self.assertIn(test_chapter.location.block_id, test_course.children)
 
         with self.assertRaises(DuplicateCourseError):
             persistent_factories.PersistentCourseFactory.create(
-                course_id='testx.tempcourse', org='testx', 
+                offering='tempcourse', org='testx',
                 display_name='fun test course', user_id='testbot'
             )
 
@@ -82,7 +81,7 @@ class TemplateTests(unittest.TestCase):
         Test create_xblock to create non persisted xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            course_id='testx.tempcourse', org='testx',
+            offering='tempcourse', org='testx',
             display_name='fun test course', user_id='testbot'
         )
 
@@ -109,7 +108,7 @@ class TemplateTests(unittest.TestCase):
         try saving temporary xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            course_id='testx.tempcourse', org='testx', 
+            offering='tempcourse', org='testx',
             display_name='fun test course', user_id='testbot'
         )
         test_chapter = modulestore('split').create_xblock(
@@ -148,7 +147,7 @@ class TemplateTests(unittest.TestCase):
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            course_id='edu.harvard.history.doomed', org='testx',
+            offering='history.doomed', org='edu.harvard',
             display_name='doomed test course',
             user_id='testbot')
         persistent_factories.ItemFactory.create(display_name='chapter 1',
@@ -171,7 +170,7 @@ class TemplateTests(unittest.TestCase):
         Test get_block_generations
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            course_id='edu.harvard.history.hist101', org='testx',
+            offering='history.hist101', org='edu.harvard',
             display_name='history test course',
             user_id='testbot'
         )
@@ -193,7 +192,9 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator.make_relative(updated_loc, block_id=sub.location.block_id),
+            parent_location=BlockUsageLocator.make_relative(
+                updated_loc, block_type='problem', block_id=sub.location.block_id
+            ),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )

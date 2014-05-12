@@ -79,5 +79,8 @@ setup(
             'asset-location = xmodule.modulestore.locations:AssetLocation',
             'edx = xmodule.modulestore.locator:BlockUsageLocator',
         ],
+        'definition_key': [
+            'defx = xmodule.modulestore.locator:DefinitionLocator',
+        ],
     },
 )

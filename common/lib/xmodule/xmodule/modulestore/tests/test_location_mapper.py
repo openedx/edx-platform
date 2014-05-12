@@ -267,6 +267,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         )
         prob_locator = BlockUsageLocator(
             prob_course_key,
+            block_type='problem',
             block_id='problem2',
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
@@ -289,20 +290,21 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         prob_location = loc_mapper().translate_locator_to_location(prob_locator, get_course=True)
         self.assertEqual(prob_location, SlashSeparatedCourseKey(org, course, run))
         # explicit branch
-        prob_locator = BlockUsageLocator(
-            prob_course_key.for_branch('draft'), block_id=prob_locator.block_id
-        )
+        prob_locator = prob_locator.for_branch('draft')
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # Even though the problem was set as draft, we always return revision=None to work
         # with old mongo/draft modulestores.
         self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', None))
-        prob_locator = BlockUsageLocator(prob_course_key.for_branch('production'), block_id='problem2')
+        prob_locator = BlockUsageLocator(
+            prob_course_key.for_branch('production'),
+            block_type='problem', block_id='problem2'
+        )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', None))
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
             prob_course_key.for_branch('production'),
-            block_id='chapter48f',
+            block_type='chapter', block_id='chapter48f',
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location(org, course, run, 'chapter', '48f23a10395384929234'))
@@ -311,7 +313,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location(org, course, run, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
-            prob_course_key.for_branch('production'), block_id='chapter48f'
+            prob_course_key.for_branch('production'), block_type='chapter', block_id='chapter48f'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location(org, course, run, 'chapter', '48f23a10395384929234'))
@@ -319,7 +321,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         # look for non-existent problem
         prob_locator2 = BlockUsageLocator(
             prob_course_key.for_branch('draft'),
-            block_id='problem3'
+            block_type='problem', block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator2)
         self.assertIsNone(prob_location, 'Found non-existent problem')
