@@ -46,6 +46,7 @@ from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.keys import UsageKey
 
 log = logging.getLogger("edx.courseware")
 
@@ -739,7 +740,7 @@ def submission_history(request, course_id, student_username, location):
         return HttpResponse(escape(_(u'Invalid course id.')))
 
     try:
-        usage_key = course_key.make_usage_key_from_deprecated_string(location)
+        usage_key = UsageKey.from_string(location)
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 

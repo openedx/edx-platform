@@ -79,15 +79,19 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
+        course = CourseFactory()
+        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory(category='vertical', parent_location=section.location)
+        self.component = ItemFactory(category='problem', parent_location=vertical.location)
+
+        self.course_key = course.id
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
         self.enrollment.save()
-        self.location = ['tag', 'org', 'course', 'category', 'name']
-
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
@@ -243,6 +247,21 @@ class ViewsTestCase(TestCase):
         self.assertIn('and choose your student track', response.content)
         # clean up course modes
         CourseMode.objects.all().delete()
+
+    def test_submission_history_accepts_valid_ids(self):
+        # log into a staff account
+        admin = AdminFactory()
+
+        self.client.login(username=admin.username, password='test')
+
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_key.to_deprecated_string(),
+            'student_username': 'dummy',
+            'location': unicode(self.component.location)
+        })
+        response = self.client.get(url)
+        # Tests that we do not get an "Invalid x" response when passing correct arguments to view
+        self.assertFalse('Invalid' in response.content)
 
     def test_submission_history_xss(self):
         # log into a staff account
