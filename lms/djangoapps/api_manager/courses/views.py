@@ -844,10 +844,15 @@ class CourseContentGroupsDetail(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ModulesUsersList(generics.ListAPIView):
+class CourseContentUsersList(generics.ListAPIView):
     """
-    This View supports get method which returns users enrolled and
+    ### The CourseContentUsersList view allows clients to users enrolled and
     users not enrolled for course within all groups of course
+    - URI: ```/api/courses/{course_id}/content/{content_id}/users```
+    - GET: Returns a JSON representation of users enrolled or not enrolled
+    ### Use Cases/Notes:
+    * Use CourseContentUsersList to grab the users enrolled in Course content group
+    * Use CourseContentUsersList to grab the users not enrolled in Course content group
     """
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
@@ -861,7 +866,7 @@ class ModulesUsersList(generics.ListAPIView):
         """
         course_id = self.kwargs['course_id']
         content_id = self.kwargs['content_id']
-        users_type = self.kwargs['users_type']
+        users_type = self.request.QUERY_PARAMS.get('users_type', None)
         group_type = self.request.QUERY_PARAMS.get('type', None)
         group_id = self.request.QUERY_PARAMS.get('group_id', None)
         groups = CourseContentGroupRelationship.objects.filter(course_id=course_id, content_id=content_id)

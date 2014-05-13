@@ -998,7 +998,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_modules_users_list_get(self):
+    def test_course_content_users_list_get(self):
         test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
         test_uri_users = '{}/{}/users'.format(self.base_course_content_uri, self.course_project.id)
         test_course_users_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
@@ -1050,22 +1050,22 @@ class CoursesApiTests(TestCase):
                     response = self.do_post(test_course_users_uri, data)
                     self.assertEqual(response.status_code, 201)
 
-        response = self.do_get('{}/{}'.format(test_uri_users, 'enrolled'))
+        response = self.do_get('{}?users_type={}'.format(test_uri_users, 'enrolled'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        response = self.do_get('{}/{}'.format(test_uri_users, 'notenrolled'))
+        response = self.do_get('{}?users_type={}'.format(test_uri_users, 'notenrolled'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
         #filter by group id
-        response = self.do_get('{}/{}?group_id={}'.format(test_uri_users, 'enrolled', group_id))
+        response = self.do_get('{}?users_type={}&group_id={}'.format(test_uri_users, 'enrolled', group_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        response = self.do_get('{}/{}?group_id={}'.format(test_uri_users, 'notenrolled', group_id))
+        response = self.do_get('{}?users_type={}&group_id={}'.format(test_uri_users, 'notenrolled', group_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
         #filter by group type
-        response = self.do_get('{}/{}?type={}'.format(test_uri_users, 'enrolled', 'project'))
+        response = self.do_get('{}?users_type={}&type={}'.format(test_uri_users, 'enrolled', 'project'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
