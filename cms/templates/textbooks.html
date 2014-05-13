@@ -75,6 +75,10 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
         <div class="bit">
           <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
           <p>${_("If your textbook doesn't have individual chapters, you can upload the entire text as a single chapter and enter a name of your choice in the Chapter Name field.")}</p>
+          <%
+            help_doc_urls = get_online_help_info(online_help_token)
+          %>
+          <p><a href="${help_doc_urls['doc_url']}" target="_blank">Read More</a></p>
         </div>
       </aside>
     </section>

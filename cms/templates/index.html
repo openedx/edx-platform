@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="base.html" />
-
+<%def name="online_help_token()"><% return "home" %></%def>
 <%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
 
