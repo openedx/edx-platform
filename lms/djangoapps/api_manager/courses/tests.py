@@ -1050,22 +1050,22 @@ class CoursesApiTests(TestCase):
                     response = self.do_post(test_course_users_uri, data)
                     self.assertEqual(response.status_code, 201)
 
-        response = self.do_get('{}?users_type={}'.format(test_uri_users, 'enrolled'))
+        response = self.do_get('{}?enrolled={}'.format(test_uri_users, 'True'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        response = self.do_get('{}?users_type={}'.format(test_uri_users, 'notenrolled'))
+        response = self.do_get('{}?enrolled={}'.format(test_uri_users, 'False'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
         #filter by group id
-        response = self.do_get('{}?users_type={}&group_id={}'.format(test_uri_users, 'enrolled', group_id))
+        response = self.do_get('{}?enrolled={}&group_id={}'.format(test_uri_users, 'true', group_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        response = self.do_get('{}?users_type={}&group_id={}'.format(test_uri_users, 'notenrolled', group_id))
+        response = self.do_get('{}?enrolled={}&group_id={}'.format(test_uri_users, 'false', group_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
         #filter by group type
-        response = self.do_get('{}?users_type={}&type={}'.format(test_uri_users, 'enrolled', 'project'))
+        response = self.do_get('{}?enrolled={}&type={}'.format(test_uri_users, 'true', 'project'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
