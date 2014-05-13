@@ -4,11 +4,8 @@ from __future__ import absolute_import
 import hashlib
 import logging
 from uuid import uuid4
-
 from collections import OrderedDict
 from functools import partial
-from static_replace import replace_static_urls
-from xmodule_modifiers import wrap_xblock
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -18,34 +15,35 @@ from django.views.decorators.http import require_http_methods
 
 from xblock.fields import Scope
 from xblock.fragment import Fragment
-
 import xmodule
+from xmodule_modifiers import wrap_xblock
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore import Location
 from xmodule.video_module import manage_video_subtitles_save
-
-from util.json_request import expect_json, JsonResponse
-from util.string_utils import str_to_bool
-
-from ..utils import get_modulestore
 
 from .access import has_course_access
 from .helpers import _xmodule_recurse
+from ..utils import get_modulestore
+from static_replace import replace_static_urls
+from util.json_request import expect_json, JsonResponse
+from util.string_utils import str_to_bool
+
+from cms.lib.xblock.runtime import handler_url, local_resource_url
 from contentstore.utils import compute_publish_state, PublishState
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.runtime import handler_url, local_resource_url
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 
 log = logging.getLogger(__name__)
 
 CREATE_IF_NOT_FOUND = ['course_info']
+CATEGORIES_WITH_CHILDS = [u'chapter', u'sequential', u'vertical']
 
 
 # In order to allow descriptors to use a handler url, we need to
@@ -126,6 +124,15 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
+            # delete item from loc_mapper and cache if its not already published
+            if old_location.category not in CATEGORIES_WITH_CHILDS:
+                try:
+                    modulestore('direct').get_item(old_location)
+                except ItemNotFoundError:
+                    loc_mapper().delete_item_mapping(locator, old_location)
+            elif old_location.category in CATEGORIES_WITH_CHILDS and delete_children and delete_all_versions:
+                loc_mapper().delete_item_mapping(locator, old_location)
+
             return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
         else:  # Since we have a package_id, we are updating an existing xblock.
             if block == 'handouts' and old_location is None:
@@ -188,6 +195,8 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
     if not has_course_access(request.user, locator):
         raise PermissionDenied()
     old_location = loc_mapper().translate_locator_to_location(locator)
+    if old_location is None:
+        raise ItemNotFoundError(locator)
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 

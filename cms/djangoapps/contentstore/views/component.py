@@ -346,6 +346,9 @@ def _get_item_in_course(request, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)
+    if old_location is None:
+        raise ItemNotFoundError(locator)
+
     course_location = loc_mapper().translate_locator_to_location(locator, True)
     course = modulestore().get_item(course_location)
     item = modulestore().get_item(old_location, depth=1)
