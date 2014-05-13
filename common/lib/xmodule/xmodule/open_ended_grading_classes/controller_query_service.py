@@ -44,7 +44,7 @@ class ControllerQueryService(GradingService):
         log.debug(self.combined_notifications_url)
         data = self.get(self.combined_notifications_url, params)
 
-        tags = [u'course_id:{}'.format(course_id), u'user_is_staff:{}'.format(user_is_staff)]
+        tags = [u'course_id:{}'.format(course_id.to_deprecated_string()), u'user_is_staff:{}'.format(user_is_staff)]
         tags.extend(
             u'{}:{}'.format(key, value)
             for key, value in data.items()
@@ -56,12 +56,12 @@ class ControllerQueryService(GradingService):
     def get_grading_status_list(self, course_id, student_id):
         params = {
             'student_id': student_id,
-            'course_id': course_id,
+            'course_id': course_id.to_deprecated_string(),
         }
 
         data = self.get(self.grading_status_list_url, params)
 
-        tags = [u'course_id:{}'.format(course_id)]
+        tags = [u'course_id:{}'.format(course_id.to_deprecated_string())]
         self._record_result('get_grading_status_list', data, tags)
         dog_stats_api.histogram(
             self._metric_name('get_grading_status_list.length'),
@@ -77,7 +77,7 @@ class ControllerQueryService(GradingService):
 
         data = self.get(self.flagged_problem_list_url, params)
 
-        tags = [u'course_id:{}'.format(course_id)]
+        tags = [u'course_id:{}'.format(course_id.to_deprecated_string())]
         self._record_result('get_flagged_problem_list', data, tags)
         dog_stats_api.histogram(
             self._metric_name('get_flagged_problem_list.length'),
@@ -95,7 +95,7 @@ class ControllerQueryService(GradingService):
 
         data = self.post(self.take_action_on_flags_url, params)
 
-        tags = [u'course_id:{}'.format(course_id), u'action_type:{}'.format(action_type)]
+        tags = [u'course_id:{}'.format(course_id.to_deprecated_string()), u'action_type:{}'.format(action_type)]
         self._record_result('take_action_on_flags', data, tags)
         return data
 
