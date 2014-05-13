@@ -7,10 +7,33 @@ from textwrap import dedent
 
 TEST_COURSE_UPDATES_CONTENT = dedent(
     """
+    <section>
+      <article>
+        <h2>April 18, 2014</h2>
+        This does not have a paragraph tag around it
+      </article>
+      <article>
+        <h2>April 17, 2014</h2>
+        Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag
+      </article>
+      <article>
+        <h2>April 16, 2014</h2>
+        Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag<p>one more</p>
+      </article>
+      <article>
+        <h2>April 15, 2014</h2>
+        <p>A perfectly</p><p>formatted piece</p><p>of HTML</p>
+      </article>
+    </section>
+    """
+)
+
+TEST_COURSE_UPDATES_CONTENT_LEGACY = dedent(
+    """
     <ol>
       <li>
         <h2>April 18, 2014</h2>
-        This does not have a paragraph tag around it
+        This is some legacy content
       </li>
       <li>
         <h2>April 17, 2014</h2>

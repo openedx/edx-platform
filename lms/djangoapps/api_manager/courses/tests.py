@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT
+from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
 
 TEST_API_KEY = str(uuid.uuid4())
@@ -559,6 +559,38 @@ class CoursesApiTests(TestCase):
         test_uri = '{}/{}/updates'.format(self.base_courses_uri, test_course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_courses_updates_legacy(self):
+        #try a bogus course_id to test failure case
+        test_course = CourseFactory.create()
+        ItemFactory.create(
+            category="course_info",
+            parent_location=test_course.location,
+            data=TEST_COURSE_UPDATES_CONTENT_LEGACY,
+            display_name="updates"
+        )
+        test_uri = self.base_courses_uri + '/' + test_course.id + '/updates'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertEqual(response.data['content'], TEST_COURSE_UPDATES_CONTENT_LEGACY)
+
+        # then try parsed
+        test_uri = self.base_courses_uri + '/' + test_course.id + '/updates?parse=True'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        postings = response.data['postings']
+        self.assertEqual(len(postings), 4)
+        self.assertEqual(postings[0]['date'], 'April 18, 2014')
+        self.assertEqual(postings[0]['content'], 'This is some legacy content')
+        self.assertEqual(postings[1]['date'], 'April 17, 2014')
+        self.assertEqual(postings[1]['content'], 'Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag')
+        self.assertEqual(postings[2]['date'], 'April 16, 2014')
+        self.assertEqual(postings[2]['content'], 'Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag<p>one more</p>')
+        self.assertEqual(postings[3]['date'], 'April 15, 2014')
+        self.assertEqual(postings[3]['content'], '<p>A perfectly</p><p>formatted piece</p><p>of HTML</p>')
 
     def test_static_tab_list_get(self):
         test_uri = '{}/{}/static_tabs'.format(self.base_courses_uri, self.test_course_id)
