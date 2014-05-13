@@ -173,13 +173,19 @@ def set_due_date_extension(course, unit, student, due_date):
                 course_id=course.id,
                 module_state_key=node.location.url()
             )
-
             state = json.loads(student_module.state)
-            state['extended_due'] = DATE_FIELD.to_json(due_date)
-            student_module.state = json.dumps(state)
-            student_module.save()
+
         except StudentModule.DoesNotExist:
-            pass
+            student_module = StudentModule.objects.create(
+                student_id=student.id,
+                course_id=course.id,
+                module_state_key=node.location.url(),
+                module_type=node.category)
+            state = {}
+
+        state['extended_due'] = DATE_FIELD.to_json(due_date)
+        student_module.state = json.dumps(state)
+        student_module.save()
 
         for child in node.get_children():
             set_due_date(child)
