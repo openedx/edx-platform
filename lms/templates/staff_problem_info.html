@@ -61,14 +61,14 @@ ${block_content}
         <label for="sd_fu_${location.name}">${_('Username')}:</label>
         <input type="text" id="sd_fu_${location.name}" placeholder="${user.username}"/>
       </div>
-      <div>
+      <div data-location="${unicode(location)}" data-location-name="${location.name}">
         [
-        <a href="#" id="staff-debug-reset" data-location="${location.name}">${_('Reset Student Attempts')}</a>
+        <a href="#" id="staff-debug-reset">${_('Reset Student Attempts')}</a>
         |
-        <a href="#" id="staff-debug-sdelete" data-location="${location.name}">${_('Delete Student State')}</a>
+        <a href="#" id="staff-debug-sdelete">${_('Delete Student State')}</a>
         |
-        <a href="#" id="staff-debug-rescore" data-location="${location.name}">${_('Rescore Student Submission')}</a>
-        
+        <a href="#" id="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+
         ]
       </div>
       <div id="result_${location.name}"/>
@@ -128,7 +128,7 @@ $(function () {
         null,
         %endif
         {
-            'location': '${location}',
+            'location': '${location.to_deprecated_string()}',
             'xqa_key': '${xqa_key}',
             'category': '${category}',
             'user': '${user}'

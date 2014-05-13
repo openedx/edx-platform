@@ -832,7 +832,7 @@ def rescore_problem(request, course_id):
     try:
         module_state_key = UsageKey.from_string(problem_to_reset)
     except InvalidKeyError:
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest("Unable to parse problem id")
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
