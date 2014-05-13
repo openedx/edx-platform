@@ -67,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-03-28 05:40+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -947,8 +947,40 @@ msgid ""
 msgstr "इस समस्या के लिए स्टाफ़ के जवाब में कुछ गड़बड़ थी।"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr "या"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr "कस्टम जवाब: चेक फ़ंक्शन ने एक अमान्य शब्दकोश लौटाया!"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1455,9 +1487,10 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
-"यूट्यूब यू आर एल या किसी फ़ाइल के लिए लिंक जो कि कहीं वेब पर उपलब्ध है।"
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
@@ -1923,6 +1956,7 @@ msgstr "कार्य पहले से ही चल रहा है।"
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4121,6 +4155,13 @@ msgstr "यह पेज मौजूद नहीं है"
 msgid "close"
 msgstr "बंद करें"
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr ""
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4411,10 +4452,6 @@ msgstr ""
 "एक आईडी वैरीफ़ाइड प्रमाण पत्र आपकी पहचान का सबूत आपकी फ़ोटो और आईडी के "
 "माध्यम से स्थापित करता है और यह पूरे पाठ्यक्रम के दौरान जांचा जाता है, यह "
 "स्थापित करने के लिए कि वे आप ही हैं जिन्होंने पास ग्रेड पाए हैं। "
-
-#: common/templates/course_modes/choose.html
-msgid "or"
-msgstr "या"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -5792,6 +5829,24 @@ msgstr "टिप्पणी दें"
 msgid "Staff Debug"
 msgstr "स्टाफ़ डीबग"
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr "छात्रों के प्रयास रीसेट करें"
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr "छात्र की प्रस्तुति को फिर से स्कोर करें"
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr "मॉड्यूल फ़ील्ड्स"
@@ -5845,6 +5900,7 @@ msgstr "उपयोगकर्ता"
 msgid "Staffing and Enrollment"
 msgstr "स्टाफ़िंग और नामांकन "
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5896,21 +5952,24 @@ msgid "Administer Courses"
 msgstr "पाठ्यक्रम वितरित करें"
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr "रिपोज़िटरी का स्थान"
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr "रिपोज़िटरी शाखा (optional)"
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr "GitHub से नया पाठ्यक्रम लोड करें"
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr "पाठ्यक्रम आईडी या dir"
@@ -5918,10 +5977,6 @@ msgstr "पाठ्यक्रम आईडी या dir"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr " साइट से पाठ्यक्रम को हटाएं"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
-msgstr "Django PID"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -5939,17 +5994,16 @@ msgstr "तारीख़"
 msgid "Course ID"
 msgstr "पाठ्यक्रम आईडी"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "git एक्शन"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
 msgstr "हाल ही में हुई git लोड गतिविधि "
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
-msgstr "git एक्शन"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -6568,11 +6622,8 @@ msgid "Course Handouts"
 msgstr "पाठ्यक्रम हैंडआउट्स"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
-msgstr "प्रशिक्षक डैशबोर्ड"
+msgid "Legacy Instructor Dashboard"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6580,8 +6631,30 @@ msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "नया बीटा डैशबोर्ड परखें"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr "प्रशिक्षक डैशबोर्ड"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -7130,6 +7203,10 @@ msgstr ""
 "जाएगा।"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "आपकी अंतिम श्रेणी:"
 
@@ -7214,16 +7291,36 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} कवर इमेज"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr ": के रूप में नामांकन"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
-msgstr "आईडी वैरीफाईड"
+msgid "Verified"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "ऑनर कोड"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -8364,13 +8461,13 @@ msgstr ""
 msgid "Choose the graded unit:"
 msgstr "ग्रेडेड यूनिट को चुनें: "
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
 msgstr ""
-"एक्सटेंशन की देय तारीख और समय (in UTC; please specify MM/DD/YYYY HH:MM) "
-"बताएं"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8401,8 +8498,8 @@ msgid "List all students with due date extensions"
 msgstr "उन छात्रों की सूची बनाएं जिन्हें देय तारीख की एक्सटेंशन मिली हैं "
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
-msgstr "किसी एक छात्र का नाम दर्ज करें और उसकी सभी एक्सटेंशन्स देखें।"
+msgid "Specify a student to see all of that student's extensions."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8427,8 +8524,15 @@ msgid "Reset due date for student"
 msgstr "छात्र की देय तारीख को रीसेट करें"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
-msgstr "मानक डैशबोर्ड पर वापस जाएं"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8748,6 +8852,20 @@ msgid "Show Email Task History"
 msgstr "ई-मेल टास्क हिस्टरी दिखाएं"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "विद्यार्थी-विशिष्ट ग्रेड निरीक्षण"
 
@@ -8788,14 +8906,6 @@ msgstr ""
 msgid "Next, select an action to perform for the given user and problem:"
 msgstr ""
 "इसके आगे, दिए गए उपयोगकर्ता और समस्या का प्रदर्शन करने के लिए एक्शन चुनें:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "छात्रों के प्रयास रीसेट करें"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "छात्र की प्रस्तुति को फिर से स्कोर करें"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -9297,6 +9407,13 @@ msgid "Registered as: "
 msgstr "के रूप में पंजीकृत:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
+msgstr "आईडी वैरीफाईड"
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -9498,11 +9615,6 @@ msgstr ""
 " edX को निर्यात नियंत्रण का पालन करना होगा और हम आपको इस पाठ्यक्रम में "
 "प्रवेश करने की अनुमति नहीं दे सकते। लेकिन आप अगर चाहे तो हमारे कैटेलॉग में "
 "कोई और दिलचस्प पाठ्क्रम खोज सकते हैं।"
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "ऑनर कोड"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -9922,6 +10034,9 @@ msgstr "फ़ोटो &amp सबमिट करें; री-वैरि�
 msgid "Re-Verification Submission Confirmation"
 msgstr "प्रस्तुति की पुनः वेरिफ़िकेशन की पुष्टि"
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -10775,12 +10890,6 @@ msgstr ""
 
 #: cms/templates/component.html
 msgid "Delete this component"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
