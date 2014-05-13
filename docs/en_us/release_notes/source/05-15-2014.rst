@@ -1,0 +1,110 @@
+###################################
+May 15, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of May 15, 2014. See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include: 
+
+  * Updated the `Running Your Course`_ chapter to remove references to the “new
+    beta” Instructor Dashboard.
+
+  * Updated `Enrollment`_ section to reflect that usernames or email
+    addresses can be used to batch enroll students.
+
+  * Updated `Grade and Answer Data`_ section to include new features in
+    the problem **Staff Debug** viewer for rescoring, resetting attempts, and
+    deleting state for a specified student.
+
+  * Updated `Staffing`_ section to explain the labeling differences
+    between Studio and the LMS with respect to course team roles.
+
+  * Updated `Assign Discussion Administration Roles`_ section to include a note
+    about course staff requiring explicit granting of discussion administration
+    roles.
+
+  * Added the `VitalSource E-Reader Tool`_ section.
+    
+  * Updated  `Add Files to a Course`_ section to include warnings about
+    file size.
+
+  * Updated the `LTI Component`_ section to reflect new settings.
+
+
+* `edX Data Documentation`_
+  
+  Recent changes include:
+
+  Updated `Tracking Logs`_ section to include events for course
+  enrollment activities: ``edx.course.enrollment.activated`` and
+  ``edx.course.enrollment.deactivated``.
+  
+
+* `edX Platform Developer Documentation`_
+
+   Recent changes include: 
+
+   Added an `Analytics`_ section for developers.
+  
+  
+* `edX XBlock Documentation`_
+
+
+
+*************
+edX Studio
+*************
+
+* A problem that prevented you from hiding the Wiki in the list of Pages when
+  using Firefox is resolved. (STUD-1581)
+
+* A problem that prevented you from importing a course created on edx.org into
+  edX Edge is resolved. (STUD-1599)
+
+* All text in the Video component UI has been updated for clarity. (DOC-206)
+
+***************************************
+edX Learning Management System
+***************************************
+
+* The Instructor Dashboard that appears to course teams by default in the
+  LMS has changed. The Instructor Dashboard that appears when you click
+  **Instructor** is now the "New Beta" dashboard. The "Standard" dashboard
+  remains available; a button click is required to access it. The two dashboard
+  versions are also relabeled in this release. The version that was previously
+  identified as the "New Beta Dashboard" is now labeled "Instructor Dashboard",
+  and the version previously identified as the "Standard Dashboard" is now
+  labeled "Legacy Dashboard". (LMS-1296)
+
+
+* Previously, when a student clicked **Run Code** for a MatLab problem, the
+  entire page was reloaded. This issue has been resolved so that now only the
+  MatLab problem elements are reloaded. (LMS-2505)
+
+
+****************
+edX Analytics
+****************
+
+* There is a new event tracking API for instrumenting events to capture user
+  actions and other point-in-time activities in Studio and the edX LMS. See
+  `Analytics`_ for more information.
+
+.. include:: links.rst
