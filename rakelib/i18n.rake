@@ -73,12 +73,6 @@ namespace :i18n do
     end
   end
 
-  desc "Run tests for the internationalization library"
-  task :test => [:install_python_prereqs, I18N_REPORT_DIR, :clean_reports_dir] do
-    pythonpath_prefix = "PYTHONPATH=#{REPO_ROOT}/i18n:$PYTHONPATH"
-    test_sh("i18n", "#{pythonpath_prefix} nosetests #{REPO_ROOT}/i18n/tests --with-xunit --xunit-file=#{I18N_XUNIT_REPORT}")
-  end
-
   # Commands for automating the process of including translations in edx-platform.
   # Will eventually be run by jenkins.
   namespace :robot do

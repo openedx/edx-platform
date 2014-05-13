@@ -5,22 +5,7 @@ from paver.easy import sh, task, cmdopts, needs
 import os
 import errno
 from .utils.envs import Env
-
-
-def get_or_make_dir(directory_path):
-    """
-    Ensure that a directory exists, and return its path
-    """
-    try:
-        os.makedirs(directory_path)
-    except OSError as err:
-        if err.errno != errno.EEXIST:
-            # If we get an error other than one that says
-            # that the file already exists
-            raise
-
-    return directory_path
-
+from .utils.test.utils import get_or_make_dir
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
