@@ -64,21 +64,12 @@
         <section id="catchDIV">
             <div class="annotationListContainer">${_('You do not have any notes.')}</div>
         </section>
-<<<<<<< HEAD
         <script>
 
         //Grab uri of the course
         var parts = window.location.href.split("/"),
             uri = '';
         for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
-=======
-    	<script>
-
-    	//Grab uri of the course
-    	var parts = window.location.href.split("/"), 
-    		uri = '';
-	for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
->>>>>>> edx/master
         var pagination = 100,
             is_staff = false,
             options = {
@@ -173,8 +164,6 @@
                         extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
                         toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
                     }
-<<<<<<< HEAD
-=======
                     return true;
                   },
             },
@@ -194,7 +183,6 @@
                     update:  '/update/:id',
                     destroy: '/delete/:id',
                     search:  '/search'
->>>>>>> edx/master
                 },
             };
 

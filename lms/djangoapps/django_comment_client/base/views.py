@@ -183,7 +183,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=request.user.id,
-        course_id=course_id.to_deprecated_string(),
+        course_id=course_key.to_deprecated_string(),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]

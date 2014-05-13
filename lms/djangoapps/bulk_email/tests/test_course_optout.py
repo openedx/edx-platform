@@ -38,9 +38,9 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.success_content = {
-            'course_id': self.course.id,
+            'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
 

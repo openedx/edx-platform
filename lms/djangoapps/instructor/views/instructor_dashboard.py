@@ -83,7 +83,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -156,7 +156,7 @@ def _section_membership(course_key, access):
 def _section_student_admin(course_key, access):
     """ Provide data for the corresponding dashboard section """
     is_small_course = False
-    enrollment_count = CourseEnrollment.num_enrolled_in(course_id)
+    enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         is_small_course = enrollment_count <= max_enrollment_for_buttons
@@ -166,12 +166,12 @@ def _section_student_admin(course_key, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'is_small_course': is_small_course,
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id.to_deprecated_string()}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id.to_deprecated_string()}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id.to_deprecated_string()}),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id.to_deprecated_string()}),
-        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 
