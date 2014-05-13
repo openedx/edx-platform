@@ -1,11 +1,9 @@
 import logging
 
-from django.conf import settings
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
-from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
@@ -20,11 +18,11 @@ from xmodule.modulestore import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from edxmako.shortcuts import render_to_string
 from django.utils.translation import ugettext as _
 
-from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE,
-                                      StudentProblemList, generate_problem_url, create_controller_query_service)
+from open_ended_grading.utils import (
+    STAFF_ERROR_MESSAGE, StudentProblemList, generate_problem_url, create_controller_query_service
+)
 
 log = logging.getLogger(__name__)
 
@@ -68,9 +66,10 @@ def staff_grading(request, course_id):
     """
     Show the instructor grading interface.
     """
-    course = get_course_with_access(request.user, 'staff', course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_key)
 
-    ajax_url = _reverse_with_slash('staff_grading', course_id)
+    ajax_url = _reverse_with_slash('staff_grading', course_key)
 
     return render_to_response('instructor/staff_grading.html', {
         'course': course,
@@ -118,9 +117,9 @@ def peer_grading(request, course_id):
     When a student clicks on the "peer grading" button in the open ended interface, link them to a peer grading
     xmodule in the course.
     '''
-
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     #Get the current course
-    course = get_course_with_access(request.user, 'load', course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
@@ -187,13 +186,11 @@ def flagged_problem_list(request, course_id):
     '''
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key)
-    student_id = unique_id_for_user(request.user)
 
     # call problem list service
     success = False
     error_text = ""
     problem_list = []
-    base_course_url = reverse('courses')
 
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()

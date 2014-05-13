@@ -109,13 +109,13 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
-        self.location = 'TestLocation'
         self.create_account('u1', self.student, self.password)
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
         self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.location_string = self.course_id.make_usage_key('html', 'TestLocation').to_deprecated_string()
         self.toy = modulestore().get_course(self.course_id)
 
         make_instructor(self.toy, self.instructor)
@@ -140,7 +140,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id.to_deprecated_string()})
-        data = {'location': self.location}
+        data = {'location': self.location_string}
 
         response = check_for_post_code(self, 200, url, data)
 
@@ -165,7 +165,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         data = {'score': '12',
                 'feedback': 'great!',
                 'submission_id': '123',
-                'location': self.location,
+                'location': self.location_string,
                 'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
         if skip:
@@ -227,7 +227,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'score': '12',
             'feedback': '',
             'submission_id': '123',
-            'location': self.location,
+            'location': self.location_string,
             'submission_flagged': "false",
             'rubric_scores[]': ['1', '2']
         }
@@ -262,13 +262,13 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
-        self.location = 'TestLocation'
         self.create_account('u1', self.student, self.password)
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
         self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.location_string = self.course_id.make_usage_key('html', 'TestLocation').to_deprecated_string()
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
@@ -292,7 +292,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.logout()
 
     def test_get_next_submission_success(self):
-        data = {'location': self.location}
+        data = {'location': self.location_string}
 
         response = self.peer_module.get_next_submission(data)
         content = response
@@ -312,7 +312,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_save_grade_success(self):
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location,
+            'location': self.location_string,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,
@@ -342,7 +342,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
-        data = {'location': self.location}
+        data = {'location': self.location_string}
         response = self.peer_module.is_student_calibrated(data)
 
         self.assertTrue(response['success'])
@@ -355,7 +355,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse('calibrated' in response)
 
     def test_show_calibration_essay_success(self):
-        data = {'location': self.location}
+        data = {'location': self.location_string}
 
         response = self.peer_module.show_calibration_essay(data)
 
@@ -376,7 +376,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_save_calibration_essay_success(self):
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location,
+            'location': self.location_string,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,
@@ -410,7 +410,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location,
+            'location': self.location_string,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,

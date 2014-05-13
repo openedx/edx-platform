@@ -9,6 +9,7 @@ from opaque_keys import InvalidKeyError
 import bson.son
 import logging
 from django.db.models.query_utils import Q
+from django.db.utils import IntegrityError
 
 log = logging.getLogger(__name__)
 
@@ -28,69 +29,72 @@ class Migration(DataMigration):
         loc_map_collection = loc_mapper().location_map
         # b/c the Groups table had several entries for each course, we need to ensure we process each unique
         # course only once. The below datastructures help ensure that.
-        hold = {}
-        done = set()
-        orgs = {}
-        query = Q(name__startswith='course_creator_group')
+        hold = {}  # key of course_id_strings with array of group objects. Should only be org scoped entries
+        # or deleted courses
+        orgs = {}  # downcased org to last recorded normal case of the org
+        query = Q(name='course_creator_group')
         for role in ['staff', 'instructor', 'beta_testers', ]:
             query = query | Q(name__startswith=role)
         for group in orm['auth.Group'].objects.filter(query).all():
-            def _migrate_users(correct_course_key, lower_org):
+            def _migrate_users(correct_course_key, role, lower_org):
                 """
                 Get all the users from the old group and migrate to this course key in the new table
                 """
                 for user in orm['auth.user'].objects.filter(groups=group).all():
                     entry = orm['student.courseaccessrole'](
-                        role=parsed_entry.group('role_id'), user=user,
-                        org=correct_course_key.org, course_id=correct_course_key.to_deprecated_string()
+                        role=role, user=user,
+                        org=correct_course_key.org, course_id=correct_course_key
                     )
-                    entry.save()
+                    try:
+                        entry.save()
+                    except IntegrityError:
+                        # already stored
+                        pass
                 orgs[lower_org] = correct_course_key.org
-                done.add(correct_course_key)
 
-            # should this actually loop through all groups and log any which are not compliant? That is,
-            # remove the above filter
             parsed_entry = self.GROUP_ENTRY_RE.match(group.name)
-            if parsed_entry.group('role_id') == 'course_creator_group':
+            role = parsed_entry.group('role_id')
+            if role == 'course_creator_group':
                 for user in orm['auth.user'].objects.filter(groups=group).all():
-                    entry = orm['student.courseaccessrole'](role=parsed_entry.group('role_id'), user=user)
+                    entry = orm['student.courseaccessrole'](role=role, user=user)
                     entry.save()
             else:
                 course_id_string = parsed_entry.group('course_id_string')
                 try:
                     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
-                    if course_key not in done:
-                        # is the downcased version, get the normal cased one. loc_mapper() has no
-                        # methods taking downcased SSCK; so, need to do it manually here
-                        correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection, done)
-                        _migrate_users(correct_course_key, course_key.org)
-                        done.add(course_key)
+                    # course_key is the downcased version, get the normal cased one. loc_mapper() has no
+                    # methods taking downcased SSCK; so, need to do it manually here
+                    correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection)
+                    if correct_course_key is not None:
+                        _migrate_users(correct_course_key, role, course_key.org)
                 except InvalidKeyError:
                     entry = loc_map_collection.find_one({
                         'course_id': re.compile(r'^{}$'.format(course_id_string), re.IGNORECASE)
                     })
                     if entry is None:
-                        # not a course_id as far as we can tell
-                        if course_id_string not in done:
-                            hold[course_id_string] = group
+                        hold.setdefault(course_id_string, []).append(group)
                     else:
-                        correct_course_key = self._cache_done_return_ssck(entry, done)
-                        _migrate_users(correct_course_key, entry['lower_id']['org'])
+                        correct_course_key = SlashSeparatedCourseKey(*entry['_id'].values())
+                        _migrate_users(correct_course_key, role, entry['lower_id']['org'])
 
-        # see if any in hold ere missed above
-        for not_ssck, group in hold.iteritems():
-            if not_ssck not in done:
-                if not_ssck in orgs:
+        # see if any in hold were missed above
+        for held_auth_scope, groups in hold.iteritems():
+            # orgs indexed by downcased org
+            held_auth_scope = held_auth_scope.lower()
+            if held_auth_scope in orgs:
+                for group in groups:
+                    role = self.GROUP_ENTRY_RE.match(group.name).group('role_id')
                     # they have org permission
                     for user in orm['auth.user'].objects.filter(groups=group).all():
                         entry = orm['student.courseaccessrole'](
-                            role=parsed_entry.group('role_id'), user=user,
-                            org=orgs[not_ssck],
+                            role=role,
+                            user=user,
+                            org=orgs[held_auth_scope],
                         )
                         entry.save()
-                else:
-                    # should this just log or really make an effort to do the conversion?
-                    log.warn("Didn't convert role %s", group.name)
+            else:
+                # don't silently skip unexpected roles
+                log.warn("Didn't convert roles %s", [group.name for group in groups])
 
     def backwards(self, orm):
         "Write your backwards methods here."
@@ -98,10 +102,9 @@ class Migration(DataMigration):
         # the semantic of backwards should be other than perhaps clearing the table.
         orm['student.courseaccessrole'].objects.all().delete()
 
-    def _map_downcased_ssck(self, downcased_ssck, loc_map_collection, done):
+    def _map_downcased_ssck(self, downcased_ssck, loc_map_collection):
         """
-        Get the normal cased version of this downcased slash sep course key and add
-        the lowercased locator form to done map
+        Get the normal cased version of this downcased slash sep course key
         """
         # given the regex, the son may be an overkill
         course_son = bson.son.SON([
@@ -111,24 +114,10 @@ class Migration(DataMigration):
         ])
         entry = loc_map_collection.find_one(course_son)
         if entry:
-            return self._cache_done_return_ssck(entry, done)
+            idpart = entry['_id']
+            return SlashSeparatedCourseKey(idpart['org'], idpart['course'], idpart['name'])
         else:
             return None
-
-    def _cache_done_return_ssck(self, entry, done):
-        """
-        Add all the various formats which auth may use to the done set and return the ssck for the entry
-        """
-        # cache that the dotted form is done too
-        if 'lower_course_id' in entry:
-            done.add(entry['lower_course_id'])
-        elif 'course_id' in entry:
-            done.add(entry['course_id'].lower())
-        elif 'lower_org' in entry:
-            done.add('{}.{}'.format(entry['lower_org'], entry['lower_offering']))
-        else:
-            done.add('{}.{}'.format(entry['org'].lower(), entry['offering'].lower()))
-        return SlashSeparatedCourseKey(*entry['_id'].values())
 
 
     models = {
