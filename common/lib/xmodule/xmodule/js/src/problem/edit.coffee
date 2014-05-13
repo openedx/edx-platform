@@ -109,7 +109,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       $(".CodeMirror").css({"overflow": "visible"})
       $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
     else
-      $(".CodeMirror").removeAttr("style")
+      $(".CodeMirror").css({"overflow": "none"})
       $(".modal-content").removeAttr("style")
 
   ###
