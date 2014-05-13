@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)/groups/(?P<group_id>[0-9]+)$', courses_views.CourseContentGroupsDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)/groups/*$', courses_views.CourseContentGroupsList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)/children/*$', courses_views.CourseContentList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)/users/*$', courses_views.CourseContentUsersList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)$', courses_views.CourseContentDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/*$', courses_views.CourseContentList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/(?P<group_id>[0-9]+)$', courses_views.CoursesGroupsDetail.as_view()),

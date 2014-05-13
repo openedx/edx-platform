@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 import logging
+import itertools
 from lxml import etree
 from StringIO import StringIO
 
@@ -9,12 +10,13 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from api_manager.users.serializers import UserSerializer
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
 from courseware.model_data import FieldDataCache
@@ -844,3 +846,47 @@ class CourseContentGroupsDetail(APIView):
             'group_id': group_id,
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class CourseContentUsersList(generics.ListAPIView):
+    """
+    ### The CourseContentUsersList view allows clients to users enrolled and
+    users not enrolled for course within all groups of course
+    - URI: ```/api/courses/{course_id}/content/{content_id}/users?enrolled={enrolment_status}&group_id={group_id}&type={group_type}```
+    - GET: Returns a JSON representation of users enrolled or not enrolled
+    ### Use Cases/Notes:
+    * Use CourseContentUsersList to grab the users enrolled in Course content group
+    * Use CourseContentUsersList to grab the users not enrolled in Course content group
+    """
+    permission_classes = (ApiKeyHeaderPermission,)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        """
+        GET retrieves the list of users who registered for a given course content
+        and list of users who are not registered for that group course content.
+        'enrolled' query parameter for filtering user' enrolment status
+        'group_id' query parameter is available for filtering by group.
+        'type' query parameter is available for filtering by group_type.
+        """
+        course_id = self.kwargs['course_id']
+        content_id = self.kwargs['content_id']
+        enrolled = self.request.QUERY_PARAMS.get('enrolled', 'True')
+        group_type = self.request.QUERY_PARAMS.get('type', None)
+        group_id = self.request.QUERY_PARAMS.get('group_id', None)
+        groups = CourseContentGroupRelationship.objects.filter(course_id=course_id, content_id=content_id)
+
+        if group_id:
+            groups = groups.filter(group__group__id=group_id)
+
+        if group_type:
+            groups = groups.filter(group__group_type=group_type)
+
+        lookup_group_ids = groups.values_list('group_id', flat=True)
+        users = User.objects.filter(groups__id__in=lookup_group_ids)
+        enrolled_users = CourseEnrollment.users_enrolled_in(course_id).filter(groups__id__in=lookup_group_ids)
+        if enrolled in ['True', 'true']:
+            queryset = enrolled_users
+        else:
+            queryset = list(itertools.ifilterfalse(lambda x: x in enrolled_users, users))
+        return queryset
