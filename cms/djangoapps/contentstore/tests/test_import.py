@@ -88,12 +88,12 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # Checks to make sure that a course with an org/course like
         # edx/course can be imported into a namespace with an org/course
         # like edx/course_name
-        module_store, __, __, course_location = self.load_test_import_course()
+        module_store, __, course = self.load_test_import_course()
         __, course_items = import_from_xml(
             module_store,
             'common/test/data',
             ['test_import_course_2'],
-            target_location_namespace=course_location,
+            target_course_id=course.id,
             verbose=True,
         )
         self.assertEqual(len(course_items), 1)

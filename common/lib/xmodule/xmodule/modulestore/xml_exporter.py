@@ -86,8 +86,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, d
             try:
                 course_image = contentstore.find(
                     StaticContent.compute_location(
-                        course.location.org,
-                        course.location.course,
+                        course.id,
                         course.course_image
                     ),
                 )
