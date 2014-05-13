@@ -154,7 +154,7 @@ class DraftModuleStore(MongoModuleStore):
         self.refresh_cached_metadata_inheritance_tree(draft_location)
         self.fire_updated_modulestore_signal(get_course_id_no_run(draft_location), draft_location)
 
-        return self._load_items([original])[0]
+        return wrap_draft(self._load_items([original])[0])
 
     def update_item(self, xblock, user=None, allow_not_found=False):
         """

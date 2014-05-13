@@ -34,6 +34,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
+    - xmodule_js/common_static/js/vendor/jquery.simulate.js
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js

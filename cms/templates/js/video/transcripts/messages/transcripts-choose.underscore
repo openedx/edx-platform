@@ -4,9 +4,9 @@
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("The timed transcript for the first HTML5 source does not appear to be the same as the timed transcript for the second HTML5 source.") %>
+    <%= gettext("The timed transcript for the first video file does not appear to be the same as the timed transcript for the second video file.") %>
     <strong>
-        <%= gettext("Which one would you like to use?") %>
+        <%= gettext("Which timed transcript would you like to use?") %>
     </strong>
 </p>
 

@@ -1375,6 +1375,7 @@ class StringResponse(LoncapaResponse):
         Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
         Should be removed soon. When to remove it, is up to Lyla Fisher.
         """
+        _ = self.capa_system.i18n.ugettext
         # backward compatibility, should be removed in future.
         if self.backward:
             return self.check_string_backward(expected, given)
@@ -1386,7 +1387,10 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = '[courseware.capa.responsetypes.stringresponse] error: {}'.format(err.message)
+                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                    error=_(u'error'),
+                    message=err.message
+                )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)
             return bool(result)
@@ -1410,7 +1414,9 @@ class StringResponse(LoncapaResponse):
         return hints_to_show
 
     def get_answers(self):
-        return {self.answer_id: ' <b>or</b> '.join(self.correct_answer)}
+        _ = self.capa_system.i18n.ugettext
+        separator = u' <b>{}</b> '.format(_(u'or'))
+        return {self.answer_id: separator.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
 
@@ -1505,6 +1511,7 @@ class CustomResponse(LoncapaResponse):
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         """
+        _ = self.capa_system.i18n.ugettext
 
         log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
@@ -1514,9 +1521,16 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = ('[courseware.capa.responsetypes.customresponse] error getting'
-                   ' student answer from %s' % student_answers)
-            msg += '\n idset = %s, error = %s' % (idset, err)
+            msg = _(
+                "[courseware.capa.responsetypes.customresponse] error getting"
+                " student answer from {student_answers}"
+                "\n idset = {idset}, error = {err}"
+            ).format(
+                student_answers=student_answers,
+                idset=idset,
+                err=err
+            );
+
             log.error(msg)
             raise Exception(msg)
 
@@ -1529,7 +1543,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = ('<span class="inline-error">No answer entered!</span>'
+            msg = (u'<span class="inline-error">{0}</span>'.format(_(u'No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
@@ -1778,9 +1792,14 @@ class SymbolicResponse(CustomResponse):
                 debug=self.context.get('debug'),
             )
         except Exception as err:
-            log.error("oops in symbolicresponse (cfn) error %s", err)
+            log.error("oops in SymbolicResponse (cfn) error %s", err)
             log.error(traceback.format_exc())
-            raise Exception("oops in symbolicresponse (cfn) error %s", err)
+            _ = self.capa_system.i18n.ugettext
+            # Translators: 'SymbolicResponse' is a problem type and should not be translated.
+            msg = _(u"oops in SymbolicResponse (cfn) error {error_msg}").format(
+                error_msg=err,
+            )
+            raise Exception(msg)
         self.context['messages'][0] = self.clean_message_html(ret['msg'])
         self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
 
@@ -1863,10 +1882,12 @@ class CodeResponse(LoncapaResponse):
 
         self.initial_display = find_with_default(
             codeparam, 'initial_display', '')
+        _ = self.capa_system.i18n.ugettext
         self.answer = find_with_default(codeparam, 'answer_display',
-                                        'No answer provided.')
+                                        _(u'No answer provided.'))
 
     def get_score(self, student_answers):
+        _ = self.capa_system.i18n.ugettext
         try:
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
@@ -1882,7 +1903,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Error checking problem: no external queueing server is configured.')
+                     msg=_(u'Error checking problem: no external queueing server is configured.'))
             return cmap
 
         # Prepare xqueue request

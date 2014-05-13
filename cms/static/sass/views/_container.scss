@@ -7,7 +7,7 @@
 // ====================
 
 // UI: container page view
-body.view-container {
+.view-container {
 
   .mast {
     border-bottom: none;
@@ -97,7 +97,58 @@ body.view-container {
 }
 
 // UI: xblock rendering
-body.view-container  .content-primary {
+body.view-container .content-primary {
+
+  // dragging bits
+  .ui-sortable-helper {
+
+    article {
+      display: none;
+    }
+  }
+
+  .component-placeholder {
+    height: ($baseline*2.5);
+    opacity: .5;
+    margin: $baseline;
+    background-color: $gray-l5;
+    border-radius: ($baseline/2);
+    border: 2px dashed $gray-l2;
+  }
+
+  .vert-mod {
+
+    // min-height to allow drop when empty
+    .vertical-container {
+      min-height: ($baseline*2.5);
+    }
+
+    .vert {
+      position: relative;
+
+      .drag-handle {
+        display: none; // only show when vert is draggable
+        position: absolute;
+        top: 0;
+        right: ($baseline/2); // equal to margin on component
+        width: ($baseline*1.5);
+        height: ($baseline*2.5);
+        margin: 0;
+        background: transparent url("../img/drag-handles.png") no-repeat scroll center center;
+      }
+    }
+
+    .is-draggable {
+
+      .xblock-header {
+        padding-right: ($baseline*1.5); // make room for drag handle
+      }
+
+      .drag-handle {
+        display: block;
+      }
+    }
+  }
 
   .wrapper-xblock {
     @extend %wrap-xblock;

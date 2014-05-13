@@ -18,6 +18,22 @@ class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
     def student_view(self, context):
+        # When rendering a Studio preview, use a different template to support drag and drop.
+        if context and context.get('runtime_type', None) == 'studio':
+            return self.studio_preview_view(context)
+
+        return self.render_view(context, 'vert_module.html')
+
+    def studio_preview_view(self, context):
+        """
+        Renders the Studio preview view, which supports drag and drop.
+        """
+        return self.render_view(context, 'vert_module_studio_view.html')
+
+    def render_view(self, context, template_name):
+        """
+        Helper method for rendering student_view and the Studio version.
+        """
         fragment = Fragment()
         contents = []
 
@@ -33,8 +49,9 @@ class VerticalModule(VerticalFields, XModule):
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.system.render_template('vert_module.html', {
-            'items': contents
+        fragment.add_content(self.system.render_template(template_name, {
+            'items': contents,
+            'xblock_context': context,
         }))
         return fragment
 

@@ -52,14 +52,14 @@ class Comment(models.Model):
         else:
             raise CommentClientRequestError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_tags=self._metric_tags,
             metric_action='comment.abuse.flagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll):
         if voteable.type == 'thread':
@@ -73,14 +73,14 @@ class Comment(models.Model):
         if removeAll:
             params['all'] = True
 
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_tags=self._metric_tags,
             metric_action='comment.abuse.unflagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
 
 def _url_for_thread_comments(thread_id):

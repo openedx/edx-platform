@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:09-0400\n"
-"PO-Revision-Date: 2014-04-26 10:59+0000\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"PO-Revision-Date: 2014-05-13 07:54+0000\n"
 "Last-Translator: spentamanyu <i.delamo@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
@@ -1466,6 +1466,34 @@ msgstr "Elemento de lista"
 msgid "Heading"
 msgstr "Cabecera"
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -1493,7 +1521,8 @@ msgstr "Studio tiene problemas para guardar tu trabajo"
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
@@ -1746,23 +1775,29 @@ msgstr "Editar la fecha de publicación de la sección"
 msgid "Not Graded"
 msgstr "No calificado"
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr "ascendente"
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr "descendente"
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
 msgstr ""
-"Mostrando %(current_span)s%(start)s-%(end)s%(end_span)s de un total de "
-"%(total_span)s%(total)s %(end_span)s, ordenados por "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Mostrando %(current_item_range)s de un total de  %(total_items_count)s, "
+"organizados por  %(sort_name)s en orden ascendente"
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr ""
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"

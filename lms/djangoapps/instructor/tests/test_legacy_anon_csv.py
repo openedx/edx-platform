@@ -52,7 +52,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def test_download_anon_csv(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id})
 
         with patch('instructor.views.legacy.unique_id_for_user') as mock_unique:
             mock_unique.return_value = 42

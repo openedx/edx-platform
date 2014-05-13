@@ -18,8 +18,13 @@ and other contributors can expect from each other. The goals are:
 Roles
 -----
 
+People play different roles in the pull-request review process.  Each role has
+different jobs and responsibilities:
+
 :doc:`core-committer`
-    Can commit changes to an Open edX repository.  Core committers are responsible for the quality of the code, and for supporting the code in the future.  Core committers are also developers in their own right.
+    Can commit changes to an Open edX repository.  Core committers are
+    responsible for the quality of the code, and for supporting the code in the
+    future.  Core committers are also developers in their own right.
 
 :doc:`product-owner`
     Prioritizes the work of core committers.
@@ -50,18 +55,21 @@ request: include a detailed description, keep the code clear and readable,
 make sure the tests pass, be responsive to code review comments.
 Small pull requests are easier to review than large pull requests, so
 split up your changes into several small pull requests when possible --
-it will make everything go faster.
+it will make everything go faster.  See the full :doc:`contributor guidelines <contributor>`
+for details of what to do and what to expect.
 
 If you are a :doc:`product owner <product-owner>`, treat pull requests
 from contributors like feature requests from a customer.
 Keep the lines of communication open -- if there are delays or unexpected
 problems, add a comment to the pull request informing the author of the
 pull request of what’s going on. No one likes to feel like they’re being ignored!
+More details are in the :doc:`product owner guidelines <product-owner>`.
 
 If you are a :doc:`core committer <core-committer>`, allocate some time
 in every two-week sprint to review pull requests from other contributors.
 The community managers will make sure that these pull requests meet a
 basic standard for quality before asking you spend time reviewing them.
+More details are in the :doc:`core committer guidelines <code-committer>`.
 
 Feel free to read the other documentation specific to each individual role in the
 process, but you don’t need to read everything to get started! If you're not

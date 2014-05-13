@@ -1,6 +1,21 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
+<div>
+  %if section_data['is_small_course']:
+  ## Show the gradebook for small courses
+    <h2>${_("Student Gradebook")}</h2>
+      <p>
+	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
+      </p>
+      <br>
+      <p>
+	<a href="${ section_data['spoc_gradebook_url'] }" class="progress-link"> ${_("View Gradebook")} </a>
+      </p>
+    <hr>
+  %endif
+</div>
+
 <div class="student-specific-container action-type-container">
   <h2>${_("Student-specific grade inspection")}</h2>
   <div class="request-response-error"></div>

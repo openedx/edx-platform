@@ -11,6 +11,8 @@ Change Log
 
    * - Date
      - Change
+   * - 05/0614
+     - Added enrollment event types to the :ref:`Tracking Logs` chapter. 
    * - 05/05/14
      - Removed information on the Poll module. `Polls <http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/poll.html>`_ are now covered in the *Building and Running an edX Course* guide.
    * -
@@ -19,7 +21,6 @@ Change Log
      - Removed information on CustomResponse XML and Python Script. See `Write-Your-Own-Grader Problem <http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/custom_python.html>`_ in the  *Building and Running an edX Course* guide.
    * - 
      - Removed information on Formula Equation Input. See `Create a Math Expression Input Problem <http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/math_expression_input.html>`_ in the  *Building and Running an edX Course* guide.
-
    * - 04/29/14
      - Corrected misstatement on how :ref:`Discussion Forums Data` is sent in
        data packages.

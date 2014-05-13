@@ -121,9 +121,9 @@
       }
     }
   }
-  
+
   //Metrics tab
- 
+
   .metrics-container {
     position: relative;
     width: 100%;
@@ -170,6 +170,18 @@
     border-radius: 5px;
     margin-top: 25px;
   }
- 
+
+  .wrapper-msg {
+    margin-bottom: ($baseline*1.5);
+
+    .msg {
+      margin-bottom: 0;
+    }
+
+    .note {
+      margin: 0;
+    }
+  }
+
 }
 

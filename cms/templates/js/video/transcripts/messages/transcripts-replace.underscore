@@ -4,9 +4,9 @@
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("The timed transcript file on YouTube does not appear to be the same as the timed transcript file on edX.") %>
+    <%= gettext("The timed transcript for this video on edX is out of date, but YouTube has a current timed transcript for this video.") %>
     <strong>
-        <%= gettext("Would you like to replace the edX timed transcript with the ones from YouTube?") %>
+        <%= gettext("Do you want to replace the edX transcript with the YouTube transcript?") %>
     </strong>
 </p>
 
@@ -19,11 +19,11 @@
         class="action setting-replace"
         type="button"
         name="setting-replace"
-        value="<%= gettext("Yes, Replace EdX Timed Transcript with YouTube Timed Transcript") %>"
-        data-tooltip="<%= gettext("Yes, Replace EdX Timed Transcript with YouTube Timed Transcript") %>"
+        value="<%= gettext("Yes, replace the edX transcript with the YouTube transcript") %>"
+        data-tooltip="<%= gettext("Yes, replace the edX transcript with the YouTube transcript") %>"
     >
         <span>
-            <%= gettext("Yes, Replace EdX Timed Transcript with YouTube Timed Transcript") %>
+            <%= gettext("Yes, replace the edX transcript with the YouTube transcript") %>
         </span>
     </button>
 </div>

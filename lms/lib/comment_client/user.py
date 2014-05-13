@@ -56,14 +56,14 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id, 'value': value}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_action='user.vote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def unvote(self, voteable):
         if voteable.type == 'thread':
@@ -73,14 +73,14 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id}
-        request = perform_request(
+        response = perform_request(
             'delete',
             url,
             params,
             metric_action='user.unvote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def active_threads(self, query_params={}):
         if not self.course_id:
@@ -141,7 +141,7 @@ class User(models.Model):
                 )
             else:
                 raise
-        self.update_attributes(**response)
+        self._update_from_response(response)
 
 
 def _url_for_vote_comment(comment_id):

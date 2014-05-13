@@ -117,6 +117,8 @@ class VerifiedView(View):
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        if verify_mode is None:
+            return redirect(reverse('dashboard'))
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
         else:

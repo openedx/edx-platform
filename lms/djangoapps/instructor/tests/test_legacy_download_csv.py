@@ -49,7 +49,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
 
     def test_download_grades_csv(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id})
         msg = "url = {0}\n".format(url)
         response = self.client.post(url, {'action': 'Download CSV of all student grades for this course'})
         msg += "instructor dashboard download csv grades: response = '{0}'\n".format(response)

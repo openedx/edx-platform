@@ -2,10 +2,8 @@
 Student Views
 """
 import datetime
-import json
 import logging
 import re
-import urllib
 import uuid
 import time
 from collections import defaultdict
@@ -17,7 +15,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
-from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
@@ -29,6 +26,7 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
 from django.template.response import TemplateResponse
@@ -46,7 +44,6 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
-from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -91,7 +88,6 @@ from third_party_auth import pipeline, provider
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-Article = namedtuple('Article', 'title url author image deck publication publish_date')
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
 def csrf_token(context):
@@ -135,19 +131,6 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
-day_pattern = re.compile(r'\s\d+,\s')
-multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
-
-
-def _get_date_for_press(publish_date):
-    # strip off extra months, and just use the first:
-    date = re.sub(multimonth_pattern, ", ", publish_date)
-    if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y").replace(tzinfo=UTC)
-    else:
-        date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
-    return date
-
 
 def embargo(_request):
     """
@@ -165,18 +148,7 @@ def embargo(_request):
 
 
 def press(request):
-    json_articles = cache.get("student_press_json_articles")
-    if json_articles is None:
-        if hasattr(settings, 'RSS_URL'):
-            content = urllib.urlopen(settings.PRESS_URL).read()
-            json_articles = json.loads(content)
-        else:
-            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
-            json_articles = json.loads(content)
-        cache.set("student_press_json_articles", json_articles)
-    articles = [Article(**article) for article in json_articles]
-    articles.sort(key=lambda item: _get_date_for_press(item.publish_date), reverse=True)
-    return render_to_response('static_templates/press.html', {'articles': articles})
+    return render_to_response('static_templates/press.html')
 
 
 def process_survey_link(survey_link, user):
@@ -356,7 +328,7 @@ def signin_user(request):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
@@ -389,7 +361,7 @@ def register_user(request, extra_context=None):
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
 
     context = {
         'course_id': request.GET.get('course_id'),
@@ -703,6 +675,7 @@ def _get_course_enrollment_domain(course_id):
         return None
 
 
+@never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
     """
@@ -712,9 +685,9 @@ def accounts_login(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so redirect
-        # to branding and allow that to process the login.
-        return redirect(reverse('root'))
+        # SSL login doesn't require a view, so login
+        # directly here
+        return external_auth.views.ssl_login(request)
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
@@ -1878,26 +1851,3 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
-
-
-@login_required
-def token(request):
-    '''
-    Return a token for the backend of annotations.
-    It uses the course id to retrieve a variable that contains the secret
-    token found in inheritance.py. It also contains information of when
-    the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend.
-    '''
-    course_id = request.GET.get("course_id")
-    course = course_from_id(course_id)
-    dtnow = datetime.datetime.now()
-    dtutcnow = datetime.datetime.utcnow()
-    delta = dtnow - dtutcnow
-    newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
-    newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    secret = course.annotation_token_secret
-    custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": request.user.email, "ttl": 86400}
-    newtoken = create_token(secret, custom_data)
-    response = HttpResponse(newtoken, mimetype="text/plain")
-    return response

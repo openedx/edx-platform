@@ -15,7 +15,6 @@ urlpatterns = ('',  # nopep8
     url(r'^request_certificate$', 'certificates.views.request_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
-    url(r'^token$', 'student.views.token', name="token"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
 
@@ -68,6 +67,9 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
+    
+    # Feedback Form endpoint
+    url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
@@ -122,9 +124,6 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Favicon
         (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-
-        url(r'^submit_feedback$', 'util.views.submit_feedback'),
-
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -271,14 +270,15 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
-
-        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
-
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
+            include('instructor.views.api_urls')),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.legacy.gradebook', name='gradebook'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'instructor.views.legacy.grade_summary', name='grade_summary'),
+            'instructor.views.instructor_dashboard.spoc_gradebook', name='spoc_gradebook'),
+
+        # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
+
+        # Open Ended grading views
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
@@ -365,13 +365,14 @@ if settings.COURSEWARE_ENABLED:
         )
 
 
-if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
-            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
-
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
-            include('instructor.views.api_urls'))
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_gradebook$',
+            'instructor.views.legacy.gradebook', name='gradebook_legacy'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_grade_summary$',
+            'instructor.views.legacy.grade_summary', name='grade_summary_legacy'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_instructor_dash$',
+            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_legacy"),
     )
 
 if settings.FEATURES.get('CLASS_DASHBOARD'):

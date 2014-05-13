@@ -139,49 +139,128 @@ If you use a JSON formatter to "pretty print" this event, a version that is more
 Common Fields
 ********************
 
-This section contains a table of the JSON fields that are common to the schema definitions of all events.
+This section describes the JSON fields that are common to the schema definitions of all events.
 
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| Field                     | Details                                                     | Type        | Values/Format/Member Fields        |
-+===========================+=============================================================+=============+====================================+
-| ``agent``                 | Browser agent string of the user who triggered the event.   | string      |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``context``               | For all event types, identifies the course that generated   | string/JSON | Contains these common member       |
-|                           | the event, the organization that lists the course, and the  |             | fields:                            |  
-|                           | individual who is performing the action.                    |             | ``course_id``                      |
-|                           |                                                             |             | ``org_id``                         |
-|                           | ``course_user_tags`` contains a dictionary with the key(s)  |             | ``user_id``                        |
-|                           |  and value(s) from the ``user_api_usercoursetag`` table     |             | ``course_user_tags``               |    
-|                           |  for the user. See :ref:`user_api_usercoursetag`.           |             |                                    | 
-|                           |                                                             |             | These fields are blank if values   |
-|                           | Also contains member fields that apply to specific event    |             | cannot be determined.              |
-|                           | types only: see the description for each event type.        |             |                                    |
-|                           |                                                             |             |                                    |
-|                           | **History**: Added 23 Oct 2013; ``user_id`` added           |             |                                    |
-|                           | 6 Nov 2013. Other event fields may duplicate this data.     |             |                                    |
-|                           | ``course_user_tags`` added 12 Mar 2014.                     |             |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``event``                 | Specifics of the triggered event.                           | string/JSON |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``event_source``          | Specifies whether the triggered event originated in the     | string      | 'browser', 'server', 'task'        |
-|                           | browser or on the server.                                   |             |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``event_type``            | The type of event triggered. Values depend on               | string      | For descriptions of member fields, |
-|                           | ``event_source``.                                           |             | see the event type descriptions    |
-|                           |                                                             |             | that follow.                       |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``ip``                    | IP address of the user who triggered the event.             | string      |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``page``                  | Page user was visiting when the event was fired.            | string      | '$URL'                             |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``session``               | This key identifies the user's session. May be undefined.   | string      | 32 digits                          |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``time``                  | Gives the UTC time at which the event was fired.            | string      | 'YYYY-MM-DDThh:mm:ss.xxxxxx'       |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``username``              | The username of the user who caused the event to fire. This | string      |                                    |
-|                           | string is empty for anonymous events (i.e., user not logged |             |                                    |
-|                           | in).                                                        |             |                                    |
-+---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+=====================
+``agent`` Field
+=====================
+
+**Type:** string
+
+**Details:** Browser agent string of the user who triggered the event. 
+
+.. _context:
+
+===================
+``context`` Field
+===================
+
+**Type:** string/JSON 
+
+**Details:** For all event types, this dict type field includes member fields
+that identify the course that generated the event, the organization that lists
+the course, and the individual who is performing the action.
+``course_user_tags`` contains a dictionary with the key(s) and value(s) from the
+``user_api_usercoursetag`` table for the user. See
+:ref:`user_api_usercoursetag`.
+
+**Values/Format/Member Fields:** Contains these common member fields:
+
+* ``course_id``
+* ``org_id``
+* ``user_id``
+* ``course_user_tags``
+
+These fields are blank if values cannot be determined. Also contains member
+fields that apply to specific event types only: see the description for each
+event type.
+
+**History**: Added 23 Oct 2013; ``user_id`` added 6 Nov 2013. Other event fields
+may duplicate this data. ``course_user_tags`` added 12 Mar 2014.
+
+===================
+``event`` Field
+===================
+
+**Type:** string/JSON
+
+**Details:** For all event types, this dict type field includes member fields
+that identify specifics of the triggered event. Different member fields are
+supplied for different types of events: see the description for each event type.
+
+========================
+``event_source`` Field
+========================
+
+**Type:** string
+
+**Details:** Specifies whether the triggered event originated in the browser or
+on the server.
+
+**Values/Format/Member Fields:** 'browser', 'server', or 'task'
+
+=====================
+``event_type`` Field
+=====================
+
+**Type:** string
+
+**Details:** The type of event triggered. Values depend on ``event_source``. 
+
+===================
+``host`` Field
+===================
+
+**Type:** string
+
+**Details:** The site visited by the user, for example, courses.edx.org.
+
+===================
+``ip`` Field
+===================
+
+**Type:** string
+
+**Details:** IP address of the user who triggered the event. 
+
+===================
+``page`` Field
+===================
+
+**Type:** string
+
+**Details:** Page user was visiting when the event was fired. 
+
+**Values/Format/Member Fields:** '$URL'
+
+===================
+``session`` Field
+===================
+
+**Type:** string
+
+**Details:** This key identifies the user's session. May be undefined. 
+
+**Values/Format/Member Fields:** 32 digits 
+
+===================
+``time`` Field
+===================
+
+**Type:** string
+
+**Details:** Gives the UTC time at which the event was fired.
+
+**Values/Format/Member Fields:** 'YYYY-MM-DDThh:mm:ss.xxxxxx'
+
+===================
+``username`` Field
+===================
+
+**Type:** The username of the user who caused the event to fire. This string is
+empty for anonymous events, such as when the user is not logged in.
+
+**Details:** string
 
 .. _Student_Event_Types:
 
@@ -189,7 +268,9 @@ This section contains a table of the JSON fields that are common to the schema d
 Student Event Types
 ****************************************
 
-The Student Event Type table lists the event types that are logged for interactions with the LMS outside the Instructor Dashboard.
+This section lists the event types that are logged for interactions with the LMS outside the Instructor Dashboard.
+
+* :ref:`enrollment`
 
 * :ref:`navigational`
 
@@ -203,7 +284,114 @@ The Student Event Type table lists the event types that are logged for interacti
 
 * :ref:`AB_Event_Types`
 
-The descriptions that follow include what each event type represents, which component it originates from, and what ``event`` fields it contains. The ``event_source`` field from the "Common Fields" table above distinguishes between events that originate in the browser (in javascript) and events that originate on the server (during the processing of a request).
+The descriptions that follow include what each event type represents, which
+component it originates from, and what member fields the ``event`` and
+``context`` dict fields contain. The value in the ``event_source`` field (see
+the :ref:`common` section above) distinguishes between events that originate in
+the browser (in JavaScript) and events that originate on the server (during the
+processing of a request).
+
+.. _enrollment:
+
+=========================
+Enrollment Event Types
+=========================
+
+These event types are fired by the server in response to course enrollment
+activities completed by a student.
+
+* ``edx.course.enrollment.activated`` is fired when a student enrolls in a
+  course. On edx.org, this is typically the result of a student clicking 
+  **Register** for the course. 
+
+* ``edx.course.enrollment.deactivated`` is fired when a student unenrolls from a
+  course. On edx.org, this is typically the result of a student clicking
+  **Unregister** for the course.
+
+In addition, actions by instructors and course staff members also generate
+enrollment events. For the actions that members of the course team complete that
+result in these events, see :ref:`instructor_enrollment`.
+
+**Event Source**: Server
+
+**History**: The enrollment event types were added on 03 Dec 2013.
+
+.. Alison: move other tables to this format, and identify these event and context fields as member fields.
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``course_id``
+     - string
+     - **History**: Maintained for backward compatibility. As of 23 Oct 2013,
+       replaced by the ``context`` ``course_id`` field. See the description of
+       the :ref:`context`.
+   * - ``user_id``
+     - integer
+     - Identifies the user who was enrolled or unenrolled. 
+   * - ``mode``
+     - string
+     - 'audit', 'honor', 'verified'
+   * - ``name``
+     - string
+     - Identifies the type of event: 'edx.course.enrollment.activated' or
+       'edx.course.enrollment.deactivated'. **History**: Added 07 May 2014 to
+       replace the ``event`` ``event_type`` field.
+   * - ``session``
+     - string
+     - The Django session ID, if available. Can be used to identify events for a
+       specific user within a session. **History**: Added 07 May 2014.
+
+``context`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details and Member Fields
+   * - ``path``
+     - string
+     - The URL path that generated the event: '/change_enrollment'.
+       **History**: Added 07 May 2014.
+
+Example
+--------
+
+.. reviewers, is this example accurate wrt the new fields?
+
+.. code-block:: json
+
+  {
+    "username": "AAAAAAAAAA",
+    "host": "courses.edx.org",
+    "event_source": "server",
+    "event_type": "edx.course.enrollment.activated",
+    "context": {
+      "course_id": "edX\/DemoX\/Demo_Course",
+      "org_id": "edX",
+      "path": "/change_enrollment",
+      "user_id": 9999999
+    },
+    "time": "2014-01-26T00:28:28.388782+00:00",
+    "ip": "NN.NN.NNN.NNN",
+    "event": {
+      "course_id": "edX\/DemoX\/Demo_Course",
+      "user_id": 9999999,
+      "mode": "honor"
+      "name": "edx.course.enrollment.activated",
+      "session": a14j3ifhskngw0gfgn230g
+    },
+    "agent": "Mozilla\/5.0 (Windows NT 6.1; WOW64; Trident\/7.0; rv:11.0) like Gecko",
+    "page": null
+  }
 
 .. _navigational:
 
@@ -225,7 +413,7 @@ These event types are fired when a user selects a navigational control.
 
 **Event Source**: Browser
 
-``event`` **Fields**: These navigational event types all have the same fields.
+``event`` **Fields**: The navigational event types listed above have the same fields.
 
 +--------------------+---------------+---------------------------------------------------------------------+
 | Field              | Type          | Details                                                             |
@@ -241,11 +429,10 @@ These event types are fired when a user selects a navigational control.
 | ``id``             | integer       | The edX ID of the sequence.                                         |
 +--------------------+---------------+---------------------------------------------------------------------+
 
----------------
 ``page_close``
 ---------------
 
-In addition, the ``page_close`` event type originates from within the Logger itself.  
+An additional event type, ``page_close``, originates from within the Logger itself.  
 
 **Component**: Logger
 
@@ -265,7 +452,6 @@ These event types can fire when a user works with a video.
 
 **Event Source**: Browser
 
----------------------------------
 ``pause_video``, ``play_video``
 ---------------------------------
 
@@ -275,22 +461,20 @@ These event types can fire when a user works with a video.
 
 ``event`` **Fields**: These event types have the same ``event`` fields.
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``id``              | string        | EdX ID of the video being watched (for example,                     |
-|                     |               | i4x-HarvardX-PH207x-video-Simple_Random_Sample).                    |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``code``            | string        | YouTube ID of the video being watched (for                          |
-|                     |               | example, FU3fCJNs94Y).                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``currentTime``     | float         | Time the video was played at, in seconds.                           |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``speed``           | string        | Video speed in use (i.e., 0.75, 1.0, 1.25, 1.50).                   |
-|                     |               |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
++-----------------+--------+----------------------------------------------------+
+| Field           | Type   | Details                                            |
++=================+========+====================================================+
+| ``id``          | string | EdX ID of the video being watched (for example,    |
+|                 |        | i4x-HarvardX-PH207x-video-Simple_Random_Sample).   |
++-----------------+--------+----------------------------------------------------+
+| ``code``        | string | YouTube ID of the video being watched (for         |
+|                 |        | example, FU3fCJNs94Y).                             |
++-----------------+--------+----------------------------------------------------+
+| ``currentTime`` | float  | Time the video was played at, in seconds.          |
++-----------------+--------+----------------------------------------------------+
+| ``speed``       | string | Video speed in use: '0.75', '1.0', '1.25', '1.50'. |
++-----------------+--------+----------------------------------------------------+
 
------------------
 ``seek_video``
 -----------------
 
@@ -306,7 +490,6 @@ The ``seek_video`` event fires when the user clicks the playback bar or transcri
 | ``type``            |               | The navigational method used to change position within the video.   |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------
 ``speed_change_video`` 
 ------------------------
 
@@ -335,7 +518,6 @@ The ``speed_change_video`` event fires when a user selects a different playing s
 Textbook Interaction Event Types   
 =================================
 
-----------
 ``book``
 ----------
 
@@ -382,7 +564,6 @@ PNG Viewer.
 | ``new``     | integer | Destination page number.                                                         |
 +-------------+---------+----------------------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.thumbnails.toggled``
 ------------------------------------
 
@@ -407,7 +588,6 @@ on the icon to show or hide page thumbnails.
 | ``page``    | integer | The number of the page that is open when the user clicks this icon. |
 +-------------+---------+---------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.thumbnail.navigated``
 ------------------------------------
 
@@ -435,7 +615,6 @@ on a thumbnail image to navigate to a page.
 |                     |         | thumbnail. For example, Page 2.                 |
 +---------------------+---------+-------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.outline.toggled``
 ------------------------------------
 
@@ -460,7 +639,6 @@ outline icon to show or hide a list of the book's chapters.
 | ``page``    | integer | The number of the page that is open when the user clicks this link. |
 +-------------+---------+---------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.chapter.navigated``
 ------------------------------------
 
@@ -486,7 +664,6 @@ a link in the outline to navigate to a chapter.
 |                   |         | outline link.                                   |
 +-------------------+---------+-------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.page.navigated``
 ------------------------------------
 
@@ -511,7 +688,6 @@ a page number.
 | ``page``    | integer | The destination page number entered by the user. |
 +-------------+---------+--------------------------------------------------+
 
---------------------------------------
 ``textbook.pdf.zoom.buttons.changed``
 --------------------------------------
 
@@ -538,7 +714,6 @@ either the Zoom In or Zoom Out icon.
 | ``page``      | integer | The number of the page that is open when the user clicks the icon. |
 +---------------+---------+--------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.zoom.menu.changed``
 ------------------------------------
 
@@ -565,7 +740,6 @@ magnification setting.
 | ``page``    | integer | The number of the page that is open when the user selects this value.          |
 +-------------+---------+--------------------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.display.scaled``
 ------------------------------------
 
@@ -593,7 +767,6 @@ magnification setting from the zoom menu or resizes the browser window.
 | ``page``    | integer | The number of the page that is open when the scaling takes place. |
 +-------------+---------+-------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.display.scrolled``
 ------------------------------------
 
@@ -620,7 +793,6 @@ page changes while a user scrolls up or down.
 | ``direction`` | string  | 'up', 'down'                                                        |
 +---------------+---------+---------------------------------------------------------------------+
 
-------------------------------------
 ``textbook.pdf.search.executed``
 ------------------------------------
 
@@ -659,7 +831,6 @@ field within 500ms of each other.
 | ``page``          | integer | The number of the page that is open when the search takes place. |
 +-------------------+---------+------------------------------------------------------------------+
 
----------------------------------------------
 ``textbook.pdf.search.navigatednext``
 ---------------------------------------------
 
@@ -698,7 +869,6 @@ on the Find Next or Find Previous icons for an entered search string.
 | ``page``          | integer | The number of the page that is open when the search takes place. |
 +-------------------+---------+------------------------------------------------------------------+
 
----------------------------------------------
 ``textbook.pdf.search.highlight.toggled``
 ---------------------------------------------
 
@@ -734,7 +904,6 @@ selects or clears the **Highlight All** option for a search.
 | ``page``          | integer | The number of the page that is open when the search takes place. |
 +-------------------+---------+------------------------------------------------------------------+
 
-------------------------------------------------------
 ``textbook.pdf.search.casesensitivity.toggled``
 ------------------------------------------------------
 
@@ -776,7 +945,6 @@ user selects or clears the **Match Case** option for a search.
 Problem Interaction Event Types 
 =================================
 
-----------------------------
 ``problem_check`` (Browser)
 ----------------------------
 
@@ -788,7 +956,6 @@ Problem Interaction Event Types
 
 ``event`` **Fields**: The ``event`` field contains the values of all input fields from the problem being checked, styled as GET parameters.
 
------------------------------
 ``problem_check`` (Server)
 -----------------------------
 
@@ -896,7 +1063,6 @@ The server fires ``problem_check`` events when a problem is successfully checked
 | ``success``         | string        | 'correct', 'incorrect'                                              |
 +---------------------+---------------+---------------------------------------------------------------------+
 
------------------------------
 ``problem_check_fail``
 -----------------------------
 
@@ -922,7 +1088,6 @@ The server fires ``problem_check_fail`` events when a problem cannot be checked 
 | ``failure``         | string        | 'closed', 'unreset'                                                 |
 +---------------------+---------------+---------------------------------------------------------------------+
 
------------------------------
 ``problem_reset``
 -----------------------------
 
@@ -934,7 +1099,6 @@ The server fires ``problem_check_fail`` events when a problem cannot be checked 
 
 ``event`` **Fields**: None
 
------------------------------
 ``problem_rescore``
 -----------------------------
 
@@ -968,7 +1132,6 @@ The server fires ``problem_rescore`` events when a problem is successfully resco
 | ``attempts``        | integer       |                                                                     |
 +---------------------+---------------+---------------------------------------------------------------------+
 
------------------------------
 ``problem_rescore_fail``
 -----------------------------
 
@@ -990,7 +1153,6 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 | ``failure``         | string        | 'unsupported', 'unanswered', 'input_error', 'unexpected'            |
 +---------------------+---------------+---------------------------------------------------------------------+
 
------------------------------
 ``problem_save``
 -----------------------------
 
@@ -1002,7 +1164,6 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 
 ``event`` **Fields**: None
 
------------------------------
 ``problem_show``
 -----------------------------
 
@@ -1021,7 +1182,6 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 |                     |               | i4x://MITx/6.00x/problem/L15:L15_Problem_2).                        |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------------------------------
 ``reset_problem``
 ------------------------------------------------
 
@@ -1043,7 +1203,6 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 | ``new_state``       | string / JSON | New problem state.                                                  |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------------------------------
 ``reset_problem_fail`` 
 ------------------------------------------------
 
@@ -1065,7 +1224,6 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 | ``failure``         | string        | 'closed', 'not_done'                                                |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------------------------------
 ``show_answer`` 
 ------------------------------------------------
 
@@ -1087,7 +1245,6 @@ Server-side event which displays the answer to a problem.
 | ``problem_id``      | string        | EdX ID of the problem being shown.                                  |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------------------------------
 ``save_problem_fail`` 
 ------------------------------------------------
 
@@ -1111,7 +1268,6 @@ Server-side event which displays the answer to a problem.
 | ``answers``         | dict          |                                                                     |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-------------------------------------------------
 ``save_problem_success`` 
 ------------------------------------------------
 
@@ -1139,7 +1295,6 @@ Server-side event which displays the answer to a problem.
 Open Response Assessment Event Types 
 ======================================
 
----------------------------------------------------------------------------
 ``oe_hide_question`` and ``oe_show_question``
 ---------------------------------------------------------------------------
 
@@ -1180,7 +1335,6 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 | ``category``        | integer       | Rubric category selected.                                           |
 +-----------------------------------+-------------------------------+---------------------+-----------------+
 
-------------------------------------------------------------------
 ``oe_show_full_feedback`` and ``oe_show_respond_to_feedback``
 ------------------------------------------------------------------
 
@@ -1190,7 +1344,7 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 
 ``event`` **Fields**: None.
 
---------------------------------------------
+
 ``oe_feedback_response_selected`` 
 --------------------------------------------
 
@@ -1206,7 +1360,7 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 | ``value``           | integer       | Value selected in the feedback response form.                       |
 +---------------------+---------------+---------------------------------------------------------------------+
 
----------------------------------------------------------------------
+
 ``peer_grading_hide_question`` and ``peer_grading_show_question``
 ---------------------------------------------------------------------
 
@@ -1226,7 +1380,7 @@ The ``peer_grading_hide_question`` and ``peer_grading_show_question`` event type
 | ``location``        | string        | The location of the question whose prompt is being shown or hidden. |
 +---------------------+---------------+---------------------------------------------------------------------+
 
------------------------------------------------------------------------
+
 ``staff_grading_hide_question`` and ``staff_grading_show_question``
 -----------------------------------------------------------------------
 
@@ -1261,7 +1415,6 @@ The event types that follow apply to modules that are set up to randomly assign 
 
 **History**: These event types were added on 12 Mar 2014.
 
-----------------------------------
 ``assigned_user_to_partition``
 ----------------------------------
 
@@ -1288,7 +1441,6 @@ When a student views a module that is set up to test different child modules, th
 | ``partition_name``  | string        | Name of the partition.                                              |
 +---------------------+---------------+---------------------------------------------------------------------+
 
-----------------------------------
 ``child_render``
 ----------------------------------
 
@@ -1314,7 +1466,8 @@ When a student views a module that is set up to test different content using chi
 Instructor Event Types
 *************************
 
-The Instructor Event Type table lists the event types logged for course team interaction with the Instructor Dashboard in the LMS.
+The Instructor Event Type table lists the event types logged for course team
+interaction with the Instructor Dashboard in the LMS. 
 
 .. need a description for each of these
 
@@ -1384,3 +1537,29 @@ The Instructor Event Type table lists the event types logged for course team int
 |                                        |                      |                 +---------------------+---------------+
 |                                        |                      |                 | ``event``           | string        |
 +----------------------------------------+----------------------+-----------------+---------------------+---------------+
+
+.. _instructor_enrollment:
+
+=============================
+Instructor Enrollment Events
+=============================
+
+In addition to the enrollment events that are generated when students 
+enroll in or unenroll from a course, actions by instructors and course staff
+members also generate enrollment events.
+
+* When a course author creates a course, his or her user account is enrolled in
+  the course and the server fires an ``edx.course.enrollment.activated`` event.
+
+* When a user with the Instructor or Course Staff role enrolls in a course, the
+  server fires ``edx.course.enrollment.activated``. The server fires
+  ``edx.course.enrollment.deactivated`` events when these users unenroll from a
+  course.
+
+* When a user with the Instructor or Course Staff role uses the **Batch
+  Enrollment** feature to enroll students or other staff members in a course,
+  the server fires an ``edx.course.enrollment.activated`` event for each
+  enrollment. When this feature is used to unenroll students from a course, the
+  server fires a ``edx.course.enrollment.deactivated`` for each unenrollment.
+
+For details about the enrollment events, see :ref:`enrollment`.
