@@ -1,5 +1,5 @@
 import os
-from lettuce import world
+from lettuce import world, step
 from django.conf import settings
 
 
@@ -14,7 +14,8 @@ def import_file(filename):
     world.css_click(outline_css)
 
 
-def go_to_import():
+@step('I go to the import page$')
+def go_to_import(step):
     menu_css = 'li.nav-course-tools'
     import_css = 'li.nav-course-tools-import a'
     world.css_click(menu_css)
