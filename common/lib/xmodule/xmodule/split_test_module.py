@@ -21,6 +21,8 @@ log = logging.getLogger('edx.' + __name__)
 
 class SplitTestFields(object):
     """Fields needed for split test module"""
+    has_children = True
+
     user_partition_id = Integer(
         help="Which user partition is used for this test",
         scope=Scope.content
