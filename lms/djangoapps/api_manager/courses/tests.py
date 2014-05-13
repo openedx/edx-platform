@@ -38,6 +38,7 @@ class CoursesApiTests(TestCase):
         self.test_server_prefix = 'https://testserver'
         self.base_courses_uri = '/api/courses'
         self.base_groups_uri = '/api/groups'
+        self.base_users_uri = '/api/users'
         self.test_group_name = 'Alpha Group'
 
         self.course = CourseFactory.create()
@@ -1028,3 +1029,75 @@ class CoursesApiTests(TestCase):
         )
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_content_users_list_get(self):
+        test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
+        test_uri_users = '{}/{}/users'.format(self.base_course_content_uri, self.course_project.id)
+        test_course_users_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+
+        # Create a group and add it to course module
+        data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # Create another group and add it to course module
+        data = {'name': 'Beta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        another_group_id = response.data['id']
+        data = {'group_id': another_group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # create a 5 new users
+        for i in xrange(1, 6):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+
+            #add two users to Alpha Group and one to Beta Group and keep two without any group
+            if i <= 3:
+                add_to_group = group_id
+                if i > 2:
+                    add_to_group = another_group_id
+                test_group_users_uri = '{}/{}/users'.format(self.base_groups_uri, add_to_group)
+
+                data = {'user_id': created_user_id}
+                response = self.do_post(test_group_users_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+                #enroll one user in Alpha Group and one in Beta Group created user
+                if i >= 2:
+                    response = self.do_post(test_course_users_uri, data)
+                    self.assertEqual(response.status_code, 201)
+
+        response = self.do_get('{}?enrolled={}'.format(test_uri_users, 'True'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        response = self.do_get('{}?enrolled={}'.format(test_uri_users, 'False'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        #filter by group id
+        response = self.do_get('{}?enrolled={}&group_id={}'.format(test_uri_users, 'true', group_id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        response = self.do_get('{}?enrolled={}&group_id={}'.format(test_uri_users, 'false', group_id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        #filter by group type
+        response = self.do_get('{}?enrolled={}&type={}'.format(test_uri_users, 'true', 'project'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
