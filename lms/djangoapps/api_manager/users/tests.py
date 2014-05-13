@@ -239,7 +239,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_list_post(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -262,7 +262,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_list_post_duplicate(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -281,7 +281,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_list_post_invalid_user(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users/897698769/groups'
@@ -292,7 +292,7 @@ class UsersApiTests(TestCase):
     def test_user_groups_list_get(self):
         test_uri = '/api/groups'
         group_name = 'Alpha Group'
-        data = {'name': group_name}
+        data = {'name': group_name, 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -327,7 +327,7 @@ class UsersApiTests(TestCase):
 
         group_url = '/api/groups'
         group_name = 'Alpha Group'
-        data = {'name': group_name, 'group_type': 'Engineer'}
+        data = {'name': group_name, 'type': 'Engineer'}
         response = self.do_post(group_url, data)
         group_id = response.data['id']
         user_groups_uri = '{}/groups'.format(test_uri)
@@ -336,7 +336,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
 
         group_name = 'Beta Group'
-        data = {'name': group_name, 'group_type': 'Architect'}
+        data = {'name': group_name, 'type': 'Architect'}
         response = self.do_post(group_url, data)
         group_id = response.data['id']
         data = {'group_id': group_id}
@@ -367,7 +367,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_detail_get(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -390,7 +390,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_detail_delete(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -419,7 +419,7 @@ class UsersApiTests(TestCase):
 
     def test_user_groups_detail_get_undefined(self):
         test_uri = '/api/groups'
-        data = {'name': 'Alpha Group'}
+        data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
         test_uri = '/api/users'
@@ -529,8 +529,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         position_data = {
             'position': {
-                'parent_module_id': str(course.id),
-                'child_module_id': str(chapter3.location)
+                'parent_content_id': str(course.id),
+                'child_content_id': str(chapter3.location)
 
             }
         }
@@ -551,15 +551,15 @@ class UsersApiTests(TestCase):
         test_uri = '/api/users/{}/courses/{}'.format(str(user_id), course_id)
         position_data = {
             'position': {
-                'parent_module_id': course_id,
-                'child_module_id': str(chapter1.location)
+                'parent_content_id': course_id,
+                'child_content_id': str(chapter1.location)
 
             }
         }
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.status_code, 404)
 
-    def test_user_courses_detail_post_position_course_as_module(self):
+    def test_user_courses_detail_post_position_course_as_content(self):
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
@@ -581,8 +581,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         position_data = {
             'position': {
-                'parent_module_id': str(course.location),
-                'child_module_id': str(chapter1.location)
+                'parent_content_id': str(course.location),
+                'child_content_id': str(chapter1.location)
 
             }
         }
@@ -617,8 +617,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['user_id'], user_id)
         position_data = {
             'position': {
-                'parent_module_id': str(course.location),
-                'child_module_id': str(chapter1.location)
+                'parent_content_id': str(course.location),
+                'child_content_id': str(chapter1.location)
 
             }
         }
