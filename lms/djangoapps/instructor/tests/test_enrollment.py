@@ -315,33 +315,31 @@ class TestInstructorEnrollmentStudentModule(TestCase):
 
     def test_delete_submission_scores(self):
         user = UserFactory()
-        course = CourseFactory.create()
-        problem_location = msk_from_problem_urlname(
-            course.id,
-            'b3dce2586c9c4876b73e7f390e42ef8f',
-            block_type='openassessment'
-        )
+        problem_location = self.course_key.make_usage_key('dummy', 'module')
 
         # Create a student module for the user
         StudentModule.objects.create(
             student=user,
-            course_id=course.id,
+            course_id=self.course_key,
             module_state_key=problem_location,
             state=json.dumps({})
         )
 
         # Create a submission and score for the student using the submissions API
         student_item = {
-            'student_id': anonymous_id_for_user(user, course.id),
-            'course_id': course.id,
-            'item_id': problem_location,
+            'student_id': anonymous_id_for_user(user, self.course_key),
+            'course_id': self.course_key.to_deprecated_string(),
+            'item_id': problem_location.to_deprecated_string(),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
-        reset_student_attempts(course.id, user, problem_location, delete_module=True)
+        reset_student_attempts(
+            self.course_key, user, problem_location,
+            delete_module=True
+        )
 
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
