@@ -26,32 +26,52 @@ For example, the following LTI component incorporates a Cerego tool that student
 .. image:: /Images/LTIExample.png
    :alt: Cerego LTI component example
 
+.. _LTI Information:
+
+************************
+Obtain LTI Information
+************************
+
 Before you create an LTI component from an external LTI provider in a
 unit, you need the following information.
 
--  The **LTI ID**. This is a value that you create to refer to the external LTI
-   provider. You should create an LTI ID that you can remember easily.
-
-   The LTI ID can contain uppercase and lowercase alphanumeric
-   characters, as well as underscore characters (_). It can contain any
-   number of characters. For example, you may create an LTI ID that is
-   as simple as **test_lti_id**, or your LTI ID may be a string of
-   numbers and letters such as  **id_21441** or
-   **book_lti_provider_from_new_york**.
--  The **client key**. This value is a sequence of characters that you
-   obtain from the LTI provider. The client key is used for
-   authentication and can contain any number of characters. For example,
-   your client key may be **b289378-f88d-2929-ctools.umich.edu**.
--  The **client secret**. This value is a sequence of characters that
-   you obtain from the LTI provider. The client secret is used for
-   authentication and can contain any number of characters. For example,
-   your client secret may be something as simple as **secret**, or it
-   may be a string of numbers and letters such as **23746387264** or
-   **yt4984yr8**.
 -  The **launch URL** (if the LTI component requires a student response
    that will be graded). You obtain the launch URL from the LTI
    provider. The launch URL is the URL that Studio sends to the external
    LTI provider so that the provider can send back students’ grades.
+
+- The **lti_passports** policy key. This policy key has three parts: an LTI ID, a client key, and a client secret.
+
+  -  The **LTI ID**. This is a value that you create to refer to the external LTI
+     provider. You should create an LTI ID that you can remember easily.
+
+     The LTI ID can contain uppercase and lowercase alphanumeric
+     characters, as well as underscore characters (_). It can be any length. For example, you may create an LTI ID that is
+     as simple as **test_lti_id**, or your LTI ID may be a string of
+     numbers and letters such as  **id_21441** or
+     **book_lti_provider_from_new_york**.
+  -  The **client key**. This value is a sequence of characters that you
+     obtain from the LTI provider. The client key is used for
+     authentication and can contain any number of characters. For example,
+     your client key may be **b289378-f88d-2929-ctools.school.edu**.
+  -  The **client secret**. This value is a sequence of characters that
+     you obtain from the LTI provider. The client secret is used for
+     authentication and can contain any number of characters. For example,
+     your client secret can be something as simple as **secret**, or it
+     may be a string of numbers and letters such as **23746387264** or
+     **yt4984yr8**.
+
+  To create the **lti_passports** policy key, combine the LTI ID, client key, and client secret in the following format (make sure to include the colons):
+
+  ``lti_id:client_key:client_secret``
+
+  For example, an **lti_passports** policy key may resemble any of the following:
+
+  ``test_lti_id:b289378-f88d-2929-ctools.school.edu:secret``
+  
+  ``id_21441:b289378-f88d-2929-ctools.school.edu:23746387264``
+
+  ``book_lti_provider_from_new_york:b289378-f88d-2929-ctools.company.com:yt4984yr8``
 
 ************************
 Create an LTI Component
@@ -93,30 +113,20 @@ you see a notification that your changes have been saved.
 Step 2. Register the External LTI Provider
 ==========================================
 
-To regiser the external LTI provider, you’ll add the LIT ID, the client
-key, and the client secret in the **lti_passports** policy key.
+To register the external LTI provider, you’ll add the **lti_passports** policy key to the course's advanced settings.
 
 #. On the **Advanced Settings** page, locate the **lti_passports**
    policy key.
 
-#. Under **Policy Value**, place your cursor between the brackets, and
-   then enter the LTI ID, client key, and client secret in the following
-   format (make sure to include the quotation marks and the colons).
+#. In the **Policy Value** field for the **lti_passports** policy key, place your cursor between the brackets, and then enter the **lti_passports** policy key surrounded by quotation marks.
 
-   ::
+   For example, the text in the **Policy Value** field may resemble the following.
 
-      “lti_id:client_key:client_secret”
+   ``"test_lti_id:b289378-f88d-2929-ctools.umich.edu:secret"``
 
-   For example, the value in the **lti_passports** field may be the following.
+   If you have multiple LTI providers, separate the values for each **lti_passports** policy key with a comma. Make sure to surround each entry with quotation marks.
 
-   ::
-
-      “test_lti_id:b289378-f88d-2929-ctools.umich.edu:secret”
-
-   If you have multiple LTI providers, separate the values with a comma.
-   Make sure to surround each entry with quotation marks.
-
-   ::
+   .. code-block:: xml
 
       "test_lti_id:b289378-f88d-2929-ctools.umich.edu:secret",
       "id_21441:b289378-f88d-2929-ctools.school.edu:23746387264",
@@ -127,7 +137,7 @@ key, and the client secret in the **lti_passports** policy key.
 
 The page refreshes automatically. At the top of the page,
 you see a notification that your changes have been saved, and you can
-see your entries in the **lti_passports** policy key.
+see your entries for the **lti_passports** policy key.
 
 ==========================================
 Step 3. Add the LTI Component to a Unit
