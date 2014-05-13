@@ -72,7 +72,7 @@ class ControllerQueryService(GradingService):
 
     def get_flagged_problem_list(self, course_id):
         params = {
-            'course_id': course_id,
+            'course_id': course_id.to_deprecated_string(),
         }
 
         data = self.get(self.flagged_problem_list_url, params)
@@ -87,7 +87,7 @@ class ControllerQueryService(GradingService):
 
     def take_action_on_flags(self, course_id, student_id, submission_id, action_type):
         params = {
-            'course_id': course_id,
+            'course_id': course_id.to_deprecated_string(),
             'student_id': student_id,
             'submission_id': submission_id,
             'action_type': action_type
