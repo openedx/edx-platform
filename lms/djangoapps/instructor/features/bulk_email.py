@@ -117,7 +117,6 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     # Go to the email section of the instructor dash
     world.visit('/courses/edx/888/Bulk_Email_Test_Course')
     world.css_click('a[href="/courses/edx/888/Bulk_Email_Test_Course/instructor"]')
-    world.css_click('div.beta-button-wrapper>a.beta-button')
     world.css_click('a[data-section="send_email"]')
 
     # Select the recipient

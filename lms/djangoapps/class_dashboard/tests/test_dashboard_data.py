@@ -252,6 +252,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         b_section_has_problem = get_array_section_has_problem(self.course.id)
         self.assertEquals(b_section_has_problem[0], True)
 
+<<<<<<< HEAD:lms/djangoapps/class_dashboard/tests/test_dashboard_data.py
     def test_dashboard(self):
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -263,6 +264,8 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         )
         self.assertContains(response, '<h2>Course Statistics At A Glance</h2>')
 
+=======
+>>>>>>> edx/master:lms/djangoapps/class_dashboard/tests/test_dashboard_data.py
     def test_has_instructor_access_for_class(self):
         """
         Test for instructor access

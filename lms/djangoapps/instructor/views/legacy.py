@@ -1,6 +1,9 @@
 """
 Instructor Views
 """
+## NOTE: This is the code for the legacy instructor dashboard
+## We are no longer supporting this file or accepting changes into it.
+
 from contextlib import contextmanager
 import csv
 import json
@@ -1035,10 +1038,14 @@ def instructor_dashboard(request, course_id):
         'metrics_results': metrics_results,
     }
 
+<<<<<<< HEAD
     if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse(
             'instructor_dashboard_2', kwargs={'course_id': course_key.to_deprecated_string()}
         )
+=======
+    context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_id})
+>>>>>>> edx/master
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 

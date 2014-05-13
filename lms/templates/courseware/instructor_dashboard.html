@@ -1,10 +1,14 @@
+## NOTE: This is the template for the LEGACY instructor dashboard         ##
+## We are no longer supporting this file or accepting changes into it.    ##
+## Please see lms/templates/instructor for instructor dashboard templates ##
+
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="pagetitle">${_("Legacy Instructor Dashboard")}</%block>
 <%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
@@ -122,12 +126,18 @@ function goto( mode)
       %if studio_url:
         <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
       %endif
-      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
-        <a class="instructor-info-action beta-button" href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a>
-      %endif
+      <a class="instructor-info-action beta-button" href="${ standard_dashboard_url }">${_("Back To Instructor Dashboard")}</a>
     </div>
 
     <h1>${_("Instructor Dashboard")}</h1>
+
+    %if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+    ## Only show this banner on the edx.org website (other sites may choose to show this if they wish)
+    <div class="wrapper-msg urgency-low msg-warning is-shown">
+        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon-double-angle-right"></i></a></p>
+          <p class="note">${_("If the Instructor Dashboard is missing functionality, please contact your PM to let us know.")}</p>
+    </div>
+    %endif
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
@@ -187,11 +197,19 @@ function goto( mode)
     % endif
 
     <p>
+<<<<<<< HEAD
     <a href="${reverse('gradebook', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
     <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
+=======
+    <a href="${reverse('gradebook_legacy', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    </p>
+
+    <p>
+    <a href="${reverse('grade_summary_legacy', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
+>>>>>>> edx/master
     </p>
 
     <p>

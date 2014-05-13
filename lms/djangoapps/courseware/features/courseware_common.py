@@ -1,5 +1,6 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 
@@ -12,6 +13,11 @@ def i_click_on_view_courseware(step):
 @step('I click on the "([^"]*)" tab$')
 def i_click_on_the_tab(step, tab_text):
     world.click_link(tab_text)
+
+
+@step('I click on the "([^"]*)" link$')
+def i_click_on_the_link(step, link_text):
+    world.click_link(link_text)
 
 
 @step('I visit the courseware URL$')

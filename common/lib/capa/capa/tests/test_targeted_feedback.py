@@ -5,7 +5,7 @@ i.e. those with the <multiplechoiceresponse> element
 
 import unittest
 import textwrap
-from . import test_capa_system, new_loncapa_problem
+from . import test_capa_system, new_loncapa_problem, load_fixture
 
 
 class CapaTargetedFeedbackTest(unittest.TestCase):
@@ -80,62 +80,8 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegexpMatches(without_new_lines, r"<div>.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*</div>")
         self.assertRegexpMatches(without_new_lines, r"feedback1|feedback2|feedback3|feedbackC")
 
-    # A targeted-feedback problem shared for a few tests
-    common_targeted_xml = textwrap.dedent("""
-        <problem>
-        <p>What is the correct answer?</p>
-        <multiplechoiceresponse targeted-feedback="">
-          <choicegroup type="MultipleChoice">
-            <choice correct="false" explanation-id="feedback1">wrong-1</choice>
-            <choice correct="false" explanation-id="feedback2">wrong-2</choice>
-            <choice correct="true" explanation-id="feedbackC">correct-1</choice>
-            <choice correct="false" explanation-id="feedback3">wrong-3</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <targetedfeedbackset>
-            <targetedfeedback explanation-id="feedback1">
-            <div class="detailed-targeted-feedback">
-                <p>Targeted Feedback</p>
-                <p>This is the 1st WRONG solution</p>
-            </div>
-            </targetedfeedback>
-
-            <targetedfeedback explanation-id="feedback2">
-            <div class="detailed-targeted-feedback">
-                <p>Targeted Feedback</p>
-                <p>This is the 2nd WRONG solution</p>
-            </div>
-            </targetedfeedback>
-
-            <targetedfeedback explanation-id="feedback3">
-            <div class="detailed-targeted-feedback">
-                <p>Targeted Feedback</p>
-                <p>This is the 3rd WRONG solution</p>
-            </div>
-            </targetedfeedback>
-
-            <targetedfeedback explanation-id="feedbackC">
-            <div class="detailed-targeted-feedback-correct">
-                <p>Targeted Feedback</p>
-                <p>Feedback on your correct solution...</p>
-            </div>
-            </targetedfeedback>
-
-        </targetedfeedbackset>
-
-        <solution explanation-id="feedbackC">
-        <div class="detailed-solution">
-            <p>Explanation</p>
-            <p>This is the solution explanation</p>
-            <p>Not much to explain here, sorry!</p>
-        </div>
-        </solution>
-    </problem>
-    """)
-
     def test_targeted_feedback_not_finished(self):
-        problem = new_loncapa_problem(self.common_targeted_xml)
+        problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
 
@@ -144,7 +90,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertEquals(the_html, problem.get_html(), "Should be able to call get_html() twice")
 
     def test_targeted_feedback_student_answer1(self):
-        problem = new_loncapa_problem(self.common_targeted_xml)
+        problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
         problem.done = True
         problem.student_answers = {'1_2_1': 'choice_3'}
 
@@ -158,7 +104,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertEquals(the_html, the_html2)
 
     def test_targeted_feedback_student_answer2(self):
-        problem = new_loncapa_problem(self.common_targeted_xml)
+        problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
         problem.done = True
         problem.student_answers = {'1_2_1': 'choice_0'}
 
@@ -611,3 +557,41 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback3|feedbackC")
+
+    def test_targeted_feedback_multiple_not_answered(self):
+        # Not answered -> empty targeted feedback
+        problem = new_loncapa_problem(load_fixture('targeted_feedback_multiple.xml'))
+        the_html = problem.get_html()
+        without_new_lines = the_html.replace("\n", "")
+        # Q1 and Q2 have no feedback
+        self.assertRegexpMatches(
+            without_new_lines,
+            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>.*' +
+            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>'
+        )
+
+    def test_targeted_feedback_multiple_answer_1(self):
+        problem = new_loncapa_problem(load_fixture('targeted_feedback_multiple.xml'))
+        problem.done = True
+        problem.student_answers = {'1_2_1': 'choice_0'}  # feedback1
+        the_html = problem.get_html()
+        without_new_lines = the_html.replace("\n", "")
+        # Q1 has feedback1 and Q2 has nothing
+        self.assertRegexpMatches(
+            without_new_lines,
+            r'<targetedfeedbackset.*?>.*?explanation-id="feedback1".*?</targetedfeedbackset>.*' +
+            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>'
+        )
+
+    def test_targeted_feedback_multiple_answer_2(self):
+        problem = new_loncapa_problem(load_fixture('targeted_feedback_multiple.xml'))
+        problem.done = True
+        problem.student_answers = {'1_2_1': 'choice_0', '1_3_1': 'mask_1'}  # Q1 wrong, Q2 correct
+        the_html = problem.get_html()
+        without_new_lines = the_html.replace("\n", "")
+        # Q1 has feedback1 and Q2 has feedbackC
+        self.assertRegexpMatches(
+            without_new_lines,
+            r'<targetedfeedbackset.*?>.*?explanation-id="feedback1".*?</targetedfeedbackset>.*' +
+            r'<targetedfeedbackset.*?>.*explanation-id="feedbackC".*?</targetedfeedbackset>'
+        )

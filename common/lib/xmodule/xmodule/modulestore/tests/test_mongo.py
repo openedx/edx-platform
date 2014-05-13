@@ -1,9 +1,17 @@
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
+<<<<<<< HEAD
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance
+=======
+    assert_not_equals, assert_false, assert_true
+from itertools import ifilter
+>>>>>>> edx/master
 # pylint: enable=E0611
+from path import path
 import pymongo
 import logging
+import shutil
+from tempfile import mkdtemp
 from uuid import uuid4
 import unittest
 import bson.son
@@ -18,7 +26,11 @@ from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
+<<<<<<< HEAD
 from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+=======
+from xmodule.modulestore.xml_exporter import export_to_xml
+>>>>>>> edx/master
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
@@ -351,6 +363,7 @@ class TestMongoModuleStore(unittest.TestCase):
                 }
             )
 
+<<<<<<< HEAD
         def check_xblock_fields():
             def check_children(xblock):
                 for child in xblock.children:
@@ -390,6 +403,58 @@ class TestMongoModuleStore(unittest.TestCase):
         setup_test()
         check_xblock_fields()
         check_mongo_fields()
+=======
+    def test_export_course_image(self):
+        """
+        Test to make sure that we have a course image in the contentstore,
+        then export it to ensure it gets copied to both file locations.
+        """
+        location = Location('c4x', 'edX', 'simple', 'asset', 'images_course_image.jpg')
+        course_location = Location('i4x', 'edX', 'simple', 'course', '2012_Fall')
+
+        # This will raise if the course image is missing
+        self.content_store.find(location)
+
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.store, self.content_store, course_location, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+            assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
+    def test_export_course_image_nondefault(self):
+        """
+        Make sure that if a non-default image path is specified that we
+        don't export it to the static default location
+        """
+        course = self.get_course_by_id('edX/toy/2012_Fall')
+        assert_true(course.course_image, 'just_a_test.jpg')
+
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
+            assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
+    def test_course_without_image(self):
+        """
+        Make sure we elegantly passover our code when there isn't a static
+        image
+        """
+        course = self.get_course_by_id('edX/simple_with_draft/2012_Fall')
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+            assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
+
+>>>>>>> edx/master
 
 class TestMongoKeyValueStore(object):
     """

@@ -52,7 +52,7 @@
             <span class="sts-enrollment-value">${_("Honor Code")}</span>
           </span>
         % elif enrollment.mode == "audit":
-          <span class="sts-enrollment" title="${_("You're auditing this course")}>
+          <span class="sts-enrollment" title="${_("You're auditing this course")}">
             <span class="label">${_("Enrolled as: ")}</span>
             <span class="sts-enrollment-value">${_("Auditing")}</span>
           </span>
@@ -82,7 +82,7 @@
         </h3>
       </hgroup>
 
-      % if course.may_certify() and cert_status and not enrollment.mode == 'audit':
+      % if course.may_certify() and cert_status:
       <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 

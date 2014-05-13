@@ -7,7 +7,7 @@ describe('StaffDebugActions', function() {
     describe('get_url ', function() {
         it('defines url to courseware ajax entry point', function() {
             spyOn(StaffDebug, "get_current_url").andReturn("/courses/edX/Open_DemoX/edx_demo_course/courseware/stuff");
-            expect(StaffDebug.get_url('rescore_problem')).toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor_dashboard/api/rescore_problem');
+            expect(StaffDebug.get_url('rescore_problem')).toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
         });
     });
 
@@ -41,7 +41,7 @@ describe('StaffDebugActions', function() {
                 'delete_module': false
             });
             expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                '/instructor_dashboard/api/reset_student_attempts'
+                '/instructor/api/reset_student_attempts'
             );
             $('#' + fixture_id).remove();
         });
@@ -60,7 +60,7 @@ describe('StaffDebugActions', function() {
                 'delete_module': true
             });
             expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                '/instructor_dashboard/api/reset_student_attempts'
+                '/instructor/api/reset_student_attempts'
             );
 
             $('#' + fixture_id).remove();
@@ -80,7 +80,7 @@ describe('StaffDebugActions', function() {
                 'delete_module': false
             });
             expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                '/instructor_dashboard/api/rescore_problem'
+                '/instructor/api/rescore_problem'
             );
             $('#' + fixture_id).remove();
         });
