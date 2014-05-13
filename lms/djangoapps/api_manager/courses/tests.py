@@ -362,22 +362,22 @@ class CoursesApiTests(TestCase):
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['groups']), 3)
+        self.assertEqual(len(response.data), 3)
 
         courses_groups_uri = '{}?type={}'.format(test_uri, 'Programming')
         response = self.do_get(courses_groups_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['groups']), 2)
+        self.assertEqual(len(response.data), 2)
 
         group_type_uri = '{}?type={}'.format(test_uri, 'Calculus')
         response = self.do_get(group_type_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['groups']), 1)
+        self.assertEqual(len(response.data), 1)
 
         error_group_type_uri = '{}?type={}'.format(test_uri, 'error_type')
         response = self.do_get(error_group_type_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['groups']), 0)
+        self.assertEqual(len(response.data), 0)
 
         response = self.do_get(course_fail_uri)
         self.assertEqual(response.status_code, 404)
@@ -414,15 +414,21 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['group_id'], str(group_id))
 
     def test_courses_groups_detail_get_invalid_resources(self):
-        course_id = 'asd/fas/vcsadfaf'
-        group_id = '12343'
-        test_uri = '{}/{}/groups/{}'.format(self.base_courses_uri, course_id, group_id)
+        test_uri = '{}/{}/groups/123145'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
-        confirm_uri = self.test_server_prefix + test_uri
-        self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertEqual(response.data['course_id'], course_id)
-        self.assertEqual(response.data['group_id'], group_id)
+
+        test_uri = '{}/{}/groups/123145'.format(self.base_courses_uri, self.test_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        data = {'name': self.test_group_name, 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        test_uri = '{}/{}/groups/{}'.format(self.base_courses_uri, self.test_course_id, response.data['id'])
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+
 
     def test_courses_groups_detail_delete(self):
         data = {'name': self.test_group_name, 'type': 'test'}
