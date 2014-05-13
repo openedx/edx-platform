@@ -224,7 +224,11 @@ def _parse_updates_html(html):
     tree = etree.parse(StringIO(html), parser)
 
     # get all of the individual postings
-    postings = tree.findall('/body/ol/li')
+    postings = tree.findall('/body/section/article')
+
+    # be backwards compatible
+    if not postings:
+        postings = tree.findall('/body/ol/li')
 
     result = []
     for posting in postings:
