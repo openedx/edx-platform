@@ -382,7 +382,7 @@ class SSLClientTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(user, course.id)
 
         CourseStaffRole(course.id).add_users(user)
-        course_private_url = course.location.url_reverse('course/', '')
+        course_private_url = reverse('course_handler', args=(unicode(course.id),))
         self.assertFalse(SESSION_KEY in self.client.session)
 
         response = self.client.get(
