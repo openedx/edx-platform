@@ -35,11 +35,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-<<<<<<< HEAD
-        self.url = reverse('instructor_dashboard_2', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
->>>>>>> edx/master
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 
@@ -127,11 +123,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-<<<<<<< HEAD
-        self.url = reverse('instructor_dashboard_2', kwargs={'course_id': self.course_key.to_deprecated_string()})
-=======
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_name})
->>>>>>> edx/master
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_key.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 

@@ -188,43 +188,6 @@ def import_from_xml(
             for module in xml_module_store.modules[course_key].itervalues():
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
-<<<<<<< HEAD
-=======
-                    course_location = module.location
-                    course_org_lower = course_location.org.lower()
-                    course_number_lower = course_location.course.lower()
-
-                    # Check to see if a course with the same
-                    # pseudo_course_id, but different run exists in
-                    # the passed store to avoid broken courses
-                    courses = store.get_courses()
-                    bad_run = False
-                    if target_location_namespace is None:
-                        for course in courses:
-                            if course.location.org.lower() == course_org_lower and \
-                            course.location.course.lower() == course_number_lower:
-                                log.debug('Import is overwriting existing course')
-                                # Importing over existing course, check
-                                # that runs match or fail
-                                if course.location.name != module.location.name:
-                                    log.error(
-                                        'A course with ID %s exists, and this '
-                                        'course has the same organization and '
-                                        'course number, but a different term that '
-                                        'is fully identified as %s.',
-                                        course.location.course_id,
-                                        module.location.course_id
-                                    )
-                                    bad_run = True
-                                    break
-                    if bad_run:
-                        # Skip this course, but keep trying to import courses
-                        continue
-
-                    log.debug('======> IMPORTING course to location {loc}'.format(
-                        loc=course_location
-                    ))
->>>>>>> edx/master
 
                     log.debug(u'======> IMPORTING course {course_key}'.format(
                         course_key=course_key,

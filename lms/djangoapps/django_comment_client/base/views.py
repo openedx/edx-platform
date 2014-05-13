@@ -86,26 +86,15 @@ def create_thread(request, course_id, commentable_id):
     if 'body' not in post or not post['body'].strip():
         return JsonError(_("Body can't be empty"))
 
-<<<<<<< HEAD
-    thread = cc.Thread(**extract(post, ['body', 'title']))
-    thread.update_attributes(**{
-        'anonymous': anonymous,
-        'anonymous_to_peers': anonymous_to_peers,
-        'commentable_id': commentable_id,
-        'course_id': course_id.to_deprecated_string(),
-        'user_id': request.user.id,
-    })
-=======
     thread = cc.Thread(
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         commentable_id=commentable_id,
-        course_id=course_id,
+        course_id=course_id.to_deprecated_string(),
         user_id=request.user.id,
         body=post["body"],
         title=post["title"]
     )
->>>>>>> edx/master
 
     user = cc.User.from_django_user(request.user)
 
@@ -190,26 +179,15 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     else:
         anonymous_to_peers = False
 
-<<<<<<< HEAD
-    comment.update_attributes(**{
-        'anonymous': anonymous,
-        'anonymous_to_peers': anonymous_to_peers,
-        'user_id': request.user.id,
-        'course_id': course_key.to_deprecated_string(),
-        'thread_id': thread_id,
-        'parent_id': parent_id,
-    })
-=======
     comment = cc.Comment(
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=request.user.id,
-        course_id=course_id,
+        course_id=course_id.to_deprecated_string(),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]
     )
->>>>>>> edx/master
     comment.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)

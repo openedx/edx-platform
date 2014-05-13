@@ -71,34 +71,18 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         # Pull up email view on instructor dashboard
-<<<<<<< HEAD
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
->>>>>>> edx/master
         response = self.client.get(self.url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
-<<<<<<< HEAD
-        self.assertTrue(email_link in response.content)
-
-        # Select the Email view of the instructor dash
-        session = self.client.session
-        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
-        session.save()
-        response = self.client.get(self.url)
-        selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
-        self.assertTrue(selected_email_link in response.content)
-=======
         self.assertTrue(email_section in response.content)
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.success_content = {
-            'course_id': self.course.id,
+            'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
->>>>>>> edx/master
 
     def tearDown(self):
         """

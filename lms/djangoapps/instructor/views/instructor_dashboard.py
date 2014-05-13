@@ -83,11 +83,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-<<<<<<< HEAD
-        'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
-=======
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_id}),
->>>>>>> edx/master
+        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_id.to_deprecated_string()}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -169,21 +165,13 @@ def _section_student_admin(course_key, access):
         'section_key': 'student_admin',
         'section_display_name': _('Student Admin'),
         'access': access,
-<<<<<<< HEAD
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
-=======
         'is_small_course': is_small_course,
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
-        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_id}),
->>>>>>> edx/master
+        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id.to_deprecated_string()}),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_id.to_deprecated_string()}),
     }
     return section_data
 

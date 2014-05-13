@@ -1082,15 +1082,11 @@ def send_email(request, course_id):
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
-<<<<<<< HEAD
-    response_payload = {'course_id': course_id.to_deprecated_string()}
-=======
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'success': True,
     }
->>>>>>> edx/master
     return JsonResponse(response_payload)
 
 

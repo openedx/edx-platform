@@ -70,11 +70,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         '''
         content_store = contentstore()
         module_store = modulestore('direct')
-<<<<<<< HEAD
-        import_from_xml(module_store, 'common/test/data/', ['test_import_course'], static_content_store=content_store, do_import_static=False, verbose=True)
-        course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
-        course = module_store.get_course(course_id)
-=======
         import_from_xml(
             module_store,
             'common/test/data/',
@@ -83,11 +78,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             do_import_static=False,
             verbose=True,
         )
-        course_location = CourseDescriptor.id_to_location(
-            'edX/test_import_course/2012_Fall'
-        )
-        course = module_store.get_item(course_location)
->>>>>>> edx/master
+        course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
+        course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
         return module_store, content_store, course

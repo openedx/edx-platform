@@ -55,16 +55,12 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-<<<<<<< HEAD
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.success_content = {
-            'course_id': self.course.id,
+            'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
->>>>>>> edx/master
 
     def tearDown(self):
         patch.stopall()

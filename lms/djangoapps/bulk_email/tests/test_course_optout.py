@@ -53,29 +53,13 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
         # Pull up email view on instructor dashboard
-<<<<<<< HEAD
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
->>>>>>> edx/master
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
-<<<<<<< HEAD
-        self.assertTrue(email_link in response.content)
-
-        # Select the Email view of the instructor dash
-        session = self.client.session
-        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
-        session.save()
-        response = self.client.get(url)
-        selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
-        self.assertTrue(selected_email_link in response.content)
-=======
         self.assertTrue(email_section in response.content)
->>>>>>> edx/master
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optout_course(self):
@@ -93,10 +77,6 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()
 
-<<<<<<< HEAD
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
->>>>>>> edx/master
         test_email = {
             'action': 'Send email',
             'send_to': 'all',
@@ -125,10 +105,6 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()
 
-<<<<<<< HEAD
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
->>>>>>> edx/master
         test_email = {
             'action': 'Send email',
             'send_to': 'all',

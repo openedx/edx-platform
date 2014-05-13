@@ -68,14 +68,10 @@ class TestGradebook(ModuleStoreTestCase):
                     module_state_key=item.location
                 )
 
-<<<<<<< HEAD
         self.response = self.client.get(reverse(
-            'gradebook',
+            'gradebook_legacy',
             args=(self.course.id.to_deprecated_string(),)
         ))
-=======
-        self.response = self.client.get(reverse('gradebook_legacy', args=(self.course.id,)))
->>>>>>> edx/master
 
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)

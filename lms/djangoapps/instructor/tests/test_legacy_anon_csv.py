@@ -53,11 +53,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def test_download_anon_csv(self):
         course = self.toy
-<<<<<<< HEAD
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
-=======
-        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id})
->>>>>>> edx/master
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id.to_deprecated_string()})
 
         with patch('instructor.views.legacy.unique_id_for_user') as mock_unique:
             mock_unique.return_value = 42

@@ -32,11 +32,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-<<<<<<< HEAD
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-=======
-        self.url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id})
->>>>>>> edx/master
+        self.url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
 
