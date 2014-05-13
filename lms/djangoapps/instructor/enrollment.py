@@ -191,8 +191,8 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     if delete_module:
         sub_api.reset_score(
             anonymous_id_for_user(student, course_id),
-            course_id,
-            module_state_key,
+            course_id.to_deprecated_string(),
+            module_state_key.to_deprecated_string(),
         )
 
     module_to_reset = StudentModule.objects.get(

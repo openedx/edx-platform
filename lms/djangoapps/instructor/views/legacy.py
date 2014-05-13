@@ -388,8 +388,8 @@ def instructor_dashboard(request, course_id):
                     try:
                         sub_api.reset_score(
                             anonymous_id_for_user(student, course_key),
-                            course_key,
-                            module_state_key,
+                            course_key.to_deprecated_string(),
+                            module_state_key.to_deprecated_string(),
                         )
                     except sub_api.SubmissionError:
                         # Trust the submissions API to log the error
