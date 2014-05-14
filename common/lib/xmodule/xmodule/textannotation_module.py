@@ -1,5 +1,4 @@
 ''' Text annotation module '''
-
 from lxml import etree
 from pkg_resources import resource_string
 
