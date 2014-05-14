@@ -13,6 +13,9 @@ May, 2014
    * - Date
      - Change
    * - 05/14/14
+     - Updated the :ref:`Running Your Course Index` chapter to remove references
+       to the "new beta" Instructor Dashboard.
+   * - 
      - Updated the :ref:`Enrollment` section to reflect that usernames or email
        addresses can be used to batch enroll students.
    * - 
@@ -20,7 +23,7 @@ May, 2014
        **Staff Debug** viewer for rescoring, resetting attempts, and deleting
        student state.
    * - 
-     - Updated the :ref:`Course_Staffing` section to state the labelling
+     - Updated the :ref:`Course_Staffing` section to state the labeling
        differences between Studio and the LMS with respect to course team roles.
    * - 05/09/14
      - Updated :ref:`Assigning_discussion_roles` with a note about course staff
@@ -33,7 +36,8 @@ May, 2014
      - Updated the :ref:`Discussions` chapter to include a topic on closing
        discussions.
    * - 05/06/14
-     - Expanded the :ref:`Grades` chapter to include a topic on interpreting the score histograms for problems.
+     - Expanded the :ref:`Grades` chapter to include a topic on interpreting the
+       score histograms for problems.
    * - 
      - Updated :ref:`LTI Component` to reflect changes to the Studio UI.
    * - 05/02/14
