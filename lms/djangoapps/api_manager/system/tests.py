@@ -69,6 +69,7 @@ class SystemApiTests(TestCase):
         self.assertIsNotNone(response.data['uri'])
         self.assertGreater(len(response.data['uri']), 0)
         self.assertEqual(response.data['uri'], test_uri)
+        self.assertGreater(len(response.data['csrf_token']), 0)
         self.assertIsNotNone(response.data['documentation'])
         self.assertGreater(len(response.data['documentation']), 0)
         self.assertIsNotNone(response.data['name'])
