@@ -34,7 +34,8 @@ class SecureClient(Client):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False})
+@override_settings(PASSWORD_MIN_LENGTH=4)
+@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class UsersApiTests(TestCase):
 
     """ Test suite for Users API views """
@@ -144,19 +145,30 @@ class UsersApiTests(TestCase):
     def test_user_detail_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        data = {'email': self.test_email,
+                'username': local_username, 'password':self.test_password,
+                'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
         test_uri = test_uri + '/' + str(response.data['id'])
-        data = {'is_active': False}
+        auth_data = {'username': local_username, 'password': self.test_password}
+        self.do_post('/api/sessions', auth_data)
+        self.assertEqual(response.status_code, 201)
+        data = {'is_active': False, 'is_staff': True}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['is_active'], False)
+        self.assertEqual(response.data['is_staff'], True)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['email'], self.test_email)
+        self.assertEqual(response.data['username'], local_username)
+        self.assertEqual(response.data['first_name'], self.test_first_name)
+        self.assertEqual(response.data['last_name'], self.test_last_name)
+        self.assertEqual(response.data['full_name'], '{} {}'.format(self.test_first_name, self.test_last_name))
         self.assertEqual(response.data['is_active'], False)
 
-    def test_user_detail_post_username(self):
+    def test_user_detail_post_duplicate_username(self):
         """
         Create two users, then pass the same first username in request in order to update username of second user.
         Must return bad request against username, Already exist!
@@ -187,6 +199,19 @@ class UsersApiTests(TestCase):
             'Username should only consist of A-Z and 0-9, with no spaces.')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['message'], message)
+
+    def test_user_detail_post_invalid_password(self):
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email,
+                'username': local_username, 'password': self.test_password,
+                'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = test_uri + '/' + str(response.data['id'])
+        data = {'password': 'x'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 400)
 
     def test_user_detail_post_user_profile_added_updated(self):
         """
