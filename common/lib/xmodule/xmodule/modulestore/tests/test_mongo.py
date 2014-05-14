@@ -401,15 +401,15 @@ class TestMongoModuleStore(unittest.TestCase):
         Test to make sure that we have a course image in the contentstore,
         then export it to ensure it gets copied to both file locations.
         """
-        location = Location('c4x', 'edX', 'simple', 'asset', 'images_course_image.jpg')
-        course_location = Location('i4x', 'edX', 'simple', 'course', '2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        location = course_key.make_asset_key('asset', 'images_course_image.jpg')
 
         # This will raise if the course image is missing
         self.content_store.find(location)
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course_location, root_dir, 'test_export')
+            export_to_xml(self.store, self.content_store, course_key, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
@@ -420,12 +420,12 @@ class TestMongoModuleStore(unittest.TestCase):
         Make sure that if a non-default image path is specified that we
         don't export it to the static default location
         """
-        course = self.get_course_by_id('edX/toy/2012_Fall')
+        course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         assert_true(course.course_image, 'just_a_test.jpg')
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            export_to_xml(self.store, self.content_store, course.id, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         finally:
@@ -436,10 +436,10 @@ class TestMongoModuleStore(unittest.TestCase):
         Make sure we elegantly passover our code when there isn't a static
         image
         """
-        course = self.get_course_by_id('edX/simple_with_draft/2012_Fall')
+        course = self.store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course.location, root_dir, 'test_export')
+            export_to_xml(self.store, self.content_store, course.id, root_dir, 'test_export')
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
