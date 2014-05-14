@@ -103,7 +103,7 @@ $(function () {
     descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
     for grade in descending_grades:
         percent = grade_cutoffs[grade]
-        grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
+        grade_cutoff_ticks.append( [ percent, u"{0} {1:.0%}".format(grade, percent) ] )
   else:
     grade_cutoff_ticks = [ ]
   %>
