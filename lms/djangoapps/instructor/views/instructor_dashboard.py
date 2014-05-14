@@ -271,10 +271,11 @@ def spoc_gradebook(request, course_id):
     - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     - Only displayed to course staff
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
     enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_id,
+        courseenrollment__course_id=course_key,
         courseenrollment__is_active=1
     ).order_by('username').select_related("profile")
 
@@ -296,7 +297,7 @@ def spoc_gradebook(request, course_id):
     return render_to_response('courseware/gradebook.html', {
         'students': student_info,
         'course': course,
-        'course_id': course_id,
+        'course_id': course_key,
         # Checked above
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
