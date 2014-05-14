@@ -14,6 +14,12 @@ Feature: CMS.Help
         And I click the course link in My Courses
         Then I should see online help for "organizing_course"
 
+        And I click a subsection in the outline
+        Then I should see the online help for "subsection"
+
+        And I click a unit
+        Then I should see the online help for "unit"
+
         And I go to the course updates page
         Then I should see online help for "updates"
 
