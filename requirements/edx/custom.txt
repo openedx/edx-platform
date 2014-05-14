@@ -4,3 +4,4 @@
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@7b41f0339674a212f4504c89e2985d5c99012b90#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@d9d5f420b3ce3c03a61340e52547502ea3434df2#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@aeb70a34768b30cf1e4a408e74f0028a16df7fc0#egg=xblock-ooyala
+-e git+https://github.com/edx-solutions/xblock-group-project.git@0701fd72bd4038c53b117d2ab17bc276f017e770#egg=xblock-group-project
