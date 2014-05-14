@@ -142,3 +142,8 @@ To add a course team member:
 #. Click **Add a New Team Member**.
 #. Enter the new team member's email address, then click **ADD USER**.
 
+You can also assign privileged roles to users when you work in the LMS.
+Regardless of where the role is assigned, these administrative team members can
+work on your course in both the LMS and in Studio. For more information on
+assigning roles while you run your course, see
+:ref:`Course_Staffing`.
