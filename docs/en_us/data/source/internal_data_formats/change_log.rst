@@ -11,7 +11,7 @@ Change Log
 
    * - Date
      - Change
-   * - 05/0614
+   * - 05/06/14
      - Added enrollment event types to the :ref:`Tracking Logs` chapter. 
    * - 05/05/14
      - Removed information on the Poll module. `Polls <http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/poll.html>`_ are now covered in the *Building and Running an edX Course* guide.
@@ -31,7 +31,7 @@ Change Log
    * -
      - Reformatted the :ref:`Tracking Logs` chapter to improve readability.
    * - 03/28/14
-     - Added the :ref:'Data_Czar' chapter.
+     - Added the :ref:`Data_Czar` chapter.
    * - 03/24/14
      - Added the ``user_api_usercoursetag`` table to the :ref:`Student_Info` chapter and the ``assigned_user_to_partition`` and ``child_render`` event types to the :ref:`Tracking Logs` chapter.
    * - 03/19/14

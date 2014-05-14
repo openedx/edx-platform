@@ -40,7 +40,6 @@ from lms.lib.xblock.runtime import quote_slashes
 # Submissions is a Django app that is currently installed
 # from the edx-ora2 repo, although it will likely move in the future.
 from submissions import api as sub_api
-from student.models import anonymous_id_for_user
 
 from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
@@ -68,7 +67,12 @@ from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
 from class_dashboard import dashboard_data
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
+from student.models import (
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    unique_id_for_user,
+    anonymous_id_for_user
+)
 from student.views import course_from_id
 import track.views
 from xblock.field_data import DictFieldData
@@ -688,9 +692,15 @@ def instructor_dashboard(request, course_id):
             courseenrollment__course_id=course_key,
         ).order_by('id')
 
+<<<<<<< HEAD
         datatable = {'header': ['User ID', 'Anonymized user ID']}
         datatable['data'] = [[s.id, unique_id_for_user(s)] for s in students]
         return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
+=======
+        datatable = {'header': ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']}
+        datatable['data'] = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
+        return return_csv(course_id.replace('/', '-') + '-anon-ids.csv', datatable)
+>>>>>>> edx/master
 
     #----------------------------------------
     # Group management

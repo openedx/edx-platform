@@ -1324,18 +1324,28 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
+    @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
         """
         Test the CSV output for the anonymized user ids.
         """
+<<<<<<< HEAD
         url = reverse('get_anon_ids', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('instructor.views.api.unique_id_for_user') as mock_unique:
             mock_unique.return_value = '42'
             response = self.client.get(url, {})
+=======
+        url = reverse('get_anon_ids', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {})
+>>>>>>> edx/master
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
-        self.assertTrue(body.endswith('"7","42"\n'))
+        self.assertTrue(body.startswith(
+            '"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            '\n"2","41","42"\n'
+        ))
+        self.assertTrue(body.endswith('"7","41","42"\n'))
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})

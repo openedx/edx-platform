@@ -97,15 +97,11 @@ Before you can assign roles to your discussion administrators, you need their em
 * To get this information for a staff member, on the Instructor Dashboard click **Membership** and then select **Course Staff** from the drop-down list.
 * To get this information for an enrolled student, on the Instructor Dashboard click **Data Download** > **Download profile information as a CSV**.
 
-**Tip**: These instructions are for the new Instructor Dashboard: click **Try New Beta Dashboard**.
-
 To assign a role:
 
 #. View the live version of your course.
 
-#. Click **Instructor** then **Try New Beta Dashboard**.
-
-#. Click **Membership**.
+#. Click **Instructor**, then click **Membership**.
 
 #. In the Administration List Management section, use the drop-down list to select Discussion Admins, Discussion Moderators, or Discussion Community TAs.
 
