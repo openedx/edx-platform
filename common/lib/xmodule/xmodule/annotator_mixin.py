@@ -6,6 +6,7 @@ from pkg_resources import resource_string
 from lxml import etree
 from urlparse import urlparse
 from os.path import splitext, basename
+from HTMLParser import HTMLParser
 
 def get_instructions(xmltree):
     """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -39,6 +40,8 @@ ANNOTATOR_COMMON_JS = [
     resource_string(__name__, 'js/src/ova/diacritic-annotator.js'),
     resource_string(__name__, 'js/src/ova/jquery-Watch.js'),
     resource_string(__name__, 'js/src/ova/ova.js'),
+    resource_string(__name__, 'js/src/ova/openseadragon.js'),
+    resource_string(__name__, 'js/src/ova/OpenSeaDragonAnnotation.js'),
     resource_string(__name__, 'js/src/ova/catch/js/handlebars-1.1.2.js'),
     resource_string(__name__, 'js/src/ova/catch/js/catch.js'),
 ]
@@ -53,3 +56,19 @@ ANNOTATOR_COMMON_CSS = [
     resource_string(__name__, 'css/ova/ova.css'),
     resource_string(__name__, 'js/src/ova/catch/css/main.css'),
 ]
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def handle_entityref(self, name):
+        self.fed.append('&%s;' % name)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def html_to_text(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
