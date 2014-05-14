@@ -1,4 +1,5 @@
 """ BASE API VIEWS """
+from django.middleware.csrf import get_token
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -47,6 +48,7 @@ class ApiDetail(APIView):
         response_data['description'] = "Machine interface for interactions with Open edX."
         response_data['documentation'] = "http://docs.openedxapi.apiary.io"
         response_data['uri'] = base_uri
+        response_data['csrf_token'] = get_token(request)
         response_data['resources'] = []
         response_data['resources'].append({'uri': base_uri + 'courses'})
         response_data['resources'].append({'uri': base_uri + 'groups'})
