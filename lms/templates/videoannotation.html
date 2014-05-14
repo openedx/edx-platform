@@ -49,16 +49,18 @@
 	
 	//Grab uri of the course
     var parts = window.location.href.split("/"), 
-    	uri = '';
+    	uri = '',
+	courseid;
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
 	//Change uri in cms
 	var lms_location = $('.sidebar .preview-button').attr('href');
 	if (typeof lms_location!='undefined'){
+		courseid = parts[4].split(".").join("/");
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
-	var unit_id = $('#sequence-list').find('.active').attr("data-element");
-    uri += unit_id;
+	
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
@@ -117,7 +119,7 @@
                   },
             },
             auth: {
-                token: "${token}"
+                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
             },
             store: {
                 // The endpoint of the store on your server.
@@ -173,6 +175,8 @@
     var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
     
     ova.annotator.addPlugin('Tags');
+
+    
     
     //Catch
     var annotator = ova.annotator,
@@ -182,7 +186,7 @@
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	        userId:'${user.email}',
+	    userId:'${user.email}',
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },
