@@ -17,6 +17,7 @@ from django.test.client import RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from edxmako.middleware import MakoMiddleware
@@ -24,7 +25,8 @@ from edxmako.middleware import MakoMiddleware
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
+    studio_store_config)
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory
 
@@ -34,6 +36,8 @@ from course_modes.models import CourseMode
 import shoppingcart
 
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+
+TEST_MODULESTORE = studio_store_config(settings.TEST_ROOT / "data")
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -72,6 +76,57 @@ class TestJumpTo(TestCase):
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(MODULESTORE=TEST_MODULESTORE)
+class TestJumpToIdDraft(ModuleStoreTestCase):
+    """
+    Tests the jump_to_id link resolution of draft items in preview mode
+
+    We have to use a mixed direct/draft store for this, as this is only an issue
+    for draft items that belong to public ones.
+    Since preview mode uses a DraftModuleStore by default, mocking the hostname
+    to `preview.localhost` is not necessary.
+    """
+
+    def setUp(self):
+        self.course, item = self.create_course(start=datetime(2014, 5, 13))
+        self.instructor = self.create_instructor(self.course)
+        self.draft = self.convert_item_to_draft(item)
+
+    def create_course(self, **kwargs):
+        course = CourseFactory()
+        chapter = ItemFactory(category='chapter', parent_location=course.location)
+        section = ItemFactory(category='sequential', parent_location=chapter.location)
+        item = ItemFactory(category='vertical', parent_location=section.location)
+        return course, item
+
+    def convert_item_to_draft(self, item):
+        draft = modulestore('draft').convert_to_draft(item.location)
+        # convert_to_draft() seems to leave the previous direct version intact,
+        # so delete it manually.
+        modulestore('direct').delete_item(item.location)
+        return draft
+
+    def create_instructor(self, course):
+        user = InstructorFactory(course_key=course.id)
+        user.set_password('test')
+        user.save()
+        return user
+
+    def test_jumpto_id_draft(self):
+        ins = self.instructor
+        loc = self.course.location
+        self.client.login(username=ins.username, password='test')
+        jumpto_url = '{0}/{1}/{2}/{3}/jump_to_id/{4}'.format(
+            '/courses',
+            loc.org,
+            loc.course,
+            loc.name,
+            self.draft.location.name
+        )
+        response = self.client.get(jumpto_url)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
