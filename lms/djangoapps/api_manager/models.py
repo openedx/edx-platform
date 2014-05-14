@@ -122,4 +122,7 @@ class CourseContentGroupRelationship(TimeStampedModel):
     record_active = models.BooleanField(default=True)
 
     class Meta:
+        """
+        Mapping model to enable grouping of course content such as chapters
+        """
         unique_together = ("course_id", "content_id", "group")
