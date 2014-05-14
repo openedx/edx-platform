@@ -168,6 +168,10 @@ ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
+# Additional installed apps
+for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
+    INSTALLED_APPS += (app,)
+
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
 LOGGING = get_logger_config(LOG_DIR,
