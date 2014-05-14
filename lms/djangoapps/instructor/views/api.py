@@ -630,15 +630,9 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
-<<<<<<< HEAD
-    header = ['User ID', 'Anonymized user ID']
-    rows = [[s.id, unique_id_for_user(s)] for s in students]
-    return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
-=======
     header = ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
-    return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
->>>>>>> edx/master
+    return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @ensure_csrf_cookie

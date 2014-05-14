@@ -451,16 +451,11 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         MakoMiddleware().process_request(self.request)
 
-<<<<<<< HEAD
-        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
-=======
         course = CourseFactory(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
-        self.course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
->>>>>>> edx/master
+        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
         self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
@@ -469,15 +464,9 @@ class ProgressPageTests(ModuleStoreTestCase):
     def test_pure_ungraded_xblock(self):
         ItemFactory(category='acid', parent_location=self.vertical.location)
 
-<<<<<<< HEAD
         resp = views.progress(self.request, self.course.id.to_deprecated_string())
-        self.assertEquals(resp.status_code, 200)
-=======
-        resp = views.progress(self.request, self.course.id)
         self.assertEqual(resp.status_code, 200)
 
     def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, self.course.id)
+        resp = views.progress(self.request, self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
-
->>>>>>> edx/master

@@ -692,15 +692,9 @@ def instructor_dashboard(request, course_id):
             courseenrollment__course_id=course_key,
         ).order_by('id')
 
-<<<<<<< HEAD
-        datatable = {'header': ['User ID', 'Anonymized user ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s)] for s in students]
-        return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
-=======
         datatable = {'header': ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']}
         datatable['data'] = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
-        return return_csv(course_id.replace('/', '-') + '-anon-ids.csv', datatable)
->>>>>>> edx/master
+        return return_csv(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
     # Group management

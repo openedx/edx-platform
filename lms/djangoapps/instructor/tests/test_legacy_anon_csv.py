@@ -56,16 +56,8 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
     @patch.object(instructor.views.legacy, 'unique_id_for_user', Mock(return_value='41'))
     def test_download_anon_csv(self):
         course = self.toy
-<<<<<<< HEAD
         url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id.to_deprecated_string()})
-
-        with patch('instructor.views.legacy.unique_id_for_user') as mock_unique:
-            mock_unique.return_value = 42
-            response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
-=======
-        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
->>>>>>> edx/master
 
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
