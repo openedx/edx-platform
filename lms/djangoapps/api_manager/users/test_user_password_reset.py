@@ -123,6 +123,37 @@ class UserPasswordResetTest(TestCase):
         )
         self._assert_response(response, status=200)
 
+    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE': 20,
+                                                 'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
+    def test_password_reset_not_allowable_reuse_staff_user(self):
+        """
+        Try resetting staff user password with an already-used password
+        Hits a very specific LOC in the view code
+        """
+        response = self._do_post_request(
+            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
+            first_name='John', last_name='Doe', secure=True, is_staff=True
+        )
+        self._assert_response(response, status=201)
+        user_id = response.data['id']
+
+        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
+
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, password='Test.Me64#', secure=True
+        )
+        self._assert_response(response, status=200)
+
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, password='Test.Me64#', secure=True
+        )
+        message = _(
+            "You are re-using a password that you have used recently. You must "
+            "have 20 distinct password(s) before reusing a previous password."
+        )
+        self._assert_response(response, status=403, message=message)
+
+
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 1})
     def test_is_password_reset_too_frequent(self):
         """
@@ -202,6 +233,8 @@ class UserPasswordResetTest(TestCase):
             post_params['first_name'] = kwargs.get('first_name')
         if kwargs.get('last_name'):
             post_params['last_name'] = kwargs.get('last_name')
+        if kwargs.get('is_staff'):
+            post_params['is_staff'] = kwargs.get('is_staff')
 
         headers = {'X-Edx-Api-Key': TEST_API_KEY, 'Content-Type': 'application/json'}
         if kwargs.get('secure', False):

@@ -122,12 +122,12 @@ class UsersList(APIView):
         first_name = request.DATA.get('first_name', '')
         last_name = request.DATA.get('last_name', '')
         is_active = request.DATA.get('is_active', None)
+        is_staff = request.DATA.get('is_staff', False)
         city = request.DATA.get('city', '')
         country = request.DATA.get('country', '')
         level_of_education = request.DATA.get('level_of_education', '')
         year_of_birth = request.DATA.get('year_of_birth', '')
         gender = request.DATA.get('gender', '')
-
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -154,7 +154,7 @@ class UsersList(APIView):
 
         # Create the User, UserProfile, and UserPreference records
         try:
-            user = User.objects.create(email=email, username=username)
+            user = User.objects.create(email=email, username=username, is_staff=is_staff)
         except IntegrityError:
             user = None
         else:
@@ -163,6 +163,8 @@ class UsersList(APIView):
             user.last_name = last_name
             if is_active is not None:
                 user.is_active = is_active
+            if is_staff is not None:
+                user.is_staff = is_staff
             user.save()
 
             profile = UserProfile(user=user)
@@ -238,17 +240,10 @@ class UsersDetail(APIView):
         POST provides the ability to update information about an existing user
         """
         response_data = {}
-
-        first_name = request.DATA.get('first_name', '')
-        last_name = request.DATA.get('last_name', '')
-        city = request.DATA.get('city', '')
-        country = request.DATA.get('country', '')
-        level_of_education = request.DATA.get('level_of_education', '')
-        year_of_birth = request.DATA.get('year_of_birth', '')
-        gender = request.DATA.get('gender', '')
-
         base_uri = _generate_base_uri(request)
         response_data['uri'] = _generate_base_uri(request)
+        first_name = request.DATA.get('first_name')  # Used in multiple spots below
+        last_name = request.DATA.get('last_name')  # Used in multiple spots below
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
         limiter = BadRequestRateLimiter()
         if limiter.is_rate_limit_exceeded(request):
@@ -260,112 +255,123 @@ class UsersDetail(APIView):
         except ObjectDoesNotExist:
             limiter.tick_bad_request_counter(request)
             existing_user = None
-        if existing_user:
-            username = request.DATA.get('username', None)
-            if username:
+        if existing_user is None:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        # Ok, valid User, now update the provided fields
+        if first_name:
+            existing_user.first_name = first_name
+        if last_name:
+            existing_user.last_name = last_name
+        is_active = request.DATA.get('is_active')
+        if is_active is not None:
+            existing_user.is_active = is_active
+            response_data['is_active'] = existing_user.is_active
+        is_staff = request.DATA.get('is_staff')
+        if is_staff is not None:
+            existing_user.is_staff = is_staff
+            response_data['is_staff'] = existing_user.is_staff
+        existing_user.save()
+
+        username = request.DATA.get('username', None)
+        if username:
+            try:
+                validate_slug(username)
+            except ValidationError:
+                status_code = status.HTTP_400_BAD_REQUEST
+                response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
+                return Response(response_data, status=status_code)
+
+            existing_username = User.objects.filter(username=username).filter(~Q(id=user_id))
+            if existing_username:
+                status_code = status.HTTP_409_CONFLICT
+                response_data['message'] = "User '%s' already exists" % (username)
+                response_data['field_conflict'] = "username"
+                return Response(response_data, status=status_code)
+
+            existing_user.username = username
+            response_data['username'] = existing_user.username
+            existing_user.save()
+
+        password = request.DATA.get('password')
+        if password:
+            old_password_hash = existing_user.password
+            _serialize_user(response_data, existing_user)
+            if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
                 try:
-                    validate_slug(username)
-                except ValidationError:
+                    validate_password_length(password)
+                    validate_password_complexity(password)
+                    validate_password_dictionary(password)
+                except ValidationError, err:
+                    # bad user? tick the rate limiter counter
+                    AUDIT_LOG.warning("API::Bad password in password_reset.")
                     status_code = status.HTTP_400_BAD_REQUEST
-                    response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
+                    response_data['message'] = _('Password: ') + '; '.join(err.messages)
                     return Response(response_data, status=status_code)
+            # also, check the password reuse policy
+            err_msg = None
+            if not PasswordHistory.is_allowable_password_reuse(existing_user, password):
+                if existing_user.is_staff:
+                    num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+                else:
+                    num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+                err_msg = _(
+                    "You are re-using a password that you have used recently. You must "
+                    "have {0} distinct password(s) before reusing a previous password."
+                ).format(num_distinct)
+            # also, check to see if passwords are getting reset too frequent
+            if PasswordHistory.is_password_reset_too_soon(existing_user):
+                num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+                err_msg = _(
+                    "You are resetting passwords too frequently. Due to security policies, "
+                    "{0} day(s) must elapse between password resets"
+                ).format(num_days)
 
-                existing_username = User.objects.filter(username=username).filter(~Q(id=user_id))
-                if existing_username:
-                    status_code = status.HTTP_409_CONFLICT
-                    response_data['message'] = "User '%s' already exists" % (username)
-                    response_data['field_conflict'] = "username"
-                    return Response(response_data, status=status_code)
+            if err_msg:
+                # We have an password reset attempt which violates some security policy,
+                status_code = status.HTTP_403_FORBIDDEN
+                response_data['message'] = err_msg
+                return Response(response_data, status=status_code)
 
-                existing_user.username = username
-                response_data['username'] = existing_user.username
-                existing_user.save()
+            existing_user.is_active = True
+            existing_user.set_password(password)
+            existing_user.save()
+            update_user_password_hash = existing_user.password
 
+            if update_user_password_hash != old_password_hash:
+                # add this account creation to password history
+                # NOTE, this will be a NOP unless the feature has been turned on in configuration
+                password_history_entry = PasswordHistory()
+                password_history_entry.create(existing_user)
 
-            is_active = request.DATA.get('is_active', None)
-            if is_active is not None:
-                existing_user.is_active = is_active
-                response_data['is_active'] = existing_user.is_active
-                existing_user.save()
-
-            password = request.DATA.get('password')
-            if password:
-                old_password_hash = existing_user.password
-                _serialize_user(response_data, existing_user)
-                password = request.DATA['password']
-                if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
-                    try:
-                        validate_password_length(password)
-                        validate_password_complexity(password)
-                        validate_password_dictionary(password)
-                    except ValidationError, err:
-                        # bad user? tick the rate limiter counter
-                        AUDIT_LOG.warning("API::Bad password in password_reset.")
-                        status_code = status.HTTP_400_BAD_REQUEST
-                        response_data['message'] = _('Password: ') + '; '.join(err.messages)
-                        return Response(response_data, status=status_code)
-
-                # also, check the password reuse policy
-                err_msg = None
-                if not PasswordHistory.is_allowable_password_reuse(existing_user, password):
-                    if existing_user.is_staff:
-                        num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
-                    else:
-                        num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-                    err_msg = _(
-                        "You are re-using a password that you have used recently. You must "
-                        "have {0} distinct password(s) before reusing a previous password."
-                    ).format(num_distinct)
-
-                # also, check to see if passwords are getting reset too frequent
-                if PasswordHistory.is_password_reset_too_soon(existing_user):
-                    num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-                    err_msg = _(
-                        "You are resetting passwords too frequently. Due to security policies, "
-                        "{0} day(s) must elapse between password resets"
-                    ).format(num_days)
-
-                if err_msg:
-                    # We have an password reset attempt which violates some security policy,
-                    status_code = status.HTTP_403_FORBIDDEN
-                    response_data['message'] = err_msg
-                    return Response(response_data, status=status_code)
-
-                existing_user.is_active = True
-                existing_user.set_password(password)
-                existing_user.save()
-                update_user_password_hash = existing_user.password
-
-                if update_user_password_hash != old_password_hash:
-                    # add this account creation to password history
-                    # NOTE, this will be a NOP unless the feature has been turned on in configuration
-                    password_history_entry = PasswordHistory()
-                    password_history_entry.create(existing_user)
-
-            existing_user_profile = UserProfile.objects.get(user_id=user_id)
-            if existing_user_profile:
+        # Also update the UserProfile record for this User
+        existing_user_profile = UserProfile.objects.get(user_id=user_id)
+        if existing_user_profile:
+            if first_name and last_name:
                 existing_user_profile.name = '{} {}'.format(first_name, last_name)
+            city = request.DATA.get('city')
+            if city:
                 existing_user_profile.city = city
+            country = request.DATA.get('country')
+            if country:
                 existing_user_profile.country = country
+            level_of_education = request.DATA.get('level_of_education')
+            if level_of_education:
                 existing_user_profile.level_of_education = level_of_education
+            year_of_birth = request.DATA.get('year_of_birth')
+            try:
+                year_of_birth = int(year_of_birth)
+            except (ValueError, TypeError):
+                # If they give us garbage, just ignore it instead
+                # of asking them to put an integer.
+                year_of_birth = None
+            if year_of_birth:
+                existing_user_profile.year_of_birth = year_of_birth
+            gender = request.DATA.get('gender')
+            if gender:
                 existing_user_profile.gender = gender
-
-                try:
-                    existing_user_profile.year_of_birth = int(year_of_birth)
-                except ValueError:
-                    # If they give us garbage, just ignore it instead
-                    # of asking them to put an integer.
-                    existing_user_profile.year_of_birth = None
-
-                existing_user_profile.save()
-
-            status_code = status.HTTP_200_OK
-
-        else:
-            status_code = status.HTTP_404_NOT_FOUND
-            response_data['message'] = 'User not exist'
-
-        return Response(response_data, status=status_code)
+            existing_user_profile.save()
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class UsersGroupsList(APIView):
