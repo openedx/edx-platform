@@ -1,5 +1,5 @@
 """
-Tests of the instructor dashboard gradebook
+Tests of the instructor dashboard spoc gradebook
 """
 
 from django.test.utils import override_settings
@@ -10,7 +10,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 
 
@@ -19,6 +18,11 @@ USER_COUNT = 11
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
+    """
+    Test functionality of the spoc gradebook. Sets up a course with assignments and
+    students who've scored various scores on these assignments. Base class for further
+    gradebook tests.
+    """
     grading_policy = None
 
     def setUp(self):
@@ -68,7 +72,7 @@ class TestGradebook(ModuleStoreTestCase):
                 )
 
         self.response = self.client.get(reverse(
-            'gradebook_legacy',
+            'spoc_gradebook',
             args=(self.course.id.to_deprecated_string(),)
         ))
 
@@ -77,6 +81,10 @@ class TestGradebook(ModuleStoreTestCase):
 
 
 class TestDefaultGradingPolicy(TestGradebook):
+    """
+    Tests that the grading policy is properly applied for all users in the course
+    Uses the default policy (50% passing rate)
+    """
     def test_all_users_listed(self):
         for user in self.users:
             self.assertIn(user.username, unicode(self.response.content, 'utf-8'))
@@ -98,6 +106,10 @@ class TestDefaultGradingPolicy(TestGradebook):
 
 
 class TestLetterCutoffPolicy(TestGradebook):
+    """
+    Tests advanced grading policy (with letter grade cutoffs). Includes tests of
+    UX display (color, etc).
+    """
     grading_policy = {
         "GRADER": [
             {
