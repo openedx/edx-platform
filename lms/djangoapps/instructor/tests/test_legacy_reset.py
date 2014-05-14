@@ -36,11 +36,7 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
 
     def test_delete_student_state_resets_scores(self):
-        problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'b3dce2586c9c4876b73e7f390e42ef8f',
-            block_type='openassessment'
-        )
+        problem_location = self.course.id.make_usage_key('dummy', 'module')
 
         # Create a student module for the user
         StudentModule.objects.create(
@@ -53,8 +49,8 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(self.student, self.course.id),
-            'course_id': self.course.id,
-            'item_id': problem_location,
+            'course_id': self.course.id.to_deprecated_string(),
+            'item_id': problem_location.to_deprecated_string(),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
