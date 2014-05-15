@@ -791,8 +791,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             # gets the 'default_value' and 'explicitly_set' attrs
             metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
             metadata_fields[field.name]['field_name'] = field.name
-            metadata_fields[field.name]['display_name'] = field.display_name
-            metadata_fields[field.name]['help'] = field.help
+            metadata_fields[field.name]['display_name'] = self.runtime.service(self, "i18n").ugettext(field.display_name) if field.display_name is not None else None
+            metadata_fields[field.name]['help'] = self.runtime.service(self, "i18n").ugettext(field.help) if field.help is not None else None
             metadata_fields[field.name]['value'] = field.read_json(self)
 
             # We support the following editors:
