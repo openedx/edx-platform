@@ -14,6 +14,7 @@ This document is intended for researchers and data czars at edX partner institut
    internal_data_formats/discussion_data.rst
    internal_data_formats/wiki_data.rst
    internal_data_formats/tracking_logs.rst
+   internal_data_formats/event_list.rst
 
 
 ********************

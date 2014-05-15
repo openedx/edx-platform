@@ -194,12 +194,27 @@ class VideoStudentViewHandlers(object):
             transcript_name = self.sub
 
         if transcript_name:
+<<<<<<< HEAD
             course = self.descriptor.runtime.modulestore.get_course(self.course_id)
             if course.static_asset_path:
+=======
+            course_location = CourseDescriptor.id_to_location(self.course_id)
+
+            # Get the asset path for course
+            asset_path = None
+            if hasattr(self.descriptor.runtime, 'modulestore'):
+                course = self.descriptor.runtime.modulestore.get_item(course_location)
+                asset_path = course.static_asset_path
+            else:
+                # Handle XML Courses that don't have modulestore in the runtime
+                asset_path = getattr(self.descriptor, 'data_dir', None)
+
+            if asset_path:
+>>>>>>> edx/master
                 response = Response(
                     status=307,
                     location='/static/{0}/{1}'.format(
-                        course.static_asset_path,
+                        asset_path,
                         subs_filename(transcript_name, self.transcript_language)
                     )
                 )
