@@ -349,8 +349,20 @@ edx_d3CreateStackedBarGraph = function(parameters, svg, divTooltip) {
         var top = pos[1]-10;
         var width = $('#'+graph.divTooltip.attr("id")).width();
 
+        // Construct the tooltip
+        if (d.tooltip['type'] == 'subsection') {
+          tooltip_str = d.tooltip['num_students'] + ' ' + gettext('student(s) opened Subsection') +  ' ' \
+                      + d.tooltip['subsection_num'] + ': ' + d.tooltip['subsection_name'] 
+        }else if (d.tooltip['type'] == 'problem') {
+          tooltip_str = d.tooltip['label'] + ' ' + d.tooltip['problem_name'] + ' - ' \
+                      + d.tooltip['count_grade'] + ' ' + gettext('students') + ' (' \
+                      + d.tooltip['student_count_percent'] + '%) (' + \
+                      + d.tooltip['percent'] + '%: ' + \
+                      + d.tooltip['grade'] +'/' + d.tooltip['max_grade'] + ' ' 
+                      + gettext('questions') + ')'
+        }
         graph.divTooltip.style("visibility", "visible")
-          .text(d.tooltip);
+          .text(tooltip_str);
 
         if ((left+width+30) > $("#"+graph.divTooltip.node().parentNode.id).width())
           left -= (width+30);
