@@ -195,7 +195,11 @@ ${fragment.foot_html()}
 
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
-          ${accordion}
+          % if accordion.strip():
+            ${accordion}
+          % else:
+            <div class="chapter">${_("No content has been added to this course")}</div>
+          % endif
         </nav>
       </div>
     </div>
