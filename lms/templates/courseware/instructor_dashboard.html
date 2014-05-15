@@ -17,6 +17,13 @@
 <%static:css group='style-vendor-tinymce-skin'/>
 <%static:css group='style-course'/>
 
+  <script type="text/javascript">
+    // This is a hack to get tinymce to work correctly in Firefox until the annotator tool is refactored to not include
+    // tinymce globally.
+    if(typeof window.Range.prototype === "undefined") {
+        window.Range.prototype = { };
+    }
+  </script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
