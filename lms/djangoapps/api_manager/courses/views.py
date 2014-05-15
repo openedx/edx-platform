@@ -98,6 +98,9 @@ def _serialize_content(request, course_id, content):
         content_uri = '{}/content/{}'.format(content_uri, content_id)
     data['uri'] = content_uri
 
+    if hasattr(content, 'due'):
+        data['due'] = content.due
+
     return data
 
 
