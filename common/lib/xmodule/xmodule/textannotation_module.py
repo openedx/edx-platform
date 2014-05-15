@@ -1,5 +1,4 @@
 ''' Text annotation module '''
-
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -7,6 +6,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_token import retrieve_token
+from xmodule.annotator_mixin import get_instructions, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
 
 import textwrap
 
@@ -45,13 +45,19 @@ class AnnotatableFields(object):
     )
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
     annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    diacritics = String(
+        display_name="Diacritic Marks",
+        help= "Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
+        scope=Scope.settings,
+        default='',
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
     ''' Text Annotation Module '''
     js = {'coffee': [],
-          'js': []}
-    css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
+          'js': ANNOTATOR_COMMON_JS}
+    css = {'scss': ANNOTATOR_COMMON_CSS + [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'textannotation'
 
     def __init__(self, *args, **kwargs):
@@ -67,12 +73,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
     def get_html(self):
         """ Renders parameters to template. """
@@ -84,6 +85,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
         }
         return self.system.render_template('textannotation.html', context)
 

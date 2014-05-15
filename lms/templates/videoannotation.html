@@ -1,4 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+<%static:css group='style-annotator'/>
+<%static:css group='style-vendor-tinymce-content'/>
+<%static:css group='style-vendor-tinymce-skin'/>
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}" />
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}" />
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -152,17 +158,17 @@
         optionsRichText: {
             tinymce:{
                 selector: "li.annotator-item textarea",
-                plugins: "media image insertdatetime link code",
+                plugins: "media image codemirror",
                 menubar: false,
                 toolbar_items_size: 'small',
                 extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
             }
         },
     };
 	
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+	tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
 	
 	//remove old instances
     if (Annotator._instances.length !== 0) {

@@ -827,21 +827,6 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/ova/annotator-full.js',
-    'js/vendor/ova/annotator-full-firebase-auth.js',
-    'js/vendor/ova/video.dev.js',
-    'js/vendor/ova/vjs.youtube.js',
-    'js/vendor/ova/rangeslider.js',
-    'js/vendor/ova/share-annotator.js',
-    'js/vendor/ova/tinymce.min.js',
-    'js/vendor/ova/richText-annotator.js',
-    'js/vendor/ova/reply-annotator.js',
-    'js/vendor/ova/tags-annotator.js',
-    'js/vendor/ova/flagging-annotator.js',
-    'js/vendor/ova/jquery-Watch.js',
-    'js/vendor/ova/ova.js',
-    'js/vendor/ova/catch/js/catch.js',
-    'js/vendor/ova/catch/js/handlebars-1.1.2.js',
     'js/vendor/URI.min.js',
 ]
 
@@ -858,16 +843,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
-            'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/annotator.css',
             'css/vendor/ova/video-js.min.css',
-            'css/vendor/ova/rangeslider.css',
-            'css/vendor/ova/share-annotator.css',
-            'css/vendor/ova/richText-annotator.css',
-            'css/vendor/ova/tags-annotator.css',
-            'css/vendor/ova/flagging-annotator.css',
-            'css/vendor/ova/ova.css',
-            'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
@@ -882,6 +858,13 @@ PIPELINE_CSS = {
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
+    },
+    'style-annotator' :{
+        'source_filenames':[
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/token-input.css'
+        ],
+        'output_filename': 'css/lms-style-vendor-ova-annotator.css',
     },
     'style-app': {
         'source_filenames': [
