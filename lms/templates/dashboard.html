@@ -291,7 +291,7 @@
 
   <section class="my-courses" id="my-courses">
     <header>
-      <h2>${_("Current Courses")}</h2>
+      <div style="display:flex"><h2>${_("Courses")} </h2><div style="flex-grow:1"></div><div style="font-size: 13px; color: #646464;">${_("ordered by recent activity")}</div></div>
     </header>
 
     % if len(course_enrollment_pairs) > 0:
