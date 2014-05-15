@@ -12,10 +12,12 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/16/14
+     - Updated :ref:`Working with Video Components` to reflect UI changes.
    * - 05/14/14
      - Updated the :ref:`Running Your Course Index` chapter to remove references
        to the "new beta" Instructor Dashboard.
-   * - 
+   * - 05/13/14
      - Updated the :ref:`Enrollment` section to reflect that usernames or email
        addresses can be used to batch enroll students.
    * - 
