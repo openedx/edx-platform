@@ -69,7 +69,7 @@ class TestGradebook(ModuleStoreTestCase):
                 )
 
         self.response = self.client.get(reverse(
-            'gradebook',
+            'gradebook_legacy',
             args=(self.course.id.to_deprecated_string(),)
         ))
 

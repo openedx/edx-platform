@@ -103,13 +103,22 @@ def get_opt_course_with_access(user, action, course_key):
 
 
 def course_image_url(course):
-    """ Determine whether this is an XML or Studio-backed course, and return the appropriate course_image URL """
+    """Try to look up the image url for the course.  If it's not found,
+    log an error and return the dead link"""
     if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
-        return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
+        # If we are a static course with the course_image attribute
+        # set different than the default, return that path so that
+        # courses can use custom course image paths, otherwise just
+        # return the default static path.
+        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
+        if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
+            url += '/' + course.course_image
+        else:
+            url += '/images/course_image.jpg'
     else:
-        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-        _path = loc.to_deprecated_string()
-        return _path
+        loc = StaticContent.compute_location(course.id, course.course_image)
+        url = loc.to_deprecated_string()
+    return url
 
 
 def find_file(filesystem, dirs, filename):

@@ -11,6 +11,7 @@ from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
 from mock import Mock, patch
+from django.conf import settings
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -103,6 +104,7 @@ class TestCommonExceptions400(unittest.TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -1322,18 +1324,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
+    @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
         """
         Test the CSV output for the anonymized user ids.
         """
         url = reverse('get_anon_ids', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        with patch('instructor.views.api.unique_id_for_user') as mock_unique:
-            mock_unique.return_value = '42'
-            response = self.client.get(url, {})
+        response = self.client.get(url, {})
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
-        self.assertTrue(body.endswith('"7","42"\n'))
+        self.assertTrue(body.startswith(
+            '"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            '\n"2","41","42"\n'
+        ))
+        self.assertTrue(body.endswith('"7","41","42"\n'))
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -1603,6 +1608,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that

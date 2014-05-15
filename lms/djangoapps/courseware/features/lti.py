@@ -2,24 +2,17 @@
 import datetime
 import os
 import pytz
+from django.conf import settings
 from mock import patch
 from pytz import UTC
-from nose.tools import assert_equal
 from splinter.exceptions import ElementDoesNotExist
-
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.conf import settings
+from nose.tools import assert_true, assert_equal, assert_in
 from lettuce import world, step
-from lettuce.django import django_url
 
-from common import course_id, visit_scenario_item
 from courseware.tests.factories import InstructorFactory, BetaTesterFactory
-
 from courseware.access import has_access
 from student.tests.factories import UserFactory
 
-from nose.tools import assert_equals
 from common import course_id, visit_scenario_item
 
 
@@ -246,6 +239,22 @@ def check_lti_popup():
     world.browser.switch_to_window(parent_window) # Switch to the main window again
 
 
+@step('visit the LTI component')
+def visit_lti_component(_step):
+    visit_scenario_item('LTI')
+
+
+@step('I see LTI component (.*) with text "([^"]*)"$')
+def see_elem_text(_step, elem, text):
+    selector_map = {
+        'progress': '.problem-progress',
+        'feedback': '.problem-feedback',
+        'module title': '.problem-header'
+    }
+    assert_in(elem, selector_map)
+    assert_true(world.css_has_text(selector_map[elem], text))
+
+
 @step('I see text "([^"]*)"$')
 def check_progress(_step, text):
     assert world.browser.is_text_present(text)
@@ -253,37 +262,53 @@ def check_progress(_step, text):
 
 @step('I see graph with total progress "([^"]*)"$')
 def see_graph(_step, progress):
-    SELECTOR = 'grade-detail-graph'
-    XPATH = '//div[@id="{parent}"]//div[text()="{progress}"]'.format(
-        parent=SELECTOR,
+    selector = 'grade-detail-graph'
+    xpath = '//div[@id="{parent}"]//div[text()="{progress}"]'.format(
+        parent=selector,
         progress=progress,
     )
-    node = world.browser.find_by_xpath(XPATH)
+    node = world.browser.find_by_xpath(xpath)
 
     assert node
 
 
 @step('I see in the gradebook table that "([^"]*)" is "([^"]*)"$')
 def see_value_in_the_gradebook(_step, label, text):
-    TABLE_SELECTOR = '.grade-table'
+    table_selector = '.grade-table'
     index = 0
-    table_headers = world.css_find('{0} thead th'.format(TABLE_SELECTOR))
+    table_headers = world.css_find('{0} thead th'.format(table_selector))
 
     for i, element in enumerate(table_headers):
         if element.text.strip() == label:
             index = i
             break;
 
-    assert world.css_has_text('{0} tbody td'.format(TABLE_SELECTOR), text, index=index)
+    assert_true(world.css_has_text('{0} tbody td'.format(table_selector), text, index=index))
 
 
-@step('I submit answer to LTI question$')
-def click_grade(_step):
+@step('I submit answer to LTI (.*) question$')
+def click_grade(_step, version):
+    version_map = {
+        '1': {'selector': 'submit-button', 'expected_text': 'LTI consumer (edX) responded with XML content'},
+        '2': {'selector': 'submit-lti2-button', 'expected_text': 'LTI consumer (edX) responded with HTTP 200'},
+    }
+    assert_in(version, version_map)
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
-        iframe.find_by_name('submit-button').first.click()
-        assert iframe.is_text_present('LTI consumer (edX) responded with XML content')
+        iframe.find_by_name(version_map[version]['selector']).first.click()
+        assert iframe.is_text_present(version_map[version]['expected_text'])
+
+
+@step('LTI provider deletes my grade and feedback$')
+def click_delete_button(_step):
+    with world.browser.get_iframe(get_lti_frame_name()) as iframe:
+        iframe.find_by_name('submit-lti2-delete-button').first.click()
+
+
+def get_lti_frame_name():
+    location = world.scenario_dict['LTI'].location.html_id()
+    return 'ltiFrame-' + location
 
 
 @step('I see in iframe that LTI role is (.*)$')
@@ -308,3 +333,14 @@ def switch_view(_step, view):
         world.css_click('#staffstatus')
         world.wait_for_ajax_complete()
 
+
+@step("in the LTI component I do not see (.*)$")
+def check_lti_component_no_elem(_step, text):
+    selector_map = {
+        'a launch button': '.link_lti_new_window',
+        'an provider iframe': '.ltiLaunchFrame',
+        'feedback': '.problem-feedback',
+        'progress': '.problem-progress',
+    }
+    assert_in(text, selector_map)
+    assert_true(world.is_css_not_present(selector_map[text]))

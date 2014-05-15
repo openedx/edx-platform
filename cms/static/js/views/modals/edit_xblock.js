@@ -135,13 +135,14 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 var parent = $(event.target.parentElement),
                     mode = parent.data('mode');
                 event.preventDefault();
-                var $cheatsheet = $('.simple-editor-cheatsheet');
-                if ($cheatsheet.hasClass("shown")) {
-                    $(".CodeMirror").removeAttr("style");
-                    $(".modal-content").removeAttr("style");
-                    $cheatsheet.removeClass('shown');
-                }
                 this.selectMode(mode);
+                var $cheatsheet = $('.simple-editor-cheatsheet');
+                if ($cheatsheet.length == 0){
+                    $cheatsheet = $('.simple-editor-open-ended-cheatsheet');
+                }
+                $(".CodeMirror").css({"overflow": "none"});
+                $(".modal-content").removeAttr("style");
+                $cheatsheet.removeClass('shown');
             },
 
             selectMode: function(mode) {

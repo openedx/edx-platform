@@ -1,8 +1,10 @@
 import re
 
 from mock import patch
+from mock import sentinel
 
 from django.contrib.auth.models import User
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -50,35 +52,86 @@ class TrackMiddlewareTestCase(TestCase):
         self.track_middleware.process_request(request)
         self.assertFalse(self.mock_server_track.called)
 
-    def test_request_in_course_context(self):
-        request = self.request_factory.get('/courses/test_org/test_course/test_run/foo')
-        self.track_middleware.process_request(request)
-        captured_context = tracker.get_tracker().resolve_context()
-        self.track_middleware.process_response(request, None)
+    def test_default_request_context(self):
+        context = self.get_context_for_path('/courses/')
+        self.assertEquals(context, {
+            'user_id': '',
+            'session': '',
+            'username': '',
+            'ip': '127.0.0.1',
+            'host': 'testserver',
+            'agent': '',
+            'path': '/courses/',
+            'org_id': '',
+            'course_id': '',
+        })
 
-        self.assertEquals(
-            captured_context,
-            {
-                'course_id': 'test_org/test_course/test_run',
-                'org_id': 'test_org',
-                'user_id': ''
-            }
-        )
+    def get_context_for_path(self, path):
+        """Extract the generated event tracking context for a given request for the given path."""
+        request = self.request_factory.get(path)
+        return self.get_context_for_request(request)
+
+    def get_context_for_request(self, request):
+        """Extract the generated event tracking context for the given request."""
+        self.track_middleware.process_request(request)
+        try:
+            captured_context = tracker.get_tracker().resolve_context()
+        finally:
+            self.track_middleware.process_response(request, None)
+
         self.assertEquals(
             tracker.get_tracker().resolve_context(),
             {}
         )
 
+        return captured_context
+
+    def test_request_in_course_context(self):
+        captured_context = self.get_context_for_path('/courses/test_org/test_course/test_run/foo')
+        expected_context_subset = {
+            'course_id': 'test_org/test_course/test_run',
+            'org_id': 'test_org',
+        }
+        self.assert_dict_subset(captured_context, expected_context_subset)
+
+    def assert_dict_subset(self, superset, subset):
+        """Assert that the superset dict contains all of the key-value pairs found in the subset dict."""
+        for key, expected_value in subset.iteritems():
+            self.assertEquals(superset[key], expected_value)
+
     def test_request_with_user(self):
+        user_id = 1
+        username = sentinel.username
+
         request = self.request_factory.get('/courses/')
-        request.user = User(pk=1)
-        self.track_middleware.process_request(request)
-        self.addCleanup(self.track_middleware.process_response, request, None)
-        self.assertEquals(
-            tracker.get_tracker().resolve_context(),
-            {
-                'course_id': '',
-                'org_id': '',
-                'user_id': 1
-            }
-        )
+        request.user = User(pk=user_id, username=username)
+
+        context = self.get_context_for_request(request)
+        self.assert_dict_subset(context, {
+            'user_id': user_id,
+            'username': username,
+        })
+
+    def test_request_with_session(self):
+        request = self.request_factory.get('/courses/')
+        SessionMiddleware().process_request(request)
+        request.session.save()
+        session_key = request.session.session_key
+
+        context = self.get_context_for_request(request)
+        self.assert_dict_subset(context, {
+            'session': session_key,
+        })
+
+    def test_request_headers(self):
+        ip_address = '10.0.0.0'
+        user_agent = 'UnitTest/1.0'
+
+        factory = RequestFactory(REMOTE_ADDR=ip_address, HTTP_USER_AGENT=user_agent)
+        request = factory.get('/some-path')
+        context = self.get_context_for_request(request)
+
+        self.assert_dict_subset(context, {
+            'ip': ip_address,
+            'agent': user_agent,
+        })

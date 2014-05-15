@@ -6,14 +6,14 @@ import settings
 
 class User(models.Model):
 
-    accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
+    accessible_fields = ['username', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
                          'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
                          'subscribed_thread_ids', 'subscribed_commentable_ids',
                          'subscribed_course_ids', 'threads_count', 'comments_count',
                          'default_sort_key'
                         ]
 
-    updatable_fields = ['username', 'external_id', 'email', 'default_sort_key']
+    updatable_fields = ['username', 'external_id', 'default_sort_key']
     initializable_fields = updatable_fields
 
     metric_tag_fields = ['course_id']
@@ -26,8 +26,7 @@ class User(models.Model):
     def from_django_user(cls, user):
         return cls(id=str(user.id),
                    external_id=str(user.id),
-                   username=user.username,
-                   email=user.email)
+                   username=user.username)
 
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
@@ -57,14 +56,14 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id, 'value': value}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_action='user.vote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def unvote(self, voteable):
         if voteable.type == 'thread':
@@ -74,14 +73,14 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id}
-        request = perform_request(
+        response = perform_request(
             'delete',
             url,
             params,
             metric_action='user.unvote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def active_threads(self, query_params={}):
         if not self.course_id:
@@ -142,7 +141,7 @@ class User(models.Model):
                 )
             else:
                 raise
-        self.update_attributes(**response)
+        self._update_from_response(response)
 
 
 def _url_for_vote_comment(comment_id):

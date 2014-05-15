@@ -11,6 +11,8 @@ from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import editable_modulestore
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from cache_toolbox.core import del_cached_content
@@ -222,6 +224,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     DATA = """
         <video show_captions="true"
         display_name="A Name"
+        sub='OEoXaMPEzfM'
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
@@ -398,6 +401,77 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         request = Request.blank('/translation/uk')
         response = self.item.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body), subs)
+
+    def test_translation_static_transcript(self):
+        """
+        Set course static_asset_path and ensure we get redirected to that path
+        if it isn't found in the contentstore
+        """
+        self.course.static_asset_path = 'dummy/static'
+        self.course.save()
+        store = editable_modulestore()
+        store.update_item(self.course, 'OEoXaMPEzfM')
+
+        # Test youtube style en
+        request = Request.blank('/translation/en?videoId=12345')
+        response = self.item.transcript(request=request, dispatch='translation/en')
+        self.assertEqual(response.status, '307 Temporary Redirect')
+        self.assertIn(
+            ('Location', '/static/dummy/static/subs_12345.srt.sjson'),
+            response.headerlist
+        )
+
+        # Test HTML5 video style
+        self.item.sub = 'OEoXaMPEzfM'
+        request = Request.blank('/translation/en')
+        response = self.item.transcript(request=request, dispatch='translation/en')
+        self.assertEqual(response.status, '307 Temporary Redirect')
+        self.assertIn(
+            ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson'),
+            response.headerlist
+        )
+
+        # Test different language to ensure we are just ignoring it since we can't
+        # translate with static fallback
+        request = Request.blank('/translation/uk')
+        response = self.item.transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_xml_transcript(self):
+        """
+        Set data_dir and remove runtime modulestore to simulate an XMLModuelStore course.
+        Then run the same tests as static_asset_path run.
+        """
+        # Simulate XMLModuleStore xmodule
+        self.item_descriptor.data_dir = 'dummy/static'
+        del self.item_descriptor.runtime.modulestore
+
+        self.assertFalse(self.course.static_asset_path)
+
+        # Test youtube style en
+        request = Request.blank('/translation/en?videoId=12345')
+        response = self.item.transcript(request=request, dispatch='translation/en')
+        self.assertEqual(response.status, '307 Temporary Redirect')
+        self.assertIn(
+            ('Location', '/static/dummy/static/subs_12345.srt.sjson'),
+            response.headerlist
+        )
+
+        # Test HTML5 video style
+        self.item.sub = 'OEoXaMPEzfM'
+        request = Request.blank('/translation/en')
+        response = self.item.transcript(request=request, dispatch='translation/en')
+        self.assertEqual(response.status, '307 Temporary Redirect')
+        self.assertIn(
+            ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson'),
+            response.headerlist
+        )
+
+        # Test different language to ensure we are just ignoring it since we can't
+        # translate with static fallback
+        request = Request.blank('/translation/uk')
+        response = self.item.transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status, '404 Not Found')
 
 
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):

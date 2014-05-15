@@ -105,26 +105,33 @@ def celery(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("settings=", "s", "Django settings"),
+    ("settings=", "s", "Django settings for both LMS and Studio"),
     ("worker_settings=", "w", "Celery worker Django settings"),
-    ("fast", "f", "Skip updating assets")
+    ("fast", "f", "Skip updating assets"),
+    ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
+    ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
 ])
 def run_all_servers(options):
     """
     Runs Celery workers, Studio, and LMS.
     """
     settings = getattr(options, 'settings', 'dev')
+    settings_lms = getattr(options, 'settings_lms', settings)
+    settings_cms = getattr(options, 'settings_cms', settings)
     worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
     fast = getattr(options, 'fast', False)
 
     if not fast:
-        for system in ['lms', 'studio']:
-            args = [system, '--settings={}'.format(settings), '--skip-collect']
-            call_task('pavelib.assets.update_assets', args=args)
+        args = ['lms', '--settings={}'.format(settings_lms), '--skip-collect']
+        call_task('pavelib.assets.update_assets', args=args)
+
+        args = ['studio', '--settings={}'.format(settings_cms), '--skip-collect']
+        call_task('pavelib.assets.update_assets', args=args)
+
         call_task('pavelib.assets.watch_assets', options={'background': True})
     run_multi_processes([
-        django_cmd('lms', settings, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['lms'])),
-        django_cmd('studio', settings, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['studio'])),
+        django_cmd('lms', settings_lms, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['lms'])),
+        django_cmd('studio', settings_cms, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['studio'])),
         django_cmd('lms', worker_settings, 'celery', 'worker', '--loglevel=INFO', '--pythonpath=.')
     ])
 

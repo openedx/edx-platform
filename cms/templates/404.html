@@ -1,21 +1,24 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%block name="title">${_("Page Not Found")}</%block>
+<%block name="bodyclass">view-util util-404</%block>
+
 
 <%block name="content">
-
 <div class="wrapper-content wrapper">
   <section class="content">
-
-    <h1>${_("Page not found")}</h1>
-    <p>${_('The page that you were looking for was not found.')}
+    <header>
+      <h1 class="title title-1">${_("Page not found")}</h1>
+    </header>
+    <article class="content-primary" role="main">
+      <p>${_('The page that you were looking for was not found.')}
        ${_('Go back to the {homepage} or let us know about any pages that may have been moved at {email}.').format(
             homepage='<a href="/">homepage</a>',
             email=u'<a href="mailto:{address}">{address}</a>'.format(
                 address=settings.TECH_SUPPORT_EMAIL,
             ))}
-    </p>
+      </p>
+    </article>
   </section>
 </div>
-
 </%block>

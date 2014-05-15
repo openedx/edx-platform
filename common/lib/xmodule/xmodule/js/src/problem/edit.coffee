@@ -48,7 +48,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   onShowXMLButton: (e) =>
     e.preventDefault();
-    @addRemoveCheatsheetCSS()
+    if @cheatsheet != undefined
+      @addRemoveCheatsheetCSS()
     if @confirmConversionToXml()
       @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
@@ -108,7 +109,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       $(".CodeMirror").css({"overflow": "visible"})
       $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
     else
-      $(".CodeMirror").removeAttr("style")
+      $(".CodeMirror").css({"overflow": "none"})
       $(".modal-content").removeAttr("style")
 
   ###
@@ -359,7 +360,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text. 
       var split = xml.split('\n');
       var new_xml = [];
-      var line, i, curlabel = '';
+      var line, i, curlabel, prevlabel = '';
       var didinput = false;
       for (i = 0; i < split.length; i++) {
         line = split[i];
@@ -370,13 +371,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
           line = line.replace(/>>|<</g, '');
-        } else if (line.match(/<\w+response/) && didinput) {
+        } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
           didinput = false;
-        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '') {
+        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
           line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
           didinput = true;
+          prevlabel = curlabel;
         }
         new_xml.push(line);
       }

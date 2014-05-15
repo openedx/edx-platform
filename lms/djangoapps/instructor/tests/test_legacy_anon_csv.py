@@ -17,12 +17,13 @@ from django.core.urlresolvers import reverse
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+import instructor.views.legacy
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
-from mock import patch
+from mock import Mock, patch
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -51,14 +52,17 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.login(self.instructor, self.password)
         self.enroll(self.toy)
 
+    @patch.object(instructor.views.legacy, 'anonymous_id_for_user', Mock(return_value='42'))
+    @patch.object(instructor.views.legacy, 'unique_id_for_user', Mock(return_value='41'))
     def test_download_anon_csv(self):
         course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
-
-        with patch('instructor.views.legacy.unique_id_for_user') as mock_unique:
-            mock_unique.return_value = 42
-            response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id.to_deprecated_string()})
+        response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
 
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertEqual(body, '"User ID","Anonymized user ID"\n"2","42"\n')
+        self.assertEqual(
+            body,
+            ('"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+             '\n"2","41","42"\n')
+        )

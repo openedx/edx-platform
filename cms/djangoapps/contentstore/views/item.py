@@ -33,6 +33,7 @@ from ..utils import get_modulestore
 from .access import has_course_access
 from .helpers import _xmodule_recurse
 from contentstore.utils import compute_publish_state, PublishState
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -178,6 +179,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = get_modulestore(usage_key)
         component = store.get_item(usage_key)
+        is_read_only = _xblock_is_read_only(component)
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -197,12 +199,18 @@ def xblock_view_handler(request, usage_key_string, view_name):
             store.update_item(component, None)
 
         elif view_name == 'student_view' and component.has_children:
+            context = {
+                'runtime_type': 'studio',
+                'container_view': False,
+                'read_only': is_read_only,
+                'root_xblock': component,
+            }
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.
             html = render_to_string('container_xblock_component.html', {
+                'xblock_context': context,
                 'xblock': component,
                 'locator': usage_key,
-                'reordering_enabled': True,
             })
             return JsonResponse({
                 'html': html,
@@ -210,8 +218,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
             })
         elif view_name in ('student_view', 'container_preview'):
             is_container_view = (view_name == 'container_preview')
-            component_publish_state = compute_publish_state(component)
-            is_read_only_view = component_publish_state == PublishState.public
 
             # Only show the new style HTML for the container view, i.e. for non-verticals
             # Note: this special case logic can be removed once the unit page is replaced
@@ -219,7 +225,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             context = {
                 'runtime_type': 'studio',
                 'container_view': is_container_view,
-                'read_only': is_read_only_view,
+                'read_only': is_read_only,
                 'root_xblock': component,
             }
 
@@ -229,6 +235,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # into the preview fragment, so we don't want to add another header here.
             if not is_container_view:
                 fragment.content = render_to_string('component.html', {
+                    'xblock_context': context,
                     'preview': fragment.content,
                     'label': component.display_name or component.scope_ids.block_type,
                 })
@@ -246,6 +253,17 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
     else:
         return HttpResponse(status=406)
+
+
+def _xblock_is_read_only(xblock):
+    """
+    Returns true if the specified xblock is read-only, meaning that it cannot be edited.
+    """
+    # We allow direct editing of xblocks in DIRECT_ONLY_CATEGORIES (for example, static pages).
+    if xblock.category in DIRECT_ONLY_CATEGORIES:
+        return False
+    component_publish_state = compute_publish_state(xblock)
+    return component_publish_state == PublishState.public
 
 
 def _save_item(request, usage_key, data=None, children=None, metadata=None, nullout=None,

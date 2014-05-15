@@ -4,6 +4,7 @@ import json
 from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTabList, WikiTab
 from contentstore.utils import reverse_course_url
@@ -23,7 +24,7 @@ class TabsPageTests(CourseTestCase):
         self.url = reverse_course_url('tabs_handler', self.course.id)
 
         # add a static tab to the course, for code coverage
-        ItemFactory.create(
+        self.test_tab = ItemFactory.create(
             parent_location=self.course.location,
             category="static_tab",
             display_name="Static_1"
@@ -172,6 +173,24 @@ class TabsPageTests(CourseTestCase):
             }),
         )
         self.check_invalid_tab_id_response(resp)
+
+    def test_tab_preview_html(self):
+        """
+        Verify that the static tab renders itself with the correct HTML
+        """
+        preview_url = '/xblock/{}/student_view'.format(self.test_tab.location)
+
+        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        self.assertEqual(resp.status_code, 200)
+        resp_content = json.loads(resp.content)
+        html = resp_content['html']
+
+        # Verify that the HTML contains the expected elements
+        self.assertIn('<span class="action-button-text">Edit</span>', html)
+        self.assertIn('<span class="sr">Duplicate this component</span>', html)
+        self.assertIn('<span class="sr">Delete this component</span>', html)
+        self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle"></span>', html)
+
 
 
 class PrimitiveTabEdit(TestCase):

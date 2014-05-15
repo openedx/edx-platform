@@ -18,6 +18,7 @@ from logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+HTTPS = 'off'
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
@@ -30,11 +31,13 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
+FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
 FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['IS_EDX_DOMAIN'] = True  # Is this an edX-owned domain? (used on instructor dashboard)
+
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 

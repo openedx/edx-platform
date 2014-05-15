@@ -10,7 +10,6 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-import crum
 from datetime import datetime, timedelta
 import hashlib
 import json
@@ -32,7 +31,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
 from track import contexts
-from track.views import server_track
 from eventtracking import tracker
 from importlib import import_module
 
@@ -723,7 +721,7 @@ class CourseEnrollment(models.Model):
             }
 
             with tracker.get_tracker().context(event_name, context):
-                server_track(crum.get_current_request(), event_name, data)
+                tracker.emit(event_name, data)
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)

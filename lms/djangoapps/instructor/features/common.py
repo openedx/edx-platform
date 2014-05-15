@@ -77,7 +77,6 @@ def go_to_section(section_name):
     # course_info, membership, student_admin, data_download, analytics, send_email
     world.visit('/courses/edx/999/Test_Course')
     world.css_click('a[href="/courses/edx/999/Test_Course/instructor"]')
-    world.css_click('div.beta-button-wrapper>a.beta-button')
     world.css_click('a[data-section="{0}"]'.format(section_name))
 
 

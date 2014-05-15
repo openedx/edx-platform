@@ -8,7 +8,7 @@
 # tosti <tosti.chiang@gmail.com>, 2013
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
-# okalright <iftwoplustwoequalsfive@gmail.com>, 2013
+# okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
@@ -16,6 +16,7 @@
 # Yu-Ren Chen <yrchen@atcity.org>, 2013-2014
 # Yu-Ren Chen <yrchen@atcity.org>, 2013
 # Yu-Ren Chen <yrchen@atcity.org>, 2013
+# qwer20108 <qwer20108@gmail.com>, 2014
 # christtabris <christtabris@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -46,6 +47,8 @@
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
 # Yu-Ren Chen <yrchen@atcity.org>, 2013-2014
+# Oscar Wei <oscarwei1988@gmail.com>, 2014
+# qwer20108 <qwer20108@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -60,6 +63,7 @@
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
 # Yu-Ren Chen <yrchen@atcity.org>, 2014
+# qwer20108 <qwer20108@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -83,7 +87,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-04-10 20:10+0000\n"
 "Last-Translator: Yu-Ren Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -204,9 +208,8 @@ msgid "Course id is invalid"
 msgstr "課程編號無效"
 
 #: common/djangoapps/student/views.py
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
-msgstr ""
+msgstr "課程已滿"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -851,7 +854,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -945,7 +948,39 @@ msgid ""
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr "或者"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr ""
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1139,9 +1174,17 @@ msgstr "課程"
 msgid "Course Info"
 msgstr "課程資訊"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Progress" is the name of the student's course progress page
+#: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
+#, fuzzy
 msgid "Progress"
-msgstr "進度"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"課程進度\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"進度"
 
 #. Translators: "Wiki" is the name of the course's wiki page
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
@@ -1154,13 +1197,17 @@ msgstr "Wiki"
 #. the discussion forums
 #: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
 msgid "Discussion"
-msgstr ""
+msgstr "討論"
 
-#: cms/templates/textbooks.html cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
+#: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "教材"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Staff grading" appears on a tab that allows
+#. staff to view open-ended problems that require staff grading
+#: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/instructor/staff_grading.html
 msgid "Staff grading"
 msgstr "員工評分"
@@ -1169,9 +1216,12 @@ msgstr "員工評分"
 #. students to view open-ended problems that require grading
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "Peer grading"
-msgstr ""
+msgstr "同儕評量"
 
-#: lms/templates/courseware/syllabus.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Syllabus" appears on a tab that, when clicked, opens the
+#. syllabus of the course.
+#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "教學大綱"
 
@@ -1181,7 +1231,7 @@ msgstr "教學大綱"
 #. their course
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "Instructor"
-msgstr "教師"
+msgstr "教師控制面板"
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -1403,8 +1453,20 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
-msgstr "一個YouTube網址或是位於網路上的檔案連結。"
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
+msgstr ""
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -2312,7 +2374,7 @@ msgstr "進度：距今{attempted}的{action}{succeeded}"
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find submission to be {action} for student '{student}'"
-msgstr ""
+msgstr "找不到提交為{action}的學生'{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -3828,6 +3890,13 @@ msgstr ""
 msgid "close"
 msgstr ""
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr ""
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -3948,7 +4017,7 @@ msgstr ""
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: lms/templates/static_templates/tos.html
 msgid "Terms of Service"
-msgstr ""
+msgstr "服務條款"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
@@ -4092,10 +4161,6 @@ msgid ""
 "photo and ID and is checked throughout the course to verify that it is you "
 "who earned the passing grade."
 msgstr "一個ID證書需要透過您的照片和ID以及檢查整個課程，證明您的身分以確認是您獲得了及格。"
-
-#: common/templates/course_modes/choose.html
-msgid "or"
-msgstr "或者"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -4522,7 +4587,7 @@ msgstr ""
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
-msgstr ""
+msgstr "&copy; 2014 {platform_name}, 保留部分權利。"
 
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
@@ -4853,9 +4918,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "外部資源"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -4864,6 +4943,10 @@ msgstr "在新視窗檢視資源"
 #: lms/templates/lti.html
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
+msgstr ""
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
 msgstr ""
 
 #: lms/templates/lti_form.html
@@ -5395,6 +5478,24 @@ msgstr "新增評論"
 msgid "Staff Debug"
 msgstr "工作人員除錯"
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr "重定學生嘗試記錄"
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr "恢復學生提交記錄"
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr "模組欄位"
@@ -5448,6 +5549,7 @@ msgstr "使用者"
 msgid "Staffing and Enrollment"
 msgstr "工作人員及註冊資訊"
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5497,21 +5599,24 @@ msgid "Administer Courses"
 msgstr "管理課程"
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr ""
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr ""
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr "從github載入新課程"
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr "課程編號或目錄"
@@ -5519,10 +5624,6 @@ msgstr "課程編號或目錄"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "從網站中刪除課程"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
-msgstr "Django的PID"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -5540,17 +5641,16 @@ msgstr "日期"
 msgid "Course ID"
 msgstr "課程編號"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Git動作"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
 msgstr "近期的git載入活動"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
-msgstr "git動作"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -5679,10 +5779,6 @@ msgstr "下載影片"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/video.html
@@ -6134,7 +6230,7 @@ msgstr "在Studio中檢視更新"
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
-msgstr "課程更新&amp;新聞"
+msgstr " 公佈欄"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -6145,11 +6241,8 @@ msgid "Course Handouts"
 msgstr "課程講義"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
-msgstr "教師控制面板"
+msgid "Legacy Instructor Dashboard"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6157,8 +6250,30 @@ msgid "View Course in Studio"
 msgstr "在Studio中檢視課程"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "試試新測試視窗"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr "教師控制面板"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6655,6 +6770,10 @@ msgid ""
 msgstr "最終課程細節目前正在被封閉。您很快就能看到最終名次。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "您的最終得分："
 
@@ -6722,16 +6841,36 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} 封面圖片"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "登記為："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
-msgstr "ID 已驗證"
+msgid "Verified"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "榮譽準則"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -7819,10 +7958,12 @@ msgstr ""
 msgid "Choose the graded unit:"
 msgstr ""
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7850,7 +7991,7 @@ msgid "List all students with due date extensions"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
+msgid "Specify a student to see all of that student's extensions."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7873,8 +8014,15 @@ msgid "Reset due date for student"
 msgstr "重置學生的結束時間"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
-msgstr "回到標準訊息視窗"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8150,6 +8298,20 @@ msgid "Show Email Task History"
 msgstr "顯示郵件遞送任務歷史"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "學生特定評分檢驗"
 
@@ -8186,14 +8348,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Next, select an action to perform for the given user and problem:"
 msgstr "下一步，選擇一個動作以執行給定的使用者和問題："
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "重定學生嘗試記錄"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "恢復學生提交記錄"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -8377,7 +8531,7 @@ msgstr "已評分"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Available"
-msgstr "可用的"
+msgstr "可評分的"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Required"
@@ -8656,6 +8810,13 @@ msgid "Registered as: "
 msgstr "註冊："
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
+msgstr "ID 已驗證"
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -8832,11 +8993,6 @@ msgid ""
 "free to browse our catalogue to find other courses you may be interested in "
 "taking."
 msgstr ""
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "榮譽準則"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -9220,6 +9376,9 @@ msgstr ""
 msgid "Re-Verification Submission Confirmation"
 msgstr ""
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -9864,7 +10023,7 @@ msgstr "聯繫edX技術支援團隊"
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
-msgstr "檔案及上傳"
+msgstr " 檔案上傳 "
 
 #: cms/templates/asset_index.html
 msgid "Uploading…"
@@ -9982,7 +10141,7 @@ msgstr "任何您在這檢查表做出的更改將會自動儲存，並且立刻
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
-msgstr ""
+msgstr "重複"
 
 #: cms/templates/component.html
 msgid "Duplicate this component"
@@ -9991,12 +10150,6 @@ msgstr ""
 #: cms/templates/component.html
 msgid "Delete this component"
 msgstr ""
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
-msgstr "拖動以重新排序"
 
 #: cms/templates/container.html
 msgid "Container"
@@ -10040,25 +10193,25 @@ msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
-msgstr "課程更新"
+msgstr "公佈欄"
 
 #: cms/templates/course_info.html
 msgid "New Update"
-msgstr "新增更新"
+msgstr "新增公告"
 
 #: cms/templates/course_info.html
 msgid ""
 "Use course updates to notify students of important dates or exams, highlight"
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
-msgstr "使用課程更新以提醒學生重要日期或考試、強調論壇中特定的討論內容、公告時間表的改變和回答學生問題。以HTML新增或編輯更新。"
+msgstr "使用公佈欄以提醒學生重要日期或考試、強調論壇中特定的討論內容、公告時間表的改變和回答學生問題。以HTML新增或編輯公告。"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/export.html cms/templates/widgets/header.html
 msgid "Pages"
-msgstr "靜態頁面"
+msgstr "自訂頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
@@ -10075,7 +10228,7 @@ msgid ""
 "Note: Pages are publicly visible. If users know the URL of a page, they can "
 "view the page even if they are not registered for or logged in to your "
 "course."
-msgstr "注意：靜態介面是公開可見的，如果使用者知道靜態頁面的URL，就算使用者並未註冊或是登入您的課程，依然可以看見其內容。"
+msgstr "注意：自訂頁面是公開可見的，如果使用者知道自訂頁面的URL，就算使用者並未註冊或是登入您的課程，依然可以看見其內容。"
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
@@ -10099,18 +10252,18 @@ msgstr "新增頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
-msgstr "什麼是靜態頁面？"
+msgstr "什麼是\"自訂頁面\"？"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
 "(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages that you create."
-msgstr "靜態頁面會水平列在課程上方。預設頁面(課程、課程訊息、討論區、Wiki和進度)會接在教材和自訂的靜態頁面之前。"
+msgstr "自訂頁面會水平列在課程上方。預設頁面(課程、課程訊息、討論區、Wiki和進度)會接在教材和自訂的自訂頁面之前。"
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
-msgstr "自訂靜態頁面"
+msgstr "自訂頁面"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -10995,11 +11148,11 @@ msgstr "需要幫助？"
 msgid ""
 "If you are new to Studio and having trouble getting started, there are a few"
 " things that may be of help:"
-msgstr "如果您對Studio不瞭解，同時開始使用時遇到困難，那麼這些東西可能對您有所幫助。"
+msgstr "如果您對Studio不瞭解，或使用時遇到困難，您可以參考以下連結。"
 
 #: cms/templates/index.html
 msgid "Get started by reading Studio's Documentation"
-msgstr "從閱讀Studio的說明文件開始"
+msgstr "閱讀 Studio 說明文件"
 
 #: cms/templates/index.html
 msgid "Request help with Studio"
@@ -11199,7 +11352,7 @@ msgstr "每門課程必須有一名管理員。如果您是管理員並希望轉
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Course Outline"
-msgstr "課程大綱"
+msgstr "課程內容"
 
 #: cms/templates/overview.html cms/templates/overview.html
 #: cms/templates/overview.html
@@ -11393,7 +11546,7 @@ msgstr "時程與細節設置"
 
 #: cms/templates/settings.html
 msgid "Schedule & Details"
-msgstr "時程表與細節"
+msgstr " 時程表與課程介紹"
 
 #: cms/templates/settings.html
 msgid "Basic Information"

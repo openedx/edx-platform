@@ -65,16 +65,38 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def load_test_import_course(self):
         '''
-        Load the standard course used to test imports (for do_import_static=False behavior).
+        Load the standard course used to test imports
+        (for do_import_static=False behavior).
         '''
         content_store = contentstore()
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['test_import_course'], static_content_store=content_store, do_import_static=False, verbose=True)
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['test_import_course'],
+            static_content_store=content_store,
+            do_import_static=False,
+            verbose=True,
+        )
         course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
         course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
         return module_store, content_store, course
+
+    def test_import_course_into_similar_namespace(self):
+        # Checks to make sure that a course with an org/course like
+        # edx/course can be imported into a namespace with an org/course
+        # like edx/course_name
+        module_store, __, course = self.load_test_import_course()
+        __, course_items = import_from_xml(
+            module_store,
+            'common/test/data',
+            ['test_import_course_2'],
+            target_course_id=course.id,
+            verbose=True,
+        )
+        self.assertEqual(len(course_items), 1)
 
     def test_unicode_chars_in_course_name_import(self):
         """

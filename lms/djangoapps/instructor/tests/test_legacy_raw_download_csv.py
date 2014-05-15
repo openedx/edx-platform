@@ -45,7 +45,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
         resp = self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.assertEqual(resp.status_code, 200)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id.to_deprecated_string()})
         msg = "url = {0}\n".format(url)
         response = self.client.post(url, {'action': 'Download CSV of all RAW grades'})
         msg += "instructor dashboard download raw csv grades: response = '{0}'\n".format(response)

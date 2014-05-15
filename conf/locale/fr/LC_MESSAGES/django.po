@@ -6,7 +6,7 @@
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
-# Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
 # francoisedocq, 2014
 # francoisedocq, 2014
@@ -29,6 +29,7 @@
 # Yannick1 <yannick.petit@gmail.com>, 2013
 # pchiu <philippe.chiu@gmail.com>, 2013-2014
 # qcappart <quentin.c@swing.be>, 2014
+# rafcha <raphael.chay@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
 # Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
 # Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
@@ -41,7 +42,7 @@
 # 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
-# Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
 # francoisedocq, 2014
 # francoisedocq, 2014
@@ -52,6 +53,7 @@
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
+# rafcha <raphael.chay@gmail.com>, 2014
 # Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
 # Yannick1 <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
@@ -64,7 +66,7 @@
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
 # ClaudeCoulombe <claude.coulombe@gmail.com>, 2014
-# Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
 # Gilles_Langevin <langevin.net@gmail.com>, 2013
@@ -76,11 +78,15 @@
 # JRolland <julien.rolland33@gmail.com>, 2013
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
+# Manjari <mringuet@gmail.com>, 2014
+# Mtiana <mtiana8@gmail.com>, 2014
+# eddy01 <ngwa.edwin@yahoo.com>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Yannick1 <yannick.petit@gmail.com>, 2013
 # pchiu <philippe.chiu@gmail.com>, 2013-2014
 # qcappart <quentin.c@swing.be>, 2014
+# rafcha <raphael.chay@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
 # antoviaque <xavier@antoviaque.org>, 2014
 # Yannick1 <yannick.petit@gmail.com>, 2013
@@ -92,7 +98,7 @@
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
-# Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
 # Gilles_Langevin <langevin.net@gmail.com>, 2013
@@ -100,6 +106,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
+# rafcha <raphael.chay@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
 # Yannick1 <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -125,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -907,7 +914,7 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "queued"
+msgid "processing"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1018,10 +1025,42 @@ msgstr ""
 "frontière vide."
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr "ou"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr ""
 "Réponse personnalisée: La fonction de vérification a renvoyé un dictionnaire"
 " invalide!"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1538,10 +1577,20 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
-"Une adresse YouTube ou un lien vers un fichier hébergé n'importe où sur le "
-"web."
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -4223,6 +4272,13 @@ msgstr "Page non trouvée"
 msgid "close"
 msgstr "fermer"
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr ""
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4517,10 +4573,6 @@ msgstr ""
 "Un Certificat avec ID Vérifiée nécessite que votre identité soit vérifiée "
 "par votre photo et pièce d'identité durant le cours, pour prouver que c'est "
 "bien vous qui avez obtenu le grade."
-
-#: common/templates/course_modes/choose.html
-msgid "or"
-msgstr "ou"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -5327,9 +5379,23 @@ msgstr ""
 msgid "Sign in with {provider_name}"
 msgstr ""
 
+#. Translators:  "External resource" means that this learning module is hosted
+#. on a platform external to the edX LMS
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "Ressource externe"
+
+#. Translators: "points" is the student's achieved score on this LTI unit, and
+#. "total_points" is the maximum number of points achievable.
+#: lms/templates/lti.html
+msgid "{points} / {total_points} points"
+msgstr ""
+
+#. Translators: "total_points" is the maximum number of points achievable on
+#. this LTI unit
+#: lms/templates/lti.html
+msgid "{total_points} points possible"
+msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -5341,6 +5407,10 @@ msgid ""
 msgstr ""
 "Veuillez fournir launch_url. Cliquez sur \"Editer\" et remplissez les champs"
 " requis."
+
+#: lms/templates/lti.html
+msgid "Feedback on your work from the grader:"
+msgstr ""
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -5896,6 +5966,24 @@ msgstr "Ajouter un commentaire"
 msgid "Staff Debug"
 msgstr "Débogage équipe pédagogique"
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr "Réinitialiser Essais des Étudiant"
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr "Réévaluer la soumission d'un étudiant"
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr "Champs Module"
@@ -5949,6 +6037,7 @@ msgstr "Utilisateurs"
 msgid "Staffing and Enrollment"
 msgstr "Encadrement et Inscriptions"
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -6001,21 +6090,24 @@ msgid "Administer Courses"
 msgstr "Administrer les cours"
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr ""
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr ""
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr "Charger un nouveau cours à partir de github"
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr "Identifiant ou dossier du cours"
@@ -6023,10 +6115,6 @@ msgstr "Identifiant ou dossier du cours"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "Supprimer le cours du site"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
-msgstr "PID Django"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -6044,17 +6132,16 @@ msgstr "Date"
 msgid "Course ID"
 msgstr "ID de Cours"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Action Git"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
 msgstr "Activités récente de la charge git pour"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
-msgstr "action git"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -6195,10 +6282,6 @@ msgstr "Télécharger la vidéo"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr ""
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/video.html
@@ -6680,11 +6763,8 @@ msgid "Course Handouts"
 msgstr "Documents de cours"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
-msgstr "Tableau de bord enseignant"
+msgid "Legacy Instructor Dashboard"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6692,8 +6772,30 @@ msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "Essayer le nouveau tableau de bord"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr "Tableau de bord enseignant"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -7246,6 +7348,10 @@ msgstr ""
 "finale sera disponible sous peu."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "Votre note finale :"
 
@@ -7331,16 +7437,36 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} Image de couverture"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "Inscrit en tant que:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
-msgstr "ID vérifié"
+msgid "Verified"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "Code d'honneur"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -8478,13 +8604,13 @@ msgstr ""
 msgid "Choose the graded unit:"
 msgstr "Choisissez les unités notées :"
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
 msgstr ""
-"Spécifiez la date et l'heure de la prolongation d'échéance (au format UTC: "
-"veuillez définir MM/JJ/AAAA HH:MM)"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8517,9 +8643,8 @@ msgstr ""
 "d'échéance"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
+msgid "Specify a student to see all of that student's extensions."
 msgstr ""
-"Spécifiez un étudiant pour afficher toutes les extensions dont il bénéficie."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8544,8 +8669,15 @@ msgid "Reset due date for student"
 msgstr "Remettre à zéro l'échéance pour l'étudiant"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
-msgstr "Retour au tableau de bord standard"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8833,6 +8965,20 @@ msgid "Show Email Task History"
 msgstr "Afficher l'historique des tâches liées aux emails"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "Examen des notes spécifiques des étudiants"
 
@@ -8874,14 +9020,6 @@ msgid "Next, select an action to perform for the given user and problem:"
 msgstr ""
 "Ensuite, choisissez une action à exécuter pour l'utilisateur et le problème "
 "choisis :"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "Réinitialiser Essais des Étudiant"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "Réévaluer la soumission d'un étudiant"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -9385,6 +9523,13 @@ msgid "Registered as: "
 msgstr "Inscrit en tant que:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
+msgstr "ID vérifié"
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -9585,11 +9730,6 @@ msgstr ""
 "mesures de contrôle d'export, et nous ne pouvons vous permettre d'accéder à "
 "ce cours. Vous pouvez consulter notre catalogue pour trouver d'autres cours "
 "susceptibles de vous intéresser."
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "Code d'honneur"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -10015,6 +10155,9 @@ msgstr "Soumettre les photos &amp; vérifier à nouveau"
 msgid "Re-Verification Submission Confirmation"
 msgstr "Confirmation de la demande de revérification"
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -10915,12 +11058,6 @@ msgstr "Dupliquer ce composant"
 #: cms/templates/component.html
 msgid "Delete this component"
 msgstr "Supprimer ce composant"
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
-msgstr "Glissez pour modifier l'ordre"
 
 #: cms/templates/container.html
 msgid "Container"

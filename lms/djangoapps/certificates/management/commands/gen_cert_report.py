@@ -30,16 +30,16 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('-c', '--course',
-            metavar='COURSE_ID',
-            dest='course',
-            default=None,
-            help='Only generate for COURSE_ID'),
+                    metavar='COURSE_ID',
+                    dest='course',
+                    default=None,
+                    help='Only generate for COURSE_ID'),
         )
 
     def _ended_courses(self):
         for course_id in [course  # all courses in COURSE_LISTINGS
-                for sub in settings.COURSE_LISTINGS
-                    for course in settings.COURSE_LISTINGS[sub]]:
+                          for sub in settings.COURSE_LISTINGS
+                          for course in settings.COURSE_LISTINGS[sub]]:
             course = modulestore().get_course(course_id)
             if course.has_ended():
                 yield course_id
@@ -57,29 +57,39 @@ class Command(BaseCommand):
 
         for course_id in ended_courses:
 
-            # find students who are enrolled
+            # find students who are active
+            # enrolled students are always downloable + notpassing
             print "Looking up certificate states for {0}".format(course_id)
-            enrolled_students = User.objects.filter(
-                    courseenrollment__course_id=course_id,
-                    courseenrollment__is_active=True)
-            cert_data[course_id] = {'enrolled': enrolled_students.count()}
+            active_students = User.objects.filter(
+                courseenrollment__course_id=course_id,
+                courseenrollment__is_active=True)
 
-            tallies = GeneratedCertificate.objects.filter(
-                        course_id__exact=course_id).values('status').annotate(
-                            dcount=Count('status'))
+            cert_data[course_id] = {'active': active_students.count()}
+
+            status_tally = GeneratedCertificate.objects.filter(
+                course_id__exact=course_id).values('status').annotate(
+                dcount=Count('status'))
             cert_data[course_id].update(
-                    {status['status']: status['dcount']
-                                        for status in tallies})
+                {status['status']: status['dcount']
+                    for status in status_tally})
+
+            mode_tally = GeneratedCertificate.objects.filter(
+                course_id__exact=course_id,
+                status__exact='downloadable').values('mode').annotate(
+                dcount=Count('mode'))
+            cert_data[course_id].update(
+                {mode['mode']: mode['dcount']
+                    for mode in mode_tally})
 
         # all states we have seen far all courses
         status_headings = set(
-                [status for course in cert_data
-                    for status in cert_data[course]])
+            [status for course in cert_data
+                for status in cert_data[course]])
 
         # print the heading for the report
         print "{:>20}".format("course ID"),
         print ' '.join(["{:>12}".format(heading)
-                            for heading in status_headings])
+                        for heading in status_headings])
 
         # print the report
         for course_id in cert_data:

@@ -25,6 +25,12 @@ def index(request):
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
         from external_auth.views import ssl_login
+        # Set next URL to dashboard if it isn't set to avoid
+        # caching a redirect to / that causes a redirect loop on logout
+        if not request.GET.get('next'):
+            req_new = request.GET.copy()
+            req_new['next'] = reverse('dashboard')
+            request.GET = req_new
         return ssl_login(request)
 
     enable_mktg_site = microsite.get_value(

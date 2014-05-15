@@ -32,7 +32,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
 
@@ -50,7 +50,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
 
         # Select the Email view of the instructor dash
         session = self.client.session
-        session['idash_mode'] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
         session.save()
         response = self.client.get(self.url)
 
@@ -108,3 +108,38 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
             # Assert that the URL for the email view is not in the response
             response = self.client.get(self.url)
             self.assertFalse(self.email_link in response.content)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    def test_send_mail_unauthorized(self):
+        """ Test 'Send email' action returns an error if course is not authorized to send email. """
+
+        response = self.client.post(
+            self.url, {
+                'action': 'Send email',
+                'to_option': 'all',
+                'subject': "Welcome to the course!",
+                'message': "Lets start with an introduction!"
+            }
+        )
+        self.assertContains(response, "Email is not enabled for this course.")
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    def test_send_mail_authorized(self):
+        """ Test 'Send email' action when course is authorized to send email. """
+
+        course_authorization = CourseAuthorization(course_id=self.course.id, email_enabled=True)
+        course_authorization.save()
+
+        session = self.client.session
+        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
+        session.save()
+
+        response = self.client.post(
+            self.url, {
+                'action': 'Send email',
+                'to_option': 'all',
+                'subject': 'Welcome to the course!',
+                'message': 'Lets start with an introduction!',
+            }
+        )
+        self.assertContains(response, "Your email was successfully queued for sending.")

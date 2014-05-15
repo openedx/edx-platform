@@ -1,4 +1,4 @@
-<course>
+<course course_image="just_a_test.jpg">
     <textbook title="Textbook" book_url="https://s3.amazonaws.com/edx-textbooks/guttag_computation_v3/"/>
   <chapter url_name="Overview">
     <videosequence url_name="Toy_Videos">

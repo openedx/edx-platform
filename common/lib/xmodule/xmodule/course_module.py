@@ -369,6 +369,9 @@ class CourseFields(object):
     )
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                                scope=Scope.settings)
+    certificates_show_before_end = Boolean(help="True if students may download certificates before course end",
+                                           scope=Scope.settings,
+                                           default=False)
     course_image = String(
         help="Filename of the course image",
         scope=Scope.settings,
@@ -591,6 +594,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return False
 
         return datetime.now(UTC()) > self.end
+
+    def may_certify(self):
+        """
+        Return True if it is acceptable to show the student a certificate download link
+        """
+        return self.certificates_show_before_end or self.has_ended()
 
     def has_started(self):
         return datetime.now(UTC()) > self.start

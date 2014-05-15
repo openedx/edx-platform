@@ -1,6 +1,9 @@
 """
 Instructor Views
 """
+## NOTE: This is the code for the legacy instructor dashboard
+## We are no longer supporting this file or accepting changes into it.
+
 from contextlib import contextmanager
 import csv
 import json
@@ -37,7 +40,6 @@ from lms.lib.xblock.runtime import quote_slashes
 # Submissions is a Django app that is currently installed
 # from the edx-ora2 repo, although it will likely move in the future.
 from submissions import api as sub_api
-from student.models import anonymous_id_for_user
 
 from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
@@ -52,7 +54,7 @@ from django_comment_common.models import (
 )
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
-from instructor.views.tools import strip_if_string
+from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course
 from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,
@@ -65,7 +67,12 @@ from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
 from class_dashboard import dashboard_data
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
+from student.models import (
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    unique_id_for_user,
+    anonymous_id_for_user
+)
 from student.views import course_from_id
 import track.views
 from xblock.field_data import DictFieldData
@@ -116,10 +123,11 @@ def instructor_dashboard(request, course_id):
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
     idash_mode = request.POST.get('idash_mode', '')
+    idash_mode_key = u'idash_mode:{0}'.format(course_id)
     if idash_mode:
-        request.session['idash_mode'] = idash_mode
+        request.session[idash_mode_key] = idash_mode
     else:
-        idash_mode = request.session.get('idash_mode', 'Grades')
+        idash_mode = request.session.get(idash_mode_key, 'Grades')
 
     enrollment_number = CourseEnrollment.num_enrolled_in(course_key)
 
@@ -684,8 +692,8 @@ def instructor_dashboard(request, course_id):
             courseenrollment__course_id=course_key,
         ).order_by('id')
 
-        datatable = {'header': ['User ID', 'Anonymized user ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s)] for s in students]
+        datatable = {'header': ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']}
+        datatable['data'] = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
         return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
@@ -843,35 +851,38 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
-        try:
-            # Create the CourseEmail object.  This is saved immediately, so that
-            # any transaction that has been pending up to this point will also be
-            # committed.
-            email = CourseEmail.create(
-                course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
-            )
-
-            # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-            submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
-
-        except Exception as err:  # pylint: disable=broad-except
-            # Catch any errors and deliver a message to the user
-            error_msg = "Failed to send email! ({0})".format(err)
-            msg += "<font color='red'>" + error_msg + "</font>"
-            log.exception(error_msg)
-
-        else:
-            # If sending the task succeeds, deliver a success message to the user.
-            if email_to_option == "all":
-                text = _(
-                    "Your email was successfully queued for sending. "
-                    "Please note that for large classes, it may take up to an hour "
-                    "(or more, if other courses are simultaneously sending email) "
-                    "to send all emails."
+        if bulk_email_is_enabled_for_course(course_key):
+            try:
+                # Create the CourseEmail object.  This is saved immediately, so that
+                # any transaction that has been pending up to this point will also be
+                # committed.
+                email = CourseEmail.create(
+                    course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
                 )
+
+                # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
+
+            except Exception as err:  # pylint: disable=broad-except
+                # Catch any errors and deliver a message to the user
+                error_msg = "Failed to send email! ({0})".format(err)
+                msg += "<font color='red'>" + error_msg + "</font>"
+                log.exception(error_msg)
+
             else:
-                text = _('Your email was successfully queued for sending.')
-            email_msg = '<div class="msg msg-confirm"><p class="copy">{text}</p></div>'.format(text=text)
+                # If sending the task succeeds, deliver a success message to the user.
+                if email_to_option == "all":
+                    text = _(
+                        "Your email was successfully queued for sending. "
+                        "Please note that for large classes, it may take up to an hour "
+                        "(or more, if other courses are simultaneously sending email) "
+                        "to send all emails."
+                    )
+                else:
+                    text = _('Your email was successfully queued for sending.')
+                email_msg = '<div class="msg msg-confirm"><p class="copy">{text}</p></div>'.format(text=text)
+        else:
+            msg += "<font color='red'>Email is not enabled for this course.</font>"
 
     elif "Show Background Email Task History" in action:
         message, datatable = get_background_task_table(course_key, task_type='bulk_course_email')
@@ -984,8 +995,7 @@ def instructor_dashboard(request, course_id):
     # 1. Feature flag is on
     # 2. We have explicitly enabled email for the given course via django-admin
     # 3. It is NOT an XML course
-    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       CourseAuthorization.instructor_email_enabled(course_key) and is_studio_course:
+    if bulk_email_is_enabled_for_course(course_key):
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
@@ -1032,10 +1042,7 @@ def instructor_dashboard(request, course_id):
         'metrics_results': metrics_results,
     }
 
-    if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
-        context['beta_dashboard_url'] = reverse(
-            'instructor_dashboard_2', kwargs={'course_id': course_key.to_deprecated_string()}
-        )
+    context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 

@@ -20,6 +20,18 @@ describe 'MarkdownEditingDescriptor', ->
       expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('xml only')
 
+  describe 'advanced editor opens correctly', ->
+    it 'click on advanced editor should work', ->
+      loadFixtures 'problem-with-markdown.html'
+      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
+      spyOn(@descriptor, 'confirmConversionToXml').andReturn(true)
+      expect(@descriptor.confirmConversionToXml).not.toHaveBeenCalled()
+      e = jasmine.createSpyObj('e', [ 'preventDefault' ])
+      @descriptor.onShowXMLButton(e)
+      expect(e.preventDefault).toHaveBeenCalled()
+      expect(@descriptor.confirmConversionToXml).toHaveBeenCalled()
+      expect($('.editor-bar').length).toEqual(0)
+
   describe 'insertMultipleChoice', ->
     it 'inserts the template if selection is empty', ->
       revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('')
@@ -538,7 +550,7 @@ describe 'MarkdownEditingDescriptor', ->
     
     <p>What is the capital of Germany?</p>
     <multiplechoiceresponse>
-      <choicegroup type="MultipleChoice">
+      <choicegroup label="What is the capital of Germany?" type="MultipleChoice">
         <choice correct="false">Bonn</choice>
         <choice correct="false">Hamburg</choice>
         <choice correct="true">Berlin</choice>

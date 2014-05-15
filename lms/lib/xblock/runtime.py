@@ -5,7 +5,7 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 import re
 
 from django.core.urlresolvers import reverse
-
+from django.conf import settings
 from user_api import user_service
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
@@ -99,6 +99,15 @@ class LmsHandlerUrls(object):
         # If there is a query string, append it
         if query:
             url += '?' + query
+
+        # If third-party, return fully-qualified url
+        if thirdparty:
+            scheme = "https" if settings.HTTPS == "on" else "http"
+            url = '{scheme}://{host}{path}'.format(
+                scheme=scheme,
+                host=settings.SITE_NAME,
+                path=url
+            )
 
         return url
 

@@ -97,6 +97,29 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
             )
         )
 
+    def test_static_asset_path_course_image_default(self):
+        """
+        Test that without course_image being set, but static_asset_path
+        being set that we get the right course_image url.
+        """
+        course = CourseFactory.create(static_asset_path="foo")
+        self.assertEquals(
+            course_image_url(course),
+            '/static/foo/images/course_image.jpg'
+        )
+
+    def test_static_asset_path_course_image_set(self):
+        """
+        Test that with course_image and static_asset_path both
+        being set, that we get the right course_image url.
+        """
+        course = CourseFactory.create(course_image=u'things_stuff.jpg',
+                                      static_asset_path="foo")
+        self.assertEquals(
+            course_image_url(course),
+            '/static/foo/things_stuff.jpg'
+        )
+
 
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
@@ -107,14 +130,12 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
 
     def test_non_ascii_image_name(self):
-        # XML Course images are always stored at /images/course_image.jpg
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before_\N{SNOWMAN}_after.jpg'))
-        self.assertEquals(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+        self.assertEquals(course_image_url(course), u'/static/xml_test_course/before_\N{SNOWMAN}_after.jpg')
 
     def test_spaces_in_image_name(self):
-        # XML Course images are always stored at /images/course_image.jpg
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
-        self.assertEquals(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+        self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
 class CoursesRenderTest(ModuleStoreTestCase):

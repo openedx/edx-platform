@@ -4,6 +4,7 @@ Courseware views functions
 
 import logging
 import urllib
+import json
 
 from collections import defaultdict
 from django.utils.translation import ugettext as _
@@ -12,8 +13,9 @@ from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -24,8 +26,7 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import get_courses, get_course_with_access, get_studio_url, sort_by_announcement
-
+from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
@@ -99,7 +100,6 @@ def render_accordion(request, course, chapter, section, field_data_cache):
 
     Returns the html string
     """
-
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	 # keep just one instance of User
@@ -834,3 +834,63 @@ def get_static_tab_contents(request, course, tab):
             )
 
     return html
+
+
+@require_GET
+def get_course_lti_endpoints(request, course_id):
+    """
+    View that, given a course_id, returns the a JSON object that enumerates all of the LTI endpoints for that course.
+
+    The LTI 2.0 result service spec at
+    http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html
+    says "This specification document does not prescribe a method for discovering the endpoint URLs."  This view
+    function implements one way of discovering these endpoints, returning a JSON array when accessed.
+
+    Arguments:
+        request (django request object):  the HTTP request object that triggered this view function
+        course_id (unicode):  id associated with the course
+
+    Returns:
+        (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
+    """
+    try:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    except InvalidKeyError:
+        return HttpResponse(status=404)
+
+    try:
+        course = get_course(course_key, depth=2)
+    except ValueError:
+        return HttpResponse(status=404)
+
+    anonymous_user = AnonymousUser()
+    anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
+    lti_descriptors = modulestore().get_items(course.id, category='lti')
+
+    lti_noauth_modules = [
+        get_module_for_descriptor(
+            anonymous_user,
+            request,
+            descriptor,
+            FieldDataCache.cache_for_descriptor_descendents(
+                course_key,
+                anonymous_user,
+                descriptor
+            ),
+            course_key
+        )
+        for descriptor in lti_descriptors
+    ]
+
+    endpoints = [
+        {
+            'display_name': module.display_name,
+            'lti_2_0_result_service_json_endpoint': module.get_outcome_service_url(
+                service_name='lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
+            'lti_1_1_result_service_xml_endpoint': module.get_outcome_service_url(
+                service_name='grade_handler'),
+        }
+        for module in lti_noauth_modules
+    ]
+
+    return HttpResponse(json.dumps(endpoints), content_type='application/json')

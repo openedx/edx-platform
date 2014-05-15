@@ -1,0 +1,73 @@
+###################################
+May 12, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of May 12, 2014. See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include: 
+
+  * Updated `Drag and Drop Problem`_ information.
+  
+  * Updated the `Discussions`_ chapter to include a topic on closing
+    discussions.
+  
+  * Expanded the `Grade and Answer Data`_ chapter to include a topic on
+    interpreting the score histograms for problems.
+
+  * Added documentation for the `IFrame Tool`_
+
+* `edX Data Documentation`_
+  
+  Recent changes include: 
+  
+  * Corrected misstatement on how `Discussion Forums Data`_ is sent in data
+    packages.
+
+  * Added enrollment events to `Tracking Logs`_.
+    
+  * Removed obsolete information about XML formats for problems.
+  
+
+* `edX Platform Developer Documentation`_
+  
+  
+* `edX XBlock Documentation`_
+
+
+
+*************
+edX Studio
+*************
+
+* In certain rare situations, users were not able to edit a draft unit without
+  making it Private. This problem is resolved. (STUD-1485, STUD-1499)
+
+* When you created problems with two inputs, the label for the second input was
+  not preserved in the Advanced Editor. This problem is resolved. (STUD-1524)
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* Students registered for an honor code certificate now see their registration
+  track on the Dashboard. (LMS-1071)
+
+.. include:: links.rst

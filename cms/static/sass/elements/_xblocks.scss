@@ -19,6 +19,7 @@
     @include box-sizing(border-box);
     @include ui-flexbox();
     @extend %ui-align-center-flex;
+    justify-content: space-between;
     border-bottom: 1px solid $gray-l4;
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
@@ -30,14 +31,14 @@
       @extend %ui-justify-left-flex;
       @include ui-flexbox();
       width: flex-grid(6,12);
-      vertical-align: top;
+      vertical-align: middle;
     }
 
     .header-actions {
       @include ui-flexbox();
       @extend %ui-justify-right-flex;
       width: flex-grid(6,12);
-      vertical-align: top;
+      vertical-align: middle;
     }
   }
 }

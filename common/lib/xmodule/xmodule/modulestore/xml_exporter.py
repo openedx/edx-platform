@@ -5,6 +5,8 @@ Methods for exporting course data to XML
 import logging
 import lxml.etree
 from xblock.fields import Scope
+from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
@@ -77,6 +79,25 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, d
             root_dir + '/' + course_dir + '/static/',
             root_dir + '/' + course_dir + '/policies/assets.json',
         )
+
+        # If we are using the default course image, export it to the
+        # legacy location to support backwards compatibility.
+        if course.course_image == course.fields['course_image'].default:
+            try:
+                course_image = contentstore.find(
+                    StaticContent.compute_location(
+                        course.id,
+                        course.course_image
+                    ),
+                )
+            except NotFoundError:
+                pass
+            else:
+                output_dir = root_dir + '/' + course_dir + '/static/images/'
+                if not os.path.isdir(output_dir):
+                    os.makedirs(output_dir)
+                with OSFS(output_dir).open('course_image.jpg', 'wb') as course_image_file:
+                    course_image_file.write(course_image.data)
 
     # export the static tabs
     export_extra_content(export_fs, modulestore, course_key, 'static_tab', 'tabs', '.html')

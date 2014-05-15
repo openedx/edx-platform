@@ -12,6 +12,7 @@ import unittest
 
 from datetime import datetime
 from lxml import etree
+from lxml.html import fragment_fromstring
 from mock import Mock, MagicMock, patch
 from pytz import UTC
 from webob.multidict import MultiDict
@@ -1384,23 +1385,44 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     link_text = u'I love going to www.lolcatz.com'
     link_atag = u'I love going to <a target="_blank" href="http://www.lolcatz.com">www.lolcatz.com</a>'
 
+    def assertHtmlEqual(self, actual, expected):
+        """
+        Assert that two strings represent the same html.
+        """
+        return self._assertHtmlEqual(
+            fragment_fromstring(actual, create_parent='div'),
+            fragment_fromstring(expected, create_parent='div')
+        )
+
+    def _assertHtmlEqual(self, actual, expected):
+        """
+        Assert that two HTML ElementTree elements are equal.
+        """
+        self.assertEqual(actual.tag, expected.tag)
+        self.assertEqual(actual.attrib, expected.attrib)
+        self.assertEqual(actual.text, expected.text)
+        self.assertEqual(actual.tail, expected.tail)
+        self.assertEqual(len(actual), len(expected))
+        for actual_child, expected_child in zip(actual, expected):
+            self._assertHtmlEqual(actual_child, expected_child)
+
     def test_script(self):
         """
         Basic test for stripping <script>
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
 
     def test_img(self):
         """
         Basic test for passing through img, but stripping bad attr
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
 
     def test_embed(self):
         """
         Basic test for passing through embed, but stripping bad attr
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
 
     def test_iframe(self):
         """
@@ -1412,25 +1434,25 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
         """
         Test for passing through text unchanged, including unicode
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.text), self.text)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.text), self.text)
 
     def test_lessthan(self):
         """
         Tests that `<` in text context is handled properly
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
 
     def test_linebreaks(self):
         """
         tests the replace_newlines function
         """
-        self.assertEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
+        self.assertHtmlEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
 
     def test_linkify(self):
         """
         tests the replace_newlines function
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
 
     def test_combined(self):
         """
@@ -1448,4 +1470,4 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
                                                                       self.embed_clean,
                                                                       self.text_lessthan_encode,
                                                                       self.img_clean)
-        self.assertEqual(OpenEndedChild.sanitize_html(test_input), test_output)
+        self.assertHtmlEqual(OpenEndedChild.sanitize_html(test_input), test_output)

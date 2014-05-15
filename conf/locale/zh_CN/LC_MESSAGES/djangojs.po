@@ -6,10 +6,12 @@
 # Translators:
 # csc <am15501@163.com>, 2014
 # Bookman <bookman@vip.163.com>, 2013
+# PeterWang.Dut <peterwang.dut@gmail.com>, 2014
 # csc <am15501@163.com>, 2014
 # felicitychou <felicitychou@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
+# freakylemon <freakylemon@ymail.com>, 2014
 # hanwentao <wentao.han@gmail.com>, 2013
 # harry75369 <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2014
@@ -38,6 +40,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# vingte <411029240@qq.com>, 2014
 # Bookman <bookman@vip.163.com>, 2013
 # csc <am15501@163.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
@@ -58,9 +61,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-24 13:20+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"PO-Revision-Date: 2014-05-12 01:20+0000\n"
+"Last-Translator: vingte <411029240@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -540,7 +543,7 @@ msgstr "您确定要删除这个帖子？"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
-msgstr ""
+msgstr "加载您的页面时出了一些问题，请重试。"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -1368,6 +1371,34 @@ msgstr "列表项"
 msgid "Heading"
 msgstr "标题"
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -1391,7 +1422,8 @@ msgstr "Studio 保存您工作时遇到问题"
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
@@ -1601,7 +1633,7 @@ msgstr "文件格式不支持。请上传一个后缀名为<code>tar.gz</code>�
 
 #: cms/static/js/views/metadata.js
 msgid "Upload File"
-msgstr ""
+msgstr "上传文件"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -1627,23 +1659,27 @@ msgstr "修改章节发布日期"
 msgid "Not Graded"
 msgstr "未评分"
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr "升序"
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr "降序"
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
 msgstr ""
-"总计%(total_span)s%(total)s%(end_span)s，以 "
-"%(order_span)s%(sort_order)s%(end_span)s "
-"%(sort_direction)s方式排序，显示为%(current_span)s%(start)s-%(end)s%(end_span)s"
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr ""
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"

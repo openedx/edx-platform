@@ -98,7 +98,7 @@ class Thread(models.Model):
             metric_action='model.retrieve',
             metric_tags=self._metric_tags
         )
-        self.update_attributes(**response)
+        self._update_from_response(response)
 
     def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
@@ -108,14 +108,14 @@ class Thread(models.Model):
         else:
             raise CommentClientRequestError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_action='thread.abuse.flagged',
             metric_tags=self._metric_tags
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll):
         if voteable.type == 'thread':
@@ -129,38 +129,38 @@ class Thread(models.Model):
         if removeAll:
             params['all'] = True
 
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_tags=self._metric_tags,
             metric_action='thread.abuse.unflagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_from_response(response)
 
     def pin(self, user, thread_id):
         url = _url_for_pin_thread(thread_id)
         params = {'user_id': user.id}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_tags=self._metric_tags,
             metric_action='thread.pin'
         )
-        self.update_attributes(request)
+        self._update_from_response(response)
 
     def un_pin(self, user, thread_id):
         url = _url_for_un_pin_thread(thread_id)
         params = {'user_id': user.id}
-        request = perform_request(
+        response = perform_request(
             'put',
             url,
             params,
             metric_tags=self._metric_tags,
             metric_action='thread.unpin'
         )
-        self.update_attributes(request)
+        self._update_from_response(response)
 
 
 def _url_for_flag_abuse_thread(thread_id):

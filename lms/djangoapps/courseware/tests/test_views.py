@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
 Tests courseware views.py
 """
@@ -46,7 +47,7 @@ class TestJumpTo(TestCase):
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_jumpto_invalid_location(self):
-        location = self.course_key.make_usage_key(None, 'NoSuchPlace')        
+        location = self.course_key.make_usage_key(None, 'NoSuchPlace')
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
         jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
@@ -125,14 +126,14 @@ class ViewsTestCase(TestCase):
         # depreciated function
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
-        self.assertEquals(views.user_groups(mock_user), [])
+        self.assertEqual(views.user_groups(mock_user), [])
 
     def test_get_current_child(self):
         self.assertIsNone(views.get_current_child(MagicMock()))
         mock_xmodule = MagicMock()
         mock_xmodule.position = -1
         mock_xmodule.get_display_items.return_value = ['one', 'two']
-        self.assertEquals(views.get_current_child(mock_xmodule), 'one')
+        self.assertEqual(views.get_current_child(mock_xmodule), 'one')
         mock_xmodule_2 = MagicMock()
         mock_xmodule_2.position = 3
         mock_xmodule_2.get_display_items.return_value = []
@@ -210,13 +211,13 @@ class ViewsTestCase(TestCase):
         chat_settings = views.chat_settings(mock_course, mock_user)
 
         # Test the proper format of all chat settings
-        self.assertEquals(chat_settings['domain'], domain)
-        self.assertEquals(chat_settings['room'], "a-b-c_class")
-        self.assertEquals(chat_settings['username'], "johndoe@%s" % domain)
+        self.assertEqual(chat_settings['domain'], domain)
+        self.assertEqual(chat_settings['room'], "a-b-c_class")
+        self.assertEqual(chat_settings['username'], "johndoe@%s" % domain)
 
         # TODO: this needs to be changed once we figure out how to
         #       generate/store a real password.
-        self.assertEquals(chat_settings['password'], "johndoe@%s" % domain)
+        self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
 
     def test_course_mktg_about_coming_soon(self):
         # we should not be able to find this course
@@ -469,7 +470,10 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         MakoMiddleware().process_request(self.request)
 
-        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        course = CourseFactory(
+            start=datetime(2013, 9, 16, 7, 17, 28),
+            grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+        )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
         self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
@@ -480,4 +484,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         ItemFactory(category='acid', parent_location=self.vertical.location)
 
         resp = views.progress(self.request, self.course.id.to_deprecated_string())
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_non_asci_grade_cutoffs(self):
+        resp = views.progress(self.request, self.course.id.to_deprecated_string())
+        self.assertEqual(resp.status_code, 200)

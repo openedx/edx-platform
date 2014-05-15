@@ -1,8 +1,8 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery"],
-    function($) {
+define(["jquery", "js/spec_helpers/view_helpers"],
+    function($, view_helpers) {
         var basicModalTemplate = readFixtures('basic-modal.underscore'),
             modalButtonTemplate = readFixtures('modal-button.underscore'),
             feedbackTemplate = readFixtures('system-feedback.underscore'),
@@ -14,11 +14,7 @@ define(["jquery"],
             cancelModalIfShowing;
 
         installModalTemplates = function(append) {
-            if (append) {
-                appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTemplate));
-            } else {
-                setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTemplate));
-            }
+            view_helpers.installViewTemplates(append);
             appendSetFixtures($("<script>", { id: "basic-modal-tpl", type: "text/template" }).text(basicModalTemplate));
             appendSetFixtures($("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTemplate));
         };
@@ -58,11 +54,11 @@ define(["jquery"],
             }
         };
 
-        return {
+        return $.extend(view_helpers, {
             'installModalTemplates': installModalTemplates,
             'isShowingModal': isShowingModal,
             'hideModalIfShowing': hideModalIfShowing,
             'cancelModal': cancelModal,
             'cancelModalIfShowing': cancelModalIfShowing
-        };
+        });
     });

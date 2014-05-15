@@ -6,7 +6,7 @@ data: |
       <p>Some edX classes use extremely large, extremely detailed graphics. To make it easier to understand we can offer two versions of those graphics, with the zoomed section showing when you click on the main view.</p>
       <p>The example below is from <a href="https://www.edx.org/course/mit/7-00x/introduction-biology-secret-life/1014" target="_blank">7.00x: Introduction to Biology</a> and shows a subset of the biochemical reactions that cells carry out. </p>
       <p>You can view the chemical structures of the molecules by clicking on them. The magnified view also lists the enzymes involved in each step.</p>
-
+      <p class="sr">Press spacebar to open the magifier.</p>
       <div class="zooming-image-place" style="position: relative;">
         <a class="loupe" href="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png">
             <img alt="magnify" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_overview_01.png" />
@@ -20,7 +20,12 @@ data: |
           height: 350,
           lightbox: false
         });
+        $(document).keydown(function(event) {
+          if (event.keyCode == 32) {
+            event.preventDefault();
+            $('.loupe img').click();
+          }
+        });
       });
       // ]]></script>
       <div id="ap_listener_added"></div>
-

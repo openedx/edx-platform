@@ -33,7 +33,7 @@ from django_comment_common.models import (
 )
 
 from courseware.models import StudentModule
-from student.models import unique_id_for_user, CourseEnrollment
+from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
@@ -66,6 +66,7 @@ from .tools import (
     parse_datetime,
     set_due_date_extension,
     strip_if_string,
+    bulk_email_is_enabled_for_course,
 )
 from xmodule.modulestore import Location
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
@@ -629,8 +630,8 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
-    header = ['User ID', 'Anonymized user ID']
-    rows = [[s.id, unique_id_for_user(s)] for s in students]
+    header = ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']
+    rows = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
     return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
@@ -831,7 +832,7 @@ def rescore_problem(request, course_id):
     try:
         module_state_key = UsageKey.from_string(problem_to_reset)
     except InvalidKeyError:
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest("Unable to parse problem id")
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
@@ -1066,6 +1067,10 @@ def send_email(request, course_id):
     - 'message' specifies email's content
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    if not bulk_email_is_enabled_for_course(course_id):
+        return HttpResponseForbidden("Email is not enabled for this course.")
+
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
@@ -1077,7 +1082,11 @@ def send_email(request, course_id):
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
-    response_payload = {'course_id': course_id.to_deprecated_string()}
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'success': True,
+    }
     return JsonResponse(response_payload)
 
 

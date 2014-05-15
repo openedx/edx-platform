@@ -2,8 +2,8 @@
  * XBlockContainerView is used to display an xblock which has children, and allows the
  * user to interact with the children.
  */
-define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt", "js/views/baseview", "js/views/xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, gettext, NotificationView, PromptView, BaseView, XBlockView, EditXBlockModal, XBlockInfo) {
+define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt", "js/views/baseview", "js/views/container", "js/views/xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
+    function ($, _, gettext, NotificationView, PromptView, BaseView, ContainerView, XBlockView, EditXBlockModal, XBlockInfo) {
 
         var XBlockContainerView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -13,7 +13,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.noContentElement = this.$('.no-container-content');
-                this.xblockView = new XBlockView({
+                this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
                     view: this.view
@@ -184,4 +184,3 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
 
         return XBlockContainerView;
     }); // end define();
-

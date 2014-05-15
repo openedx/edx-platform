@@ -6,7 +6,7 @@
 # Translators:
 # abdallah_n <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# abdallah_n <abdoosh00@gmail.com>, 2013
+# abdallah_n <abdoosh00@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013
@@ -16,6 +16,7 @@
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2013-2014
 # Abdelmageed <mido.a@hotmail.com>, 2014
+# nabeelqordoba <nabeel@qordoba.com>, 2014
 # najwan <najwanrousan@gmail.com>, 2013
 # najwan <najwanrousan@gmail.com>, 2013
 # SiddigSami <siddigsami@live.com>, 2014
@@ -36,9 +37,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-26 09:40+0000\n"
-"Last-Translator: may <may@qordoba.com>\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"PO-Revision-Date: 2014-05-12 17:46+0000\n"
+"Last-Translator: nabeelqordoba <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,7 +52,7 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr ""
+msgstr "حسناً"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/asset.js
@@ -62,35 +63,35 @@ msgstr ""
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
 msgid "This link will open in a new browser window/tab"
-msgstr ""
+msgstr "هذا الرابط سيُفتح في نافذة/علامة تبويب جديدة"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr ""
+msgstr "إظهار الحواشي "
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "إخفاء الحواشي"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
-msgstr ""
+msgstr "تكبير شاشة التعليمات"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "تصغير شاشة التعليمات"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
-msgstr ""
+msgstr "التعليق"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr ""
+msgstr "الرد على الحواشي"
 
 #. Translators: %(earned)s is the number of points earned. %(total)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -121,45 +122,45 @@ msgstr[5] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
-msgstr ""
+msgstr "الإجابة:"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
-msgstr ""
+msgstr "إخفاء الإجابات"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr ""
+msgstr "إظهار الإجابات"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
-msgstr ""
+msgstr "كشف الإجابات "
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer hidden"
-msgstr ""
+msgstr "الإجابة مخفيّة"
 
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unanswered"
-msgstr ""
+msgstr "لم تتم الإجابة عليه"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr ""
+msgstr "الحالة: لم يتم تقديمها"
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "You need to pick a rating before you can submit."
-msgstr ""
+msgstr "يتعين عليك اختيار تقدير قبل أن تقوم بالتقديم."
 
 #. Translators: this message appears when transitioning between openended
 #. grading
@@ -168,55 +169,60 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
-msgstr ""
+msgstr "درجتك لا تلبي المعيار المطلوب للانتقال إلى الخطوة التالية."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Submit"
-msgstr ""
+msgstr "تقديم"
 
 #. Translators: one clicks this button after one has finished filling out the
 #. grading
 #. form for an openended assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit assessment"
-msgstr ""
+msgstr "تقديم التقييم"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
-msgstr ""
+msgstr "تم تقديم إجابتك. الرجاء التحقق لاحقاً من درجتك."
 
 #. Translators: this button is clicked to submit a student's rating of
 #. an evaluator's assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit post-assessment"
-msgstr ""
+msgstr "تقديم تقييم المشاركة"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "تم حفظ الإجابة، لكن لم يتم تقديمها بعد."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
 msgstr ""
+"الرجاء التأكيد على رغبتك تقديم ملفاتك، حيث لن تتمكن من إجراء أية تعديلات بعد"
+" أن تقوم بالتقديم."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
+"أنت تحاول تحميل ملف بحجم يزيد عن الحد المقبول بالنسبة للنظام لدينا. الرجاء "
+"اختيار ملف بحجم لا يتجاوز 2 ميغابايت أو إدخال رابط إلى الملف في المربع "
+"المخصص للإجابة."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr ""
+msgstr "هل أنت متأكد من رغبتك إزالة إجابتك السابقة على هذا السؤال؟"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
-msgstr ""
+msgstr "تم الانتقال إلى الخطوة التالية."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -225,6 +231,10 @@ msgid ""
 " uploaded the image to another website, you can paste a link to it into the "
 "answer box."
 msgstr ""
+"هذا السؤال يتطلّب تحميل ملفات، لكن المتصفح الخاص بك لا يدعم هذه العملية. "
+"حاول تحميل الإصدار الأخير من متصفح جوجل كروم، أو كبديلٍ عن ذلك، في حال قمت "
+"بتحميل الصورة إلى موقع مختلف، فبإمكانك وضع رابط إليها في المربع المخصص "
+"للإجابة."
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -232,26 +242,28 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr ""
+msgstr "إظهار السؤال"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
-msgstr ""
+msgstr "إخفاء السؤال "
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"خطأ في التسلسل! ليس بالإمكان الانتقال إلى علامة التبويب %(tab_name)s في "
+"الـSequenceModule الحالي. الرجاء الاتصال بطاقم المساق."
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr ""
+msgstr "تمرير مقطع الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
-msgstr ""
+msgstr "توقيف"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Play"
@@ -259,28 +271,28 @@ msgstr "تشغيل"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr ""
+msgstr "ملء المتصفح"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
-msgstr ""
+msgstr "الخروج من المتصفح "
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr ""
+msgstr "الدقة العالية مفعّلة"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr ""
+msgstr "الدقة العالية غير مفعّلة"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr ""
+msgstr "تحديد الموضع على مقطع الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr ""
+msgstr "انتهى مقطع الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -314,63 +326,63 @@ msgstr[5] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr ""
+msgstr "الصوت "
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Muted"
-msgstr ""
+msgstr "كتم الصوت"
 
 #. Translators: Volume level in range (0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very low"
-msgstr ""
+msgstr "منخفض جداً"
 
 #. Translators: Volume level in range (20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Low"
-msgstr ""
+msgstr "منخفض"
 
 #. Translators: Volume level in range (40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Average"
-msgstr ""
+msgstr "متوسط"
 
 #. Translators: Volume level in range (60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Loud"
-msgstr ""
+msgstr "عالي"
 
 #. Translators: Volume level in range (80,100)%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very loud"
-msgstr ""
+msgstr "عالي جداً"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Maximum"
-msgstr ""
+msgstr "الحد الأقصى"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr ""
+msgstr "سيتم عرض العنوان الفرعي عند "
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
-msgstr ""
+msgstr "تشغيل العناوين الفرعية"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
-msgstr ""
+msgstr "إيقاف العناوين الفرعية"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr ""
+msgstr "إخفاء النقاش"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
-msgstr ""
+msgstr "إظهار النقاش"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -382,30 +394,36 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
-msgstr ""
+msgstr "عذراً"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
-msgstr ""
+msgstr "هناك مشكلة ما في عملية تحميل النقاش. الرجاء إعادة المحاولة لاحقاً."
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
 msgstr ""
+"هناك مشكلة ما في عملية تحميل المواضيع التي طلبتها. الرجاء إعادة المحاولة "
+"لاحقاً."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "Loading content"
-msgstr ""
+msgstr "جاري تحميل المحتوى"
 
 #: common/static/coffee/src/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
+"هناك مشكلة ما في عملية تنفيذ طلبك. الرجاء التأكد من قيامك بنسخ أي مواد لم "
+"يتم حفظها إلى مكان آخر، ومن ثمّ قم بإعادة تحميل الصفحة."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
+"واجهتنا بعض المشكلات أثناء إجراء العمليات الخاصة بطلبك. الرجاء إعادة "
+"المحاولة."
 
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
@@ -415,25 +433,25 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/new_post_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Close"
-msgstr ""
+msgstr "إغلاق "
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Open"
-msgstr ""
+msgstr "فتح"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "remove vote"
-msgstr ""
+msgstr "إزالة التصويت"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote"
-msgstr ""
+msgstr "تصويت"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote (click to remove your vote)"
@@ -457,15 +475,17 @@ msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr ""
+msgstr "تحميل المزيد"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr ""
+msgstr "تحميل المزيد من المواضيع"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
 msgstr ""
+"هناك مشكلة ما في عملية تحميل المزيد من المواضيع. الرجاء إعادة المحاولة "
+"لاحقاً."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
@@ -479,11 +499,11 @@ msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
-msgstr ""
+msgstr "تحميل قائمة المواضيع"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
-msgstr ""
+msgstr "اضغط هنا لإزالة التقرير"
 
 #. Translators: The text between start_sr_span and end_span is not shown
 #. in most browsers but will be read by screen readers.
@@ -491,44 +511,47 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
+"تم الإبلاغ عن إساءة استخدام %(start_sr_span)s، أنقر لحذف التقرير "
+"%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Report Misuse"
-msgstr ""
+msgstr "الإبلاغ عن إساءة استعمال"
 
 #. Translators: The text between start_sr_span and end_span is not shown
 #. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
+msgstr "مُثبَّت %(start_sr_span)s، أنقر لإزالة التثبيت %(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to unpin"
-msgstr ""
+msgstr "أنقر لإزالة التثبيت"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
-msgstr ""
+msgstr "مُثبَّت"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
-msgstr ""
+msgstr "ثبّت الموضوع "
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr ""
+msgstr "الموضوع الذي قمت باختياره قد تم إلغاؤه. الرجاء اختيار موضوع آخر."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
-msgstr ""
+msgstr "هناك مشكلة ما في عملية تحميل الردود. الرجاء إعادة تحميل الصفحة."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
+"هناك مشكلة ما في عملية تحميل المزيد من الردود. الرجاء إعادة المحاولة لاحقاً."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -542,7 +565,7 @@ msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
-msgstr ""
+msgstr "إظهار كافة الردود"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
@@ -556,123 +579,124 @@ msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr ""
+msgstr "تحميل كافة الردود"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr ""
+msgstr "تحميل الـ %(numResponses)s رداً التالية"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr ""
+msgstr "هل أنت متأكد من أنك تودّ إلغاء هذه المشاركة؟ "
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
+"هناك مشكلة في عملية تحميل الصفحة التي طلبتها. الرجاء إعادة المحاولة لاحقاً."
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
-msgstr ""
+msgstr "مجهول"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "staff"
-msgstr ""
+msgstr "طاقم المساق"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Community TA"
-msgstr ""
+msgstr "مساعد المشرف للمجموعة"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported, click to remove report"
-msgstr ""
+msgstr "تم الإبلاغ عن إساءة الاستخدام، اضغط لإزالة التقرير"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr ""
+msgstr "هل أنت متأكد من رغبتك إلغاء هذا التعليق؟"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
-msgstr ""
+msgstr "حدثت مشكلة ما لدى محاولة إلغاء هذا التعليق. الرجاء إعادة المحاولة."
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr ""
+msgstr "هل أنت متأكد من أنك تودّ إلغاء هذا الرد؟"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr ""
+msgstr "من %s ثانية مضت"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
-msgstr ""
+msgstr "%s ثانية من الآن"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "أقل من دقيقة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "حوالي الدقيقة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%d دقيقة"
+msgstr[1] "%d دقيقة"
+msgstr[2] "%d دقيقتين"
+msgstr[3] "%d دقائق "
+msgstr[4] "%d دقيقة"
+msgstr[5] "%d دقيقة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "حوالي الساعة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "حوالي %d ساعة"
+msgstr[1] "حوالي %d ساعة"
+msgstr[2] "حوالي %d ساعتين"
+msgstr[3] "حوالي %d ساعات"
+msgstr[4] "حوالي %d ساعة"
+msgstr[5] "حوالي %d ساعة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "يوم واحد"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%d يوم"
+msgstr[1] "%d يوم واحد"
+msgstr[2] "%d يومين"
+msgstr[3] "%d أيام"
+msgstr[4] "%d يوم"
+msgstr[5] "%d يوم"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "حوالي الشهر"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%d شهر"
+msgstr[1] "%d شهر واحد"
+msgstr[2] "%d شهرين"
+msgstr[3] "%d أشهر"
+msgstr[4] "%d شهر"
+msgstr[5] "%d شهر"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "حوالي السنة"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
@@ -686,47 +710,51 @@ msgstr[5] ""
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
-msgstr ""
+msgstr "%s متاح "
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+" هذه قائمة بالـ %s المتاحة. تستطيع اختيار البعض عن طريق انتقائهم في المربع "
+"أدناه ومن ثم الضغط على سهم \"اختيار\" الموجود بين المربعين."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "اطبع داخل هذا المربع لتقليل الخيارات في قائمة الـ %s المتاحة."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
-msgstr ""
+msgstr "تقليل خيارات البحث"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
-msgstr ""
+msgstr "اختيار الكل"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "إضغط لاختيار جميع الـ %s في نفس الوقت"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose"
-msgstr ""
+msgstr "اختيار"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove"
-msgstr ""
+msgstr "حذف"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Chosen %s"
-msgstr ""
+msgstr "الـ %s المختارة"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+" هذه قائمة بالـ %s المختارة. تستطيع حذف البعض عن طريق انتقائهم في المربع "
+"أدناه ومن ثم الضغط على سهم \"حذف\" الموجود بين المربعين."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove all"
@@ -734,23 +762,25 @@ msgstr "حذف الكل"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "إضغط لحذف جميع الـ %s المختارة في نفس الوقت."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%(sel)s من %(cnt)s تم تحديدها "
+msgstr[1] "%(sel)s من %(cnt)s تم تحديدها"
+msgstr[2] "%(sel)s من %(cnt)s تم تحديدها"
+msgstr[3] "%(sel)s من %(cnt)s تم تحديدها"
+msgstr[4] "%(sel)s من %(cnt)s تم تحديدها"
+msgstr[5] "%(sel)s من %(cnt)s تم تحديدها"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"لديك بعض التغييرات التي لم يتم حفظها على حقول فردية قابلة للتعديل. إذا قمت "
+"بتشغيل أي إجراء، ستلغى كافة التغييرات التي لم يتم حفظها."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -758,6 +788,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"لقد قمت باختيار إجراء، إلا أنك لم تقم بحفظ التغييرات التي قمت بها على الحقول"
+" الفردية حتى الآن. الرجاء الضغط على OK للحفظ. ستحتاج إلى إعادة ذلك الإجراء "
+"مرة أخرى."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -765,23 +798,26 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"لقد قمت باختيار إجراء، إلا أنك لم تقم بأي تغييرات على الحقول الفردية. على "
+"الأرجح أنك تبحث على زر GO عوضاً عن زر الحفظ."
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
+"يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
 #: lms/static/admin/js/calendar.js
 msgid "S|M|T|W|T|F|S"
-msgstr ""
+msgstr "الأحد|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
 msgid "Show"
-msgstr ""
+msgstr "إظهار"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
 msgid "Hide"
@@ -790,7 +826,7 @@ msgstr "إخفاء"
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr ""
+msgstr "الأحد|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
@@ -803,7 +839,7 @@ msgstr "الساعة"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Choose a time"
-msgstr ""
+msgstr "اختر وقتاً"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Midnight"
@@ -811,7 +847,7 @@ msgstr "منتصف الليل"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "6 a.m."
-msgstr ""
+msgstr "6 صباحاً"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
@@ -836,164 +872,172 @@ msgstr "غداً"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "فتح الآلة الحاسبة "
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
-msgstr ""
+msgstr "إغلاق الآلة الحاسبة "
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Preview"
-msgstr ""
+msgstr "المعاينة"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr ""
+msgstr "محتوى المشاركة"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
-msgstr ""
+msgstr "حدث خطأ في عملية استرجاع التوزيع."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Unavailable metric display."
-msgstr ""
+msgstr "العرض المتري غير متوفر."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching grade distributions."
-msgstr ""
+msgstr "حدث خطأ في عملية استرجاع توزيع الدرجات."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Last Updated: <%= timestamp %>"
-msgstr ""
+msgstr "التحديث الأخير: <%= timestamp %>"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "<%= num_students %> students scored."
-msgstr ""
+msgstr "تم تقييم أعمال <%= num_students %> طالب."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
-msgstr ""
+msgstr "جاري التحميل..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr ""
+msgstr "خطأ في الحصول على قائمة الطلاب."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr ""
+msgstr "خطأ في استرجاع الإعدادات الخاصة بالتقييم."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr ""
+msgstr "خطأ في عملية حساب وإعداد الدرجات. الرجاء إعادة المحاولة لاحقاً."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
-msgstr ""
+msgstr "اسم الملف"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
 msgstr ""
+"يتم إنشاء الروابط عند الطلب وينتهي مفعولها خلال 5 دقائق نظراً لحساسية "
+"المحتوى المتعلق بمعلومات الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Email"
-msgstr ""
+msgstr "البريد الإلكتروني"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Revoke access"
-msgstr ""
+msgstr "إلغاء إمكانية الوصول"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr ""
+msgstr "أدخل اسم المستخدم أو البريد الإكتروني"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
-msgstr ""
+msgstr "الرجاء إدخال اسم مستخدم او عنوان بريد إلكتروني."
 
 #. Translators: A rolename appears this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
-msgstr ""
+msgstr "خطأ في محاولة استرجاع القائمة الخاصة بالأدوار"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
-msgstr ""
+msgstr "خطأ في تغيير صلاحيات المستخدم."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%= identifier %>'."
 msgstr ""
+"لا يمكن إيجاد مستخدم بالاسم او عنوان البريد إلكتروني التالي '<%= identifier "
+"%>'."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%= username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
+"خطأ: المستخدم '<%= username %>' لم يقم بتفعل حسابه بعد. المستخدمون يجب أن "
+"ينشئوا و يفعلوا حساباتهم قبل أن يمكن إسناد الأدوار إليهم  "
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr ""
+msgstr "خطأ: لا يمكنك حذف نفسك من مجموعة المعلم!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr ""
+msgstr "حدث خطأ في عملية إضافة/إلغاء مستخدمين كأعضاء في فريق اختبار بيتا."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
-msgstr ""
+msgstr "تم بنجاح إضافة هؤلاء المستخدمين إلى قائمة أعضاء فريق اختبار بيتا:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
-msgstr ""
+msgstr "تم بنجاح إلغاء هؤلاء المستخدمين من قائمة أعضاء فريق اختبار بيتا:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
-msgstr ""
+msgstr "لم تتم إضافة هؤلاء المستخدمين إلى قائمة أعضاء فريق اختبار بيتا:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
-msgstr ""
+msgstr "لم يتم إلغاء هؤلاء المستخدمين من قائمة أعضاء فريق اختبار بيتا:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
+"يتعين على المستخدمين إنشاء وتفعيل حسابهم قبل أن يمكن ترقيتهم لعضو فريق "
+"اختبار بيتا."
 
 #. Translators: A list of identifiers (which are email addresses and/or
 #. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
-msgstr ""
+msgstr "لم يتم إيجاد مستخدمين لديهم الأرقام لتالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
-msgstr ""
+msgstr "حدث خطأ في عملية تسجيل/إلغاء تسجيل المستخدمين."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
-msgstr ""
+msgstr "عناوين البريد الإلكتروني و/أو الأسماء التالية غير صحيحة:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
-msgstr ""
+msgstr "تم بنجاح تسجيل وإرسال بريد إلكتروني إلى المستخدمين التالية أسماؤهم:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
-msgstr ""
+msgstr "تم بنجاح تسجيل المستخدمين التالية أسماؤهم:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -1001,11 +1045,14 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
 msgstr ""
+"تم بنجاح إرسال بريد إلكتروني حول التسجيل إلى المستخدمين التالية أسماؤهم. "
+"وسيسمح لهم بالالتحاق بالمساق بمجرد قيامهم بالتسجيل:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr ""
+"سيسمح للمستخدمين التالية أسماؤهم بالالتحاق بالمساق بمجرد قيامهم بالتسجيل:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -1013,11 +1060,13 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
 msgstr ""
+"تم بنجاح إرسال بريد إلكتروني حول التسجيل إلى المستخدمين التالية أسماؤهم. "
+"وسيتم إلحاقهم بالمساق بمجرد قيامهم بالتسجيل:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
-msgstr ""
+msgstr "سيتم إلحاق المستخدمين التالية أسماؤهم بالمساق بمجرد قيامهم بالتسجيل:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -1025,47 +1074,58 @@ msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
 msgstr ""
+"تم إرسال الرسائل الإلكترونية بنجاح. ولم يعد المستخدمون التالية أسماؤهم "
+"مسجّلون بالمساق:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
-msgstr ""
+msgstr "لم يعد المستخدمون التالية أسماؤهم مسجّلون بالمساق:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
+"لم يكن المستخدمون المذكورون لاحقاً منتسبين للمساق ولذلك فلا يمكن إلغاء "
+"تسجيلهم فيه:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr ""
+msgstr "ينبغي إعطاء موضوعٍ لرسالة البريد الإلكتروني الخاصة بك."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr ""
+msgstr "ينبغي لرسالة البريد الإلكتروني الخاصة بك أن تتضمن محتوى."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "تم بنجاح إدراج رسالتك ضمن صف الرسائل بانتظار إرسالها."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to yourself. Is this "
 "OK?"
 msgstr ""
+"أنت بصدد إرسال رسالة بريد إلكتروني إلى نفسك عنوانها  '<%= subject %>'. هل "
+"هذا ما تريد فعله؟"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to everyone who is "
 "staff or instructor on this course. Is this OK?"
 msgstr ""
+"أنت بصدد إرسال بريد إلكتروني عنوانه ’<%= subject %>‘ إلى جميع الأشخاص "
+"المسجلين ضمن فريق العمل أو التدريس في هذا المساق. هل هذا ما تريد فعله؟ "
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to ALL (everyone who "
 "is enrolled in this course as student, staff, or instructor). Is this OK?"
 msgstr ""
+"أنت بصدد إرسال بريد إلكتروني عنوانه ’<%= subject %>‘ إلى الجميع (كافة "
+"الأشخاص المسجلين كطلاب أو ضمن فريق العمل أو التدريس في هذا المساق). هل هذا "
+"ما تريد فعله؟ "
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -1073,18 +1133,24 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
+"تم بنجاح إدراج رسالتك ضمن صف الرسائل بانتظار إرسالها. الرجاء أخذ العلم بأنه "
+"في حالة الصفوف الكبيرة، قد يستغرق إرسال كافة الرسائل الإلكترونية ما يصل إلى "
+"الساعة (أو أكثر، في حال كانت المساقات الأخرى تقوم بإرسال رسائل إلكترونية "
+"بالتزامن مع هذا المساق). "
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr ""
+msgstr "خطأ في إرسال البريد الإلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr ""
+msgstr "لا يوجد سجل خاص بالرسائل البريدية المرسلة لهذا المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
 msgstr ""
+"حدث خطأ أثناء محاولة الحصول على سجل عن المهمات الخاصة بالرسائل البريدية لهذا"
+" المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1092,13 +1158,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "الرجاء إدخال اسم الطالب أو عنوان بريده الإلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%= student_id %>'. Check that the "
 "student identifier is spelled correctly."
 msgstr ""
+"خطأ في الحصول على الرابط الإلكتروني لسجل تقدُّم الطالب الذي يحمل الرقم ’<%= "
+"student_id %>‘. الرجاء التحقّق من إدخال رقم الطالب بالشكل الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1108,13 +1176,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem urlname."
-msgstr ""
+msgstr "الرجاء إدخال اسم الرابط الخاص بالمسألة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
 msgstr ""
+"تم بنجاح! إعادة ضبط عدد المحاولات إلى الصفر بالنسبة للمسألة رقم '<%= "
+"problem_id %>' وللطالب رقم '<%= student_id %>'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1122,21 +1192,29 @@ msgid ""
 " '<%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
 msgstr ""
+"حدث خطأ في إعادة ضبط عدد المحاولات إلى الصفر بالنسبة للمسألة رقم '<%= "
+"problem_id %>' وللطالب رقم '<%= student_id %>'. يجب التحقق من إدخال رقم "
+"الطالب ورقم المسألة بالشكل الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
 msgstr ""
+"إلغاء حالة الطالب رقم '<%= student_id %>' بالنسبة للمسألة رقم '<%= "
+"problem_id %>'؟"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
 " %>'. Check that the problem and student identifiers are spelled correctly."
 msgstr ""
+"حدث خطأ في إلغاء حالة الطالب رقم '<%= student_id %>' بالنسبة للمسألة رقم "
+"'<%= problem_id %>'. يجب التحقق من إدخال رقم الطالب ورقم المسألة بالشكل "
+"الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
-msgstr ""
+msgstr "تم بنجاح إلغاء حالة الوحدة التعليمية."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1144,6 +1222,9 @@ msgid ""
 "'<%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
+"تم البدء بمهمة إعادة تقييم المسألة بالنسبة للمسألة رقم '<%= problem_id %>' "
+"وللطالب رقم '<%= student_id %>'. يمكن الضغط على زر ’إظهار سجل المهمات "
+"السابقة للطالب‘ للاطلاع على حالة المهمة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1151,6 +1232,9 @@ msgid ""
 "'<%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
 msgstr ""
+"حدث خطأ في البدء بمهمة إعادة تقييم المسألة بالنسبة للمسألة رقم '<%= "
+"problem_id %>' وللطالب رقم '<%= student_id %>'. يجب التحقق من إدخال رقم "
+"الطالب ورقم المسألة بالشكل الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1158,10 +1242,15 @@ msgid ""
 "student_id %>'. Check that the problem and student identifiers are spelled "
 "correctly."
 msgstr ""
+"حدث خطأ في الحصول على سجل المهمات السابقة بالنسبة للمسألة رقم '<%= "
+"problem_id %>' وللطالب رقم '<%= student_id %>'. يجب التحقق من إدخال رقم "
+"الطالب ورقم المسألة بالشكل الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
 msgstr ""
+"إعادة ضبط عدد المحاولات إلى الصفر بالنسبة لكافة الطلاب على المسألة رقم '<%= "
+"problem_id %>'؟"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1169,16 +1258,22 @@ msgid ""
 " Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
+"تم بنجاح البدء بمهمة إعادة ضبط عدد المحاولات إلى الصفر بالنسبة للمسألة رقم "
+"'<%= problem_id %>'. يمكن الضغط على زر ’إظهار سجل المهمات السابقة المتعلقة "
+"بالمسألة‘ للاطلاع على حالة المهمة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
 "problem_id %>'. Check that the problem identifier is spelled correctly."
 msgstr ""
+"حدث خطأ لدى البدء بمهمة إعادة ضبط عدد المحاولات إلى الصفر لكافة الطلاب "
+"بالنسبة للمسألة رقم '<%= problem_id %>'. يجب التحقق من الإدخال الصحيح لرقم "
+"المسألة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr ""
+msgstr "إعادة تقييم المسألة رقم '<%= problem_id %>' لكافة الطلاب؟"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1186,409 +1281,455 @@ msgid ""
 "students. Click the 'Show Background Task History for Problem' button to see"
 " the status of the task."
 msgstr ""
+"تم بنجاح البدء بمهمة إعادة تقييم المسألة رقم '<%= problem_id %>' لكافة "
+"الطلاب. يمكن الضغط على زر ’إظهار سجل المهمات السابقة المتعلقة بالمسألة‘ "
+"للاطلاع على حالة المهمة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
 " problem identifier is spelled correctly."
 msgstr ""
+"حدث خطأ لدى البدء بمهمة إعادة تقييم المسألة رقم '<%= problem_id %>'. يجب "
+"التحقق من الإدخال الصحيح لرقم المسألة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
 msgstr ""
+"حدث خطأ في عملية إعداد قائمة المهمات السابقة لهذا الطالب وهذه المسألة."
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Type"
-msgstr ""
+msgstr "نوع المهمة "
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task inputs"
-msgstr ""
+msgstr "مدخلات المهمة "
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task ID"
-msgstr ""
+msgstr "رمز المهمة"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Requester"
-msgstr ""
+msgstr "مقدم الطلب "
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Submitted"
-msgstr ""
+msgstr "تم تقديمه"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Duration (sec)"
-msgstr ""
+msgstr "المدة المستغرقة (sec) "
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "State"
-msgstr ""
+msgstr "الحالة"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Status"
-msgstr ""
+msgstr "حالة المهمّة"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Progress"
-msgstr ""
+msgstr "تطوّر المهمة "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
-msgstr ""
+msgstr "تم حفظ الدرجات. يجري الآن جلب عملية التقديم التالية حتى يتم تقييمها."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr ""
+msgstr "اسم المسألة "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr ""
+msgstr "تم تقييمه"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
-msgstr ""
+msgstr "متاح لإجراء عملية التقييم."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Required"
-msgstr ""
+msgstr "مطلوب "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Progress"
-msgstr ""
+msgstr "التطور "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Back to problem list"
-msgstr ""
+msgstr "العودة إلى القائمة الخاصة بالمسألة"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Try loading again"
-msgstr ""
+msgstr "حاول إعادة التحميل"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> available "
-msgstr ""
+msgstr "<%= num %>  متوفرة"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
-msgstr ""
+msgstr "<%= num %>  تم تقييمها"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr ""
+msgstr "يلزم  <%= num %>  إضافية للبدء بـ ML"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
-msgstr ""
+msgstr "إعادة التحقق من وجود تقديمات أخرى "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state: <%= state %>"
-msgstr ""
+msgstr "دخل النظام في حالة غير صحيحة: <%= state %>"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state for submission: "
-msgstr ""
+msgstr "دخل النظام في حالة غير صحيحة بالنسبة لعملية التقديم:"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
-msgstr ""
+msgstr "(إخفاء) "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr ""
+msgstr "(إظهار)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
-msgstr ""
+msgstr "إدخال رابط إلكتروني"
 
 #. Translators: Please keep the quotation marks (") around this text
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
 msgid "\"optional title\""
-msgstr ""
+msgstr "\"عنوان اختياري\""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type url)"
-msgstr ""
+msgstr "إدخال صورة (تحميل ملف أو طباعة الرابط الإلكتروني url) "
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr ""
+msgstr "للمساعدة في التحرير بلغة المارك داون"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr ""
+msgstr "سميك (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
-msgstr ""
+msgstr "مائل (Ctrl+I)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr ""
+msgstr "رابط إلكتروني (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
-msgstr ""
+msgstr "نص مقتبس (Ctrl+Q)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr ""
+msgstr "نموذج تعليمات برمجية (Ctrl+K)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
-msgstr ""
+msgstr "صورة (Ctrl+G)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
-msgstr ""
+msgstr "قائمة مرقّمة (Ctrl+O)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
-msgstr ""
+msgstr "قائمة منقّطة (Ctrl+U)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading (Ctrl+H)"
-msgstr ""
+msgstr "عنوان (Ctrl+H)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
-msgstr ""
+msgstr "خط أفقي (Ctrl+R)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "إلغاء (Ctrl+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr ""
+msgstr "إعادة الفعل (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr ""
+msgstr "إعادة الفعل (Ctrl+Shift+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"
-msgstr ""
+msgstr "نص بأحرف قوية"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
-msgstr ""
+msgstr "نص بأحرف مائلة للتشديد"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr ""
+msgstr "أدخل الوصف الخاص بالصورة هنا"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr ""
+msgstr "أدخل الوصف الخاص بالرابط هنا"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
-msgstr ""
+msgstr "نص مقتبس"
 
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
 msgid "enter code here"
-msgstr ""
+msgstr "أدخل التعليمات البرمجية هنا"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
-msgstr ""
+msgstr "أحد عناصر القائمة"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading"
-msgstr ""
+msgstr "عنوان"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr "حدث خطأ ما."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr "تم إعادة ضبط محاولات المستخدم {user} بنجاح"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr "لم تنجح عمليات ضبط المحاولات."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr "تم حذف حالة المستخدم {user} بنجاح"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr "لم تنجح عملية حذف حالة الطالب."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr "تمت عمليات إعادة تقييم المستخدم {user} بنجاح"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr "لم تتم عملية إعادة التقييم بنجاح"
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
-msgstr ""
+msgstr "لا يمكن استرجاع البيانات، الرجاء إعادة المحاولة لاحقاً"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
-msgstr ""
+msgstr "عدد الطلاب"
 
 #: cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"قد يحدث ذلك بسبب خطأٍ ما على المخدّم الخاص بنا أو بسبب اتصال الإنترنت لديك. "
+"الرجاء محاولة تحديث الصفحة أو التأكد من جودة اتصالك بالإنترنت."
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "نظام استوديو Studio يواجه صعوبة في حفظ عملك "
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
-msgstr ""
+msgstr "الحفظ &hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Component Confirmation"
-msgstr ""
+msgstr "تأكيد حذف العنصر"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this component? This action cannot be "
 "undone."
 msgstr ""
+"هل أنت متأكد من رغبتك حذف هذا العنصر؟ لا يمكن الرجوع عن هذه العملية فيما "
+"بعد."
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
 #: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
-msgstr ""
+msgstr "الحذف &hellip;"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Adding&hellip;"
-msgstr ""
+msgstr "الإضافة والمساعدة؛ Adding&hellip؛"
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
-msgstr ""
+msgstr "نسخة مطابقة ومساعدة؛ Duplicating&hellip؛"
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
-msgstr ""
+msgstr "حذف هذا العنصر؟"
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "حذف هذا العنصر سيكون دائماً ولا يمكن الرجوع عنه."
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
-msgstr ""
+msgstr "نعم، إحذف هذا العنصر"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "سيفتح هذا الرابط في نافذة نمطية جديدة"
 
 #: cms/static/js/base.js
 msgid "Delete this "
-msgstr ""
+msgstr "حذف هذا"
 
 #: cms/static/js/base.js
 msgid "Deleting this "
-msgstr ""
+msgstr "جاري الحذف "
 
 #: cms/static/js/base.js
 msgid "Yes, delete this "
-msgstr ""
+msgstr "نعم، احذف هذا"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr ""
+msgstr "الرجاء عدم استخدام أية مسافات في هذا الحقل."
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
+msgstr "الرجاء عدم استخدام المسافات أو أية أحرف خاصة في هذا الحقل."
 
 #: cms/static/js/index.js
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr ""
+"الطول الكلي لحقول اسم المؤسسة، ورقم المساق، ورمز تشغيل المنهاج لا يمكن أن "
+"تتجاوز 65 حرف. "
 
 #: cms/static/js/index.js
 msgid "Required field."
-msgstr ""
+msgstr "حقل مطلوب."
 
 #: cms/static/js/sock.js
 msgid "Hide Studio Help"
-msgstr ""
+msgstr "إخفاء مساعدة نظام استوديو Studio"
 
 #: cms/static/js/sock.js
 msgid "Looking for Help with Studio?"
-msgstr ""
+msgstr "هل تبحث عن مساعدة في نظام استوديو Studio؟"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "ينبغي أن تقوم بتحديد إسم"
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"يمكن تحميل ملفات <%= fileTypes %> فقط. للتحميل، الرجاء اختيار ملف ينتهي بـ  "
+"<%= fileExtensions %>"
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
+msgstr "أو"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr ""
+msgstr "لابد من تعيين تاريخ بدء المساق."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
-msgstr ""
+msgstr "لايمكن أن يسبق تاريخ انتهاء المساق تاريخ ابتدائه."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
-msgstr ""
+msgstr "لايمكن أن يسبق تاريخ بدء المساق تاريخ التسجيل فيه."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
+"لا يمكن أن يكون تاريخ بدء التسجيل في المساق بعد تاريخ انتهاء التسجيل في "
+"المساق."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
+"لا يمكن أن يكون تاريخ انتهاء التسجيل في المساق بعد تاريخ انتهاء المساق."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr ""
+msgstr "يجب أن يحتوي المفتاح على حروف، أو أرقام، أو _، أو -"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr ""
+msgstr "هنالك بالفعل مهمة أخرى تحمل نفس هذا الاسم."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "الرجاء إدخال رقم صحيح بين 0 و 100."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "الرجاء إدخال عدد صحيح أكبر من 0."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
-msgstr ""
+msgstr "الرجاء إدخال عدد صحيح غير سالب."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
+msgstr "لا يمكن إتاحة أنواع <% attrs.types %> أكثر مما سيتم تعيينه."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "يجب أن تحدد فترة السماح بالصيغة التالية HH:MM "
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
-msgstr ""
+msgstr "تأكيد حذف ملف"
 
 #: cms/static/js/views/asset.js
 msgid ""
@@ -1596,181 +1737,196 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
+"هل أنت متأكد من رغبتك حذف هذا العنصر؟ لا يمكن عكس هذه العملية لاحقاً! \n"
+"\n"
+"كما أن أي محتوى يتضمن رابطاً أو مرجعاً لهذه المادة لن يعود فعالاً بعد عملية الحذف (مثل صور و/أو روابط غير فعالة)"
 
 #: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "تم حذف ملفك."
 
 #: cms/static/js/views/assets.js
 msgid "Name"
-msgstr ""
+msgstr "الاسم "
 
 #: cms/static/js/views/assets.js
 msgid "Date Added"
-msgstr ""
+msgstr "تاريخ الإضافة "
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr ""
+msgstr "هل أنت متأكد من رغبتك في حذف هذا التحديث؟"
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "لا يمكن عكس هذا الإجراء أو إلغاؤه."
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr ""
+msgstr "قم بتحميل ملف PDF جديد إلى “<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
-msgstr ""
+msgstr "الرجاء اختيار ملف PDF ليتم تحميله. "
 
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
-msgstr ""
+msgstr "حفظ"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "حدث خطأ في عملية التحميل "
 
 #: cms/static/js/views/import.js
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
-msgstr ""
+msgstr "صيغة الملف غير مدعومة. الرجاء تحميل ملف بلاحقة <code>tar.gz</code>."
 
 #: cms/static/js/views/metadata.js
 msgid "Upload File"
-msgstr ""
+msgstr "تحميل ملف"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "طي جميع الأقسام"
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr ""
+msgstr "تمديد كل الأقسام"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr ""
+msgstr "تاريخ النشر:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
+msgstr "{month}/{day}/{year} at {hour}:{minute} التوقيت العالمي"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr ""
+msgstr "تعديل تاريخ نشر القسم"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
-msgstr ""
+msgstr "لم يتم تقييمه"
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr ""
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr ""
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
 msgstr ""
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"
-msgstr ""
+msgstr "لا يمكن حفظ التغييرات التي قمت بها"
 
 #: cms/static/js/views/section_edit.js
 msgid "Return and resolve this issue"
-msgstr ""
+msgstr "عد وحاول حل المشكلة"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr ""
+msgstr "هل تريد حذف “<%= name %>”؟"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
+"لا يمكن الرجوع أو عكس عملية حذف الكتاب، وحال القيام بها سيتم كذلك إزالة أي "
+"مرجعٍ لهذا الكتاب في تصفح منهاج المساق الخاص بك."
 
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
-msgstr ""
+msgstr "جاري الحذف"
 
 #: cms/static/js/views/uploads.js
 msgid "Upload"
-msgstr ""
+msgstr "حمّل الملف"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "نعتذر، حدث خطأ ما"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr ""
+msgstr "لقد قمت ببعض التعديلات"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
-msgstr ""
+msgstr "لن تصبح التغييرات التي قمت بها نافذة حتى تقوم بإجراء عملية الحفظ."
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "لقد قمت بعمل بعض التغييرات، ولكن يوجد بعض الأخطاء"
 
 #: cms/static/js/views/validation.js
 msgid ""
 "Please address the errors on this page first, and then save your progress."
-msgstr ""
+msgstr "الرجاء تصحيح الأخطاء في هذه الصفحة أولاً، ثم القيام بحفظ تقدمك."
 
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
-msgstr ""
+msgstr "حفظ التغييرات"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "لقد تم حفظ التغييرات التي قمت بها"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
-msgstr ""
+msgstr "محرر"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Settings"
-msgstr ""
+msgstr "إعدادات"
 
 #: cms/static/js/views/modals/base_modal.js
 msgid "Save"
-msgstr ""
+msgstr "حفظ"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
-msgstr ""
+msgstr "العنصر"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
-msgstr ""
+msgstr "تعديل: %(title)s"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
 msgstr ""
+"لن تصبح التغييرات التي قمت بها نافذة حتى تقوم بإجراء عملية الحفظ. الرجاء "
+"مراعاة الدقة في تنسيق المفتاح والقيمة حيث أن عملية التدقيق والتصحيح الفورية "
+"غير مطبقة."
 
 #: cms/static/js/views/settings/advanced.js
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "تم حفظ التغييرات على السياسة الخاصة بك."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -1778,21 +1934,26 @@ msgid ""
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
 msgstr ""
+"الرجاء ملاحظة أن عملية التحقق من صحة زوج المفتاح والقيمة للسياسة الخاصة بك "
+"غير مطبقة بعد. وفي حال كنت تواجه أية مشكلات، الرجاء مراجعة زوج المفتاح "
+"والقيمة للسياسة الخاصة بك والتحقق منهم بنفسك. "
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr ""
+msgstr "تحميل الصورة الخاصة بالمساق."
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgstr "الملفات يجب أن تكون بصيغة JPEG أو PNG."
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
 "Sorry, there was an error parsing the subtitles that you uploaded. Please "
 "check the format and try again."
 msgstr ""
+"عفواً، حدث خطأ في عملية تحليل العناوين الفرعية التي قمت بتحميلها. الرجاء "
+"التحقق من الصيغة ومن ثمّ إعادة المحاولة. "
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
+msgstr "تحميل الترجمة"

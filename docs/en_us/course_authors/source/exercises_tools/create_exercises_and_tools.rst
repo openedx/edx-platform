@@ -46,6 +46,11 @@ General Exercises and Tools
           :alt: Google Hangout
      - :ref:`Google Instant Hangout`
      - You can add the ability for students to participate in instant hangouts directly from your course. With instant hangouts, students can interact through live video and voice, share screens and watch videos together, and collaborate on documents. 
+   * - .. image:: /Images/IFrame_1.png
+          :width: 100
+          :alt: Example IFrame tool
+     - :ref:`IFrame`
+     - IFrames allow you to integrate ungraded exercises and tools from any Internet site into an HTML component in your course.
    * - .. image:: /Images/LTIExample.png
           :width: 100
           :alt: Example LTI component
@@ -86,6 +91,11 @@ General Exercises and Tools
           :alt: Example write-your-own-grader problem
      - :ref:`Write Your Own Grader`
      - In custom Python-evaluated input (also called "write-your-own-grader") problems, the grader uses a Python script that you create and embed in the problem to evaluates a student's response or provide hints. These problems can be any type.
+   * - .. image:: /Images/VitalSource.png
+          :width: 100
+          :alt: VitalSource e-book with highlighted note
+     - :ref:`VitalSource`
+     - The VitalSource Online Bookshelf e-reader allows students to read, browse, and search content (including figures and notes), as well as work with multiple highlighters and copy notes into external documents.
 
 ********************************
 Image-Based Exercises and Tools

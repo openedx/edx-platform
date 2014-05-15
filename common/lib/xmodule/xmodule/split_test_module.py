@@ -21,6 +21,8 @@ log = logging.getLogger('edx.' + __name__)
 
 class SplitTestFields(object):
     """Fields needed for split test module"""
+    has_children = True
+
     user_partition_id = Integer(
         help="Which user partition is used for this test",
         scope=Scope.content
@@ -198,7 +200,7 @@ class SplitTestModule(SplitTestFields, XModule):
         conditions for staff.
         """
         # When rendering a Studio preview, render all of the block's children
-        if context and context['runtime_type'] == 'studio':
+        if context and context.get('runtime_type', None) == 'studio':
             return self.studio_preview_view(context)
 
         if self.child is None:
