@@ -8,6 +8,7 @@ import simplejson as json
 import uuid
 from random import randint
 
+from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
@@ -923,21 +924,32 @@ class CoursesApiTests(TestCase):
         test_uri = '{}/{}/groups'.format(self.base_course_content_uri, self.course_project.id)
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
-        group_id = response.data['id']
-        data = {'group_id': group_id}
+        alpha_group_id = response.data['id']
+        data = {'group_id': alpha_group_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
 
+        # Add a profile-less group to the system to offset the identifiers
+        Group.objects.create(name='Offset Group')
+
         data = {'name': 'Beta Group', 'type': 'project'}
         response = self.do_post(self.base_groups_uri, data)
-        group_id = response.data['id']
-        data = {'group_id': group_id}
+
+        data = {'name': 'Delta Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+
+        data = {'name': 'Gamma Group', 'type': 'project'}
+        response = self.do_post(self.base_groups_uri, data)
+        gamma_group_id = response.data['id']
+        data = {'group_id': gamma_group_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['group_id'], alpha_group_id)
+        self.assertEqual(response.data[1]['group_id'], gamma_group_id)
 
         test_uri = test_uri + '?type=project'
         response = self.do_get(test_uri)
