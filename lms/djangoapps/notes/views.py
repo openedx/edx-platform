@@ -4,7 +4,6 @@ from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-from xmodule.annotator_token import retrieve_token
 
 
 @login_required
@@ -23,8 +22,7 @@ def notes(request, course_id):
         'course': course,
         'notes': notes,
         'student': student,
-        'storage': storage,
-        'token': retrieve_token(student.email, course.annotation_token_secret),
+        'storage': storage
     }
 
     return render_to_response('notes.html', context)
