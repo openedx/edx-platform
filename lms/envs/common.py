@@ -828,7 +828,6 @@ main_vendor_js = [
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/ova/annotator-full.js',
-    'js/vendor/ova/annotator-full-firebase-auth.js',
     'js/vendor/ova/video.dev.js',
     'js/vendor/ova/vjs.youtube.js',
     'js/vendor/ova/rangeslider.js',
