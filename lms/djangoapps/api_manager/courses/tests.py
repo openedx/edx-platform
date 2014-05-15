@@ -48,6 +48,7 @@ class CoursesApiTests(TestCase):
             category="chapter",
             parent_location=self.course.location,
             data=self.test_data,
+            due="2014-05-16T14:30:00Z",
             display_name="Overview"
         )
 
