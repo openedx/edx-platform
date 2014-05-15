@@ -1,6 +1,10 @@
 """
-Defines OpaqueKey class, to be used as the base-class for
+Defines the :class:`OpaqueKey` class, to be used as the base-class for
 implementing pluggable OpaqueKeys.
+
+These keys are designed to provide a limited, forward-evolveable interface to
+an application, while concealing the particulars of the serialization
+formats, and allowing new serialization formats to be installed transparently.
 """
 from abc import ABCMeta, abstractmethod, abstractproperty
 from copy import deepcopy
@@ -21,8 +25,8 @@ class InvalidKeyError(Exception):
 
 class OpaqueKeyMetaclass(ABCMeta):
     """
-    Metaclass for OpaqueKeys. Automatically derives the class from a namedtuple
-    with a fieldset equal to the KEY_FIELDS class attribute, if KEY_FIELDS is set.
+    Metaclass for :class:`OpaqueKey`. Sets the default value for the values in ``KEY_FIELDS`` to
+    ``None``.
     """
     def __new__(mcs, name, bases, attrs):
         if '__slots__' not in attrs:
@@ -40,31 +44,48 @@ class OpaqueKey(object):
 
     There are two levels of expected subclasses: Key type definitions, and key implementations
 
-    OpaqueKey
-        |
-    KeyType
-        |
-    KeyImplementation
+    ::
 
-    The KeyType base class must define the class property KEY_TYPE, which identifies
-    which entry_point namespace the keys implementations should be registered with.
+        OpaqueKey
+            |
+        Key type
+            |
+        Key implementation
 
-    The KeyImplementation classes must define CANONICAL_NAMESPACE and KEY_FIELDS.
-        CANONICAL_NAMESPACE: Identifies the key namespace for the particular
-            key_implementation (when serializing). KeyImplementations must be
-            registered using the CANONICAL_NAMESPACE is their entry_point name,
-            but can also be registered with other names for backwards compatibility.
-        KEY_FIELDS: A list of attribute names that will be used to establish object
-            identity. KeyImplementation instances will compare equal iff all of
-            their KEY_FIELDS match, and will not compare equal to instances
-            of different KeyImplementation classes (even if the KEY_FIELDS match).
-            These fields must be hashable.
+    The key type base class must define the class property ``KEY_TYPE``, which identifies
+    which ``entry_point`` namespace the keys implementations should be registered with.
+
+    The KeyImplementation classes must define the following:
+
+    ``CANONICAL_NAMESPACE``
+        Identifies the key namespace for the particular key implementation
+        (when serializing). Key implementations must be registered using the
+        ``CANONICAL_NAMESPACE`` is their entry_point name, but can also be registered
+        with other names for backwards compatibility.
+
+    ``KEY_FIELDS``
+        A list of attribute names that will be used to establish object
+        identity. Key implementation instances will compare equal iff all of
+        their ``KEY_FIELDS`` match, and will not compare equal to instances
+        of different KeyImplementation classes (even if the ``KEY_FIELDS`` match).
+        These fields must be hashable.
+
+    ``_to_string``
+        Serialize the key into a unicode object. This should not include the namespace
+        prefix (``CANONICAL_NAMESPACE``).
+
+    ``_from_string``
+        Construct an instance of this :class:`OpaqueKey` from a unicode object. The namespace
+        will already have been parsed.
 
     OpaqueKeys will not have optional constructor parameters (due to the implementation of
-    KEY_FIELDS), by default. However, and implementation class can provide a default,
-    as long as it passes that default to a call to super().__init__.
+    ``KEY_FIELDS``), by default. However, and implementation class can provide a default,
+    as long as it passes that default to a call to ``super().__init__``.
 
-    OpaqueKeys are immutable.
+    :class:`OpaqueKey` objects are immutable.
+
+    Serialization of an :class:`OpaqueKey` is performed by using the :func:`unicode` builtin.
+    Deserialization is performed by the :meth:`from_string` method.
     """
     __metaclass__ = OpaqueKeyMetaclass
     __slots__ = ('_initialized')
@@ -142,6 +163,10 @@ class OpaqueKey(object):
         self._initialized = True
 
     def replace(self, **kwargs):
+        """
+        Return: a new :class:`OpaqueKey` with ``KEY_FIELDS`` specified in ``kwargs`` replaced
+            their corresponding values.
+        """
         existing_values = {key: getattr(self, key) for key in self.KEY_FIELDS}  # pylint: disable=no-member
         existing_values.update(kwargs)
         return type(self)(**existing_values)
@@ -156,6 +181,9 @@ class OpaqueKey(object):
         raise AttributeError("Can't delete {!r}. OpaqueKeys are immutable.".format(name))
 
     def __unicode__(self):
+        """
+        Serialize this :class:`OpaqueKey`, in the form ``<CANONICAL_NAMESPACE>:<value of _to_string>``.
+        """
         return self.NAMESPACE_SEPARATOR.join([self.CANONICAL_NAMESPACE, self._to_string()])  # pylint: disable=no-member
 
     def __copy__(self):
