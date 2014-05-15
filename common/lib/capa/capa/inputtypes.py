@@ -804,20 +804,7 @@ class MatlabInput(CodeInput):
 
         xml = self.xml
 
-        # the new way to define the api key is to set it in the course advanced settings
-        api_key = getattr(self.capa_system, 'matlab_api_key', None)
-        if api_key:
-            plot_payload = '%api_key={}'.format(api_key)
-        else:
-            plot_payload = ''
-
-        # the old way to define api_key is to add it to the plot_payload xml.
-        # are there other things that go in the payload?
-        xml_payload = xml.findtext('./plot_payload')
-        if xml_payload:
-            plot_payload += '\n{}'.format(xml_payload)
-
-        self.plot_payload = plot_payload
+        self.plot_payload = xml.findtext('./plot_payload')
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''
@@ -966,7 +953,10 @@ class MatlabInput(CodeInput):
         contents = {
             'grader_payload': self.plot_payload,
             'student_info': json.dumps(student_info),
-            'student_response': response
+            'student_response': response,
+            'token': getattr(self.capa_system, 'matlab_api_key', None),
+            'endpoint_version': "2",
+            'requestor_id': anonymous_student_id,
         }
 
         (error, msg) = qinterface.send_to_queue(header=xheader,

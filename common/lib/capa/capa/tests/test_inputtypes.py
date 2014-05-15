@@ -642,7 +642,8 @@ class MatlabTest(unittest.TestCase):
 
         body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
         payload = json.loads(body)
-        self.assertIn('%api_key=test_api_key', payload['grader_payload'])
+        self.assertEqual('test_api_key', payload['token'])
+        self.assertEqual('2', payload['endpoint_version'])
 
     def test_get_html(self):
         # usual output
