@@ -4,6 +4,7 @@ class @HTMLEditingDescriptor
     @element = element
     @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
     @editor_choice = @element.find("#editor-tab").data('editor')
+
     if @base_asset_url == undefined
       @base_asset_url = null
 
@@ -62,17 +63,15 @@ class @HTMLEditingDescriptor
         
         # Necessary to avoid stripping of style tags.
         valid_children : "+body[style]",
-
-        # Allow any elements to be used, e.g. link, script, math
-        valid_elements: "*[*]",
-        extended_valid_elements: "*[*]",
-        invalid_elements: "",
-        
+        valid_elements: "h1,h2,h3,h4,p[id|style],div[id|style],span[id|style],img[src|style|alt|width|height],br,hr,a[*],strong/b,cite,mark,address,i/em,code,ul,ol,li,blockquote"
+        extended_valid_elements: "link,math,maction,maligngroup,malingmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeldtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover"        
+        invalid_elements: "script,style",
         setup: @setupTinyMCE,
         # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
         # The tinyMCE callback passes in the editor as a parameter.
         init_instance_callback: @initInstanceCallback
       })
+      @confirmVisualEditor()
 
   setupTinyMCE: (ed) =>
     ed.addButton('wrapAsCode', {
@@ -132,6 +131,38 @@ class @HTMLEditingDescriptor
     @starting_content = visualEditor.getContent({format:"raw", no_events: 1})
     visualEditor.focus()
 
+  confirmVisualEditor: () =>
+    # warn the user if the visual editor will probably alter their markup
+    if @editor_choice == 'visual'
+      raw_content = @advanced_editor.getValue()
+      if raw_content != ''
+        schema = @getVisualEditor().schema
+        should_warn = false
+        walk = (node) ->
+          if not node
+            return
+          if node.nodeType == 1
+            tagname = node.tagName.toLowerCase()
+            if not schema.isValid(tagname)
+              should_warn = true
+              return
+            else
+              for attr in node.attributes
+                if not schema.isValid(tagname, attr.name)
+                  should_warn = true
+                  return
+            for child in node.childNodes
+              walk child
+        root = document.createElement('div')
+        root.innerHTML = raw_content
+        walk root
+
+        if should_warn
+          if not confirm gettext("Visual editing may cause data loss. Click cancel for raw editor.")
+            @editor_choice = "raw"
+            @element.find('.tiny-mce').remove()
+            @$advancedEditorWrapper.removeClass('is-inactive')
+
   getVisualEditor: () ->
     ###
     Returns the instance of TinyMCE.
@@ -151,4 +182,4 @@ class @HTMLEditingDescriptor
     if text == undefined
       text = @advanced_editor.getValue()
 
-    data: text
+    return {data: text, metadata: {editor: @editor_choice}}
