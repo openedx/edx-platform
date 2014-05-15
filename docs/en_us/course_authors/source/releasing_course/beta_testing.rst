@@ -194,9 +194,9 @@ When you add beta testers, note the following.
 
 .. _Add_Testers_Bulk:
 
---------------------------
+================================
 Add Multiple Beta Testers
---------------------------
+================================
 
 If you have a number of beta testers that you want to add, you can use the "batch
 add" option to add them all at once, rather than individually. With this
@@ -229,9 +229,9 @@ testers**.
 
 .. note:: The **Auto Enroll** option has no effect when you click **Remove beta testers**. The user's role as a beta tester is removed; course enrollment is not affected.
 
------------------------------
+================================
 Add Beta Testers Individually
------------------------------
+================================
 
 To add a single beta tester:
 
