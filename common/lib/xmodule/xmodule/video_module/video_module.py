@@ -357,8 +357,8 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
-            'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
-            'display_name': 'Video URL',
+            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or .webm video file hosted elsewhere on the Internet.'),
+            'display_name': 'Default Video URL',
             'field_name': 'video_url',
             'type': 'VideoList',
             'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]

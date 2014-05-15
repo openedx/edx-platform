@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
@@ -18,14 +19,15 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.courses import get_course_by_id, get_cms_course_link, get_course_with_access
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from instructor.offline_gradecalc import student_grades
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from .tools import get_units_with_due_date, title_or_url
+from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 
 
 @ensure_csrf_cookie
@@ -60,7 +62,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
+    if bulk_email_is_enabled_for_course(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
     # Gate access to Metrics tab by featue flag and staff authorization
@@ -79,7 +81,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
+        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_id}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -156,15 +158,23 @@ def _section_membership(course_id, access):
 
 def _section_student_admin(course_id, access):
     """ Provide data for the corresponding dashboard section """
+    is_small_course = False
+    enrollment_count = CourseEnrollment.num_enrolled_in(course_id)
+    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    if max_enrollment_for_buttons is not None:
+        is_small_course = enrollment_count <= max_enrollment_for_buttons
+
     section_data = {
         'section_key': 'student_admin',
         'section_display_name': _('Student Admin'),
         'access': access,
+        'is_small_course': is_small_course,
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_id}),
     }
     return section_data
 
@@ -246,3 +256,43 @@ def _section_metrics(course_id, access):
         'get_students_problem_grades_url': reverse('get_students_problem_grades'),
     }
     return section_data
+
+
+#---- Gradebook (shown to small courses only) ----
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def spoc_gradebook(request, course_id):
+    """
+    Show the gradebook for this course:
+    - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    - Only displayed to course staff
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1
+    ).order_by('username').select_related("profile")
+
+    # TODO (vshnayder): implement pagination to show to large courses
+    max_num_students = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    enrolled_students = enrolled_students[:max_num_students]   # HACK!
+
+    student_info = [
+        {
+            'username': student.username,
+            'id': student.id,
+            'email': student.email,
+            'grade_summary': student_grades(student, request, course),
+            'realname': student.profile.name,
+        }
+        for student in enrolled_students
+    ]
+
+    return render_to_response('courseware/gradebook.html', {
+        'students': student_info,
+        'course': course,
+        'course_id': course_id,
+        # Checked above
+        'staff_access': True,
+        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+    })

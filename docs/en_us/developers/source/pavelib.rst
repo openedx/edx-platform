@@ -140,7 +140,12 @@ Run Servers
 
     **run_celery**: runs celery for specified system
 
-     *--settings=* Environment settings e.g. aws, dev
+     *--settings=* Environment settings e.g. aws, dev both for LMS and Studio
+
+     *--settings_lms=* Override django settings for LMS e.g. cms.dev
+
+     *--settings_cms=* Override django settings for Studio
+
 
 ::
 

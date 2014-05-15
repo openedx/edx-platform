@@ -67,7 +67,7 @@ class TestGradebook(ModuleStoreTestCase):
                     module_state_key=Location(item.location).url()
                 )
 
-        self.response = self.client.get(reverse('gradebook', args=(self.course.id,)))
+        self.response = self.client.get(reverse('gradebook_legacy', args=(self.course.id,)))
 
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)

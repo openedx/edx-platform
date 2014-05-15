@@ -90,8 +90,9 @@ To enroll students or staff members:
 
 #. Click **Membership**. 
 
-#. In the **Batch Enrollment** section of the page, enter an email address or
-   multiple addresses separated by commas or line feeds.
+#. In the **Batch Enrollment** section of the page, enter the username or email
+   address of the student, or enter multiple names or addresses separated by
+   commas or new lines.
 
   You can copy and paste data from a CSV file of email addresses. However,
   note that this feature is better suited to courses with smaller enrollments,
@@ -159,8 +160,8 @@ To unenroll students, you supply the email addresses of enrolled students.
 
 #. Click **Membership**. 
 
-#. In the **Batch Enrollment** section of the page, enter an email address or
-   multiple addresses separated by commas or line feeds.
+#. In the **Batch Enrollment** section of the page, enter a username or an email
+   address, or multiple names or addresses separated by commas or new lines.
 
 #. To send students an email message, leave **Notify students by email**
    selected.

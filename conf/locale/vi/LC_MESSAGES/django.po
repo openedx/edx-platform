@@ -49,6 +49,7 @@
 # mannd <mannd@live.com>, 2013
 # ngocchung75 <ngocchung75@gmail.com>, 2013
 # mannd <mannd@live.com>, 2013
+# An Walker <neyugn2909@gmail.com>, 2014
 # hdvd2309 <huynq23091@gmail.com>, 2013-2014
 # tah <truonganhhoang@gmail.com>, 2013
 # Thành Bùi Việt <thanhbv@gmail.com>, 2014
@@ -92,7 +93,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-05-02 00:21+0000\n"
 "Last-Translator: tan.mng90 <tan.mng90@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -258,7 +259,7 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Quá nhiều cố gắng đăng nhập thất bại. Vui lòng thử lại sau."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Email hoặc mật khẩu không đúng."
 
@@ -954,7 +955,40 @@ msgid ""
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr ""
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1185,12 +1219,9 @@ msgstr ""
 msgid "Peer grading"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Syllabus" appears on a tab that, when clicked, opens the
-#. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
+#: lms/templates/courseware/syllabus.html
 msgid "Syllabus"
-msgstr ""
+msgstr "Đề cương"
 
 #. Translators: 'Instructor' appears on the tab that leads to the instructor
 #. dashboard, which is
@@ -1420,7 +1451,9 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
 
 #. Translators: This is a type of file used for captioning in the video
@@ -1447,6 +1480,7 @@ msgstr "Chỉ mục"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
 msgstr "Tìm kiếm"
 
@@ -1858,6 +1892,7 @@ msgstr "Công việc đang được thực hiện."
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -2651,12 +2686,10 @@ msgstr ""
 msgid "University"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Course"
-msgstr ""
+msgstr "Khóa Học"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Announce Date"
@@ -3212,6 +3245,8 @@ msgid "Password Reset Help"
 msgstr "Hướng Dẫn Đặt Lại Mật Khẩu"
 
 #: lms/templates/registration/password_reset_confirm.html
+#: cms/templates/login.html lms/templates/login-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "Cần Trợ Giúp?"
 
@@ -3282,6 +3317,11 @@ msgstr "Xóa bài viết"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
 msgstr "Xóa"
 
@@ -3754,9 +3794,14 @@ msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
 msgstr ""
 
-#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
+#, fuzzy
 msgid "My Notes"
-msgstr "Ghi Chú của tôi"
+msgstr ""
+"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
+"Ghi Chú của tôi\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Các Ghi Chú Của Tôi"
 
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
@@ -3917,6 +3962,13 @@ msgstr "Không tìm thấy trang"
 msgid "close"
 msgstr ""
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr ""
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -3932,12 +3984,12 @@ msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
-msgstr ""
+msgstr "Lỗi:"
 
 #: cms/templates/index.html cms/templates/settings.html
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
-msgstr "Mã Khóa Học"
+msgstr ""
 
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/overview.html
@@ -3955,7 +4007,7 @@ msgstr "Hủy bỏ"
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Organization:"
-msgstr ""
+msgstr "Tổ Chức:"
 
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -3980,7 +4032,7 @@ msgstr "Quên mật khẩu?"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
-msgstr ""
+msgstr "Mật khẩu"
 
 #: cms/templates/manage_users.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -3992,7 +4044,7 @@ msgstr "Thiết lập"
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
-msgstr ""
+msgstr "Quản Trị"
 
 #: cms/templates/overview.html cms/templates/overview.html
 #: cms/templates/overview.html cms/templates/overview.html
@@ -4006,7 +4058,7 @@ msgstr "Lưu"
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
-msgstr ""
+msgstr "Đăng Ký"
 
 #: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/signup_modal.html
@@ -4038,7 +4090,7 @@ msgstr ""
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: lms/templates/static_templates/tos.html
 msgid "Terms of Service"
-msgstr ""
+msgstr "Điều khoản sử dụng dịch vụ"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
@@ -4180,10 +4232,6 @@ msgid ""
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "or"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr ""
 
@@ -4207,7 +4255,7 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
-msgstr ""
+msgstr "Hướng dẫn"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -4318,7 +4366,7 @@ msgstr ""
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
-msgstr "Có lỗi xảy ra. Xin thử lại sau."
+msgstr "Có lỗi xảy ra. Vui lòng thử lại sau."
 
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
@@ -4581,7 +4629,7 @@ msgstr ""
 
 #: lms/templates/folditchallenge.html
 msgid "Score"
-msgstr ""
+msgstr "Điểm"
 
 #: lms/templates/footer.html
 msgid "About"
@@ -4804,7 +4852,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
-msgstr "Xin hãy thử lại sau."
+msgstr "Vui lòng thử lại sau."
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -4923,7 +4971,7 @@ msgstr ""
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 msgid "example: username@domain.com"
-msgstr ""
+msgstr "ví dụ: username@domain.com"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
@@ -5092,17 +5140,17 @@ msgstr ""
 
 #: lms/templates/navigation.html
 msgid "How it Works"
-msgstr ""
+msgstr "Phương Thức Hoạt Động"
 
 #: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
-msgstr ""
+msgstr "Khóa học"
 
 #: lms/templates/navigation.html
 msgid "Schools"
-msgstr ""
+msgstr "Trường"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
@@ -5110,7 +5158,7 @@ msgstr "Đăng Ký Ngay"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Log in"
-msgstr ""
+msgstr "Đăng nhập"
 
 #: lms/templates/navigation.html
 msgid ""
@@ -5122,11 +5170,11 @@ msgstr ""
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
-msgstr ""
+msgstr "Bạn không có bất kỳ ghi chú nào."
 
 #: lms/templates/problem.html
 msgid "Reset"
-msgstr ""
+msgstr "Thiết lập lại"
 
 #: lms/templates/problem.html
 msgid "Show Answer"
@@ -5179,7 +5227,7 @@ msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "The following errors occurred while processing your registration:"
-msgstr ""
+msgstr "Các lỗi sau đây xảy ra trong khi xử lý đăng ký của bạn:"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
@@ -5194,13 +5242,12 @@ msgstr "Nhập tên hiển thị công khai"
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
 msgid "example: JaneDoe"
-msgstr ""
+msgstr "ví dụ: JaneDoe"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
 msgid "Will be shown in any discussions or forums you participate in"
-msgstr ""
-"sẽ được hiển thị trong mọi cuộc thảo luận hoặc các diễn đàn bạn tham gia"
+msgstr "Sẽ được hiển thị trong mọi thảo luận hoặc các diễn đàn bạn tham gia"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
@@ -5295,7 +5342,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
-msgstr "Đăng ký tài khoản {platform_name}"
+msgstr ""
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
@@ -5331,7 +5378,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
-msgstr "Vui lòng điền thông tin cho tài khoản của bạn."
+msgstr ""
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
@@ -5339,7 +5386,7 @@ msgstr "không thể thay đổi sau này"
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr ""
+msgstr "ví dụ: JaneDoe"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
@@ -5347,7 +5394,7 @@ msgstr "cần thiết để ghi vào chứng chỉ của bạn."
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
-msgstr ""
+msgstr "Chào mừng {username}"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
@@ -5384,7 +5431,7 @@ msgstr "Năm sinh"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr "Vui lòng chia sẻ lý do bạn tham gia {platform_name}"
+msgstr "Vui lòng chia sẻ lý do bạn đăng ký tham gia {platform_name}"
 
 #: lms/templates/register.html lms/templates/university_profile/edge.html
 msgid "Register"
@@ -5512,6 +5559,24 @@ msgstr ""
 msgid "Staff Debug"
 msgstr ""
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr ""
@@ -5565,6 +5630,7 @@ msgstr "Người dùng"
 msgid "Staffing and Enrollment"
 msgstr ""
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5614,31 +5680,30 @@ msgid "Administer Courses"
 msgstr ""
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr ""
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr ""
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr ""
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
 msgstr ""
 
 #. Translators: A version number appears after this string
@@ -5657,16 +5722,15 @@ msgstr ""
 msgid "Course ID"
 msgstr ""
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr ""
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
 msgstr ""
 
 #: lms/templates/textannotation.html
@@ -5805,7 +5869,7 @@ msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "Total number of words:"
-msgstr ""
+msgstr "Tổng số từ:"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
@@ -6038,7 +6102,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Overview"
-msgstr ""
+msgstr "Tổng quan"
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
@@ -6225,7 +6289,7 @@ msgstr ""
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Gradebook"
-msgstr ""
+msgstr "Bảng điểm"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
@@ -6252,10 +6316,7 @@ msgid "Course Handouts"
 msgstr "Tài Liệu Phát Tay"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
+msgid "Legacy Instructor Dashboard"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6264,7 +6325,29 @@ msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6317,7 +6400,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Gradebook name:"
-msgstr ""
+msgstr "Tên bảng điểm:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Assignment name:"
@@ -6759,6 +6842,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr ""
 
@@ -6826,15 +6913,35 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
+msgid "Verified"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6928,7 +7035,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 msgid "Notification Actions"
-msgstr ""
+msgstr "Hoạt Động Thông Báo"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 msgid ""
@@ -7093,9 +7200,8 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "Tiêu đề"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -7149,7 +7255,7 @@ msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all discussions"
-msgstr "Tìm kiếm các thảo luận"
+msgstr "Tìm kiếm tất cả các thảo luận"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Sort by:"
@@ -7276,7 +7382,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "-posted %(time_ago)s by"
-msgstr ""
+msgstr "-đăng %(time_ago)s bởi"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing comment"
@@ -7291,6 +7397,8 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+"%(comments_count)s %(span_sr_open)sbình luận (%(unread_comments_count)s bình"
+" luận chưa đọc)%(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
@@ -7356,12 +7464,12 @@ msgstr ""
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] ""
+msgstr[0] "%s các thảo luận đã bắt đầu"
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s comment"
@@ -7920,10 +8028,12 @@ msgstr ""
 msgid "Choose the graded unit:"
 msgstr ""
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7951,7 +8061,7 @@ msgid "List all students with due date extensions"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
+msgid "Specify a student to see all of that student's extensions."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7974,7 +8084,14 @@ msgid "Reset due date for student"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -8248,6 +8365,20 @@ msgid "Show Email Task History"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr ""
 
@@ -8282,14 +8413,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Next, select an action to perform for the given user and problem:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -8677,7 +8800,7 @@ msgstr ""
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Total Amount"
-msgstr ""
+msgstr "Tổng số tiền"
 
 #: lms/templates/shoppingcart/list.html
 msgid "You have selected no items for purchase."
@@ -8741,6 +8864,13 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Registered as: "
+msgstr ""
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -8873,7 +9003,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
-msgstr ""
+msgstr "Tổng cộng"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "this"
@@ -8921,11 +9051,6 @@ msgid ""
 "controls, and we cannot allow you to access this particular course. Feel "
 "free to browse our catalogue to find other courses you may be interested in "
 "taking."
-msgstr ""
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
 msgstr ""
 
 #: lms/templates/static_templates/media-kit.html
@@ -9312,6 +9437,9 @@ msgstr ""
 msgid "Re-Verification Submission Confirmation"
 msgstr ""
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -10091,12 +10219,6 @@ msgstr ""
 
 #: cms/templates/component.html
 msgid "Delete this component"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html

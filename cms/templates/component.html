@@ -26,6 +26,7 @@
       </li>
     </ul>
 </div>
-<span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
+% if not xblock_context['read_only']:
+    <span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
+% endif
 ${preview}
-

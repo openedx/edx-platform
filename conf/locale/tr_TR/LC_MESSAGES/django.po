@@ -73,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:10-0400\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -954,8 +954,40 @@ msgid ""
 msgstr "Çalışanların bu soruya cevap vermesinde sorun yaşandı: boş sınır"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "or"
+msgstr "veya"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid ""
+"[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
+" idset = {idset}, error = {err}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr "ÖzelYanıt: kontrol fonksiyonu geçersiz sözlük döndü!"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error checking problem: no external queueing server is configured."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1464,9 +1496,10 @@ msgstr ""
 "{exception_message}: Yüklenmiş transkriptler bulunamadı: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
-"Youtube URL'i veya web'de herhangi bir yerde bulunan dosyaya bir bağlantı."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
@@ -4119,6 +4152,13 @@ msgstr "Sayfa bulunamadı"
 msgid "close"
 msgstr "kapat"
 
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/vert_module_studio_view.html
+msgid "Drag to reorder"
+msgstr ""
+
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4403,10 +4443,6 @@ msgstr ""
 "Kimlikle Onaylanmış Sertifika fotoğrafınız ve kimlik belgenizle kimliğinizin"
 " kanıtlanmasını gerektir ve ders sırasında sizin bu sertifikayı almak üzere "
 "geçer not aldığınız kontrol edilir. "
-
-#: common/templates/course_modes/choose.html
-msgid "or"
-msgstr "veya"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -5778,6 +5814,24 @@ msgstr "Yorum ekle"
 msgid "Staff Debug"
 msgstr "Personel için Debug"
 
+#: lms/templates/staff_problem_info.html
+msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Student Attempts"
+msgstr "Öğrencilerin Yanıtlarını Sıfırla"
+
+#: lms/templates/staff_problem_info.html
+msgid "Delete Student State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Student Submission"
+msgstr "Öğrencilerin Cevaplarını Yeniden Notlandır"
+
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
 msgstr "Modül Alanları"
@@ -5831,6 +5885,7 @@ msgstr "Kullanıcılar"
 msgid "Staffing and Enrollment"
 msgstr "Görevlendirme ve Kayıt"
 
+#. Translators: refers to http://git-scm.com/docs/git-log
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5880,21 +5935,24 @@ msgid "Administer Courses"
 msgstr "Dersleri Yönetin"
 
 #. Translators: Repo is short for git repository or source of
-#. courseware
+#. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
 msgstr "Depo yeri"
 
-#. Translators: Repo is short for git repository or source of
+#. Translators: Repo is short for git repository (http://git-scm.com/about) or
+#. source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
 msgstr "Depo dalı (opsiyonel)"
 
+#. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
 msgstr "github'dan yeni dersi yükle"
 
+#. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
 msgstr "Ders numarası veya dizini"
@@ -5902,10 +5960,6 @@ msgstr "Ders numarası veya dizini"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "Siteden dersi sil"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Django PID"
-msgstr "Django PID"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -5923,17 +5977,16 @@ msgstr "Tarih"
 msgid "Course ID"
 msgstr "Ders No"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Git Aksiyonu"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
 msgstr "Son git yük etkinliği, için"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "git action"
-msgstr "git işlemi"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -6548,11 +6601,8 @@ msgid "Course Handouts"
 msgstr "Ders Notları"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Instructor Dashboard"
-msgstr "Eğitmen Anapaneli"
+msgid "Legacy Instructor Dashboard"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6560,8 +6610,30 @@ msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "Yeni Beta Panelini Deneyin"
+msgid "Back To Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "Instructor Dashboard"
+msgstr "Eğitmen Anapaneli"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"You are using the legacy instructor dashboard, which we will retire in the "
+"near future."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Return to the Instructor Dashboard"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid ""
+"If the Instructor Dashboard is missing functionality, please contact your PM"
+" to let us know."
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -7112,6 +7184,10 @@ msgstr ""
 "süre içinde sunulacak."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Your final standing is unrequested or unavailable at this time."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "Final notunuz:"
 
@@ -7196,16 +7272,36 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} Kapak resmi"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "Kaydolunan isim:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "ID Verified"
-msgstr "Kimlik Onaylandı"
+msgid "Verified"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "Onur Kodu"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're auditing this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Auditing"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -8338,13 +8434,13 @@ msgstr ""
 msgid "Choose the graded unit:"
 msgstr "Notlandırılmış birimi seçiniz:"
 
+#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
+#. format the system requires.
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Specify the extension due date and time (in UTC; please specify MM/DD/YYYY "
-"HH:MM)"
+"Specify the extension due date and time (in UTC; please specify "
+"{format_string})."
 msgstr ""
-"Uzatılan teslim tarihini ve saati belirleyiniz (UTC olarak; lütfen "
-"MM/DD/YYYY HH:MM olarak giriniz)"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8375,8 +8471,8 @@ msgid "List all students with due date extensions"
 msgstr "Teslim süresi uzatılmış bütün öğrencileri listeleme"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Specify a specific student to see all of that student's extensions."
-msgstr "Bütün uzatımlarını görmek üzere bir öğrenciyi belirlemek"
+msgid "Specify a student to see all of that student's extensions."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8401,8 +8497,15 @@ msgid "Reset due date for student"
 msgstr "Teslim tarihini sıfırla"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Back to Standard Dashboard"
-msgstr "Standart Panele Geri Dön"
+msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid ""
+"We've changed the look and feel of the Instructor Dashboard. During this "
+"transition time, you can still access the old Instructor Dashboard by "
+"clicking the 'Revert to Legacy Dashboard' button above."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8709,6 +8812,20 @@ msgid "Show Email Task History"
 msgstr "E-posta Görev Geçmişini Göster"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Click here to view the gradebook for enrolled students. This feature is only"
+" visible to courses with a small number of total enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "Öğrenciye özel not muayenesi"
 
@@ -8750,14 +8867,6 @@ msgid "Next, select an action to perform for the given user and problem:"
 msgstr ""
 "Bir sonra, verilen kullanıcı ve problem için gerçekleştirilecek bir aksiyon "
 "seçin:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "Öğrencilerin Yanıtlarını Sıfırla"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "Öğrencilerin Cevaplarını Yeniden Notlandır"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -9251,6 +9360,13 @@ msgid "Registered as: "
 msgstr "Olarak kayıtlı:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "ID Verified"
+msgstr "Kimlik Onaylandı"
+
+#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -9445,11 +9561,6 @@ msgstr ""
 "bir ülke kaynaklı bir IP numarasından ulaştığınızı belirtti. Bu derse "
 "erişiminizi şu an için veremiyoruz. Ders almak yerine, alabileceğiniz diğer "
 "dersleri aramak için kataloğumuzu inceleyebilirsiniz."
-
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "Onur Kodu"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -9867,6 +9978,9 @@ msgstr "Fotoğrafları giriniz &amp; yeniden onaylama"
 msgid "Re-Verification Submission Confirmation"
 msgstr "Yeniden onaylama Girişi Doğrulaması"
 
+#. Translators: 'Credentials' refer to photographs the user has taken to
+#. verify
+#. their identity.
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Your Credentials Have Been Updated"
@@ -10739,12 +10853,6 @@ msgstr "Bu bileşenin kopyasını çıkarın"
 #: cms/templates/component.html
 msgid "Delete this component"
 msgstr "Bu bileşeni silin"
-
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Drag to reorder"
-msgstr "Tekrar düzenlemek için sürükle"
 
 #: cms/templates/container.html
 msgid "Container"

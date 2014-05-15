@@ -99,7 +99,7 @@ setup_instructor_dashboard = (idash_content) =>
       e.preventDefault()
 
       # deactivate all link & section styles
-      idash_content.find(".#{CSS_INSTRUCTOR_NAV}").children().removeClass CSS_ACTIVE_SECTION
+      idash_content.find(".#{CSS_INSTRUCTOR_NAV} li").children().removeClass CSS_ACTIVE_SECTION
       idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
 
       # discover section paired to link

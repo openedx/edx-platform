@@ -4,6 +4,8 @@
 Acceptance tests for Video.
 """
 
+import json
+import requests
 from .helpers import UniqueCourseTest
 from ..pages.lms.video import VideoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -13,6 +15,8 @@ from ..pages.lms.course_info import CourseInfoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 VIDEO_SOURCE_PORT = 8777
+YOUTUBE_STUB_PORT = 9080
+YOUTUBE_STUB_URL = 'http://127.0.0.1:{}/'.format(YOUTUBE_STUB_PORT)
 
 HTML5_SOURCES = [
     'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
@@ -23,6 +27,13 @@ HTML5_SOURCES = [
 HTML5_SOURCES_INCORRECT = [
     'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
 ]
+
+
+class YouTubeConfigError(Exception):
+    """
+    Error occurred while configuring YouTube Stub Server.
+    """
+    pass
 
 
 class VideoBaseTest(UniqueCourseTest):
@@ -50,6 +61,10 @@ class VideoBaseTest(UniqueCourseTest):
         self.metadata = None
         self.assets = []
         self.verticals = None
+        self.youtube_configuration = {}
+
+        # reset youtube stub server
+        self.addCleanup(self._reset_youtube_stub_server)
 
     def navigate_to_video(self):
         """ Prepare the course and get to the video and render it """
@@ -75,6 +90,9 @@ class VideoBaseTest(UniqueCourseTest):
         chapter = XBlockFixtureDesc('chapter', 'Test Chapter').add_children(chapter_sequential)
         self.course_fixture.add_children(chapter)
         self.course_fixture.install()
+
+        if len(self.youtube_configuration) > 0:
+            self._configure_youtube_stub_server(self.youtube_configuration)
 
     def _add_course_verticals(self):
         """
@@ -125,6 +143,39 @@ class VideoBaseTest(UniqueCourseTest):
         """ Wait for the video Xmodule but not for rendering """
         self._navigate_to_courseware_video()
         self.video.wait_for_video_class()
+
+    def _configure_youtube_stub_server(self, config):
+        """
+        Allow callers to configure the stub server using the /set_config URL.
+        :param config: Configuration dictionary.
+        The request should have PUT data, such that:
+            Each PUT parameter is the configuration key.
+            Each PUT value is a JSON-encoded string value for the configuration.
+        :raise YouTubeConfigError:
+        """
+        youtube_stub_config_url = YOUTUBE_STUB_URL + 'set_config'
+
+        config_data = {param: json.dumps(value) for param, value in config.items()}
+        response = requests.put(youtube_stub_config_url, data=config_data)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                    youtube_stub_config_url, config, response.status_code))
+
+    def _reset_youtube_stub_server(self):
+        """
+        Reset YouTube Stub Server Configurations using the /del_config URL.
+        :raise YouTubeConfigError:
+        """
+        youtube_stub_config_url = YOUTUBE_STUB_URL + 'del_config'
+
+        response = requests.delete(youtube_stub_config_url)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                    youtube_stub_config_url, response.status_code))
 
     def metadata_for_mode(self, player_mode, additional_data=None):
         """
@@ -268,7 +319,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
         """
@@ -292,10 +343,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.')
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
 
         # select language with code "zh"
-        self.video.select_language('zh')
+        self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
@@ -303,7 +354,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_fullscreen_video_alignment_on_transcript_toggle(self):
         """
@@ -336,6 +387,140 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
+
+    def test_video_rendering_with_default_response_time(self):
+        """
+        Scenario: Video is rendered in Youtube mode when the YouTube Server responds quickly
+        Given the YouTube server response time less than 1.5 seconds
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "Youtube" mode
+        """
+        # configure youtube server
+        self.youtube_configuration['time_to_response'] = 0.4
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('youtube'))
+
+    def test_video_rendering_wo_default_response_time(self):
+        """
+        Scenario: Video is rendered in HTML5 when the YouTube Server responds slowly
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        """
+        # configure youtube server
+        self.youtube_configuration['time_to_response'] = 2.0
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+    def test_video_with_youtube_blocked(self):
+        """
+        Scenario: Video is rendered in HTML5 mode when the YouTube API is blocked
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the YouTube API is blocked
+        And the course has a Video component in "Youtube_HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'time_to_response': 2.0,
+            'youtube_api_blocked': True,
+        })
+        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+    def test_download_transcript_button_works_correctly(self):
+        """
+        Scenario: Download Transcript button works correctly
+        Given the course has Video components A and B in "Youtube" mode
+        And Video component C in "HTML5" mode
+        And I have defined downloadable transcripts for the videos
+        Then I can download a transcript for Video A in "srt" format
+        And I can download a transcript for Video A in "txt" format
+        And I can download a transcript for Video B in "txt" format
+        And the Download Transcript menu does not exist for Video C
+        """
+
+        data_a = {'sub': 'OEoXaMPEzfM', 'download_track': True}
+        youtube_a_metadata = self.metadata_for_mode('youtube', additional_data=data_a)
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+
+        data_b = {'youtube_id_1_0': 'b7xgknqkQk8', 'sub': 'b7xgknqkQk8', 'download_track': True}
+        youtube_b_metadata = self.metadata_for_mode('youtube', additional_data=data_b)
+        self.assets.append('subs_b7xgknqkQk8.srt.sjson')
+
+        data_c = {'track': 'http://example.org/', 'download_track': True}
+        html5_c_metadata = self.metadata_for_mode('html5', additional_data=data_c)
+
+        self.verticals = [
+            [{'display_name': 'A', 'metadata': youtube_a_metadata}],
+            [{'display_name': 'B', 'metadata': youtube_b_metadata}],
+            [{'display_name': 'C', 'metadata': html5_c_metadata}]
+        ]
+
+        # open the section with videos (open video "A")
+        self.navigate_to_video()
+
+        # check if we can download transcript in "srt" format that has text "00:00:00,270"
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,270'))
+
+        # select the transcript format "txt"
+        self.assertTrue(self.video.select_transcript_format('txt'))
+
+        # check if we can download transcript in "txt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Hi, welcome to Edx.'))
+
+        # open video "B"
+        self.course_nav.go_to_sequential('B')
+
+        # check if we can download transcript in "txt" format that has text "Equal transcripts"
+        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
+
+        # open video "C"
+        self.course_nav.go_to_sequential('C')
+
+        # menu "download_transcript" doesn't exist
+        self.assertFalse(self.video.is_menu_exist('download_transcript'))
+
+    def test_video_language_menu_working(self):
+        """
+        Scenario: Language menu works correctly in Video component
+        Given the course has a Video component in "Youtube" mode
+        And I have defined multiple language transcripts for the videos
+        And I make sure captions are closed
+        And I see video menu "language" with correct items
+        And I select language with code "zh"
+        Then I see "好 各位同学" text in the captions
+        And I select language with code "en"
+        Then I see "Hi, welcome to Edx." text in the captions
+        """
+        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
+        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.hide_captions()
+
+        correct_languages = {'en': 'English', 'zh': 'Chinese'}
+        self.assertEqual(self.video.caption_languages(), correct_languages)
+
+        self.video.select_language('zh')
+
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        self.video.select_language('en')
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
@@ -417,7 +602,7 @@ class Html5VideoTest(VideoBaseTest):
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
         """
@@ -441,10 +626,10 @@ class Html5VideoTest(VideoBaseTest):
         self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.')
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
 
         # select language with code "zh"
-        self.video.select_language('zh')
+        self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
@@ -453,7 +638,7 @@ class Html5VideoTest(VideoBaseTest):
 
         #Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
-        self.video.downloaded_transcript_contains_text('srt', unicode_text)
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_full_screen_video_alignment_with_transcript_visible(self):
         """
@@ -523,3 +708,18 @@ class Html5VideoTest(VideoBaseTest):
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
+
+    def test_video_rendering(self):
+        """
+        Scenario: Video component is fully rendered in the LMS in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        Then the video has rendered in "HTML5" mode
+        And video sources are correct
+        """
+        self.metadata = self.metadata_for_mode('html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+        self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources()]))

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-05 09:25-0400\n"
-"PO-Revision-Date: 2014-05-05 13:26:48.910894\n"
+"POT-Creation-Date: 2014-05-13 09:40-0400\n"
+"PO-Revision-Date: 2014-05-13 13:41:26.703210\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1465,6 +1465,34 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr "Ûnknöwn Érrör Öççürréd. Ⱡ'σяє#"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr "Süççéssfüllý rését thé ättémpts för üsér {user} Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr "Fäïléd tö rését ättémpts. Ⱡ'σяєм#"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr "Süççéssfüllý délétéd stüdént stäté för üsér {user} Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr "Fäïléd tö délété stüdént stäté. Ⱡ'σяєм ι#"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr "Süççéssfüllý résçöréd prößlém för üsér {user} Ⱡ'σяєм ιρѕυ#"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr "Fäïléd tö résçöré prößlém. Ⱡ'σяєм#"
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -1491,7 +1519,8 @@ msgstr "Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ι�
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
@@ -1748,24 +1777,31 @@ msgstr "Édït séçtïön réléäsé däté Ⱡ'σяєм#"
 msgid "Not Graded"
 msgstr "Nöt Grädéd Ⱡ#"
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr "äsçéndïng #"
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr "désçéndïng Ⱡ#"
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
 msgstr ""
-"Shöwïng %(current_span)s%(start)s-%(end)s%(end_span)s öüt öf "
-"%(total_span)s%(total)s tötäl%(end_span)s, sörtéd ßý "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕι#"
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
+"%(sort_name)s äsçéndïng Ⱡ'σяєм ιρѕυм #"
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
+"%(sort_name)s désçéndïng Ⱡ'σяєм ιρѕυм #"
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr "%(total_items)s tötäl #"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"

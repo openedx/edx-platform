@@ -83,7 +83,14 @@ To create the drag and drop problem that appears in the image above, you'll down
         <target id="0" h="53" w="66" y="55.100006103515625" x="131.5"/>
         <target id="1" h="113" w="55" y="140.10000610351562" x="181.5"/>
       </drag_and_drop_input>
-      <answer type="loncapa/python"> correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] if draganddrop.grade(submission[0], correct_answer): correct = ['correct'] else: correct = ['incorrect'] </answer>
+      <answer type="loncapa/python"> 
+  correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, 
+  {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] 
+  if draganddrop.grade(submission[0], correct_answer): 
+      correct = ['correct'] 
+  else: 
+      correct = ['incorrect'] 
+      </answer>
     </customresponse>
     <solution>
       <img src="/static/AllopurinolAnswer.gif"/>

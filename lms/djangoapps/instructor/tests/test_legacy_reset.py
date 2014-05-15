@@ -53,7 +53,7 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {
             'action': 'Delete student state for module',
             'unique_student_identifier': self.student.email,

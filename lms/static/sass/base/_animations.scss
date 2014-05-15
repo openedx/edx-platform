@@ -241,3 +241,23 @@
 @-webkit-keyframes video-appear { @include video-appear-keyframes; }
    @-moz-keyframes video-appear { @include video-appear-keyframes; }
         @keyframes video-appear { @include video-appear-keyframes; }
+
+// quick fade-in animation to get user attention
+//************************************************************************//
+
+.is-fading-in {
+  @include animation(fade-in-animation 0.8s);
+}
+
+@mixin fade-in-keyframes {
+  0% {
+    opacity: 0.0;
+  }
+  100% {
+    opacity: 1.0;
+  }
+}
+
+@-webkit-keyframes fade-in-animation{ @include fade-in-keyframes; }
+   @-moz-keyframes fade-in-animation{ @include fade-in-keyframes; }
+        @keyframes fade-in-animation{ @include fade-in-keyframes; }

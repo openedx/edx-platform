@@ -2,9 +2,9 @@
 Change Log
 ############
 
-************
+***********
 May, 2014
-************
+***********
 
 .. list-table::
    :widths: 10 70
@@ -12,9 +12,27 @@ May, 2014
 
    * - Date
      - Change
+     - 05/13/14
+     - Updated the :ref:`Enrollment` section to reflect that usernames or email
+       addresses can be used to batch enroll students.
+   * - 05/09/14
+     - Updated :ref:`Assigning_discussion_roles` with a note about course staff requiring
+       explicit granting of discussion administration roles.
+   * - 
+     - Added :ref:`VitalSource` topic.
+   * - 05/08/14
+     - Added warnings to :ref:`Add a File` about file size.
+   * - 05/07/14
+     - Updated the :ref:`Discussions` chapter to include a topic on closing
+       discussions.
+   * - 05/06/14
+     - Expanded the :ref:`Grades` chapter to include a topic on interpreting the score histograms for problems.
+   * - 
+     - Updated :ref:`LTI Component` to reflect changes to the Studio UI.
    * - 05/02/14
-     - Updated :ref:`Drag and Drop` information
-
+     - Updated :ref:`Drag and Drop` information.
+   * - 
+     - Updated :ref:`IFrame` documentation.
 
 ************
 April, 2014
@@ -26,8 +44,6 @@ April, 2014
 
    * - Date
      - Change
-   * - 05/02/14
-     - Update :ref:`IFrame` documentation
    * - 04/28/14
      - Updated :ref:`Show or Hide the Course Wiki Page` to include note about Wiki content being available after you hide the Wiki page.
    * - 04/26/14

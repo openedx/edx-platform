@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-02 17:09-0400\n"
-"PO-Revision-Date: 2014-04-25 16:10+0000\n"
+"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"PO-Revision-Date: 2014-05-12 18:15+0000\n"
 "Last-Translator: mcolomer <mcmlilhity@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/edx-platform/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -1451,6 +1451,34 @@ msgstr "Item de llista"
 msgid "Heading"
 msgstr "Capçalera"
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr "Hi ha hagut un error desconegut."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr "S'han reiniciat amb èxit els intents per l'usuari {user}"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr "No s'han pogut reinicialitzar els intents."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr "S'ha esborrat l'estat de l'estudiant per l'usuari {user}"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr "No s'ha pogut esborrar l'estat de l'estudiant."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr "S'ha pogut reescriure la puntuació del problema de l'usuari {user}"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr "No s'ha pogut reescriure la puntuació."
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -1477,7 +1505,8 @@ msgstr "L'Studio té problemes guardant la teva feina."
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
@@ -1723,23 +1752,31 @@ msgstr "Edita la data de lliurament de la secció"
 msgid "Not Graded"
 msgstr "No puntuat"
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr "ascendent"
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr "descendent"
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
 msgstr ""
-"Mostrant %(current_span)s%(start)s-%(end)s%(end_span)s de "
-"%(total_span)s%(total)s total%(end_span)s, ordenats per "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"S'està mostrant %(current_item_range)s de %(total_items_count)s en total, "
+"ordenats per %(sort_name)s ascendent"
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+"S'està mostrant %(current_item_range)s de %(total_items_count)s en total, "
+"ordenats per %(sort_name)s descendent"
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr "%(total_items)s total"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"
