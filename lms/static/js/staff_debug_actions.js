@@ -111,15 +111,15 @@ var StaffDebug = (function(){
 
 // Register click handlers
 $(document).ready(function() {
-    $('#staff-debug-reset').click(function() {
+    $('.staff-debug-reset').click(function() {
         StaffDebug.reset($(this).data('location'));
         return false;
     });
-    $('#staff-debug-sdelete').click(function() {
+    $('.staff-debug-sdelete').click(function() {
         StaffDebug.sdelete($(this).data('location'));
         return false;
     });
-    $('#staff-debug-rescore').click(function() {
+    $('.staff-debug-rescore').click(function() {
         StaffDebug.rescore($(this).data('location'));
         return false;
     });
