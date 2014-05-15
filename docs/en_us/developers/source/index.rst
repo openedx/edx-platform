@@ -23,6 +23,7 @@ Contents:
     analytics.rst
     process/index
     testing/index
+    cognitive_load
 
 APIs
 -----
