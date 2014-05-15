@@ -132,6 +132,9 @@ if Backbone?
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
       @renderThreads()
+      sort_element = @$('.sort-bar a[data-sort="' + this.collection.sort_preference + '"]')
+      sort_element.attr('aria-checked',true)
+      sort_element.addClass('active')
       @
 
     renderThreads: =>
@@ -413,18 +416,14 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      activeSort = @$(".sort-bar a[class='active']")
+      activeSort = @$(".sort-bar a.active")
       activeSort.removeClass("active")
       activeSort.attr("aria-checked", "false")
       newSort = $(event.target)
       newSort.addClass("active")
       newSort.attr("aria-checked", "true")
       @sortBy = newSort.data("sort")
-
-      @displayedCollection.comparator = switch @sortBy
-        when 'date' then @displayedCollection.sortByDateRecentFirst
-        when 'votes' then @displayedCollection.sortByVotes
-        when 'comments' then @displayedCollection.sortByComments
+      @displayedCollection.setSortComparator(@sortBy)
       @retrieveFirstPage(event)
 
     performSearch: (event) ->

@@ -167,6 +167,38 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         ).fulfill()
 
 
+class DiscussionSortPreferencePage(CoursePage):
+    """
+    Page that contain the discussion board with sorting options
+    """
+    def __init__(self, browser, course_id):
+        super(DiscussionSortPreferencePage, self).__init__(browser, course_id)
+        self.url_path = "discussion/forum"
+
+    def is_browser_on_page(self):
+        """
+        Return true if the browser is on the right page else false.
+        """
+        return self.q(css="body.discussion .sort-bar").present
+
+    def get_selected_sort_preference_text(self):
+        """
+        Return the text of option that is selected for sorting.
+        """
+        return self.q(css="body.discussion .sort-bar a.active").text[0].lower()
+
+    def change_sort_preference(self, sort_by):
+        """
+        Change the option of sorting by clicking on new option.
+        """
+        self.q(css="body.discussion .sort-bar a[data-sort='{0}']".format(sort_by)).click()
+
+    def refresh_page(self):
+        """
+        Reload the page.
+        """
+        self.browser.refresh()
+
 class DiscussionTabSingleThreadPage(CoursePage):
     def __init__(self, browser, course_id, thread_id):
         super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
