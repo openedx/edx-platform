@@ -111,15 +111,16 @@ var StaffDebug = (function(){
 
 // Register click handlers
 $(document).ready(function() {
-    $('.staff-debug-reset').click(function() {
+    var $courseContent = $('.course-content');
+    $courseContent.on("click", '.staff-debug-reset', function() {
         StaffDebug.reset($(this).data('location'));
         return false;
     });
-    $('.staff-debug-sdelete').click(function() {
+    $courseContent.on("click", '.staff-debug-sdelete', function() {
         StaffDebug.sdelete($(this).data('location'));
         return false;
     });
-    $('.staff-debug-rescore').click(function() {
+    $courseContent.on("click", '.staff-debug-rescore', function() {
         StaffDebug.rescore($(this).data('location'));
         return false;
     });
