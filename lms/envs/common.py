@@ -1148,6 +1148,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'djcelery',
     'south',
+    'social.apps.django_app.default',
 
     # Database-backed configuration
     'config_models',
