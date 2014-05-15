@@ -24,6 +24,7 @@ Contents:
     process/index
     testing/index
     cognitive_load
+    deploy-new-service
 
 APIs
 -----
