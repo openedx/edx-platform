@@ -118,11 +118,11 @@ class CourseContentGroupRelationship(TimeStampedModel):
     """
     course_id = models.CharField(max_length=255, db_index=True)
     content_id = models.CharField(max_length=255, db_index=True)
-    group = models.ForeignKey(GroupProfile, db_index=True)
+    group_profile = models.ForeignKey(GroupProfile, db_index=True)
     record_active = models.BooleanField(default=True)
 
     class Meta:
         """
         Mapping model to enable grouping of course content such as chapters
         """
-        unique_together = ("course_id", "content_id", "group")
+        unique_together = ("course_id", "content_id", "group_profile")
