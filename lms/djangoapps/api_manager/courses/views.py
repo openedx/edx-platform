@@ -121,17 +121,6 @@ def _serialize_content_children(request, course_id, children):
     return data
 
 
-def _serialize_content_groups(request, course_id, content_id, groups):
-    """
-    Loads the specified content group data into the response dict
-    This should probably evolve to use DRF serializers
-    """
-    return [
-        {'course_id': course_id, 'content_id': content_id, 'group_id': group.group_id}
-        for group in groups
-    ]
-
-
 def _serialize_content_with_children(request, course_descriptor, descriptor, depth):
     data = _serialize_content(
         request,
@@ -760,31 +749,34 @@ class CourseContentGroupsList(APIView):
         if group_id is None:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         try:
-            existing_group = GroupProfile.objects.get(group_id=group_id)
+            existing_profile = GroupProfile.objects.get(group_id=group_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         try:
             existing_relationship = CourseContentGroupRelationship.objects.get(
                 course_id=course_id,
                 content_id=content_id,
-                group=existing_group
+                group_profile=existing_profile
             )
         except ObjectDoesNotExist:
             existing_relationship = None
         response_data = {}
         base_uri = _generate_base_uri(request)
-        response_data['uri'] = '{}/{}'.format(base_uri, existing_group.group_id)
+        response_data['uri'] = '{}/{}'.format(base_uri, existing_profile.group_id)
         if existing_relationship:
             response_data['message'] = "Relationship already exists."
             return Response(response_data, status=status.HTTP_409_CONFLICT)
         CourseContentGroupRelationship.objects.create(
             course_id=course_id,
             content_id=content_id,
-            group=existing_group
+            group_profile=existing_profile
         )
+        rels = CourseContentGroupRelationship.objects.all()
+        for rel in rels:
+            print rel.__dict__
         response_data['course_id'] = course_descriptor.id
         response_data['content_id'] = existing_content.id
-        response_data['group_id'] = str(existing_group.group_id)
+        response_data['group_id'] = str(existing_profile.group_id)
         return Response(response_data, status=status.HTTP_201_CREATED)
 
     def get(self, request, course_id, content_id):
@@ -794,7 +786,6 @@ class CourseContentGroupsList(APIView):
         """
         response_data = []
         group_type = request.QUERY_PARAMS.get('type')
-
         try:
             course_descriptor = get_course(course_id)
         except ValueError:
@@ -804,18 +795,16 @@ class CourseContentGroupsList(APIView):
             existing_content = store.get_instance(course_id, Location(content_id))
         except InvalidLocationError:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        groups = CourseContentGroupRelationship.objects.filter(
+        relationships = CourseContentGroupRelationship.objects.filter(
             course_id=course_id,
-            content_id=content_id
-        )
+            content_id=content_id,
+        ).select_related("groupprofile")
         if group_type:
-            groups = groups.filter(group__group_type=group_type)
-        response_data = _serialize_content_groups(
-            request,
-            course_id,
-            content_id,
-            groups
-        )
+            relationships = relationships.filter(group_profile__group_type=group_type)
+        response_data = [
+            {'course_id': course_id, 'content_id': content_id, 'group_id': relationship.group_profile.group_id}
+            for relationship in relationships
+        ]
         return Response(response_data, status=status.HTTP_200_OK)
 
 
@@ -837,10 +826,10 @@ class CourseContentGroupsDetail(APIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            groups = CourseContentGroupRelationship.objects.get(
+            relationship = CourseContentGroupRelationship.objects.get(
                 course_id=course_id,
                 content_id=content_id,
-                group=group_id
+                group_profile__group_id=group_id
             )
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
@@ -856,37 +845,38 @@ class CourseContentUsersList(generics.ListAPIView):
     """
     ### The CourseContentUsersList view allows clients to users enrolled and
     users not enrolled for course within all groups of course
-    - URI: ```/api/courses/{course_id}/content/{content_id}/users?enrolled={enrolment_status}&group_id={group_id}&type={group_type}```
+    - URI: ```/api/courses/{course_id}/content/{content_id}/users
+        * enrolled: boolean, filters user set by enrollment status
+        * group_id: numeric, filters user set by membership in a specific group
+        * type: string, filters user set by membership in groups matching the specified type
     - GET: Returns a JSON representation of users enrolled or not enrolled
     ### Use Cases/Notes:
-    * Use CourseContentUsersList to grab the users enrolled in Course content group
-    * Use CourseContentUsersList to grab the users not enrolled in Course content group
+    * Filtering related Users by enrollement status should be self-explanatory
+    * An example of specific group filtering is to get the set of users who are members of a particular workgroup related to the content
+    * An example of group type filtering is to get all users who are members of an organization group related to the content
     """
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
 
     def get_queryset(self):
         """
-        GET retrieves the list of users who registered for a given course content
-        and list of users who are not registered for that group course content.
-        'enrolled' query parameter for filtering user' enrolment status
-        'group_id' query parameter is available for filtering by group.
-        'type' query parameter is available for filtering by group_type.
+        GET /api/courses/{course_id}/content/{content_id}/users
         """
         course_id = self.kwargs['course_id']
         content_id = self.kwargs['content_id']
         enrolled = self.request.QUERY_PARAMS.get('enrolled', 'True')
         group_type = self.request.QUERY_PARAMS.get('type', None)
         group_id = self.request.QUERY_PARAMS.get('group_id', None)
-        groups = CourseContentGroupRelationship.objects.filter(course_id=course_id, content_id=content_id)
+        relationships = CourseContentGroupRelationship.objects.filter(
+            course_id=course_id, content_id=content_id).select_related("groupprofile")
 
         if group_id:
-            groups = groups.filter(group__group__id=group_id)
+            relationships = relationships.filter(group_profile__group__id=group_id)
 
         if group_type:
-            groups = groups.filter(group__group_type=group_type)
+            relationships = relationships.filter(group_profile__group_type=group_type)
 
-        lookup_group_ids = groups.values_list('group_id', flat=True)
+        lookup_group_ids = relationships.values_list('group_profile', flat=True)
         users = User.objects.filter(groups__id__in=lookup_group_ids)
         enrolled_users = CourseEnrollment.users_enrolled_in(course_id).filter(groups__id__in=lookup_group_ids)
         if enrolled in ['True', 'true']:
