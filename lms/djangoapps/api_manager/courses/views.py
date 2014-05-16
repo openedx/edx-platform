@@ -8,13 +8,11 @@ from StringIO import StringIO
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
 
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from api_manager.permissions import ApiKeyHeaderPermission
+
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
 from api_manager.users.serializers import UserSerializer
 from courseware import module_render
@@ -24,6 +22,7 @@ from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
+from api_manager.permissions import SecureAPIView
 
 
 log = logging.getLogger(__name__)
@@ -254,8 +253,8 @@ def _parse_updates_html(html):
     return result
 
 
-class CourseContentList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CourseContentList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, content_id=None):
         """
@@ -287,8 +286,8 @@ class CourseContentList(APIView):
         return Response(response_data, status=status_code)
 
 
-class CourseContentDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CourseContentDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, content_id):
         """
@@ -324,8 +323,8 @@ class CourseContentDetail(APIView):
         return Response(response_data, status=status_code)
 
 
-class CoursesList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request):
         """
@@ -344,8 +343,8 @@ class CoursesList(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class CoursesDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id):
         """
@@ -383,8 +382,8 @@ class CoursesDetail(APIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CoursesGroupsList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesGroupsList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def post(self, request, course_id):
         """
@@ -441,8 +440,9 @@ class CoursesGroupsList(APIView):
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
 
-class CoursesGroupsDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+
+class CoursesGroupsDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, group_id):
         """
@@ -488,8 +488,8 @@ class CoursesGroupsDetail(APIView):
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
-class CoursesOverview(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesOverview(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id):
         """
@@ -515,8 +515,8 @@ class CoursesOverview(APIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CoursesUpdates(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesUpdates(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id):
         """
@@ -540,8 +540,8 @@ class CoursesUpdates(APIView):
         return Response(response_data)
 
 
-class CoursesStaticTabsList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesStaticTabsList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id):
         """
@@ -572,8 +572,8 @@ class CoursesStaticTabsList(APIView):
         return Response(response_data)
 
 
-class CoursesStaticTabsDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesStaticTabsDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, tab_id):
         """
@@ -602,8 +602,8 @@ class CoursesStaticTabsDetail(APIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CoursesUsersList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesUsersList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def post(self, request, course_id):
         """
@@ -681,8 +681,8 @@ class CoursesUsersList(APIView):
         return Response(response_data)
 
 
-class CoursesUsersDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CoursesUsersDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, user_id):
         """
@@ -740,8 +740,8 @@ class CoursesUsersDetail(APIView):
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
-class CourseContentGroupsList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CourseContentGroupsList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def post(self, request, course_id, content_id):
         try:
@@ -816,8 +816,8 @@ class CourseContentGroupsList(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class CourseContentGroupsDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class CourseContentGroupsDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, course_id, content_id, group_id):
         """
@@ -849,7 +849,7 @@ class CourseContentGroupsDetail(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class CourseContentUsersList(generics.ListAPIView):
+class CourseContentUsersList(SecureAPIView):
     """
     ### The CourseContentUsersList view allows clients to users enrolled and
     users not enrolled for course within all groups of course
@@ -859,10 +859,7 @@ class CourseContentUsersList(generics.ListAPIView):
     * Use CourseContentUsersList to grab the users enrolled in Course content group
     * Use CourseContentUsersList to grab the users not enrolled in Course content group
     """
-    permission_classes = (ApiKeyHeaderPermission,)
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
+    def get(self, request, course_id, content_id):
         """
         GET retrieves the list of users who registered for a given course content
         and list of users who are not registered for that group course content.
@@ -870,8 +867,6 @@ class CourseContentUsersList(generics.ListAPIView):
         'group_id' query parameter is available for filtering by group.
         'type' query parameter is available for filtering by group_type.
         """
-        course_id = self.kwargs['course_id']
-        content_id = self.kwargs['content_id']
         enrolled = self.request.QUERY_PARAMS.get('enrolled', 'True')
         group_type = self.request.QUERY_PARAMS.get('type', None)
         group_id = self.request.QUERY_PARAMS.get('group_id', None)
@@ -890,4 +885,6 @@ class CourseContentUsersList(generics.ListAPIView):
             queryset = enrolled_users
         else:
             queryset = list(itertools.ifilterfalse(lambda x: x in enrolled_users, users))
-        return queryset
+
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)  # pylint: disable=E1101
