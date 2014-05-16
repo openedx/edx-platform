@@ -193,8 +193,8 @@ def get_d3_problem_grade_distrib(course_id):
 
                                 # Compute percent of students with this grade
                                 student_count_percent = 0
-                                if total_student_count.get(child.location.url(), 0) > 0:
-                                    student_count_percent = count_grade * 100 / total_student_count[child.location.url()]
+                                if total_student_count.get(child.location, 0) > 0:
+                                    student_count_percent = count_grade * 100 / total_student_count[child.location]
 
                                 # Tooltip parameters for problem in grade distribution view
                                 tooltip = {

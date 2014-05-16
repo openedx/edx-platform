@@ -115,7 +115,7 @@ class ImportTestCase(CourseTestCase):
         """
         # Create a non_staff user and add it to course staff only
         __, nonstaff_user = self.create_non_staff_authed_user_client(authenticate=False)
-        auth.add_users(self.user, CourseStaffRole(self.course.location), nonstaff_user)
+        auth.add_users(self.user, CourseStaffRole(self.course.id), nonstaff_user)
 
         course = self.store.get_item(self.course_location)
         self.assertIsNotNone(course)
@@ -135,8 +135,8 @@ class ImportTestCase(CourseTestCase):
         self.assertNotEqual(display_name_before_import, display_name_after_import)
 
         # Now check that non_staff user has his same role
-        self.assertFalse(CourseInstructorRole(self.course_location).has_user(nonstaff_user))
-        self.assertTrue(CourseStaffRole(self.course_location).has_user(nonstaff_user))
+        self.assertFalse(CourseInstructorRole(self.course.id).has_user(nonstaff_user))
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(nonstaff_user))
 
         # Now course staff user can also successfully import course
         self.client.login(username=nonstaff_user.username, password='foo')
@@ -146,8 +146,8 @@ class ImportTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 200)
 
         # Now check that non_staff user has his same role
-        self.assertFalse(CourseInstructorRole(self.course_location).has_user(nonstaff_user))
-        self.assertTrue(CourseStaffRole(self.course_location).has_user(nonstaff_user))
+        self.assertFalse(CourseInstructorRole(self.course.id).has_user(nonstaff_user))
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(nonstaff_user))
 
     ## Unsafe tar methods #####################################################
     # Each of these methods creates a tarfile with a single type of unsafe
