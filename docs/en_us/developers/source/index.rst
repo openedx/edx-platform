@@ -23,7 +23,7 @@ Contents:
     analytics.rst
     process/index
     testing/index
-    cognitive_load
+    code-considerations
     deploy-new-service
 
 APIs
