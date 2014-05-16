@@ -77,7 +77,10 @@ def _generate_items_for_subtask(item_queryset, item_fields, total_num_items, tot
     for query_number in range(num_queries):
         # In case total_num_items has increased since it was initially calculated
         # include all remaining items in last query.
-        item_sublist = list(item_queryset.order_by('pk').filter(pk__gt=last_pk)[:items_per_query].values(*all_item_fields))
+        if query_number < num_queries - 1:
+            item_sublist = list(item_queryset.order_by('pk').filter(pk__gt=last_pk)[:items_per_query].values(*all_item_fields))
+        else:
+            item_sublist = list(item_queryset.order_by('pk').filter(pk__gt=last_pk).values(*all_item_fields))
 
         last_pk = item_sublist[-1]['pk']
         num_items_this_query = len(item_sublist)
