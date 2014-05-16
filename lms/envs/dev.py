@@ -308,3 +308,6 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+########################## ALLOWED API USER IP ########################
+ALLOWED_IP_ADDRESSES = ['127.0.0.1']
