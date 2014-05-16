@@ -1,4 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course
 
@@ -14,8 +17,12 @@ class Command(BaseCommand):
         course_id = args[0]
 
         try:
-            course = get_course(course_id)
-        except ValueError:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+        course = get_course(course_key)
+        if not course:
             raise CommandError("Invalid course id: {}".format(course_id))
 
         if course.discussion_link:
