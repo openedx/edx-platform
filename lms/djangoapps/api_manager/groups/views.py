@@ -8,13 +8,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from api_manager.permissions import ApiKeyHeaderPermission
+
+
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile
 from xmodule.modulestore.django import modulestore
+from api_manager.permissions import SecureAPIView
 from xmodule.modulestore import Location, InvalidLocationError
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
@@ -39,7 +39,7 @@ def _generate_base_uri(request, include_query_string=True):
     return resource_uri
 
 
-class GroupsList(APIView):
+class GroupsList(SecureAPIView):
     """
     ### The GroupsList view allows clients to retrieve/append a list of Group entities
     - URI: ```/api/groups/```
@@ -74,7 +74,6 @@ class GroupsList(APIView):
         ** organization: display_name, contact_name, phone, email
     * Ultimately, both 'type' and 'data' are determined by the client/caller.  Open edX has no type or data specifications at the present time.
     """
-    permissions_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request):
         """
@@ -140,7 +139,7 @@ class GroupsList(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class GroupsDetail(APIView):
+class GroupsDetail(SecureAPIView):
     """
     ### The GroupsDetail view allows clients to interact with a specific Group entity
     - URI: ```/api/groups/{group_id}```
@@ -167,7 +166,6 @@ class GroupsDetail(APIView):
         ** Related Courses (/api/groups/{group_id}/courses)
         ** Related Groups(/api/groups/{group_id}/groups)
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
@@ -231,7 +229,7 @@ class GroupsDetail(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class GroupsUsersList(APIView):
+class GroupsUsersList(SecureAPIView):
     """
     ### The GroupsUserList view allows clients to interact with the set of User entities related to the specified Group
     - URI: ```/api/groups/{group_id}/users/```
@@ -248,7 +246,6 @@ class GroupsUsersList(APIView):
     * For example, as a newly-added member of a 'workgroup' group, a User could be presented with a list of their peers
     * Once a User Group exists, you can additionally link to Courses and other Groups (see GroupsCoursesList, GroupsGroupsList)
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
@@ -304,7 +301,7 @@ class GroupsUsersList(APIView):
         return Response(response_data, status=response_status)
 
 
-class GroupsUsersDetail(APIView):
+class GroupsUsersDetail(SecureAPIView):
     """
     ### The GroupsUsersDetail view allows clients to interact with a specific Group-User relationship
     - URI: ```/api/groups/{group_id}/users/{user_id}```
@@ -314,7 +311,6 @@ class GroupsUsersDetail(APIView):
     * Use the GroupsUsersDetail to validate that a User is a member of a specific Group
     * Cancelling a User's membership in a Group is as simple as calling DELETE on the URI
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, user_id):
         """
@@ -350,7 +346,7 @@ class GroupsUsersDetail(APIView):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-class GroupsGroupsList(APIView):
+class GroupsGroupsList(SecureAPIView):
     """
     ### The GroupsGroupsList view allows clients to interact with the set of Groups related to the specified Group
     - URI: ```/api/groups/{group_id}/groups/```
@@ -381,7 +377,6 @@ class GroupsGroupsList(APIView):
         ** GET /groups/987/groups/246 -> 200 OK
     * Once a Group Group exists, you can additionally link to Users and Courses (see GroupsUsersList, GroupsCoursesList)
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
@@ -454,7 +449,7 @@ class GroupsGroupsList(APIView):
         return Response(response_data, status=response_status)
 
 
-class GroupsGroupsDetail(APIView):
+class GroupsGroupsDetail(SecureAPIView):
     """
     ### The GroupsGroupsDetail view allows clients to interact with a specific Group-Group relationship
     - URI: ```/api/groups/{group_id}/groups/{related_group_id}```
@@ -466,7 +461,6 @@ class GroupsGroupsDetail(APIView):
         ** Is the current course series linked to the specified workgroup?
     * To remove an existing Group-Group relationship, simply call DELETE on the URI
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, related_group_id):
         """
@@ -520,7 +514,7 @@ class GroupsGroupsDetail(APIView):
         return Response({}, status=response_status)
 
 
-class GroupsCoursesList(APIView):
+class GroupsCoursesList(SecureAPIView):
     """
     ### The GroupsCoursesList view allows clients to interact with the set of Courses related to the specified Group
     - URI: ```/api/groups/{group_id}/courses/```
@@ -536,7 +530,6 @@ class GroupsCoursesList(APIView):
     * Create a Group of Courses to model cases such as an academic program or topical series
     * Once a Course Group exists, you can additionally link to Users and other Groups (see GroupsUsersList, GroupsGroupsList)
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, group_id):
         """
@@ -595,7 +588,7 @@ class GroupsCoursesList(APIView):
         return Response(response_data, status=response_status)
 
 
-class GroupsCoursesDetail(APIView):
+class GroupsCoursesDetail(SecureAPIView):
     """
     ### The GroupsCoursesDetail view allows clients to interact with a specific Group-Course relationship
     - URI: ```/api/groups/{group_id}/courses/{course_id}```
@@ -608,7 +601,6 @@ class GroupsCoursesDetail(APIView):
     * Removing a Course from a Group is as simple as calling DELETE on the URI
         * Remove a course from the specified academic program
     """
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request, group_id, course_id):
         """

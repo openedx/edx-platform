@@ -3,7 +3,8 @@ from django.middleware.csrf import get_token
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from api_manager.permissions import SecureAPIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
 
@@ -23,9 +24,8 @@ def _generate_base_uri(request):
     return resource_uri
 
 
-class SystemDetail(APIView):
+class SystemDetail(SecureAPIView):
     """Manages system-level information about the Open edX API"""
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request):
         base_uri = _generate_base_uri(request)
@@ -37,9 +37,8 @@ class SystemDetail(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class ApiDetail(APIView):
+class ApiDetail(SecureAPIView):
     """Manages top-level information about the Open edX API"""
-    permission_classes = (ApiKeyHeaderPermission,)
 
     def get(self, request):
         base_uri = _generate_base_uri(request)
