@@ -66,10 +66,19 @@
         </section>
         <script>
 
+<<<<<<< HEAD
         //Grab uri of the course
         var parts = window.location.href.split("/"),
             uri = '';
         for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
+=======
+    	//Grab uri of the course
+    	var parts = window.location.href.split("/"), 
+    		uri = '',
+		courseid;
+	for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
+	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
+>>>>>>> edx/master
         var pagination = 100,
             is_staff = false,
             options = {
@@ -168,7 +177,7 @@
                   },
             },
             auth: {
-                token: "${token}"
+                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
             },
             store: {
                 // The endpoint of the store on your server.

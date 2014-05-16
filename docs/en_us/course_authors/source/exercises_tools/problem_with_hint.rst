@@ -57,7 +57,7 @@ To create the above problem:
 	    </text>
     </problem>
 
-.. _Drag and Drop Problem XML:
+.. _Problem with Adaptive Hint XML:
 
 *********************************
 Problem with Adaptive Hint XML

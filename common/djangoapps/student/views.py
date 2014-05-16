@@ -44,6 +44,7 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
+from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -1867,7 +1868,11 @@ def token(request):
     the token was issued. This will be stored with the user along with
     the id for identification purposes in the backend.
     '''
+<<<<<<< HEAD
     course_id = SlashSeparatedCourseKey.from_deprecated_string(request.GET.get("course_id"))
+=======
+    course_id = request.GET.get("course_id")
+>>>>>>> edx/master
     course = course_from_id(course_id)
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()

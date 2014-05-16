@@ -4,38 +4,44 @@ courses
 """
 import logging
 import os
-import tarfile
-import shutil
 import re
-from tempfile import mkdtemp
+import shutil
+import tarfile
 from path import path
+from tempfile import mkdtemp
 
 from django.conf import settings
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie
-from django.core.servers.basehttp import FileWrapper
-from django.core.files.temp import NamedTemporaryFile
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
-from django.http import HttpResponseNotFound
-from django.views.decorators.http import require_http_methods, require_GET
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods, require_GET
 
+from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
-
-from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
+<<<<<<< HEAD
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from xmodule.exceptions import SerializationError
 
 from .access import has_course_access
+=======
+from xmodule.exceptions import SerializationError
+from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_exporter import export_to_xml
+>>>>>>> edx/master
 
-from util.json_request import JsonResponse
+from .access import has_course_access
 from extract_tar import safetar_extractall
-from student.roles import CourseInstructorRole, CourseStaffRole
 from student import auth
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from util.json_request import JsonResponse
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
 
@@ -234,10 +240,13 @@ def import_handler(request, course_key_string):
                     session_status[key] = 3
                     request.session.modified = True
 
+<<<<<<< HEAD
                     auth.add_users(request.user, CourseInstructorRole(new_location.course_key), request.user)
                     auth.add_users(request.user, CourseStaffRole(new_location.course_key), request.user)
                     logging.debug('created all course groups at {0}'.format(new_location))
 
+=======
+>>>>>>> edx/master
                 # Send errors to client with stage at which error occurred.
                 except Exception as exception:   # pylint: disable=W0703
                     log.exception(

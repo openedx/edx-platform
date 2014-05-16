@@ -114,6 +114,7 @@ var StaffDebug = (function(){
 
 // Register click handlers
 $(document).ready(function() {
+<<<<<<< HEAD
     $('#staff-debug-reset').click(function() {
         StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
@@ -124,6 +125,18 @@ $(document).ready(function() {
     });
     $('#staff-debug-rescore').click(function() {
         StaffDebug.rescore($(this).parent().data('location-name'), $(this).parent().data('location'));
+=======
+    $('.staff-debug-reset').click(function() {
+        StaffDebug.reset($(this).data('location'));
+        return false;
+    });
+    $('.staff-debug-sdelete').click(function() {
+        StaffDebug.sdelete($(this).data('location'));
+        return false;
+    });
+    $('.staff-debug-rescore').click(function() {
+        StaffDebug.rescore($(this).data('location'));
+>>>>>>> edx/master
         return false;
     });
 });

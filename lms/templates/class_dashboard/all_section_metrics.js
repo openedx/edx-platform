@@ -1,4 +1,4 @@
-<%page args="id_opened_prefix, id_grade_prefix, id_attempt_prefix, id_tooltip_prefix, course_id, **kwargs"/>
+<%page args="id_opened_prefix, id_grade_prefix, id_attempt_prefix, id_tooltip_prefix, course_id, allSubsectionTooltipArr, allProblemTooltipArr, **kwargs"/>
 <%!
   import json
   from django.core.urlresolvers import reverse
@@ -29,6 +29,13 @@ $(function () {
         bLegend : false,
         margin: {left:0},
       };
+      
+      // Construct array of tooltips for all sections for the "Download Subsection Data" button.
+      var sectionTooltipArr = new Array();
+      paramOpened.data.forEach( function(element, index, array) {
+    	sectionTooltipArr[index] = element.stackData[0].tooltip;
+      });
+      allSubsectionTooltipArr[i] = sectionTooltipArr;
       
       barGraphOpened = edx_d3CreateStackedBarGraph(paramOpened, d3.select(curr_id).append("svg"),
               d3.select("#${id_tooltip_prefix}"+i));
@@ -68,6 +75,17 @@ $(function () {
         bVerticalXAxisLabel : true,
       };
       
+      // Construct array of tooltips for all sections for the "Download Problem Data" button.
+      var sectionTooltipArr = new Array();
+      paramGrade.data.forEach( function(element, index, array) {
+    	var stackDataArr = new Array();
+    	for (var j = 0; j < element.stackData.length; j++) {
+    		stackDataArr[j] = element.stackData[j].tooltip
+    	}
+    	sectionTooltipArr[index] = stackDataArr;
+      });
+      allProblemTooltipArr[i] = sectionTooltipArr;
+
       barGraphGrade = edx_d3CreateStackedBarGraph(paramGrade, d3.select(curr_id).append("svg"),
               d3.select("#${id_tooltip_prefix}"+i));
       barGraphGrade.scale.stackColor.domain([0,50,100]).range(["#e13f29","#cccccc","#17a74d"]);
@@ -83,6 +101,7 @@ $(function () {
 
       i+=1;
     }
+    
   });
   
 });

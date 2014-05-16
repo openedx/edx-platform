@@ -255,10 +255,17 @@ def _section_metrics(course_key, access):
         'section_key': 'metrics',
         'section_display_name': ('Metrics'),
         'access': access,
+<<<<<<< HEAD
         'sub_section_display_name': get_section_display_name(course_key),
         'section_has_problem': get_array_section_has_problem(course_key),
+=======
+        'course_id': course_id,
+        'sub_section_display_name': get_section_display_name(course_id),
+        'section_has_problem': get_array_section_has_problem(course_id),
+>>>>>>> edx/master
         'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
         'get_students_problem_grades_url': reverse('get_students_problem_grades'),
+        'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
 
