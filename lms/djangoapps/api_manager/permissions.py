@@ -63,7 +63,7 @@ class IPAddressRestrictedPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         ip_address = get_client_ip_address(request)
-        allowed_ip_addresses = getattr(settings, 'ALLOWED_IP_ADDRESSES', None)
+        allowed_ip_addresses = getattr(settings, 'API_ALLOWED_IP_ADDRESSES', None)
         if allowed_ip_addresses:
             for allowed_ip_address in allowed_ip_addresses:
                 if '/' in allowed_ip_address:
