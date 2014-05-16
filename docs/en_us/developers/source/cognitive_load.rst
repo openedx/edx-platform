@@ -1,6 +1,6 @@
-**************
-Cognitive Load
-**************
+*******************
+Code Considerations
+*******************
 
 This is a checklist of all of the things that we expect a developer to consider
 as they are building new or modifying existing functionality.
@@ -20,13 +20,16 @@ Operational Impact
       dashboard to monitor them?
 
 * Am I building a feature that will have impact to the performance of the system?
+  Keep in mind that Open edX needs to support hundreds of thousands if not
+  millions of students, so be careful that you code will work well when the
+  numbers get large.
 
     * Deep Search
     * Grade Downloads
 
 * Are reasonable log messages being written out for debugging purposes?
-* Will this new feature easily startup in the Vagrant image?
-* Do we have documentation for how to startup this feature if it has any
+* Will this new feature easily start up in the Vagrant image?
+* Do we have documentation for how to start up this feature if it has any
   new startup requirements?
 * Are there any special directories/file system permissions that need to be set?
 * Will this have any impact to the CDN related technologies?
@@ -44,7 +47,7 @@ Documentation/Training/Support
 
   * For Studio much of the documentation is in the product.
 
-* Is this feature big enough that we need to have a session with stake holders
+* Is this feature big enough that we need to have a session with stakeholders
   to introduce this feature BEFORE we release it? (PMs, Support, etc...)
 
   * Paid Certificates
@@ -134,7 +137,6 @@ Collaboration
   * Forums/LMS - email
 
 * Does this feature require a special broadcast to external teams as well?
-  (Stanford, Google, Berkley, etc...)
 
 Open Source
 ===========

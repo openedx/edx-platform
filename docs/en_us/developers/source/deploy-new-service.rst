@@ -68,7 +68,7 @@ Logging
 It's important that your application logging in built out to provide sufficient
 feedback for problem determination as well as ensuring that it is operating as
 desired.  It's also important that your service log using our deployment
-standards, i.e., logs vi syslog in deployment environments and utilizes the
+standards, i.e., logs vs syslog in deployment environments and utilizes the
 standard log format for syslog.  Can the logs be consumed by Splunk?  They
 should not be if they contain  data discussed in the Data Security section below.
 
