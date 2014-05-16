@@ -503,7 +503,7 @@ def get_module_system_for_user(user, field_data_cache,
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
-            make_psychometrics_data_update_handler(course_id, user, descriptor.location.to_deprecated_string())
+            make_psychometrics_data_update_handler(course_id, user, descriptor.location)
         )
 
     system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
