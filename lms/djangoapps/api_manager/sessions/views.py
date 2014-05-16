@@ -10,14 +10,14 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
-
+from api_manager.permissions import SecureAPIView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
 
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from api_manager.permissions import ApiKeyHeaderPermission
+
 from api_manager.users.serializers import UserSerializer
 from student.models import (
     LoginFailures, PasswordHistory
@@ -40,8 +40,8 @@ def _generate_base_uri(request):
     return resource_uri
 
 
-class SessionsList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class SessionsList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def post(self, request):
         """
@@ -113,8 +113,8 @@ class SessionsList(APIView):
         return Response(response_data, status=response_status)
 
 
-class SessionsDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class SessionsDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def get(self, request, session_id):
         """
