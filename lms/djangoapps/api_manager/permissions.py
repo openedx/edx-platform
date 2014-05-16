@@ -3,7 +3,10 @@ import logging
 
 from django.conf import settings
 
+from api_manager.utils import get_client_ip_address, address_exists_in_network
 from rest_framework import permissions
+from rest_framework.views import APIView
+
 
 log = logging.getLogger(__name__)
 
@@ -50,3 +53,34 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 
         # Allow the request to take place
         return True
+
+
+class IPAddressRestrictedPermission(permissions.BasePermission):
+    """
+    Check for permissions by matching the request IP address
+    against the allowed ip address(s)
+    """
+
+    def has_permission(self, request, view):
+        ip_address = get_client_ip_address(request)
+        allowed_ip_addresses = getattr(settings, 'ALLOWED_IP_ADDRESSES', None)
+        if allowed_ip_addresses:
+            for allowed_ip_address in allowed_ip_addresses:
+                if '/' in allowed_ip_address:
+                    is_allowed = address_exists_in_network(ip_address, allowed_ip_address)
+                    if is_allowed:
+                        return is_allowed
+                else:
+                    if ip_address == allowed_ip_address:
+                        return True
+            log.warn("{} is not allowed to access Api".format(ip_address))
+            return False
+        else:
+            return True
+
+
+class SecureAPIView(APIView):
+    """
+        Inherited from APIView
+    """
+    permission_classes = (ApiKeyHeaderPermission, IPAddressRestrictedPermission)
