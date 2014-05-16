@@ -207,7 +207,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Expect an InvalidKeyError from course page as we don't have anything else built
         with self.assertRaisesRegexp(
                 InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+                "<class 'opaque_keys.keys.CourseKey'>: None"
         ):
             self.client.get(
                 reverse('signup'), follow=True,
@@ -219,7 +219,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Now that we are logged in, make sure we don't see the registration page
         with self.assertRaisesRegexp(
                 InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+                "<class 'opaque_keys.keys.CourseKey'>: None"
         ):
             self.client.get(reverse('signup'), follow=True)
 

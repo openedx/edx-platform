@@ -6,8 +6,8 @@ from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import UsageKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 

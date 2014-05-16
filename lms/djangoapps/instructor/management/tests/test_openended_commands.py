@@ -24,7 +24,7 @@ from instructor.management.commands.openended_post import post_submission_for_st
 from instructor.management.commands.openended_stats import calculate_task_statistics
 from instructor.utils import get_module_for_student
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

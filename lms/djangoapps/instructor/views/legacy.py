@@ -30,7 +30,7 @@ from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from opaque_keys import InvalidKeyError
@@ -40,7 +40,7 @@ from lms.lib.xblock.runtime import quote_slashes
 # from the edx-ora2 repo, although it will likely move in the future.
 from submissions import api as sub_api
 
-from bulk_email.models import CourseEmail, CourseAuthorization
+from bulk_email.models import CourseEmail
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
@@ -79,7 +79,7 @@ from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
-from xmodule.modulestore.locations import i4xEncoder
+from opaque_keys.locations import i4xEncoder
 
 log = logging.getLogger(__name__)
 

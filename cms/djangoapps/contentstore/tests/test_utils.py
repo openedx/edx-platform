@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 
 from contentstore import utils
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 class LMSLinksTestCase(TestCase):

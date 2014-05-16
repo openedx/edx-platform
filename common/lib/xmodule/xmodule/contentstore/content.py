@@ -9,7 +9,7 @@ import logging
 import StringIO
 from urlparse import urlparse, urlunparse
 
-from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 

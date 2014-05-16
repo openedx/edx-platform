@@ -6,7 +6,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, LocalId
+from opaque_keys.locator import BlockUsageLocator, LocalId
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

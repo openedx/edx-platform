@@ -23,7 +23,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsGenerationException,
 )
 from xmodule.modulestore.mongo.base import MongoModuleStore
-from xmodule.modulestore.locations import AssetLocation
+from opaque_keys.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0

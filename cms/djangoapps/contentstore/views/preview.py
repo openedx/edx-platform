@@ -13,7 +13,7 @@ from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.keys import UsageKey
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request

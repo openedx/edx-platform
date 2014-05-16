@@ -1,7 +1,7 @@
 import django_comment_common.models as models
 from django.test import TestCase
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 class RoleClassTestCase(TestCase):

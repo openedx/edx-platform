@@ -7,7 +7,7 @@ import json
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata

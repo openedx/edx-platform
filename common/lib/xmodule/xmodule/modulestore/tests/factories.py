@@ -3,7 +3,7 @@ from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules
-from xmodule.modulestore.locations import Location
+from opaque_keys.locations import Location
 from xblock.core import XBlock
 
 

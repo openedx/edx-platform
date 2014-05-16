@@ -12,7 +12,7 @@ from certificates.models import certificate_status_for_student, CertificateStatu
 from certificates.queue import XQueueCertInterface
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 logger = logging.getLogger(__name__)
 

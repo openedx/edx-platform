@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 from optparse import make_option
 from django.conf import settings
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import CourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.models import CertificateStatuses

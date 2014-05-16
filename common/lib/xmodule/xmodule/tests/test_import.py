@@ -18,7 +18,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer

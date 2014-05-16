@@ -20,8 +20,8 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
-from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import UsageKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator

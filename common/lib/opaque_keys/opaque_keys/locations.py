@@ -6,7 +6,7 @@ from bson.son import SON
 
 from opaque_keys import InvalidKeyError, OpaqueKey
 
-from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
+from opaque_keys.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
 import json
 
 log = logging.getLogger(__name__)

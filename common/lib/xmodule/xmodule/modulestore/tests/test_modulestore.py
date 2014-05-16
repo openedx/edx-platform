@@ -2,7 +2,7 @@ from nose.tools import assert_equals, assert_raises, assert_true, assert_false  
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 def check_path_to_location(modulestore):

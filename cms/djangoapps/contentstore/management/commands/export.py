@@ -6,10 +6,10 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.keys import CourseKey
 from xmodule.contentstore.django import contentstore
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):

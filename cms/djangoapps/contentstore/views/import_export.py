@@ -24,7 +24,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 

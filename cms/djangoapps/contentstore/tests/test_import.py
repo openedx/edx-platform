@@ -17,7 +17,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import _CONTENTSTORE

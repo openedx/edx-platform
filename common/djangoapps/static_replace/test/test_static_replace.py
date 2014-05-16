@@ -5,7 +5,7 @@ from static_replace import (replace_static_urls, replace_course_urls,
                             _url_replace_regex)
 from mock import patch, Mock
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.xml import XMLModuleStore
 

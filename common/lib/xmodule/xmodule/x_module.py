@@ -23,7 +23,7 @@ from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
+from opaque_keys.keys import OpaqueKeyReader, UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 

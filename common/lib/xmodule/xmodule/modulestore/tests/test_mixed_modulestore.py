@@ -9,12 +9,12 @@ from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MO
     XML_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 from django.conf import settings
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 import bson.son
 if not settings.configured:
     settings.configure()

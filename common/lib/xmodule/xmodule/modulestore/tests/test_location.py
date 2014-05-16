@@ -5,7 +5,7 @@ import ddt
 
 from unittest import TestCase
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import Location, AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.locations import Location, AssetLocation, SlashSeparatedCourseKey
 
 # Pairs for testing the clean* functions.
 # The first item in the tuple is the input string.

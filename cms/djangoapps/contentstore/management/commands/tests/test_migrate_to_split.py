@@ -11,7 +11,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.locator import CourseLocator
+from opaque_keys.locator import CourseLocator
 # pylint: disable=E1101
 
 

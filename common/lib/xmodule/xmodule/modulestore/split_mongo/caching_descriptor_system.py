@@ -1,7 +1,7 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.locator import BlockUsageLocator, LocalId, CourseLocator
+from opaque_keys.locator import BlockUsageLocator, LocalId, CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xblock.runtime import KvsFieldData

@@ -20,7 +20,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
 from external_auth.models import ExternalAuthMap
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
