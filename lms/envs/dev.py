@@ -273,3 +273,6 @@ try:
     from .private import *      # pylint: disable=import-error
 except ImportError:
     pass
+
+########################## ALLOWED API USER IP ########################
+ALLOWED_IP_ADDRESSES = ['127.0.0.1']
