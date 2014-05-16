@@ -113,7 +113,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_problemset_grade_distrib(self):
 
-        prob_grade_distrib = get_problem_grade_distribution(self.course.id)
+        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id)
         probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib)
 
         for problem in probset_grade_distrib:
@@ -256,7 +256,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id,
+                           'course_id': course_id.to_deprecated_string(),
                            'data_type': data_type,
                            })
 
@@ -292,7 +292,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id,
+                           'course_id': course_id.to_deprecated_string(),
                            'data_type': data_type,
                            })
 
