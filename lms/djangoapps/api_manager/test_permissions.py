@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 TEST_API_KEY = "123456ABCDEF"
 
 
-@override_settings(ALLOWED_IP_ADDRESSES=['127.0.0.1', '10.0.2.2', '192.168.0.0/24'])
+@override_settings(API_ALLOWED_IP_ADDRESSES=['127.0.0.1', '10.0.2.2', '192.168.0.0/24'])
 class PermissionsTests(TestCase):
     """ Test suite for Permissions helper classes """
     def setUp(self):
