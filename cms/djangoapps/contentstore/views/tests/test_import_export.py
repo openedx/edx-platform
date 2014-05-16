@@ -117,7 +117,7 @@ class ImportTestCase(CourseTestCase):
         __, nonstaff_user = self.create_non_staff_authed_user_client(authenticate=False)
         auth.add_users(self.user, CourseStaffRole(self.course.id), nonstaff_user)
 
-        course = self.store.get_item(self.course_location)
+        course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
         display_name_before_import = course.display_name
 
@@ -127,7 +127,7 @@ class ImportTestCase(CourseTestCase):
             resp = self.client.post(self.url, args)
         self.assertEquals(resp.status_code, 200)
 
-        course = self.store.get_item(self.course_location)
+        course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
         display_name_after_import = course.display_name
 
