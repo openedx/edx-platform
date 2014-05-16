@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 def user_from_str(identifier):
@@ -28,20 +31,23 @@ class Command(BaseCommand):
     "Migrate a course from old-Mongo to split-Mongo"
 
     help = "Migrate a course from old-Mongo to split-Mongo"
-    args = "location email <new org> <new offering>"
+    args = "course_key email <new org> <new offering>"
 
     def parse_args(self, *args):
         """
-        Return a 4-tuple of (location, user, org, offering).
+        Return a 4-tuple of (course_key, user, org, offering).
         If the user didn't specify an org & offering, those will be None.
         """
         if len(args) < 2:
             raise CommandError(
                 "migrate_to_split requires at least two arguments: "
-                "a location and a user identifier (email or ID)"
+                "a course_key and a user identifier (email or ID)"
             )
 
-        location = args[0]
+        try:
+            course_key = CourseKey.from_string(args[0])
+        except InvalidKeyError:
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
         try:
             user = user_from_str(args[1])
@@ -54,10 +60,10 @@ class Command(BaseCommand):
         except IndexError:
             org = offering = None
 
-        return location, user, org, offering
+        return course_key, user, org, offering
 
     def handle(self, *args, **options):
-        location, user, org, offering = self.parse_args(*args)
+        course_key, user, org, offering = self.parse_args(*args)
 
         migrator = SplitMigrator(
             draft_modulestore=modulestore('default'),
@@ -66,4 +72,4 @@ class Command(BaseCommand):
             loc_mapper=loc_mapper(),
         )
 
-        migrator.migrate_mongo_course(location, user, org, offering)
+        migrator.migrate_mongo_course(course_key, user, org, offering)

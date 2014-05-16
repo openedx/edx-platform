@@ -7,6 +7,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 #
@@ -16,13 +18,22 @@ class Command(BaseCommand):
     """Clone a MongoDB-backed course to another location"""
     help = 'Clone a MongoDB backed course to another location'
 
+    def course_key_from_arg(self, arg):
+        """
+        Convert the command line arg into a course key
+        """
+        try:
+            return CourseKey.from_string(arg)
+        except InvalidKeyError:
+            return SlashSeparatedCourseKey.from_deprecated_string(arg)
+
     def handle(self, *args, **options):
         "Execute the command"
         if len(args) != 2:
             raise CommandError("clone requires 2 arguments: <source-course_id> <dest-course_id>")
 
-        source_course_id = CourseKey.from_string(args[0])
-        dest_course_id = CourseKey.from_string(args[1])
+        source_course_id = self.course_key_from_arg(args[0])
+        dest_course_id = self.course_key_from_arg(args[1])
 
         mstore = modulestore('direct')
         cstore = contentstore()
