@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Update bulk email implementation to lessen load on the database
+by consolidating chunked queries for recipients into a single query.
+
 Blades: Fix link to javascript file in ChoiceTextResponse. BLD-1103.
 
 All: refactored code to handle course_ids, module_ids, etc in a cleaner way.
