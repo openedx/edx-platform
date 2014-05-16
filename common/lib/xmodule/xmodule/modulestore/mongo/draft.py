@@ -95,7 +95,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_loc = as_draft(location)
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system, fields)
 
-    def get_items(self, course_key, settings=None, content=None, **kwargs):
+    def get_items(self, course_key, settings=None, content=None, revision=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -108,6 +108,9 @@ class DraftModuleStore(MongoModuleStore):
             course_key (CourseKey): the course identifier
             settings: not used
             content: not used
+            revision (str): the revision of the items you're looking for. Only 'draft' makes sense for
+                this modulestore. None implies get one of either the draft or published for each
+                matching xblock preferring the draft if it exists.
             kwargs (key=value): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
@@ -118,6 +121,9 @@ class DraftModuleStore(MongoModuleStore):
             wrap_draft(item) for item in
             super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
         ]
+        if revision == 'draft':
+            # the user only wants the drafts not everything w/ preference for draft
+            return draft_items
         draft_items_locations = {item.location for item in draft_items}
         non_draft_items = [
             item for item in
