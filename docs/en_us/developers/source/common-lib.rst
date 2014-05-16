@@ -11,4 +11,5 @@ Contents:
    sandbox-packages.rst
    symmath.rst
    calc.rst
+   opaque-keys.rst
 
