@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%def name="online_help_token()"><% return "default" %></%def>
+<%page args="online_help_token"/>
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
@@ -22,12 +22,8 @@
         </div>
 
       <ul class="list-actions">
-          <%
-            help_doc_urls = get_online_help_info(online_help_token())
-          %>
-
-          <li class="action-item">
-            <a href="${help_doc_urls['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an edX Course PDF")}</a>
+          <li class="action-item js-help-pdf">
+            <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an edX Course PDF")}</a>
           </li>
 
         <li class="action-item">

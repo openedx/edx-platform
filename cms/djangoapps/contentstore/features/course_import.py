@@ -1,3 +1,7 @@
+# pylint: disable=C0111
+# pylint: disable=W0621
+# pylint: disable=W0613
+
 import os
 from lettuce import world, step
 from django.conf import settings

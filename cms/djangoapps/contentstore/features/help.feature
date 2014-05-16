@@ -14,12 +14,6 @@ Feature: CMS.Help
         And I click the course link in My Courses
         Then I should see online help for "organizing_course"
 
-        And I click a subsection in the outline
-        Then I should see the online help for "subsection"
-
-        And I click a unit
-        Then I should see the online help for "unit"
-
         And I go to the course updates page
         Then I should see online help for "updates"
 
@@ -52,4 +46,16 @@ Feature: CMS.Help
 
         And I go to the export page
         Then I should see online help for "export"
+
+
+    Scenario: Users can access online help on the unit page
+        Given I am in Studio editing a new unit
+        Then I should see online help for "units"
+
+
+    Scenario: Users can access online help on the subsection page
+        Given I have opened a new course section in Studio
+        And I have added a new subsection
+        And I click on the subsection
+        Then I should see online help for "subsections"
 
