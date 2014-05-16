@@ -30,3 +30,6 @@
 
 # Prototype XBlocks for limited roll-outs and user testing. These are not for general use.
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
+
+# SGA XBlock
+-e git+https://github.com/jazkarta/edx-sga#egg=edx-sga
