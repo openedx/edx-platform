@@ -64,7 +64,7 @@ class RegistrationTest(UniqueCourseTest):
         course_names = dashboard.available_courses
         self.assertIn(self.course_info['display_name'], course_names)
 
-
+@skip("TE-399")
 class LanguageTest(UniqueCourseTest):
     """
     Tests that the change language functionality on the dashboard works
