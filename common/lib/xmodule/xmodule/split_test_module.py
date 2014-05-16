@@ -159,7 +159,7 @@ class SplitTestModule(SplitTestFields, XModule):
 
             contents.append({
                 'group_id': group_id,
-                'id': child.id,
+                'id': child.location.to_deprecated_string(),
                 'content': rendered_child.content
             })
 
