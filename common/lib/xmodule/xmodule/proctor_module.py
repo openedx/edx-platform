@@ -1,6 +1,5 @@
 import json
 import logging
-import random
 import requests
 
 from lxml import etree
@@ -12,7 +11,8 @@ from django.contrib.auth.models import User
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 
-from xblock.core import Integer, Scope, String
+from xblock.fields import Scope, String, Boolean
+from xblock.fragment import Fragment
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -43,14 +43,15 @@ class ProctorPanel(object):
         self.user = User.objects.get(pk=user_id)
 
     def is_released(self):
-        url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
+        #url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
+        url = '{1}/cmd/status/{0}'.format(self.user_id, self.ProctorPanelServer)
         log.info('ProctorPanel url={0}'.format(url))
         #ret = self.ses.post(url, data={'userid' : self.user_id, 'urlname': self.procset_name}, verify=False)
         auth = (self.ProctorPanelInterface.get('username'), self.ProctorPanelInterface.get('password'))
-        ret = self.ses.get(url, verify=False, auth=auth)
+        ret = self.ses.get(url, verify=False, auth=auth, params={'problem': self.procset_name})
         try:
             retdat = json.loads(ret.content)
-        except Exception as err:
+        except Exception:
             log.error('bad return from proctor panel: ret.content={0}'.format(ret.content))
             retdat = {}
 
@@ -60,7 +61,15 @@ class ProctorPanel(object):
 
 
 class ProctorFields(object):
+    #display_name = String(
+    #    display_name="Display Name",
+    #    help="This name appears in the grades progress page",
+    #    scope=Scope.settings,
+    #    default="Proctored Module"
+    #)
     procset_name = String(help="Name of this proctored set", scope=Scope.settings)
+    staff_release = Boolean(help="True if staff forced release independent of proctor panel",
+                       default=False, scope=Scope.user_state)
 
 
 class ProctorModule(ProctorFields, XModule):
@@ -82,17 +91,21 @@ class ProctorModule(ProctorFields, XModule):
 
     """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/conditional/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            resource_string(__name__, 'js/src/conditional/display.coffee')
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js')
+        ],
+    }
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-
+        super(ProctorModule, self).__init__(*args, **kwargs)
         # check proctor panel to see if this should be released
         user_id = self.system.seed
         self.pp = ProctorPanel(user_id, self.procset_name)
@@ -103,7 +116,16 @@ class ProctorModule(ProctorFields, XModule):
 
         log.info('Proctor module child={0}'.format(self.child))
         log.info('Proctor module child display_name={0}'.format(self.child.display_name))
-        self.display_name = self.child.display_name
+        # TODO: This attr is read-only now - need to figure out if/why this is
+        # needed and find a fix if necessary (disabling doesnt appear to break
+        # anything)
+        #self.display_name = self.child.display_name
+
+
+    def is_released(self):
+        if self.staff_release:
+            return True
+        return self.pp.is_released()
 
 
     def get_child_descriptors(self):
@@ -114,16 +136,19 @@ class ProctorModule(ProctorFields, XModule):
 
 
     def not_released_html(self):
-        return self.system.render_template('proctor_release.html', {
+        return Fragment(self.system.render_template('proctor_release.html', {
                 'element_id': self.location.html_id(),
                 'id': self.id,
                 'name': self.display_name or self.procset_name,
                 'pp': self.pp,
-        })
+                'location': self.location,
+                'ajax_url': self.system.ajax_url,
+                'is_staff': self.system.user_is_staff,
+        }))
 
 
-    def get_html(self):
-        if not self.pp.is_released():	# check for release each time we do get_html()
+    def student_view(self, context):
+        if not self.is_released():	# check for release each time we do get_html()
             log.info('is_released False')
             return self.not_released_html()
             # return "<div>%s not yet released</div>" % self.display_name
@@ -131,21 +156,38 @@ class ProctorModule(ProctorFields, XModule):
         log.info('is_released True')
 
         # for sequential module, just return HTML (no ajax container)
-        if self.child.category in ['sequential', 'videosequence', 'problemset']:
-            return self.child.get_html()
+        if self.child.category in ['sequential', 'videosequence', 'problemset', 'randomize']:
+            html = self.child.render('student_view', context)
+            if self.staff_release:
+                dishtml = self.system.render_template('proctor_disable.html', {
+                        'element_id': self.location.html_id(),
+                        'is_staff': self.system.user_is_staff,
+                        'ajax_url': self.system.ajax_url,
+                        })
+                html.content = dishtml + html.content
+            return html
 
         # return ajax container, so that we can dynamically check for is_released changing
-        return self.system.render_template('conditional_ajax.html', {
+        return Fragment(self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
             'depends': '',
-        })
+        }))
 
 
 
     def handle_ajax(self, _dispatch, _data):
-        if not self.pp.is_released():	# check for release each time we do get_html()
+        if self.system.user_is_staff and _dispatch=='release':
+            self.staff_release = True
+            # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Release successful</body></html>'
+            return json.dumps({'html': 'staff_release successful'})
+        if self.system.user_is_staff and _dispatch=='disable':
+            self.staff_release = False
+            return json.dumps({'html': 'staff_disable successful'})
+            # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Disable successful</body></html>'
+
+        if not self.is_released():	# check for release each time we do get_html()
             log.info('is_released False')
             # html = "<div>%s not yet released</div>" % self.display_name
             html = self.not_released_html()
@@ -171,6 +213,5 @@ class ProctorDescriptor(ProctorFields, SequenceDescriptor):
 
         xml_object = etree.Element('proctor')
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
