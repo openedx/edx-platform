@@ -381,6 +381,10 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
             )
         ).install()
 
+    @skip('Flakey test, TE-401')
+    def test_acid_block(self):
+        super(XBlockAcidNoChildTest, self).test_acid_block()
+
 
 class XBlockAcidChildTest(XBlockAcidBase):
     """
