@@ -60,7 +60,7 @@ class OpaqueKey(object):
     ``CANONICAL_NAMESPACE``
         Identifies the key namespace for the particular key implementation
         (when serializing). Key implementations must be registered using the
-        ``CANONICAL_NAMESPACE`` is their entry_point name, but can also be registered
+        ``CANONICAL_NAMESPACE`` as their entry_point name, but can also be registered
         with other names for backwards compatibility.
 
     ``KEY_FIELDS``
@@ -79,7 +79,7 @@ class OpaqueKey(object):
         will already have been parsed.
 
     OpaqueKeys will not have optional constructor parameters (due to the implementation of
-    ``KEY_FIELDS``), by default. However, and implementation class can provide a default,
+    ``KEY_FIELDS``), by default. However, an implementation class can provide a default,
     as long as it passes that default to a call to ``super().__init__``.
 
     :class:`OpaqueKey` objects are immutable.
