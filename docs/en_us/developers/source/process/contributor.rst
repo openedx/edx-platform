@@ -100,6 +100,7 @@ Further Information
 For futher information on the pull request requirements, please see the following
 links:
 
+* :doc:`../code-considerations`
 * :doc:`../testing`
 * :doc:`../testing/jenkins`
 * :doc:`../testing/code-coverage`
