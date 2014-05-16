@@ -433,12 +433,7 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-<<<<<<< HEAD
     module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
-=======
-
-    module_id = request.GET.get('module_id')
->>>>>>> edx/master
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students

@@ -14,10 +14,7 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
-<<<<<<< HEAD
 from contentstore.utils import reverse_course_url
-=======
->>>>>>> edx/master
 
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import loc_mapper
