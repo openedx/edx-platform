@@ -66,82 +66,6 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.new-course-save').off('click');
         };
 
-        var toggleLicenseForm = function(e) {
-            var button = $(e.srcElement);
-            var selector = button.closest('.course-item').find('.license-selector');
-
-            selector.toggleClass('is-shown');
-
-            if (selector.hasClass('is-shown')) {
-                // Toggle button text
-                button.text('Save')
-            }
-            else {
-                // Toggle button text
-                button.text('Change Course License')
-
-                // Update course here
-
-            }
-        }
-
-        var setCourseLicense = function(e) {
-            e.preventDefault();
-            var button = $(e.srcElement);
-            var container = button.closest('.license-selector');
-            var allornothing = container.children('.license-allornothing');
-            var cc = container.children('.license-cc');
-
-            var license;
-            if(cc.has(button).length==0) {
-                allornothing.children('.license-button').removeClass('selected');
-                button.addClass('selected');
-                license = button.attr("data");
-            }
-            else {
-                button.toggleClass("selected");
-
-                
-
-                if (button.attr("data") == "ND" && button.hasClass("selected")) {
-                    cc.children(".license-button[data='SA']").first().removeClass("selected");
-                }
-                else if(button.attr("data") == "SA"&& button.hasClass("selected")) {
-                    cc.children(".license-button[data='ND']").first().removeClass("selected");
-                }
-
-                if (button.attr("data") == "BY" && !button.hasClass("selected")) {
-                    license = "CC0";
-                    allornothing.children(".license-button[data='CC0']").first().addClass("selected");
-                }
-                else {
-                    license = "CC";
-                    cc.children(".license-button[data='BY']").first().addClass("selected");
-                    var selected = cc.children(".selected");
-                    selected.each( function() {
-                        license = license + "-" + $(this).attr("data");
-                    })
-                }
-
-                
-            }
-
-            // Toggle between custom license and allornothing
-            if (license=="ARR" || license=="CC0") {
-                allornothing.addClass('selected');
-                cc.removeClass('selected');
-            }
-            else {
-                cc.addClass('selected');
-                allornothing.removeClass('selected');
-                allornothing.children().removeClass("selected");
-            }
-
-            // Set chosen license
-            container.find('.selected-license').html(license_to_img(license));
-            container.find('.license').val(license);
-        }
-
         var addNewCourse = function (e) {
             e.preventDefault();
             $('.new-course-button').addClass('is-disabled');
@@ -165,8 +89,6 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.action-reload').bind('click', ViewUtils.reload);
 
             // Licencing in new course form
-            $('.license-button').bind('click', setCourseLicense);
-            // Change license button
             var licenseSelector = new LicenseSelector();
             $('#field-course-license').html(licenseSelector.render().$el);
         };

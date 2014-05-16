@@ -29,7 +29,7 @@ define(["js/views/baseview", "underscore", "gettext"],
             render: function() {
                 this.$el.html(this.template({
                     default_license: this.license,
-                    default_license_img: this.img(),
+                    default_license_img: this.img()
                 }));
 
                 this.$el.addClass('license-selector');
@@ -145,31 +145,31 @@ define(["js/views/baseview", "underscore", "gettext"],
             },
 
              onLicenseButtonClick : function(e) {
-                var button = $(e.srcElement).closest('.license-button');
-                var allornothing = this.$el.find('.license-allornothing');
-                var cc = this.$el.find('.license-cc');
+                var $button = $(e.srcElement).closest('.license-button');
+                var $allornothing = this.$el.find('.license-allornothing');
+                var $cc = this.$el.find('.license-cc');
 
                 var license;
-                if(cc.has(button).length==0) {
-                    license = button.attr("data-license");
+                if($cc.has($button).length==0) {
+                    license = $button.attr("data-license");
                 }
                 else {
-                    button.toggleClass("selected");
+                    $button.toggleClass("selected");
 
-                    if (button.attr("data-license") == "ND" && button.hasClass("selected")) {
-                        cc.children(".license-button[data-license='SA']").removeClass("selected");
+                    if ($button.attr("data-license") == "ND" && $button.hasClass("selected")) {
+                        $cc.children(".license-button[data-license='SA']").removeClass("selected");
                     }
-                    else if(button.attr("data-license") == "SA"&& button.hasClass("selected")) {
-                        cc.children(".license-button[data-license='ND']").removeClass("selected");
+                    else if($button.attr("data-license") == "SA"&& $button.hasClass("selected")) {
+                        $cc.children(".license-button[data-license='ND']").removeClass("selected");
                     }
 
-                    if (button.attr("data-license") == "BY" && !button.hasClass("selected")) {
+                    if ($button.attr("data-license") == "BY" && !$button.hasClass("selected")) {
                         license = "CC0";
                     }
                     else {
                         license = "CC";
-                        cc.children(".license-button[data-license='BY']").addClass("selected");
-                        var selected = cc.children(".selected");
+                        $cc.children(".license-button[data-license='BY']").addClass("selected");
+                        var selected = $cc.children(".selected");
                         selected.each( function() {
                             license = license + "-" + $(this).attr("data-license");
                         })

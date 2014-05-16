@@ -23,11 +23,9 @@ var AssetView = BaseView.extend({
       license_img: this.licenseSelector.img(),
       external_url: this.model.get('external_url'),
       portable_url: this.model.get('portable_url'),
-      uniqueId: uniqueId,
+      uniqueId: uniqueId
     }));
     this.licenseSelector.render();
-    //form = $("<tr></tr>").html($("<td colspan='7'></td>".html(this.loadTemplate("license-selector"))));
-    //this.$el.add(form);
     this.updateLockState();
     return this;
   },

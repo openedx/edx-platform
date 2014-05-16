@@ -525,17 +525,16 @@ def _create_or_rerun_course(request):
         run = request.json.get('run')
 	    license = request.json.get('license')
 
-        # allow/disable unicode characters in course_id according to settings
-        if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
-            if _has_non_ascii_characters(org) or _has_non_ascii_characters(course) or _has_non_ascii_characters(run):
-                return JsonResponse(
-                    {'error': _('Special characters not allowed in organization, course number, and course run.')},
-                    status=400
-                )
+    # allow/disable unicode characters in course_id according to settings
+    if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
+        if _has_non_ascii_characters(org) or _has_non_ascii_characters(course) or _has_non_ascii_characters(run) or _has_non_ascii_characters(license):
+            return JsonResponse(
+                {'error': _('Special characters not allowed in organization, course number, course run and course license.')},
+                status=400
+            )
 
         fields = {'start': start}
-        if display_name is not None:
-            fields['display_name'] = display_name
+        fields = {'display_name': display_name, 'license': license} if display_name is not None else {'license': license}
 
         if 'source_course_key' in request.json:
             return _rerun_course(request, org, course, run, fields)
