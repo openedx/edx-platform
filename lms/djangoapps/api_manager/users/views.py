@@ -10,11 +10,12 @@ from django.conf import settings
 from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
 from django.db.models import Q
 
+from api_manager.permissions import SecureAPIView
 from api_manager.models import GroupProfile
-from api_manager.permissions import ApiKeyHeaderPermission
+
 from courseware import module_render
 from courseware.model_data import FieldDataCache
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
@@ -110,8 +111,8 @@ def _save_content_position(request, user, course_id, course_descriptor, position
     return saved_content.id
 
 
-class UsersList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
+class UsersList(SecureAPIView):
+    """ Inherit with SecureAPIView """
 
     def post(self, request):
         """
@@ -211,9 +212,8 @@ class UsersList(APIView):
         return Response(response_data, status=status_code)
 
 
-class UsersDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def get(self, request, user_id):
         """
         GET retrieves an existing user from the system
@@ -377,9 +377,8 @@ class UsersDetail(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class UsersGroupsList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersGroupsList(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def post(self, request, user_id):
         """
         POST creates a new user-group relationship in the system
@@ -439,9 +438,8 @@ class UsersGroupsList(APIView):
         return Response(response_data, status=response_status)
 
 
-class UsersGroupsDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersGroupsDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def get(self, request, user_id, group_id):
         """
         GET retrieves an existing user-group relationship from the system
@@ -472,9 +470,8 @@ class UsersGroupsDetail(APIView):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-class UsersCoursesList(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersCoursesList(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def post(self, request, user_id):
         """
         POST creates a new course enrollment for a user
@@ -529,9 +526,8 @@ class UsersCoursesList(APIView):
         return Response(response_data, status=status_code)
 
 
-class UsersCoursesDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersCoursesDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def post(self, request, user_id, course_id):
         """
         POST creates an ACTIVE course enrollment for the specified user
@@ -605,9 +601,8 @@ class UsersCoursesDetail(APIView):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-class UsersCoursesGradesDetail(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
+class UsersCoursesGradesDetail(SecureAPIView):
+    """ Inherit with SecureAPIView """
     def get(self, request, user_id, course_id):
         """
         GET returns the current gradebook for the user in a course
