@@ -10,7 +10,7 @@ The VitalSource Bookshelf e-reader tool provides your students with easy access 
    :width: 500
    :alt: VitalSource e-book with highlighted note
 
-For more information about Vital Source and its features, visit the `VitalSource Bookshelf support site <https://support.vitalsource.com/hc/en-us>`_.
+For more information about Vital Source and its features, visit the `VitalSource Bookshelf support site <https://support.vitalsource.com>`_.
 
 .. note:: Before you add a VitalSource Bookshelf e-reader to your course, you must work with Vital Source to make sure the content you need already exists in the Vital Source inventory. If the content is not yet available, Vital Source works with the publisher of the e-book to create an e-book that meets the VitalSource Bookshelf specifications. **This process can take up to four months.** The following steps assume that the e-book you want is already part of the Vital Source inventory.
 

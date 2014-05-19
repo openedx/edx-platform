@@ -21,9 +21,7 @@ To view course data:
 
 #. View the live version of your course.
 
-#. Click **Instructor** then **Try New Beta Dashboard**.
-
-#. Click **Course Info** if necessary. 
+#. Click **Instructor**, then click **Course Info** if necessary. 
 
    The **Basic Course Information** section of the page that opens lists
    information about the course.

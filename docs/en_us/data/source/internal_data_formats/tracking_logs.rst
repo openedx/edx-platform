@@ -4,14 +4,24 @@
 Tracking Logs
 ######################
 
-This chapter provides reference information about the event data that is delivered in data packages. Events are initiated by interactions with the courseware and the Instructor Dashboard in the LMS, and are stored in JSON documents. In the data package, event data is delivered in a log file. 
+This chapter provides reference information about the event data that is
+delivered in data packages. Events are emitted by the server or the browser to
+capture information about interactions with the courseware and the Instructor
+Dashboard in the LMS, and are stored in JSON documents. In the data package,
+event data is delivered in a log file.
 
 The sections in this chapter describe:
 
 * A :ref:`sample_events`.
-* :ref:`common` that are included in the JSON document of every event type.
-* :ref:`Student_Event_Types` for interactions with the LMS outside of the Instructor Dashboard.
-* :ref:`Instructor_Event_Types` for interactions with the Instructor Dashboard in the LMS.
+* :ref:`common` that are included in the JSON document of every event.
+* :ref:`Student_Event_Types` for interactions with the LMS outside of the
+  Instructor Dashboard. 
+* :ref:`Instructor_Event_Types` for interactions with the Instructor Dashboard
+  in the LMS.
+
+Student and instructor events are grouped into categories in this chapter. For
+an alphabetical list of events, see the :ref:`event_list`.
+
 
 .. _sample_events:
 
@@ -139,7 +149,8 @@ If you use a JSON formatter to "pretty print" this event, a version that is more
 Common Fields
 ********************
 
-This section describes the JSON fields that are common to the schema definitions of all events.
+This section describes the JSON fields that are common to the schema definitions
+of all events.
 
 =====================
 ``agent`` Field
@@ -155,25 +166,22 @@ This section describes the JSON fields that are common to the schema definitions
 ``context`` Field
 ===================
 
-**Type:** string/JSON 
+**Type:** dict
 
-**Details:** For all event types, this dict type field includes member fields
-that identify the course that generated the event, the organization that lists
-the course, and the individual who is performing the action.
-``course_user_tags`` contains a dictionary with the key(s) and value(s) from the
-``user_api_usercoursetag`` table for the user. See
+**Details:** For all events, this field includes member fields that
+identify:
+
+* The ``course_id`` of the course that generated the event.
+* The ``org_id`` of the organization that lists the course. 
+* The ``user_id`` of the individual who is performing the action. 
+  
+When included, ``course_user_tags`` contains a dictionary with the key(s) and
+value(s) from the ``user_api_usercoursetag`` table for the user. See
 :ref:`user_api_usercoursetag`.
 
-**Values/Format/Member Fields:** Contains these common member fields:
-
-* ``course_id``
-* ``org_id``
-* ``user_id``
-* ``course_user_tags``
-
-These fields are blank if values cannot be determined. Also contains member
-fields that apply to specific event types only: see the description for each
-event type.
+The member fields are blank if values cannot be determined. The ``context``
+field can also contain additional member fields that apply to specific events
+only: see the description for each type of event.
 
 **History**: Added 23 Oct 2013; ``user_id`` added 6 Nov 2013. Other event fields
 may duplicate this data. ``course_user_tags`` added 12 Mar 2014.
@@ -182,11 +190,11 @@ may duplicate this data. ``course_user_tags`` added 12 Mar 2014.
 ``event`` Field
 ===================
 
-**Type:** string/JSON
+**Type:** dict
 
-**Details:** For all event types, this dict type field includes member fields
-that identify specifics of the triggered event. Different member fields are
-supplied for different types of events: see the description for each event type.
+**Details:** This field includes member fields that identify specifics of each
+triggered event. Different member fields are supplied for different events: see
+the description for each type of event.
 
 ========================
 ``event_source`` Field
@@ -195,9 +203,11 @@ supplied for different types of events: see the description for each event type.
 **Type:** string
 
 **Details:** Specifies whether the triggered event originated in the browser or
-on the server.
+on the server. The values in this field are:
 
-**Values/Format/Member Fields:** 'browser', 'server', or 'task'
+* 'browser'
+* 'server'
+* 'task'
 
 =====================
 ``event_type`` Field
@@ -229,9 +239,8 @@ on the server.
 
 **Type:** string
 
-**Details:** Page user was visiting when the event was fired. 
-
-**Values/Format/Member Fields:** '$URL'
+**Details:** The '$URL' of the page the user was visiting when the event was
+emitted.
 
 ===================
 ``session`` Field
@@ -239,9 +248,8 @@ on the server.
 
 **Type:** string
 
-**Details:** This key identifies the user's session. May be undefined. 
-
-**Values/Format/Member Fields:** 32 digits 
+**Details:** This 32-character value is a key that identifies the user's
+session. Can be undefined.
 
 ===================
 ``time`` Field
@@ -249,26 +257,26 @@ on the server.
 
 **Type:** string
 
-**Details:** Gives the UTC time at which the event was fired.
-
-**Values/Format/Member Fields:** 'YYYY-MM-DDThh:mm:ss.xxxxxx'
+**Details:** Gives the UTC time at which the event was emitted in 'YYYY-MM-
+DDThh:mm:ss.xxxxxx' format.
 
 ===================
 ``username`` Field
 ===================
 
-**Type:** The username of the user who caused the event to fire. This string is
-empty for anonymous events, such as when the user is not logged in.
+**Type:** string
 
-**Details:** string
+**Details:** The username of the user who caused the event to be emitted. This
+string is empty for anonymous events, such as when the user is not logged in.
 
 .. _Student_Event_Types:
 
 ****************************************
-Student Event Types
+Student Events
 ****************************************
 
-This section lists the event types that are logged for interactions with the LMS outside the Instructor Dashboard.
+This section lists the events that are logged for interactions with the LMS
+outside the Instructor Dashboard.
 
 * :ref:`enrollment`
 
@@ -284,39 +292,51 @@ This section lists the event types that are logged for interactions with the LMS
 
 * :ref:`AB_Event_Types`
 
-The descriptions that follow include what each event type represents, which
-component it originates from, and what member fields the ``event`` and
-``context`` dict fields contain. The value in the ``event_source`` field (see
-the :ref:`common` section above) distinguishes between events that originate in
-the browser (in JavaScript) and events that originate on the server (during the
-processing of a request).
+The descriptions that follow include what each event represents, the system
+component it originates from, the history of any changes made to the event over
+time, and any additional member fields that the ``context`` and ``event`` fields contain.
+
+The value in the ``event_source`` field (see the :ref:`common` section above)
+distinguishes between events that originate in the browser (in JavaScript) and
+events that originate on the server (during the processing of a request).
 
 .. _enrollment:
 
 =========================
-Enrollment Event Types
+Enrollment Events
 =========================
-
-These event types are fired by the server in response to course enrollment
+.. tracked_command.py
+The server emits these events in response to course enrollment
 activities completed by a student.
 
-* ``edx.course.enrollment.activated`` is fired when a student enrolls in a
-  course. On edx.org, this is typically the result of a student clicking 
-  **Register** for the course. 
+* When a student enrolls in a course, ``edx.course.enrollment.activated`` is
+  emitted. On edx.org, this is typically the result of a student clicking
+  **Register** for the course.
 
-* ``edx.course.enrollment.deactivated`` is fired when a student unenrolls from a
-  course. On edx.org, this is typically the result of a student clicking
+* When a student unenrolls from a course, ``edx.course.enrollment.deactivated``
+  is emitted. On edx.org, this is typically the result of a student clicking
   **Unregister** for the course.
 
 In addition, actions by instructors and course staff members also generate
-enrollment events. For the actions that members of the course team complete that
-result in these events, see :ref:`instructor_enrollment`.
+enrollment events. For the actions that members of the course team complete that result in these events, see :ref:`instructor_enrollment`.
 
 **Event Source**: Server
 
-**History**: The enrollment event types were added on 03 Dec 2013.
+**History**: The enrollment events were added on 03 Dec 2013.
 
-.. Alison: move other tables to this format, and identify these event and context fields as member fields.
+``context`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details and Member Fields
+   * - ``path``
+     - string
+     - The URL path that generated the event: '/change_enrollment'.
+       **History**: Added 07 May 2014.
 
 ``event`` **Member Fields**: 
 
@@ -348,20 +368,6 @@ result in these events, see :ref:`instructor_enrollment`.
      - The Django session ID, if available. Can be used to identify events for a
        specific user within a session. **History**: Added 07 May 2014.
 
-``context`` **Member Fields**: 
-
-.. list-table::
-   :widths: 15 15 60
-   :header-rows: 1
-
-   * - Field
-     - Type
-     - Details and Member Fields
-   * - ``path``
-     - string
-     - The URL path that generated the event: '/change_enrollment'.
-       **History**: Added 07 May 2014.
-
 Example
 --------
 
@@ -369,43 +375,44 @@ Example
 
 .. code-block:: json
 
-  {
-    "username": "AAAAAAAAAA",
-    "host": "courses.edx.org",
-    "event_source": "server",
-    "event_type": "edx.course.enrollment.activated",
-    "context": {
-      "course_id": "edX\/DemoX\/Demo_Course",
-      "org_id": "edX",
-      "path": "/change_enrollment",
-      "user_id": 9999999
-    },
-    "time": "2014-01-26T00:28:28.388782+00:00",
-    "ip": "NN.NN.NNN.NNN",
-    "event": {
-      "course_id": "edX\/DemoX\/Demo_Course",
-      "user_id": 9999999,
-      "mode": "honor"
-      "name": "edx.course.enrollment.activated",
-      "session": a14j3ifhskngw0gfgn230g
-    },
-    "agent": "Mozilla\/5.0 (Windows NT 6.1; WOW64; Trident\/7.0; rv:11.0) like Gecko",
-    "page": null
-  }
+    {
+        "username": "AAAAAAAAAA",
+        "host": "courses.edx.org",
+        "event_source": "server",
+        "event_type": "edx.course.enrollment.activated",
+        "context": {
+          "course_id": "edX\/DemoX\/Demo_Course",
+          "org_id": "edX",
+          "path": "/change_enrollment",
+          "user_id": 9999999
+        },
+        "time": "2014-01-26T00:28:28.388782+00:00",
+        "ip": "NN.NN.NNN.NNN",
+        "event": {
+          "course_id": "edX\/DemoX\/Demo_Course",
+          "user_id": 9999999,
+          "mode": "honor"
+          "name": "edx.course.enrollment.activated",
+          "session": a14j3ifhskngw0gfgn230g
+        },
+        "agent": "Mozilla\/5.0 (Windows NT 6.1; WOW64; Trident\/7.0; rv:11.0) like Gecko",
+        "page": null
+      }
 
 .. _navigational:
 
 ==============================
-Navigational Event Types   
+Navigational Events   
 ==============================
+.. display_spec.coffee
+The browser emits these events when a user selects a navigational control. 
 
-These event types are fired when a user selects a navigational control. 
+* ``seq_goto`` is emitted when a user jumps between units in a sequence. 
 
-* ``seq_goto`` fires when a user jumps between units in a sequence. 
+* ``seq_next`` is emitted when a user navigates to the next unit in a sequence.
 
-* ``seq_next`` fires when a user navigates to the next unit in a sequence. 
-
-* ``seq_prev`` fires when a user navigates to the previous unit in a sequence. 
+* ``seq_prev`` is emitted when a user navigates to the previous unit in a
+  sequence.
 
 **Component**: Sequence 
 
@@ -413,116 +420,177 @@ These event types are fired when a user selects a navigational control.
 
 **Event Source**: Browser
 
-``event`` **Fields**: The navigational event types listed above have the same fields.
+``event`` **Member Fields**: All of the navigational events have the same fields
+in the ``event`` dict field.
 
-+--------------------+---------------+---------------------------------------------------------------------+
-| Field              | Type          | Details                                                             |
-+====================+===============+=====================================================================+
-| ``old``            | integer       | For ``seq_goto``, the index of the unit being jumped from.          |
-|                    |               | For ``seq_next`` and ``seq_prev``, the index of the unit being      |
-|                    |               | navigated away from.                                                |
-+--------------------+---------------+---------------------------------------------------------------------+
-| ``new``            | integer       | For ``seq_goto``, the index of the unit being jumped to.            |
-|                    |               | For ``seq_next`` and ``seq_prev``, the index of the unit being      |
-|                    |               | navigated to.                                                       |
-+--------------------+---------------+---------------------------------------------------------------------+
-| ``id``             | integer       | The edX ID of the sequence.                                         |
-+--------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``old``
+     - integer
+     - For ``seq_goto``, the index of the unit being jumped from. For
+       ``seq_next`` and ``seq_prev``, the index of the unit being navigated away
+       from.
+   * - ``new``
+     - integer
+     - For ``seq_goto``, the index of the unit being jumped to. For ``seq_next``
+       and ``seq_prev``, the index of the unit being navigated to. 
+   * - ``id``
+     - integer
+     - The edX ID of the sequence. 
 
 ``page_close``
 ---------------
 
-An additional event type, ``page_close``, originates from within the Logger itself.  
+An additional type of event, ``page_close``, originates from within the
+JavaScript Logger itself.
 
-**Component**: Logger
+.. what is the function of the Logger? what value do the events that it logs have? is event_source by any chance set to 'task' for these?
+
+**Component**: JavaScript Logger
 
 **Event Source**: Browser
 
-``event`` **Fields**: None
+``event`` **Member Fields**: None
 
 .. _video:
 
 ==============================
-Video Interaction Event Types   
+Video Interaction Events   
 ==============================
-
-These event types can fire when a user works with a video.
+.. video_player_spec.js, lms-modules.js
+The browser emits these events when a user works with a video.
 
 **Component**: Video
 
 **Event Source**: Browser
 
-``pause_video``, ``play_video``
+``play_video``, ``pause_video``
 ---------------------------------
 
-* The ``pause_video`` event type fires on video pause. 
+* The browser emits ``play_video`` events on video play. 
 
-* The ``play_video`` event type fires on video play. 
+* The browser emits  ``pause_video`` events on video pause. 
 
-``event`` **Fields**: These event types have the same ``event`` fields.
+``event`` **Member Fields**: These events have the same ``event`` fields.
 
-+-----------------+--------+----------------------------------------------------+
-| Field           | Type   | Details                                            |
-+=================+========+====================================================+
-| ``id``          | string | EdX ID of the video being watched (for example,    |
-|                 |        | i4x-HarvardX-PH207x-video-Simple_Random_Sample).   |
-+-----------------+--------+----------------------------------------------------+
-| ``code``        | string | YouTube ID of the video being watched (for         |
-|                 |        | example, FU3fCJNs94Y).                             |
-+-----------------+--------+----------------------------------------------------+
-| ``currentTime`` | float  | Time the video was played at, in seconds.          |
-+-----------------+--------+----------------------------------------------------+
-| ``speed``       | string | Video speed in use: '0.75', '1.0', '1.25', '1.50'. |
-+-----------------+--------+----------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``id``
+     - string
+     - EdX ID of the video being watched (for example, i4x-HarvardX-PH207x-video-Simple_Random_Sample).
+   * - ``code``
+     - string
+     - YouTube ID of the video being watched (for example, FU3fCJNs94Y).
+   * - ``currentTime``
+     - float
+     - Time the video was played at, in seconds. 
+   * - ``speed``
+     - string
+     - Video speed in use: '0.75', '1.0', '1.25', '1.50'.
 
 ``seek_video``
 -----------------
 
-The ``seek_video`` event fires when the user clicks the playback bar or transcript to go to a different point in the video file.
+The browser emits ``seek_video`` events when a user clicks the playback bar or
+transcript to go to a different point in the video file.
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``old_time``        |               | The time in the video that the user is coming from.                 |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new_time``        |               | The time in the video that the user is going to.                    |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``type``            |               | The navigational method used to change position within the video.   |
-+---------------------+---------------+---------------------------------------------------------------------+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``old_time``
+     - 
+     - The time in the video that the user chose to go to a different point in the file.
+   * - ``new_time``
+     - 
+     - The time in the video that the user selected as the destination point.
+   * - ``type``
+     - 
+     - The navigational method used to change position within the video.
+
+.. need types
 
 ``speed_change_video`` 
 ------------------------
 
-The ``speed_change_video`` event fires when a user selects a different playing speed for the video. 
+The browser emits ``speed_change_video`` events when a user selects a different
+playing speed for the video.
 
-**History**: Prior to 12 Feb 2014, this event fired when the user selected either the same speed or a different speed.  
+**History**: Prior to 12 Feb 2014, this event was emitted when the user selected either the same speed or a different speed.  
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``current_time``    |               | The time in the video that the user chose to change the             |
-|                     |               | playing speed.                                                      |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``old_speed``       |               | The speed at which the video was playing.                           |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new_speed``       |               | The speed that the user selected for the video to play.             |
-+---------------------+---------------+---------------------------------------------------------------------+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``current_time``
+     - 
+     - The time in the video that the user chose to change the playing speed.  
+   * - ``old_speed``
+     - 
+     - The speed at which the video was playing. 
+   * - ``new_speed``
+     - 
+     - The speed that the user selected for the video to play. 
 
 .. types needed
 
-.. additional missing video event types TBD
+.. ``load_video``
+.. -----------------
+
+.. %%TBD
+
+.. The browser emits  ``load_video`` events when . 
+
+.. ``event`` **Member Fields**: None
+
+.. ``hide_transcript``
+.. -------------------
+
+.. %%TBD
+
+.. The browser emits  ``hide_transcript`` events when . 
+
+.. ``event`` **Member Fields**: 
+
+.. ``show_transcript``
+.. --------------------
+
+.. %%TBD
+
+.. The browser emits  ``show_transcript`` events when . 
+
+.. ``event`` **Member Fields**: 
 
 .. _pdf:
 
 =================================
-Textbook Interaction Event Types   
+Textbook Interaction Events   
 =================================
-
+.. pdf-analytics.js
 ``book``
 ----------
 
-The ``book`` event type fires when a user navigates within the PDF Viewer or the
-PNG Viewer.
+The browser emits ``book`` events when a user navigates within the PDF Viewer or the PNG Viewer.
 
 * For textbooks in PDF format, the URL in the common ``page`` field contains
   '/pdfbook/'.
@@ -533,217 +601,274 @@ PNG Viewer.
 
 **Event Source**: Browser
 
-**History**: This event type changed on 16 Apr 2014 to include the ``name`` and
-``chapter`` fields.
+**History**: This event changed on 16 Apr 2014 to include ``event`` member
+fields ``name`` and ``chapter``.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+----------------------------------------------------------------------------------+
-| Field       | Type    | Details                                                                          |
-+=============+=========+==================================================================================+
-| ``type``    | string  | 'gotopage' fires when a page loads after the student manually enters its number. |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | 'prevpage' fires when the next page button is clicked.                           |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | 'nextpage' fires when the previous page button is clicked.                       |
-+-------------+---------+----------------------------------------------------------------------------------+
-| ``name``    | string  | For 'gotopage', set to ``textbook.pdf.page.loaded``.                             |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | For 'prevpage', set to ``textbook.pdf.page.navigatedprevious``.                  |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | For 'nextpage', set to ``textbook.pdf.page.navigatednext``.                      |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.         |
-+-------------+---------+----------------------------------------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                                                        |
-|             |         +----------------------------------------------------------------------------------+
-|             |         | **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.         |
-+-------------+---------+----------------------------------------------------------------------------------+
-| ``old``     | integer | The original page number. Applies to 'gotopage' event types only.                |
-+-------------+---------+----------------------------------------------------------------------------------+
-| ``new``     | integer | Destination page number.                                                         |
-+-------------+---------+----------------------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``type``
+     - string
+     -  
+       * 'gotopage' is emitted when a page loads after the student manually enters its number.
+       * 'prevpage' is emitted when the next page button is clicked.
+       * 'nextpage' is emitted when the previous page button is clicked.
+
+   * - ``name``
+     - string
+     -  
+       * For 'gotopage', set to ``textbook.pdf.page.loaded``.
+       * For 'prevpage', set to ``textbook.pdf.page.navigatedprevious``. 
+       * For 'nextpage', set to ``textbook.pdf.page.navigatednext``. 
+       
+       **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+       **History**: Added for events produced by the PDF Viewer on 16 Apr 2014.
+   * - ``old``
+     - integer
+     - The original page number. Applies to 'gotopage' event types only.   
+   * - ``new``
+     - integer
+     - Destination page number.
 
 ``textbook.pdf.thumbnails.toggled``
 ------------------------------------
 
-The ``textbook.pdf.thumbnails.toggled`` event type fires when a user clicks
+The browser emits ``textbook.pdf.thumbnails.toggled`` events when a user clicks
 on the icon to show or hide page thumbnails.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+---------------------------------------------------------------------+
-| Field       | Type    | Details                                                             |
-+=============+=========+=====================================================================+
-| ``name``    | string  | ``textbook.pdf.thumbnails.toggled``                                 |
-+-------------+---------+---------------------------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                                           |
-+-------------+---------+---------------------------------------------------------------------+
-| ``page``    | integer | The number of the page that is open when the user clicks this icon. |
-+-------------+---------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.thumbnails.toggled``
+   * - ``chapter``
+     -  string
+     -  The name of the PDF file.
+   * -  ``page``
+     -  integer
+     -  The number of the page that is open when the user clicks this icon. 
 
 ``textbook.pdf.thumbnail.navigated``
 ------------------------------------
 
-The ``textbook.pdf.thumbnail.navigated`` event type fires when a user clicks
+The browser emits ``textbook.pdf.thumbnail.navigated`` events when a user clicks
 on a thumbnail image to navigate to a page.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------+-------------------------------------------------+
-| Field               | Type    | Details                                         |
-+=====================+=========+=================================================+
-| ``name``            | string  | ``textbook.pdf.thumbnail.navigated``            |
-+---------------------+---------+-------------------------------------------------+
-| ``chapter``         | string  | The name of the PDF file.                       |
-+---------------------+---------+-------------------------------------------------+
-| ``page``            | integer | The page number of the thumbnail clicked.       |
-+---------------------+---------+-------------------------------------------------+
-| ``thumbnail_title`` | string  | The identifying name for the destination of the |
-|                     |         | thumbnail. For example, Page 2.                 |
-+---------------------+---------+-------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.thumbnail.navigated``
+   * - ``chapter`` 
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The page number of the thumbnail clicked.
+   * - ``thumbnail_title``
+     - string
+     - The identifying name for the destination of the thumbnail. For example, Page 2. 
 
 ``textbook.pdf.outline.toggled``
 ------------------------------------
 
-The ``textbook.pdf.outline.toggled`` event type fires when a user clicks the
-outline icon to show or hide a list of the book's chapters. 
+The browser emits ``textbook.pdf.outline.toggled`` events when a user clicks the
+outline icon to show or hide a list of the book's chapters.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+---------------------------------------------------------------------+
-| Field       | Type    | Details                                                             |
-+=============+=========+=====================================================================+
-| ``name``    | string  | ``textbook.pdf.outline.toggled``                                    |
-+-------------+---------+---------------------------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                                           |
-+-------------+---------+---------------------------------------------------------------------+
-| ``page``    | integer | The number of the page that is open when the user clicks this link. |
-+-------------+---------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.outline.toggled``
+   * - ``chapter`` 
+     - string
+     - The name of the PDF file.
+   * - ``page`` 
+     - integer
+     - The number of the page that is open when the user clicks this link.
 
 ``textbook.pdf.chapter.navigated``
 ------------------------------------
 
-The ``textbook.pdf.chapter.navigated`` event type fires when a user clicks on
-a link in the outline to navigate to a chapter.
+The browser emits ``textbook.pdf.chapter.navigated`` events when a user clicks
+on a link in the outline to navigate to a chapter.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------------+---------+-------------------------------------------------+
-| Field             | Type    | Details                                         |
-+===================+=========+=================================================+
-| ``name``          | string  | ``textbook.pdf.chapter.navigated``              |
-+-------------------+---------+-------------------------------------------------+
-| ``chapter``       | string  | The name of the PDF file.                       |
-+-------------------+---------+-------------------------------------------------+
-| ``chapter_title`` | string  | The identifying name for the destination of the |
-|                   |         | outline link.                                   |
-+-------------------+---------+-------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.chapter.navigated``
+   * - ``chapter``
+     - string
+     - The name of the PDF file.
+   * - ``chapter_title``
+     - string
+     - The identifying name for the destination of the outline link. 
+     
 ``textbook.pdf.page.navigated``
 ------------------------------------
 
-The ``textbook.pdf.page.navigated`` event type fires when a user manually enters
+The browser emits ``textbook.pdf.page.navigated`` events when a user manually enters
 a page number.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+--------------------------------------------------+
-| Field       | Type    | Details                                          |
-+=============+=========+==================================================+
-| ``name``    | string  | ``textbook.pdf.page.navigated``                  |
-+-------------+---------+--------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                        |
-+-------------+---------+--------------------------------------------------+
-| ``page``    | integer | The destination page number entered by the user. |
-+-------------+---------+--------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.page.navigated``
+   * - ``chapter``
+     - string
+     - The name of the PDF file.
+   * - ``page``
+     - integer
+     - The destination page number entered by the user.
 
 ``textbook.pdf.zoom.buttons.changed``
 --------------------------------------
 
-The ``textbook.pdf.zoom.buttons.changed`` event type fires when a user clicks
+The browser emits ``textbook.pdf.zoom.buttons.changed`` events when a user clicks
 either the Zoom In or Zoom Out icon.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------+---------+--------------------------------------------------------------------+
-| Field         | Type    | Details                                                            |
-+===============+=========+====================================================================+
-| ``name``      | string  | ``textbook.pdf.zoom.buttons.changed``                              |
-+---------------+---------+--------------------------------------------------------------------+
-| ``direction`` | string  | 'in', 'out'                                                        |
-+---------------+---------+--------------------------------------------------------------------+
-| ``chapter``   | string  | The name of the PDF file.                                          |
-+---------------+---------+--------------------------------------------------------------------+
-| ``page``      | integer | The number of the page that is open when the user clicks the icon. |
-+---------------+---------+--------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.zoom.buttons.changed``
+   * - ``direction``
+     -  string
+     -  'in', 'out'
+   * - ``chapter``
+     - string
+     - The name of the PDF file.
+   * - ``page``
+     - integer
+     - The number of the page that is open when the user clicks the icon.
 
 ``textbook.pdf.zoom.menu.changed``
 ------------------------------------
 
-The ``textbook.pdf.zoom.menu.changed`` event type fires when a user selects a
+The browser emits ``textbook.pdf.zoom.menu.changed`` events when a user selects a
 magnification setting.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+--------------------------------------------------------------------------------+
-| Field       | Type    | Details                                                                        |
-+=============+=========+================================================================================+
-| ``name``    | string  | ``textbook.pdf.zoom.menu.changed``                                             |
-+-------------+---------+--------------------------------------------------------------------------------+
-| ``amount``  | string  | '1', '0.75', '1.5', 'custom', 'page_actual', 'auto', 'page_width', 'page_fit'. |
-+-------------+---------+--------------------------------------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                                                      |
-+-------------+---------+--------------------------------------------------------------------------------+
-| ``page``    | integer | The number of the page that is open when the user selects this value.          |
-+-------------+---------+--------------------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.zoom.menu.changed``
+   * - ``amount``
+     - string
+     - '1', '0.75', '1.5', 'custom', 'page_actual', 'auto', 'page_width', 'page_fit'.
+   * - ``chapter``
+     - string
+     - The name of the PDF file.
+   * - ``page``
+     - integer
+     - The number of the page that is open when the user selects this value.
 
 ``textbook.pdf.display.scaled``
 ------------------------------------
 
-The ``textbook.pdf.display.scaled`` event type fires when the display
+The browser emits ``textbook.pdf.display.scaled`` events when the display
 magnification changes. These changes occur after a student selects a
 magnification setting from the zoom menu or resizes the browser window.
 
@@ -751,570 +876,691 @@ magnification setting from the zoom menu or resizes the browser window.
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------+---------+-------------------------------------------------------------------+
-| Field       | Type    | Details                                                           |
-+=============+=========+===================================================================+
-| ``name``    | string  | ``textbook.pdf.display.scaled``                                   |
-+-------------+---------+-------------------------------------------------------------------+
-| ``amount``  | string  | The magnification setting; for example, 0.95 or 1.25.             |
-+-------------+---------+-------------------------------------------------------------------+
-| ``chapter`` | string  | The name of the PDF file.                                         |
-+-------------+---------+-------------------------------------------------------------------+
-| ``page``    | integer | The number of the page that is open when the scaling takes place. |
-+-------------+---------+-------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.display.scaled``
+   * - ``amount``
+     - string
+     - The magnification setting; for example, 0.95 or 1.25.
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page`` 
+     - integer
+     - The number of the page that is open when the scaling takes place.
 
 ``textbook.pdf.display.scrolled``
 ------------------------------------
 
-The ``textbook.pdf.display.scrolled`` event type fires each time the displayed
+The browser emits ``textbook.pdf.display.scrolled`` events each time the displayed
 page changes while a user scrolls up or down.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------+---------+---------------------------------------------------------------------+
-| Field         | Type    | Details                                                             |
-+===============+=========+=====================================================================+
-| ``name``      | string  | ``textbook.pdf.display.scrolled``                                   |
-+---------------+---------+---------------------------------------------------------------------+
-| ``chapter``   | string  | The name of the PDF file.                                           |
-+---------------+---------+---------------------------------------------------------------------+
-| ``page``      | integer | The number of the page that is open when the scrolling takes place. |
-+---------------+---------+---------------------------------------------------------------------+
-| ``direction`` | string  | 'up', 'down'                                                        |
-+---------------+---------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.display.scrolled``
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The number of the page that is open when the scrolling takes place.
+   * - ``direction``
+     - string
+     - 'up', 'down' 
 
 ``textbook.pdf.search.executed``
 ------------------------------------
 
-The ``textbook.pdf.search.executed`` event type fires when a user searches for a
+The browser emits ``textbook.pdf.search.executed`` events when a user searches for a
 text value in the file. To reduce the number of events produced, instead of
-producing one event per entered character this event type defines a search
-string as the set of characters that are consecutively entered in the search
+producing one event per entered character this event defines a search
+string as the set of characters that is consecutively entered in the search
 field within 500ms of each other.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------------+---------+------------------------------------------------------------------+
-| Field             | Type    | Details                                                          |
-+===================+=========+==================================================================+
-| ``name``          | string  | ``textbook.pdf.search.executed``                                 |
-+-------------------+---------+------------------------------------------------------------------+
-| ``query``         | string  | The value in the search field.                                   |
-+-------------------+---------+------------------------------------------------------------------+
-| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``status``        | string  | A "not found" status phrase for a search string that             |
-|                   |         | is unsuccessful. Blank for successful search strings.            |
-+-------------------+---------+------------------------------------------------------------------+
-| ``chapter``       | string  | The name of the PDF file.                                        |
-+-------------------+---------+------------------------------------------------------------------+
-| ``page``          | integer | The number of the page that is open when the search takes place. |
-+-------------------+---------+------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.search.executed``
+   * - ``query``
+     - string
+     - The value in the search field.
+   * - ``caseSensitive``
+     - boolean
+     - 'true' if the case sensitive option is selected, 'false' if this option is not selected.
+   * - ``highlightAll``
+     - boolean
+     - 'true' if the option to highlight all matches is selected, 'false' if this option is not selected.
+   * - ``status``
+     - string
+     - A "not found" status phrase for a search string that is unsuccessful. Blank for successful search strings.
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The number of the page that is open when the search takes place.
 
 ``textbook.pdf.search.navigatednext``
 ---------------------------------------------
 
-The ``textbook.pdf.search.navigatednext`` event type fires when a user clicks
+The browser emits ``textbook.pdf.search.navigatednext`` events when a user clicks
 on the Find Next or Find Previous icons for an entered search string.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------------+---------+------------------------------------------------------------------+
-| Field             | Type    | Details                                                          |
-+===================+=========+==================================================================+
-| ``name``          | string  | ``textbook.pdf.search.navigatednext``                            |
-+-------------------+---------+------------------------------------------------------------------+
-| ``findprevious``  | string  | 'true' if the user clicks the Find Previous icon, 'false'        |
-|                   |         | if the user clicks the Find Next icon.                           |
-+-------------------+---------+------------------------------------------------------------------+
-| ``query``         | string  | The value in the search field.                                   |
-+-------------------+---------+------------------------------------------------------------------+
-| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``status``        | string  | A "not found" status phrase for a search string that             |
-|                   |         | is unsuccessful. Blank for successful search strings.            |
-+-------------------+---------+------------------------------------------------------------------+
-| ``chapter``       | string  | The name of the PDF file.                                        |
-+-------------------+---------+------------------------------------------------------------------+
-| ``page``          | integer | The number of the page that is open when the search takes place. |
-+-------------------+---------+------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.search.navigatednext`` 
+   * - ``findprevious``
+     - boolean
+     - 'true' if the user clicks the Find Previous icon, 'false' if the user clicks the Find Next icon.
+   * - ``query``
+     - string
+     - The value in the search field.
+   * - ``caseSensitive``
+     - boolean
+     - 'true' if the case sensitive option is selected, 'false' if this option is not selected.  
+   * - ``highlightAll``
+     - boolean
+     - 'true' if the option to highlight all matches is selected, 'false' if this option is not selected. 
+   * - ``status``
+     -  string
+     - A "not found" status phrase for a search string that is unsuccessful. Blank for successful search strings.   
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The number of the page that is open when the search takes place.
 
 ``textbook.pdf.search.highlight.toggled``
 ---------------------------------------------
 
-The ``textbook.pdf.search.highlight.toggled`` event type fires when a user
+The browser emits ``textbook.pdf.search.highlight.toggled`` events when a user
 selects or clears the **Highlight All** option for a search.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------------+---------+------------------------------------------------------------------+
-| Field             | Type    | Details                                                          |
-+===================+=========+==================================================================+
-| ``name``          | string  | ``textbook.pdf.search.highlight.toggled``                        |
-+-------------------+---------+------------------------------------------------------------------+
-| ``query``         | string  | The value in the search field.                                   |
-+-------------------+---------+------------------------------------------------------------------+
-| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``status``        | string  | A "not found" status phrase for a search string that is          |
-|                   |         | unsuccessful. Blank for successful search strings.               |
-+-------------------+---------+------------------------------------------------------------------+
-| ``chapter``       | string  | The name of the PDF file.                                        |
-+-------------------+---------+------------------------------------------------------------------+
-| ``page``          | integer | The number of the page that is open when the search takes place. |
-+-------------------+---------+------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.search.highlight.toggled``
+   * - ``query``
+     - string
+     - The value in the search field. 
+   * - ``caseSensitive``
+     - boolean
+     - 'true' if the case sensitive option is selected, false' if this option is not selected. 
+   * - ``highlightAll``
+     - boolean
+     - 'true' if the option to highlight all matches is selected, 'false' if this option is not selected.
+   * - ``status``
+     - string
+     - A "not found" status phrase for a search string that is unsuccessful. Blank for successful search strings.
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The number of the page that is open when the search takes place.
 
 ``textbook.pdf.search.casesensitivity.toggled``
 ------------------------------------------------------
 
-The ``textbook.pdf.search.casesensitivity.toggled`` event type fires when a
+The browser emits ``textbook.pdf.search.casesensitivity.toggled`` events when a
 user selects or clears the **Match Case** option for a search.
 
 **Component**: PDF Viewer 
 
 **Event Source**: Browser
 
-**History**: This event type was added on 16 Apr 2014.
+**History**: This event was added on 16 Apr 2014.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+-------------------+---------+------------------------------------------------------------------+
-| Field             | Type    | Details                                                          |
-+===================+=========+==================================================================+
-| ``name``          | string  | ``textbook.pdf.search.casesensitivity.toggled``                  |
-+-------------------+---------+------------------------------------------------------------------+
-| ``query``         | string  | The value in the search field.                                   |
-+-------------------+---------+------------------------------------------------------------------+
-| ``caseSensitive`` | boolean | 'true' if the case sensitive option is selected,                 |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``highlightAll``  | boolean | 'true' if the option to highlight all matches is selected,       |
-|                   |         | 'false' if this option is not selected.                          |
-+-------------------+---------+------------------------------------------------------------------+
-| ``status``        | string  | A "not found" status phrase for a search string that             |
-|                   |         | is unsuccessful. Blank for successful search strings.            |
-+-------------------+---------+------------------------------------------------------------------+
-| ``chapter``       | string  | The name of the PDF file.                                        |
-+-------------------+---------+------------------------------------------------------------------+
-| ``page``          | integer | The number of the page that is open when the search takes place. |
-+-------------------+---------+------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``name``
+     - string
+     - ``textbook.pdf.search.casesensitivity.toggled``
+   * - ``query``
+     - string
+     - The value in the search field.
+   * - ``caseSensitive``
+     - boolean
+     - 'true' if the case sensitive option is selected, 'false' if this option is not selected.
+   * - ``highlightAll``
+     - boolean
+     - 'true' if the option to highlight all matches is selected, 'false' if this option is not selected. 
+   * - ``status``
+     -  string
+     - A "not found" status phrase for a search string that is unsuccessful. Blank for successful search strings.
+   * - ``chapter``
+     - string
+     - The name of the PDF file. 
+   * - ``page``
+     - integer
+     - The number of the page that is open when the search takes place.
 
 .. _problem:
 
 =================================
-Problem Interaction Event Types 
+Problem Interaction Events 
 =================================
+.. lms-modules.js
+.. %%
+.. These events are 
+.. Capa Module
+
+Problem interaction events are emitted by the server or the browser to capture
+information about interactions with problems, specifically, problems defined in
+the edX Capa module.
 
 ``problem_check`` (Browser)
 ----------------------------
+.. no sample to check
+Both browser interactions and server requests produce ``problem_check`` events.
+The browser emits ``problem_check`` events when a user checks a problem.
 
-``problem_check`` events are produced by both browser interactions and server requests. A browser fires ``problem_check`` events when a user wants to check a problem.  
+**Event Source**: Browser 
 
-**Component**: Capa Module
-
-**Event Source**: Browser
-
-``event`` **Fields**: The ``event`` field contains the values of all input fields from the problem being checked, styled as GET parameters.
+``event`` **Member Fields**: For browser-emitted ``problem_check`` events, the
+``event`` field contains the values of all input fields from the problem being
+checked, styled as GET parameters.
 
 ``problem_check`` (Server)
------------------------------
+----------------------------
+.. no sample to check
+Both browser interactions and server requests produce ``problem_check`` events.
 
-The server fires ``problem_check`` events when a problem is successfully checked.  
-
-**Component**: Capa Module
-
+The server emits ``problem_check`` events when a problem is successfully checked. 
+  
 **Event Source**: Server
 
 **History**: 
 
-* On 5 Mar 2014, the ``submission`` dictionary was added to the ``event`` field and  ``module`` was added to the ``context`` field.
+* On 5 Mar 2014, the ``submission`` dictionary was added to the ``event`` field
+  and  ``module`` was added to the ``context`` field.
 
-* Prior to 15 Oct 2013, this event type was named ``save_problem_check``.
+* Prior to 15 Oct 2013, this server-emitted event was named ``save_problem_check``.
 
-* Prior to 15 Jul 2013, this event was fired twice for the same action.
+* Prior to 15 Jul 2013, this event was emitted twice for the same action.
 
-``context`` **Fields**: 
+``context`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details and Member Fields                                           |
-+=====================+===============+=====================================================================+
-| ``module``          | dict          | Provides the specific problem component as part of the context.     |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``display_name``  | string  | The **Display Name** given to the     |
-|                     |               |                   |         | problem component.                    |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               |                                                                     | 
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-``event`` **Fields**: 
+   * - Field
+     - Type
+     - Details
+   * - ``module``
+     - dict
+     - Provides the specific problem component as part of the context. Contains
+       the member field ``display_name``, which is the string value for the
+       **Display Name** given to the problem component.
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details and Member Fields                                           |
-+=====================+===============+=====================================================================+
-| ``answers``         | dict          | The problem ID and the internal answer identifier in a name:value   |
-|                     |               | pair. For a component with multiple problems, every problem and     |
-|                     |               | answer are listed.                                                  |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``attempts``        | integer       | The number of times the user attempted to answer the problem.       |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``correct_map``     | string / JSON | For each problem ID value listed by ``answers``, provides:          |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``correctness``   | string  | 'correct', 'incorrect'                |
-|                     |               +-------------------+---------+---------------------------------------+  
-|                     |               | ``hint``          | string  | Gives optional hint. Nulls allowed.   |
-|                     |               +-------------------+---------+---------------------------------------+  
-|                     |               | ``hintmode``      | string  | None, 'on_request', 'always'. Nulls   |
-|                     |               |                   |         | allowed.                              |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``msg``           | string  | Gives extra message response.         | 
-|                     |               +-------------------+---------+---------------------------------------+  
-|                     |               | ``npoints``       | integer | Points awarded for this               | 
-|                     |               |                   |         | ``answer_id``. Nulls allowed.         |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``queuestate``    | dict    | None when not queued, else            |
-|                     |               |                   |         | ``{key:'', time:''}`` where ``key``   |
-|                     |               |                   |         | is a secret string dump of a DateTime |
-|                     |               |                   |         | object in the form '%Y%m%d%H%M%S'.    |
-|                     |               |                   |         | Nulls allowed.                        |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``grade``           | integer       | Current grade value.                                                |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``max_grade``       | integer       | Maximum possible grade value.                                       |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem that was checked.                                 |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``submission``      | object        | Provides data about the response made. For components that include  |
-|                     |               | multiple problems, separate submission objects are provided for     |
-|                     |               | each one.                                                           |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``answer``        | string  | The value that the student entered,   |
-|                     |               |                   |         | or the display name of the value      |
-|                     |               |                   |         | selected.                             |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``correct``       | Boolean | 'true', 'false'                       |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``input_type``    | string  | The type of value that the student    |
-|                     |               |                   |         | supplies for the ``response_type``.   | 
-|                     |               |                   |         | Based on the XML element names used   | 
-|                     |               |                   |         | in the Advanced Editor. Examples      | 
-|                     |               |                   |         | include 'checkboxgroup', 'radiogroup',| 
-|                     |               |                   |         | 'choicegroup', and 'textline'.        |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``question``      | string  | Provides the text of the question.    |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``response_type`` | string  | The type of problem. Based on the XML | 
-|                     |               |                   |         | element names used in the Advanced    | 
-|                     |               |                   |         | Editor. Examples include              |
-|                     |               |                   |         | 'choiceresponse', 'optionresponse',   |
-|                     |               |                   |         | and 'multiplechoiceresponse'.         |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               | ``variant``       | integer | For problems that use problem         |
-|                     |               |                   |         | randomization features such as answer |
-|                     |               |                   |         | pools or choice shuffling, contains   |
-|                     |               |                   |         | the unique ID of the variant that was |
-|                     |               |                   |         | presented to this user.               |
-|                     |               +-------------------+---------+---------------------------------------+ 
-|                     |               |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``success``         | string        | 'correct', 'incorrect'                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``answers``
+     - dict
+     - The problem ID and the internal answer identifier in a name:value pair.
+       For a component with multiple problems, lists every problem and
+       answer.
+   * - ``attempts``
+     - integer
+     - The number of times the user attempted to answer the problem.
+   * - ``correct_map``
+     - dict
+     - For each problem ID value listed by ``answers``, provides:
+       
+       * ``correctness``: string; 'correct', 'incorrect'
+       * ``hint``: string; Gives optional hint. Nulls allowed. 
+       * ``hintmode``: string; None, 'on_request', 'always'. Nulls allowed. 
+       * ``msg``: string; Gives extra message response.
+       * ``npoints``: integer; Points awarded for this ``answer_id``. Nulls allowed.
+       * ``queuestate``: dict; None when not queued, else ``{key:'', time:''}``
+         where ``key`` is a secret string dump of a DateTime object in the form
+         '%Y%m%d%H%M%S'. Nulls allowed. 
+
+   * - ``grade``
+     - integer
+     - Current grade value. 
+   * - ``max_grade``
+     - integer
+     - Maximum possible grade value.
+   * - ``problem_id``
+     - string
+     - ID of the problem that was checked.
+   * - ``state``
+     - dict
+     - Current problem state.
+   * - ``submission``
+     - object
+     - Provides data about the response made. For components that include
+       multiple problems, a separate submission object is provided for each one.
+
+       * ``answer``: string; The value that the student entered, or the display name of the value selected.
+       * ``correct``: Boolean; 'true', 'false'
+       * ``input_type``: string; The type of value that the student supplies for
+         the ``response_type``. Based on the XML element names used in the
+         Advanced Editor. Examples include 'checkboxgroup', 'radiogroup',
+         'choicegroup', and 'textline'.
+       * ``question``: string; Provides the text of the question.
+       * ``response_type``: string; The type of problem. Based on the XML
+         element names used in the Advanced  Editor. Examples include
+         'choiceresponse', 'optionresponse', and 'multiplechoiceresponse'.
+       * ``variant``: integer; For problems that use problem randomization
+         features such as answer pools or choice shuffling, contains the unique
+         ID of the variant that was presented to this user. 
+
+   * - ``success``
+     - string
+     - 'correct', 'incorrect' 
 
 ``problem_check_fail``
 -----------------------------
-
-The server fires ``problem_check_fail`` events when a problem cannot be checked successfully.
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``problem_check_fail`` events when a problem cannot be checked successfully.
 
 **Event Source**: Server
 
-**History**: Prior to 15 Oct 2013, this event type was named ``save_problem_check_fail``.
+**History**: Prior to 15 Oct 2013, this event was named ``save_problem_check_fail``.
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being checked.                                    |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``answers``         | dict          |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``failure``         | string        | 'closed', 'unreset'                                                 |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-``problem_reset``
------------------------------
+   * - Field
+     - Type
+     - Details
+   * - ``state``  
+     - dict
+     - Current problem state.
+   * - ``problem_id``
+     - string
+     - ID of the problem being checked.
+   * - ``answers`` 
+     - dict
+     - 
+   * - ``failure`` 
+     - string
+     - 'closed', 'unreset'
 
-``problem_reset`` events fire when a user resets a problem.
+.. ``problem_reset``
+.. -----------------------------
+.. no sample to check
+.. The browser emits ``problem_reset`` events when a user resets a problem.
+.. %%is this an instructor initiated event?
+.. return Logger.log('problem_reset', [_this.answers, response.contents], _this.id);
 
-**Component**: Capa Module
+.. **Event Source**: Browser
 
-**Event Source**: Browser
-
-``event`` **Fields**: None
+.. ``event`` **Member Fields**: None
 
 ``problem_rescore``
 -----------------------------
-
-The server fires ``problem_rescore`` events when a problem is successfully rescored.  
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``problem_rescore`` events when a problem is successfully rescored.  
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being rescored.                                   |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``orig_score``      | integer       |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``orig_total``      | integer       |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new_score``       | integer       |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new_total``       | integer       |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``correct_map``     | string / JSON | See the fields for the ``problem_check`` server event type above.   |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``success``         | string        | 'correct', 'incorrect'                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``attempts``        | integer       |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``state``
+     - dict
+     - Current problem state.
+   * - ``problem_id``
+     - string
+     - ID of the problem being rescored.
+   * - ``orig_score``
+     - integer
+     - 
+   * - ``orig_total``
+     - integer
+     - 
+   * - ``new_score`` 
+     - integer
+     - 
+   * - ``new_total``
+     - integer
+     - 
+   * - ``correct_map``
+     - dict
+     - See the fields for the ``problem_check`` server event above.
+   * - ``success``
+     - string
+     - 'correct', 'incorrect'
+   * - ``attempts``
+     - integer
+     - 
 
 ``problem_rescore_fail``
 -----------------------------
-
-The server fires ``problem_rescore_fail`` events when a problem cannot be successfully rescored.  
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``problem_rescore_fail`` events when a problem cannot be successfully rescored.  
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being checked.                                    |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``failure``         | string        | 'unsupported', 'unanswered', 'input_error', 'unexpected'            |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``state``
+     - dict
+     - Current problem state. 
+   * - ``problem_id``
+     - string
+     - ID of the problem being checked.
+   * - ``failure`` 
+     - string
+     - 'unsupported', 'unanswered', 'input_error', 'unexpected'
 
 ``problem_save``
 -----------------------------
-
-``problem_save`` fires when a problem is saved.
-
-**Component**: Capa Module
+.. no sample to check
+The browser emits ``problem_save`` events when a user saves a problem.
 
 **Event Source**: Browser
 
-``event`` **Fields**: None
+``event`` **Member Fields**: None
 
 ``problem_show``
 -----------------------------
-
-``problem_show`` fires when a problem is shown.  
-
-**Component**: Capa Module
+.. no sample to check
+The browser emits ``problem_show`` events when a problem is shown.  
+.. %%
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``problem``         | string        | ID of the problem being shown. For example,                         |
-|                     |               | i4x://MITx/6.00x/problem/L15:L15_Problem_2).                        |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``problem``
+     - string
+     - ID of the problem being shown. For example, i4x://MITx/6.00x/problem/L15:L15_Problem_2).
 
 ``reset_problem``
 ------------------------------------------------
-
-``reset_problem`` fires when a problem has been reset successfully. 
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``reset_problem`` events when a problem has been reset successfully. 
+.. %%what is the difference between reset_problem and problem_reset?
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``old_state``       | string / JSON | The state of the problem before the reset was performed.            |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being reset.                                      |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``new_state``       | string / JSON | New problem state.                                                  |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``old_state``
+     - dict
+     - The state of the problem before the reset was performed. 
+   * - ``problem_id``
+     - string
+     - ID of the problem being reset.
+   * - ``new_state``
+     - dict
+     - New problem state.  
 
 ``reset_problem_fail`` 
 ------------------------------------------------
-
-``reset_problem_fail`` fires when a problem cannot be reset successfully. 
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``reset_problem_fail`` events when a problem cannot be reset successfully. 
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``old_state``       | string / JSON | The state of the problem before the reset was requested.            |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being reset.                                      |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``failure``         | string        | 'closed', 'not_done'                                                |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``old_state``
+     - dict
+     - The state of the problem before the reset was requested.
+   * - ``problem_id``
+     - string
+     - ID of the problem being reset.  
+   * - ``failure``
+     - string
+     - 'closed', 'not_done'
 
 ``show_answer`` 
 ------------------------------------------------
-
-Server-side event which displays the answer to a problem. 
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``show_answer`` events when the answer to a problem is shown. 
 
 **Event Source**: Server
 
-**History**: The original name for this event type was ``showanswer``. 
+**History**: The original name for this event was ``showanswer``. 
 
 .. **Question** is this renaming info correct?
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``problem_id``      | string        | EdX ID of the problem being shown.                                  |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``problem_id``
+     - string
+     - EdX ID of the problem being shown. 
 
 ``save_problem_fail`` 
 ------------------------------------------------
+.. no sample to check
 
-``save_problem_fail``  fires when a problem cannot be saved successfully. 
-
-**Component**: Capa Module
+The server emits ``save_problem_fail``  events when a problem cannot be saved successfully. 
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being saved.                                      |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``failure``         | string        | 'closed', 'done'                                                    |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``answers``         | dict          |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``state``
+     - dict
+     - Current problem state.
+   * - ``problem_id``
+     - string
+     - ID of the problem being saved. 
+   * - ``failure`` 
+     - string
+     - 'closed', 'done' 
+   * - ``answers`` 
+     - dict
+     - 
 
 ``save_problem_success`` 
 ------------------------------------------------
-
-``save_problem_success`` fires when a problem is saved successfully. 
-
-**Component**: Capa Module
+.. no sample to check
+The server emits ``save_problem_success`` events when a problem is saved successfully. 
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-|  Field              | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``state``           | string / JSON | Current problem state.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being saved.                                      |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``answers``         | dict          |                                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``state``
+     - dict
+     - Current problem state. 
+   * - ``problem_id``
+     - string
+     - ID of the problem being saved. 
+   * - ``answers``
+     -  dict
+     -  
+
+.. ``problem_graded``
+.. -------------------
+
+.. %%TBD
+
+.. The server emits a ``problem_graded`` event %%%
+
+.. return Logger.log('problem_graded', [_this.answers, response.contents], _this.id);
+
+.. ``event`` **Member Fields**: The ``event`` field delivers the values entered for the problem component in Studio as a string. The display name, problem text, and choices or response field labels are included.
 
 .. _ora:
 
 ======================================
-Open Response Assessment Event Types 
+Open Response Assessment Events 
 ======================================
+.. reviewers: I did not spend much editing time on these descriptions, I only
+.. changed the presentation. Please review for accuracy only.
+**History**: The events in this section record interactions with the prototype
+implementation of open response assessment (ORA) problem types. As of May 2014,
+new courses are not using this implementation of ORA and a complete redesign of
+this feature is in limited release.
 
 ``oe_hide_question`` and ``oe_show_question``
 ---------------------------------------------------------------------------
 
-The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user hides or redisplays a combined open-ended problem.
+The browser emits ``oe_hide_question`` and ``oe_show_question`` events when the
+user hides or redisplays a combined open-ended problem.
 
-**History**: These event types were previously named ``oe_hide_problem`` and ``oe_show_problem``.
+**History**: These events were previously named ``oe_hide_problem`` and
+``oe_show_problem``.
 
 **Component**: Combined Open-Ended
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``location``        | string        | The location of the question whose prompt is being shown or hidden. |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-----------------------
+   * - Field
+     - Type
+     - Details
+   * - ``location``
+     - string
+     - The location of the question whose prompt is being shown or hidden.
+
 ``rubric_select`` 
 ----------------------
 
@@ -1322,18 +1568,24 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``location``        | string        | The location of the question whose rubric is                        |
-|                     |               | being selected.                                                     |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``selection``       | integer       | Value selected on rubric.                                           |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``category``        | integer       | Rubric category selected.                                           |
-+-----------------------------------+-------------------------------+---------------------+-----------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``location``
+     - string
+     - The location of the question whose rubric is being selected. 
+   * - ``selection``
+     - integer
+     - Value selected on rubric. 
+   * - ``category``
+     - integer
+     - Rubric category selected.
 
 ``oe_show_full_feedback`` and ``oe_show_respond_to_feedback``
 ------------------------------------------------------------------
@@ -1342,8 +1594,7 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 
 **Event Source**: Browser
 
-``event`` **Fields**: None.
-
+``event`` **Member Fields**: None.
 
 ``oe_feedback_response_selected`` 
 --------------------------------------------
@@ -1352,191 +1603,418 @@ The ``oe_hide_question`` and ``oe_show_question`` event types fire when the user
 
 **Event Source**: Browser
 
-``event`` **Fields**:
+``event`` **Member Fields**:
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``value``           | integer       | Value selected in the feedback response form.                       |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
+   * - Field
+     - Type
+     - Details
+   * - ``value``
+     - integer
+     - Value selected in the feedback response form.
 
 ``peer_grading_hide_question`` and ``peer_grading_show_question``
 ---------------------------------------------------------------------
+.. I couldn't find these names in any js file. peer_grading_problem.js includes oe_hide or show_question.
+The browser emits ``peer_grading_hide_question`` and
+``peer_grading_show_question`` events when the user hides or redisplays a
+problem that is peer graded.
 
-The ``peer_grading_hide_question`` and ``peer_grading_show_question`` event types fire when the user hides or redisplays a problem that is peer graded.
-
-**History**: These event types were previously named ``peer_grading_hide_problem`` and ``peer_grading_show_problem``.
+**History**: These events were previously named ``peer_grading_hide_problem`` and ``peer_grading_show_problem``.
 
 **Component**: Peer Grading
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``location``        | string        | The location of the question whose prompt is being shown or hidden. |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
+   * - Field
+     - Type
+     - Details
+   * - ``location``
+     - string
+     - The location of the question whose prompt is being shown or hidden.
 
 ``staff_grading_hide_question`` and ``staff_grading_show_question``
 -----------------------------------------------------------------------
+.. staff_grading.js
+The browser emits ``staff_grading_hide_question`` and
+``staff_grading_show_question`` events when the user hides or redisplays a
+problem that is staff graded.
 
-The ``staff_grading_hide_question`` and ``staff_grading_show_question`` event types fire when the user hides or redisplays a problem that is staff graded.
-
-**History**: These event types were previously named ``staff_grading_hide_problem`` and ``staff_grading_show_problem``.
+**History**: These events were previously named ``staff_grading_hide_problem`` and ``staff_grading_show_problem``.
 
 **Component**: Staff Grading
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``location``        | string        | The location of the question whose prompt is being shown or hidden. |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``location``
+     - string
+     - The location of the question whose prompt is being shown or hidden.
 
 .. _AB_Event_Types:
 
 ==========================
-A/B Testing Event Types
+A/B Testing Events
 ==========================
 
-Course authors can configure course content to present modules that contain other modules. For example, a parent module can include two child modules with content that differs in some way for comparison testing. When a student navigates to a module that is set up for A/B testing in this way, the student is randomly assigned to a group and shown only one of the child modules. 
+Course authors can configure course content to present modules that contain
+other modules. For example, a parent module can include two child modules with
+content that differs in some way for comparison testing. When a student
+navigates to a module that is set up for A/B testing in this way, the student is
+randomly assigned to a group and shown only one of the child modules.
 
-* Internally, a *partition* defines the type of experiment: between video and text, for example. A course can include any number of modules with the same partition, or experiment type.
-* For each partition, students are randomly assigned to a *group*. The group determines which content, either video or text in this example, is shown by every module with that partitioning. 
+* Internally, a *partition* defines the type of experiment: comparing the
+  effectiveness of video alone to text alone, for example. A course can include
+  any number of modules with the same partition, or experiment type.
 
-The event types that follow apply to modules that are set up to randomly assign students to groups so that different content can be shown to the different groups. 
+* For each partition, students are randomly assigned to a *group*. The group
+  determines which content, either video or text in this example, is shown by
+  every module with that partitioning.
 
-**History**: These event types were added on 12 Mar 2014.
+The events that follow apply to modules that are set up to randomly assign
+students to groups so that different content can be shown to the different
+groups.
+
+**History**: These events were added on 12 Mar 2014.
 
 ``assigned_user_to_partition``
 ----------------------------------
 
-When a student views a module that is set up to test different child modules, the server checks the ``user_api_usercoursetag`` table for the student's assignment to the relevant partition, and to a group for that partition. The partition ID is the ``user_api_usercoursetag.key`` and the group ID is the ``user_api_usercoursetag.value``. If the student does not yet have an assignment, the server fires an ``assigned_user_to_partition`` event and adds a row to the ``user_api_usercoursetag`` table for the student. See :ref:`user_api_usercoursetag`. 
+When a student views a module that is set up to test different child modules,
+the server checks the ``user_api_usercoursetag`` table for the student's
+assignment to the relevant partition, and to a group for that partition. 
 
-.. note:: After this event fires, the common ``context`` field in all subsequent events includes a ``course_user_tags`` member field with the student's assigned partition and group.
+* The partition ID is the ``user_api_usercoursetag.key``.
+
+* The group ID is the ``user_api_usercoursetag.value``.
+
+If the student does not yet have an assignment, the server emits an
+``assigned_user_to_partition`` event and adds a row to the
+``user_api_usercoursetag`` table for the student. See
+:ref:`user_api_usercoursetag`.
+
+.. note:: After this event is emitted, the common ``context`` field in all subsequent events includes a ``course_user_tags`` member field with the student's assigned partition and group.
 
 **Component**: Split Test
 
 **Event Source**: Browser
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``group_id``        | integer       | Identifier of the group.                                            |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``group_name``      | string        | Name of the group.                                                  |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``partition_id``    | integer       | Identifier for the partition, in the format                         |
-|                     |               | ``xblock.partition_service.partition_ID`` where ID is an integer.   |
-+---------------------+---------------+---------------------------------------------------------------------+
-| ``partition_name``  | string        | Name of the partition.                                              |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``group_id``
+     - integer
+     - Identifier of the group.
+   * - ``group_name``
+     - string
+     - Name of the group. 
+   * - ``partition_id``
+     - integer
+     - Identifier for the partition, in the format ``xblock.partition_service.partition_ID`` where ID is an integer.
+   * - ``partition_name``
+     - string
+     - Name of the partition.
 
 ``child_render``
 ----------------------------------
 
-When a student views a module that is set up to test different content using child modules, a ``child_render`` event fires to identify the child module that is shown to the student. 
+When a student views a module that is set up to test different content using
+child modules, the server emits a ``child_render`` event to identify
+the child module that was shown to the student.
 
 **Component**: Split Test
 
 **Event Source**: Server
 
-``event`` **Fields**: 
+``event`` **Member Fields**: 
 
-+---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
-+=====================+===============+=====================================================================+
-| ``child-id``        | string        | ID of the module that displays to the student.                      |
-+---------------------+---------------+---------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-.. this might be renamed to child_id
+   * - Field
+     - Type
+     - Details
+   * - ``child-id``
+     - string
+     - ID of the module that displays to the student. 
 
 .. _Instructor_Event_Types:
 
 *************************
-Instructor Event Types
+Instructor Events
 *************************
 
-The Instructor Event Type table lists the event types logged for course team
-interaction with the Instructor Dashboard in the LMS. 
+This section lists the events that the server emits as a result of course team
+interaction with the Instructor Dashboard in the LMS.
 
-.. need a description for each of these
+The schema definitions of each of these events include only the JSON fields that
+are common to all events.
 
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| Event Type                             | Component            | Event Source    | ``event`` Fields    | Type          |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``list-students``,                     | Instructor Dashboard | Server          |                     |               |
-| ``dump-grades``,                       |                      |                 |                     |               |
-| ``dump-grades-raw``,                   |                      |                 |                     |               |
-| ``dump-grades-csv``,                   |                      |                 |                     |               |
-| ``dump-grades-csv-raw``,               |                      |                 |                     |               |
-| ``dump-answer-dist-csv``,              |                      |                 |                     |               |
-| ``dump-graded-assignments-config``     |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``rescore-all-submissions``,           | Instructor Dashboard | Server          | ``problem``         | string        |
-| ``reset-all-attempts``                 |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``course``          | string        |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``delete-student-module-state``,       | Instructor Dashboard | Server          | ``problem``         | string        |
-| ``rescore-student-submission``         |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``student``         | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``course``          | string        |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``reset-student-attempts``             | Instructor Dashboard | Server          | ``old_attempts``    | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``student``         | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``problem``         | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``instructor``      | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``course``          | string        |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``get-student-progress-page``          | Instructor Dashboard | Server          | ``student``         | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``instructor``      | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``course``          | string        |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``list-staff``,                        | Instructor Dashboard | Server          |                     |               |
-| ``list-instructors``,                  |                      |                 |                     |               |
-| ``list-beta-testers``                  |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``add-instructor``,                    | Instructor Dashboard | Server          | ``instructor``      | string        |
-| ``remove-instructor``                  |                      |                 |                     |               |
-|                                        |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``list-forum-admins``,                 | Instructor Dashboard | Server          | ``course``          | string        |
-| ``list-forum-mods``,                   |                      |                 |                     |               |
-| ``list-forum-community-TAs``           |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``remove-forum-admin``,                | Instructor Dashboard | Server          | ``username``        | string        |
-| ``add-forum-admin``,                   |                      |                 |                     |               |
-| ``remove-forum-mod``,                  |                      |                 |                     |               |
-| ``add-forum-mod``,                     |                      |                 +---------------------+---------------+
-| ``remove-forum-community-TA``,         |                      |                 | ``course``          | string        |
-| ``add-forum-community-TA``             |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``psychometrics-histogram-generation`` | Instructor Dashboard | Server          | ``problem``         | string        |
-|                                        |                      |                 |                     |               |
-|                                        |                      |                 |                     |               |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
-| ``add-or-remove-user-group``           | Instructor Dashboard | Server          | ``event_name``      | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``user``            | string        |
-|                                        |                      |                 +---------------------+---------------+
-|                                        |                      |                 | ``event``           | string        |
-+----------------------------------------+----------------------+-----------------+---------------------+---------------+
+* ``dump-answer-dist-csv``
+* ``dump-graded-assignments-config``
+* ``dump-grades``
+* ``dump-grades-csv``
+* ``dump-grades-csv-raw``
+* ``dump-grades-raw``
+* ``list-beta-testers``
+* ``list-instructors``
+* ``list-staff``
+* ``list-students``
+
+.. _rescore_all:
+
+======================================================
+``rescore-all-submissions`` and ``reset-all-attempts``
+======================================================
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``problem`` 
+     - string
+   * - ``course``
+     - string
+
+.. _rescore_student:
+
+===================================================================
+ ``delete-student-module-state`` and ``rescore-student-submission``
+===================================================================
+.. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``problem``
+     - string
+   * - ``student``
+     - string
+   * - ``course``
+     - string
+
+.. _reset_attempts:
+
+======================================================
+``reset-student-attempts``
+======================================================
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``old_attempts``
+     - string
+   * - ``student``
+     - string
+   * - ``problem``
+     - string 
+   * - ``course``
+     - string
+
+.. _progress:
+
+======================================================
+``get-student-progress-page`` 
+======================================================
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``student``
+     - string
+   * - ``instructor``
+     - string
+   * - ``course``
+     - string
+
+======================================================
+``add_instructor`` and ``remove_instructor`` 
+======================================================
+.. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``instructor``
+     - string
+
+.. _list_forum:
+
+======================================================
+List Discussion Staff Events
+======================================================
+.. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
+
+* ``list-forum-admins``
+
+* ``list-forum-mods``
+
+* ``list-forum-community-TAs``
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``course``
+     - string
+
+.. _forum:
+
+======================================================
+Manage Discussion Staff Events   
+======================================================
+.. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
+
+* ``add-forum-admin``
+
+* ``remove-forum-admin``
+
+* ``add-forum-mod``
+
+* ``remove-forum-mod``
+
+* ``add-forum-community-TA``
+
+* ``remove-forum-community-TA``
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``username``
+     - string
+   * - ``course``
+     - string
+
+.. _histogram:
+
+======================================================
+``psychometrics-histogram-generation``
+======================================================
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``problem``
+     - string
+
+.. _user_group:
+
+======================================================
+``add-or-remove-user-group``   
+======================================================
+
+**Component**: Instructor Dashboard
+
+**Event Source**: Server
+
+``event`` **Fields**: 
+
+.. list-table::
+   :widths: 40 40
+   :header-rows: 1
+
+   * - Field
+     - Type
+   * - ``event_name``
+     - string
+   * - ``user``
+     - string
+   * - ``event``
+     - string
 
 .. _instructor_enrollment:
 
@@ -1549,17 +2027,17 @@ enroll in or unenroll from a course, actions by instructors and course staff
 members also generate enrollment events.
 
 * When a course author creates a course, his or her user account is enrolled in
-  the course and the server fires an ``edx.course.enrollment.activated`` event.
+  the course and the server emits an ``edx.course.enrollment.activated`` event.
 
 * When a user with the Instructor or Course Staff role enrolls in a course, the
-  server fires ``edx.course.enrollment.activated``. The server fires
+  server emits ``edx.course.enrollment.activated``. The server emits
   ``edx.course.enrollment.deactivated`` events when these users unenroll from a
   course.
 
 * When a user with the Instructor or Course Staff role uses the **Batch
   Enrollment** feature to enroll students or other staff members in a course,
-  the server fires an ``edx.course.enrollment.activated`` event for each
+  the server emits an ``edx.course.enrollment.activated`` event for each
   enrollment. When this feature is used to unenroll students from a course, the
-  server fires a ``edx.course.enrollment.deactivated`` for each unenrollment.
+  server emits a ``edx.course.enrollment.deactivated`` for each unenrollment.
 
 For details about the enrollment events, see :ref:`enrollment`.

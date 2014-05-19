@@ -45,6 +45,7 @@
 # abdallah_n <abdoosh00@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013-2014
+# ayshibly <ayshibly@gmail.com>, 2014
 # hani1460 <hani0a@hotmail.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # jkfreij <jkfreij@gmail.com>, 2014
@@ -69,6 +70,7 @@
 # jkfreij <jkfreij@gmail.com>, 2014
 # khateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2014
+# nabeelqordoba <nabeel@qordoba.com>, 2014
 # najwan <najwanrousan@gmail.com>, 2013
 # sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -96,7 +98,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"POT-Creation-Date: 2014-05-19 08:17-0400\n"
 "PO-Revision-Date: 2014-05-12 17:39+0000\n"
 "Last-Translator: nabeelqordoba <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -995,7 +997,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error"
-msgstr ""
+msgstr "خطأ"
 
 #: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html
@@ -1007,10 +1009,12 @@ msgid ""
 "[courseware.capa.responsetypes.customresponse] error getting student answer from {student_answers}\n"
 " idset = {idset}, error = {err}"
 msgstr ""
+"[courseware.capa.responsetypes.customresponse] خطأ في الحصول على إجابة الطالب من {student_answers}\n"
+"idset = {idset}، خطأ = {err}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer entered!"
-msgstr ""
+msgstr "لم يتمّ إدخال أي إجابة!"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
@@ -1019,16 +1023,16 @@ msgstr "CustomResponse: وظيفة التحقق رجعت بدليل غير صح�
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
-msgstr ""
+msgstr "لم يتمّ تقديم أي جواب."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error checking problem: no external queueing server is configured."
-msgstr ""
+msgstr "حدث مشكلة في التحقّق من الخطأ: لم يتمّ ضبط أي مخدّم صف خارجي."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1540,6 +1544,9 @@ msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
+"الرابط الإلكتروني لمقطع الفيديو الخاص بك. يمكن أن يكون رابط عنوان مقطع فيديو"
+" على موقع YouTube أو رابط لملف فيديو .mp4 أو .ogg أو .webm في أي موقع على "
+"شبكة الانترنت."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
@@ -1576,38 +1583,75 @@ msgid "Copyright"
 msgstr "حقوق الطبع والنشر "
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "الاسم "
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr "اسم المستخدم"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr "الدرجة"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
+msgstr "النسبة"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
 msgstr ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "students"
-msgstr "الطلاب"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "questions"
-msgstr "الأسئلة"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{num_students} student(s) opened Subsection {subsection_num}: "
-"{subsection_name}"
+msgid "Subsection"
 msgstr ""
-"قام {num_students} بفتح القسم الفرعي رقم {subsection_num}: واسمه "
-"{subsection_name} "
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+msgid "Opened by this number of students"
 msgstr ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "subsections"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "المسألة "
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Count of Students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "% of Students"
+msgstr ""
+
+#: lms/templates/folditchallenge.html
+msgid "Score"
+msgstr "النتيجة"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "problems"
+msgstr ""
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -2008,24 +2052,6 @@ msgstr "المستخدم غير موجود."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "المهمة قيد التشغيل بالفعل."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "اسم المستخدم"
-
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "الاسم "
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4988,10 +5014,6 @@ msgstr "قائمة المتصدِرين في اللغز "
 msgid "User"
 msgstr "المستخدم"
 
-#: lms/templates/folditchallenge.html
-msgid "Score"
-msgstr "النتيجة"
-
 #: lms/templates/footer.html
 msgid "About"
 msgstr "نبذة عن"
@@ -5976,7 +5998,7 @@ msgstr "إعادة ضبط عدد محاولات الطالب "
 
 #: lms/templates/staff_problem_info.html
 msgid "Delete Student State"
-msgstr ""
+msgstr "إلغاء حالة الطالب في المساق"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -6770,7 +6792,7 @@ msgstr "الأوراق الموزّعة للمساق"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
-msgstr ""
+msgstr "شاشة المعلومات الرئيسية الموروثة للموَجه."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6779,7 +6801,7 @@ msgstr "عرض المساق في الاستوديو"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Back To Instructor Dashboard"
-msgstr ""
+msgstr "العودة إلى شاشة المعلومات الرئيسية للموجّه."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6792,16 +6814,20 @@ msgid ""
 "You are using the legacy instructor dashboard, which we will retire in the "
 "near future."
 msgstr ""
+"أنت تستخدم شاشة المعلومات الرئيسية الموروثة للموجّه، التي سنقوم بسحبها في "
+"المستقبل القريب."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Return to the Instructor Dashboard"
-msgstr ""
+msgstr "العودة إلى شاشة المعلومات الرئيسية للموجّه"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "If the Instructor Dashboard is missing functionality, please contact your PM"
 " to let us know."
 msgstr ""
+"إذا لم تكن شاشة المعلومات الرئيسية تعمل، الرجاء الاتصال بمدير المشروع "
+"لإعلامنا بذلك."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6998,7 +7024,6 @@ msgstr "سحب التسجيل من سجل الدرجات الخارجي"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr "القسم:"
 
@@ -7149,12 +7174,6 @@ msgid "Score distribution for problems"
 msgstr "توزيع الدرجات بالنسبة للمسائل"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "المسألة "
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Max"
 msgstr "الحد الأعلى "
 
@@ -7168,7 +7187,6 @@ msgid "There is no data available to display at this time."
 msgstr "لا توجد أية بيانات متاحة للعرض في هذا الوقت."
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
@@ -7344,10 +7362,6 @@ msgstr ""
 "قريباً."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final standing is unrequested or unavailable at this time."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "درجتك النهائية:"
 
@@ -7431,7 +7445,7 @@ msgstr "{course_number} {course_name} صورة الغلاف"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as a verified student"
-msgstr ""
+msgstr "تمّ تسجيلك كطالب معتمد."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -7445,7 +7459,7 @@ msgstr "تم التحقق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as an honor code student"
-msgstr ""
+msgstr "تمّ تسجيلك بمثابة طالب في ميثاق الشرف."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/static_templates/honor.html
@@ -7455,11 +7469,11 @@ msgstr "شهادة شرفيّة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're auditing this course"
-msgstr ""
+msgstr "أنت مسجّل في هذا المساق كمستمع."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Auditing"
-msgstr ""
+msgstr "الحضور بصفة مستمع."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -8698,6 +8712,8 @@ msgid ""
 "Specify the extension due date and time (in UTC; please specify "
 "{format_string})."
 msgstr ""
+"حدّد تاريخ وتوقيت التمديد (بحسب التوقيت العالمي؛ الرجاء استخدام الصيغة "
+"{شهر/يوم/سنة ساعة:دقيقة})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8728,7 +8744,7 @@ msgstr "إظهار قائمة بكافة الطلاب الذين تم منحهم
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Specify a student to see all of that student's extensions."
-msgstr ""
+msgstr "تحديد طالب معيّن لاستعراض كافة التمديدات الممنوحة له."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8754,7 +8770,7 @@ msgstr "إعادة ضبط التاريخ المحدّد للطالب."
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
-msgstr ""
+msgstr "العودة إلى شاشة المعلومات الرئيسية الموروثة "
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid ""
@@ -8762,6 +8778,9 @@ msgid ""
 "transition time, you can still access the old Instructor Dashboard by "
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
+"لقد قمنا بتغيير شكل وأسلوب شاشة المعلومات الرئيسية. خلال فترة التحوّل هذه، "
+"يمكنك الدخول إلى شاشة المعلومات الرئيسية للموجّه القديمة من خلال الضغط على "
+"زرّ \"العودة إلى شاشة المعلومات الرئيسية الموروثة\" أعلاه."
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -9013,12 +9032,53 @@ msgid "Add Community TA"
 msgstr "إضافة المساعد المشرف للمجموعة"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Use Reload Graphs to refresh the graphs."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr "إعادة تحميل الرسوم البيانية"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Count of Students Opened a Subsection"
-msgstr "عدد الطلاب الذين قاموا بفتح قسم فرعي"
+msgid "Subsection Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the number of students that opened the subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that opened the "
+"subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "You can also download this data as a CSV file."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Subsection Data for all Subsections as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the grade distribution for that problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that attempted the "
+"problem, along with the grades they received."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Problem Data for all Problems as a CSV"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
@@ -9032,14 +9092,6 @@ msgstr "تنزيل درجات الطلاب بصيغة CSV"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
 msgstr "هذه قائمة جزئية، لعرض جميع الطلاب يرجى التنزيل بصيغة CSV."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "الدرجة"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "النسبة"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -9084,17 +9136,19 @@ msgstr "إظهار سجل كافة مهمات البريد الإلكتروني 
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
-msgstr ""
+msgstr "دفتر الدرجات الخاص بالطالب"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Click here to view the gradebook for enrolled students. This feature is only"
 " visible to courses with a small number of total enrolled students."
 msgstr ""
+"الرجاء النقر هنا لعرض كتاب الدرجات الخاص بالطلاب المسجّلين. يمكن رؤية هذه "
+"الميزة فقط في المساقات التي يكون عدد الطلاب المسجلّين فيها قليلًا."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
-msgstr ""
+msgstr "عرض دفتر الدرجات"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
@@ -9301,7 +9355,7 @@ msgstr ""
 "{p_tag}ليس لديك حالياً أية مهمّات تقييم نظراء تنتظرك. وحتى تصلك مهمّات تقييم نظراء:\n"
 "{ul_tag}\n"
 "{li_tag}يجب أن تكون قد قدّمت إجابةً على إحدى مسائل تقييم النظراء{end_li_tag}\n"
-"{li_tag}يتعيّن أن يقوم أستاذ المقرر بتقييم المقالات المستخدمة بغرض مساعدتك على فهم معايير التقييم بشكلٍ أفضل.{end_li_tag}\n"
+"{li_tag}يتعيّن أن يقوم أستاذ المساق بتقييم المقالات المستخدمة بغرض مساعدتك على فهم معايير التقييم بشكلٍ أفضل.{end_li_tag}\n"
 "{li_tag}يتعيّن وجود تسليمات تنتظر التقييم.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
@@ -11381,8 +11435,7 @@ msgstr ""
 "للمساعدة."
 
 #: cms/templates/error.html cms/templates/error.html
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
 msgstr "استخدام أداة الآراء والملاحظات لدينا، ’تندر‘، للإسهام بملاحظاتك "
 
@@ -11919,7 +11972,7 @@ msgid ""
 "Integrating your imported content into this course. This may take a while "
 "with larger courses."
 msgstr ""
-"يتم دمج المحتوى الذي قمت باستيراده في هذا المقرر. قد يستغرق ذلك وقتاً مع "
+"يتم دمج المحتوى الذي قمت باستيراده في هذا المساق. قد يستغرق ذلك وقتاً مع "
 "المساقات الكبيرة. "
 
 #: cms/templates/import.html
@@ -12154,7 +12207,7 @@ msgid ""
 msgstr ""
 "EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
 "تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
-"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. سيقوم فريقنا "
+"الأثناء التي يتم خلالها منح امتيازات صاحب المساق من قبل EDX. سيقوم فريقنا "
 "بتقييم طلبك وإعطائك إجابةً بشأنه في غضون 24 ساعة خلال أسبوع العمل."
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
@@ -12178,7 +12231,7 @@ msgid ""
 msgstr ""
 "EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
 "تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
-"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. لقد أنهى فريقنا"
+"الأثناء التي يتم خلالها منح امتيازات صاحب المساق من قبل EDX. لقد أنهى فريقنا"
 " عملية تقييم طلبك."
 
 #: cms/templates/index.html cms/templates/index.html
@@ -12203,7 +12256,7 @@ msgid ""
 msgstr ""
 "EDX استوديو هو حل برمجي مستضاف نوفّره لشركاء xConsortium وللضيوف المحددين. "
 "تظهر المساقات التي كنت عضواً في فريق إنشائها في الأعلى وبإمكانك تعديلها، في "
-"الأثناء التي يتم خلالها منح امتيازات صاحب المقرر من قبل EDX. طلبك قيد "
+"الأثناء التي يتم خلالها منح امتيازات صاحب المساق من قبل EDX. طلبك قيد "
 "التقييم الآن من قبل فريقنا."
 
 #: cms/templates/index.html
@@ -12214,25 +12267,25 @@ msgstr ""
 "طلبك حالياً قيد المراجعة والتقييم من قبل طاقم edX في الوقت الحالي وسيتم "
 "التحديث بشأنه قريباً."
 
-#: cms/templates/index.html cms/templates/index.html
-msgid "Need help?"
-msgstr "هل تحتاج إلى مساعدة؟"
+#: cms/templates/index.html
+msgid "New to edX Studio?"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"If you are new to Studio and having trouble getting started, there are a few"
-" things that may be of help:"
+"Click Help in the upper-right corner to get more more information about the "
+"Studio page you are viewing. You can also use the links at the bottom of the"
+" page to access our continously updated documentation and other Studio "
+"resources."
 msgstr ""
-"إذا كنت جديداً على برنامج استوديو ولديك بعض الصعوبات في البدء، هنالك بعض "
-"الأمور التي قد تساعدك:"
 
 #: cms/templates/index.html
-msgid "Get started by reading Studio's Documentation"
-msgstr "ابدأ أولاً بقراءة التوثيق الخاص ببرنامج استوديو."
+msgid "Getting Started with edX Studio"
+msgstr ""
 
-#: cms/templates/index.html
-msgid "Request help with Studio"
-msgstr "اطلب المساعدة ببرنامج استوديو"
+#: cms/templates/index.html cms/templates/widgets/sock.html
+msgid "Request help with edX Studio"
+msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
@@ -12281,6 +12334,10 @@ msgstr ""
 "اتخاذها بانتظارك هناك."
 
 #: cms/templates/index.html
+msgid "Need help?"
+msgstr "هل تحتاج إلى مساعدة؟"
+
+#: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
@@ -12310,7 +12367,7 @@ msgstr "المعلومات المطلوبة لتسجيل الدخول لاستو
 msgid "Email Address"
 msgstr "عنوان البريد الإلكتروني"
 
-#: cms/templates/login.html cms/templates/widgets/sock.html
+#: cms/templates/login.html
 msgid "Studio Support"
 msgstr "دعم الاستوديو"
 
@@ -12781,11 +12838,11 @@ msgid ""
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
 "تؤثر هذه التواريخ على <strong>الفترة التي يمكن فيها رؤية المنهاج</strong>، "
-"لكنها <strong>تختلف عن التواريخ التي تظهر على صفحة ملخص مقررك</strong>. "
-"ولتحديد تاريخ بدء المقرر وتواريخ التسجيل كما ستظهر على صفحة ملخص مقررك، "
-"الرجاء اتباع الإرشادات المتوفرة من قبل مدير البرنامج أو السيد كونراد وار على"
-" <a rel=\"email\" class=\"action action-email\" "
-"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>. "
+"لكنها <strong>تختلف عن التواريخ التي تظهر على صفحة ملخص مساقك</strong>. "
+"ولتحديد تاريخ بدء المساق وتواريخ التسجيل كما ستظهر على صفحة ملخص مساقك، "
+"الرجاء اتباع الإرشادات المتوفرة من قبل <abbr title=\"Program Manager\">مدير "
+"البرنامج</abbr> أو السيد كونراد وار على <a rel=\"email\" class=\"action "
+"action-email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -13093,6 +13150,10 @@ msgstr ""
 "إذا لم يتضمّن كتابك فصول منفردة، يمكنك تحميل النص بأكمله كفصل واحد وإدخال "
 "اسم من اختيارك في حقل إسم الفصل."
 
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr ""
+
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr "وحدة منفردة"
@@ -13262,8 +13323,7 @@ msgstr "تمّ إرسال رابط تفعيل على  {email}، مع التعل�
 msgid "All rights reserved."
 msgstr "جميع الحقوق محفوظة."
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
 msgstr "للاتصال بنا"
 
@@ -13303,18 +13363,9 @@ msgstr "تصدير"
 msgid "Help &amp; Account Navigation"
 msgstr "المساعدة وتصفح الحساب "
 
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-msgid "This is a PDF Document"
-msgstr "هذه وثيقة بصيغة PDF"
-
 #: cms/templates/widgets/header.html
-msgid "Studio Documentation"
-msgstr "التوثيق الخاص ببرنامج استوديو"
-
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-#: cms/templates/widgets/sock.html
-msgid "Studio Help Center"
-msgstr "مركز مساعدة برنامج استوديو"
+msgid "Contextual Online Help"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Currently signed in as:"
@@ -13388,46 +13439,40 @@ msgid "Label"
 msgstr "العنوان"
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for Help with Studio?"
-msgstr "هل تبحث عن مساعدة في برنامج استديو؟"
+msgid "Looking for help with Studio?"
+msgstr ""
 
-#: cms/templates/widgets/sock.html
-msgid "edX Studio Help"
-msgstr "المساعدة الخاصة ببرنامج استوديو edX"
+#: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
+msgid "edX Studio Documentation"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid ""
-"Need help with Studio? Creating a course is complex, so we're here to help. "
-"Take advantage of our documentation, help center, as well as our edX101 "
-"introduction course for course authors."
+"You can click Help in the upper right corner of any page to get more "
+"information about the page you're on. You can also use the links below to "
+"download the Building and Running an edX Course PDF file, to go to the edX "
+"Author Support site, or to enroll in edX101."
 msgstr ""
-"هل تحتاج مساعدة في استعمال برنامج استوديو؟ إن وضع مقررٍ ما هو أمرٌ معقد، "
-"لذلك فنحن هنا للمساعدة. استفد من التوثيق الكامل الذي نوفّره، ومن مركز "
-"المساعدة، وأيضاً من مقرر edX101 التمهيدي لمؤلفي المساقات."
 
 #: cms/templates/widgets/sock.html
-msgid "Download Studio Documentation"
-msgstr "تنزيل وثائق برنامج استوديو"
+msgid "Building and Running an edX Course PDF"
+msgstr ""
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "How to use Studio to build your course"
-msgstr "كيفية استعمال برنامج استوديو لبناء مساقك"
+msgid "edX Studio Author Support"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "التسجيل في مساق edX101 "
 
 #: cms/templates/widgets/sock.html
-msgid "Contact us about Studio"
-msgstr "اتصل بنا بخصوص برنامج استوديو"
+msgid "How to use edX Studio to build your course"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid ""
-"Have problems, questions, or suggestions about Studio? We're also here to "
-"listen to any feedback you want to share."
+msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr ""
-"هل يوجد لديك مشاكل، أسئلة، أو اقتراحات تتعلق ببرنامج استوديو؟ نحن هنا أيضاً "
-"للاستماع لأي آراء أو ملاحظات من قبلك تود مشاركتها."
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
