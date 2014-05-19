@@ -66,6 +66,25 @@
   }
 }
 
+%btn-inherited-linkedin {
+  @extend %btn-inherited;
+  @include linear-gradient(top, rgba($white, .3), rgba($white, 0));
+  border: 1px solid shade($color-linkedin, 10%);
+  background-color: $color-linkedin;
+  color: $white;
+
+  &:hover, &.active {
+    background-color: saturate($color-linkedin, 25%);
+    color: $white;
+  }
+
+  &.disabled, &.is-disabled {
+    border: 1px solid tint($action-primary-disabled-bg, 10%);
+    background: $action-primary-disabled-bg;
+    color: $action-prmary-disabled-fg;
+  }
+}
+
 // ====================
 
 // primary button
