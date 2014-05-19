@@ -44,7 +44,11 @@ PR `#2439 <https://github.com/edx/edx-platform/commit/793dae53b720d2563a6354c897
 Use ARIA properties
 *******************
 
-When developing new HTML/JS widgets, check the ARIA `Design Patterns <http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#aria_ex>`_ to find out which ARIA properties and roles to add to your elements. Some attributes may need to be updated dynamically, for instance, when creating a `<Drag and Drop interface <http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#draganddrop>`_
+When developing new HTML/JS widgets, follow the `13 steps for building an accessible widget <http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#accessiblewidget>`_. Basically, you need to use the appropriate `role` attribute for your widget, ensure it can be navigated with the keyboard, ensure that the appropriate ARIA properties are updated dynamically, synchronize visual changes with the accessible properties, and test with an accessible user-agent. Designing the widget to be accessible before it's pretty will help prevent accessibility from becoming an afterthought. Check the ARIA `Design Patterns <http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#aria_ex>`_ to find out which ARIA properties and roles to add to your elements. Some attributes may need to be updated dynamically, for instance, when creating a `<Drag and Drop interface <http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#draganddrop>`_
+
+Examples:
+`Tab Panel <http://www.oaa-accessibility.org/examplep/tabpanel1/>`_
+`Modal Dialog <http://www.oaa-accessibility.org/examplep/alertdialog1/>`_
 
 Think about navigation within the page
 **************************************
