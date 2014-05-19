@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
@@ -589,9 +589,11 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
         instance.handle_ajax(dispatch, data)
         # Save any state that has changed to the underlying KeyValueStore
         instance.save()
-    except:
-        log.exception("error processing ajax call")
-        raise
+    except Exception:  # pylint: disable=broad-except
+        error_message = (u"Error processing xqueue_callback for course_id={course_id}, "
+                         u"user_id={user_id}, problem_url={problem_url}, handler={handler}")
+        log.exception(error_message.format(course_id=course_id, user_id=userid, problem_url=mod_id, handler=dispatch))
+        return HttpResponseServerError()
 
     return HttpResponse("")
 
