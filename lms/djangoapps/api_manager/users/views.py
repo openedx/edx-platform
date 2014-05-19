@@ -112,11 +112,48 @@ def _save_content_position(request, user, course_id, course_descriptor, position
 
 
 class UsersList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersList view allows clients to retrieve/append a list of User entities
+    - URI: ```/api/users/```
+    - POST: Provides the ability to append to the User entity set
+        * email: __required__, The unique email address for the User being created
+        * username: __required__, The unique username for the User being created
+        * password: __required__, String which matches enabled formatting constraints
+        * first_name
+        * last_name
+        * is_active, Boolean flag controlling the User's account activation status
+        * is_staff, Boolean flag controlling the User's administrative access/permissions
+        * city
+        * country, Two-character country code
+        * level_of_education
+        * year_of_birth, Four-digit integer value
+        * gender, Single-character value (M/F)
+    - POST Example:
+
+            {
+                "email" : "honor@edx.org",
+                "username" : "honor",
+                "password" : "edx!@#",
+                "first_name" : "Honor",
+                "last_name" : "Student",
+                "is_active" : False,
+                "is_staff" : False,
+                "city" : "Boston",
+                "country" : "US",
+                "level_of_education" : "hs",
+                "year_of_birth" : "1996",
+                "gender" : "F",
+            }
+    ### Use Cases/Notes:
+    * GET requests for _all_ users are not currently allowed via the API
+    * Password formatting policies can be enabled through the "ENFORCE_PASSWORD_POLICY" feature flag
+    * The first_name and last_name fields are additionally concatenated and stored in the 'name' field of UserProfile
+    * Values for level_of_education can be found in the LEVEL_OF_EDUCATION_CHOICES enum, located in common/student/models.py
+    """
 
     def post(self, request):
         """
-        POST creates a new user in the system
+        POST /api/users/
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -139,108 +176,143 @@ class UsersList(SecureAPIView):
                 validate_password_complexity(password)
                 validate_password_dictionary(password)
             except ValidationError, err:
-                status_code = status.HTTP_400_BAD_REQUEST
                 response_data['message'] = _('Password: ') + '; '.join(err.messages)
-                return Response(response_data, status=status_code)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except ValidationError:
-            status_code = status.HTTP_400_BAD_REQUEST
             response_data['message'] = _('Valid e-mail is required.')
-            return Response(response_data, status=status_code)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             validate_slug(username)
         except ValidationError:
-            status_code = status.HTTP_400_BAD_REQUEST
             response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
-            return Response(response_data, status=status_code)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
         # Create the User, UserProfile, and UserPreference records
         try:
             user = User.objects.create(email=email, username=username, is_staff=is_staff)
         except IntegrityError:
-            user = None
-        else:
-            user.set_password(password)
-            user.first_name = first_name
-            user.last_name = last_name
-            if is_active is not None:
-                user.is_active = is_active
-            if is_staff is not None:
-                user.is_staff = is_staff
-            user.save()
-
-            profile = UserProfile(user=user)
-            profile.name = '{} {}'.format(first_name, last_name)
-            profile.city = city
-            profile.country = country
-            profile.level_of_education = level_of_education
-            profile.gender = gender
-
-            try:
-                profile.year_of_birth = int(year_of_birth)
-            except ValueError:
-                # If they give us garbage, just ignore it instead
-                # of asking them to put an integer.
-                profile.year_of_birth = None
-
-            profile.save()
-
-            UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
-
-            # add this account creation to password history
-            # NOTE, this will be a NOP unless the feature has been turned on in configuration
-            password_history_entry = PasswordHistory()
-            password_history_entry.create(user)
-
-            # add to audit log
-            AUDIT_LOG.info(u"API::New account created with user-id - {0}".format(user.id))
-
-            # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
-            # auto-enroll students when they create a new account. Also be sure to remove from
-            # the CourseEnrollmentAllow table after the auto-registration has taken place
-        if user:
-            status_code = status.HTTP_201_CREATED
-            response_data = _serialize_user(response_data, user)
-            response_data['uri'] = '{}/{}'.format(base_uri, str(user.id))
-        else:
-            status_code = status.HTTP_409_CONFLICT
             response_data['message'] = "User '%s' already exists" % (username)
-            response_data['field_conflict'] = "username"
+            response_data['field_conflict'] = "username or email"
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
 
-        return Response(response_data, status=status_code)
+        user.set_password(password)
+        user.first_name = first_name
+        user.last_name = last_name
+        if is_active is not None:
+            user.is_active = is_active
+        if is_staff is not None:
+            user.is_staff = is_staff
+        user.save()
+
+        profile = UserProfile(user=user)
+        profile.name = '{} {}'.format(first_name, last_name)
+        profile.city = city
+        profile.country = country
+        profile.level_of_education = level_of_education
+        profile.gender = gender
+
+        try:
+            profile.year_of_birth = int(year_of_birth)
+        except ValueError:
+            # If they give us garbage, just ignore it instead
+            # of asking them to put an integer.
+            profile.year_of_birth = None
+
+        profile.save()
+
+        UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+
+        # add this account creation to password history
+        # NOTE, this will be a NOP unless the feature has been turned on in configuration
+        password_history_entry = PasswordHistory()
+        password_history_entry.create(user)
+
+        # add to audit log
+        AUDIT_LOG.info(u"API::New account created with user-id - {0}".format(user.id))
+
+        # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
+        # auto-enroll students when they create a new account. Also be sure to remove from
+        # the CourseEnrollmentAllow table after the auto-registration has taken place
+        response_data = _serialize_user(response_data, user)
+        response_data['uri'] = '{}/{}'.format(base_uri, str(user.id))
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class UsersDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersDetail view allows clients to interact with a specific User entity
+    - URI: ```/api/users/{user_id}```
+    - GET: Returns a JSON representation of the specified User entity
+    - POST: Provides the ability to modify specific fields for this User entity
+        * email: __required__, The unique email address for the User being created
+        * username: __required__, The unique username for the User being created
+        * password: __required__, String which matches enabled formatting constraints
+        * first_name
+        * last_name
+        * is_active, Boolean flag controlling the User's account activation status
+        * is_staff, Boolean flag controlling the User's administrative access/permissions
+        * city
+        * country, Two-character country code
+        * level_of_education
+        * year_of_birth, Four-digit integer value
+        * gender, Single-character value (M/F)
+    - POST Example:
+
+            {
+                "email" : "honor@edx.org",
+                "username" : "honor",
+                "password" : "edx!@#",
+                "first_name" : "Honor",
+                "last_name" : "Student",
+                "is_active" : False,
+                "is_staff" : False,
+                "city" : "Boston",
+                "country" : "US",
+                "level_of_education" : "hs",
+                "year_of_birth" : "1996",
+                "gender" : "F",
+            }
+    ### Use Cases/Notes:
+    * Use the UsersDetail view to obtain the current state for a specific User
+    * For POSTs, you may include only those parameters you wish to modify, for example:
+        ** Modifying the 'city' without changing the 'level_of_education' field
+        ** New passwords will be subject to both format and history checks, if enabled
+    * A GET response will additionally include a list of URIs to available sub-resources:
+        ** Related Courses (/api/users/{user_id}/courses)
+        ** Related Groups(/api/users/{user_id}/groups)
+    """
+
     def get(self, request, user_id):
         """
-        GET retrieves an existing user from the system
+        GET /api/users/{user_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
         try:
             existing_user = User.objects.get(id=user_id)
-            _serialize_user(response_data, existing_user)
-            response_data['uri'] = base_uri
-            response_data['resources'] = []
-            resource_uri = '{}/groups'.format(base_uri)
-            response_data['resources'].append({'uri': resource_uri})
-            resource_uri = '{}/courses'.format(base_uri)
-            response_data['resources'].append({'uri': resource_uri})
-
-            existing_user_profile = UserProfile.objects.get(user_id=user_id)
-            if existing_user_profile:
-                _serialize_user_profile(response_data, existing_user_profile)
-
-            return Response(response_data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
+        _serialize_user(response_data, existing_user)
+        response_data['uri'] = base_uri
+        response_data['resources'] = []
+        resource_uri = '{}/groups'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/courses'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+
+        existing_user_profile = UserProfile.objects.get(user_id=user_id)
+        if existing_user_profile:
+            _serialize_user_profile(response_data, existing_user_profile)
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
     def post(self, request, user_id):
         """
-        POST provides the ability to update information about an existing user
+        POST /api/users/{user_id}
         """
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -281,16 +353,14 @@ class UsersDetail(SecureAPIView):
             try:
                 validate_slug(username)
             except ValidationError:
-                status_code = status.HTTP_400_BAD_REQUEST
                 response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
-                return Response(response_data, status=status_code)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
             existing_username = User.objects.filter(username=username).filter(~Q(id=user_id))
             if existing_username:
-                status_code = status.HTTP_409_CONFLICT
                 response_data['message'] = "User '%s' already exists" % (username)
                 response_data['field_conflict'] = "username"
-                return Response(response_data, status=status_code)
+                return Response(response_data, status=status.HTTP_409_CONFLICT)
 
             existing_user.username = username
             response_data['username'] = existing_user.username
@@ -308,9 +378,8 @@ class UsersDetail(SecureAPIView):
                 except ValidationError, err:
                     # bad user? tick the rate limiter counter
                     AUDIT_LOG.warning("API::Bad password in password_reset.")
-                    status_code = status.HTTP_400_BAD_REQUEST
                     response_data['message'] = _('Password: ') + '; '.join(err.messages)
-                    return Response(response_data, status=status_code)
+                    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             # also, check the password reuse policy
             err_msg = None
             if not PasswordHistory.is_allowable_password_reuse(existing_user, password):
@@ -378,10 +447,27 @@ class UsersDetail(SecureAPIView):
 
 
 class UsersGroupsList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersGroupsList view allows clients to interact with the set of Group entities related to the specified User
+    - URI: ```/api/users/{user_id}/groups/```
+    - GET: Returns a JSON representation (array) of the set of related Group entities
+        * type: Set filtering parameter
+    - POST: Append a Group entity to the set of related Group entities for the specified User
+        * group_id: __required__, The identifier for the Group being added
+    - POST Example:
+
+            {
+                "group_id" : 123
+            }
+    ### Use Cases/Notes:
+    * Use the UsersGroupsList view to manage Group membership for a specific User
+    * For example, you could display a list of all of a User's groups in a dashboard or administrative view
+    * Optionally include the 'type' parameter to retrieve a subset of groups with a matching 'group_type' value
+    """
+
     def post(self, request, user_id):
         """
-        POST creates a new user-group relationship in the system
+        POST /api/users/{user_id}/groups
         """
         response_data = {}
         group_id = request.DATA['group_id']
@@ -391,30 +477,22 @@ class UsersGroupsList(SecureAPIView):
             existing_user = User.objects.get(id=user_id)
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
-            existing_user = None
-            existing_group = None
-        if existing_user and existing_group:
-            try:
-                existing_relationship = existing_user.groups.get(id=existing_group.id)
-            except ObjectDoesNotExist:
-                existing_relationship = None
-            if existing_relationship is None:
-                existing_user.groups.add(existing_group.id)
-                response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
-                response_data['group_id'] = str(existing_group.id)
-                response_data['user_id'] = str(existing_user.id)
-                response_status = status.HTTP_201_CREATED
-            else:
-                response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
-                response_data['message'] = "Relationship already exists."
-                response_status = status.HTTP_409_CONFLICT
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            existing_relationship = existing_user.groups.get(id=existing_group.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
+            response_data['message'] = "Relationship already exists."
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
+        except ObjectDoesNotExist:
+            existing_user.groups.add(existing_group.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+            response_data['group_id'] = str(existing_group.id)
+            response_data['user_id'] = str(existing_user.id)
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
     def get(self, request, user_id):
         """
-        GET retrieves the list of groups related to the specified user
+        GET /api/users/{user_id}/groups?type=workgroup
         """
         try:
             existing_user = User.objects.get(id=user_id)
@@ -434,35 +512,38 @@ class UsersGroupsList(SecureAPIView):
             group_data['id'] = group.id
             group_data['name'] = group_profile.name
             response_data['groups'].append(group_data)
-        response_status = status.HTTP_200_OK
-        return Response(response_data, status=response_status)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class UsersGroupsDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersGroupsDetail view allows clients to interact with a specific User-Group relationship
+    - URI: ```/api/users/{user_id}/groups/{group_id}```
+    - GET: Returns a JSON representation of the specified User-Group relationship
+    - DELETE: Removes an existing User-Group relationship
+    ### Use Cases/Notes:
+    * Use the UsersGroupsDetail to validate that a User is a member of a specific Group
+    * Cancelling a User's membership in a Group is as simple as calling DELETE on the URI
+    """
+
     def get(self, request, user_id, group_id):
         """
-        GET retrieves an existing user-group relationship from the system
+        GET /api/users/{user_id}/groups/{group_id}
         """
         response_data = {}
         try:
             existing_user = User.objects.get(id=user_id, is_active=True)
             existing_relationship = existing_user.groups.get(id=group_id)
         except ObjectDoesNotExist:
-            existing_user = None
-            existing_relationship = None
-        if existing_user and existing_relationship:
-            response_data['user_id'] = existing_user.id
-            response_data['group_id'] = existing_relationship.id
-            response_data['uri'] = _generate_base_uri(request)
-            response_status = status.HTTP_200_OK
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        response_data['user_id'] = existing_user.id
+        response_data['group_id'] = existing_relationship.id
+        response_data['uri'] = _generate_base_uri(request)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, group_id):
         """
-        DELETE removes/inactivates/etc. an existing user-group relationship
+        DELETE /api/users/{user_id}/groups/{group_id}
         """
         existing_user = User.objects.get(id=user_id, is_active=True)
         existing_user.groups.remove(group_id)
@@ -471,10 +552,25 @@ class UsersGroupsDetail(SecureAPIView):
 
 
 class UsersCoursesList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersCoursesList view allows clients to interact with the set of Course entities related to the specified User
+    - URI: ```/api/users/{user_id}/courses/```
+    - GET: Returns a JSON representation (array) of the set of related Course entities
+    - POST: Append a Group entity to the set of related Group entities for the specified User
+        * course_id: __required__, The identifier (aka, location/key) for the Course being added
+    - POST Example:
+
+            {
+                "course_id" : "edx/demo/course"
+            }
+    ### Use Cases/Notes:
+    * POST to the UsersCoursesList view to create a new Course enrollment for the specified User (aka, Student)
+    * Perform a GET to generate a list of all active Course enrollments for the specified User
+    """
+
     def post(self, request, user_id):
         """
-        POST creates a new course enrollment for a user
+        POST /api/users/{user_id}/courses/
         """
         store = modulestore()
         response_data = {}
@@ -484,53 +580,68 @@ class UsersCoursesList(SecureAPIView):
             user = User.objects.get(id=user_id)
             course_descriptor = store.get_course(course_id)
         except (ObjectDoesNotExist, ValueError):
-            user = None
-            course_descriptor = None
-        if user and course_descriptor:
-            base_uri = _generate_base_uri(request)
-            course_enrollment = CourseEnrollment.enroll(user, course_id)
-            response_data['uri'] = '{}/{}'.format(base_uri, course_id)
-            response_data['id'] = course_id
-            response_data['name'] = course_descriptor.display_name
-            response_data['is_active'] = course_enrollment.is_active
-            status_code = status.HTTP_201_CREATED
-        else:
-            status_code = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=status_code)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        base_uri = _generate_base_uri(request)
+        course_enrollment = CourseEnrollment.enroll(user, course_id)
+        response_data['uri'] = '{}/{}'.format(base_uri, course_id)
+        response_data['id'] = course_id
+        response_data['name'] = course_descriptor.display_name
+        response_data['is_active'] = course_enrollment.is_active
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
     def get(self, request, user_id):
         """
-        GET creates the list of enrolled courses for a user
+        GET /api/users/{user_id}/courses/
         """
         store = modulestore()
-        response_data = []
         base_uri = _generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
-            user = None
-        if user:
-            enrollments = CourseEnrollment.enrollments_for_user(user=user)
-            for enrollment in enrollments:
-                descriptor = store.get_course(enrollment.course_id)
-                course_data = {
-                    "id": enrollment.course_id,
-                    "uri": '{}/{}'.format(base_uri, enrollment.course_id),
-                    "is_active": enrollment.is_active,
-                    "name": descriptor.display_name
-                }
-                response_data.append(course_data)
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            status_code = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=status_code)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        enrollments = CourseEnrollment.enrollments_for_user(user=user)
+        response_data = []
+        for enrollment in enrollments:
+            descriptor = store.get_course(enrollment.course_id)
+            course_data = {
+                "id": enrollment.course_id,
+                "uri": '{}/{}'.format(base_uri, enrollment.course_id),
+                "is_active": enrollment.is_active,
+                "name": descriptor.display_name
+            }
+            response_data.append(course_data)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class UsersCoursesDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersCoursesDetail view allows clients to interact with a specific User-Course relationship (aka, enrollment)
+    - URI: ```/api/users/{user_id}/courses/{course_id}```
+    - POST: Stores the last-known location for the Course, for the specified User
+        * position: The parent-child identifier set for the Content being set as the last-known position, consisting of:
+        ** parent_content_id, normally the Course identifier
+        ** child_content_id, normally the Chapter identifier
+    - POST Example:
+
+            {
+                "position" : {
+                    "parent_content_id" : "edX/Open_DemoX/edx_demo_course",
+                    "child_content_id" : "i4x://edX/Open_DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b"
+                }
+            }
+    - GET: Returns a JSON representation of the specified User-Course relationship
+    - DELETE: Inactivates (but does not remove) a Course relationship for the specified User
+    ### Use Cases/Notes:
+    * Use the UsersCoursesDetail view to manage EXISTING Course enrollments
+    * Use GET to confirm that a User is actively enrolled in a particular course
+    * Use DELETE to unenroll a User from a Course (inactivates the enrollment)
+    * Use POST to record the last-known position within a Course (essentially, a bookmark)
+    * Note: To create a new Course enrollment, see UsersCoursesList
+    """
+
     def post(self, request, user_id, course_id):
         """
-        POST creates an ACTIVE course enrollment for the specified user
+        POST /api/users/{user_id}/courses/{course_id}
         """
         store = modulestore()
         base_uri = _generate_base_uri(request)
@@ -540,27 +651,22 @@ class UsersCoursesDetail(SecureAPIView):
             user = User.objects.get(id=user_id)
             course_descriptor = store.get_course(course_id)
         except (ObjectDoesNotExist, ValueError):
-            user = None
-            course_descriptor = None
-        if user and course_descriptor:
-            response_data['user_id'] = user.id
-            response_data['course_id'] = course_id
-            response_status = status.HTTP_201_CREATED
-            if request.DATA['position']:
-                response_data['position'] = _save_content_position(
-                    request,
-                    user,
-                    course_id,
-                    course_descriptor,
-                    request.DATA['position']
-                )
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+        response_data['user_id'] = user.id
+        response_data['course_id'] = course_id
+        if request.DATA['position']:
+            response_data['position'] = _save_content_position(
+                request,
+                user,
+                course_id,
+                course_descriptor,
+                request.DATA['position']
+            )
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, user_id, course_id):
         """
-        GET identifies an ACTIVE course enrollment for the specified user
+        GET /api/users/{user_id}/courses/{course_id}
         """
         store = modulestore()
         response_data = {}
@@ -569,43 +675,47 @@ class UsersCoursesDetail(SecureAPIView):
             user = User.objects.get(id=user_id, is_active=True)
             course_descriptor = store.get_course(course_id)
         except (ObjectDoesNotExist, ValueError):
-            user = None
-            course_descriptor = None
-        if user and CourseEnrollment.is_enrolled(user, course_id):
-            response_data['user_id'] = user.id
-            response_data['course_id'] = course_id
-            response_data['uri'] = base_uri
-            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-            course_content = module_render.get_module(
-                user,
-                request,
-                course_descriptor.location,
-                field_data_cache,
-                course_id)
-            response_data['position'] = course_content.position
-            response_status = status.HTTP_200_OK
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if not CourseEnrollment.is_enrolled(user, course_id):
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        response_data['user_id'] = user.id
+        response_data['course_id'] = course_id
+        response_data['uri'] = base_uri
+        field_data_cache = FieldDataCache([course_descriptor], course_id, user)
+        course_content = module_render.get_module(
+            user,
+            request,
+            course_descriptor.location,
+            field_data_cache,
+            course_id)
+        response_data['position'] = course_content.position
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, course_id):
         """
-        DELETE unenrolls the specified user from a course
+        DELETE /api/users/{user_id}/courses/{course_id}
         """
         try:
             user = User.objects.get(id=user_id, is_active=True)
         except ObjectDoesNotExist:
-            user = None
-        if user:
-            CourseEnrollment.unenroll(user, course_id)
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        CourseEnrollment.unenroll(user, course_id)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 class UsersCoursesGradesDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersCoursesGradesDetail view allows clients to interact with the User's gradebook for a particular Course
+    - URI: ```/api/users/{user_id}/courses/{course_id}/grades```
+    - GET: Returns a JSON representation of the specified Course gradebook
+    ### Use Cases/Notes:
+    * Use the UsersCoursesDetail view to manage the User's gradebook for a Course enrollment
+    * Use GET to retrieve the Course gradebook for the specified User
+    """
+
     def get(self, request, user_id, course_id):
         """
-        GET returns the current gradebook for the user in a course
+        GET /api/users/{user_id}/courses/{course_id}/grades
         """
 
         # @TODO: Add authorization check here once we get caller identity
@@ -639,7 +749,22 @@ class UsersCoursesGradesDetail(SecureAPIView):
 
 
 class UsersPreferences(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The UsersPreferences view allows clients to interact with the set of Preference key-value pairs related to the specified User
+    - URI: ```/api/users/{user_id}/preferences/```
+    - GET: Returns a JSON representation (dict) of the set of User preferences
+    - POST: Append a new UserPreference key-value pair to the set of preferences for the specified User
+        * "keyname": __required__, The identifier (aka, key) for the UserPreference being added.  Values must be strings
+    - POST Example:
+
+            {
+                "favorite_color" : "blue"
+            }
+    ### Use Cases/Notes:
+    * POSTing a non-string preference value will result in a 400 Bad Request response from the server
+    * POSTing a duplicate preference will cause the existing preference to be overwritten (effectively a PUT operation)
+    """
+
     def get(self, request, user_id): # pylint: disable=W0613
         """
         GET returns the preferences for the specified user
