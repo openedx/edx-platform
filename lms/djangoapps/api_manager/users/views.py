@@ -636,3 +636,63 @@ class UsersCoursesGradesDetail(SecureAPIView):
         }
 
         return Response(response_data)
+
+
+class UsersPreferences(SecureAPIView):
+    """ Inherit with SecureAPIView """
+    def get(self, request, user_id): # pylint: disable=W0613
+        """
+        GET returns the preferences for the specified user
+        """
+
+        response_data = {}
+
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
+        for preference in user.preferences.all():
+            response_data[preference.key] = preference.value
+
+        return Response(response_data)
+
+    def post(self, request, user_id):
+        """
+        POST adds a new entry into the UserPreference table
+        """
+
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
+        if not len(request.DATA):
+            return Response({}, status.HTTP_400_BAD_REQUEST)
+
+        # do a quick inspection to make sure we're only getting strings as values
+        for key in request.DATA.keys():
+            value = request.DATA[key]
+            if not isinstance(value, basestring):
+                return Response({}, status.HTTP_400_BAD_REQUEST)
+
+        status_code = status.HTTP_200_OK
+        for key in request.DATA.keys():
+            value = request.DATA[key]
+
+            # see if the key already exists
+            found = None
+            for preference in user.preferences.all():
+                if preference.key == key:
+                    found = preference
+                    break
+
+            if found:
+                found.value = value
+                found.save()
+            else:
+                preference = UserPreference.objects.create(user_id=user_id, key=key, value=value)
+                preference.save()
+                status_code = status.HTTP_201_CREATED
+
+        return Response({}, status_code)
