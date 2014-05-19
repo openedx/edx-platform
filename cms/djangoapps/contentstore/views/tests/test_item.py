@@ -632,6 +632,39 @@ class TestEditItem(ItemTest):
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
+    def test_create_draft_with_multiple_requests(self):
+        """
+        Create a draft request returns already created version if it exists.
+        """
+        # Make problem public.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        # Now make it draft, which means both versions will exist.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'publish': 'create_draft'
+            }
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        draft_1 = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertIsNotNone(draft_1)
+
+        # Now check that when a user sends request to create a draft when there is already a draft version then
+        # user gets that already created draft instead of getting DuplicateItemError exception.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'publish': 'create_draft'
+            }
+        )
+        draft_2 = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertIsNotNone(draft_2)
+        self.assertEqual(draft_1, draft_2)
+
     def test_published_and_draft_contents_with_update(self):
         """ Create a draft and publish it then modify the draft and check that published content is not modified """
 
