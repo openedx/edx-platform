@@ -28,7 +28,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # General information about the project.
-project = u'Release Notes for edX Course Staff'
+project = u'edX Course Staff Release Notes'
 copyright = u'2014, edX'
 
 # The short X.Y version.
