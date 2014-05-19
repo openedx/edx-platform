@@ -126,7 +126,7 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 409)
         self.assertGreater(response.data['message'], 0)
-        self.assertEqual(response.data['field_conflict'], 'username')
+        self.assertEqual(response.data['field_conflict'], 'username or email')
 
     def test_user_detail_get(self):
         test_uri = '/api/users'
@@ -582,7 +582,7 @@ class UsersApiTests(TestCase):
             display_name="Chapter 1"
         )
         user_id = 2342334
-        course_id = 'asdfa9sd8fasdf'
+        course_id = 'asd/fa/9sd8fasdf'
         test_uri = '/api/users/{}/courses/{}'.format(str(user_id), course_id)
         position_data = {
             'position': {
@@ -661,7 +661,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['position'], chapter1.id)
 
     def test_user_courses_detail_get_undefined_user(self):
-        test_uri = '/api/users/2134234/courses/a8df7asvd98'
+        test_uri = '/api/users/2134234/courses/a8df7/asv/d98'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
