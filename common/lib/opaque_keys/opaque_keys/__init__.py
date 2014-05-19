@@ -88,7 +88,7 @@ class OpaqueKey(object):
     Deserialization is performed by the :meth:`from_string` method.
     """
     __metaclass__ = OpaqueKeyMetaclass
-    __slots__ = ('_initialized')
+    __slots__ = ('_initialized', 'deprecated')
 
     NAMESPACE_SEPARATOR = u':'
 
@@ -161,6 +161,9 @@ class OpaqueKey(object):
 
             setattr(self, key, value)
         self._initialized = True
+        # a flag used to indicate that this instance was deserialized from the deprecated form
+        # and should serialize to the deprecated form
+        setattr(self, 'deprecated', False)
 
     def replace(self, **kwargs):
         """
@@ -172,7 +175,7 @@ class OpaqueKey(object):
         return type(self)(**existing_values)
 
     def __setattr__(self, name, value):
-        if getattr(self, '_initialized', False):
+        if name != 'deprecated' and getattr(self, '_initialized', False):
             raise AttributeError("Can't set {!r}. OpaqueKeys are immutable.".format(name))
 
         super(OpaqueKey, self).__setattr__(name, value)
@@ -184,6 +187,9 @@ class OpaqueKey(object):
         """
         Serialize this :class:`OpaqueKey`, in the form ``<CANONICAL_NAMESPACE>:<value of _to_string>``.
         """
+        if getattr(self, 'deprecated', False):
+            # no namespace on deprecated
+            return self._to_string()
         return self.NAMESPACE_SEPARATOR.join([self.CANONICAL_NAMESPACE, self._to_string()])  # pylint: disable=no-member
 
     def __copy__(self):
@@ -272,4 +278,6 @@ class OpaqueKey(object):
         try:
             return cls._drivers()[namespace].plugin._from_string(rest)
         except KeyError:
+            if hasattr(cls, 'deprecated_fallback'):
+                return getattr(cls, 'deprecated_fallback').from_deprecated_string(serialized)
             raise InvalidKeyError(cls, serialized)
