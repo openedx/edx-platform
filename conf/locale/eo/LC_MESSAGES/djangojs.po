@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:40-0400\n"
-"PO-Revision-Date: 2014-05-13 13:41:26.703210\n"
+"POT-Creation-Date: 2014-05-19 08:29-0400\n"
+"PO-Revision-Date: 2014-05-19 12:30:25.098977\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1497,6 +1497,18 @@ msgstr "Fäïléd tö résçöré prößlém. Ⱡ'σяєм#"
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
 msgstr "Ûnäßlé tö rétrïévé dätä, pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr "stüdént(s) öpénéd Süßséçtïön Ⱡ'σяєм #"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr "stüdénts #"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
+msgstr "qüéstïöns #"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"

@@ -10,6 +10,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013
 # Ahmad Abd Arrahman <mygooglizer@gmail.com>, 2013
+# ayshibly <ayshibly@gmail.com>, 2014
 # jkfreij <jkfreij@gmail.com>, 2014
 # khateeb <eng.elkhteeb@gmail.com>, 2013
 # khateeb <eng.elkhteeb@gmail.com>, 2013
@@ -37,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
-"PO-Revision-Date: 2014-05-12 17:46+0000\n"
+"POT-Creation-Date: 2014-05-19 08:16-0400\n"
+"PO-Revision-Date: 2014-05-18 11:56+0000\n"
 "Last-Translator: nabeelqordoba <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -1552,6 +1553,18 @@ msgid "Unable to retrieve data, please try again later."
 msgstr "لا يمكن استرجاع البيانات، الرجاء إعادة المحاولة لاحقاً"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
 msgstr "عدد الطلاب"
 
@@ -1823,6 +1836,8 @@ msgid ""
 "Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
 "%(sort_name)s ascending"
 msgstr ""
+"إظهار %(current_item_range)s من أصل إجمالي يبلغ %(total_items_count)s، "
+"مرتّبة وفقًا لـ %(sort_name)s تصاعدي"
 
 #. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
 #. Added descending"
@@ -1831,12 +1846,14 @@ msgid ""
 "Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
 "%(sort_name)s descending"
 msgstr ""
+"إظهار %(current_item_range)s من أصل إجمالي يبلغ %(total_items_count)s، "
+"مرتّبة وفقًا لـ %(sort_name)s تنازلي"
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "%(total_items)s total"
-msgstr ""
+msgstr "مجموع يبلغ %(total_items)s "
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"

@@ -588,6 +588,7 @@ LANGUAGES = (
     ('gl', u'Galego'),  # Galician
     ('he', u'עברית'),  # Hebrew
     ('hi', u'हिन्दी'),  # Hindi
+    ('hr', u'hrvatski'),  # Croatian
     ('hu', u'magyar'),  # Hungarian
     ('hy-am', u'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
     ('id', u'Bahasa Indonesia'),  # Indonesian
