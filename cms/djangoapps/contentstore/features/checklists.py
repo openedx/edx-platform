@@ -86,6 +86,9 @@ def i_am_brought_to_help_page_in_new_window(step):
     world.browser.switch_to_window(windows[1])
     assert_equal('http://help.edge.edx.org/', world.browser.url)
 
+    # Clean up by closing the help window
+    world.browser.driver.close()
+
 
 ############### HELPER METHODS ####################
 def verifyChecklist2Status(completed, total, percentage):
