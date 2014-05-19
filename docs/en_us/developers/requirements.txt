@@ -4,3 +4,4 @@ pytz
 -e git+https://github.com/edx/XBlock.git#egg=XBlock
 lxml
 sphinxcontrib-napoleon==0.2.6
+stevedore==0.14.1
