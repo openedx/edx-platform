@@ -679,7 +679,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 and rules as kwargs below
             content (dict): fields to look for which have content scope. Follows same syntax and
                 rules as kwargs below.
-            revision (str): the revision of the items you're looking for.
+            revision (str): the revision of the items you're looking for. (only 'draft' makes sense for
+                this modulestore. If you don't provide a revision, it won't retrieve any drafts. If you
+                say 'draft', it will only return drafts. If you want one of each matching xblock but
+                preferring draft to published, call this same method on the draft modulestore w/o a
+                revision qualifier.)
             kwargs (key=value): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
