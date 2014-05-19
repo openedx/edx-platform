@@ -93,7 +93,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"POT-Creation-Date: 2014-05-19 08:17-0400\n"
 "PO-Revision-Date: 2014-05-02 00:21+0000\n"
 "Last-Translator: tan.mng90 <tan.mng90@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -980,7 +980,7 @@ msgstr ""
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1488,32 +1488,75 @@ msgstr "Tìm kiếm"
 msgid "Copyright"
 msgstr "Bản quyền"
 
+#: lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "Tên"
+
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "students"
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "questions"
+msgid "Subsection"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{num_students} student(s) opened Subsection {subsection_num}: "
-"{subsection_name}"
+msgid "Opened by this number of students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+msgid "subsections"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Count of Students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "% of Students"
+msgstr ""
+
+#: lms/templates/folditchallenge.html
+msgid "Score"
+msgstr "Điểm"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "problems"
 msgstr ""
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
@@ -1673,11 +1716,9 @@ msgstr ""
 msgid "Courses loaded in the modulestore"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 msgid "username"
-msgstr ""
+msgstr "tên đăng nhập"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -1887,31 +1928,11 @@ msgstr "Người dùng không tồn tại."
 msgid "Task is already running."
 msgstr "Công việc đang được thực hiện."
 
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr ""
-
-#: lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "Tên"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Language"
@@ -1936,7 +1957,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Mailing Address"
-msgstr "Địa chỉ"
+msgstr "Địa Chỉ Thư"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
@@ -4277,7 +4298,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Faq"
-msgstr ""
+msgstr "Thắc mắc thường gặp"
 
 #: lms/templates/contact.html lms/templates/footer.html
 msgid "Press"
@@ -4331,20 +4352,17 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Media"
-msgstr ""
+msgstr "Truyền Thông"
 
 #: lms/templates/contact.html
 msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
-"Vui lòng truy cập {link_start}trang hỏi đáp{link_end} để biết thêm thông "
-"tin. Với các kênh truyền thông hoặc báo chí, xin vui lòng liên hệ qua email "
-"{email}."
 
 #: lms/templates/contact.html
 msgid "Universities"
-msgstr ""
+msgstr "Các Trường Đại Học"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4356,11 +4374,11 @@ msgstr ""
 
 #: lms/templates/course.html
 msgid "New"
-msgstr ""
+msgstr "Mới"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
-msgstr ""
+msgstr "Bảng Điều Khiển"
 
 #: lms/templates/dashboard.html lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
@@ -4419,7 +4437,7 @@ msgstr "Đặt Lại Mật Khẩu"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr "Khóa Học Hiện Tại"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -4483,7 +4501,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
-msgstr "Thay đổi tên bạn"
+msgstr "Thay đổi tên của bạn"
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -4525,7 +4543,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
-msgstr "Hủy đăng ký"
+msgstr "Hủy Đăng Ký"
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
@@ -4533,11 +4551,11 @@ msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr ""
+msgstr "Thay đổi Email không thành công"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
-msgstr ""
+msgstr "Chúng tôi không thể gửi email xác nhận đến {email}"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
@@ -4547,16 +4565,16 @@ msgstr ""
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
-msgstr ""
+msgstr "Thay đổi E-mail thành công!"
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
-msgstr ""
+msgstr "Bạn nên xem email mới trong {link_start}bảng điều khiển{link_end}."
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
-msgstr ""
+msgstr "Một tài khoản với địa chỉ e-mail mới đã tồn tại."
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
@@ -4564,27 +4582,27 @@ msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Khóa Học:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
-msgstr ""
+msgstr "Thêm học viên mới"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
-msgstr ""
+msgstr "Các học viên hiện tại:"
 
 #: lms/templates/enroll_students.html
 msgid "New students added: "
-msgstr ""
+msgstr "Các học viên mới được thêm vào:"
 
 #: lms/templates/enroll_students.html
 msgid "Students rejected: "
-msgstr ""
+msgstr "Các học viên bị từ chối:"
 
 #: lms/templates/enroll_students.html
 msgid "Debug: "
-msgstr ""
+msgstr "Sửa lỗi:"
 
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
@@ -4596,7 +4614,7 @@ msgstr ""
 
 #: lms/templates/folditbasic.html
 msgid "Status:"
-msgstr ""
+msgstr "Trạng Thái:"
 
 #: lms/templates/folditbasic.html
 msgid "You have successfully gotten to level {goal_level}."
@@ -4625,11 +4643,7 @@ msgstr ""
 
 #: lms/templates/folditchallenge.html
 msgid "User"
-msgstr ""
-
-#: lms/templates/folditchallenge.html
-msgid "Score"
-msgstr "Điểm"
+msgstr "Người dùng"
 
 #: lms/templates/footer.html
 msgid "About"
@@ -4638,12 +4652,12 @@ msgstr "Về edX"
 #: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
-msgstr "Công việc"
+msgstr "Việc Làm"
 
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
-msgstr "Hỏi đáp"
+msgstr "Hỏi Đáp"
 
 #: lms/templates/footer.html
 msgid "{platform_name} Logo"
@@ -4658,10 +4672,10 @@ msgid ""
 "computer science, public health, and artificial intelligence."
 msgstr ""
 "{platform_name} là một tổ chức phi lợi nhuận được tạo ra bởi {Harvard} và "
-"{MIT} - Dự án có sứ mệnh mang nền giáo dục với chất lượng tốt nhất cho mọi "
-"người không giới hạn tuổi tác ở khắp nơi trên thế giới. Hệ thống khóa học mở"
-" trực tuyến {platform_name} có khả năng tương tác cao, bao gồm rất nhiều các"
-" môn học như khoa học máy tính, y tế công cộng, trí tuệ nhân tạo..."
+"{MIT} - Dự án có sứ mệnh mang nền giáo dục với chất lượng tốt nhất đến với "
+"mọi người không giới hạn tuổi tác ở khắp nơi trên thế giới. Hệ thống khóa "
+"học mở trực tuyến {platform_name} có khả năng tương tác cao, bao gồm rất "
+"nhiều các môn học như khoa học máy tính, y tế công cộng, trí tuệ nhân tạo..."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -4669,12 +4683,12 @@ msgstr ""
 
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
-msgstr "Điều khoản sử dụng dịch vụ và Cam kết danh dự"
+msgstr "Điều Khoản Sử Dụng Dịch Vụ và Cam Kết Danh Dự"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
-msgstr ""
+msgstr "Đặt Lại Mật Khẩu"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -4684,7 +4698,7 @@ msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
-msgstr ""
+msgstr "E-mail Của Bạn"
 
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
@@ -4692,11 +4706,11 @@ msgstr "Đây là địa chỉ e-mail mà bạn sử dụng để đăng ký v�
 
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
-msgstr ""
+msgstr "Đặt Lại Mật Khẩu Của Tôi"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr ""
+msgstr "Email không đúng."
 
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 msgid "{platform_name} Help"
@@ -4715,8 +4729,6 @@ msgid ""
 "lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
-"Nếu bạn có <strong>câu hỏi chung</strong> về {platform_name}, bạn có thể tìm"
-" được thông tin tại {link_start}phần hỏi đáp{link_end}"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4726,15 +4738,15 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
-msgstr ""
+msgstr "Báo cáo lỗi"
 
 #: lms/templates/help_modal.html
 msgid "Make a suggestion"
-msgstr ""
+msgstr "Đề xuất"
 
 #: lms/templates/help_modal.html
 msgid "Ask a question"
-msgstr ""
+msgstr "Đặt câu hỏi"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4749,7 +4761,7 @@ msgstr ""
 #: lms/templates/register.html lms/templates/signup_modal.html
 #: lms/templates/signup_modal.html
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: lms/templates/help_modal.html
 msgid "Briefly describe your issue"
@@ -4761,7 +4773,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Include error messages, steps which lead to the issue, etc"
-msgstr ""
+msgstr "Bao gồm các thông báo lỗi, các bước dẫn đến vấn đề này, vv"
 
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
@@ -4779,7 +4791,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
-msgstr ""
+msgstr "Cảm Ơn Bạn!"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4788,10 +4800,11 @@ msgid ""
 "UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
 " where most questions have already been answered."
 msgstr ""
-"Cảm ơn về phản  hồi của bạn. Chúng tôi thường phản hồi yêu cầu trong 1 ngày "
-"làm việc (từ thứ 2 đến thứ 6, {open_time} đến {close_time}). Trong thời gian"
-" chờ đợi, bạn có thể xem các {link_start}câu hỏi thườn gặp{link_end} đã được"
-" trả lời."
+"Cảm ơn câu hỏi hay phản hồi của bạn. Chúng tôi thường phản hồi yêu cầu trong"
+" vòng một ngày làm việc (từ Thứ Hai đến Thứ Sáu, {open_time} đến "
+"{close_time} theo giờ UTC). Trong thời gian chờ đợi, bạn có thể xem "
+"{link_start}phần Hỏi Đáp chi tiết{link_end}, nơi đã trả lời phần lớn các câu"
+" hỏi."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -4799,7 +4812,7 @@ msgstr "vấn đề"
 
 #: lms/templates/help_modal.html
 msgid "Report a Problem"
-msgstr "Báo cáo lỗi"
+msgstr "Báo Cáo Lỗi"
 
 #: lms/templates/help_modal.html
 msgid "Brief description of the problem"
@@ -4894,11 +4907,11 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
-msgstr ""
+msgstr "Thông Tin Hữu Ích"
 
 #: lms/templates/login-sidebar.html lms/templates/login-sidebar.html
 msgid "Login via OpenID"
-msgstr ""
+msgstr "Đăng nhập qua OpenID"
 
 #: lms/templates/login-sidebar.html
 msgid ""
@@ -4908,7 +4921,7 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
-msgstr "Chưa tham gia?"
+msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
@@ -4935,7 +4948,7 @@ msgstr "Đăng nhập vào Tài Khoản {platform_name} Của Tôi"
 
 #: lms/templates/login.html
 msgid "Access My Courses"
-msgstr "Truy Cập Các Khóa Học"
+msgstr "Truy Cập Các Khóa Học Của Tôi"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
@@ -4959,7 +4972,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
-msgstr ""
+msgstr "Email hoặc mật khẩu của bạn không chính xác"
 
 #: lms/templates/login.html
 msgid ""
@@ -4975,7 +4988,7 @@ msgstr "ví dụ: username@domain.com"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr ""
+msgstr "Tuỳ Chọn Tài Khoản"
 
 #: lms/templates/login.html
 msgid "Remember me"
@@ -5087,16 +5100,16 @@ msgstr ""
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
-msgstr ""
+msgstr "Dữ liệu thô:"
 
 #: lms/templates/name_changes.html
 msgid "Accepted"
-msgstr ""
+msgstr "Chấp Thuận"
 
 #: lms/templates/name_changes.html lms/templates/name_changes.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
-msgstr ""
+msgstr "Lỗi"
 
 #: lms/templates/name_changes.html
 msgid "Rejected"
@@ -5108,11 +5121,11 @@ msgstr ""
 
 #: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
 msgid "Confirm"
-msgstr ""
+msgstr "Xác Nhận"
 
 #: lms/templates/name_changes.html
 msgid "[Reject]"
-msgstr ""
+msgstr "[Từ chối]"
 
 #: lms/templates/navigation.html
 msgid "Global Navigation"
@@ -5191,7 +5204,7 @@ msgstr ""
 #: lms/templates/provider_login.html
 #: lms/templates/university_profile/edge.html
 msgid "Log In"
-msgstr ""
+msgstr "Đăng Nhập"
 
 #: lms/templates/provider_login.html
 msgid ""
@@ -5202,7 +5215,7 @@ msgstr ""
 
 #: lms/templates/provider_login.html
 msgid "Return To %s"
-msgstr ""
+msgstr "Quay Lại %s"
 
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
@@ -5256,7 +5269,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "Tôi đồng ý với {link_start}Điều khoản sử dụng dịch vụ{link_end}"
+msgstr "Tôi đồng ý với {link_start}Điều Khoản Sử Dụng Dịch Vụ{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
@@ -5269,7 +5282,7 @@ msgstr ""
 
 #: lms/templates/register-sidebar.html
 msgid "Registration Help"
-msgstr "Trợ giúp đăng ký"
+msgstr "Trợ Giúp Đăng Ký"
 
 #: lms/templates/register-sidebar.html
 msgid "Already registered?"
@@ -5277,11 +5290,11 @@ msgstr "Đã đăng ký?"
 
 #: lms/templates/register-sidebar.html
 msgid "Click here to log in."
-msgstr "Bấm vào đây để đăng nhập."
+msgstr "Nhấn vào đây để đăng nhập."
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
-msgstr "Chào mừng đến với {platform_name}"
+msgstr "Chào mừng bạn đến với {platform_name}"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5289,14 +5302,10 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
-"Đăng ký tài khoản {platform_name} để bạn có thể truy cập vào tất cả các khóa"
-" học của chúng tôi. Nếu bạn chưa sẵn sàng để học tại {platform_name}, việc "
-"đăng ký có thể đưa bạn vào danh sách gửi thư để được cập nhật thông tin về "
-"các khóa học mới."
 
 #: lms/templates/register-sidebar.html
 msgid "Next Steps"
-msgstr "Bước tiếp theo"
+msgstr "Bước Tiếp Theo"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5305,10 +5314,6 @@ msgid ""
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
-"Chúng tôi sẽ gửi một email kích hoạt. Bạn cần đọc email và nhấn vào đường "
-"link để hoàn tất quá trình. Nếu bạn không thấy email, bạn hãy kiểm tra thư "
-"mục thư rác và đánh dấu tất cả mail từ class.stanford.edu không phải là thư "
-"rác, sau đó bạn sẽ có thể nhận tất cả mail từ khóa học."
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5317,20 +5322,14 @@ msgid ""
 "the email?  Check your spam folder and mark {platform_name} emails as 'not "
 "spam'.  At {platform_name}, we communicate mostly through email."
 msgstr ""
-"Sau khi bạn đăng kí {platform_name}, chúng tôi sẽ gửi một email kích hoạt. "
-"Bạn cần đọc email và nhấn vào đường link để hoàn tất quá trình. Nếu bạn "
-"không thấy email, bạn hãy kiểm tra thư mục thư rác và đánh dấu email từ "
-"{platform_name} là 'không phải thư rác'. Ngoài ra, trên {platform_name}, "
-"chúng tôi giao tiếp chủ yếu là thông qua email."
 
 #: lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
-msgstr "Bạn cần giúp đỡ trong việc đăng ký {platform_name}?"
+msgstr "Cần trợ giúp khi đăng ký {platform_name}?"
 
 #: lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
-"Xem câu hỏi thường gặp của chúng tôi cho câu trả lời cho câu hỏi thường gặp."
+msgstr "Xem phần Hỏi Đáp để đọc trả lời cho những thắc mắc thường gặp."
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5338,11 +5337,11 @@ msgid ""
 "discussion forums or through the FAQs."
 msgstr ""
 "Sau khi đăng ký, hầu hết các câu hỏi có thể được trả lời trong các diễn đàn "
-"thảo luận hoặc thông qua các câu hỏi thường gặp."
+"thảo luận của một khóa học cụ thể hoặc qua phần Hỏi Đáp."
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
-msgstr ""
+msgstr "Đăng ký tài khoản {platform_name}"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
@@ -5386,7 +5385,7 @@ msgstr "không thể thay đổi sau này"
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr "ví dụ: JaneDoe"
+msgstr "ví dụ: Jane Doe"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
@@ -5394,7 +5393,7 @@ msgstr "cần thiết để ghi vào chứng chỉ của bạn."
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
-msgstr "Chào mừng {username}"
+msgstr "Chào {username}"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
@@ -5422,7 +5421,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Highest Level of Education Completed"
-msgstr "Cấp bậc học vấn của bạn"
+msgstr "Trình độ học vấn cao nhất của bạn"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
@@ -5435,11 +5434,11 @@ msgstr "Vui lòng chia sẻ lý do bạn đăng ký tham gia {platform_name}"
 
 #: lms/templates/register.html lms/templates/university_profile/edge.html
 msgid "Register"
-msgstr ""
+msgstr "Đăng Ký"
 
 #: lms/templates/register.html lms/templates/signup_modal.html
 msgid "Create My Account"
-msgstr "Tạo tài khoản"
+msgstr "Tạo Tài Khoản"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -5507,11 +5506,11 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
-msgstr ""
+msgstr "Bạn đã có tài khoản?"
 
 #: lms/templates/signup_modal.html
 msgid "Login."
-msgstr ""
+msgstr "Đăng nhập."
 
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
@@ -5583,7 +5582,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "XML attributes"
-msgstr ""
+msgstr "thuộc tính XML"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission History Viewer"
@@ -5595,7 +5594,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
-msgstr ""
+msgstr "Xem Lịch Sử"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
@@ -5747,11 +5746,11 @@ msgstr ""
 
 #: lms/templates/tracking_log.html
 msgid "ipaddr"
-msgstr ""
+msgstr "lệnh ipaddr"
 
 #: lms/templates/tracking_log.html
 msgid "source"
-msgstr ""
+msgstr "nguồn"
 
 #: lms/templates/tracking_log.html
 msgid "type"
@@ -5771,7 +5770,7 @@ msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
-msgstr ""
+msgstr "Sử dụng hệ thống"
 
 #: lms/templates/using.html
 msgid ""
@@ -5890,7 +5889,7 @@ msgstr ""
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Next Step"
-msgstr ""
+msgstr "Bước Tiếp Theo"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid ""
@@ -5931,7 +5930,7 @@ msgstr ""
 #. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
-msgstr ""
+msgstr "Xem thông tin phản hồi đầy đủ"
 
 #. Translators: this text forms a link that, when
 #. clicked, allows a user to respond to the feedback
@@ -5942,7 +5941,7 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
-msgstr ""
+msgstr "Trả Lời Phản Hồi"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -5952,12 +5951,12 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Correct"
-msgstr ""
+msgstr "Chính Xác"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Correct"
-msgstr ""
+msgstr "Có Phần Chính Xác "
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -5977,7 +5976,7 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Additional comments:"
-msgstr ""
+msgstr "Ý Kiến Bổ Sung:"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -5996,7 +5995,7 @@ msgstr ""
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
-msgstr ""
+msgstr "Chưa được trả lời"
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Skip Post-Assessment"
@@ -6515,7 +6514,6 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr ""
 
@@ -6653,12 +6651,6 @@ msgid "Score distribution for problems"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr ""
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Max"
 msgstr ""
 
@@ -6672,7 +6664,6 @@ msgid "There is no data available to display at this time."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
@@ -6842,10 +6833,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final standing is unrequested or unavailable at this time."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr ""
 
@@ -6879,7 +6866,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
-msgstr ""
+msgstr "Liên kết này sẽ mở ra/tải về một tài liệu PDF"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6905,7 +6892,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
-msgstr ""
+msgstr "Hoàn thành khảo sát ý kiến ​​phản hồi về khóa học của chúng tôi"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6950,7 +6937,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr "Khóa học đã bắt đầu - {start_date}"
+msgstr "Khóa Học Đã Bắt Đầu - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -6958,7 +6945,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
-msgstr "Khóa học bắt đầu - {start_date}"
+msgstr "Khóa Học Bắt Đầu - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Document your accomplishment!"
@@ -8301,11 +8288,52 @@ msgid "Add Community TA"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Use Reload Graphs to refresh the graphs."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Count of Students Opened a Subsection"
+msgid "Subsection Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the number of students that opened the subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that opened the "
+"subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "You can also download this data as a CSV file."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Subsection Data for all Subsections as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the grade distribution for that problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that attempted the "
+"problem, along with the grades they received."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Problem Data for all Problems as a CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -8319,14 +8347,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -10467,8 +10487,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/error.html cms/templates/error.html
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
 msgstr ""
 
@@ -11199,25 +11218,25 @@ msgid ""
 "shortly."
 msgstr ""
 
-#: cms/templates/index.html cms/templates/index.html
-msgid "Need help?"
-msgstr "Cần trợ giúp?"
+#: cms/templates/index.html
+msgid "New to edX Studio?"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"If you are new to Studio and having trouble getting started, there are a few"
-" things that may be of help:"
+"Click Help in the upper-right corner to get more more information about the "
+"Studio page you are viewing. You can also use the links at the bottom of the"
+" page to access our continously updated documentation and other Studio "
+"resources."
 msgstr ""
-"Nếu bạn mới sử dụng Studio và đang có vấn đề với việc bắt đầu, có một vài "
-"thứ có thể giúp bạn:"
 
 #: cms/templates/index.html
-msgid "Get started by reading Studio's Documentation"
-msgstr "Bắt đầu bằng việc đọc Tài Liệu Studio"
+msgid "Getting Started with edX Studio"
+msgstr ""
 
-#: cms/templates/index.html
-msgid "Request help with Studio"
-msgstr "Yêu cầu giúp đỡ với Studio"
+#: cms/templates/index.html cms/templates/widgets/sock.html
+msgid "Request help with edX Studio"
+msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
@@ -11261,6 +11280,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
+msgid "Need help?"
+msgstr "Cần trợ giúp?"
+
+#: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
@@ -11287,7 +11310,7 @@ msgstr ""
 msgid "Email Address"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/widgets/sock.html
+#: cms/templates/login.html
 msgid "Studio Support"
 msgstr ""
 
@@ -12009,6 +12032,10 @@ msgstr ""
 "toàn bộ văn bản như một chương sách và đặt một tên theo ý bạn trong trường "
 "Tên Chương."
 
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr ""
+
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr ""
@@ -12156,8 +12183,7 @@ msgstr ""
 msgid "All rights reserved."
 msgstr ""
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
 msgstr "Liên Hệ"
 
@@ -12197,18 +12223,9 @@ msgstr "Xuất Khóa Học"
 msgid "Help &amp; Account Navigation"
 msgstr ""
 
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-msgid "This is a PDF Document"
-msgstr ""
-
 #: cms/templates/widgets/header.html
-msgid "Studio Documentation"
-msgstr "Tài Liệu Studio"
-
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-#: cms/templates/widgets/sock.html
-msgid "Studio Help Center"
-msgstr "Trung Tâm Trợ Giúp Studio"
+msgid "Contextual Online Help"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Currently signed in as:"
@@ -12282,26 +12299,27 @@ msgid "Label"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for Help with Studio?"
-msgstr "Tìm kiếm Trợ giúp với Studio?"
+msgid "Looking for help with Studio?"
+msgstr ""
 
-#: cms/templates/widgets/sock.html
-msgid "edX Studio Help"
+#: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
+msgid "edX Studio Documentation"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid ""
-"Need help with Studio? Creating a course is complex, so we're here to help. "
-"Take advantage of our documentation, help center, as well as our edX101 "
-"introduction course for course authors."
+"You can click Help in the upper right corner of any page to get more "
+"information about the page you're on. You can also use the links below to "
+"download the Building and Running an edX Course PDF file, to go to the edX "
+"Author Support site, or to enroll in edX101."
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Download Studio Documentation"
+msgid "Building and Running an edX Course PDF"
 msgstr ""
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "How to use Studio to build your course"
+msgid "edX Studio Author Support"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
@@ -12309,13 +12327,11 @@ msgid "Enroll in edX101"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Contact us about Studio"
+msgid "How to use edX Studio to build your course"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid ""
-"Have problems, questions, or suggestions about Studio? We're also here to "
-"listen to any feedback you want to share."
+msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

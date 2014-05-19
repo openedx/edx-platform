@@ -26,6 +26,7 @@
 # rafcha <raphael.chay@gmail.com>, 2014
 # aissam <ais.salhy@gmail.com>, 2014
 # sarina <sarina@edx.org>, 2014
+# SLOG90 <slog90@gmail.com>, 2014
 # antoviaque <xavier@antoviaque.org>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -44,13 +45,14 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # pchiu <philippe.chiu@gmail.com>, 2013
+# SLOG90 <slog90@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
-"PO-Revision-Date: 2014-05-11 14:42+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-05-19 08:16-0400\n"
+"PO-Revision-Date: 2014-05-14 09:14+0000\n"
+"Last-Translator: SLOG90 <slog90@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1492,6 +1494,18 @@ msgstr ""
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
 msgstr "Impossible de récupérer les données, merci de réessayer plus tard."
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
+msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
