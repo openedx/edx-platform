@@ -3,6 +3,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from student.roles import CourseInstructorRole %>
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "team" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
 

@@ -61,9 +61,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
-"PO-Revision-Date: 2014-05-12 01:20+0000\n"
-"Last-Translator: vingte <411029240@qq.com>\n"
+"POT-Creation-Date: 2014-05-19 08:16-0400\n"
+"PO-Revision-Date: 2014-05-19 05:02+0000\n"
+"Last-Translator: pku9104038 <pku9104038@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1373,36 +1373,48 @@ msgstr "标题"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
-msgstr ""
+msgstr "未知错误。"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
-msgstr ""
+msgstr "成功重置用户{user}的请求"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to reset attempts."
-msgstr ""
+msgstr "重置请求失败。"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
-msgstr ""
+msgstr "成功删除学生{user}的状态"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to delete student state."
-msgstr ""
+msgstr "删除学生状态失败。"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
-msgstr ""
+msgstr "成功重评用户 {user}得分"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem."
-msgstr ""
+msgstr "重评得分失败。"
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
 msgstr "无法读取数据，请稍后再试试。"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
+msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1665,7 +1677,7 @@ msgstr "未评分"
 msgid ""
 "Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
 "%(sort_name)s ascending"
-msgstr ""
+msgstr "从%(total_items_count)s中显示%(current_item_range)s，按 %(sort_name)s升序排列"
 
 #. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
 #. Added descending"
@@ -1673,13 +1685,13 @@ msgstr ""
 msgid ""
 "Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
 "%(sort_name)s descending"
-msgstr ""
+msgstr "从 %(total_items_count)s中显示%(current_item_range)s ，按%(sort_name)s降序排列"
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "%(total_items)s total"
-msgstr ""
+msgstr "共%(total_items)s"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"

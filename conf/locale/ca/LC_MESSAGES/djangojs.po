@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"POT-Creation-Date: 2014-05-19 08:16-0400\n"
 "PO-Revision-Date: 2014-05-12 18:15+0000\n"
 "Last-Translator: mcolomer <mcmlilhity@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/edx-platform/language/ca/)\n"
@@ -1484,6 +1484,18 @@ msgstr "No s'ha pogut reescriure la puntuació."
 msgid "Unable to retrieve data, please try again later."
 msgstr ""
 "No  s'ha pogut obtenir les dades. Si us plau, intenta-ho més endavant."
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
+msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"

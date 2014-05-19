@@ -2,6 +2,7 @@
     from django.utils.translation import ugettext as _
 %>
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "updates" %></%def>
 <%namespace name='static' file='static_content.html'/>
 
 <!-- TODO decode course # from context_course into title -->
