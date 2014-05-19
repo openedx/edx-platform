@@ -75,7 +75,10 @@ class Migration(DataMigration):
                         hold.setdefault(course_id_string, []).append(group)
                     else:
                         correct_course_key = SlashSeparatedCourseKey(*entry['_id'].values())
-                        _migrate_users(correct_course_key, role, entry['lower_id']['org'])
+                        if 'lower_id' in entry:
+                            _migrate_users(correct_course_key, role, entry['lower_id']['org'])
+                        else:
+                            _migrate_users(correct_course_key, role, entry['_id']['org'].lower())
 
         # see if any in hold were missed above
         for held_auth_scope, groups in hold.iteritems():
