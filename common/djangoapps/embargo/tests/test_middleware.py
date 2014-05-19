@@ -215,7 +215,7 @@ class EmbargoMiddlewareTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'EMBARGO_SITE': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
     def test_embargo_off_embargo_site_on(self):
         # When the middleware is turned on with SITE, main site access should be restricted
         # Accessing a regular page from a blocked IP is denied.
@@ -227,10 +227,10 @@ class EmbargoMiddlewareTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'EMBARGO_SITE': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
     @override_settings(EMBARGO_SITE_REDIRECT_URL='https://www.edx.org/')
     def test_embargo_off_embargo_site_on_with_redirect_url(self):
-        # When the middleware is turned on with EMBARGO_SITE, main site access
+        # When the middleware is turned on with SITE_EMBARGOED, main site access
         # should be restricted. Accessing a regular page from a blocked IP is
         # denied, and redirected to EMBARGO_SITE_REDIRECT_URL rather than returning a 403.
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')

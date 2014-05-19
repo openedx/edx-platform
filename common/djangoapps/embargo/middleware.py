@@ -22,9 +22,9 @@ Usage:
 FEATURES['EMBARGO'] = True # blocked ip will be redirected to /embargo
 
 # To enable Embargoing site:
-FEATURES['EMBARGO_SITE'] = True
+FEATURES['SITE_EMBARGOED'] = True
 
-# With EMBARGO_SITE, you can define an external to redirect with:
+# With SITE_EMBARGOED, you can define an external to redirect with:
 EMBARGO_SITE_REDIRECT_URL = 'https://www.edx.org/'
 
 # if EMBARGO_SITE_REDIRECT_URL is missing, a HttpResponseForbidden is returned.
@@ -53,7 +53,7 @@ class EmbargoMiddleware(object):
     optionally ``IPFilter`` rows in the database, using the django admin site.
     """
     def __init__(self):
-        self.site_enabled = settings.FEATURES.get('EMBARGO_SITE', False)
+        self.site_enabled = settings.FEATURES.get('SITE_EMBARGOED', False)
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO', False) and \
            not self.site_enabled:
@@ -65,9 +65,10 @@ class EmbargoMiddleware(object):
         """
         url = request.path
         course_id = course_id_from_url(url)
+        course_is_embargoed = EmbargoedCourse.is_embargoed(course_id)
 
         # If they're trying to access a course that cares about embargoes
-        if self.site_enabled or EmbargoedCourse.is_embargoed(course_id):
+        if self.site_enabled or course_is_embargoed:
             response = redirect('embargo')
             # Set the proper response if site is enabled
             if self.site_enabled:
@@ -80,15 +81,25 @@ class EmbargoMiddleware(object):
 
             # if blacklisted, immediately fail
             if ip_addr in IPFilter.current().blacklist_ips:
-                log.info("Embargo: Restricting IP address %s because IP is blacklisted.", ip_addr)
+                if course_is_embargoed:
+                    msg = "Embargo: Restricting IP address %s to course %s because IP is blacklisted." % \
+                          (ip_addr, course_id)
+                else:
+                    msg = "Embargo: Restricting IP address %s because IP is blacklisted." % ip_addr
+
+                log.info(msg)
                 return response
 
             country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
             is_embargoed = country_code_from_ip in EmbargoedState.current().embargoed_countries_list
             # Fail if country is embargoed and the ip address isn't explicitly whitelisted
             if is_embargoed and ip_addr not in IPFilter.current().whitelist_ips:
-                log.info(
-                    "Embargo: Restricting IP address %s because IP is from country %s.",
-                    ip_addr, country_code_from_ip
-                )
+                if course_is_embargoed:
+                    msg = "Embargo: Restricting IP address %s to course %s because IP is from country %s." % \
+                          (ip_addr, course_id, country_code_from_ip)
+                else:
+                    msg = "Embargo: Restricting IP address %s because IP is from country %s." % \
+                          (ip_addr, country_code_from_ip)
+
+                log.info(msg)
                 return response
