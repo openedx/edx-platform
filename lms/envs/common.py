@@ -608,6 +608,7 @@ LANGUAGES = (
     ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
     ('ne', u'नेपाली'),  # Nepali
     ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
+    ('or', u'ଓଡ଼ିଆ'),  # Oriya
     ('pl', u'Polski'),  # Polish
     ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
     ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
