@@ -114,15 +114,15 @@ var StaffDebug = (function(){
 
 // Register click handlers
 $(document).ready(function() {
-    $('#staff-debug-reset').click(function() {
+    $('.staff-debug-reset').click(function() {
         StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
-    $('#staff-debug-sdelete').click(function() {
+    $('.staff-debug-sdelete').click(function() {
         StaffDebug.sdelete($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
-    $('#staff-debug-rescore').click(function() {
+    $('.staff-debug-rescore').click(function() {
         StaffDebug.rescore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });

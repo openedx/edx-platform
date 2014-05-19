@@ -150,6 +150,13 @@
 
 .. _Drag and Drop Problem: http://ca.readthedocs.org/en/latest/exercises_tools/drag_and_drop.html
 
+
+.. _Assign Discussion Administration Roles: http://edx.readthedocs.org/projects/ca/en/latest/running_course/discussions.html#assigning-discussion-roles
+
+.. _LTI Component: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html
+
+.. _VitalSource E-Reader Tool: http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/vitalsource.html
+
 .. DATA DOCUMENTATION
 
 .. _Student Info and Progress Data: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info
@@ -173,3 +180,5 @@
 .. _Contributing to Open edX: http://edx.readthedocs.org/projects/userdocs/en/latest/process/index.html
 
 .. _edX XBlock Documentation: http://edx.readthedocs.org/projects/xblock/en/latest/
+
+.. _Analytics: http://edx.readthedocs.org/projects/userdocs/en/latest/analytics.html

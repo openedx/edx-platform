@@ -44,6 +44,7 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
+from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student

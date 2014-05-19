@@ -165,7 +165,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:30-0400\n"
+"POT-Creation-Date: 2014-05-19 08:17-0400\n"
 "PO-Revision-Date: 2014-04-24 12:34+0000\n"
 "Last-Translator: pku9104038 <pku9104038@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -1055,7 +1055,7 @@ msgstr "客户端响应：检查函数返回无效字典！"
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-msgid "oops in SymbolicResponse (cfn) error {error_msg}"
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1546,6 +1546,7 @@ msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
+"该地址指向视频链接。这可能是一个YouTube的网址或者一个存储于其他互联网服务器的 .mp4, .ogg, 或者.webm 格式视频的链接地址。"
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
@@ -1587,36 +1588,75 @@ msgid "Copyright"
 msgstr "版权"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "名称"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr "用户名"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr "成绩"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
+msgstr "百分比"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
 msgstr ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "students"
-msgstr "学生们"
+msgid "Subsection"
+msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Opened by this number of students"
+msgstr ""
+
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "questions"
+msgid "subsections"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
 msgstr "问题"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{num_students} student(s) opened Subsection {subsection_num}: "
-"{subsection_name}"
-msgstr "{num_students} 学生打开二级章节 {subsection_num}: {subsection_name}"
+msgid "Count of Students"
+msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+msgid "% of Students"
 msgstr ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+
+#: lms/templates/folditchallenge.html
+msgid "Score"
+msgstr "得分"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "problems"
+msgstr ""
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -1988,24 +2028,6 @@ msgstr "该用户不存在。"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "任务已在运行中。"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "用户名"
-
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "名称"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4767,10 +4789,6 @@ msgstr "答题排行榜"
 msgid "User"
 msgstr "用户"
 
-#: lms/templates/folditchallenge.html
-msgid "Score"
-msgstr "得分"
-
 #: lms/templates/footer.html
 msgid "About"
 msgstr "关于我们"
@@ -5697,7 +5715,7 @@ msgstr "工作人员调试"
 
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
-msgstr ""
+msgstr "动作"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -5706,7 +5724,7 @@ msgstr "重置学生的尝试次数"
 
 #: lms/templates/staff_problem_info.html
 msgid "Delete Student State"
-msgstr ""
+msgstr "删除学生状态"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -6462,7 +6480,7 @@ msgstr "课程讲义"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
-msgstr ""
+msgstr "传统教师面板"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6471,7 +6489,7 @@ msgstr "在职员界面查看课程"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Back To Instructor Dashboard"
-msgstr ""
+msgstr "返回教师面板"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6483,17 +6501,17 @@ msgstr "授课教师面板"
 msgid ""
 "You are using the legacy instructor dashboard, which we will retire in the "
 "near future."
-msgstr ""
+msgstr "您现在正在使用传统教师面板，传统界面将于不久后淘汰。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Return to the Instructor Dashboard"
-msgstr ""
+msgstr "返回教师面板"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "If the Instructor Dashboard is missing functionality, please contact your PM"
 " to let us know."
-msgstr ""
+msgstr "如果教师面板界功能性缺失，请与课程负责人联系以告知我们。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6665,7 +6683,6 @@ msgstr "从远程成绩单中获取注册人数"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr "章节："
 
@@ -6805,12 +6822,6 @@ msgid "Score distribution for problems"
 msgstr "问答问题的成绩分布"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "问题"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Max"
 msgstr "最大"
 
@@ -6824,7 +6835,6 @@ msgid "There is no data available to display at this time."
 msgstr "目前没有可用的数据"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
@@ -6990,10 +7000,6 @@ msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr "课程数据正在处理中，你将很快能看到最终的成绩。"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final standing is unrequested or unavailable at this time."
-msgstr "您的最终名次目前无法查询。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -8215,7 +8221,7 @@ msgstr "请选择等级单元"
 msgid ""
 "Specify the extension due date and time (in UTC; please specify "
 "{format_string})."
-msgstr ""
+msgstr "明确截止日期、截止时间的宽限 (世界标准时间; 请明确 {format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -8243,7 +8249,7 @@ msgstr "列出所有拥有到期扩展应用的学生"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Specify a student to see all of that student's extensions."
-msgstr ""
+msgstr "指定一个能查看所有学生延期状况的学生。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
@@ -8266,14 +8272,14 @@ msgstr "重置学生的结束时间"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
-msgstr ""
+msgstr "回归传统界面"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid ""
 "We've changed the look and feel of the Instructor Dashboard. During this "
 "transition time, you can still access the old Instructor Dashboard by "
 "clicking the 'Revert to Legacy Dashboard' button above."
-msgstr ""
+msgstr "我们已经改变教师面板界面外观。值此更改时期，您依然可以通过点击'回归传统界面'按钮以访问旧教师面板界面。"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -8487,12 +8493,53 @@ msgid "Add Community TA"
 msgstr "添加社区助教"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Use Reload Graphs to refresh the graphs."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr "重新载入图片"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Count of Students Opened a Subsection"
-msgstr "统计开辟了子栏目的学生人数"
+msgid "Subsection Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the number of students that opened the subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that opened the "
+"subsection."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "You can also download this data as a CSV file."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Subsection Data for all Subsections as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution Data"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the grade distribution for that problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that attempted the "
+"problem, along with the grades they received."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Problem Data for all Problems as a CSV"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
@@ -8506,14 +8553,6 @@ msgstr "以CSV格式下载学生成绩数据"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
 msgstr "这是一个部分列表，查看所有以CSV格式下载的学生信息"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "成绩"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "百分比"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8552,17 +8591,17 @@ msgstr "显示邮件任务历史"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
-msgstr ""
+msgstr "学生成绩单"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Click here to view the gradebook for enrolled students. This feature is only"
 " visible to courses with a small number of total enrolled students."
-msgstr ""
+msgstr "点击此处查看学生成绩单。该功能只适用于注册人数较少的课程。"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
-msgstr ""
+msgstr "查看成绩单"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
@@ -10655,8 +10694,7 @@ msgstr ""
 "很抱歉，我们无法找到您查找的Studio页面。您可能需要返回至Studio控制面板重新尝试。如果您仍遇到问题，请与{link_start}Studio技术支持{link_end}联系。"
 
 #: cms/templates/error.html cms/templates/error.html
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
 msgstr "请使用工具Tender来分享您的反馈"
 
@@ -11400,23 +11438,25 @@ msgid ""
 "shortly."
 msgstr "edX员工正在审核您的请求，并将尽快给您反馈。"
 
-#: cms/templates/index.html cms/templates/index.html
-msgid "Need help?"
-msgstr "需要帮助？"
+#: cms/templates/index.html
+msgid "New to edX Studio?"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"If you are new to Studio and having trouble getting started, there are a few"
-" things that may be of help:"
-msgstr "如果您是Studio新手，开始使用时遇到困难，那么这些东西可能对您有所帮助。"
+"Click Help in the upper-right corner to get more more information about the "
+"Studio page you are viewing. You can also use the links at the bottom of the"
+" page to access our continously updated documentation and other Studio "
+"resources."
+msgstr ""
 
 #: cms/templates/index.html
-msgid "Get started by reading Studio's Documentation"
-msgstr "从阅读Studio文档入手"
+msgid "Getting Started with edX Studio"
+msgstr ""
 
-#: cms/templates/index.html
-msgid "Request help with Studio"
-msgstr "向Studio请求帮助"
+#: cms/templates/index.html cms/templates/widgets/sock.html
+msgid "Request help with edX Studio"
+msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
@@ -11460,6 +11500,10 @@ msgid ""
 msgstr "快完成了！为了完成您的注册，我们需要验证您的邮箱地址(%(email)s)。一封激活信息以及接下来的步骤应该已经送达您的邮箱。"
 
 #: cms/templates/index.html
+msgid "Need help?"
+msgstr "需要帮助？"
+
+#: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
@@ -11486,7 +11530,7 @@ msgstr "登录edX Studio所需的信息"
 msgid "Email Address"
 msgstr "电子邮件地址"
 
-#: cms/templates/login.html cms/templates/widgets/sock.html
+#: cms/templates/login.html
 msgid "Studio Support"
 msgstr "Studio支持"
 
@@ -12190,6 +12234,10 @@ msgid ""
 "Name field."
 msgstr "如果您的教材没有独立的章节，您可以上传整个文本作为一个章节，并在章节名称字段中输入您所选择的名称。"
 
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr ""
+
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr "独立单元"
@@ -12339,8 +12387,7 @@ msgstr "我们已发送一封电子邮件至{email}，里面包含一个激活�
 msgid "All rights reserved."
 msgstr "保留所有权利。"
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
 msgstr "联系我们"
 
@@ -12380,18 +12427,9 @@ msgstr "导出"
 msgid "Help &amp; Account Navigation"
 msgstr "帮助 &amp; 账户导航"
 
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-msgid "This is a PDF Document"
-msgstr "这是一个PDF文档"
-
 #: cms/templates/widgets/header.html
-msgid "Studio Documentation"
-msgstr "Studio文档"
-
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-#: cms/templates/widgets/sock.html
-msgid "Studio Help Center"
-msgstr "Studio帮助中心"
+msgid "Contextual Online Help"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Currently signed in as:"
@@ -12465,42 +12503,40 @@ msgid "Label"
 msgstr "标签"
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for Help with Studio?"
-msgstr "寻求关于Studio用法的帮助？"
+msgid "Looking for help with Studio?"
+msgstr ""
 
-#: cms/templates/widgets/sock.html
-msgid "edX Studio Help"
-msgstr "edX Studio帮助"
+#: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
+msgid "edX Studio Documentation"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid ""
-"Need help with Studio? Creating a course is complex, so we're here to help. "
-"Take advantage of our documentation, help center, as well as our edX101 "
-"introduction course for course authors."
+"You can click Help in the upper right corner of any page to get more "
+"information about the page you're on. You can also use the links below to "
+"download the Building and Running an edX Course PDF file, to go to the edX "
+"Author Support site, or to enroll in edX101."
 msgstr ""
-"需要关于Studio的帮助吗？由于创建课程比较复杂，因此我们在此提供帮助。请仔细阅读我们的文档，帮助中心以及面向课程作者的入门课程edX101。"
 
 #: cms/templates/widgets/sock.html
-msgid "Download Studio Documentation"
-msgstr "下载Studio文档"
+msgid "Building and Running an edX Course PDF"
+msgstr ""
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "How to use Studio to build your course"
-msgstr "如何使用Studio创建您的课程"
+msgid "edX Studio Author Support"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "注册edX101"
 
 #: cms/templates/widgets/sock.html
-msgid "Contact us about Studio"
-msgstr "联系我们"
+msgid "How to use edX Studio to build your course"
+msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid ""
-"Have problems, questions, or suggestions about Studio? We're also here to "
-"listen to any feedback you want to share."
-msgstr "如果您遇到困难，希望对Studio提出问题或建议，请与我们分享您的反馈。"
+msgid "Have problems, questions, or suggestions about edX Studio?"
+msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

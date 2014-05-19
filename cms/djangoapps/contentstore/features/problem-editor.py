@@ -6,7 +6,7 @@ from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
 from advanced_settings import change_value
-from course_import import import_file, go_to_import
+from course_import import import_file
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -216,11 +216,6 @@ def high_level_source_in_editor(_step):
 @step(u'I have an empty course')
 def i_have_empty_course(step):
     open_new_course()
-
-
-@step(u'I go to the import page')
-def i_go_to_import(_step):
-    go_to_import()
 
 
 @step(u'I import the file "([^"]*)"$')

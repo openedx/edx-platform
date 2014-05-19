@@ -94,11 +94,14 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_problem_grade_distribution(self):
 
-        prob_grade_distrib = get_problem_grade_distribution(self.course.id)
+        prob_grade_distrib, total_student_count = get_problem_grade_distribution(self.course.id)
 
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
             self.assertEquals(1, max_grade)
+
+        for val in total_student_count.values():
+            self.assertEquals(USER_COUNT, val)
 
     def test_get_sequential_open_distibution(self):
 
@@ -110,7 +113,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_problemset_grade_distrib(self):
 
-        prob_grade_distrib = get_problem_grade_distribution(self.course.id)
+        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id)
         probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib)
 
         for problem in probset_grade_distrib:
@@ -241,6 +244,61 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         self.assertContains(response, '"Name","Username"')
         # Check response contains 1 line for each user +1 for the header
         self.assertEquals(USER_COUNT + 1, len(response.content.splitlines()))
+
+    def test_post_metrics_data_subsections_csv(self):
+
+        url = reverse('post_metrics_data_csv')
+
+        sections = json.dumps(["Introduction"])
+        tooltips = json.dumps([[{"subsection_name": "Pre-Course Survey", "subsection_num": 1, "type": "subsection", "num_students": 18963}]])
+        course_id = self.course.id
+        data_type = 'subsection'
+
+        data = json.dumps({'sections': sections,
+                           'tooltips': tooltips,
+                           'course_id': course_id.to_deprecated_string(),
+                           'data_type': data_type,
+                           })
+
+        response = self.client.post(url, {'data': data})
+        # Check response contains 1 line for header, 1 line for Section and 1 line for Subsection
+        self.assertEquals(3, len(response.content.splitlines()))
+
+    def test_post_metrics_data_problems_csv(self):
+
+        url = reverse('post_metrics_data_csv')
+
+        sections = json.dumps(["Introduction"])
+        tooltips = json.dumps([[[
+            {'student_count_percent': 0,
+             'problem_name': 'Q1',
+             'grade': 0,
+             'percent': 0,
+             'label': 'P1.2.1',
+             'max_grade': 1,
+             'count_grade': 26,
+             'type': u'problem'},
+            {'student_count_percent': 99,
+             'problem_name': 'Q1',
+             'grade': 1,
+             'percent': 100,
+             'label': 'P1.2.1',
+             'max_grade': 1,
+             'count_grade': 4763,
+             'type': 'problem'},
+        ]]])
+        course_id = self.course.id
+        data_type = 'problem'
+
+        data = json.dumps({'sections': sections,
+                           'tooltips': tooltips,
+                           'course_id': course_id.to_deprecated_string(),
+                           'data_type': data_type,
+                           })
+
+        response = self.client.post(url, {'data': data})
+        # Check response contains 1 line for header, 1 line for Sections and 2 lines for problems
+        self.assertEquals(4, len(response.content.splitlines()))
 
     def test_get_section_display_name(self):
 

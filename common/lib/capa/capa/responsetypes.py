@@ -1796,7 +1796,7 @@ class SymbolicResponse(CustomResponse):
             log.error(traceback.format_exc())
             _ = self.capa_system.i18n.ugettext
             # Translators: 'SymbolicResponse' is a problem type and should not be translated.
-            msg = _(u"oops in SymbolicResponse (cfn) error {error_msg}").format(
+            msg = _(u"An error occurred with SymbolicResponse. The error was: {error_msg}").format(
                 error_msg=err,
             )
             raise Exception(msg)

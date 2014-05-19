@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-13 09:41-0400\n"
-"PO-Revision-Date: 2014-05-13 13:41:26.227948\n"
+"POT-Creation-Date: 2014-05-19 08:30-0400\n"
+"PO-Revision-Date: 2014-05-19 12:30:24.577686\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -977,8 +977,10 @@ msgstr ""
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-msgid "oops in SymbolicResponse (cfn) error {error_msg}"
-msgstr "ööps ïn SýmßölïçRéspönsé (çfn) érrör {error_msg} Ⱡ'σяєм ιρѕυ#"
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr ""
+"Àn érrör öççürréd wïth SýmßölïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
+"ιρѕυм ∂σłσ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
@@ -1556,38 +1558,79 @@ msgid "Copyright"
 msgstr "Çöpýrïght #"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions})"
-msgstr ""
-"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
-"{grade:.0f}/{max_grade:.0f} {questions}) Ⱡ'σяєм ιρѕ#"
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "Nämé Ⱡ'σяєм#"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "students"
-msgstr "stüdénts #"
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr "Ûsérnämé #"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr "Grädé Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
+msgstr "Pérçént #"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "questions"
-msgstr "qüéstïöns #"
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
+msgstr "Séçtïön #"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{num_students} student(s) opened Subsection {subsection_num}: "
-"{subsection_name}"
-msgstr ""
-"{num_students} stüdént(s) öpénéd Süßséçtïön {subsection_num}: "
-"{subsection_name} Ⱡ'σяєм ιρѕυ#"
+msgid "Subsection"
+msgstr "Süßséçtïön Ⱡ#"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
-msgstr ""
-"{problem_info_x} {problem_info_n} - {count_grade} {students} "
-"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions}) Ⱡ'σяєм ιρѕ#"
+msgid "Opened by this number of students"
+msgstr "Öpénéd ßý thïs nümßér öf stüdénts Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "subsections"
+msgstr "süßséçtïöns Ⱡ#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "Prößlém #"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Count of Students"
+msgstr "Çöünt öf Stüdénts Ⱡ'σ#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "% of Students"
+msgstr "% öf Stüdénts Ⱡ'#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/folditchallenge.html
+msgid "Score"
+msgstr "Sçöré Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "problems"
+msgstr "prößléms #"
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -1985,24 +2028,6 @@ msgstr "Ûsér döés nöt éxïst. Ⱡ'σя#"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "Täsk ïs älréädý rünnïng. Ⱡ'σяє#"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "Ûsérnämé #"
-
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "Nämé Ⱡ'σяєм#"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -5038,10 +5063,6 @@ msgstr "Püzzlé Léädérßöärd Ⱡ'σ#"
 msgid "User"
 msgstr "Ûsér Ⱡ'σяєм#"
 
-#: lms/templates/folditchallenge.html
-msgid "Score"
-msgstr "Sçöré Ⱡ'σяєм ι#"
-
 #: lms/templates/footer.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ι#"
@@ -7105,7 +7126,6 @@ msgstr "Püll énröllmént fröm rémöté grädéßöök Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr "Séçtïön: #"
 
@@ -7261,12 +7281,6 @@ msgid "Score distribution for problems"
 msgstr "Sçöré dïstrïßütïön för prößléms Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "Prößlém #"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Max"
 msgstr "Mäx Ⱡ'σя#"
 
@@ -7280,7 +7294,6 @@ msgid "There is no data available to display at this time."
 msgstr "Théré ïs nö dätä äväïläßlé tö dïspläý ät thïs tïmé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
@@ -7454,12 +7467,6 @@ msgid ""
 msgstr ""
 "Fïnäl çöürsé détäïls äré ßéïng wräppéd üp ät thïs tïmé. Ýöür fïnäl ständïng "
 "wïll ßé äväïläßlé shörtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your final standing is unrequested or unavailable at this time."
-msgstr ""
-"Ýöür fïnäl ständïng ïs ünréqüéstéd ör ünäväïläßlé ät thïs tïmé. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -9181,12 +9188,62 @@ msgid "Add Community TA"
 msgstr "Àdd Çömmünïtý TÀ Ⱡ'σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Use Reload Graphs to refresh the graphs."
+msgstr "Ûsé Rélöäd Gräphs tö réfrésh thé gräphs. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr "Rélöäd Gräphs Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Count of Students Opened a Subsection"
-msgstr "Çöünt öf Stüdénts Öpénéd ä Süßséçtïön Ⱡ'σяєм ιρѕ#"
+msgid "Subsection Data"
+msgstr "Süßséçtïön Dätä Ⱡ'#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the number of students that opened the subsection."
+msgstr ""
+"Éäçh ßär shöws thé nümßér öf stüdénts thät öpénéd thé süßséçtïön. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that opened the "
+"subsection."
+msgstr ""
+"Ýöü çän çlïçk ön äný öf thé ßärs tö lïst thé stüdénts thät öpénéd thé "
+"süßséçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "You can also download this data as a CSV file."
+msgstr "Ýöü çän älsö döwnlöäd thïs dätä äs ä ÇSV fïlé. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Subsection Data for all Subsections as a CSV"
+msgstr ""
+"Döwnlöäd Süßséçtïön Dätä för äll Süßséçtïöns äs ä ÇSV Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution Data"
+msgstr "Grädé Dïstrïßütïön Dätä Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Each bar shows the grade distribution for that problem."
+msgstr ""
+"Éäçh ßär shöws thé grädé dïstrïßütïön för thät prößlém. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"You can click on any of the bars to list the students that attempted the "
+"problem, along with the grades they received."
+msgstr ""
+"Ýöü çän çlïçk ön äný öf thé ßärs tö lïst thé stüdénts thät ättémptéd thé "
+"prößlém, älöng wïth thé grädés théý réçéïvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Problem Data for all Problems as a CSV"
+msgstr "Döwnlöäd Prößlém Dätä för äll Prößléms äs ä ÇSV Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
@@ -9202,14 +9259,6 @@ msgid "This is a partial list, to view all students download as a csv."
 msgstr ""
 "Thïs ïs ä pärtïäl lïst, tö vïéw äll stüdénts döwnlöäd äs ä çsv. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "Grädé Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "Pérçént #"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -11671,8 +11720,7 @@ msgstr ""
 "¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρ#"
 
 #: cms/templates/error.html cms/templates/error.html
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
 msgstr ""
 "Ûsé öür féédßäçk tööl, Téndér, tö shäré ýöür féédßäçk Ⱡ'σяєм ιρѕυм ∂σ#"
@@ -12554,25 +12602,30 @@ msgstr ""
 "Ýöür réqüést ïs çürréntlý ßéïng révïéwéd ßý édX stäff änd shöüld ßé üpdätéd "
 "shörtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: cms/templates/index.html cms/templates/index.html
-msgid "Need help?"
-msgstr "Nééd hélp? Ⱡ#"
+#: cms/templates/index.html
+msgid "New to edX Studio?"
+msgstr "Néw tö édX Stüdïö? Ⱡ'σ#"
 
 #: cms/templates/index.html
 msgid ""
-"If you are new to Studio and having trouble getting started, there are a few"
-" things that may be of help:"
+"Click Help in the upper-right corner to get more more information about the "
+"Studio page you are viewing. You can also use the links at the bottom of the"
+" page to access our continously updated documentation and other Studio "
+"resources."
 msgstr ""
-"Ìf ýöü äré néw tö Stüdïö änd hävïng tröüßlé géttïng stärtéd, théré äré ä féw"
-" thïngs thät mäý ßé öf hélp: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+"Çlïçk Hélp ïn thé üppér-rïght çörnér tö gét möré möré ïnförmätïön äßöüt thé "
+"Stüdïö pägé ýöü äré vïéwïng. Ýöü çän älsö üsé thé lïnks ät thé ßöttöm öf thé"
+" pägé tö äççéss öür çöntïnöüslý üpdätéd döçüméntätïön änd öthér Stüdïö "
+"résöürçés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
+" єιυѕмσ∂ #"
 
 #: cms/templates/index.html
-msgid "Get started by reading Studio's Documentation"
-msgstr "Gét stärtéd ßý réädïng Stüdïö's Döçüméntätïön Ⱡ'σяєм ιρѕυм#"
+msgid "Getting Started with edX Studio"
+msgstr "Géttïng Stärtéd wïth édX Stüdïö Ⱡ'σяєм ι#"
 
-#: cms/templates/index.html
-msgid "Request help with Studio"
-msgstr "Réqüést hélp wïth Stüdïö Ⱡ'σяє#"
+#: cms/templates/index.html cms/templates/widgets/sock.html
+msgid "Request help with edX Studio"
+msgstr "Réqüést hélp wïth édX Stüdïö Ⱡ'σяєм #"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
@@ -12623,6 +12676,10 @@ msgstr ""
 "wäïtïng för ýöü théré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg#"
 
 #: cms/templates/index.html
+msgid "Need help?"
+msgstr "Nééd hélp? Ⱡ#"
+
+#: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
@@ -12652,7 +12709,7 @@ msgstr "Réqüïréd Ìnförmätïön tö Sïgn Ìn tö édX Stüdïö Ⱡ'σя�
 msgid "Email Address"
 msgstr "Émäïl Àddréss Ⱡ'#"
 
-#: cms/templates/login.html cms/templates/widgets/sock.html
+#: cms/templates/login.html
 msgid "Studio Support"
 msgstr "Stüdïö Süppört Ⱡ'#"
 
@@ -13472,6 +13529,10 @@ msgstr ""
 " téxt äs ä sïnglé çhäptér änd éntér ä nämé öf ýöür çhöïçé ïn thé Çhäptér "
 "Nämé fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr "Léärn Möré Ⱡ#"
+
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr "Ìndïvïdüäl Ûnït Ⱡ'#"
@@ -13651,8 +13712,7 @@ msgstr ""
 msgid "All rights reserved."
 msgstr "Àll rïghts résérvéd. Ⱡ'σя#"
 
-#: cms/templates/widgets/footer.html cms/templates/widgets/header.html
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
 msgstr "Çöntäçt Ûs Ⱡ#"
 
@@ -13692,18 +13752,9 @@ msgstr "Éxpört Ⱡ'σяєм ιρѕ#"
 msgid "Help &amp; Account Navigation"
 msgstr "Hélp &amp; Àççöünt Nävïgätïön Ⱡ'σяєм#"
 
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-msgid "This is a PDF Document"
-msgstr "Thïs ïs ä PDF Döçümént Ⱡ'σяє#"
-
 #: cms/templates/widgets/header.html
-msgid "Studio Documentation"
-msgstr "Stüdïö Döçüméntätïön Ⱡ'σя#"
-
-#: cms/templates/widgets/header.html cms/templates/widgets/sock.html
-#: cms/templates/widgets/sock.html
-msgid "Studio Help Center"
-msgstr "Stüdïö Hélp Çéntér Ⱡ'σ#"
+msgid "Contextual Online Help"
+msgstr "Çöntéxtüäl Önlïné Hélp Ⱡ'σяє#"
 
 #: cms/templates/widgets/header.html
 msgid "Currently signed in as:"
@@ -13777,48 +13828,47 @@ msgid "Label"
 msgstr "Läßél Ⱡ'σяєм ι#"
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for Help with Studio?"
-msgstr "Löökïng för Hélp wïth Stüdïö? Ⱡ'σяєм #"
+msgid "Looking for help with Studio?"
+msgstr "Löökïng för hélp wïth Stüdïö? Ⱡ'σяєм #"
 
-#: cms/templates/widgets/sock.html
-msgid "edX Studio Help"
-msgstr "édX Stüdïö Hélp Ⱡ'#"
+#: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
+msgid "edX Studio Documentation"
+msgstr "édX Stüdïö Döçüméntätïön Ⱡ'σяє#"
 
 #: cms/templates/widgets/sock.html
 msgid ""
-"Need help with Studio? Creating a course is complex, so we're here to help. "
-"Take advantage of our documentation, help center, as well as our edX101 "
-"introduction course for course authors."
+"You can click Help in the upper right corner of any page to get more "
+"information about the page you're on. You can also use the links below to "
+"download the Building and Running an edX Course PDF file, to go to the edX "
+"Author Support site, or to enroll in edX101."
 msgstr ""
-"Nééd hélp wïth Stüdïö? Çréätïng ä çöürsé ïs çömpléx, sö wé'ré héré tö hélp. "
-"Täké ädväntägé öf öür döçüméntätïön, hélp çéntér, äs wéll äs öür édX101 "
-"ïntrödüçtïön çöürsé för çöürsé äüthörs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
+"Ýöü çän çlïçk Hélp ïn thé üppér rïght çörnér öf äný pägé tö gét möré "
+"ïnförmätïön äßöüt thé pägé ýöü'ré ön. Ýöü çän älsö üsé thé lïnks ßélöw tö "
+"döwnlöäd thé Büïldïng änd Rünnïng än édX Çöürsé PDF fïlé, tö gö tö thé édX "
+"Àüthör Süppört sïté, ör tö énröll ïn édX101. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢#"
 
 #: cms/templates/widgets/sock.html
-msgid "Download Studio Documentation"
-msgstr "Döwnlöäd Stüdïö Döçüméntätïön Ⱡ'σяєм #"
+msgid "Building and Running an edX Course PDF"
+msgstr "Büïldïng änd Rünnïng än édX Çöürsé PDF Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "How to use Studio to build your course"
-msgstr "Höw tö üsé Stüdïö tö ßüïld ýöür çöürsé Ⱡ'σяєм ιρѕ#"
+msgid "edX Studio Author Support"
+msgstr "édX Stüdïö Àüthör Süppört Ⱡ'σяєм#"
 
 #: cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "Énröll ïn édX101 Ⱡ'σ#"
 
 #: cms/templates/widgets/sock.html
-msgid "Contact us about Studio"
-msgstr "Çöntäçt üs äßöüt Stüdïö Ⱡ'σяє#"
+msgid "How to use edX Studio to build your course"
+msgstr "Höw tö üsé édX Stüdïö tö ßüïld ýöür çöürsé Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/widgets/sock.html
-msgid ""
-"Have problems, questions, or suggestions about Studio? We're also here to "
-"listen to any feedback you want to share."
+msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr ""
-"Hävé prößléms, qüéstïöns, ör süggéstïöns äßöüt Stüdïö? Wé'ré älsö héré tö "
-"lïstén tö äný féédßäçk ýöü wänt tö shäré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢#"
+"Hävé prößléms, qüéstïöns, ör süggéstïöns äßöüt édX Stüdïö? Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
