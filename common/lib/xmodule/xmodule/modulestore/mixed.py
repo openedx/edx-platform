@@ -40,7 +40,11 @@ class MixedModuleStore(ModuleStoreWriteBase):
             try:
                 self.mappings[CourseKey.from_string(course_id)] = store_name
             except InvalidKeyError:
-                self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
+                try:
+                    self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
+                except InvalidKeyError:
+                    log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
+                    continue
 
         if 'default' not in stores:
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
@@ -50,8 +54,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if is_xml:
                 # restrict xml to only load courses in mapping
                 store['OPTIONS']['course_ids'] = [
-                    course_id
-                    for course_id, store_key in mappings.iteritems()
+                    course_key.to_deprecated_string()
+                    for course_key, store_key in self.mappings.iteritems()
                     if store_key == key
                 ]
             self.modulestores[key] = create_modulestore_instance(
