@@ -308,6 +308,12 @@ class VideoStudentViewHandlers(object):
 
         return response
 
+    # This is a temp interface -- name it better
+    def api_summary(self):
+        return {
+            "url": self.html5_sources[0] if self.html5_sources else self.source
+        }
+
 
 class VideoStudioViewHandlers(object):
     """

@@ -94,6 +94,9 @@ CC_PROCESSOR = {
     }
 }
 
+########################### EDX API #################################
+FEATURES['ENABLE_PUBLIC_REST_API'] = True
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
