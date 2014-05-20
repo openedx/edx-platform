@@ -6,6 +6,7 @@ Contents:
    :maxdepth: 2
 
    xmodule.rst
+   modulestore.rst
    capa.rst
    chem.rst
    sandbox-packages.rst
