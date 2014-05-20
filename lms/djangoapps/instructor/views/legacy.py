@@ -226,19 +226,19 @@ def instructor_dashboard(request, course_id):
 
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_key, get_grades=False, use_offline=use_offline)
+        datatable = get_student_grade_summary_data(request, course, get_grades=False, use_offline=use_offline)
         datatable['title'] = _('List of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_key, get_grades=True, use_offline=use_offline)
+        datatable = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
         datatable['title'] = _('Summary Grades of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_key, get_grades=True,
+        datatable = get_student_grade_summary_data(request, course, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = _('Raw Grades of students enrolled in {course_key}').format(course_key=course_key)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
@@ -246,12 +246,12 @@ def instructor_dashboard(request, course_id):
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
         return return_csv('grades_{0}.csv'.format(course_key.to_deprecated_string()),
-                          get_student_grade_summary_data(request, course, course_key, use_offline=use_offline))
+                          get_student_grade_summary_data(request, course, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_key.to_deprecated_string()),
-                          get_student_grade_summary_data(request, course, course_key, get_raw_scores=True, use_offline=use_offline))
+                          get_student_grade_summary_data(request, course, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
@@ -539,7 +539,7 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'List assignments available for this course':
         log.debug(action)
-        allgrades = get_student_grade_summary_data(request, course, course_key, get_grades=True, use_offline=use_offline)
+        allgrades = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
 
         assignments = [[x] for x in allgrades['assignments']]
         datatable = {'header': [_('Assignment Name')]}
@@ -549,7 +549,7 @@ def instructor_dashboard(request, course_id):
         msg += 'assignments=<pre>%s</pre>' % assignments
 
     elif action == 'List enrolled students matching remote gradebook':
-        stud_data = get_student_grade_summary_data(request, course, course_key, get_grades=False, use_offline=use_offline)
+        stud_data = get_student_grade_summary_data(request, course, get_grades=False, use_offline=use_offline)
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
@@ -568,7 +568,7 @@ def instructor_dashboard(request, course_id):
         if not aname:
             msg += "<font color='red'>{text}</font>".format(text=_("Please enter an assignment name"))
         else:
-            allgrades = get_student_grade_summary_data(request, course, course_key, get_grades=True, use_offline=use_offline)
+            allgrades = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
             if aname not in allgrades['assignments']:
                 msg += "<font color='red'>{text}</font>".format(
                     text=_("Invalid assignment name '{name}'").format(name=aname)
@@ -1354,8 +1354,8 @@ class GradeTable(object):
         return self.components.keys()
 
 
-def get_student_grade_summary_data(request, course, course_key, get_grades=True, get_raw_scores=False, use_offline=False):
-    '''
+def get_student_grade_summary_data(request, course, get_grades=True, get_raw_scores=False, use_offline=False):
+    """
     Return data arrays with student identity and grades for specified course.
 
     course = CourseDescriptor
@@ -1370,8 +1370,8 @@ def get_student_grade_summary_data(request, course, course_key, get_grades=True,
     data = list (one per student) of lists of data corresponding to the fields
 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
-
-    '''
+    """
+    course_key = course.id
     enrolled_students = User.objects.filter(
         courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
