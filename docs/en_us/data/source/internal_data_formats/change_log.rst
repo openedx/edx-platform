@@ -11,6 +11,9 @@ Change Log
 
    * - Date
      - Change
+   * - 05/20/14
+     - Added descriptions of five video- and problem-related events to   the
+       :ref:`Tracking Logs` chapter.
    * - 05/06/14
      - Added enrollment event types to the :ref:`Tracking Logs` chapter. 
    * - 05/05/14
