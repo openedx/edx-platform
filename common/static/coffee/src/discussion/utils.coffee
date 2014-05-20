@@ -12,8 +12,12 @@ $ ->
       @$_loading.remove()
 
 class @DiscussionUtil
+  @baseUrl: ''
 
   @wmdEditors: {}
+
+  @setBaseUrl: (baseUrl) ->
+    @baseUrl = baseUrl
 
   @getTemplate: (id) ->
     $("script##{id}").html()
@@ -52,7 +56,7 @@ class @DiscussionUtil
             .click -> handler(this)
 
   @urlFor: (name, param, param1, param2) ->
-    {
+    urls = {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
       create_thread           : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
@@ -91,7 +95,9 @@ class @DiscussionUtil
       "enable_notifications"  : "/notification_prefs/enable/"
       "disable_notifications" : "/notification_prefs/disable/"
       "notifications_status" : "/notification_prefs/status/"
-    }[name]
+    }
+
+    @baseUrl + urls[name]
 
   @ignoreEnterKey: (event) =>
     if event.which == 13
