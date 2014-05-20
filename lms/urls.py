@@ -223,7 +223,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
         #View for mktg site
-        url(r'^mktg/(?P<course_id>.*)$',
+        url(r'^mktg/(?P<course_id>[^/]+/[^/]+/[^/]+)/?$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
 
         #Inside the course
