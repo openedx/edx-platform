@@ -501,6 +501,7 @@ def get_module_system_for_user(user, field_data_cache,
         )
 
     system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
+    system.set(u'user_is_admin', has_access(user, 'global', 'staff'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, descriptor.location, 'staff', course_id):
