@@ -36,7 +36,10 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
         };
 
 
-        var closeModalNew = function () {
+        var closeModalNew = function (e) {
+             if (e) {
+                e.preventDefault();
+            };
             $('body').removeClass('modal-window-is-shown');
             $('.edit-section-publish-settings').removeClass('is-shown');
         };
