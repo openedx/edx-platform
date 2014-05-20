@@ -73,15 +73,7 @@ var submitToPaymentProcessing = function() {
     }
   )
   .done(function(data) {
-    if(data.success) {
-        $("#pay_form").submit();
-    }else{
-        if($(location).attr('href').indexOf("retake")<0) {
-            window.location.href=$(location).attr('href')+"&retake=True";
-        }else {
-            location.reload();
-        }
-    }
+    $("#pay_form").submit();
   })
   .fail(function(jqXhr,text_status, error_thrown) {
       if(jqXhr.status == 400) {
@@ -311,7 +303,6 @@ $(document).ready(function() {
   // when moving between steps
   $('#face_next_link').click(function(){
       analytics.pageview("Capture ID Photo");
-      $('#photo-error').hide();
       $('body').addClass('step-photos-id').removeClass('step-photos-cam')
   })
 
