@@ -24,6 +24,7 @@ django-mako==0.1.5pre
 django-model-utils==1.4.0
 django-masquerade==0.1.6
 django-mptt==0.5.5
+django-oauth2-provider==0.2.6.1
 django-openid-auth==0.4
 django-robots==0.9.1
 django-sekizai==0.6.1

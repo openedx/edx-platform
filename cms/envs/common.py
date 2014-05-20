@@ -106,6 +106,12 @@ FEATURES = {
 
     # Toggles Group Configuration editing functionality
     'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
+
+    # Temporary feature flag for duplicating xblock leaves
+    'ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT': False,
+
+    # Temporary feature flag for deleting xblock leaves
+    'ENABLE_DELETE_XBLOCK_LEAF_COMPONENT': False,
 }
 ENABLE_JASMINE = False
 

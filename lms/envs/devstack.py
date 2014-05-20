@@ -81,6 +81,9 @@ FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
+########################### EDX API #################################
+FEATURES['ENABLE_PUBLIC_REST_API'] = True
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
