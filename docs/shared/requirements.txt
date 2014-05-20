@@ -18,7 +18,6 @@ django-kombu==0.9.4
 django-mako==0.1.5pre
 django-masquerade==0.1.6
 django-mptt==0.5.5
-django-openid-auth==0.4
 django-robots==0.9.1
 django-sekizai==0.6.1
 django-ses==0.4.1

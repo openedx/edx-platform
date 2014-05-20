@@ -525,3 +525,14 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
             field_data['download_track'] = True
 
         return field_data
+
+
+    # This is a temp interface -- name it better, and it should only exist in module, not
+    # descriptor
+    def api_summary(self):
+        return {
+            "url": self.html5_sources[0] if self.html5_sources else self.source,
+            "duration": None,
+            "display_name": self.display_name,
+            "category": self.category,
+        }
