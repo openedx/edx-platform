@@ -274,11 +274,8 @@ FEATURES = {
     # Enable the new edX footer to be rendered. Defaults to false.
     'ENABLE_NEW_EDX_FOOTER': False,
 
-    # TODO: ECOM-136
-    # Enables the new navigation template and styles. This should be enabled
-    # when the styles appropriately match the edX.org website.
-    'ENABLE_NEW_EDX_HEADER': False,
-
+    # Expose public REST APIs (mostly used for mobile at the moment)
+    'ENABLE_PUBLIC_REST_API': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1382,6 +1379,14 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries'
+
+    # edX Public API
+    'public_api',
+    'public_api.users',
+
+    # OAuth2
+    'provider',
+    'provider.oauth2',
 )
 
 ######################### MARKETING SITE ###############################
