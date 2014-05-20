@@ -191,7 +191,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.use_for_single_location_local:
             return self.peer_grading()
         else:
-            return self.peer_grading_problem({'location': self.link_to_location})['html']
+            # b/c handle_ajax expects serialized data payload and directly calls peer_grading
+            return self.peer_grading_problem({'location': self.link_to_location.to_deprecated_string()})['html']
 
     def handle_ajax(self, dispatch, data):
         """
