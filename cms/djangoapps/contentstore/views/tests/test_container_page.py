@@ -137,8 +137,6 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
                                                    category='split_test', display_name='Split Test')
-        ItemFactory.create(parent_location=empty_child_container.location,
-                           category='html', display_name='Split Child')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view,
                                    can_reorder=False, can_edit=False, can_add=False)
 
@@ -148,9 +146,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
                                                    category='split_test', display_name='Split Test')
-        ItemFactory.create(parent_location=empty_child_container.location,
-                           category='html', display_name='Split Child')
         modulestore('draft').convert_to_draft(self.vertical.location)
         draft_empty_child_container = modulestore('draft').convert_to_draft(empty_child_container.location)
         self.validate_preview_html(draft_empty_child_container, self.reorderable_child_view,
-                                   can_reorder=True, can_edit=False, can_add=False)
+                                   can_reorder=True, can_edit=True, can_add=False)

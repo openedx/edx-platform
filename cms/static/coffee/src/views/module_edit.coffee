@@ -15,7 +15,11 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
       @render()
 
     loadDisplay: ->
-      XBlock.initializeBlock(@$el.find('.xblock-student_view'))
+      # Not all components render an inline student view, e.g. child containers which
+      # instead render a link to a separate container page.
+      xblockElement = @$el.find('.xblock-student_view')
+      if xblockElement.length > 0
+        XBlock.initializeBlock(xblockElement)
 
     createItem: (parent, payload, callback=->) ->
       payload.parent_locator = parent

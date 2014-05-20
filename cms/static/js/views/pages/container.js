@@ -46,6 +46,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                         } else {
                             noContentElement.removeClass('is-hidden');
                         }
+                        self.refreshTitle();
                         loadingElement.addClass('is-hidden');
                         self.delegateEvents();
                     }
@@ -58,6 +59,12 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
 
             getURLRoot: function() {
                 return this.xblockView.model.urlRoot;
+            },
+
+            refreshTitle: function() {
+                var title = this.$('.xblock-header .header-details span').first().text().trim();
+                this.$('.page-header-title').text(title);
+                this.$('.page-header .subtitle a').last().text(title);
             },
 
             onXBlockRefresh: function(xblockView) {
@@ -177,10 +184,9 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
              */
             refreshXBlock: function(xblockElement) {
                 var parentElement = xblockElement.parent(),
-                    rootLocator = this.xblockView.model.id,
-                    xblockLocator = xblockElement.data('locator');
-                if (xblockLocator === rootLocator) {
-                    this.render();
+                    rootLocator = this.xblockView.model.id;
+                if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
+                    this.render({ });
                 } else if (parentElement.hasClass('reorderable-container')) {
                     this.refreshChildXBlock(xblockElement);
                 } else {
