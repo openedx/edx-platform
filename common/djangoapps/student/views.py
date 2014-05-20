@@ -936,7 +936,6 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         try:
             # We do not log here, because we have a handler registered
             # to perform logging on successful logins.
-            logout(request)
             login(request, user)
             if request.POST.get('remember') == 'true':
                 request.session.set_expiry(604800)
@@ -1372,7 +1371,6 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
     login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
-    logout(request)
     login(request, login_user)
     request.session.set_expiry(0)
 
