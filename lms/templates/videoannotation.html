@@ -49,7 +49,7 @@
 
 	//Grab uri of the course
     var parts = window.location.href.split("/"),
-    	uri = '',
+    	uri = '';
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
 	//Change uri in cms
 	var lms_location = $('.sidebar .preview-button').attr('href');
