@@ -1,8 +1,8 @@
-import json
 import logging
 from dogapi import dog_stats_api
 
-from .grading_service_module import GradingService, GradingServiceError
+from .grading_service_module import GradingService
+from xmodule.modulestore.keys import UsageKey
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +30,8 @@ class PeerGradingService(GradingService):
         self.system = system
 
     def get_data_for_location(self, problem_location, student_id):
+        if isinstance(problem_location, UsageKey):
+            problem_location = problem_location.to_deprecated_string()
         params = {'location': problem_location, 'student_id': student_id}
         result = self.get(self.get_data_for_location_url, params)
         self._record_result('get_data_for_location', result)
@@ -44,6 +46,8 @@ class PeerGradingService(GradingService):
         return result
 
     def get_next_submission(self, problem_location, grader_id):
+        if isinstance(problem_location, UsageKey):
+            problem_location = problem_location.to_deprecated_string()
         result = self._render_rubric(self.get(
             self.get_next_submission_url,
             {
@@ -62,6 +66,8 @@ class PeerGradingService(GradingService):
         return result
 
     def is_student_calibrated(self, problem_location, grader_id):
+        if isinstance(problem_location, UsageKey):
+            problem_location = problem_location.to_deprecated_string()
         params = {'problem_id': problem_location, 'student_id': grader_id}
         result = self.get(self.is_student_calibrated_url, params)
         self._record_result(
@@ -72,6 +78,8 @@ class PeerGradingService(GradingService):
         return result
 
     def show_calibration_essay(self, problem_location, grader_id):
+        if isinstance(problem_location, UsageKey):
+            problem_location = problem_location.to_deprecated_string()
         params = {'problem_id': problem_location, 'student_id': grader_id}
         result = self._render_rubric(self.get(self.show_calibration_essay_url, params))
         self._record_result('show_calibration_essay', result)
