@@ -8,7 +8,9 @@ from xmodule.modulestore.django import loc_mapper, modulestore
 __all__ = ['edge', 'event', 'landing']
 
 EDITING_TEMPLATES = [
-    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal"
+    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal",
+    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
+    "add-xblock-component-menu-problem"
 ]
 
 # points to the temporary course landing page with log in and sign up
@@ -57,40 +59,50 @@ def get_parent_xblock(xblock):
     return modulestore().get_item(parent_locations[0])
 
 
-def _xblock_has_studio_page(xblock):
+def xblock_has_studio_page(xblock):
     """
     Returns true if the specified xblock has an associated Studio page. Most xblocks do
     not have their own page but are instead shown on the page of their parent. There
     are a few exceptions:
       1. Courses
-      2. Verticals
+      2. Verticals that either:
+        - are directly parented beneath a sequential (so are shown on a unit page)
+        - are a direct child of a unit page (where they are shown on a container page)
       3. XBlocks with children, except for:
-          - subsections (aka sequential blocks)
-          - chapters
+        - subsections (aka sequential blocks)
+        - chapters
     """
     category = xblock.category
-    if category in ('course', 'vertical'):
-        return True
+
+    # Verticals have their own page if one of the following is true:
+    # a) They are directly parented beneath a sequential
+    # b) They are the child of vertical that is itself parented beneath a sequential
+    if category == 'vertical':
+        parent_xblock = get_parent_xblock(xblock)
+        parent_category = parent_xblock.category if parent_xblock else None
+        if parent_category == 'sequential':
+            return True
+        elif parent_category == 'vertical':
+            grandparent_xblock = get_parent_xblock(parent_xblock)
+            grandparent_category = grandparent_xblock.category if grandparent_xblock else None
+            return grandparent_category == 'sequential'
+        return False
     elif category in ('sequential', 'chapter'):
         return False
-    elif xblock.has_children:
-        return True
-    else:
-        return False
+
+    # All other xblocks with children have their own page
+    return xblock.has_children
 
 
 def xblock_studio_url(xblock, course=None):
     """
     Returns the Studio editing URL for the specified xblock.
     """
-    if not _xblock_has_studio_page(xblock):
+    if not xblock_has_studio_page(xblock):
         return None
     category = xblock.category
     parent_xblock = get_parent_xblock(xblock)
-    if parent_xblock:
-        parent_category = parent_xblock.category
-    else:
-        parent_category = None
+    parent_category = parent_xblock.category if parent_xblock else None
     if category == 'course':
         prefix = 'course'
     elif category == 'vertical' and parent_category == 'sequential':

@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Support add, delete and duplicate on the container page. STUD-1490.
+
 Studio: Add drag-and-drop support to the container page. STUD-1309.
 
 Common: Add extensible third-party auth module.
@@ -18,7 +20,8 @@ LMS: Switch default instructor dashboard to the new (formerly "beta")
 Blades: Handle situation if no response were sent from XQueue to LMS in Matlab
 problem after Run Code button press. BLD-994.
 
-Blades: Set initial video quality to large instead of default to avoid automatic switch to HD when iframe resizes. BLD-981.
+Blades: Set initial video quality to large instead of default to avoid automatic
+switch to HD when iframe resizes. BLD-981.
 
 Blades: Add an upload button for authors to provide students with an option to
 download a handout associated with a video (of arbitrary file format). BLD-1000.

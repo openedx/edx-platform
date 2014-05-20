@@ -1,13 +1,13 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
-    "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/views/pages/container", "js/models/xblock_info"],
-    function ($, create_sinon, edit_helpers, Notification, Prompt, ContainerPage, XBlockInfo) {
+define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+    "js/views/feedback_prompt", "js/views/pages/container", "js/models/xblock_info"],
+    function ($, _, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
 
         describe("ContainerPage", function() {
             var lastRequest, renderContainerPage, expectComponents, respondWithHtml,
                 model, containerPage, requests,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
-                ABTestFixture = readFixtures('mock/mock-container-xblock.underscore');
+                mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore'),
+                mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
             beforeEach(function () {
                 edit_helpers.installEditTemplates();
@@ -20,6 +20,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                 });
                 containerPage = new ContainerPage({
                     model: model,
+                    templates: edit_helpers.mockComponentTemplates,
                     el: $('#content')
                 });
             });
@@ -43,7 +44,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
             expectComponents = function (container, locators) {
                 // verify expected components (in expected order) by their locators
-                var components = $(container).find('[data-locator]');
+                var components = $(container).find('.studio-xblock-wrapper');
                 expect(components.length).toBe(locators.length);
                 _.each(locators, function(locator, locator_index) {
                     expect($(components[locator_index]).data('locator')).toBe(locator);
@@ -51,8 +52,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             };
 
             describe("Basic display", function() {
-                var mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
-
                 it('can render itself', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
@@ -69,9 +68,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             });
 
             describe("Editing an xblock", function() {
-                var mockContainerXBlockHtml,
-                    mockXBlockEditorHtml,
-                    newDisplayName = 'New Display Name';
+                var newDisplayName = 'New Display Name';
 
                 beforeEach(function () {
                     edit_helpers.installMockXBlock({
@@ -86,9 +83,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     edit_helpers.uninstallMockXBlock();
                     edit_helpers.cancelModalIfShowing();
                 });
-
-                mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
-                mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
                 it('can show an edit modal for a child xblock', function() {
                     var editButtons;
@@ -110,8 +104,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             });
 
             describe("Editing an xmodule", function() {
-                var mockContainerXBlockHtml,
-                    mockXModuleEditor,
+                var mockXModuleEditor = readFixtures('mock/mock-xmodule-editor.underscore'),
                     newDisplayName = 'New Display Name';
 
                 beforeEach(function () {
@@ -127,9 +120,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     edit_helpers.uninstallMockXModule();
                     edit_helpers.cancelModalIfShowing();
                 });
-
-                mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
-                mockXModuleEditor = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 it('can save changes to settings', function() {
                     var editButtons, modal, mockUpdatedXBlockHtml;
@@ -165,42 +155,31 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             });
 
             describe("Empty container", function() {
-                var mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
+                var mockEmptyContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
                 it('shows the "no children" message', function() {
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(mockEmptyContainerXBlockHtml, this);
                     expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');
                     expect(containerPage.$('.wrapper-xblock')).toHaveClass('is-hidden');
                 });
             });
 
             describe("xblock operations", function() {
-                var getGroupElement, expectNumComponents, expectNotificationToBeShown,
+                var getGroupElement, expectNumComponents,
                     NUM_GROUPS = 2, NUM_COMPONENTS_PER_GROUP = 3, GROUP_TO_TEST = "A",
-                    notificationSpies,
                     allComponentsInGroup = _.map(
                         _.range(NUM_COMPONENTS_PER_GROUP),
                         function(index) { return 'locator-component-' + GROUP_TO_TEST + (index + 1); }
                     );
 
-                beforeEach(function () {
-                    notificationSpies = spyOnConstructor(Notification, "Mini", ["show", "hide"]);
-                    notificationSpies.show.andReturn(notificationSpies);
-                });
-
                 getGroupElement = function() {
                     return containerPage.$("[data-locator='locator-group-" + GROUP_TO_TEST + "']");
                 };
+
                 expectNumComponents = function(numComponents) {
                     expect(containerPage.$('.wrapper-xblock.level-element').length).toBe(
                         numComponents * NUM_GROUPS
                     );
-                };
-                expectNotificationToBeShown = function(expectedTitle) {
-                    expect(notificationSpies.constructor).toHaveBeenCalled();
-                    expect(notificationSpies.show).toHaveBeenCalled();
-                    expect(notificationSpies.hide).not.toHaveBeenCalled();
-                    expect(notificationSpies.constructor.mostRecentCall.args[0].title).toMatch(expectedTitle);
                 };
 
                 describe("Deleting an xblock", function() {
@@ -212,7 +191,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         promptSpies.show.andReturn(this.promptSpies);
                     });
 
-                    clickDelete = function(componentIndex) {
+                    clickDelete = function(componentIndex, clickNo) {
 
                         // find all delete buttons for the given group
                         var deleteButtons = getGroupElement().find(".delete-button");
@@ -226,21 +205,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
                         // no components should be deleted yet
                         expectNumComponents(NUM_COMPONENTS_PER_GROUP);
+
+                        // click 'Yes' or 'No' on delete confirmation
+                        if (clickNo) {
+                            promptSpies.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpies);
+                        } else {
+                            promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
+                        }
                     };
 
-                    deleteComponent = function(componentIndex, responseCode) {
-
-                        // click delete button for given component
+                    deleteComponent = function(componentIndex) {
                         clickDelete(componentIndex);
-
-                        // click 'Yes' on delete confirmation
-                        promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
-
-                        // expect 'deleting' notification to be shown
-                        expectNotificationToBeShown(/Deleting/);
-
-                        // respond to request with given response code
-                        lastRequest().respond(responseCode, {}, "");
+                        create_sinon.respondWithJson(requests, {});
 
                         // expect request URL to contain given component's id
                         expect(lastRequest().url).toMatch(
@@ -249,12 +225,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     };
 
                     deleteComponentWithSuccess = function(componentIndex) {
-
-                        // delete component with an 'OK' response code
-                        deleteComponent(componentIndex, 200);
-
-                        // expect 'deleting' notification to be hidden
-                        expect(notificationSpies.hide).toHaveBeenCalled();
+                        deleteComponent(componentIndex);
 
                         // verify the new list of components within the group
                         expectComponents(
@@ -263,32 +234,29 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         );
                     };
 
-                    it("deletes first xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can delete the first xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         deleteComponentWithSuccess(0);
                     });
 
-                    it("deletes middle xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can delete a middle xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         deleteComponentWithSuccess(1);
                     });
 
-                    it("deletes last xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can delete the last xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         deleteComponentWithSuccess(NUM_COMPONENTS_PER_GROUP - 1);
                     });
 
-                    it('does not delete xblock when clicking No in prompt', function () {
+                    it('does not delete when clicking No in prompt', function () {
                         var numRequests;
 
-                        renderContainerPage(ABTestFixture, this);
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         numRequests = requests.length;
 
-                        // click delete on the first component
-                        clickDelete(0);
-
-                        // click 'No' on delete confirmation
-                        promptSpies.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpies);
+                        // click delete on the first component but press no
+                        clickDelete(0, true);
 
                         // all components should still exist
                         expectComponents(getGroupElement(), allComponentsInGroup);
@@ -297,11 +265,22 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         expect(requests.length).toBe(numRequests);
                     });
 
-                    it('does not delete xblock upon failure', function () {
-                        renderContainerPage(ABTestFixture, this);
-                        deleteComponent(0, 500);
-                        expectComponents(getGroupElement(), allComponentsInGroup);
-                        expect(notificationSpies.hide).not.toHaveBeenCalled();
+                    it('shows a notification during the delete operation', function() {
+                        var notificationSpy = edit_helpers.createNotificationSpy();
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickDelete(0);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+                        create_sinon.respondWithJson(requests, {});
+                        edit_helpers.verifyNotificationHidden(notificationSpy);
+                    });
+
+                    it('does not delete an xblock upon failure', function () {
+                        var notificationSpy = edit_helpers.createNotificationSpy();
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickDelete(0);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+                        create_sinon.respondWithError(requests);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
                     });
                 });
 
@@ -329,16 +308,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         // click duplicate button for given component
                         clickDuplicate(componentIndex);
 
-                        // expect 'duplicating' notification to be shown
-                        expectNotificationToBeShown(/Duplicating/);
-
                         // verify content of request
                         request = lastRequest();
-                        request.respond(
-                            responseCode,
-                            { "Content-Type": "application/json" },
-                            JSON.stringify({'locator': 'locator-duplicated-component'})
-                        );
                         expect(request.url).toEqual("/xblock");
                         expect(request.method).toEqual("POST");
                         expect(JSON.parse(request.requestBody)).toEqual(
@@ -349,6 +320,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                                     '"}'
                             )
                         );
+
+                        // send the response
+                        request.respond(
+                            responseCode,
+                            { "Content-Type": "application/json" },
+                            JSON.stringify({'locator': 'locator-duplicated-component'})
+                        );
                     };
 
                     duplicateComponentWithSuccess = function(componentIndex) {
@@ -356,34 +334,112 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         // duplicate component with an 'OK' response code
                         duplicateComponentWithResponse(componentIndex, 200);
 
-                        // expect 'duplicating' notification to be hidden
-                        expect(notificationSpies.hide).toHaveBeenCalled();
-
                         // expect parent container to be refreshed
                         expect(refreshXBlockSpies).toHaveBeenCalled();
                     };
 
-                    it("duplicates first xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can duplicate the first xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         duplicateComponentWithSuccess(0);
                     });
 
-                    it("duplicates middle xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can duplicate a middle xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         duplicateComponentWithSuccess(1);
                     });
 
-                    it("duplicates last xblock", function() {
-                        renderContainerPage(ABTestFixture, this);
+                    it("can duplicate the last xblock", function() {
+                        renderContainerPage(mockContainerXBlockHtml, this);
                         duplicateComponentWithSuccess(NUM_COMPONENTS_PER_GROUP - 1);
                     });
 
-                    it('does not duplicate xblock upon failure', function () {
-                        renderContainerPage(ABTestFixture, this);
-                        duplicateComponentWithResponse(0, 500);
+                    it('shows a notification when duplicating', function () {
+                        var notificationSpy = edit_helpers.createNotificationSpy();
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickDuplicate(0);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
+                        create_sinon.respondWithJson(requests, {"locator": "new_item"});
+                        edit_helpers.verifyNotificationHidden(notificationSpy);
+                    });
+
+                    it('does not duplicate an xblock upon failure', function () {
+                        var notificationSpy = edit_helpers.createNotificationSpy();
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickDuplicate(0);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
+                        create_sinon.respondWithError(requests);
                         expectComponents(getGroupElement(), allComponentsInGroup);
-                        expect(notificationSpies.hide).not.toHaveBeenCalled();
                         expect(refreshXBlockSpies).not.toHaveBeenCalled();
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
+                    });
+                });
+
+                describe('createNewComponent ', function () {
+                    var clickNewComponent, verifyComponents;
+
+                    clickNewComponent = function (index) {
+                        containerPage.$(".new-component .new-component-type a.single-template")[index].click();
+                    };
+
+                    it('sends the correct JSON to the server', function () {
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickNewComponent(0);
+                        edit_helpers.verifyXBlockRequest(requests,
+                            '{"category": "discussion", "type": "discussion", "parent_locator": "locator-group-A"}');
+                    });
+
+                    it('shows a notification while creating', function () {
+                        var notificationSpy = edit_helpers.createNotificationSpy();
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickNewComponent(0);
+                        edit_helpers.verifyNotificationShowing(notificationSpy, /Adding/);
+                        create_sinon.respondWithJson(requests, { });
+                        edit_helpers.verifyNotificationHidden(notificationSpy);
+                    });
+
+                    it('does not insert component upon failure', function () {
+                        var requestCount;
+                        renderContainerPage(mockContainerXBlockHtml, this);
+                        clickNewComponent(0);
+                        requestCount = requests.length;
+                        create_sinon.respondWithError(requests);
+                        // No new requests should be made to refresh the view
+                        expect(requests.length).toBe(requestCount);
+                    });
+
+                    describe('Template Picker', function() {
+                        var showTemplatePicker,
+                            mockXBlockHtml = readFixtures('mock/mock-xblock.underscore');
+
+                        showTemplatePicker = function() {
+                            containerPage.$('.new-component .new-component-type a.multiple-templates')[0].click();
+                        };
+
+                        it('can add an HTML component without a template', function() {
+                            var xblockCount;
+                            renderContainerPage(mockContainerXBlockHtml, this);
+                            showTemplatePicker();
+                            xblockCount = containerPage.$('.studio-xblock-wrapper').length;
+                            containerPage.$('.new-component-html a')[0].click();
+                            edit_helpers.verifyXBlockRequest(requests,
+                                '{"category": "html", "parent_locator": "locator-group-A"}');
+                            create_sinon.respondWithJson(requests, {"locator": "new_item"});
+                            respondWithHtml(mockXBlockHtml);
+                            expect(containerPage.$('.studio-xblock-wrapper').length).toBe(xblockCount + 1);
+                        });
+
+                        it('can add an HTML component with a template', function() {
+                            var xblockCount;
+                            renderContainerPage(mockContainerXBlockHtml, this);
+                            showTemplatePicker();
+                            xblockCount = containerPage.$('.studio-xblock-wrapper').length;
+                            containerPage.$('.new-component-html a')[1].click();
+                            edit_helpers.verifyXBlockRequest(requests,
+                                '{"category": "html", "boilerplate" : "announcement.yaml", "parent_locator": "locator-group-A"}');
+                            create_sinon.respondWithJson(requests, {"locator": "new_item"});
+                            respondWithHtml(mockXBlockHtml);
+                            expect(containerPage.$('.studio-xblock-wrapper').length).toBe(xblockCount + 1);
+                        });
                     });
                 });
             });

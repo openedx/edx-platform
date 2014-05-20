@@ -4,6 +4,11 @@ from contentstore.views.helpers import xblock_studio_url
 %>
 <%namespace name='static' file='static_content.html'/>
 
+% if is_reorderable:
+<li class="studio-xblock-wrapper is-draggable" data-locator="${locator}">
+% else:
+<div class="studio-xblock-wrapper">
+% endif
 <section class="wrapper-xblock xblock-type-container level-element" data-locator="${locator}">
     <header class="xblock-header">
         <div class="header-details">
@@ -18,10 +23,17 @@ from contentstore.views.helpers import xblock_studio_url
                         <i class="icon-arrow-right"></i>
                     </a>
                 </li>
+                % if not xblock_context['read_only'] and is_reorderable:
                 <li class="action-item action-drag">
                     <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                 </li>
+                % endif
             </ul>
         </div>
     </header>
 </section>
+% if is_reorderable:
+</li>
+% else:
+</div>
+% endif
