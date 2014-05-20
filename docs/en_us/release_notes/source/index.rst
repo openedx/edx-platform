@@ -19,6 +19,7 @@ There is a page in this document for each update to the edX system on `edx.org`_
    :maxdepth: 1
 
    read_me
+   05-20-2014
    05-15-2014
    05-12-2014
    04-29-2014

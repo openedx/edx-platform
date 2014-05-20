@@ -1,0 +1,101 @@
+###################################
+May 20, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of May 20, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_. 
+
+In addition, you can sign up for the new `edX Release Announcements mailing
+list`_ to get an email message when we have updated the edX Course Staff Release
+Notes.
+
+
+*************
+edX Studio
+*************
+
+* This release introduces context-sensitive online help to Studio. You can click
+  **Help** in the upper-right corner to get more information about the
+  Studio page you are viewing. You can also click links that appear in the right
+  panel on some pages.
+
+  .. image:: /images/help.png
+   :alt: Online help links in Studio
+
+  A page in edX's continuously updated documentation that is related to the Studio page you are viewing opens in a new browser tab or window:
+
+  .. image:: /images/help_page.png
+   :alt: A Studio online help page
+
+
+  You can also expand the panel at the bottom of the Studio user interface and
+  use the links to access a PDF file of edX course staff documentation, edX
+  Studio Author Support, and edX101.
+
+  .. image:: /images/sock_help.png
+   :alt: Other help resources at the bottom of the Studio UI
+
+
+* A problem that caused the video transcript download button to not work for
+  students is fixed. If this was a problem in your course, you must re-import
+  the course in Studio. (BLD-1014)
+
+* A problem that prevented users with only course staff privileges from
+  importing courses is resolved. (STUD-1595)
+
+
+**************************
+edX Documentation
+**************************
+
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click the Help buttons in the edX Studio user interface to access relevant sections in this guide. You can also download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  Updated `Working with Video Components`_ to reflect UI changes.
+
+
+* `edX Data Documentation`_
+  
+  Recent changes include:
+
+  * Added an `event list`_, an alphabetical list of events with links to the
+    `Tracking Logs`_ chapter.
+  
+  * Updated the `Tracking Logs`_ chapter to provide a standardized structure
+    for delivering information about events and address problems with table
+    formatting.
+  
+
+* `edX Platform Developer Documentation`_
+
+  Recent changes include: 
+
+  Updated the `Analytics`_ section to include information on documenting and
+  debugging events.
+  
+* `edX XBlock Documentation`_
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+.. include:: links.rst
