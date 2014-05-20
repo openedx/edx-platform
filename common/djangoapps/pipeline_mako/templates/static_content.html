@@ -3,19 +3,19 @@ from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 %>
 
-<%def name='url(file)'><%
+<%def name='url(file, raw=False)'><%
 try:
     url = staticfiles_storage.url(file)
 except:
     url = file
-%>${url}</%def>
+%>${url}${"?raw" if raw else ""}</%def>
 
-<%def name='css(group)'>
+<%def name='css(group, raw=False)'>
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
     ${compressed_css(group)}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
-      <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}" type="text/css" media="all" / >
+      <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >
     % endfor
   %endif
 </%def>

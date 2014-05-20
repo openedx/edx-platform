@@ -1,9 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
-<%static:css group='style-vendor-tinymce-content'/>
-<%static:css group='style-vendor-tinymce-skin'/>
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}" />
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}" />
+<%static:css group='style-vendor-tinymce-content' raw=True />
+<%static:css group='style-vendor-tinymce-skin' raw=True />
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
 
 <div class="annotatable-wrapper">
     <div class="annotatable-header">
@@ -48,9 +48,9 @@
         $(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
     }
     $('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-    
+
     //Grab uri of the course
-    var parts = window.location.href.split("/"), 
+    var parts = window.location.href.split("/"),
         uri = '';
     for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
     //Change uri in cms
@@ -67,16 +67,16 @@
         optionsAnnotator: {
             permissions:{
                 user: {
-                    id:"${user.email}", 
+                    id:"${user.email}",
                     name:"${user.username}"
                 },
                 userString: function (user) {
-                    if (user && user.name) 
+                    if (user && user.name)
                         return user.name;
                     return user;
                 },
                 userId: function (user) {
-                    if (user && user.id) 
+                    if (user && user.id)
                         return user.id;
                     return user;
                 },
@@ -100,7 +100,7 @@
                       }
                       for (_i = 0, _len = tokens.length; _i < _len; _i++) {
                         token = tokens[_i];
-                        
+
                         if (this.userId(user) === token) {
 
                           return true;
@@ -168,7 +168,7 @@
 
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
     tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
-    
+
     //remove old instances
     if (Annotator._instances.length !== 0) {
       $('#textHolder').annotator("destroy");
@@ -176,7 +176,7 @@
     delete ova;
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
-    
+
     //Catch
     var annotator = ova.annotator,
         catchOptions = {
