@@ -1388,7 +1388,7 @@ class StringResponse(LoncapaResponse):
                 result = re.search(regexp, given)
             except Exception as err:
                 msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
-                    error=_(u'error'),
+                    error=_('error'),
                     message=err.message
                 )
                 log.error(msg, exc_info=True)
@@ -1415,7 +1415,8 @@ class StringResponse(LoncapaResponse):
 
     def get_answers(self):
         _ = self.capa_system.i18n.ugettext
-        separator = u' <b>{}</b> '.format(_(u'or'))
+        # Translators: Separator used in StringResponse to display multiple answers. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+        separator = u' <b>{}</b> '.format(_('or'))
         return {self.answer_id: separator.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
