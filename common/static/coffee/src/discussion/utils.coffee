@@ -131,7 +131,7 @@ class @DiscussionUtil
     if $elem and $elem.attr("disabled")
       return
     params["url"] = URI(params["url"]).addSearch ajax: 1
-    params["beforeSend"] = ->
+    beforeSend = ->
       if $elem
         $elem.attr("disabled", "disabled")
       if params["$loading"]
@@ -145,6 +145,7 @@ class @DiscussionUtil
           gettext("Sorry"),
           gettext("We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.")
         )
+    beforeSend()
     request = $.ajax(params).always ->
       if $elem
         $elem.removeAttr("disabled")
