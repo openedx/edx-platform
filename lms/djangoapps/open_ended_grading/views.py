@@ -35,14 +35,14 @@ def _reverse_with_slash(url_name, course_key):
     @param course_id: The id of the course object (eg course.id).
     @returns: The reversed url with a trailing slash.
     """
-    course_id = course_key.to_deprecated_string()
-    ajax_url = _reverse_without_slash(url_name, course_id)
+    ajax_url = _reverse_without_slash(url_name, course_key)
     if not ajax_url.endswith('/'):
         ajax_url += '/'
     return ajax_url
 
 
-def _reverse_without_slash(url_name, course_id):
+def _reverse_without_slash(url_name, course_key):
+    course_id = course_key.to_deprecated_string()
     ajax_url = reverse(url_name, kwargs={'course_id': course_id})
     return ajax_url
 
