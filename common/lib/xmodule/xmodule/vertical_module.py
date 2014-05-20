@@ -30,7 +30,10 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
         Renders the Studio preview view, which supports drag and drop.
         """
         fragment = Fragment()
-        self.render_reorderable_children(context, fragment)
+        # For the container page we want the full drag-and-drop, but for unit pages we want
+        # a more concise version that appears alongside the "View =>" link.
+        if context.get('container_view'):
+            self.render_children(context, fragment, can_reorder=True, can_add=True)
         return fragment
 
     def render_view(self, context, template_name):
@@ -82,3 +85,11 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
 
     # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks
     # like verticals will get exported as sequentials...
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(VerticalDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([
+            VerticalDescriptor.due,
+        ])
+        return non_editable_fields

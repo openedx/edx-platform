@@ -9,6 +9,8 @@ Blades: Remove Video player outline. BLD-975.
 
 Blades: Fix Youtube regular expression in video player editor. BLD-967.
 
+Studio: Support editing of containers. STUD-1312.
+
 Blades: Fix displaying transcripts on touch devices. BLD-1033.
 
 Blades: Tolerance expressed in percentage now computes correctly. BLD-522.

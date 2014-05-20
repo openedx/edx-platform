@@ -199,25 +199,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # change not authored by requestor but by xblocks.
             store.update_item(xblock, None)
-
-        elif view_name == 'student_view' and xblock_has_own_studio_page(xblock):
-            context = {
-                'runtime_type': 'studio',
-                'container_view': False,
-                'read_only': is_read_only,
-                'root_xblock': xblock,
-            }
-            # For non-leaf xblocks on the unit page, show the special rendering
-            # which links to the new container page.
-            html = render_to_string('container_xblock_component.html', {
-                'xblock_context': context,
-                'xblock': xblock,
-                'locator': usage_key,
-            })
-            return JsonResponse({
-                'html': html,
-                'resources': [],
-            })
         elif view_name in (unit_views + container_views):
             is_container_view = (view_name in container_views)
 
@@ -245,8 +226,15 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # the component div. Note that the container view recursively adds headers
             # into the preview fragment, so we don't want to add another header here.
             if not is_container_view:
-                fragment.content = render_to_string('component.html', {
+                # For non-leaf xblocks, show the special rendering which links to the new container page.
+                if xblock_has_own_studio_page(xblock):
+                    template = 'container_xblock_component.html'
+                else:
+                    template = 'component.html'
+                fragment.content = render_to_string(template, {
                     'xblock_context': context,
+                    'xblock': xblock,
+                    'locator': usage_key,
                     'preview': fragment.content,
                     'label': xblock.display_name or xblock.scope_ids.block_type,
                 })

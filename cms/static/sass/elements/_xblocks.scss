@@ -15,7 +15,7 @@
   }
 
   // UI: xblock header
-  .xblock-header {
+  .xblock-header-primary {
     @include box-sizing(border-box);
     @include ui-flexbox();
     @extend %ui-align-center-flex;
@@ -39,6 +39,63 @@
       @extend %ui-justify-right-flex;
       width: flex-grid(6,12);
       vertical-align: middle;
+    }
+  }
+
+  .xblock-header-secondary {
+    overflow: hidden;
+    border-top: 1px solid $gray-l3;
+    background-color: $gray-l5;
+    padding: ($baseline/2) $baseline;
+
+    .meta-info {
+      display: inline-block;
+      vertical-align: middle;
+      width: 65%;
+      font-style: italic;
+      color: $gray;
+    }
+
+    .actions-list {
+      display: inline-block;
+      vertical-align: middle;
+      width: 34%;
+      text-align: right;
+
+      .action-item {
+        display: inline-block;
+
+        .action-button {
+          @include transition(all $tmg-f3 linear 0s);
+          display: block;
+          padding: 0 $baseline/2;
+          width: auto;
+          height: ($baseline*1.5);
+          border-radius: 3px;
+          color: $gray-l1;
+
+          &:hover {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+
+          .action-button-text {
+            padding-left: 1px;
+            vertical-align: bottom;
+            text-transform: uppercase;
+            line-height: 17px;
+          }
+
+          &.delete-button:hover {
+            background-color: $gray-l1;
+          }
+        }
+
+        [class^="icon-"] {
+          display: inline-block;
+          vertical-align: bottom;
+        }
+      }
     }
   }
 }

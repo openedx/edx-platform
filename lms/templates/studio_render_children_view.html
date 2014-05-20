@@ -3,6 +3,6 @@
     ${item['content']}
     % endfor
 </ol>
-% if not xblock_context['read_only']:
+% if can_add and not xblock_context['read_only']:
 <div class="add-xblock-component new-component-item adding"></div>
 % endif

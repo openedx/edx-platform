@@ -7,6 +7,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 model, containerPage, requests,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore'),
+                mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
             beforeEach(function () {
@@ -51,19 +52,76 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
             };
 
-            describe("Basic display", function() {
+            describe("Initial display", function() {
                 it('can render itself', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
                     expect(containerPage.$('.wrapper-xblock')).not.toHaveClass('is-hidden');
                     expect(containerPage.$('.no-container-content')).toHaveClass('is-hidden');
                 });
+
                 it('shows a loading indicator', function() {
                     requests = create_sinon.requests(this);
                     containerPage.render();
                     expect(containerPage.$('.ui-loading')).not.toHaveClass('is-hidden');
                     respondWithHtml(mockContainerXBlockHtml);
                     expect(containerPage.$('.ui-loading')).toHaveClass('is-hidden');
+                });
+            });
+
+            describe("Editing the container", function() {
+                var newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXBlock({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXBlock();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                it('can edit itself', function() {
+                    var editButtons,
+                        updatedTitle = 'Updated Test Container';
+                    renderContainerPage(mockContainerXBlockHtml, this);
+
+                    // Click the root edit button
+                    editButtons = containerPage.$('.edit-button');
+                    editButtons.first().click();
+
+                    // Expect a request to be made to show the studio view for the container
+                    expect(lastRequest().url).toBe(
+                        '/xblock/testCourse/branch/draft/block/verticalFFF/studio_view'
+                    );
+                    create_sinon.respondWithJson(requests, {
+                        html: mockContainerXBlockHtml,
+                        resources: []
+                    });
+                    expect(edit_helpers.isShowingModal()).toBeTruthy();
+
+                    // Press the save button and respond with a success message to the save
+                    edit_helpers.pressModalButton('.action-save');
+                    create_sinon.respondWithJson(requests, { });
+                    expect(edit_helpers.isShowingModal()).toBeFalsy();
+
+                    // Expect the last request be to refresh the container page
+                    expect(lastRequest().url).toBe(
+                        '/xblock/testCourse/branch/draft/block/verticalFFF/container_preview'
+                    );
+                    create_sinon.respondWithJson(requests, {
+                        html: mockUpdatedContainerXBlockHtml,
+                        resources: []
+                    });
+
+                    // Expect the title and breadcrumb to be updated
+                    expect(containerPage.$('.page-header-title').text().trim()).toBe(updatedTitle);
+                    expect(containerPage.$('.page-header .subtitle a').last().text().trim()).toBe(updatedTitle);
                 });
             });
 
@@ -88,9 +146,9 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     var editButtons;
                     renderContainerPage(mockContainerXBlockHtml, this);
                     editButtons = containerPage.$('.edit-button');
-                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
-                    expect(editButtons.length).toBe(6);
-                    editButtons.first().click();
+                    // The container renders six mock xblocks, plus there is the main edit button
+                    expect(editButtons.length).toBe(7);
+                    editButtons[1].click();
                     // Make sure that the correct xblock is requested to be edited
                     expect(lastRequest().url).toBe(
                         '/xblock/locator-component-A1/studio_view'
@@ -126,9 +184,9 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
                     renderContainerPage(mockContainerXBlockHtml, this);
                     editButtons = containerPage.$('.edit-button');
-                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
-                    expect(editButtons.length).toBe(6);
-                    editButtons.first().click();
+                    // The container renders six mock xblocks, plus there is the main edit button
+                    expect(editButtons.length).toBe(7);
+                    editButtons[1].click();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditor,
                         resources: []

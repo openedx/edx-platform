@@ -1,7 +1,8 @@
 define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/module_info",
     "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers", "jasmine-stealth"],
     function ($, _, jasmine, UnitEditView, ModuleModel, create_sinon, edit_helpers) {
-        var requests, unitView, initialize, respondWithHtml, verifyComponents, i;
+        var requests, unitView, initialize, lastRequest, respondWithHtml, verifyComponents, i,
+            mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
         respondWithHtml = function(html, requestIndex) {
             create_sinon.respondWithJson(
@@ -29,6 +30,8 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
             respondWithHtml(mockXBlockHtml, 0);
             respondWithHtml(mockXBlockHtml, 1);
         };
+
+        lastRequest = function() { return requests[requests.length - 1]; };
 
         verifyComponents = function (unit, locators) {
             var components = unit.$(".component");
@@ -174,5 +177,93 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
                     test_link_disabled_during_ajax_call(draft_states[i]);
                 }
             });
+
+            describe("Editing an xblock", function() {
+                var newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXBlock({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXBlock();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                it('can show an edit modal for a child xblock', function() {
+                    var editButtons;
+                    initialize(this);
+                    editButtons = unitView.$('.edit-button');
+                    // The container renders two mock xblocks
+                    expect(editButtons.length).toBe(2);
+                    editButtons[1].click();
+                    // Make sure that the correct xblock is requested to be edited
+                    expect(lastRequest().url).toBe(
+                        '/xblock/loc_2/studio_view'
+                    );
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXBlockEditorHtml,
+                        resources: []
+                    });
+                    expect(edit_helpers.isShowingModal()).toBeTruthy();
+                });
+            });
+
+            describe("Editing an xmodule", function() {
+                var mockXModuleEditor = readFixtures('mock/mock-xmodule-editor.underscore'),
+                    newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXModule({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXModule();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                it('can save changes to settings', function() {
+                    var editButtons, modal, mockUpdatedXBlockHtml;
+                    mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
+                    initialize(this);
+                    editButtons = unitView.$('.edit-button');
+                    // The container renders two mock xblocks
+                    expect(editButtons.length).toBe(2);
+                    editButtons[1].click();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXModuleEditor,
+                        resources: []
+                    });
+
+                    modal = $('.edit-xblock-modal');
+                    // Click on the settings tab
+                    modal.find('.settings-button').click();
+                    // Change the display name's text
+                    modal.find('.setting-input').text("Mock Update");
+                    // Press the save button
+                    modal.find('.action-save').click();
+                    // Respond to the save
+                    create_sinon.respondWithJson(requests, {
+                        id: 'mock-id'
+                    });
+
+                    // Respond to the request to refresh
+                    respondWithHtml(mockUpdatedXBlockHtml);
+
+                    // Verify that the xblock was updated
+                    expect(unitView.$('.mock-updated-content').text()).toBe('Mock Update');
+                });
+            });
+
         });
     });
