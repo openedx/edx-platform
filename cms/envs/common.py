@@ -109,6 +109,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+
+    # Temporary feature flag for deleting xblock leaves
+    'ENABLE_DELETE_XBLOCK_LEAF_COMPONENT': False,
 }
 ENABLE_JASMINE = False
 

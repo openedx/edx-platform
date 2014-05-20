@@ -264,6 +264,8 @@ FEATURES = {
     # Default to false here b/c dev environments won't have the api, will override in aws.py
     'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
 
+    # Expose public REST APIs (mostly used for mobile at the moment)
+    'ENABLE_PUBLIC_REST_API': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1361,6 +1363,14 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries'
+
+    # edX Public API
+    'public_api',
+    'public_api.users',
+
+    # OAuth2
+    'provider',
+    'provider.oauth2',
 )
 
 ######################### MARKETING SITE ###############################

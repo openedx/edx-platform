@@ -87,6 +87,9 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 for processor in CC_PROCESSOR.values():
     processor['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
+########################### EDX API #################################
+FEATURES['ENABLE_PUBLIC_REST_API'] = True
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
