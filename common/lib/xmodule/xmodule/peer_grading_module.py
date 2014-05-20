@@ -13,10 +13,11 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.timeinfo import TimeInfo
 from xmodule.util.duedate import get_extended_due_date
 from xmodule.x_module import XModule, module_attr
-from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 
 from open_ended_grading_classes import combined_open_ended_rubric
 from django.utils.timezone import UTC
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 log = logging.getLogger(__name__)
 

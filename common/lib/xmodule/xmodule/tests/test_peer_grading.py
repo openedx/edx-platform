@@ -72,7 +72,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Try getting data from the external grading service
         @return:
         """
-        success, _data = self.peer_grading.query_data_for_location(self.problem_location.to_deprecated_string())
+        success, _data = self.peer_grading.query_data_for_location(self.problem_location)
         self.assertTrue(success)
 
     def test_get_score_none(self):

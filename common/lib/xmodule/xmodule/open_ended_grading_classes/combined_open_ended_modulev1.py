@@ -10,8 +10,9 @@ from xmodule.open_ended_grading_classes import self_assessment_module
 from xmodule.open_ended_grading_classes import open_ended_module
 from xmodule.util.duedate import get_extended_due_date
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 log = logging.getLogger("edx.courseware")
 
@@ -800,7 +801,7 @@ class CombinedOpenEndedV1Module():
         success = False
         allowed_to_submit = True
         try:
-            response = self.peer_gs.get_data_for_location(self.location.to_deprecated_string(), student_id)
+            response = self.peer_gs.get_data_for_location(self.location, student_id)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']
