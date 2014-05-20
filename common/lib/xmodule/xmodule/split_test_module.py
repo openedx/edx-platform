@@ -8,6 +8,7 @@ from webob import Response
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.studio_editable import StudioEditableModule
 from xmodule.x_module import XModule, module_attr
 
 from lxml import etree
@@ -45,7 +46,7 @@ class SplitTestFields(object):
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
-class SplitTestModule(SplitTestFields, XModule):
+class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
     API to figure out which child to show.
@@ -177,21 +178,10 @@ class SplitTestModule(SplitTestFields, XModule):
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
         fragment = Fragment()
-        contents = []
-
-        for child in self.descriptor.get_children():
-            rendered_child = self.runtime.get_module(child).render('student_view', context)
-            fragment.add_frag_resources(rendered_child)
-
-            contents.append({
-                'id': child.id,
-                'content': rendered_child.content
-            })
-
-        fragment.add_content(self.system.render_template('vert_module.html', {
-            'items': contents
-        }))
-
+        # Only render the children when this block is being shown as the container
+        root_xblock = context.get('root_xblock')
+        if root_xblock and root_xblock.location == self.location:
+            self.render_children(context, fragment, can_reorder=False)
         return fragment
 
     def student_view(self, context):
@@ -292,3 +282,11 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([
+            SplitTestDescriptor.due,
+        ])
+        return non_editable_fields
