@@ -5,6 +5,13 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Mobile API available for courses that opt in using the Course Advanced
+Setting "Mobile Course Available" (only used in limited closed beta).
+
+Studio: Video Module now has an optional advanced setting "EdX Video ID" for
+courses where assets are managed entirely by the video team. This is optional
+and opt-in (only used in a limited closed beta for now).
+
 LMS: Do not allow individual due dates to be earlier than the normal due date. LMS-6563
 
 Blades: Course teams can turn off Chinese Caching from Studio. BLD-1207

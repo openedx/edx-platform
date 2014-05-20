@@ -60,6 +60,7 @@ DEFAULT_SETTINGS = [
     ['Default Timed Transcript', '', False],
     ['Download Transcript Allowed', 'False', False],
     ['Downloadable Transcript URL', '', False],
+    ['EdX Video ID', '', False],
     ['Show Transcript', 'True', False],
     ['Transcript Languages', '', False],
     ['Upload Handout', '', False],
