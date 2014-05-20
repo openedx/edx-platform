@@ -171,16 +171,16 @@ class IPFilterFormTest(TestCase):
 
         # Network tests
         # ips not in whitelist network
-        for addr in '1.1.0.2, 1.0.1.0'.split(','):
+        for addr in ['1.1.0.2', '1.0.1.0']:
             self.assertNotIn(addr.strip(), whitelist)
         # ips in whitelist network
-        for addr in '1.1.0.1, 1.0.0.100'.split(','):
+        for addr in ['1.1.0.1', '1.0.0.100']:
             self.assertIn(addr.strip(), whitelist)
         # ips not in blacklist network
-        for addr in '2.0.0.0, 1.1.0.0'.split(','):
+        for addr in ['2.0.0.0', '1.1.0.0']:
             self.assertNotIn(addr.strip(), blacklist)
         # ips in blacklist network
-        for addr in '1.0.100.0, 1.0.0.10'.split(','):
+        for addr in ['1.0.100.0', '1.0.0.10']:
             self.assertIn(addr.strip(), blacklist)
 
         # Test clearing by adding an empty list is OK too

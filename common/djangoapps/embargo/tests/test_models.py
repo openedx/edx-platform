@@ -79,7 +79,7 @@ class EmbargoModelsTest(TestCase):
         cblacklist = IPFilter.current().blacklist_ips
         self.assertTrue(blacklist in cblacklist)
 
-        # network tests
+    def test_ip_network_blocking(self):
         whitelist = '1.0.0.0/24'
         blacklist = '1.1.0.0/16'
 

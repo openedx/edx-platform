@@ -18,13 +18,13 @@ Usage:
 
 # Enable the middleware in your settings
 
-# To enable Embargoing by courses, add:
+# To enable Embargo for particular courses, set:
 FEATURES['EMBARGO'] = True # blocked ip will be redirected to /embargo
 
-# To enable Embargoing site:
+# To enable the Embargo feature for the whole site, set:
 FEATURES['SITE_EMBARGOED'] = True
 
-# With SITE_EMBARGOED, you can define an external to redirect with:
+# With SITE_EMBARGOED, you can define an external url to redirect with:
 EMBARGO_SITE_REDIRECT_URL = 'https://www.edx.org/'
 
 # if EMBARGO_SITE_REDIRECT_URL is missing, a HttpResponseForbidden is returned.

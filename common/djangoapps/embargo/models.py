@@ -92,7 +92,7 @@ class IPFilter(ConfigurationModel):
 
         def __iter__(self):
             for network in self.networks:
-                    yield network
+                yield network
 
         def __contains__(self, ip):
             try:
