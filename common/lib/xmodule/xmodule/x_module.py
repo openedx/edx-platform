@@ -788,11 +788,14 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
                 continue
 
+            def get_text(value):
+                return self.runtime.service(self, "i18n").ugettext(value) if value is not None else None
+
             # gets the 'default_value' and 'explicitly_set' attrs
             metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
             metadata_fields[field.name]['field_name'] = field.name
-            metadata_fields[field.name]['display_name'] = field.display_name
-            metadata_fields[field.name]['help'] = field.help
+            metadata_fields[field.name]['display_name'] = get_text(field.display_name)
+            metadata_fields[field.name]['help'] = get_text(field.help)
             metadata_fields[field.name]['value'] = field.read_json(self)
 
             # We support the following editors:
