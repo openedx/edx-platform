@@ -12,7 +12,7 @@ except:
 
 <%def name='css(group, raw=False)'>
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
-    ${compressed_css(group)}
+    ${compressed_css(group, raw=raw)}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
       <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >

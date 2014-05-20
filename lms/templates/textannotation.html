@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
-<%static:css group='style-vendor-tinymce-content' raw=True />
-<%static:css group='style-vendor-tinymce-skin' raw=True />
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
 <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
 <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
 
