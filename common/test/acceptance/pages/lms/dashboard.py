@@ -86,5 +86,7 @@ class DashboardPage(PageObject):
 
     def _changed_lang_promise(self, code):
         def _check_func():
-            return self.q(css='select[name="language"] option[value="{}"]'.format(code)).selected
-        return EmptyPromise(_check_func, "language changed")
+            language_is_selected = self.q(css='select[name="language"] option[value="{}"]'.format(code)).selected
+            modal_is_visible = self.q(css='section#change_language.modal').visible
+            return (language_is_selected and not modal_is_visible)
+        return EmptyPromise(_check_func, "language changed and modal hidden")
