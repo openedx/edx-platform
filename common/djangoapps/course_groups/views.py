@@ -220,6 +220,6 @@ def debug_cohort_mgmt(request, course_key):
 
     context = {'cohorts_ajax_url': reverse(
         'cohorts',
-        kwargs={'course_id': course_key.to_deprecated_string()}
+        kwargs={'course_key': course_key.to_deprecated_string()}
     )}
     return render_to_response('/course_groups/debug.html', context)
