@@ -9,6 +9,8 @@ Studio: Add drag-and-drop support to the container page. STUD-1309.
 
 Common: Add extensible third-party auth module.
 
+Blades: Added new error message that displays when HTML5 video is not supported altogether. Make sure spinner gets hidden when error message is shown. BLD-638.
+
 LMS: Switch default instructor dashboard to the new (formerly "beta")
   instructor dashboard. Puts the old (now "legacy") dash behind a feature flag.
   LMS-1296
