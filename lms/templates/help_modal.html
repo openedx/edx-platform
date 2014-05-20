@@ -48,9 +48,9 @@
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}Help Center{link_end}.').format(
         link_start='<a href="{url}" target="_blank">'.format(
-          url=marketing_link('FAQ')
+          url='https://stanfordonline.zendesk.com/hc/en-us'
         ),
         link_end='</a>',
         platform_name=platform_name)}
@@ -132,14 +132,13 @@
     %>
     <p>
     ${_(
-        'Thank you for your inquiry or feedback.  We typically respond to a request '
-        'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
-        'review our {link_start}detailed FAQs{link_end} where most questions have '
-        'already been answered.'
+        'Thank you for your inquiry or feedback. We typically respond to a request within three'
+	'business days. In the meantime, please review our {link_start}Help Center articles{link_end},'
+	'where answers to many common questions have been posted.'
     ).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
+        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format('https://stanfordonline.zendesk.com/hc/en-us'),
         link_end='</a>'
     )}
     </p>
