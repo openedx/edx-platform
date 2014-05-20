@@ -81,6 +81,16 @@ class UsersApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
+    def _create_test_user(self):
+        """Helper method to create a new test user"""
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+        return user_id
+
     def test_user_list_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -733,6 +743,65 @@ class UsersApiTests(TestCase):
             '9999999', course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_get_user_preferences_user_not_found(self):
+        test_uri = '/api/users/{}/preferences'.format('999999')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_user_preferences_default(self):
+        # By default newly created users will have one initial preference settings:
+        # 'pref-lang' = 'en'
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['pref-lang'], 'en')
+
+    def test_post_user_preferences_user_not_found(self):
+        test_uri = '/api/users/{}/preferences'.format('999999')
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_user_preferences_bad_request(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {})
+        self.assertEqual(response.status_code, 400)
+        # also test with a non-simple key/value set of strings
+        response = self.do_post(test_uri, {"an_array": ['1', '2']})
+        self.assertEqual(response.status_code, 400)
+        response = self.do_post(test_uri, {"an_int": 1})
+        self.assertEqual(response.status_code, 400)
+        response = self.do_post(test_uri, {"a_float": 1.00})
+        self.assertEqual(response.status_code, 400)
+        response = self.do_post(test_uri, {"a_boolean": False})
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_user_preferences(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['pref-lang'], 'en')
+        self.assertEqual(response.data['foo'], 'bar')
+
+    def test_update_user_preferences(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        response = self.do_post(test_uri, {"foo": "updated"})
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['pref-lang'], 'en')
+        self.assertEqual(response.data['foo'], 'updated')
 
     def test_course_grades(self):
         test_uri = '/api/users'
