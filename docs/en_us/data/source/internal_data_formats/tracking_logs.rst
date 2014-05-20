@@ -490,7 +490,8 @@ The browser emits these events when a user works with a video.
      - EdX ID of the video being watched (for example, i4x-HarvardX-PH207x-video-Simple_Random_Sample).
    * - ``code``
      - string
-     - YouTube ID of the video being watched (for example, FU3fCJNs94Y).
+     - The YouTube ID of the video being loaded (for example, OEyXaRPEzfM) or
+       'html5' for html5 video.
    * - ``currentTime``
      - float
      - Time the video was played, in seconds. 
