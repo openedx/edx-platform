@@ -12,6 +12,17 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/22/14
+     - Reorganized, updated, and streamlined these sections in the :ref:`Running
+       Your Course Index` chapter:
+
+       * Divided *Grade and Answer Data* into separate sections for
+         :ref:`Grades` and :ref:`Review_Answers`.
+       * Moved information about the student **Progress** page from the
+         *Checking Student Progress and Issuing Certificates* section to
+         :ref:`Grades`.
+       * Renamed the *Checking Student Progress and Issuing Certificates*
+         section to :ref:`Checking Student Progress and Issuing Certificates`.
 
    * - 05/21/14
      - Added warning that version 1 of the :ref:`Open Response Assessments<Open Response Assessment>` suite has been deprecated and added a link to the `new ORA information <http://edx-open-response-assessments.readthedocs.org/en/latest/>`_.
