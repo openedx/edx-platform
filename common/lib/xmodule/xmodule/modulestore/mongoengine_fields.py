@@ -59,9 +59,9 @@ class UsageKeyField(mongoengine.StringField):
         """
         For now saves the usage key in the deprecated location i4x/c4x form
         """
-        assert isinstance(location, (NoneType, SlashSeparatedCourseKey))
+        assert isinstance(location, (NoneType, Location))
         if location is None:
-            return location
+            return None
         return super(UsageKeyField, self).to_mongo(location.to_deprecated_string())
 
     def to_python(self, location):
