@@ -12,6 +12,9 @@ May, 2014
 
    * - Date
      - Change
+
+   * - 05/21/14
+     - Added warning that version 1 of the :ref:`Open Response Assessments<Open Response Assessment>` suite has been deprecated and added a link to the `new ORA information <http://edx-open-response-assessments.readthedocs.org/en/latest/>`_.
    * - 05/16/14
      - Updated :ref:`Working with Video Components` to reflect UI changes.
    * - 05/14/14
