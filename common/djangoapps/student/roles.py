@@ -72,7 +72,7 @@ class RoleBase(AccessRole):
     """
     Roles by type (e.g., instructor, beta_user) and optionally org, course_key
     """
-    def __init__(self, role_name, org='', course_key=CourseKeyField.Empty):
+    def __init__(self, role_name, org='', course_key=None):
         """
         Create role from required role_name w/ optional org and course_key. You may just provide a role
         name if it's a global role (not constrained to an org or course). Provide org if constrained to
@@ -80,9 +80,6 @@ class RoleBase(AccessRole):
         for all of these.
         """
         super(RoleBase, self).__init__()
-
-        if course_key is None:
-            raise TypeError('course_key must be CourseKeyField.Empty or a valid CourseKey')
 
         self.org = org
         self.course_key = course_key
