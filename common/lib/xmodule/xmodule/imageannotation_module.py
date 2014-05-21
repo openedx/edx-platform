@@ -1,3 +1,4 @@
+# pylint: disable=W0223
 """
 Module for Image annotations using annotator.
 """
@@ -31,20 +32,7 @@ class AnnotatableFields(object):
                 showNavigator: true,
                 navigatorPosition: "BOTTOM_LEFT",
                 showNavigationControl: true,
-                tileSources:   [{
-                    Image:  {
-                        xmlns: "http://schemas.microsoft.com/deepzoom/2009",
-                        Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
-                        TileSize: "254", 
-                        Overlap: "1", 
-                        Format: "jpg", 
-                        ServerFormat: "Default",
-                        Size: { 
-                            Width: "15497",
-                            Height: "5378"
-                        }
-                    }
-                },],
+                tileSources:    [{"profile": "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2", "scale_factors": [1, 2, 4, 8, 16, 32, 64], "tile_height": 1024, "height": 3466, "width": 113793, "tile_width": 1024, "qualities": ["native", "bitonal", "grey", "color"], "formats": ["jpg", "png", "gif"], "@context": "http://library.stanford.edu/iiif/image-api/1.1/context.json", "@id": "http://54.187.32.48/loris/suzhou_orig.jp2"}],
             </json>
         </annotatable>
         """))
@@ -100,7 +88,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
             'annotation_storage': self.annotation_storage_url,
-            'token':retrieve_token(self.user, self.annotation_token_secret),
+            'token': retrieve_token(self.user, self.annotation_token_secret),
             'tag': self.instructor_tags,
             'openseadragonjson': self.openseadragonjson,
         }

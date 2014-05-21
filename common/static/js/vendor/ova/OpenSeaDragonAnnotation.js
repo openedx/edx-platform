@@ -782,6 +782,28 @@ OpenSeadragonAnnotation = function (element, options) {
     
     //Set annotator.editor.OpenSeaDragon by default
     this.annotator.editor.OpenSeaDragon=-1;
+
+    function reloadEditor(){
+    	tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
+    	tinymce.EditorManager.execCommand('mceAddEditor',true, "annotator-field-0");
+    }
+
+    var self = this;
+    document.addEventListener("fullscreenchange", function () {
+    	reloadEditor();
+	}, false);
+ 
+	document.addEventListener("mozfullscreenchange", function () {
+    	reloadEditor();
+	}, false);
+ 
+	document.addEventListener("webkitfullscreenchange", function () {
+    	reloadEditor();
+	}, false);
+ 
+	document.addEventListener("msfullscreenchange", function () {
+    	reloadEditor();
+    }, false);
     
     this.options = options;
 

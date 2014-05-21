@@ -1,9 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace name='static' file='/static_content.html'/>
-${static.css(group='style-vendor-tinymce-content', raw=True)}
-${static.css(group='style-vendor-tinymce-skin', raw=True)}
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
 
 <style type="text/css">
     .openseadragon1{
@@ -33,6 +28,11 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
 	<div class="annotatable-section">
 		<div class="annotatable-content">
 		    <div id="imageHolder" class="openseadragon1"> 
+                <%namespace name='static' file='/static_content.html'/>
+                ${static.css(group='style-vendor-tinymce-content', raw=True)}
+                ${static.css(group='style-vendor-tinymce-skin', raw=True)}
+                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
+                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
             </div> 
 			<div id="catchDIV">
 				<div class="annotationListContainer">${_('You do not have any notes.')}</div>

@@ -2,11 +2,11 @@
 Annotations Tool Mixin
 This file contains global variables and functions used in the various Annotation Tools.
 """
-from pkg_resources import resource_string
 from lxml import etree
 from urlparse import urlparse
 from os.path import splitext, basename
 from HTMLParser import HTMLParser
+
 
 def get_instructions(xmltree):
     """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -17,8 +17,9 @@ def get_instructions(xmltree):
         return etree.tostring(instructions, encoding='unicode')
     return None
 
+
 def get_extension(srcurl):
-    ''' get the extension of a given url '''
+    """get the extension of a given url """
     if 'youtu' in srcurl:
         return 'video/youtube'
     else:
@@ -26,20 +27,29 @@ def get_extension(srcurl):
         file_ext = splitext(basename(disassembled.path))[1]
         return 'video/' + file_ext.replace('.', '')
 
+
 class MLStripper(HTMLParser):
     "helper function for html_to_text below"
     def __init__(self):
+        HTMLParser.__init__(self)
         self.reset()
         self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
+
+    def handle_data(self, data):
+        """takes the data in separate chunks"""
+        self.fed.append(data)
+
     def handle_entityref(self, name):
+        """appends the reference to the body"""
         self.fed.append('&%s;' % name)
+
     def get_data(self):
+        """joins together the seperate chunks into one cohesive string"""
         return ''.join(self.fed)
+
 
 def html_to_text(html):
     "strips the html tags off of the text to return plaintext"
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
+    htmlStripper = MLStripper()
+    htmlStripper.feed(html)
+    return htmlStripper.get_data()

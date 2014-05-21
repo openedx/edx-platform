@@ -28,11 +28,11 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
                     Image:  {
                         xmlns: "http://schemas.microsoft.com/deepzoom/2009",
                         Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
-                        TileSize: "254", 
-                        Overlap: "1", 
-                        Format: "jpg", 
+                        TileSize: "254",
+                        Overlap: "1",
+                        Format: "jpg",
                         ServerFormat: "Default",
-                        Size: { 
+                        Size: {
                             Width: "15497",
                             Height: "5378"
                         }
@@ -41,7 +41,7 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
             </json>
         </annotatable>
     '''
-    
+
     def setUp(self):
         """
             Makes sure that the Module is declared and mocked with the sample xml above.

@@ -38,7 +38,7 @@ Annotator.Plugin.RichText = (function(_super) {
           		}
           	},
           	codemirror: {
-          		path: "static/js/vendor"
+          		path: "/static/js/vendor"
         	},
 			plugins: "image link codemirror",
 			menubar: false,

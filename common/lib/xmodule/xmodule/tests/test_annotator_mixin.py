@@ -7,6 +7,7 @@ from lxml import etree
 
 from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
 
+
 class HelperFunctionTest(unittest.TestCase):
     """
     Tests to ensure that the following helper functions work for the annotation tool
@@ -47,6 +48,6 @@ class HelperFunctionTest(unittest.TestCase):
         self.assertEqual(expectednotyoutube, result1)
 
     def test_html_to_text(self):
-        expectedText = "Testing here and not bolded here"
+        expectedtext = "Testing here and not bolded here"
         result = html_to_text(self.sample_html)
-        self.assertEqual(expectedText, result)
+        self.assertEqual(expectedtext, result)
