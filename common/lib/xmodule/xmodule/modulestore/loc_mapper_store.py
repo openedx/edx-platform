@@ -312,14 +312,11 @@ class LocMapperStore(object):
         Used when you only need the CourseLocator and not a full BlockUsageLocator. Probably only
         useful for get_items which wildcards name or category.
 
-        :param course_key: a CourseKey or a UsageKey
+        :param course_key: a CourseKey
         :param published: a boolean representing whether or not we should return the published or draft version
 
         Returns a Courselocator
         """
-        if isinstance(course_key, UsageKey):
-            course_key = course_key.course_key
-
         cached = self._get_course_locator_from_cache(course_key, published)
         if cached:
             return cached
