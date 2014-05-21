@@ -589,6 +589,7 @@ LANGUAGES = (
     ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
     ('fr', u'Français'),  # French
     ('gl', u'Galego'),  # Galician
+    ('gu', u'ગુજરાતી'),  # Gujarati
     ('he', u'עברית'),  # Hebrew
     ('hi', u'हिन्दी'),  # Hindi
     ('hr', u'hrvatski'),  # Croatian
@@ -596,11 +597,11 @@ LANGUAGES = (
     ('hy-am', u'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
     ('id', u'Bahasa Indonesia'),  # Indonesian
     ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
-    ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
+    ('ja-jp', u'日本語 (日本)'),  # Japanese (Japan)
     ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
     ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
     ('kn', u'ಕನ್ನಡ'),  # Kannada
-    ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
+    ('ko-kr', u'한국어 (대한민국)'),  # Korean (Korea)
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
     ('mn', u'Монгол хэл'),  # Mongolian
@@ -622,8 +623,8 @@ LANGUAGES = (
     ('uk', u'Українська'),  # Ukranian
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
-    ('zh-cn', u'中文(简体)'),  # Chinese (China)
-    ('zh-tw', u'中文(台灣)'),  # Chinese (Taiwan)
+    ('zh-cn', u'中文 (简体)'),  # Chinese (China)
+    ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
 )
 
 LANGUAGE_DICT = dict(LANGUAGES)
