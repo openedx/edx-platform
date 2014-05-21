@@ -63,7 +63,7 @@ class VideoPage(PageObject):
 
     @wait_for_js
     # TODO(muhammad-ammar) Move this function to somewhere else so that others can use it also. # pylint: disable=W0511
-    def _wait_for_element(self, element_selector, promise_desc):
+    def _wait_for_element(self, element_selector, promise_desc, timeout=200):
         """
         Wait for element specified by `element_selector` is present in DOM.
 
@@ -82,7 +82,7 @@ class VideoPage(PageObject):
             """
             return self.q(css=element_selector).present
 
-        EmptyPromise(_is_element_present, promise_desc, timeout=200).fulfill()
+        EmptyPromise(_is_element_present, promise_desc, timeout=timeout).fulfill()
 
     @wait_for_js
     def wait_for_video_class(self):
@@ -102,7 +102,7 @@ class VideoPage(PageObject):
 
         """
         self.wait_for_video_class()
-        self._wait_for_element(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
+        self._wait_for_element(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized', timeout=360)
         self._wait_for_element(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
         def _is_finished_loading():
@@ -115,7 +115,7 @@ class VideoPage(PageObject):
             """
             return not self.q(css=CSS_CLASS_NAMES['video_spinner']).visible
 
-        EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
+        EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=300).fulfill()
 
         self.wait_for_ajax()
 
