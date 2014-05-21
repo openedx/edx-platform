@@ -490,12 +490,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Tests the ajax callback to render an XModule
         """
         resp = self._test_preview(Location('i4x', 'edX', 'toy', 'vertical', 'vertical_test', None), 'container_preview')
-        # These are the data-ids of the xblocks contained in the vertical.
-        # Ultimately, these must be converted to new locators.
-        self.assertContains(resp, 'i4x://edX/toy/video/sample_video')
-        self.assertContains(resp, 'i4x://edX/toy/video/separate_file_video')
-        self.assertContains(resp, 'i4x://edX/toy/video/video_with_end_time')
-        self.assertContains(resp, 'i4x://edX/toy/poll_question/T1_changemind_poll_foo_2')
+        self.assertContains(resp, '/branch/draft/block/sample_video')
+        self.assertContains(resp, '/branch/draft/block/separate_file_video')
+        self.assertContains(resp, '/branch/draft/block/video_with_end_time')
+        self.assertContains(resp, '/branch/draft/block/T1_changemind_poll_foo_2')
 
     def _test_preview(self, location, view_name):
         """ Preview test case. """

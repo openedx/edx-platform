@@ -3,10 +3,7 @@
  */
 define(["jquery", "js/spec_helpers/view_helpers"],
     function($, view_helpers) {
-        var basicModalTemplate = readFixtures('basic-modal.underscore'),
-            modalButtonTemplate = readFixtures('modal-button.underscore'),
-            feedbackTemplate = readFixtures('system-feedback.underscore'),
-            installModalTemplates,
+        var installModalTemplates,
             getModalElement,
             isShowingModal,
             hideModalIfShowing,
@@ -15,8 +12,8 @@ define(["jquery", "js/spec_helpers/view_helpers"],
 
         installModalTemplates = function(append) {
             view_helpers.installViewTemplates(append);
-            appendSetFixtures($("<script>", { id: "basic-modal-tpl", type: "text/template" }).text(basicModalTemplate));
-            appendSetFixtures($("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTemplate));
+            view_helpers.installTemplate('basic-modal');
+            view_helpers.installTemplate('modal-button');
         };
 
         getModalElement = function(modal) {
