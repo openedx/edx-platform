@@ -38,6 +38,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     MONGO_COURSEID = 'MITx/999/2013_Spring'
     XML_COURSEID1 = 'edX/toy/2012_Fall'
     XML_COURSEID2 = 'edX/simple/2012_Fall'
+    BAD_COURSE_ID = 'edX/simple'
 
     modulestore_options = {
         'default_class': DEFAULT_CLASS,
@@ -53,7 +54,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         'mappings': {
             XML_COURSEID1: 'xml',
             XML_COURSEID2: 'xml',
-            MONGO_COURSEID: 'default'
+            BAD_COURSE_ID: 'xml',
+            MONGO_COURSEID: 'default',
         },
         'stores': {
             'xml': {
