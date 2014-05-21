@@ -11,7 +11,7 @@ Change Log
 
    * - Date
      - Change
-   * - 05/20/14
+   * - 05/21/14
      - Added descriptions of five video- and problem-related events to the
        :ref:`Tracking Logs` chapter.
    * - 

@@ -490,8 +490,8 @@ The browser emits these events when a user works with a video.
      - EdX ID of the video being watched (for example, i4x-HarvardX-PH207x-video-Simple_Random_Sample).
    * - ``code``
      - string
-     - The YouTube ID of the video being loaded (for example, OEyXaRPEzfM) or
-       'html5' for html5 video.
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
    * - ``currentTime``
      - float
      - Time the video was played, in seconds. 
@@ -569,8 +569,8 @@ The browser emits  ``load_video`` events when the video is fully rendered and re
      - Details
    * - ``code``
      - string
-     - The YouTube ID of the video being loaded (for example, OEyXaRPEzfM) or
-       'html5' for html5 video.
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
 
 ``hide_transcript``
 -------------------
@@ -589,11 +589,11 @@ suppress display of the video transcript.
      - Details
    * - ``code``
      - string
-     - The YouTube ID of the video being loaded (for example, OEyXaRPEzfM) or
-       'html5' for html5 video.
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
    * - ``currentTime``
      - float
-     - Time the video transcript was hidden, in seconds. 
+     - The point in the video file at which the transcript was hidden, in seconds. 
 
 ``show_transcript``
 --------------------
@@ -611,11 +611,11 @@ display the video transcript.
      - Details
    * - ``code``
      - string
-     - The YouTube ID of the video being loaded (for example, OEyXaRPEzfM) or
-       'html5' for html5 video.
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
    * - ``currentTime``
      - float
-     - Time the video transcript was displayed, in seconds. 
+     - The point in the video file at which the transcript was opened, in seconds. 
 
 .. _pdf:
 
