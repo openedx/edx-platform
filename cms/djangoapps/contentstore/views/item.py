@@ -21,7 +21,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore import Location
@@ -310,15 +310,19 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 
     if publish:
         if publish == 'make_private':
-            _xmodule_recurse(existing_item, lambda i: modulestore().unpublish(i.location))
+            _xmodule_recurse(
+                existing_item,
+                lambda i: modulestore().unpublish(i.location),
+                ignore_exception='ItemNotFoundError'
+            )
         elif publish == 'create_draft':
             # This recursively clones the existing item location to a draft location (the draft is
             # implicit, because modulestore is a Draft modulestore)
-            try:
-                _xmodule_recurse(existing_item, lambda i: modulestore().convert_to_draft(i.location))
-            except DuplicateItemError:
-                # Since there is already a draft version of this module so no need to create another
-                pass
+            _xmodule_recurse(
+                existing_item,
+                lambda i: modulestore().convert_to_draft(i.location),
+                ignore_exception='DuplicateItemError'
+            )
 
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)

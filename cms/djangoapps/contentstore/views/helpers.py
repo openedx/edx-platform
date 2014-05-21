@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_string, render_to_response
 from xmodule.modulestore.django import loc_mapper, modulestore
+from xmodule.modulestore.exceptions import DuplicateItemError, ItemNotFoundError
 
 __all__ = ['edge', 'event', 'landing']
 
@@ -36,9 +37,22 @@ def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
 
 
-def _xmodule_recurse(item, action):
+def _xmodule_recurse(item, action, ignore_exception=None):
+    """
+    Recursively apply provided action on item and its children
+
+    ignore_duplicate_exception (str): A optional argument; when set to a certain value then ignores the corresponding
+        exception raised while xmodule recursion
+    """
     for child in item.get_children():
-        _xmodule_recurse(child, action)
+        _xmodule_recurse(child, action, ignore_exception)
+
+    if ignore_exception in ['ItemNotFoundError', 'DuplicateItemError']:
+        # In case of valid provided exception; ignore it and continue recursion
+        try:
+            return action(item)
+        except (ItemNotFoundError, DuplicateItemError):
+            return
 
     action(item)
 
