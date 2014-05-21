@@ -64,19 +64,17 @@ def set_subsection_release_date_on_enter(_step, datestring, timestring):  # pyli
 
 
 @step('I set the subsection due date to ([0-9/-]+)( [0-9:]+)?')
-def set_subsection_due_date(_step, datestring, timestring):
+def set_subsection_due_date(_step, datestring, timestring, key=None):
     if not world.css_visible('input#due_date'):
         world.css_click('.due-date-input .set-date')
 
-    set_subsection_date('input#due_date', datestring, 'input#due_time', timestring)
+    assert world.css_visible('input#due_date')
+    set_subsection_date('input#due_date', datestring, 'input#due_time', timestring, key)
 
 
 @step('I set the subsection due date on enter to ([0-9/-]+)( [0-9:]+)?')
 def set_subsection_due_date_on_enter(_step, datestring, timestring):  # pylint: disable-msg=invalid-name
-    if not world.css_visible('input#due_date'):
-        world.css_click('.due-date-input .set-date')
-
-    set_subsection_date('input#due_date', datestring, 'input#due_time', timestring, 'ENTER')
+    set_subsection_due_date(_step, datestring, timestring, 'ENTER')
 
 
 @step('I mark it as Homework$')
