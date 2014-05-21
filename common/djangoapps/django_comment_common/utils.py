@@ -49,25 +49,6 @@ def seed_permissions_roles(course_key):
     administrator_role.inherit_permissions(moderator_role)
 
 
-def _remove_permission_role(course_id, name):
-    try:
-        role = Role.objects.get(name=name, course_id=course_id)
-        if role.course_id == course_id:
-            role.delete()
-    except Role.DoesNotExist:
-        pass
-
-
-def unseed_permissions_roles(course_id):
-    """
-    A utility method to clean up all forum related permissions and roles
-    """
-    _remove_permission_role(name="Administrator", course_id=course_id)
-    _remove_permission_role(name="Moderator", course_id=course_id)
-    _remove_permission_role(name="Community TA", course_id=course_id)
-    _remove_permission_role(name="Student", course_id=course_id)
-
-
 def are_permissions_roles_seeded(course_id):
     """
     Returns whether the forums permissions for a course have been provisioned in
