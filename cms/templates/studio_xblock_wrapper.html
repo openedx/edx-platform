@@ -1,4 +1,14 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from contentstore.views.helpers import xblock_studio_url, xblock_has_studio_page
+%>
+
+<%
+xblock_url = xblock_studio_url(xblock)
+show_inline = xblock.has_children and not xblock_url
+section_class = "level-nesting" if show_inline else "level-element"
+collapsible_class = "is-collapsible" if xblock.has_children else ""
+%>
 
 % if not is_root:
     % if is_reorderable:
@@ -7,27 +17,23 @@
     <div class="studio-xblock-wrapper" data-locator="${locator}">
     % endif
 
-    <%
-    section_class = "level-nesting" if xblock.has_children else "level-element"
-    collapsible_class = "is-collapsible" if xblock.has_children else ""
-    %>
     <section class="wrapper-xblock ${section_class} ${collapsible_class}">
 % endif
 
-    <header class="xblock-header">
-        <div class="header-details">
-            % if xblock.has_children:
-            <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
-                <i class="icon-caret-down ui-toggle-expansion"></i>
-                <span class="sr">${_('Expand or Collapse')}</span>
-            </a>
-            % endif
-            <span>${xblock.display_name_with_default | h}</span>
-        </div>
-        <div class="header-actions">
-            <ul class="actions-list">
-                % if not xblock_context['read_only']:
-                    % if not xblock.has_children:
+<header class="xblock-header">
+    <div class="header-details">
+        % if show_inline:
+        <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
+            <i class="icon-caret-down ui-toggle-expansion"></i>
+            <span class="sr">${_('Expand or Collapse')}</span>
+        </a>
+        % endif
+        <span>${xblock.display_name_with_default | h}</span>
+    </div>
+    <div class="header-actions">
+        <ul class="actions-list">
+            % if not xblock_context['read_only']:
+                % if not show_inline:
                     <li class="action-item action-edit">
                         <a href="#" class="edit-button action-button">
                             <i class="icon-pencil"></i>
@@ -46,19 +52,34 @@
                             <span class="sr">${_("Delete")}</span>
                         </a>
                     </li>
-                    % endif
-                    % if not is_root and is_reorderable:
-                    <li class="action-item action-drag">
-                        <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
-                    </li>
-                    % endif
                 % endif
-            </ul>
-        </div>
-    </header>
+                % if not is_root and is_reorderable:
+                <li class="action-item action-drag">
+                    <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                </li>
+                % endif
+            % endif
+        </ul>
+    </div>
+</header>
+% if xblock_url and not is_root:
+    <div class="container-panel">
+        <ul class="actions-list">
+            <li class="action-item action-view">
+                <a href="${xblock_url}" class="action-button">
+                    ## Translators: this is a verb describing the action of viewing more details
+                    <span class="action-button-text">${_('View')}</span>
+                    <i class="icon-arrow-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+% endif
+% if is_root or not xblock_has_studio_page(xblock):
     <article class="xblock-render">
 ${content}
     </article>
+% endif
 
 % if not is_root:
     </section>

@@ -8,15 +8,18 @@ class StudioEditableModule(object):
     Helper methods for supporting Studio editing of xblocks.
     """
 
-    def render_reorderable_children(self, context, fragment):
+    def render_children(self, context, fragment, can_reorder=False, view_name='student_view'):
         """
-        Renders children with the appropriate HTML structure for drag and drop.
+        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
+        then the children will be rendered to support drag and drop.
         """
         contents = []
 
-        for child in self.get_display_items():
-            context['reorderable_items'].add(child.location)
-            rendered_child = child.render('student_view', context)
+        for child in self.descriptor.get_children():
+            if can_reorder:
+                context['reorderable_items'].add(child.location)
+            child_module = self.runtime.get_module(child)
+            rendered_child = child_module.render(view_name, context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({

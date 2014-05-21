@@ -73,6 +73,14 @@ main_xblock_info = {
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
+                % if not unit_publish_state == 'public':
+                <li class="action-item action-edit">
+                    <a href="#" class="edit-button action-button">
+                        <i class="icon-pencil"></i>
+                        <span class="action-button-text">${_("Edit")}</span>
+                    </a>
+                </li>
+                % endif
             </ul>
         </nav>
     </header>
