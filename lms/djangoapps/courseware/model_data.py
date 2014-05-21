@@ -202,14 +202,8 @@ class FieldDataCache(object):
         field
         """
         if scope == Scope.user_state:
-            assert (field_object.module_state_key.org == self.course_id.org and
-                    field_object.module_state_key.course == self.course_id.course)
-
             return (scope, field_object.module_state_key.map_into_course(self.course_id))
         elif scope == Scope.user_state_summary:
-            assert (field_object.usage_id.org == self.course_id.org and
-                    field_object.usage_id.course == self.course_id.course)
-
             return (scope, field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
         elif scope == Scope.preferences:
             return (scope, field_object.module_type, field_object.field_name)
