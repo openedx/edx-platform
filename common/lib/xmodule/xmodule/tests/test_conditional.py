@@ -26,7 +26,7 @@ class DummySystem(ImportSystem):
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
-            course_id='/'.join([ORG, COURSE, 'test_run']),
+            course_id=SlashSeparatedCourseKey(ORG, COURSE, 'test_run'),
             course_dir='test_dir',
             error_tracker=Mock(),
             parent_tracker=Mock(),
