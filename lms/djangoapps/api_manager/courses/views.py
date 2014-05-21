@@ -12,7 +12,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 
-
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
 from api_manager.users.serializers import UserSerializer
 from courseware import module_render
@@ -46,7 +45,7 @@ def _generate_base_uri(request):
 def _get_content_children(content, content_type=None):
     """
     Parses the provided content object looking for children
-    Matches on child type (category) when specified
+    Matches on child content type (category) when specified
     """
     children = []
     if hasattr(content, 'children'):
@@ -154,6 +153,14 @@ def _inner_content(tag):
 def _parse_overview_html(html):
     """
     Helper method to break up the course about HTML into components
+    Overview content is stored in MongoDB (aka, the module store) with the following naming convention
+
+            {
+                "_id.org":"i4x",
+                "_id.course":<course_num>,
+                "_id.category":"about",
+                "_id.name":"overview"
+            }
     """
     result = {}
 
@@ -209,7 +216,15 @@ def _parse_overview_html(html):
 
 def _parse_updates_html(html):
     """
-    Helper method to break up the course updates HTML into components
+    Helper method to extract updates contained within the course info HTML into components
+    Updates content is stored in MongoDB (aka, the module store) with the following naming convention
+
+            {
+                "_id.org":"i4x",
+                "_id.course":<course_num>,
+                "_id.category":"course_info",
+                "_id.name":"updates"
+            }
     """
     result = {}
 
@@ -246,12 +261,23 @@ def _parse_updates_html(html):
 
 
 class CourseContentList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CourseContentList view allows clients to retrieve the list of children for a given CourseContent entity
+    - URI: ```/api/courses/{course_id}/content/```
+    - URI: ```/api/courses/{course_id}/content/{content_id}/children```
+    - GET: Returns a JSON representation (array) of the set of CourseContent entities
+        * type: Set filtering parameter
+    ### Use Cases/Notes:
+    * Handling two very-different looking URIs with this one method seems odd, but we don't know where in the
+      CourseContent hierarchy we are -- we could even be at the top (ie, the Course entity itself)
+    * The 'type' parameter filters content children by their 'category' field ('chapter', 'video', etc.)
+    * Note that the type/child filter currently does not traverse deeper than the immediate child level
+    """
 
     def get(self, request, course_id, content_id=None):
         """
-        GET retrieves the list of children for a given content object
-        We don't know where in the content hierarchy we are -- could even be the top
+        GET /api/courses/{course_id}/content
+        GET /api/courses/{course_id}/content/{content_id}/children
         """
         if content_id is None:
             content_id = course_id
@@ -279,15 +305,30 @@ class CourseContentList(SecureAPIView):
 
 
 class CourseContentDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CourseContentDetail view allows clients to interact with a specific CourseContent entity
+    - URI: ```/api/courses/{course_id}/content/{content_id}```
+    - GET: Returns a JSON representation of the specified CourseContent entity
+        * type: Set filtering parameter
+    ### Use Cases/Notes:
+    * If the specified CourseContent is actually the Course, then we return a Course representation
+    * The Course representation includes a top-level CourseContent element named 'content'
+    * CourseContent representations include child CourseContent elements as 'children'
+    * Including 'type' will filter the set of children to those having a category matching 'type' (eg, 'video')
+    * A GET response will additionally include a list of URIs to available sub-resources:
+        ** Related Users  /api/courses/{course_id}/content/{content_id}/users
+        ** Related Groups /api/courses/{course_id}/content/{content_id}/groups
+    """
 
     def get(self, request, course_id, content_id):
         """
-        GET retrieves an existing content object from the system
+        GET /api/courses/{course_id}/content/{content_id}?type=video
         """
         store = modulestore()
         response_data = {}
+        base_uri = _generate_base_uri(request)
         content_type = request.QUERY_PARAMS.get('type', None)
+        response_data['uri'] = base_uri
         if course_id != content_id:
             element_name = 'children'
             try:
@@ -297,6 +338,14 @@ class CourseContentDetail(SecureAPIView):
         else:
             element_name = 'content'
             content = get_course(course_id)
+            protocol = 'http'
+            if request.is_secure():
+                protocol = protocol + 's'
+            response_data['uri'] = '{}://{}/api/courses/{}'.format(
+                protocol,
+                request.get_host(),
+                course_id.encode('utf-8')
+            )
         if content:
             response_data = _serialize_content(
                 request,
@@ -309,6 +358,11 @@ class CourseContentDetail(SecureAPIView):
                 course_id,
                 children
             )
+            response_data['resources'] = []
+            resource_uri = '{}/users'.format(base_uri)
+            response_data['resources'].append({'uri': resource_uri})
+            resource_uri = '{}/groups'.format(base_uri)
+            response_data['resources'].append({'uri': resource_uri})
             status_code = status.HTTP_200_OK
         else:
             status_code = status.HTTP_404_NOT_FOUND
@@ -316,11 +370,17 @@ class CourseContentDetail(SecureAPIView):
 
 
 class CoursesList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesList view allows clients to retrieve the list of courses available in Open edX
+    - URI: ```/api/courses/```
+    - GET: Returns a JSON representation (array) of the set of Course entities
+    ### Use Cases/Notes:
+    * CoursesList currently returns *all* courses in the Open edX database
+    """
 
     def get(self, request):
         """
-        GET returns the list of available courses
+        GET /api/courses
         """
         response_data = []
         store = modulestore()
@@ -336,12 +396,25 @@ class CoursesList(SecureAPIView):
 
 
 class CoursesDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesDetail view allows clients to interact with a specific Course entity
+    - URI: ```/api/courses/{course_id}```
+    - GET: Returns a JSON representation of the specified Course entity
+        * depth: Tree prefetching/scoping parameter
+    ### Use Cases/Notes:
+    * Direct access to course information, irrespective of request/user context
+    * If 'depth' is provided, the response will include children to the specified tree level
+    * A GET response will additionally include a list of URIs to available sub-resources:
+        ** Related Users    /api/courses/{course_id}/users/
+        ** Related Groups   /api/courses/{course_id}/groups/
+        ** Course Overview  /api/courses/{course_id}/overview/
+        ** Course Updates   /api/courses/{course_id}/updates/
+        ** Static Tabs List /api/courses/{course_id}/static_tabs/
+    """
 
     def get(self, request, course_id):
         """
-        GET retrieves an existing course from the system and returns
-        summary information about its content children to the specified depth
+        GET /api/courses/{course_id}?depth=3
         """
         depth = request.QUERY_PARAMS.get('depth', 0)
         depth_int = int(depth)
@@ -351,35 +424,63 @@ class CoursesDetail(SecureAPIView):
             course_descriptor = get_course(course_id, depth=depth_int)
         except ValueError:
             course_descriptor = None
-        if course_descriptor:
-            if depth_int > 0:
-                response_data = _serialize_content_with_children(
-                    request,
-                    course_descriptor,
-                    course_descriptor,  # Primer for recursive function
-                    depth_int
-                )
-                response_data['content'] = response_data['children']
-                response_data.pop('children')
-            else:
-                response_data = _serialize_content(
-                    request,
-                    course_descriptor.id,
-                    course_descriptor
-                )
-            status_code = status.HTTP_200_OK
-            response_data['uri'] = _generate_base_uri(request)
-            return Response(response_data, status=status_code)
-        else:
+        if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
+        if depth_int > 0:
+            response_data = _serialize_content_with_children(
+                request,
+                course_descriptor,
+                course_descriptor,  # Primer for recursive function
+                depth_int
+            )
+            response_data['content'] = response_data['children']
+            response_data.pop('children')
+        else:
+            response_data = _serialize_content(
+                request,
+                course_descriptor.id,
+                course_descriptor
+            )
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        response_data['resources'] = []
+        resource_uri = '{}/content/'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/groups/'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/overview'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/updates/'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/static_tabs/'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/users/'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        return Response(response_data, status=status.HTTP_200_OK)
 
 class CoursesGroupsList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesGroupsList view allows clients to retrieve a list of Groups for a given Course entity
+    - URI: ```/api/courses/{course_id}/groups/```
+    - GET: Returns a JSON representation (array) of the set of CourseGroupRelationship entities
+        * type: Set filtering parameter
+    - POST: Creates a new relationship between the provided Course and Group
+        * group_id: __required__, The identifier for the Group with which we're establishing a relationship
+    - POST Example:
+
+            {
+                "group_id" : 12345,
+            }
+    ### Use Cases/Notes:
+    * Example: Display all of the courses for a particular academic series/program
+    * If a relationship already exists between a Course and a particular group, the system returns 409 Conflict
+    * The 'type' parameter filters groups by their 'group_type' field ('workgroup', 'series', etc.)
+    """
 
     def post(self, request, course_id):
         """
-        POST creates a new course-group relationship in the system
+        POST /api/courses/{course_id}/groups
         """
         response_data = {}
         group_id = request.DATA['group_id']
@@ -412,7 +513,7 @@ class CoursesGroupsList(SecureAPIView):
 
     def get(self, request, course_id):
         """
-        GET retrieves the list of groups related to the specified course
+        GET /api/courses/{course_id}/groups?type=workgroup
         """
         try:
             get_course(course_id)
@@ -424,51 +525,51 @@ class CoursesGroupsList(SecureAPIView):
 
         if group_type:
             course_groups = course_groups.filter(group__groupprofile__group_type=group_type)
-        response_data = {'groups': []}
+        response_data = []
         for course_group in course_groups:
             group_profile = GroupProfile.objects.get(group_id=course_group.group_id)
             group_data = {'id': course_group.group_id, 'name': group_profile.name}
-            response_data['groups'].append(group_data)
+            response_data.append(group_data)
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
 
-
 class CoursesGroupsDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesGroupsDetail view allows clients to interact with a specific CourseGroupRelationship entity
+    - URI: ```/api/courses/{course_id}/group/{group_id}```
+    - GET: Returns a JSON representation of the specified CourseGroupRelationship entity
+        * type: Set filtering parameter
+    - DELETE: Removes an existing CourseGroupRelationship from the system
+    ### Use Cases/Notes:
+    * Use this operation to confirm the existence of a specific Course-Group entity relationship
+    """
 
     def get(self, request, course_id, group_id):
         """
-        GET retrieves an existing course-group relationship from the system
+        GET /api/courses/{course_id}/groups/{group_id}
         """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
         base_uri = _generate_base_uri(request)
         response_data['uri'] = base_uri
         response_data['course_id'] = course_id
         response_data['group_id'] = group_id
-        try:
-            existing_course = get_course(course_id)
-        except ValueError:
-            existing_course = None
-        try:
-            existing_group = Group.objects.get(id=group_id)
-        except ObjectDoesNotExist:
-            existing_group = None
-        if existing_course and existing_group:
-            try:
-                existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
-            except ObjectDoesNotExist:
-                existing_relationship = None
-            if existing_relationship:
-                response_status = status.HTTP_200_OK
-            else:
-                response_status = status.HTTP_404_NOT_FOUND
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, course_id, group_id):
         """
-        DELETE removes/inactivates/etc. an existing course-group relationship
+        DELETE /api/courses/{course_id}/groups/{group_id}
         """
         try:
             existing_group = Group.objects.get(id=group_id)
@@ -481,12 +582,20 @@ class CoursesGroupsDetail(SecureAPIView):
 
 
 class CoursesOverview(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesOverview view allows clients to interact with a specific piece of Course content
+    - URI: ```/api/courses/{course_id}/overview```
+    - GET: Returns a JSON representation of the specified CourseContent entity
+        * parse: Set filtering parameter
+    ### Use Cases/Notes:
+    * Use this operation to obtain the 'overview' content for a course
+    * If 'parse' is provided (and true), the system will attempt to break the content into "sections"
+    * If 'parse' is not provided (or is false), the system will return the content in its current HTML format
+    """
 
     def get(self, request, course_id):
         """
-        GET retrieves the course overview content, which - in MongoDB - is stored with the following
-        naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
+        GET /api/courses/{course_id}/overview
         """
         response_data = OrderedDict()
         try:
@@ -508,12 +617,20 @@ class CoursesOverview(SecureAPIView):
 
 
 class CoursesUpdates(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesUpdates view allows clients to interact with a specific piece of Course content
+    - URI: ```/api/courses/{course_id}/updates```
+    - GET: Returns a JSON representation of the specified CourseContent entity
+        * parse: Set filtering parameter
+    ### Use Cases/Notes:
+    * Use this operation to obtain the 'updates' content for a course
+    * If 'parse' is provided (and true), the system will attempt to break the content into "postings"
+    * If 'parse' is not provided (or is false), the system will return the content in its current HTML format
+    """
 
     def get(self, request, course_id):
         """
-        GET retrieves the course overview content, which - in MongoDB - is stored with the following
-        naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
+        GET /api/courses/{course_id}/updates
         """
         response_data = OrderedDict()
         try:
@@ -533,11 +650,20 @@ class CoursesUpdates(SecureAPIView):
 
 
 class CoursesStaticTabsList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesStaticTabsList view allows clients to interact with a specific piece of CourseContent
+    - URI: ```/api/courses/{course_id}/static_tabs```
+    - GET: Returns a JSON representation of the specified CourseContent entity
+        * detail: boolean, Content prefetching switch
+    ### Use Cases/Notes:
+    * Use this operation to obtain the 'static tabs' content for a course
+    * Static tabs are a core part of the information architecture for the current LMS user interface
+    * If 'detail' is provided (and true), the system will additionally load the content for each tab
+    """
 
     def get(self, request, course_id):
         """
-        GET returns an array of Static Tabs inside of a course
+        GET /api/courses/{course_id}/static_tabs
         """
         try:
             existing_course = get_course(course_id)
@@ -565,42 +691,62 @@ class CoursesStaticTabsList(SecureAPIView):
 
 
 class CoursesStaticTabsDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesStaticTabsDetail view allows clients to interact with a specific Static Tab content entity
+    - URI: ```/api/courses/{course_id}/static_tabs/{tab_id}```
+    - GET: Returns a JSON representation of the specified Static Tab content entity
+    ### Use Cases/Notes:
+    * For more on static tabs, see CoursesStaticTabsList
+    * The 'tab_id' is not the typical content id -- instead it is the tab's url_slug value
+    """
 
     def get(self, request, course_id, tab_id):
         """
-        GET returns the specified static tab for the specified course
+        GET /api/courses/{course_id}/static_tabs/{tab_id}
         """
         try:
             existing_course = get_course(course_id)
         except ValueError:
-            existing_course = None
-        if existing_course:
-            response_data = OrderedDict()
-            for tab in existing_course.tabs:
-                if tab.type == 'static_tab' and tab.url_slug == tab_id:
-                    response_data['id'] = tab.url_slug
-                    response_data['name'] = tab.name
-                    response_data['content'] = get_static_tab_contents(
-                        request,
-                        existing_course,
-                        tab,
-                        wrap_xmodule_display=False
-                    )
-            if not response_data:
-                return Response({}, status=status.HTTP_404_NOT_FOUND)
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
+        response_data = OrderedDict()
+        for tab in existing_course.tabs:
+            if tab.type == 'static_tab' and tab.url_slug == tab_id:
+                response_data['id'] = tab.url_slug
+                response_data['name'] = tab.name
+                response_data['content'] = get_static_tab_contents(
+                    request,
+                    existing_course,
+                    tab,
+                    wrap_xmodule_display=False
+                )
+        if not response_data:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class CoursesUsersList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CoursesUsersList view allows clients to retrieve a list of Users enrolled in the specified Course
+    - URI: ```/api/courses/{course_id}/users/```
+    - GET: Returns a JSON representation (array) of the set of enrolled Users, including pre-enrolled users
+    - POST: Creates a new CourseUserRelationship entity using the provided Course and User
+        * user_id: The identifier for the User being enrolled
+        * email: An alternative identifier for the User being enrolled
+    - POST Example:
+
+            {
+                "user_id" : 12345
+                (or)
+                "email" : "newstudent@edx.org"
+            }
+    ### Use Cases/Notes:
+    * Example: Enroll a User in a Course simply by POSTing the User's identifier to this URI
+    * Alternatively, provide an email address which will effectively pre-enroll a user in the Course
+    """
 
     def post(self, request, course_id):
         """
-        POST enrolls a student in the course. Note, this can be a user_id or
-        just an email, in case the user does not exist in the system
+        POST /api/courses/{course_id}/users
         """
         response_data = OrderedDict()
         try:
@@ -614,12 +760,9 @@ class CoursesUsersList(SecureAPIView):
             try:
                 existing_user = User.objects.get(id=user_id)
             except ObjectDoesNotExist:
-                existing_user = None
-            if existing_user:
-                CourseEnrollment.enroll(existing_user, course_id)
-                return Response({}, status=status.HTTP_201_CREATED)
-            else:
                 return Response({}, status=status.HTTP_404_NOT_FOUND)
+            CourseEnrollment.enroll(existing_user, course_id)
+            return Response({}, status=status.HTTP_201_CREATED)
         elif 'email' in request.DATA:
             try:
                 email = request.DATA['email']
@@ -641,7 +784,7 @@ class CoursesUsersList(SecureAPIView):
 
     def get(self, request, course_id):
         """
-        GET returns a list of users enrolled in the course_id
+        GET /api/courses/{course_id/users}
         """
         response_data = OrderedDict()
         base_uri = _generate_base_uri(request)
@@ -674,11 +817,20 @@ class CoursesUsersList(SecureAPIView):
 
 
 class CoursesUsersDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
-
+    """
+    ### The CoursesUsersDetail view allows clients to interact with a specific Course enrollment
+    - URI: ```/api/courses/{course_id}/users/{user_id}```
+    - GET: Returns a JSON representation of the specified Course enrollment
+        * type: Set filtering parameter
+    - DELETE: Inactivates an existing Course enrollment
+    ### Use Cases/Notes:
+    * Use the GET operation to confirm an ACTIVE enrollment of a User in a Course
+    * If the User is enrolled in the course, we provide their last-known position to the client
+    * Use the DELETE operation to unenroll a User from a Course
+    """
     def get(self, request, course_id, user_id):
         """
-        GET identifies an ACTIVE course enrollment for the specified user
+        GET /api/courses/{course_id}/users/{user_id}
         """
         base_uri = _generate_base_uri(request)
         response_data = {
@@ -712,7 +864,7 @@ class CoursesUsersDetail(SecureAPIView):
 
     def delete(self, request, course_id, user_id):
         """
-        DELETE unenrolls the specified user from the specified course
+        DELETE /api/courses/{course_id}/users/{user_id}
         """
         try:
             existing_course = get_course(course_id)
@@ -733,9 +885,28 @@ class CoursesUsersDetail(SecureAPIView):
 
 
 class CourseContentGroupsList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    ### The CourseContentGroupsList view allows clients to retrieve a list of Content-Group relationships
+    - URI: ```/api/courses/{course_id}/content/{content_id}/groups```
+    - GET: Returns a JSON representation (array) of the set of Content-Group relationships
+        * type: Set filtering parameter
+    - POST: Creates a new CourseContentGroupRelationship entity using the provided Content and Group
+        * group_id: __required__, The identifier for the Group being related to the Content
+    - POST Example:
+
+            {
+                "group_id" : 12345
+            }
+    ### Use Cases/Notes:
+    * Example: Link a specific piece of course content to a group, such as a student workgroup
+    * Note: The specified Group must have a corresponding GroupProfile record for this operation to succeed
+    * Providing a 'type' parameter will attempt to filter the related Group set by the specified value
+    """
 
     def post(self, request, course_id, content_id):
+        """
+        POST /api/courses/{course_id}/content/{content_id}/groups
+        """
         try:
             course_descriptor = get_course(course_id)
         except ValueError:
@@ -752,37 +923,31 @@ class CourseContentGroupsList(SecureAPIView):
             existing_profile = GroupProfile.objects.get(group_id=group_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, existing_profile.group_id)
+        response_data['course_id'] = course_descriptor.id
+        response_data['content_id'] = existing_content.id
+        response_data['group_id'] = str(existing_profile.group_id)
         try:
             existing_relationship = CourseContentGroupRelationship.objects.get(
                 course_id=course_id,
                 content_id=content_id,
                 group_profile=existing_profile
             )
-        except ObjectDoesNotExist:
-            existing_relationship = None
-        response_data = {}
-        base_uri = _generate_base_uri(request)
-        response_data['uri'] = '{}/{}'.format(base_uri, existing_profile.group_id)
-        if existing_relationship:
             response_data['message'] = "Relationship already exists."
             return Response(response_data, status=status.HTTP_409_CONFLICT)
-        CourseContentGroupRelationship.objects.create(
-            course_id=course_id,
-            content_id=content_id,
-            group_profile=existing_profile
-        )
-        rels = CourseContentGroupRelationship.objects.all()
-        for rel in rels:
-            print rel.__dict__
-        response_data['course_id'] = course_descriptor.id
-        response_data['content_id'] = existing_content.id
-        response_data['group_id'] = str(existing_profile.group_id)
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        except ObjectDoesNotExist:
+            CourseContentGroupRelationship.objects.create(
+                course_id=course_id,
+                content_id=content_id,
+                group_profile=existing_profile
+            )
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
     def get(self, request, course_id, content_id):
         """
-        GET retrieves the list of groups for a given content object.
-        The 'type' query parameter is available for filtering by group_type
+        GET /api/courses/{course_id}/content/{content_id}/groups?type=workgroup
         """
         response_data = []
         group_type = request.QUERY_PARAMS.get('type')
@@ -809,11 +974,17 @@ class CourseContentGroupsList(SecureAPIView):
 
 
 class CourseContentGroupsDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
-
+    """
+    ### The CourseContentGroupsDetail view allows clients to interact with a specific Content-Group relationship
+    - URI: ```/api/courses/{course_id}/content/{content_id}/groups/{group_id}```
+    - GET: Returns a JSON representation of the specified Content-Group relationship
+    ### Use Cases/Notes:
+    * Use the GET operation to verify the existence of a particular Content-Group relationship
+    * If the User is enrolled in the course, we provide their last-known position to the client
+    """
     def get(self, request, course_id, content_id, group_id):
         """
-        GET retrieves an existing content-group relationship from the system
+        GET /api/courses/{course_id}/content/{content_id}/groups/{group_id}
         """
         try:
             course_descriptor = get_course(course_id)
@@ -824,7 +995,6 @@ class CourseContentGroupsDetail(SecureAPIView):
             existing_content = store.get_instance(course_id, Location(content_id))
         except InvalidLocationError:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-
         try:
             relationship = CourseContentGroupRelationship.objects.get(
                 course_id=course_id,
@@ -855,6 +1025,7 @@ class CourseContentUsersList(SecureAPIView):
     * An example of specific group filtering is to get the set of users who are members of a particular workgroup related to the content
     * An example of group type filtering is to get all users who are members of an organization group related to the content
     """
+
     def get(self, request, course_id, content_id):
         """
         GET /api/courses/{course_id}/content/{content_id}/users
