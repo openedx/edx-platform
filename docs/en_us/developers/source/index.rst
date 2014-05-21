@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 edX Developer's Guide
 ===================================
 
@@ -34,6 +35,7 @@ APIs
 .. toctree::
     :maxdepth: 2
 
+    api_manager/index
     djangoapps.rst
     common-lib.rst
     experiments.rst
