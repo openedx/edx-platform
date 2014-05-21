@@ -41,13 +41,6 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-def get_course_id_no_run(location):
-    '''
-    Return the first two components of the course_id for this location (org/course)
-    '''
-    return "/".join([location.org, location.course])
-
-
 class InvalidWriteError(Exception):
     """
     Raised to indicate that writing to a particular key
