@@ -66,6 +66,6 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         """
         Tests to make sure variables passed in truly exist within the html once it is all rendered.
         """
-        context = self.mod.get_html() # pylint: disable=W0212
+        context = self.mod.get_html()  # pylint: disable=W0212
         for key in ['display_name', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'annotation_storage']:
             self.assertIn(key, context)
