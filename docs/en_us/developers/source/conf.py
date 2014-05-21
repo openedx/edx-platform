@@ -45,6 +45,7 @@ sys.path.append(root / "common/lib/sandbox-packages")
 sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "common/lib/opaque_keys")
 sys.path.append(root / "lms/djangoapps")
+sys.path.append(root / "lms/djangoapps/api_manager")
 sys.path.append(root / "lms/lib")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "cms/lib")
@@ -185,6 +186,7 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
+
 
 
 
