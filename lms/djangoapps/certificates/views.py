@@ -31,13 +31,13 @@ def request_certificate(request):
             xqci = XQueueCertInterface()
             username = request.user.username
             student = User.objects.get(username=username)
-            course_id = request.POST.get('course_id')
-            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
+            course = modulestore().get_course(course_key, depth=2)
 
-            status = certificate_status_for_student(student, course_id)['status']
+            status = certificate_status_for_student(student, course_key)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_id))
-                status = xqci.add_cert(student, course_id, course=course)
+                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_key))
+                status = xqci.add_cert(student, course_key, course=course)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 
