@@ -85,8 +85,11 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
 
-    # Toggles embargo functionality
+    # Toggles the embargo functionality, which enable embargoing for particular courses
     'EMBARGO': False,
+
+    # Toggles the embargo site functionality, which enable embargoing for the whole site
+    'SITE_EMBARGOED': False,
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
@@ -301,6 +304,9 @@ LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+##### EMBARGO #####
+EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### Pipeline #######################################
 

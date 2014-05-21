@@ -225,8 +225,11 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
 
-    # Toggle embargo functionality
+    # Toggles the embargo functionality, which enable embargoing for particular courses
     'EMBARGO': False,
+
+    # Toggles the embargo site functionality, which enable embargoing for the whole site
+    'SITE_EMBARGOED': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
     # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
@@ -676,6 +679,9 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+
+##### EMBARGO #####
+EMBARGO_SITE_REDIRECT_URL = None
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'

@@ -7,7 +7,7 @@ from django import forms
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 from embargo.fixtures.country_codes import COUNTRY_CODES
 
-import socket
+import ipaddr
 
 from xmodule.modulestore.django import modulestore
 
@@ -76,21 +76,12 @@ class IPFilterForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     class Meta:  # pylint: disable=missing-docstring
         model = IPFilter
 
-    def _is_valid_ipv4(self, address):
-        """Whether or not address is a valid ipv4 address"""
+    def _is_valid_ip(self, address):
+        """Whether or not address is a valid ipv4 address or ipv6 address"""
         try:
-            # Is this an ipv4 address?
-            socket.inet_pton(socket.AF_INET, address)
-        except socket.error:
-            return False
-        return True
-
-    def _is_valid_ipv6(self, address):
-        """Whether or not address is a valid ipv6 address"""
-        try:
-            # Is this an ipv6 address?
-            socket.inet_pton(socket.AF_INET6, address)
-        except socket.error:
+            # Is this an valid ip address?
+            ipaddr.IPNetwork(address)
+        except ValueError:
             return False
         return True
 
@@ -105,7 +96,7 @@ class IPFilterForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
         error_addresses = []
         for addr in addresses.split(','):
             address = addr.strip()
-            if not (self._is_valid_ipv4(address) or self._is_valid_ipv6(address)):
+            if not self._is_valid_ip(address):
                 error_addresses.append(address)
         if error_addresses:
             msg = 'Invalid IP Address(es): {0}'.format(error_addresses)

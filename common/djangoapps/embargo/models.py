@@ -10,6 +10,9 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration embargo --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/embargo/migrations/
 """
+
+import ipaddr
+
 from django.db import models
 
 from config_models.models import ConfigurationModel
@@ -79,6 +82,30 @@ class IPFilter(ConfigurationModel):
         help_text="A comma-separated list of IP addresses that should fall under embargo restrictions."
     )
 
+    class IPFilterList(object):
+        """
+        Represent a list of IP addresses with support of networks.
+        """
+
+        def __init__(self, ips):
+            self.networks = [ipaddr.IPNetwork(ip) for ip in ips]
+
+        def __iter__(self):
+            for network in self.networks:
+                yield network
+
+        def __contains__(self, ip):
+            try:
+                ip = ipaddr.IPAddress(ip)
+            except ValueError:
+                return False
+
+            for network in self.networks:
+                if network.Contains(ip):
+                    return True
+
+            return False
+
     @property
     def whitelist_ips(self):
         """
@@ -86,7 +113,7 @@ class IPFilter(ConfigurationModel):
         """
         if self.whitelist == '':
             return []
-        return [addr.strip() for addr in self.whitelist.split(',')]  # pylint: disable=no-member
+        return self.IPFilterList([addr.strip() for addr in self.whitelist.split(',')])  # pylint: disable=no-member
 
     @property
     def blacklist_ips(self):
@@ -95,4 +122,4 @@ class IPFilter(ConfigurationModel):
         """
         if self.blacklist == '':
             return []
-        return [addr.strip() for addr in self.blacklist.split(',')]  # pylint: disable=no-member
+        return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])  # pylint: disable=no-member
