@@ -145,7 +145,7 @@ class SessionApiSecurityTest(TestCase):
         """
         Try (and fail) user creation without any punctuation in password
         """
-        response, mock_audit_log = self._do_request(self.user_url, 'test', 'test64SS', email='test@edx.org',
+        response, mock_audit_log = self._do_request(self.user_url, 'test', 'test64Ss', email='test@edx.org',  # pylint: disable=W0612
                                                     first_name='John', last_name='Doe', secure=True)
         message = _('Password: Must be more complex (must contain 2 or more uppercase characters,'
                     ' must contain 2 or more punctuation characters)')
@@ -156,7 +156,7 @@ class SessionApiSecurityTest(TestCase):
         """
         Try (and fail) user creation without any numeric characters in password
         """
-        response, mock_audit_log = self._do_request(self.user_url, 'test', 'test.paSS!', email='test@edx.org',
+        response, mock_audit_log = self._do_request(self.user_url, 'test', 'test.paSs!', email='test@edx.org',  # pylint: disable=W0612
                                                     first_name='John', last_name='Doe', secure=True)
         message = _('Password: Must be more complex (must contain 2 or more uppercase characters,'
                     ' must contain 2 or more digits)')
