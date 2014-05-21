@@ -616,9 +616,28 @@ MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = ENV_TOKENS.get("MAX_FAILED_LOGIN_ATTEMPTS_AL
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get("MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS", 15 * 60)
 
 #### PASSWORD POLICY SETTINGS #####
+# Minimum number of characters a password should have
+# e.g PASSWORD_MIN_LENGTH = 8
 PASSWORD_MIN_LENGTH = ENV_TOKENS.get("PASSWORD_MIN_LENGTH")
+# Maximum number of characters a password should have
+# e.g PASSWORD_MAX_LENGTH = None
 PASSWORD_MAX_LENGTH = ENV_TOKENS.get("PASSWORD_MAX_LENGTH")
+# Password complexity should be a dict of complexity levels and their corresponding score
+# e.g.
+# { 'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2,
+#  'UPPER_SCORE': 1, 'LOWER_SCORE': 1, 'PUNCTUATION_SCORE': 2, 'DIGITS_SCORE': 2 }
+# if score is not specified for any of complexity level its default value will be used
+# UPPER_SCORE has a default value of 1
+# LOWER_SCORE has a default value of 1
+# PUNCTUATION_SCORE has a default value of 2
+# DIGITS_SCORE has a default value of 2
+# NON_ASCII_SCORE has a default value of 2
+# WORDS_SCORE has a default value of 2
+# Default scores are only applicable if relevant complexity level is specified
 PASSWORD_COMPLEXITY = ENV_TOKENS.get("PASSWORD_COMPLEXITY", {})
+# Minimum score required to fulfill password complexity criteria. defaults to zero
+# which means a password should fulfill all levels specified in PASSWORD_COMPLEXITY
+MINIMUM_PASSWORD_COMPLEXITY_SCORE = ENV_TOKENS.get('MINIMUM_PASSWORD_COMPLEXITY_SCORE', 0)
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = ENV_TOKENS.get("PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD")
 PASSWORD_DICTIONARY = ENV_TOKENS.get("PASSWORD_DICTIONARY", [])
 
