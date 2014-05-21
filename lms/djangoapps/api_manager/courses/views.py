@@ -259,23 +259,48 @@ def _parse_updates_html(html):
 
 class CourseContentList(SecureAPIView):
     """
-    ### The CourseContentList view allows clients to retrieve the list of children for a given CourseContent entity
-    - URI: ```/api/courses/{course_id}/content/```
-    - URI: ```/api/courses/{course_id}/content/{content_id}/children```
-    - GET: Returns a JSON representation (array) of the set of CourseContent entities
-        * type: Set filtering parameter
-    ### Use Cases/Notes:
-    * Handling two very-different looking URIs with this one method seems odd, but we don't know where in the
-      CourseContent hierarchy we are -- we could even be at the top (ie, the Course entity itself)
-    * The 'type' parameter filters content children by their 'category' field ('chapter', 'video', etc.)
-    * Note that the type/child filter currently does not traverse deeper than the immediate child level
+    **Use Case** 
+
+        CourseContentList gets a collection of content for a given
+        course. You can use the **uri** value in
+        the response to get details for that content entity.
+
+        CourseContentList has an optional type parameter that allows you to
+        filter the response by content type. The value of the type parameter
+        matches the category value in the response. Valid values for the type
+        parameter are:
+
+        * chapter
+        * sequential
+        * vertical
+        * html
+        * problem
+        * discussion
+        * video
+        * [CONFIRM]
+
+    **Example requests**:
+
+        GET /api/courses/{course_id}/content
+
+        GET /api/courses/{course_id}/content?type=video
+
+        GET /api/courses/{course_id}/content/{content_id}/children
+
+    **Response Values**
+
+        * category: The type of content. 
+
+        * due: The due date.
+
+        * uri: The URI to use to get details of the content entity.
+
+        * id: The unique identifier for the content entity.
+
+        * name: The name of the course.
     """
 
     def get(self, request, course_id, content_id=None):
-        """
-        GET /api/courses/{course_id}/content
-        GET /api/courses/{course_id}/content/{content_id}/children
-        """
         if content_id is None:
             content_id = course_id
         response_data = []
@@ -303,24 +328,52 @@ class CourseContentList(SecureAPIView):
 
 class CourseContentDetail(SecureAPIView):
     """
-    ### The CourseContentDetail view allows clients to interact with a specific CourseContent entity
-    - URI: ```/api/courses/{course_id}/content/{content_id}```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * type: Set filtering parameter
-    ### Use Cases/Notes:
-    * If the specified CourseContent is actually the Course, then we return a Course representation
-    * The Course representation includes a top-level CourseContent element named 'content'
-    * CourseContent representations include child CourseContent elements as 'children'
-    * Including 'type' will filter the set of children to those having a category matching 'type' (eg, 'video')
-    * A GET response will additionally include a list of URIs to available sub-resources:
-        ** Related Users  /api/courses/{course_id}/content/{content_id}/users
-        ** Related Groups /api/courses/{course_id}/content/{content_id}/groups
+    **Use Case** 
+
+        CourseContentDetail returns a JSON collection for a specified
+        CourseContent entity. If the specified CourseContent is the Course, the
+        course representation is returned. You can use the uri values in the
+        children collection in the JSON response to get details for that content
+        entity.
+
+        CourseContentDetail has an optional type parameter that allows you to
+        filter the response by content type. The value of the type parameter
+        matches the category value in the response. Valid values for the type
+        parameter are:
+
+        * chapter
+        * sequential
+        * vertical
+        * html
+        * problem
+        * discussion
+        * video
+        * [CONFIRM]
+
+    **Example Request**
+
+          GET /api/courses/{course_id}/content/{content_id}
+
+    **Response Values**
+
+        * category: The type of content.
+
+        * name: The name of the content entity.
+
+        * due:  The due date.
+
+        * uri: The URI of the content entity.
+
+        * id: The unique identifier for the course.
+
+        * children: Content entities that this conent entity contains.
+
+        * resources: A list of URIs to available users and groups:
+          * Related Users  /api/courses/{course_id}/content/{content_id}/users
+          * Related Groups /api/courses/{course_id}/content/{content_id}/groups
     """
 
     def get(self, request, course_id, content_id):
-        """
-        GET /api/courses/{course_id}/content/{content_id}?type=video
-        """
         store = modulestore()
         response_data = {}
         base_uri = generate_base_uri(request)
@@ -369,17 +422,33 @@ class CourseContentDetail(SecureAPIView):
 
 class CoursesList(SecureAPIView):
     """
-    ### The CoursesList view allows clients to retrieve the list of courses available in Open edX
-    - URI: ```/api/courses/```
-    - GET: Returns a JSON representation (array) of the set of Course entities
-    ### Use Cases/Notes:
-    * CoursesList currently returns *all* courses in the Open edX database
+    **Use Case** 
+
+        CoursesList returns a collection of courses in the edX Platform. You can
+        use the uri value in the response to get details of the course.
+
+    **Example Request**
+
+          GET /api/courses
+
+    **Response Values**
+
+        * category: The type of content. In this case, the value is always "course".
+
+        * name: The name of the course.
+
+        * uri: The URI to use to get details of the course.
+
+        * number: The course number.
+
+        * due:  The due date. For courses, the value is always null.
+
+        * org: The organization specified for the course.
+
+        * id: The unique identifier for the course.
     """
 
     def get(self, request):
-        """
-        GET /api/courses
-        """
         response_data = []
         store = modulestore()
         course_descriptors = store.get_courses()
@@ -395,25 +464,52 @@ class CoursesList(SecureAPIView):
 
 class CoursesDetail(SecureAPIView):
     """
-    ### The CoursesDetail view allows clients to interact with a specific Course entity
-    - URI: ```/api/courses/{course_id}```
-    - GET: Returns a JSON representation of the specified Course entity
-        * depth: Tree prefetching/scoping parameter
-    ### Use Cases/Notes:
-    * Direct access to course information, irrespective of request/user context
-    * If 'depth' is provided, the response will include children to the specified tree level
-    * A GET response will additionally include a list of URIs to available sub-resources:
-        ** Related Users    /api/courses/{course_id}/users/
-        ** Related Groups   /api/courses/{course_id}/groups/
-        ** Course Overview  /api/courses/{course_id}/overview/
-        ** Course Updates   /api/courses/{course_id}/updates/
-        ** Static Tabs List /api/courses/{course_id}/static_tabs/
+    **Use Case** 
+
+        CoursesDetail returns details for a course. You can use the uri values
+        in the resources collection in the response to get more course
+        information for:
+
+        * Users (/api/courses/{course_id}/users/)
+        * Groups (/api/courses/{course_id}/groups/)
+        * Course Overview (/api/courses/{course_id}/overview/)
+        * Course Updates (/api/courses/{course_id}/updates/)
+        * Course Pages (/api/courses/{course_id}/static_tabs/)
+
+        CoursesDetail has an optional **depth** parameter that allows you to
+        get course content children to the specified tree level.
+
+    **Example requests**:
+
+        GET /api/courses/{course_id}
+
+        GET /api/courses/{course_id}?depth=2
+
+    **Response Values**
+
+        * category: The type of content.
+
+        * name: The name of the course.
+
+        * uri: The URI to use to get details of the course.
+
+        * number: The course number.
+
+        * content: When the depth parameter is used, a collection of child
+          course content entities, such as chapters, sequentials, and
+          components.
+
+        * due:  The due date. For courses, the value is always null.
+
+        * org: The organization specified for the course.
+
+        * id: The unique identifier for the course.
+
+        * resources: A collection of URIs to use to get more information about
+          the course.  
     """
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id}?depth=3
-        """
         depth = request.QUERY_PARAMS.get('depth', 0)
         depth_int = int(depth)
         # get_course_by_id raises an Http404 if the requested course is invalid
@@ -460,6 +556,25 @@ class CoursesDetail(SecureAPIView):
 
 class CoursesGroupsList(SecureAPIView):
     """
+    **Use Case** 
+
+        CoursesGroupsList returns a collection of course group relationship
+        entities(?) for a specified course entity.
+
+        CoursesGroupsList has an optional **type** parameter that allows you to
+        filter the groups returned. Valid values for the type parameter are:
+
+        * [CONFIRM]
+
+    **Example Request**
+
+        GET /api/courses/{course_id}/groups?type=workgroup
+
+        POST /api/courses/{course_id}/groups
+
+    **Response Values**
+
+
     ### The CoursesGroupsList view allows clients to retrieve a list of Groups for a given Course entity
     - URI: ```/api/courses/{course_id}/groups/```
     - GET: Returns a JSON representation (array) of the set of CourseGroupRelationship entities
@@ -582,20 +697,30 @@ class CoursesGroupsDetail(SecureAPIView):
 
 class CoursesOverview(SecureAPIView):
     """
-    ### The CoursesOverview view allows clients to interact with a specific piece of Course content
-    - URI: ```/api/courses/{course_id}/overview```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * parse: Set filtering parameter
-    ### Use Cases/Notes:
-    * Use this operation to obtain the 'overview' content for a course
-    * If 'parse' is provided (and true), the system will attempt to break the content into "sections"
-    * If 'parse' is not provided (or is false), the system will return the content in its current HTML format
+    **Use Case** 
+
+        CoursesOverview returns an HTML representation of the overview for the
+        specified course. CoursesOverview has an optional parse parameter that
+        when true breaks the response into a collection named sections. By
+        default, parse is false.
+
+    **Example Request**
+
+          GET /api/courses/{course_id}/overview
+
+          GET /api/courses/{course_id}/overview?parse=true
+
+    **Response Values**
+
+        * overview_html: The HTML representation of the course overview.
+          Sections of the overview are indicated by an HTML section element.
+
+        * sections: When parse=true, a collection of JSON objects representing
+          parts of the course overview.
+
     """
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id}/overview
-        """
         response_data = OrderedDict()
         try:
             existing_course = get_course(course_id)
@@ -617,20 +742,30 @@ class CoursesOverview(SecureAPIView):
 
 class CoursesUpdates(SecureAPIView):
     """
-    ### The CoursesUpdates view allows clients to interact with a specific piece of Course content
-    - URI: ```/api/courses/{course_id}/updates```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * parse: Set filtering parameter
-    ### Use Cases/Notes:
-    * Use this operation to obtain the 'updates' content for a course
-    * If 'parse' is provided (and true), the system will attempt to break the content into "postings"
-    * If 'parse' is not provided (or is false), the system will return the content in its current HTML format
+    **Use Case** 
+
+        CoursesUpdates returns an HTML representation of the overview for the
+        specified course. CoursesUpdates has an optional parse parameter that
+        when true breaks the response into a collection named postings. By
+        default, parse is false.
+
+    **Example Requests**
+
+          GET /api/courses/{course_id}/updates
+
+          GET /api/courses/{course_id}/updates?parse=true
+
+    **Response Values**
+
+        * content: The HTML representation of the course overview.
+          Sections of the overview are indicated by an HTML section element.
+
+        * postings: When parse=true, a collection of JSON objects representing
+          parts of the course overview. Each element in postings contains a date
+          and content key.
     """
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id}/updates
-        """
         response_data = OrderedDict()
         try:
             existing_course = get_course(course_id)
@@ -650,20 +785,31 @@ class CoursesUpdates(SecureAPIView):
 
 class CoursesStaticTabsList(SecureAPIView):
     """
-    ### The CoursesStaticTabsList view allows clients to interact with a specific piece of CourseContent
-    - URI: ```/api/courses/{course_id}/static_tabs```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * detail: boolean, Content prefetching switch
-    ### Use Cases/Notes:
-    * Use this operation to obtain the 'static tabs' content for a course
-    * Static tabs are a core part of the information architecture for the current LMS user interface
-    * If 'detail' is provided (and true), the system will additionally load the content for each tab
+    **Use Case** 
+
+        CoursesStaticTabsList returns a collection of custom pages in the
+        course. CoursesStaticTabsList has an optional detail parameter that when
+        true includes the custom page content in the response.
+
+    **Example Requests**
+
+          GET /api/courses/{course_id}/static_tabs
+
+          GET /api/courses/{course_id}/static_tabs?detail=true
+
+    **Response Values**
+
+        * tabs: The collection of custom pages in the course. Each object in the
+          collection conains the following keys:
+
+          * id: The ID of the custom page.
+
+          * name: The Display Name of the custom page.
+
+          * detail: When detail=true, the content of the custom page as HTML.
     """
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id}/static_tabs
-        """
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -691,18 +837,28 @@ class CoursesStaticTabsList(SecureAPIView):
 
 class CoursesStaticTabsDetail(SecureAPIView):
     """
-    ### The CoursesStaticTabsDetail view allows clients to interact with a specific Static Tab content entity
-    - URI: ```/api/courses/{course_id}/static_tabs/{tab_id}```
-    - GET: Returns a JSON representation of the specified Static Tab content entity
-    ### Use Cases/Notes:
-    * For more on static tabs, see CoursesStaticTabsList
-    * The 'tab_id' is not the typical content id -- instead it is the tab's url_slug value
+    **Use Case** 
+
+        CoursesStaticTabsDetail returns a collection of custom pages in the
+        course, including the page content. 
+
+    **Example Requests**
+
+          GET /api/courses/{course_id}/static_tabs/{tab_id}
+
+    **Response Values**
+
+        * tabs: The collection of custom pages in the course. Each object in the
+          collection conains the following keys:
+
+          * id: The ID of the custom page.
+
+          * name: The Display Name of the custom page.
+
+          * detail: The content of the custom page as HTML.
     """
 
     def get(self, request, course_id, tab_id):
-        """
-        GET /api/courses/{course_id}/static_tabs/{tab_id}
-        """
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -725,28 +881,37 @@ class CoursesStaticTabsDetail(SecureAPIView):
 
 class CoursesUsersList(SecureAPIView):
     """
-    ### The CoursesUsersList view allows clients to retrieve a list of Users enrolled in the specified Course
-    - URI: ```/api/courses/{course_id}/users/```
-    - GET: Returns a JSON representation (array) of the set of enrolled Users, including pre-enrolled users
-    - POST: Creates a new CourseUserRelationship entity using the provided Course and User
-        * user_id: The identifier for the User being enrolled
-        * email: An alternative identifier for the User being enrolled
-    - POST Example:
+    **Use Case** 
 
-            {
-                "user_id" : 12345
-                (or)
-                "email" : "newstudent@edx.org"
-            }
-    ### Use Cases/Notes:
-    * Example: Enroll a User in a Course simply by POSTing the User's identifier to this URI
-    * Alternatively, provide an email address which will effectively pre-enroll a user in the Course
+        CoursesUsersList returns a collection of users enrolled or pre-enrolled
+        in the course.
+
+        You also use CoursesUsersList to enroll a new user in the course.
+
+    **Example Requests**
+
+          GET /api/courses/{course_id}/users
+
+          POST /api/courses/{course_id}/users
+
+    **GET Response Values**
+
+        * enrollments: The collection of users in the course. Each object in the
+          collection conains the following keys:
+
+          * id: The ID of the user.
+
+          * email: The email address of the user.
+
+          * username: The username of the user.
+
+    **Post Values**
+
+        To create a new user through POST /api/courses/{course_id}/users, you
+        must include either a user_id or email key in the JSON object.
     """
 
     def post(self, request, course_id):
-        """
-        POST /api/courses/{course_id}/users
-        """
         response_data = OrderedDict()
         try:
             existing_course = get_course(course_id)
@@ -782,9 +947,6 @@ class CoursesUsersList(SecureAPIView):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id/users}
-        """
         response_data = OrderedDict()
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -817,15 +979,27 @@ class CoursesUsersList(SecureAPIView):
 
 class CoursesUsersDetail(SecureAPIView):
     """
-    ### The CoursesUsersDetail view allows clients to interact with a specific Course enrollment
-    - URI: ```/api/courses/{course_id}/users/{user_id}```
-    - GET: Returns a JSON representation of the specified Course enrollment
-        * type: Set filtering parameter
-    - DELETE: Inactivates an existing Course enrollment
-    ### Use Cases/Notes:
-    * Use the GET operation to confirm an ACTIVE enrollment of a User in a Course
-    * If the User is enrolled in the course, we provide their last-known position to the client
-    * Use the DELETE operation to unenroll a User from a Course
+    **Use Case** 
+
+        CoursesUsersDetail returns a details about a specified user of a course.
+
+        You also use CoursesUsersDetail to unenroll a user from the course.
+
+    **Example Requests**
+
+          GET /api/courses/{course_id}/users/{user_id}
+
+          DELETE /api/courses/{course_id}/users/{user_id}
+
+    **GET Response Values**
+
+        * course_id: The ID of the course the user is enrolled in.
+
+        * position: The last known position in the course. (??? in outline?)
+
+        * user_id: The ID of the user.
+
+        * uri: The URI to use to get details of the user.
     """
     def get(self, request, course_id, user_id):
         """
@@ -862,9 +1036,6 @@ class CoursesUsersDetail(SecureAPIView):
         return Response(response_data, status=response_status)
 
     def delete(self, request, course_id, user_id):
-        """
-        DELETE /api/courses/{course_id}/users/{user_id}
-        """
         try:
             existing_course = get_course(course_id)
         except ValueError:

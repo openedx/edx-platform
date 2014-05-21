@@ -209,6 +209,11 @@ sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
+sys.path.append(root / "lms/djangoapps/mobile_api")
+sys.path.append(root / "lms/djangoapps/mobile_api/course_info")
+sys.path.append(root / "lms/djangoapps/mobile_api/users")
+sys.path.append(root / "lms/djangoapps/mobile_api/video_outlines")
+sys.path.append(root / "lms/djangoapps/api_manager")
 
 sys.path.insert(
     0,
