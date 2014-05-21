@@ -745,3 +745,5 @@ LMS: Option to email students when enroll/un-enroll them.
 
 Blades: Added WAI-ARIA markup to the video player controls. These are now fully
 accessible by screen readers.
+
+Common: Added advanced_module for annotating images to go with the ones for text and videos.
