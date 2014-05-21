@@ -127,7 +127,7 @@ def problems_with_psychometric_data(course_id):
     Return dict of {problems (location urls): count} for which psychometric data is available.
     Does this for a given course_id.
     '''
-    pmdset = PsychometricData.objects.using(db).filter(studentmodule__course_id=course_id.to_deprecated_string())
+    pmdset = PsychometricData.objects.using(db).filter(studentmodule__course_id=course_id)
     plist = [p['studentmodule__module_state_key'] for p in pmdset.values('studentmodule__module_state_key').distinct()]
     problems = dict((p, pmdset.filter(studentmodule__module_state_key=p).count()) for p in plist)
 
