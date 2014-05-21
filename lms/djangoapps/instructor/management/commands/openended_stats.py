@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
         if len(args) == 2:
             course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            usage_key = UsageKey.from_string(args[1])
+            usage_key = course_id.make_usage_key_from_deprecated_string(args[1])
         else:
             print self.help
             return
