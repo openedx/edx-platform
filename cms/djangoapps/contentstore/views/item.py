@@ -21,7 +21,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore import Location
@@ -313,7 +313,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
             _xmodule_recurse(
                 existing_item,
                 lambda i: modulestore().unpublish(i.location),
-                ignore_exception='ItemNotFoundError'
+                ignore_exception=ItemNotFoundError
             )
         elif publish == 'create_draft':
             # This recursively clones the existing item location to a draft location (the draft is
@@ -321,7 +321,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
             _xmodule_recurse(
                 existing_item,
                 lambda i: modulestore().convert_to_draft(i.location),
-                ignore_exception='DuplicateItemError'
+                ignore_exception=DuplicateItemError
             )
 
     if data:
