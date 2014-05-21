@@ -871,10 +871,14 @@ class CourseEnrollment(models.Model):
 
         `user` is a Django User object
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        Returns the mode for both inactive and active users.
+        Returns None if the courseenrollment record does not exist.
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            if record.is_active:
+
+            if hasattr(record, 'mode'):
                 return record.mode
             else:
                 return None
