@@ -154,6 +154,9 @@ function(GraderCollection) {
                 this.updateStatusText(
                     this.i18n['You\'ve received credit for viewing this video.']
                 );
+                Logger.log('video_scored', {
+                    score: response
+                });
             }
         },
 
