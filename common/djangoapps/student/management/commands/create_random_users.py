@@ -39,6 +39,6 @@ Examples:
             except InvalidKeyError:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(args[1])
         else:
-            course_id = None
+            course_key = None
 
-        create(n, course_id)
+        create(n, course_key)
