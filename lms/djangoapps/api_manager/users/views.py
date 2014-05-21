@@ -613,13 +613,19 @@ class UsersCoursesList(SecureAPIView):
         response_data = []
         for enrollment in enrollments:
             descriptor = store.get_course(enrollment.course_id)
-            course_data = {
-                "id": enrollment.course_id,
-                "uri": '{}/{}'.format(base_uri, enrollment.course_id),
-                "is_active": enrollment.is_active,
-                "name": descriptor.display_name
-            }
-            response_data.append(course_data)
+            # NOTE: It is possible that a course has been hard deleted from the courseware
+            # database, but the enrollment row in the SQL database still exists
+            if descriptor:
+                course_data = {
+                    "id": enrollment.course_id,
+                    "uri": '{}/{}'.format(base_uri, enrollment.course_id),
+                    "is_active": enrollment.is_active,
+                    "name": descriptor.display_name
+                }
+                response_data.append(course_data)
+            else:
+                log.warning("User {0} enrolled in course_id {1}, but course could not be found.".format(user_id, enrollment.course_id))
+
         return Response(response_data, status=status.HTTP_200_OK)
 
 
