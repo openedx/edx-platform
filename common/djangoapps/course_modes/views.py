@@ -83,7 +83,7 @@ class ChooseModeView(View):
         course = course_from_id(course_key)
         if not has_access(user, 'enroll', course):
             error_msg = _("Enrollment is closed")
-            return self.get(request, course_key, error=error_msg)
+            return self.get(request, course_id, error=error_msg)
 
         upgrade = request.GET.get('upgrade', False)
 
@@ -108,12 +108,12 @@ class ChooseModeView(View):
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
-                return self.get(request, course_key, error=error_msg)
+                return self.get(request, course_id, error=error_msg)
 
             # Check for minimum pricing
             if amount_value < mode_info.min_price:
                 error_msg = _("No selected price or selected price is too low.")
-                return self.get(request, course_key, error=error_msg)
+                return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_key] = amount_value
