@@ -577,8 +577,11 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_error_message_shown)
 
         # Verify that error message has correct text
-        correct_error_message_text = 'ERROR: No playable video sources found!'
+        correct_error_message_text = 'No playable video sources found.'
         self.assertIn(correct_error_message_text, self.video.error_message_text)
+
+        # Verify that spinner is not shown
+        self.assertFalse(self.video.is_spinner_shown())
 
     def test_download_button_wo_english_transcript(self):
         """

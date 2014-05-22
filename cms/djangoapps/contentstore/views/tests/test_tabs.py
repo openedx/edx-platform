@@ -189,7 +189,7 @@ class TabsPageTests(CourseTestCase):
         self.assertIn('<span class="action-button-text">Edit</span>', html)
         self.assertIn('<span class="sr">Duplicate this component</span>', html)
         self.assertIn('<span class="sr">Delete this component</span>', html)
-        self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle"></span>', html)
+        self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle action"></span>', html)
 
 
 

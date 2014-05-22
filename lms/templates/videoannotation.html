@@ -1,4 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
+
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -48,7 +54,11 @@
 	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
 
 	//Grab uri of the course
+<<<<<<< HEAD
     var parts = window.location.href.split("/"),
+=======
+    var parts = window.location.href.split("/"), 
+>>>>>>> edx/master
     	uri = '';
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
 	//Change uri in cms
@@ -57,7 +67,12 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
+<<<<<<< HEAD
 
+=======
+	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+    uri += unit_id;
+>>>>>>> edx/master
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
@@ -116,7 +131,11 @@
                   },
             },
             auth: {
+<<<<<<< HEAD
                 tokenUrl: location.protocol+'//'+location.host+"/token?course_id=${course_key.to_deprecated_string()}"
+=======
+                token: "${token}"
+>>>>>>> edx/master
             },
             store: {
                 // The endpoint of the store on your server.
@@ -151,17 +170,21 @@
         optionsRichText: {
             tinymce:{
                 selector: "li.annotator-item textarea",
-                plugins: "media image insertdatetime link code",
+                plugins: "media image codemirror",
                 menubar: false,
                 toolbar_items_size: 'small',
                 extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
             }
         },
     };
 
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+<<<<<<< HEAD
 	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+=======
+	tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
+>>>>>>> edx/master
 
 	//remove old instances
     if (Annotator._instances.length !== 0) {
@@ -173,8 +196,11 @@
 
     ova.annotator.addPlugin('Tags');
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> edx/master
     //Catch
     var annotator = ova.annotator,
         catchOptions = {
@@ -183,7 +209,7 @@
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	    userId:'${user.email}',
+	        userId:'${user.email}',
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },

@@ -7,12 +7,17 @@
  * getUpdateUrl: a utility method that returns the xblock update URL, appending
  *               the location if passed in.
  */
-define([], function () {
+define(["underscore"], function (_) {
     var urlRoot = '/xblock';
 
     var getUpdateUrl = function (locator) {
+<<<<<<< HEAD
         if (locator === undefined) {
             return urlRoot + "/";
+=======
+        if (_.isUndefined(locator)) {
+            return urlRoot;
+>>>>>>> edx/master
         }
         else {
             return urlRoot + "/" + locator;

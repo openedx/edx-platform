@@ -208,6 +208,58 @@ class ShibSPTest(ModuleStoreTestCase):
                     # no audit logging calls
                     self.assertEquals(len(audit_log_calls), 0)
 
+    def _base_test_extauth_auto_activate_user_with_flag(self, log_user_string="inactive@stanford.edu"):
+        """
+        Tests that FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] means extauth automatically
+        linked users, activates them, and logs them in
+        """
+        inactive_user = UserFactory.create(email='inactive@stanford.edu')
+        inactive_user.is_active = False
+        inactive_user.save()
+        request = self.request_factory.get('/shib-login')
+        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
+        request.META.update({
+            'Shib-Identity-Provider': 'https://idp.stanford.edu/',
+            'REMOTE_USER': 'inactive@stanford.edu',
+            'mail': 'inactive@stanford.edu'
+        })
+
+        request.user = AnonymousUser()
+        with patch('external_auth.views.AUDIT_LOG') as mock_audit_log:
+            response = shib_login(request)
+        audit_log_calls = mock_audit_log.method_calls
+        # reload user from db, since the view function works via db side-effects
+        inactive_user = User.objects.get(id=inactive_user.id)
+        self.assertIsNotNone(ExternalAuthMap.objects.get(user=inactive_user))
+        self.assertTrue(inactive_user.is_active)
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertEqual(request.user, inactive_user)
+        self.assertEqual(response['Location'], '/')
+        # verify logging:
+        self.assertEquals(len(audit_log_calls), 3)
+        self._assert_shib_login_is_logged(audit_log_calls[0], log_user_string)
+        method_name, args, _kwargs = audit_log_calls[2]
+        self.assertEquals(method_name, 'info')
+        self.assertEquals(len(args), 1)
+        self.assertIn(u'Login success', args[0])
+        self.assertIn(log_user_string, args[0])
+
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'SQUELCH_PII_IN_LOGS': False})
+    def test_extauth_auto_activate_user_with_flag_no_squelch(self):
+        """
+        Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': False}
+        """
+        self._base_test_extauth_auto_activate_user_with_flag(log_user_string="inactive@stanford.edu")
+
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'SQUELCH_PII_IN_LOGS': True})
+    def test_extauth_auto_activate_user_with_flag_squelch(self):
+        """
+        Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': True}
+        """
+        self._base_test_extauth_auto_activate_user_with_flag(log_user_string="user.id: 1")
+
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_registration_form(self):
         """

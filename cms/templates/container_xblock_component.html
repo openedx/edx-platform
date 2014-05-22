@@ -18,10 +18,10 @@ from contentstore.views.helpers import xblock_studio_url
                         <i class="icon-arrow-right"></i>
                     </a>
                 </li>
+                <li class="action-item action-drag">
+                    <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                </li>
             </ul>
         </div>
     </header>
-    % if not xblock_context['read_only']:
-        <span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
-    % endif
 </section>

@@ -225,8 +225,11 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
 
-    # Toggle embargo functionality
+    # Toggles the embargo functionality, which enable embargoing for particular courses
     'EMBARGO': False,
+
+    # Toggles the embargo site functionality, which enable embargoing for the whole site
+    'SITE_EMBARGOED': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
     # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
@@ -677,6 +680,9 @@ ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
+##### EMBARGO #####
+EMBARGO_SITE_REDIRECT_URL = None
+
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 ##### Using cybersource by default #####
@@ -829,11 +835,11 @@ main_vendor_js = [
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/ova/annotator-full.js',
+    'js/vendor/ova/annotator-full-firebase-auth.js',
     'js/vendor/ova/video.dev.js',
     'js/vendor/ova/vjs.youtube.js',
     'js/vendor/ova/rangeslider.js',
     'js/vendor/ova/share-annotator.js',
-    'js/vendor/ova/tinymce.min.js',
     'js/vendor/ova/richText-annotator.js',
     'js/vendor/ova/reply-annotator.js',
     'js/vendor/ova/tags-annotator.js',

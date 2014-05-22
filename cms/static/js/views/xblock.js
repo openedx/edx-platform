@@ -74,10 +74,21 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 if (!element) {
                     element = this.$el;
                 }
-                // First render the HTML as the scripts might depend upon it
-                element.html(html);
-                // Now asynchronously add the resources to the page
+
+                // Render the HTML first as the scripts might depend upon it, and then
+                // asynchronously add the resources to the page.
+                this.updateHtml(element, html);
                 return this.addXBlockFragmentResources(resources);
+            },
+
+            /**
+             * Updates an element to have the specified HTML. The default method sets the HTML
+             * as child content, but this can be overridden.
+             * @param element The element to be updated
+             * @param html The desired HTML.
+             */
+            updateHtml: function(element, html) {
+                element.html(html);
             },
 
             /**

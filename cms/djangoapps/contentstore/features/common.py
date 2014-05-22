@@ -204,8 +204,9 @@ def add_subsection(name='Subsection One'):
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time, key=None):
     set_element_value(date_css, desired_date, key)
-    set_element_value(time_css, desired_time, key)
+    world.wait_for_ajax_complete()
 
+    set_element_value(time_css, desired_time, key)
     world.wait_for_ajax_complete()
 
 

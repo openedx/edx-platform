@@ -1388,7 +1388,7 @@ class StringResponse(LoncapaResponse):
                 result = re.search(regexp, given)
             except Exception as err:
                 msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
-                    error=_(u'error'),
+                    error=_('error'),
                     message=err.message
                 )
                 log.error(msg, exc_info=True)
@@ -1415,7 +1415,8 @@ class StringResponse(LoncapaResponse):
 
     def get_answers(self):
         _ = self.capa_system.i18n.ugettext
-        separator = u' <b>{}</b> '.format(_(u'or'))
+        # Translators: Separator used in StringResponse to display multiple answers. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+        separator = u' <b>{}</b> '.format(_('or'))
         return {self.answer_id: separator.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
@@ -1521,17 +1522,18 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = _(
-                "[courseware.capa.responsetypes.customresponse] error getting"
-                " student answer from {student_answers}"
-                "\n idset = {idset}, error = {err}"
-            ).format(
-                student_answers=student_answers,
+            msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
+                message= _("error getting student answer from {student_answers}").format(student_answers=student_answers),
                 idset=idset,
                 err=err
-            );
+            )
 
-            log.error(msg)
+            log.error(
+                "[courseware.capa.responsetypes.customresponse] error getting"
+                " student answer from %s"
+                "\n idset = %s, error = %s",
+                student_answers, idset, err
+            )
             raise Exception(msg)
 
         # global variable in context which holds the Presentation MathML from dynamic math input

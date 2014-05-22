@@ -216,7 +216,10 @@ function () {
             // video element via jquery (http://bugs.jquery.com/ticket/9174) we
             // create it using native JS.
             this.video = document.createElement('video');
-            this.video.innerHTML = _.values(sourceStr).join('');
+            errorMessage = gettext('This browser cannot play .mp4, .ogg, or ' +
+                '.webm files. Try using a different browser, such as Google ' +
+                'Chrome.');
+            this.video.innerHTML = _.values(sourceStr).join('') + errorMessage;
 
             // Get the jQuery object, and set the player state to UNSTARTED.
             // The player state is used by other parts of the VideoPlayer to

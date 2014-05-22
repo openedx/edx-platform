@@ -20,8 +20,13 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
+<<<<<<< HEAD
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+=======
+from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
+>>>>>>> edx/master
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.video_module import manage_video_subtitles_save
 
@@ -31,7 +36,7 @@ from util.string_utils import str_to_bool
 from ..utils import get_modulestore
 
 from .access import has_course_access
-from .helpers import _xmodule_recurse
+from .helpers import _xmodule_recurse, xblock_has_own_studio_page
 from contentstore.utils import compute_publish_state, PublishState
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from contentstore.views.preview import get_preview_fragment
@@ -177,6 +182,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
     if 'application/json' in accept_header:
+<<<<<<< HEAD
         store = get_modulestore(usage_key)
         component = store.get_item(usage_key)
         is_read_only = _xblock_is_read_only(component)
@@ -184,40 +190,64 @@ def xblock_view_handler(request, usage_key_string, view_name):
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
         component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
+=======
+        store = get_modulestore(old_location)
+        xblock = store.get_item(old_location)
+        is_read_only = _is_xblock_read_only(xblock)
+        container_views = ['container_preview', 'reorderable_container_child_preview']
+        unit_views = ['student_view']
+
+        # wrap the generated fragment in the xmodule_editor div so that the javascript
+        # can bind to it correctly
+        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime'))
+>>>>>>> edx/master
 
         if view_name == 'studio_view':
             try:
-                fragment = component.render('studio_view')
+                fragment = xblock.render('studio_view')
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=w0703
-                log.debug("unable to render studio_view for %r", component, exc_info=True)
+                log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
             # change not authored by requestor but by xblocks.
-            store.update_item(component, None)
+            store.update_item(xblock, None)
 
-        elif view_name == 'student_view' and component.has_children:
+        elif view_name == 'student_view' and xblock_has_own_studio_page(xblock):
             context = {
                 'runtime_type': 'studio',
                 'container_view': False,
                 'read_only': is_read_only,
-                'root_xblock': component,
+                'root_xblock': xblock,
             }
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.
             html = render_to_string('container_xblock_component.html', {
                 'xblock_context': context,
+<<<<<<< HEAD
                 'xblock': component,
                 'locator': usage_key,
+=======
+                'xblock': xblock,
+                'locator': locator,
+>>>>>>> edx/master
             })
             return JsonResponse({
                 'html': html,
                 'resources': [],
             })
-        elif view_name in ('student_view', 'container_preview'):
-            is_container_view = (view_name == 'container_preview')
+        elif view_name in (unit_views + container_views):
+            is_container_view = (view_name in container_views)
+
+            # Determine the items to be shown as reorderable. Note that the view
+            # 'reorderable_container_child_preview' is only rendered for xblocks that
+            # are being shown in a reorderable container, so the xblock is automatically
+            # added to the list.
+            reorderable_items = set()
+            if view_name == 'reorderable_container_child_preview':
+                reorderable_items.add(xblock.location)
 
             # Only show the new style HTML for the container view, i.e. for non-verticals
             # Note: this special case logic can be removed once the unit page is replaced
@@ -226,10 +256,11 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 'runtime_type': 'studio',
                 'container_view': is_container_view,
                 'read_only': is_read_only,
-                'root_xblock': component,
+                'root_xblock': xblock if (view_name == 'container_preview') else None,
+                'reorderable_items': reorderable_items
             }
 
-            fragment = get_preview_fragment(request, component, context)
+            fragment = get_preview_fragment(request, xblock, context)
             # For old-style pages (such as unit and static pages), wrap the preview with
             # the component div. Note that the container view recursively adds headers
             # into the preview fragment, so we don't want to add another header here.
@@ -237,7 +268,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 fragment.content = render_to_string('component.html', {
                     'xblock_context': context,
                     'preview': fragment.content,
-                    'label': component.display_name or component.scope_ids.block_type,
+                    'label': xblock.display_name or xblock.scope_ids.block_type,
                 })
         else:
             raise Http404
@@ -255,7 +286,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-def _xblock_is_read_only(xblock):
+def _is_xblock_read_only(xblock):
     """
     Returns true if the specified xblock is read-only, meaning that it cannot be edited.
     """
@@ -293,11 +324,19 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
 
     if publish:
         if publish == 'make_private':
-            _xmodule_recurse(existing_item, lambda i: modulestore().unpublish(i.location))
+            _xmodule_recurse(
+                existing_item,
+                lambda i: modulestore().unpublish(i.location),
+                ignore_exception=ItemNotFoundError
+            )
         elif publish == 'create_draft':
             # This recursively clones the existing item location to a draft location (the draft is
             # implicit, because modulestore is a Draft modulestore)
-            _xmodule_recurse(existing_item, lambda i: modulestore().convert_to_draft(i.location))
+            _xmodule_recurse(
+                existing_item,
+                lambda i: modulestore().convert_to_draft(i.location),
+                ignore_exception=DuplicateItemError
+            )
 
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
@@ -393,7 +432,7 @@ def _create_item(request):
     metadata = {}
     data = None
     template_id = request.json.get('boilerplate')
-    if template_id is not None:
+    if template_id:
         clz = parent.runtime.load_block_type(category)
         if clz is not None:
             template = clz.get_template(template_id)

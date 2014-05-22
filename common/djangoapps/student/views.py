@@ -44,7 +44,6 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
-from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -1857,6 +1856,7 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+<<<<<<< HEAD
 
 
 @login_required
@@ -1880,3 +1880,5 @@ def token(request):
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
     return response
+=======
+>>>>>>> edx/master

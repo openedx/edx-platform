@@ -216,13 +216,23 @@ def _external_login_or_signup(request,
         return _signup(request, eamap, retfun)
 
     if not user.is_active:
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning('User {0} is not active after external login'.format(user.id))
+        if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+            # if BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH, we trust external auth and activate any users
+            # that aren't already active
+            user.is_active = True
+            user.save()
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.info('Activating user {0} due to external auth'.format(user.id))
+            else:
+                AUDIT_LOG.info('Activating user "{0}" due to external auth'.format(uname))
         else:
-            AUDIT_LOG.warning('User "{0}" is not active after external login'.format(uname))
-        # TODO: improve error page
-        msg = 'Account not yet activated: please look for link in your email'
-        return default_render_failure(request, msg)
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning('User {0} is not active after external login'.format(user.id))
+            else:
+                AUDIT_LOG.warning('User "{0}" is not active after external login'.format(uname))
+            # TODO: improve error page
+            msg = 'Account not yet activated: please look for link in your email'
+            return default_render_failure(request, msg)
 
     login(request, user)
     request.session.set_expiry(0)

@@ -292,6 +292,8 @@ outside the Instructor Dashboard.
 
 * :ref:`AB_Event_Types`
 
+* :ref:`forum_events`
+
 The descriptions that follow include what each event represents, the system
 component it originates from, the history of any changes made to the event over
 time, and any additional member fields that the ``context`` and ``event`` fields contain.
@@ -1761,6 +1763,33 @@ the child module that was shown to the student.
    * - ``child-id``
      - string
      - ID of the module that displays to the student. 
+
+.. _forum_events:
+
+==========================
+Forum Events
+==========================
+
+``edx.forum.searched``
+----------------------------------
+
+After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.text_search`` event.
+
+**Component**: Discussion Tab
+
+**Event Source**: Server
+
+**History**: Added 16 May 2014.
+
+``event`` **Fields**:
+
++---------------------+---------------+---------------------------------------------------------------------+
+| Field               | Type          | Details                                                             |
++=====================+===============+=====================================================================+
+| ``query``           | string        | The text entered into the search box by the user.                   |
++---------------------+---------------+---------------------------------------------------------------------+
+| ``total_results``   | integer       | The total number of results matching the query.                     |
++---------------------+---------------+---------------------------------------------------------------------+
 
 .. _Instructor_Event_Types:
 

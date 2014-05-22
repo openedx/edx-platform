@@ -12,6 +12,26 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/22/14
+     - Reorganized, updated, and streamlined these sections in the :ref:`Running
+       Your Course Index` chapter:
+
+       * Divided *Grade and Answer Data* into separate sections for
+         :ref:`Grades` and :ref:`Review_Answers`.
+       * Moved information about the student **Progress** page from the
+         *Checking Student Progress and Issuing Certificates* section to
+         :ref:`Grades`.
+       * Renamed the *Checking Student Progress and Issuing Certificates*
+         section to :ref:`Checking Student Progress and Issuing Certificates`.
+
+   * - 
+     - Updated :ref:`Problem with Adaptive Hint` to reflect formatting
+       requirements for the Python script and the correct_answer attribute.
+   * - 05/21/14
+     - Added warning that version 1 of the :ref:`Open Response Assessments<Open
+       Response Assessment>` suite has been deprecated and added a link to the
+       `new ORA information <http://edx-open-response-
+       assessments.readthedocs.org/en/latest/>`_.
    * - 05/16/14
      - Updated :ref:`Working with Video Components` to reflect UI changes.
    * - 05/14/14
@@ -60,7 +80,7 @@ April, 2014
    * - 04/28/14
      - Updated :ref:`Show or Hide the Course Wiki Page` to include note about Wiki content being available after you hide the Wiki page.
    * - 04/26/14
-     - Updated label information; added XML information to :ref:`Problem with Adaptive Hint`  
+     - Updated label information; added XML information to :ref:`Problem with Adaptive Hint`.  
    * - 04/24/14
      - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
    * -    

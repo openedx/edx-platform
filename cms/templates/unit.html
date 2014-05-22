@@ -20,13 +20,12 @@ from django.utils.translation import ugettext as _
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui",
-        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function(doc, $, ModuleModel, UnitEditView, ui) {
+require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "js/collections/component_template",
+    "jquery.ui", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+    function(doc, $, ModuleModel, UnitEditView, ComponentTemplates) {
   window.unit_location_analytics = '${unit_locator}';
 
-  // tabs
-  $('.tab-group').tabs();
+  var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
 
   new UnitEditView({
     el: $('.main-wrapper'),
@@ -34,7 +33,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
     model: new ModuleModel({
       id: '${unit_locator}',
       state: '${unit_state}'
-    })
+    }),
+    templates: templates
   });
 
   $('.new-component-template').each(function(){
@@ -63,87 +63,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
             % for xblock in xblocks:
             <li class="component" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}"/>
             % endfor
-            <li class="new-component-item adding">
-              <div class="new-component">
-                <h5>${_("Add New Component")}</h5>
-                <ul class="new-component-type">
-                  % for type, templates in sorted(component_templates.items()):
-                  <li>
-                  % if type == 'advanced' or len(templates) > 1:
-                    <a href="#" class="multiple-templates" data-type="${type}">
-                  % else:
-                    % for __, category, __, __ in templates:
-                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
-                    % endfor
-                  % endif
-                      <span class="large-template-icon large-${type}-icon"></span>
-                      <span class="name">${type}</span>
-                    </a>
-                  </li>
-                  % endfor
-                </ul>
-              </div>
-                % for type, templates in sorted(component_templates.items()):
-                  % if len(templates) > 1 or type == 'advanced':
-                <div class="new-component-templates new-component-${type}">
-                    % if type == "problem":
-                    <div class="tab-group tabs">
-                            <ul class="problem-type-tabs nav-tabs">
-                              <li class="current">
-                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
-                              </li>
-                              <li>
-                                <a class="link-tab" href="#tab2">${_("Advanced")}</a>
-                              </li>
-                            </ul>
-                    % endif
-                    <div class="tab current" id="tab1">
-                      <ul class="new-component-template">
-                          % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                            % if has_markdown or type != "problem":
-                                % if boilerplate_name is None:
-                                  <li class="editor-md empty">
-                                    <a href="#" data-category="${category}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
-
-                                % else:
-                                  <li class="editor-md">
-                                    <a href="#" data-category="${category}"
-                                       data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
-                                % endif
-                            % endif
-
-                          %endfor
-                      </ul>
-                    </div>
-                    % if type == "problem":
-                        <div class="tab" id="tab2">
-                          <ul class="new-component-template">
-                              % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                                % if not has_markdown:
-                                  <li class="editor-manual">
-                                    <a href="#" data-category="${category}"
-                                       data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
-                                % endif
-                              % endfor
-                          </ul>
-                        </div>
-                    </div>
-                    % endif
-                    <a href="#" class="cancel-button">Cancel</a>
-                </div>
-                % endif
-                % endfor
-            </li>
           </ol>
+          <div class="add-xblock-component new-component-item adding"></div>
         </article>
       </div>
 
