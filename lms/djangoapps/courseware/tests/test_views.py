@@ -258,7 +258,7 @@ class ViewsTestCase(TestCase):
         url = reverse('submission_history', kwargs={
             'course_id': self.course_key.to_deprecated_string(),
             'student_username': 'dummy',
-            'location': unicode(self.component.location)
+            'location': self.component.location.to_deprecated_string(),
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view

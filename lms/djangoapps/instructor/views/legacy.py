@@ -33,7 +33,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore.keys import UsageKey
 from opaque_keys import InvalidKeyError
 from lms.lib.xblock.runtime import quote_slashes
 
@@ -265,7 +264,7 @@ def instructor_dashboard(request, course_id):
     elif "Rescore ALL students' problem submissions" in action:
         problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = UsageKey.from_string(problem_location_str)
+            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
             instructor_task = submit_rescore_problem_for_all_students(request, problem_location)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
@@ -301,7 +300,7 @@ def instructor_dashboard(request, course_id):
     elif "Reset ALL students' attempts" in action:
         problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = UsageKey.from_string(problem_location_str)
+            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
             instructor_task = submit_reset_problem_attempts_for_all_students(request, problem_location)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
@@ -341,7 +340,7 @@ def instructor_dashboard(request, course_id):
         else:
             problem_location_str = strip_if_string(request.POST.get('problem_for_student', ''))
             try:
-                problem_location = UsageKey.from_string(problem_location_str)
+                problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
             except InvalidKeyError:
                 msg += '<font color="red">{text}</font>'.format(
                     text=_('Could not find problem location "{url}".').format(
@@ -355,7 +354,7 @@ def instructor_dashboard(request, course_id):
     elif "Show Background Task History" in action:
         problem_location = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = UsageKey.from_string(problem_location_str)
+            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
         except InvalidKeyError:
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Could not find problem location "{url}".').format(
@@ -375,7 +374,7 @@ def instructor_dashboard(request, course_id):
         )
         problem_location_str = strip_if_string(request.POST.get('problem_for_student', ''))
         try:
-            module_state_key = UsageKey.from_string(problem_location_str)
+            module_state_key = course_key.make_usage_key_from_deprecated_string(problem_location_str)
         except InvalidKeyError:
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Could not find problem location "{url}".').format(
