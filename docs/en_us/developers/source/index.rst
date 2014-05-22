@@ -25,7 +25,7 @@ APIs
 .. toctree::
     :maxdepth: 2
 
-    api_docstrings.rst
+    api_manager/index
     djangoapps.rst
     common-lib.rst
     experiments.rst
