@@ -426,6 +426,7 @@ def css_click(css_selector, index=0, wait_time=30, dismiss_alert=False):
     if dismiss_alert:
         world.browser.get_alert().accept()
 
+    wait_for_ajax_complete()
     wait_for_js_to_load()
     return True
 
@@ -485,12 +486,15 @@ def css_fill(css_selector, text, index=0):
 @world.absorb
 def click_link(partial_text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click())
+    wait_for_ajax_complete()
     wait_for_js_to_load()
 
 
 @world.absorb
 def click_link_by_text(text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_text(text)[index].click())
+    wait_for_ajax_complete()
+    wait_for_js_to_load()
 
 
 @world.absorb
