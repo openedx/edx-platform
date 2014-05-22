@@ -67,12 +67,22 @@ def get_logger_config(log_dir,
             'syslog_format': {'format': syslog_format},
             'raw': {'format': '%(message)s'},
         },
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse',
+            }
+        },
         'handlers': {
             'console': {
                 'level': console_loglevel,
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
                 'stream': sys.stderr,
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
             },
             'syslogger-remote': {
                 'level': 'INFO',
@@ -96,6 +106,11 @@ def get_logger_config(log_dir,
                 'handlers': handlers,
                 'level': 'DEBUG',
                 'propagate': False
+            },
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
             },
         }
     }
