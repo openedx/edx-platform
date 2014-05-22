@@ -63,7 +63,6 @@ return {
                 });
                 this.iconEl.appendTo(this.state.baseImageEl.parent());
 
-
                 if (this.labelEl !== null) {
                     if (this.isOriginal === true) {
                         this.labelEl.detach();
@@ -83,9 +82,10 @@ return {
                 if (this.isOriginal === true) {
                     this.state.numDraggablesInSlider -= 1;
                 }
-                SR.readText(gettext('dragging out of slider'));
+                // SR: global "screen reader" object in accessibility_tools.js
+                window.SR.readText(gettext('dragging out of slider'));
             } else {
-                SR.readText(gettext('dragging'));
+                window.SR.readText(gettext('dragging'));
             }
 
             this.zIndex = 1000;
@@ -107,9 +107,9 @@ return {
 
             this.checkLandingElement();
             if (this.inContainer === true) {
-                SR.readText(gettext('dropped in slider'));
+                window.SR.readText(gettext('dropped in slider'));
             } else {
-                SR.readText(gettext('dropped on target'));
+                window.SR.readText(gettext('dropped on target'));
             }
             this.toggleTargets(false);
         }

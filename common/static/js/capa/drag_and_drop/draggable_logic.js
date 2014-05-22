@@ -236,15 +236,13 @@ return {
         return false;
     },
 
-    'toggleTargets': function (onoff) {
-        var c1, target, effect;
-        effect = (onoff ? 'move' : undefined);
+    'toggleTargets': function (isEnabled) {
+        var effect = (isEnabled ? 'move' : undefined);
         this.state.baseImageEl.attr('aria-dropeffect', effect);
 
-        for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
-            target = this.state.targets[c1];
+        $.each(this.state.targets, function (target) {
             target.targetEl.attr('aria-dropeffect', effect);
-        }
+        });
     },
 
     'snapToTarget': function (target) {
