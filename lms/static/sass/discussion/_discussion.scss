@@ -586,13 +586,19 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
+.container .discussion-body, .discussion-module {
   @include clearfix;
   display: block;
   border: none;
   background: transparent;
   box-shadow: none;
   line-height: 1.4;
+
+<<<<<<< HEAD:lms/static/sass/discussion/_discussion.scss
+=======
+  .sr {
+    @extend %text-sr;
+  }
 
   .bottom-post-status {
     padding: 30px;
@@ -1240,6 +1246,10 @@ body.discussion {
     h4 {
       font-size: 16px;
       font-weight: 700;
+    }
+
+    textarea.wmd-input {
+      margin-bottom: 0px;
     }
   }
 
