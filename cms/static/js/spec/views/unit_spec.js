@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/create_sinon", "js/views/feedback_notification",
-    "jasmine-stealth"],
-    function (UnitEditView, ModuleModel, create_sinon, NotificationView) {
-        var verifyJSON = function (requests, json) {
-            var request = requests[requests.length - 1];
-            expect(request.url).toEqual("/xblock/");
-            expect(request.method).toEqual("POST");
-            // There was a problem with order of returned parameters in strings.
-            // Changed to compare objects instead strings.
-            expect(JSON.parse(request.requestBody)).toEqual(JSON.parse(json));
-=======
 define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/module_info",
     "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers", "jasmine-stealth"],
     function ($, _, jasmine, UnitEditView, ModuleModel, create_sinon, edit_helpers) {
@@ -21,7 +9,6 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
                 { html: html, "resources": [] },
                 requestIndex
             );
->>>>>>> edx/master
         };
 
         initialize = function(test) {

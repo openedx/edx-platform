@@ -196,15 +196,9 @@ def unit_handler(request, usage_key_string):
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
-<<<<<<< HEAD
-            'unit_locator': usage_key,
-            'xblocks': xblocks,
-            'component_templates': component_templates,
-=======
-            'unit_locator': locator,
-            'locators': locators,
+            'unit_usage_key': usage_key,
+            'child_usage_keys': [block.scope_ids.usage_id for block in xblocks],
             'component_templates': json.dumps(component_templates),
->>>>>>> edx/master
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
             'subsection': containing_subsection,

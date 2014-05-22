@@ -20,13 +20,8 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
-<<<<<<< HEAD
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-=======
-from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
->>>>>>> edx/master
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.video_module import manage_video_subtitles_save
 
@@ -182,25 +177,15 @@ def xblock_view_handler(request, usage_key_string, view_name):
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
     if 'application/json' in accept_header:
-<<<<<<< HEAD
         store = get_modulestore(usage_key)
-        component = store.get_item(usage_key)
-        is_read_only = _xblock_is_read_only(component)
-
-        # wrap the generated fragment in the xmodule_editor div so that the javascript
-        # can bind to it correctly
-        component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
-=======
-        store = get_modulestore(old_location)
-        xblock = store.get_item(old_location)
+        xblock = store.get_item(usage_key)
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
         unit_views = ['student_view']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime'))
->>>>>>> edx/master
+        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
 
         if view_name == 'studio_view':
             try:
@@ -226,13 +211,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # which links to the new container page.
             html = render_to_string('container_xblock_component.html', {
                 'xblock_context': context,
-<<<<<<< HEAD
-                'xblock': component,
-                'locator': usage_key,
-=======
                 'xblock': xblock,
-                'locator': locator,
->>>>>>> edx/master
+                'locator': usage_key,
             })
             return JsonResponse({
                 'html': html,

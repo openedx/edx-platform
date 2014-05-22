@@ -11,16 +11,11 @@ define(["underscore"], function (_) {
     var urlRoot = '/xblock';
 
     var getUpdateUrl = function (locator) {
-<<<<<<< HEAD
-        if (locator === undefined) {
-            return urlRoot + "/";
-=======
         if (_.isUndefined(locator)) {
-            return urlRoot;
->>>>>>> edx/master
+            return urlRoot + '/';
         }
         else {
-            return urlRoot + "/" + locator;
+            return urlRoot + '/' + locator;
         }
     };
     return {
@@ -28,4 +23,3 @@ define(["underscore"], function (_) {
         getUpdateUrl: getUpdateUrl
     };
 });
-

@@ -36,7 +36,7 @@ class ContainerPageTestCase(StudioPageTestCase):
             branch_name=branch_name,
             expected_section_tag=(
                 '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                'data-locator="{branch_name}/Split_Test">'.format(branch_name=branch_name)
+                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
                 r'<a href="/unit/{branch_name}/Unit"\s*'
@@ -66,7 +66,7 @@ class ContainerPageTestCase(StudioPageTestCase):
                 branch_name=branch_name,
                 expected_section_tag=(
                     '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    'data-locator="{branch_name}/Wrapper">'.format(branch_name=branch_name)
+                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(published_container.location)
                 ),
                 expected_breadcrumbs=(
                     r'<a href="/unit/{branch_name}/Unit"\s*'

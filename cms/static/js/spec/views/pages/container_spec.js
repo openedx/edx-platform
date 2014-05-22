@@ -311,7 +311,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
                         // verify content of request
                         request = lastRequest();
-                        expect(request.url).toEqual("/xblock");
+                        expect(request.url).toEqual("/xblock/");
                         expect(request.method).toEqual("POST");
                         expect(JSON.parse(request.requestBody)).toEqual(
                             JSON.parse(

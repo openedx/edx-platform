@@ -116,7 +116,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                     requestData = _.extend(template, {
                         parent_locator: parentLocator
                     });
-                return $.postJSON(this.getURLRoot(), requestData,
+                return $.postJSON(this.getURLRoot() + '/', requestData,
                     _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset));
             },
 
@@ -135,7 +135,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                                 duplicate_source_locator: xblockElement.data('locator'),
                                 parent_locator: parentElement.data('locator')
                             };
-                        return $.postJSON(self.getURLRoot(), requestData,
+                        return $.postJSON(self.getURLRoot() + '/', requestData,
                             _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset));
                     });
             },

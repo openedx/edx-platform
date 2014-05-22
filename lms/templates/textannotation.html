@@ -35,34 +35,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
 
 
 <script>
-<<<<<<< HEAD
-	function onClickHideInstructions(){
-		//Reset function if there is more than one event handler
-		$(this).off();
-		$(this).on('click',onClickHideInstructions);
-		var hide = $(this).html()=='Collapse Instructions'?true:false,
-			cls, txt,slideMethod;
-		txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
-		cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
-		slideMethod = (hide ? 'slideUp' : 'slideDown');
-		$(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
-		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
-	}
-	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-
-	//Grab uri of the course
-    var parts = window.location.href.split("/"),
-    	uri = '';
-	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
-	//Change uri in cms
-	var lms_location = $('.sidebar .preview-button').attr('href');
-	if (typeof lms_location!='undefined'){
-		uri = window.location.protocol;
-		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
-	}
-	var pagination = 100,
-		is_staff = !('${user.is_staff}'=='False'),
-=======
     function onClickHideInstructions(){
         //Reset function if there is more than one event handler
         $(this).off();
@@ -91,7 +63,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     uri += unit_id;
     var pagination = 100,
         is_staff = !('${user.is_staff}'=='False'),
->>>>>>> edx/master
         options = {
         optionsAnnotator: {
             permissions:{
@@ -148,11 +119,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
                   },
             },
             auth: {
-<<<<<<< HEAD
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id=${course_key.to_deprecated_string()}"
-=======
                 token: "${token}"
->>>>>>> edx/master
             },
             store: {
                 // The endpoint of the store on your server.
@@ -198,20 +165,11 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
             }
         },
     };
-<<<<<<< HEAD
-
-
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-
-	//remove old instances
-=======
 
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
     tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
 
     //remove old instances
->>>>>>> edx/master
     if (Annotator._instances.length !== 0) {
       $('#textHolder').annotator("destroy");
     }
@@ -219,10 +177,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
 
-<<<<<<< HEAD
-
-=======
->>>>>>> edx/master
     //Catch
     var annotator = ova.annotator,
         catchOptions = {
