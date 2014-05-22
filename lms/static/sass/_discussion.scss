@@ -118,6 +118,10 @@
   @extend %tooltip;
 }
 
+.loading-animation {
+  @extend %loading-animation;
+}
+
 // main styling
 body.discussion {
 

@@ -193,3 +193,12 @@
     color: rgba(0, 0, 0, .85);
   }
 }
+
+%loading-animation {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  background: url(../images/spinner.gif) no-repeat;
+}
