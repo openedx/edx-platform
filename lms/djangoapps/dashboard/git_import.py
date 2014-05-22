@@ -19,7 +19,7 @@ import mongoengine
 from dashboard.models import CourseImportLog
 from opaque_keys import InvalidKeyError
 from opaque_keys.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
