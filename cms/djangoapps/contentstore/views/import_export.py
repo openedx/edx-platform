@@ -329,7 +329,7 @@ def export_handler(request, course_key_string):
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
         except SerializationError as exc:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(exc)))
+            log.exception('There was an error exporting course %s', course_module.id)
             unit = None
             failed_item = None
             parent = None
@@ -355,8 +355,8 @@ def export_handler(request, course_key_string):
                 'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
-        except Exception, exc:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(exc)))
+        except Exception as exc:
+            log.exception('There was an error exporting course %s', course_module.id)
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
