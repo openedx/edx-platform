@@ -1577,9 +1577,9 @@ for a problem and it is graded successfully.
    * - ``[answers, contents]``
      - array
      - ``answers`` provides the value checked by the user. ``contents`` delivers
-       the HTML entered for the problem in Studio, including the display name,
-       problem text, and choices or response field labels. The array includes
-       each problem in a problem component that has multiple problems.
+       HTML using data entered for the problem in Studio, including the display
+       name, problem text, and choices or response field labels. The array
+       includes each problem in a problem component that has multiple problems.
 
 .. _ora:
 
