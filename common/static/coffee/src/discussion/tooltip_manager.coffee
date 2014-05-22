@@ -1,6 +1,3 @@
-$ ->
-  new TooltipManager
-
 class @TooltipManager
   constructor: () ->
     @$body = $('body')
@@ -45,3 +42,6 @@ class @TooltipManager
   hideTooltip: (e) =>
     @$tooltip.hide().css('opacity', 0)
     clearTimeout(@tooltipTimer)
+
+$ ->
+  new TooltipManager
