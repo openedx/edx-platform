@@ -76,7 +76,7 @@ urlpatterns = ('',  # nopep8
 # OPEN EDX API
 if settings.FEATURES["API"]:
     urlpatterns += (
-        url(r'^api/*', include('api_manager.urls')),
+        url(r'^api/', include('api_manager.urls')),
     )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
