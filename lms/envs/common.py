@@ -973,6 +973,12 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
+    'style-discussion-app': {
+        'source_filenames': [
+            'sass/discussion-app.css',
+        ],
+        'output_filename': 'css/lms-style-discussion-app.css',
+    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
