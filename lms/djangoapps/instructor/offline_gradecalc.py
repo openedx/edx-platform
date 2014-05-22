@@ -1,10 +1,11 @@
-# ======== Offline calculation of grades =============================================================================
-#
-# Computing grades of a large number of students can take a long time.  These routines allow grades to
-# be computed offline, by a batch process (eg cronjob).
-#
-# The grades are stored in the OfflineComputedGrade table of the courseware model.
+"""
+======== Offline calculation of grades =============================================================
 
+Computing grades of a large number of students can take a long time.  These routines allow grades to
+be computed offline, by a batch process (eg cronjob).
+
+The grades are stored in the OfflineComputedGrade table of the courseware model.
+"""
 import json
 import time
 
@@ -49,7 +50,7 @@ def offline_grade_calculation(course_key):
 
         gradeset = grades.grade(student, request, course, keep_raw_scores=True)
         gs = enc.encode(gradeset)
-        ocg, created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_key)
+        ocg, _created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_key)
         ocg.gradeset = gs
         ocg.save()
         print "%s done" % student  	# print statement used because this is run by a management command

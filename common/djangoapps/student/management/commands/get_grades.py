@@ -1,3 +1,7 @@
+"""
+Management command to generate a list of grades for
+all students that are enrolled in a course.
+"""
 from courseware import grades, courses
 from certificates.models import GeneratedCertificate
 from django.test.client import RequestFactory

@@ -13,7 +13,6 @@ from nose.tools import raises
 from mock import Mock, patch
 from django.conf import settings
 from django.test.utils import override_settings
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
