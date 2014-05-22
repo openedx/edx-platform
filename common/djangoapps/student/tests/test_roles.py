@@ -132,7 +132,6 @@ class RolesTestCase(TestCase):
             "Student doesn't have access to {}".format(unicode(self.course_id))
         )
 
-
     def test_get_user_for_role(self):
         """
         test users_for_role
