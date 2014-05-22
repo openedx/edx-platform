@@ -64,11 +64,12 @@ ${block_content}
       <div>
         [
         <a href="#" id="staff-debug-reset" class="staff-debug-reset" data-location="${location.name}">${_('Reset Student Attempts')}</a>
+        % if access["instructor"]:
         |
         <a href="#" id="staff-debug-sdelete" class="staff-debug-sdelete" data-location="${location.name}">${_('Delete Student State')}</a>
         |
         <a href="#" id="staff-debug-rescore" class="staff-debug-rescore" data-location="${location.name}">${_('Rescore Student Submission')}</a>
-        
+        % endif
         ]
       </div>
       <div id="result_${location.name}"/>
