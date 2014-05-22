@@ -68,9 +68,9 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def _get_extension(self, srcurl):
+    def _get_extension(self, src_url):
         ''' get the extension of a given url '''
-        return get_extension(srcurl)
+        return get_extension(src_url)
 
     def get_html(self):
         """ Renders parameters to template. """

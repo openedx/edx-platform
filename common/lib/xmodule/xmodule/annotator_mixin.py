@@ -50,6 +50,6 @@ class MLStripper(HTMLParser):
 
 def html_to_text(html):
     "strips the html tags off of the text to return plaintext"
-    htmlStripper = MLStripper()
-    htmlStripper.feed(html)
-    return htmlStripper.get_data()
+    htmlstripper = MLStripper()
+    htmlstripper.feed(html)
+    return htmlstripper.get_data()

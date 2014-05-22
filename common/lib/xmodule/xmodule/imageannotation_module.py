@@ -1,4 +1,3 @@
-# pylint: disable=W0223
 """
 Module for Image annotations using annotator.
 """
@@ -48,8 +47,18 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='professor:green,teachingAssistant:blue',
     )
-    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
-    annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    annotation_storage_url = String(
+        help="Location of Annotation backend",
+        scope=Scope.settings,
+        default="http://your_annotation_storage.com",
+        display_name="Url for Annotation Storage"
+    )
+    annotation_token_secret = String(
+        help="Secret string for annotation storage",
+        scope=Scope.settings,
+        default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        display_name="Secret Token String for Annotation"
+    )
 
 
 class ImageAnnotationModule(AnnotatableFields, XModule):
@@ -96,7 +105,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         return self.system.render_template('imageannotation.html', context)
 
 
-class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):
+class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=abstract-method
     ''' Image annotation descriptor '''
     module_class = ImageAnnotationModule
     mako_template = "widgets/raw-edit.html"

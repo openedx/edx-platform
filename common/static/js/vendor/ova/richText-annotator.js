@@ -78,7 +78,6 @@ Annotator.Plugin.RichText = (function(_super) {
 		
 		annotator.subscribe("annotationEditorShown", function(){
 			$(annotator.editor.element).find('.mce-tinymce')[0].style.display='block';
-			$(annotator.editor.element).find('.mce-container').css('z-index',3000000000);
 			annotator.editor.checkOrientation();
 		});
 		annotator.subscribe("annotationEditorHidden", function(){
@@ -90,9 +89,6 @@ Annotator.Plugin.RichText = (function(_super) {
 			ed.on('change', function(e) {
 				//set the modification in the textarea of annotator
 				$(editor.element).find('textarea')[0].value = tinymce.activeEditor.getContent();
-			});
-			ed.on('Init', function(ed){
-				$('.mce-container').css('z-index','3090000000000000000');
 			});
 			//New button to add Rubrics of the url https://gteavirtual.org/rubric
 		    ed.addButton('rubric', {

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"Test for Image Annotation Xmodule functional logic."
+"""Test for Image Annotation Xmodule functional logic."""
 
 import unittest
 from mock import Mock
@@ -61,12 +61,12 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Image Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNone(actual)
 
     def test_get_html(self):

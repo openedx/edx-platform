@@ -222,7 +222,11 @@ annotationDetail:
         '</div>'+
     '{{/if}}'+
     '{{#if mediatypeforgrid.image}}'+
-        '<img src="http://www.paraemigrantes.com/wp-content/themes/daily/images/default-thumb.gif">'+
+        '<div class="zoomToImageBounds">'+
+            '<img src="{{{ thumbnailLink }}}">'+
+            '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
+            '<span class="uri" style="display:none">{{{uri}}}</span>'+
+        '</div>'+
     '{{/if}}'+
         '<div class="body">'+
             '{{{ text }}}'+
@@ -254,10 +258,6 @@ annotationDetail:
     '{{/if}}'+
 
         '<div class="controlPanel">'+
-            //'<img class="privacy_button" src="'+root+'privacy_icon.png" width="36" height="36" alt="Privacy Settings" title="Privacy Settings">'+
-//            '<img class="groups_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Groups Access" title="Groups Access">'+
-//            '<img class="reply_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Reply" title="Reply" idAnnotation="{{{ id }}}">'+
-            //'<img class="share_button" src="'+root+'share_icon.png" width="36" height="36" alt="Share Annotation" title="Share Annotation"/>'+
         '</div>'+
     '</div>',
 };
@@ -412,18 +412,19 @@ CatchAnnotation.prototype = {
         el.off();
         
         //Bind functions
-        var openAnnotationItem = this.__bind(this._openAnnotationItem,this),
-        closeAnnotationItem = this.__bind(this._closeAnnotationItem,this),
-            onGeolocationClick = this.__bind(this._onGeolocationClick,this),
-            onPlaySelectionClick = this.__bind(this._onPlaySelectionClick,this),
-            onShareControlsClick = this.__bind(this._onShareControlsClick,this),
-            onSelectionButtonClick = this.__bind(this._onSelectionButtonClick,this),
-            onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick,this),
-            onQuoteMediaButton = this.__bind(this._onQuoteMediaButton,this),
-            onControlRepliesClick = this.__bind(this._onControlRepliesClick,this),
-            onMoreButtonClick = this.__bind(this._onMoreButtonClick,this),
+        var openAnnotationItem = this.__bind(this._openAnnotationItem, this),
+        closeAnnotationItem = this.__bind(this._closeAnnotationItem, this),
+            onGeolocationClick = this.__bind(this._onGeolocationClick, this),
+            onPlaySelectionClick = this.__bind(this._onPlaySelectionClick, this),
+            onShareControlsClick = this.__bind(this._onShareControlsClick, this),
+            onSelectionButtonClick = this.__bind(this._onSelectionButtonClick, this),
+            onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick, this),
+            onQuoteMediaButton = this.__bind(this._onQuoteMediaButton, this),
+            onControlRepliesClick = this.__bind(this._onControlRepliesClick, this),
+            onMoreButtonClick = this.__bind(this._onMoreButtonClick, this),
             onSearchButtonClick = this.__bind(this._onSearchButtonClick, this),
-            onDeleteReplyButtonClick = this.__bind(this._onDeleteReplyButtonClick,this);
+            onDeleteReplyButtonClick = this.__bind(this._onDeleteReplyButtonClick, this),
+            onZoomToImageBoundsButtonClick = this.__bind(this._onZoomToImageBoundsButtonClick, this);
     
         //Open Button
         el.on("click", ".annotationItem .annotationRow", openAnnotationItem);
@@ -442,6 +443,12 @@ CatchAnnotation.prototype = {
         if (this.options.media=='text') {
             //PlaySelection button
             el.on("click",".annotationItem .annotationDetail .quote", onQuoteMediaButton);
+        }
+
+        //IMAGE
+        if (this.options.media=='image') {
+            //PlaySelection button
+            el.on("click",".annotationItem .annotationDetail .zoomToImageBounds", onZoomToImageBoundsButtonClick);
         }
         
         //controlReplies
@@ -568,7 +575,7 @@ CatchAnnotation.prototype = {
                     setTimeout(function(){
                         if (new_tot != tot){
                             self.refreshCatch(true);
-                self.checkTotAnnotations();
+                            self.checkTotAnnotations();
                         }else{
                             attempts++;
                             ischanged();
@@ -587,7 +594,7 @@ CatchAnnotation.prototype = {
                             self.refreshCatch();
                             if (typeof annotation.parent != 'undefined' && annotation.parent != '0'){
                                 var replies = $("[annotationid="+annotation.parent+"]").find(".controlReplies .hideReplies");
-                replies.show();
+                                replies.show();
                                 replies.click();
                                 replies.click();
                             }
@@ -650,6 +657,10 @@ CatchAnnotation.prototype = {
         
         item.mediatypeforgrid = {};
         item.mediatypeforgrid[item.media] = true;
+
+        if (item.mediatypeforgrid.image) {
+            item.thumbnailLink = item.target.thumb;
+        };
 
         //Flags
         if(!this.options.flags && typeof item.tags != 'undefined' && item.tags.length > 0){
@@ -748,6 +759,26 @@ CatchAnnotation.prototype = {
                         }
                     }
                 }
+            }
+        }
+    },
+    _onZoomToImageBoundsButtonClick: function(evt){
+        var zoomToBounds = $(evt.target).hasClass('zoomToImageBounds')?$(evt.target):$(evt.target).parents('.zoomToImageBounds:first'),
+            osdaId = zoomToBounds.find('.idAnnotation').html(),
+            uri = zoomToBounds.find('.uri').html();
+
+        var allannotations = this.annotator.plugins['Store'].annotations,
+            osda = this.annotator.osda;
+
+        for(var item in allannotations){
+            var an = allannotations[item];
+            if (typeof an.id!='undefined' && an.id == osdaId){//this is the annotation
+                var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
+                osda.viewer.viewport.fitBounds(bounds, false);
+
+                console.log(an.target.container);
+                $('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
+                                        'slow');
             }
         }
     },

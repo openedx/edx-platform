@@ -23,17 +23,18 @@ class HelperFunctionTest(unittest.TestCase):
 
     def test_get_instructions(self):
         """
-        Function takes in an input of a specific xml string with surrounding instructions tags and returns a valid html string.
+        Function takes in an input of a specific xml string with surrounding instructions
+        tags and returns a valid html string.
         """
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Helper Test Instructions.</p></div>"
-        actual_xml = get_instructions(xmltree)  # pylint: disable=W0212
+        actual_xml = get_instructions(xmltree)
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = get_instructions(xmltree)  # pylint: disable=W0212
+        actual = get_instructions(xmltree)
         self.assertIsNone(actual)
 
     def test_get_extension(self):
@@ -42,8 +43,8 @@ class HelperFunctionTest(unittest.TestCase):
         """
         expectedyoutube = 'video/youtube'
         expectednotyoutube = 'video/mp4'
-        result1 = get_extension(self.sample_sourceurl)  # pylint: disable=W0212
-        result2 = get_extension(self.sample_youtubeurl)  # pylint: disable=W0212
+        result1 = get_extension(self.sample_sourceurl)
+        result2 = get_extension(self.sample_youtubeurl)
         self.assertEqual(expectedyoutube, result2)
         self.assertEqual(expectednotyoutube, result1)
 
