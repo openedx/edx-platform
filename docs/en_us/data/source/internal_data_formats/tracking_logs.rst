@@ -308,6 +308,10 @@ events that originate on the server (during the processing of a request).
 Enrollment Events
 =========================
 .. tracked_command.py
+
+``edx.course.enrollment.activated`` and ``edx.course.enrollment.deactivated``
+------------------------------------------------------------------------------
+
 The server emits these events in response to course enrollment
 activities completed by a student.
 
@@ -320,11 +324,12 @@ activities completed by a student.
   **Unregister** for the course.
 
 In addition, actions by instructors and course staff members also generate
-enrollment events. For the actions that members of the course team complete that result in these events, see :ref:`instructor_enrollment`.
+enrollment events. For the actions that members of the course team complete that
+result in these events, see :ref:`instructor_enrollment`.
 
 **Event Source**: Server
 
-**History**: The enrollment events were added on 03 Dec 2013.
+**History**: These enrollment events were added on 03 Dec 2013.
 
 ``context`` **Member Fields**: 
 
@@ -400,6 +405,62 @@ Example
         "agent": "Mozilla\/5.0 (Windows NT 6.1; WOW64; Trident\/7.0; rv:11.0) like Gecko",
         "page": null
       }
+
+``edx.course.enrollment.upgrade.clicked``
+-----------------------------------------------
+
+Students who enroll with a ``student_courseenrollment.mode`` of 'audit' or
+'honor' in a course that has a verified certificate option see a **Challenge
+Yourself** link for the course on their dashboards. The browser emits this event
+when a student clicks this option, and the process of upgrading the
+``student_courseenrollment.mode`` for the student to 'verified' begins. See
+:ref:`student_courseenrollment`.
+
+**Event Source**: Browser
+
+**History**: Added 18 Dec 2013.
+
+``context`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details and Member Fields
+   * - ``mode``
+     - string
+     - Enrollment mode when the user clicked **Challenge Yourself**: 'audit' or
+       'honor'.
+
+``event`` **Member Fields**: None.
+       
+``edx.course.enrollment.upgrade.succeeded``
+------------------------------------------
+
+The server emits this event when the process of upgrading a student's
+``student_courseenrollment.mode`` from 'audit' or 'honor' to 'verified' is
+complete.
+
+**Event Source**: Server
+
+**History**: Added 18 Dec 2013.
+
+``context`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details and Member Fields
+   * - ``mode``
+     - string
+     - always 'verified'
+
+``event`` **Member Fields**: None.
 
 .. _navigational:
 
