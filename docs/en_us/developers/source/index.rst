@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. |br| raw:: html
+
 edX Developer's Guide
 ===================================
 
@@ -18,6 +20,13 @@ Contents:
     overview.rst
     extending_platform/index
     process/index
+
+ReST API
+----------
+.. toctree::
+    :maxdepth: 2
+
+    rest_api/index
 
 APIs
 -----

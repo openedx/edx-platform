@@ -66,7 +66,7 @@ else:
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-    'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
+    'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.httpdomain']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

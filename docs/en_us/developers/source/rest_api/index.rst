@@ -1,14 +1,16 @@
-.. _API Manager:
+.. _ReST API:
 
 ###############################
-API Manager
+ReST API
 ###############################
 
-The modules in the API Manager enable the edX :ref:`ReST API`.
+The edX ReST API is enabled by the :ref:`API Manager` module
 
 .. toctree::
     :maxdepth: 2
-
+    
+    api_commands
+    testing_api
     courses
     groups
     sessions

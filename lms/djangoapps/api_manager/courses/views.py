@@ -371,17 +371,34 @@ class CourseContentDetail(SecureAPIView):
 
 class CoursesList(SecureAPIView):
     """
-    ### The CoursesList view allows clients to retrieve the list of courses available in Open edX
-    - URI: ```/api/courses/```
-    - GET: Returns a JSON representation (array) of the set of Course entities
-    ### Use Cases/Notes:
-    * CoursesList currently returns *all* courses in the Open edX database
+    
+    Retrieves a list of courses in the edX Platform as a JSON representation (array) of the set of Course entities.
+
+    **Example request**:
+
+          GET /api/courses
+
+    **Example response**:
+
+          HTTP 200 OK\n  
+          Vary: Accept\n  
+          Content-Type: text/html; charset=utf-8\n
+          Allow: GET, HEAD, OPTIONS
+
+          [
+            {
+                "category": "course",\n   
+                "name": "edX Demonstration Course",\n   
+                "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course",\n   
+                "number": "Open_DemoX",\n   
+                "due": null,\n   
+                "org": "edX",\n   
+                "id": "edX/Open_DemoX/edx_demo_course"  
+            }
+          ]
     """
 
     def get(self, request):
-        """
-        GET /api/courses
-        """
         response_data = []
         store = modulestore()
         course_descriptors = store.get_courses()
