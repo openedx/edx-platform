@@ -18,13 +18,13 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.course_loc = self.course_id.make_usage_key('course', '2012_Fall')
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_loc = self.course_key.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)
-        self.course_staff = StaffFactory(course_key=self.course_id)
-        self.course_instructor = InstructorFactory(course_key=self.course_id)
+        self.course_staff = StaffFactory(course_key=self.course_key)
+        self.course_instructor = InstructorFactory(course_key=self.course_key)
 
     def test_global_staff(self):
         self.assertFalse(GlobalStaff().has_user(self.student))
@@ -55,20 +55,20 @@ class RolesTestCase(TestCase):
         Test that giving a user a course role enables access appropriately
         """
         self.assertFalse(
-            CourseStaffRole(self.course_id).has_user(self.student),
-            "Student has premature access to {}".format(self.course_id)
+            CourseStaffRole(self.course_key).has_user(self.student),
+            "Student has premature access to {}".format(self.course_key)
         )
-        CourseStaffRole(self.course_id).add_users(self.student)
+        CourseStaffRole(self.course_key).add_users(self.student)
         self.assertTrue(
-            CourseStaffRole(self.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id))
+            CourseStaffRole(self.course_key).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key))
         )
 
         # remove access and confirm
-        CourseStaffRole(self.course_id).remove_users(self.student)
+        CourseStaffRole(self.course_key).remove_users(self.student)
         self.assertFalse(
-            CourseStaffRole(self.course_id).has_user(self.student),
-            "Student still has access to {}".format(self.course_id)
+            CourseStaffRole(self.course_key).has_user(self.student),
+            "Student still has access to {}".format(self.course_key)
         )
 
     def test_org_role(self):
@@ -76,67 +76,67 @@ class RolesTestCase(TestCase):
         Test that giving a user an org role enables access appropriately
         """
         self.assertFalse(
-            OrgStaffRole(self.course_id.org).has_user(self.student),
-            "Student has premature access to {}".format(self.course_id.org)
+            OrgStaffRole(self.course_key.org).has_user(self.student),
+            "Student has premature access to {}".format(self.course_key.org)
         )
-        OrgStaffRole(self.course_id.org).add_users(self.student)
+        OrgStaffRole(self.course_key.org).add_users(self.student)
         self.assertTrue(
-            OrgStaffRole(self.course_id.org).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id.org))
+            OrgStaffRole(self.course_key.org).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key.org))
         )
 
         # remove access and confirm
-        OrgStaffRole(self.course_id.org).remove_users(self.student)
+        OrgStaffRole(self.course_key.org).remove_users(self.student)
         if hasattr(self.student, '_roles'):
             del self.student._roles
         self.assertFalse(
-            OrgStaffRole(self.course_id.org).has_user(self.student),
-            "Student still has access to {}".format(self.course_id.org)
+            OrgStaffRole(self.course_key.org).has_user(self.student),
+            "Student still has access to {}".format(self.course_key.org)
         )
 
     def test_org_and_course_roles(self):
         """
         Test that Org and course roles don't interfere with course roles or vice versa
         """
-        OrgInstructorRole(self.course_id.org).add_users(self.student)
-        CourseInstructorRole(self.course_id).add_users(self.student)
+        OrgInstructorRole(self.course_key.org).add_users(self.student)
+        CourseInstructorRole(self.course_key).add_users(self.student)
         self.assertTrue(
-            OrgInstructorRole(self.course_id.org).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id.org))
+            OrgInstructorRole(self.course_key.org).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key.org))
         )
         self.assertTrue(
-            CourseInstructorRole(self.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id))
+            CourseInstructorRole(self.course_key).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key))
         )
 
         # remove access and confirm
-        OrgInstructorRole(self.course_id.org).remove_users(self.student)
+        OrgInstructorRole(self.course_key.org).remove_users(self.student)
         self.assertFalse(
-            OrgInstructorRole(self.course_id.org).has_user(self.student),
-            "Student still has access to {}".format(self.course_id.org)
+            OrgInstructorRole(self.course_key.org).has_user(self.student),
+            "Student still has access to {}".format(self.course_key.org)
         )
         self.assertTrue(
-            CourseInstructorRole(self.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id))
+            CourseInstructorRole(self.course_key).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key))
         )
 
         # ok now keep org role and get rid of course one
-        OrgInstructorRole(self.course_id.org).add_users(self.student)
-        CourseInstructorRole(self.course_id).remove_users(self.student)
+        OrgInstructorRole(self.course_key.org).add_users(self.student)
+        CourseInstructorRole(self.course_key).remove_users(self.student)
         self.assertTrue(
-            OrgInstructorRole(self.course_id.org).has_user(self.student),
-            "Student lost has access to {}".format(self.course_id.org)
+            OrgInstructorRole(self.course_key.org).has_user(self.student),
+            "Student lost has access to {}".format(self.course_key.org)
         )
         self.assertFalse(
-            CourseInstructorRole(self.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_id))
+            CourseInstructorRole(self.course_key).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_key))
         )
 
     def test_get_user_for_role(self):
         """
         test users_for_role
         """
-        role = CourseStaffRole(self.course_id)
+        role = CourseStaffRole(self.course_key)
         role.add_users(self.student)
         self.assertGreater(len(role.users_with_role()), 0)
 
@@ -145,7 +145,7 @@ class RolesTestCase(TestCase):
         Tests that calling add_users multiple times before a single call
         to remove_users does not result in the user remaining in the group.
         """
-        role = CourseStaffRole(self.course_id)
+        role = CourseStaffRole(self.course_key)
         role.add_users(self.student)
         self.assertTrue(role.has_user(self.student))
         # Call add_users a second time, then remove just once.
