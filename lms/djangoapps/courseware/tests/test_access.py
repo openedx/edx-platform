@@ -26,9 +26,8 @@ class AccessTestCase(TestCase):
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)
-        # TODO please change the StaffFactory and InstructorFactory parameters ASAP!
-        self.course_staff = StaffFactory(course=self.course.course_key)
-        self.course_instructor = InstructorFactory(course=self.course.course_key)
+        self.course_staff = StaffFactory(course_key=self.course.course_key)
+        self.course_instructor = InstructorFactory(course_key=self.course.course_key)
 
     def test_has_access_to_course(self):
         self.assertFalse(access._has_access_to_course(
@@ -144,8 +143,8 @@ class UserRoleTestCase(TestCase):
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)
-        self.course_staff = StaffFactory(course=self.course_key)
-        self.course_instructor = InstructorFactory(course=self.course_key)
+        self.course_staff = StaffFactory(course_key=self.course_key)
+        self.course_instructor = InstructorFactory(course_key=self.course_key)
 
     def test_user_role_staff(self):
         """Ensure that user role is student for staff masqueraded as student."""

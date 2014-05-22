@@ -39,8 +39,7 @@ class InstructorFactory(UserFactory):
     last_name = "Instructor"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a course instructor user")
         CourseInstructorRole(extracted).add_users(self)
@@ -54,8 +53,7 @@ class StaffFactory(UserFactory):
     last_name = "Staff"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a course staff user")
         CourseStaffRole(extracted).add_users(self)
@@ -69,8 +67,7 @@ class BetaTesterFactory(UserFactory):
     last_name = "Beta-Tester"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a beta-tester user")
         CourseBetaTesterRole(extracted).add_users(self)
@@ -84,8 +81,7 @@ class OrgStaffFactory(UserFactory):
     last_name = "Org-Staff"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for an org-staff user")
         OrgStaffRole(extracted.org).add_users(self)
@@ -99,8 +95,7 @@ class OrgInstructorFactory(UserFactory):
     last_name = "Org-Instructor"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for an org-instructor user")
         OrgInstructorRole(extracted.org).add_users(self)

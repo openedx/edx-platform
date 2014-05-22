@@ -23,8 +23,8 @@ class RolesTestCase(TestCase):
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)
-        self.course_staff = StaffFactory(course=self.course_id)
-        self.course_instructor = InstructorFactory(course=self.course_id)
+        self.course_staff = StaffFactory(course_key=self.course_id)
+        self.course_instructor = InstructorFactory(course_key=self.course_id)
 
     def test_global_staff(self):
         self.assertFalse(GlobalStaff().has_user(self.student))
