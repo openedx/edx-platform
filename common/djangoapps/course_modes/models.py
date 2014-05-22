@@ -126,5 +126,5 @@ class CourseMode(models.Model):
 
     def __unicode__(self):
         return u"{} : {}, min={}, prices={}".format(
-            self.course_id, self.mode_slug, self.min_price, self.suggested_prices
+            self.course_id.to_deprecated_string(), self.mode_slug, self.min_price, self.suggested_prices
         )

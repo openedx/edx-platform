@@ -608,10 +608,14 @@ class MongoModuleStore(ModuleStoreWriteBase):
         otherwise, do a case sensitive search
         """
         assert(isinstance(course_key, SlashSeparatedCourseKey))
-        course_query = self._course_key_to_son(course_key)
+        location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
+            course_query = location.to_deprecated_son('_id.')
             for key in course_query.iterkeys():
-                course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
+                if isinstance(course_query[key], basestring):
+                    course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
+        else:
+            course_query = {'_id': location.to_deprecated_son()}
         return self.collection.find_one(course_query, fields={'_id': True}) is not None
 
     def has_item(self, usage_key):

@@ -15,6 +15,7 @@ from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
+from xmodule.modulestore.exceptions import InvalidLocationError
 
 log = logging.getLogger(__name__)
 
@@ -165,6 +166,7 @@ def import_from_xml(
             dest_course_id = course_key
 
         if create_new_course:
+            # this tests if exactly this course (ignoring case) exists; so, it checks the run
             if store.has_course(dest_course_id, ignore_case=True):
                 log.debug(
                     "Skipping import of course with id, {0},"
@@ -172,7 +174,15 @@ def import_from_xml(
                 )
                 continue
             else:
-                store.create_course(dest_course_id.org, dest_course_id.offering)
+                try:
+                    store.create_course(dest_course_id.org, dest_course_id.offering)
+                except InvalidLocationError:
+                    # course w/ same org and course exists and store is old mongo
+                    log.debug(
+                        "Skipping import of course with id, {0},"
+                        "since it collides with an existing one".format(dest_course_id)
+                    )
+                    continue
 
         try:
             # turn off all write signalling while importing as this
