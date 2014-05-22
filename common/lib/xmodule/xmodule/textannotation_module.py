@@ -10,10 +10,13 @@ from xmodule.annotator_token import retrieve_token
 
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"), scope=Scope.content, default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -26,25 +29,25 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default='Text Annotation',
     )
     instructor_tags = String(
-        display_name="Tags for Assignments",
-        help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
+        display_name=_("Tags for Assignments"),
+        help=_("Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue"),
         scope=Scope.settings,
         default='imagery:red,parallelism:blue',
     )
     source = String(
-        display_name="Source/Citation",
-        help="Optional for citing source of any material used. Automatic citation can be done using <a href=\"http://easybib.com\">EasyBib</a>",
+        display_name=_("Source/Citation"),
+        help=_("Optional for citing source of any material used. Automatic citation can be done using <a href=\"http://easybib.com\">EasyBib</a>"),
         scope=Scope.settings,
         default='None',
     )
-    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
-    annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
+    annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):

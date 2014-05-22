@@ -75,6 +75,9 @@ from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 DOCS_ANCHOR_TAG = (
     "<a target='_blank'"
     "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
@@ -103,8 +106,8 @@ class LTIFields(object):
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
     display_name = String(
-        display_name="Display Name",
-        help=(
+        display_name=_("Display Name"),
+        help=_(
             "Enter the name that students see for this component.  "
             "Analytics reports may also use the display name to identify this component."
         ),
@@ -112,8 +115,8 @@ class LTIFields(object):
         default="LTI",
     )
     lti_id = String(
-        display_name="LTI ID",
-        help=(
+        display_name=_("LTI ID"),
+        help=_(
             "Enter the LTI ID for the external LTI provider.  "
             "This value must be the same LTI ID that you entered in the "
             "LTI Passports setting on the Advanced Settings page."
@@ -123,8 +126,8 @@ class LTIFields(object):
         scope=Scope.settings
     )
     launch_url = String(
-        display_name="LTI URL",
-        help=(
+        display_name=_("LTI URL"),
+        help=_(
             "Enter the URL of the external tool that this component launches. "
             "This setting is only used when Hide External Tool is set to False."
             "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
@@ -132,16 +135,16 @@ class LTIFields(object):
         default='http://www.example.com',
         scope=Scope.settings)
     custom_parameters = List(
-        display_name="Custom Parameters",
-        help=(
+        display_name=_("Custom Parameters"),
+        help=_(
             "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
             "the background color for this component."
             "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
         ),
         scope=Scope.settings)
     open_in_a_new_page = Boolean(
-        display_name="Open in New Page",
-        help=(
+        display_name=_("Open in New Page"),
+        help=_(
             "Select True if you want students to click a link that opens the LTI tool in a new window. "
             "Select False if you want the LTI content to open in an IFrame in the current page. "
             "This setting is only used when Hide External Tool is set to False.  "
@@ -150,16 +153,16 @@ class LTIFields(object):
         scope=Scope.settings
     )
     has_score = Boolean(
-        display_name="Scored",
-        help=(
+        display_name=_("Scored"),
+        help=_(
             "Select True if this component will receive a numerical score from the external LTI system."
         ),
         default=False,
         scope=Scope.settings
     )
     weight = Float(
-        display_name="Weight",
-        help=(
+        display_name=_("Weight"),
+        help=_(
             "Enter the number of points possible for this component.  "
             "The default value is 1.0.  "
             "This setting is only used when Scored is set to True."
@@ -169,18 +172,18 @@ class LTIFields(object):
         values={"min": 0},
     )
     module_score = Float(
-        help="The score kept in the xblock KVS -- duplicate of the published score in django DB",
+        help=_("The score kept in the xblock KVS -- duplicate of the published score in django DB"),
         default=None,
         scope=Scope.user_state
     )
     score_comment = String(
-        help="Comment as returned from grader, LTI2.0 spec",
+        help=_("Comment as returned from grader, LTI2.0 spec"),
         default="",
         scope=Scope.user_state
     )
     hide_launch = Boolean(
-        display_name="Hide External Tool",
-        help=(
+        display_name=_("Hide External Tool"),
+        help=_(
             "Select True if you want to use this component as a placeholder for syncing with an external grading  "
             "system rather than launch an external tool.  "
             "This setting hides the Launch button and any IFrames for this component."
