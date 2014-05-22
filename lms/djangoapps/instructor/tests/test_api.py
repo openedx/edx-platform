@@ -196,7 +196,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Ensure that a staff member can't access instructor endpoints.
         """
-        staff_member = StaffFactory(course=self.course.id)
+        staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
@@ -225,7 +225,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Ensure that an instructor member can access all endpoints.
         """
-        inst = InstructorFactory(course=self.course.id)
+        inst = InstructorFactory(course_key=self.course.id)
         CourseEnrollment.enroll(inst, self.course.id)
         self.client.login(username=inst.username, password='test')
 
@@ -263,7 +263,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         self.request = RequestFactory().request()
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
@@ -751,10 +751,10 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.beta_tester = BetaTesterFactory(course=self.course.id)
+        self.beta_tester = BetaTesterFactory(course_key=self.course.id)
         CourseEnrollment.enroll(
             self.beta_tester,
             self.course.id
@@ -1056,11 +1056,11 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.other_instructor = InstructorFactory(course=self.course.id)
-        self.other_staff = StaffFactory(course=self.course.id)
+        self.other_instructor = InstructorFactory(course_key=self.course.id)
+        self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
 
     def test_modify_access_noparams(self):
@@ -1299,7 +1299,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -1478,7 +1478,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -1616,7 +1616,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
@@ -1738,7 +1738,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -1871,7 +1871,7 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
     @patch.object(instructor.views.api.requests, 'get')
@@ -2041,7 +2041,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.user1 = user1
         self.user2 = user2
 
-        self.instructor = InstructorFactory(course=course.id)
+        self.instructor = InstructorFactory(course_key=course.id)
         self.client.login(username=self.instructor.username, password='test')
 
     def test_change_due_date(self):
