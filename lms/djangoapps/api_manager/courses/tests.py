@@ -3,7 +3,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
-import simplejson as json
+import json
 import uuid
 from random import randint
 
