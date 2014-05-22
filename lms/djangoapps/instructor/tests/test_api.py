@@ -118,7 +118,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.course.id,
             'robot-some-problem-urlname'
         )
-        self.problem_urlname = str(self.problem_location)
+        self.problem_urlname = self.problem_location.to_deprecated_string()
         _module = StudentModule.objects.create(
             student=self.user,
             course_id=self.course.id,
@@ -1489,7 +1489,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
             self.course.id,
             'robot-some-problem-urlname'
         )
-        self.problem_urlname = str(self.problem_location)
+        self.problem_urlname = self.problem_location.to_deprecated_string()
 
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
@@ -1749,7 +1749,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.course.id,
             'robot-some-problem-urlname'
         )
-        self.problem_urlname = str(self.problem_location)
+        self.problem_urlname = self.problem_location.to_deprecated_string()
 
         self.module = StudentModule.objects.create(
             student=self.student,

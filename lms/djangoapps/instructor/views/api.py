@@ -70,7 +70,6 @@ from .tools import (
 )
 from xmodule.modulestore import Location
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import UsageKey
 from opaque_keys import InvalidKeyError
 
 log = logging.getLogger(__name__)
@@ -768,7 +767,7 @@ def reset_student_attempts(request, course_id):
             return HttpResponseForbidden("Requires instructor access.")
 
     try:
-        module_state_key = UsageKey.from_string(problem_to_reset)
+        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
     except InvalidKeyError:
         return HttpResponseBadRequest()
 
@@ -830,7 +829,7 @@ def rescore_problem(request, course_id):
         )
 
     try:
-        module_state_key = UsageKey.from_string(problem_to_reset)
+        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
     except InvalidKeyError:
         return HttpResponseBadRequest("Unable to parse problem id")
 
@@ -933,7 +932,7 @@ def list_instructor_tasks(request, course_id):
 
     if problem_location_str:
         try:
-            module_state_key = UsageKey.from_string(problem_location_str)
+            module_state_key = course_id.make_usage_key_from_deprecated_string(problem_location_str)
         except InvalidKeyError:
             return HttpResponseBadRequest()
         if student:

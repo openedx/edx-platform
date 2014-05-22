@@ -740,7 +740,7 @@ def submission_history(request, course_id, student_username, location):
         return HttpResponse(escape(_(u'Invalid course id.')))
 
     try:
-        usage_key = UsageKey.from_string(location)
+        usage_key = course_key.make_usage_key_from_deprecated_string(location)
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 

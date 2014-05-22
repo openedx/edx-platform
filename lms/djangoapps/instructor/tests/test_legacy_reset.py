@@ -61,7 +61,7 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.client.post(url, {
             'action': 'Delete student state for module',
             'unique_student_identifier': self.student.email,
-            'problem_for_student': str(problem_location),
+            'problem_for_student': problem_location.to_deprecated_string(),
         })
 
         self.assertEqual(response.status_code, 200)
