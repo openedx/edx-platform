@@ -281,7 +281,7 @@ def see_that_i_am_on_the_verified_track(step):
 
 @step(u'I leave the flow and return$')
 def leave_the_flow_and_return(step):
-    world.visit('verify_student/verified/edx/999/Certificates')
+    world.visit('verify_student/verified/edx/999/Certificates/')
 
 
 @step(u'I am at the verified page$')

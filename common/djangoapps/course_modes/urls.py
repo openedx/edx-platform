@@ -5,5 +5,5 @@ from course_modes import views
 
 urlpatterns = patterns(
     '',
-    url(r'^choose/(?P<course_id>[^/]+/[^/]+/[^/]+)$', views.ChooseModeView.as_view(), name="course_modes_choose"),
+    url(r'^choose/(?P<course_id>[^/]+/[^/]+/[^/]+)/$', views.ChooseModeView.as_view(), name="course_modes_choose"),
 )
