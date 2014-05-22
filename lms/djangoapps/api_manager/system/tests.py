@@ -28,7 +28,7 @@ class SystemApiTests(TestCase):
     """ Test suite for base API views """
 
     def setUp(self):
-        self.test_server_prefix = "https://testserver/api"
+        self.test_server_prefix = "https://testserver/api/"
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
@@ -48,7 +48,7 @@ class SystemApiTests(TestCase):
 
     def test_system_detail_get(self):
         """ Ensure the system returns base data about the system """
-        test_uri = self.test_server_prefix + '/system'
+        test_uri = self.test_server_prefix + 'system'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.data['uri'])

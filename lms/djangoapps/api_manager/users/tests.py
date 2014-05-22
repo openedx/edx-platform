@@ -5,7 +5,7 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_user_views.py]
 """
 from random import randint
-import simplejson as json
+import json
 import unittest
 import uuid
 from mock import patch
