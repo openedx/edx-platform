@@ -42,9 +42,10 @@ edX Studio
    :alt: Other help resources at the bottom of the Studio UI
 
 
-* A problem that caused the video transcript download button to not work for
-  students is fixed. If this was a problem in your course, you must re-import
-  the course in Studio. (BLD-1014)
+* A problem in a small number of XML-authored courses that caused the video
+  transcript download button to not work for students is fixed. If your course
+  was one of the courses affected, you must re-import the course in Studio to
+  enable transcript downloads. (BLD-1014)
 
 * A problem that prevented users with only course staff privileges from
   importing courses is resolved. (STUD-1595)
