@@ -621,7 +621,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
         # Now make it draft, which means both versions will exist.
         self.client.ajax_post(
             self.problem_update_url,
@@ -629,8 +629,8 @@ class TestEditItem(ItemTest):
                 'publish': 'create_draft'
             }
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
-        draft_1 = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        draft_1 = self.get_item_from_modulestore(self.problem_usage_key, True)
         self.assertIsNotNone(draft_1)
 
         # Now check that when a user sends request to create a draft when there is already a draft version then
@@ -641,7 +641,7 @@ class TestEditItem(ItemTest):
                 'publish': 'create_draft'
             }
         )
-        draft_2 = self.get_item_from_modulestore(self.problem_locator, True)
+        draft_2 = self.get_item_from_modulestore(self.problem_usage_key, True)
         self.assertIsNotNone(draft_2)
         self.assertEqual(draft_1, draft_2)
 
@@ -655,7 +655,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
 
         # Now make it private, and check that its published version not exists
         resp = self.client.ajax_post(
@@ -666,8 +666,8 @@ class TestEditItem(ItemTest):
         )
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_locator, False)
-        draft_1 = self.get_item_from_modulestore(self.problem_locator, True)
+            self.get_item_from_modulestore(self.problem_usage_key, False)
+        draft_1 = self.get_item_from_modulestore(self.problem_usage_key, True)
         self.assertIsNotNone(draft_1)
 
         # Now check that when a user sends request to make it private when it already is private then
@@ -680,8 +680,8 @@ class TestEditItem(ItemTest):
         )
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_locator, False)
-        draft_2 = self.get_item_from_modulestore(self.problem_locator, True)
+            self.get_item_from_modulestore(self.problem_usage_key, False)
+        draft_2 = self.get_item_from_modulestore(self.problem_usage_key, True)
         self.assertIsNotNone(draft_2)
         self.assertEqual(draft_1, draft_2)
 

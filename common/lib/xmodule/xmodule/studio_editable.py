@@ -20,7 +20,6 @@ class StudioEditableModule(object):
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
-                'id': child.id,
                 'content': rendered_child.content
             })
 

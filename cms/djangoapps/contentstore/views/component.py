@@ -230,11 +230,10 @@ def container_handler(request, usage_key_string):
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+
         usage_key = UsageKey.from_string(usage_key_string)
-        if not has_course_access(request.user, usage_key.course_key):
-            raise PermissionDenied()
         try:
-            xblock = get_modulestore(usage_key).get_item(usage_key)
+            course, xblock, __ = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
