@@ -48,7 +48,6 @@
 @import 'views/shoppingcart';
 
 // applications
-@import 'discussion';
 @import 'news';
 
 // temp - shame and developer
