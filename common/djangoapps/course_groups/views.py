@@ -8,6 +8,7 @@ import json
 import logging
 import re
 
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
@@ -40,6 +41,10 @@ def list_cohorts(request, course_key):
     {'success': True,
      'cohorts': [{'name': name, 'id': id}, ...]}
     """
+
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+
     get_course_with_access(request.user, 'staff', course_key)
 
     all_cohorts = [{'name': c.name, 'id': c.id}
@@ -63,6 +68,9 @@ def add_cohort(request, course_key):
     {'success': False,
      'msg': error_msg} if there's an error
     """
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+
     get_course_with_access(request.user, 'staff', course_key)
 
     name = request.POST.get("name")
@@ -97,6 +105,9 @@ def users_in_cohort(request, course_key, cohort_id):
          'users': [{'username': ..., 'email': ..., 'name': ...}]
     }
     """
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+
     get_course_with_access(request.user, 'staff', course_key)
 
     # this will error if called with a non-int cohort_id.  That's ok--it
@@ -144,6 +155,8 @@ def add_users_to_cohort(request, course_key, cohort_id):
      'present': [str1, str2, ...],    # already there
      'unknown': [str1, str2, ...]}
     """
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
     get_course_with_access(request.user, 'staff', course_key)
 
     cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
@@ -193,6 +206,8 @@ def remove_user_from_cohort(request, course_key, cohort_id):
     {'success': False,
      'msg': error_msg}
     """
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
     get_course_with_access(request.user, 'staff', course_key)
 
     username = request.POST.get('username')
@@ -215,6 +230,8 @@ def debug_cohort_mgmt(request, course_key):
     """
     Debugging view for dev.
     """
+    # this is a string when we get it here
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
     # add staff check to make sure it's safe if it's accidentally deployed.
     get_course_with_access(request.user, 'staff', course_key)
 
