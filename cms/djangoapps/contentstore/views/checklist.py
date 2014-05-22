@@ -16,6 +16,8 @@ from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 
+from django.utils.translation import ugettext
+
 __all__ = ['checklists_handler']
 
 
@@ -79,7 +81,7 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
             course_module.save()
             modulestore.update_item(course_module, request.user.id)
             expanded_checklist = expand_checklist_action_url(course_module, persisted_checklist)
-            return JsonResponse(expanded_checklist)
+            return JsonResponse(localize_checklist_text(expanded_checklist))
         else:
             return HttpResponseBadRequest(
                 ("Could not save checklist state because the checklist index "
@@ -99,7 +101,7 @@ def expand_all_action_urls(course_module):
     """
     expanded_checklists = []
     for checklist in course_module.checklists:
-        expanded_checklists.append(expand_checklist_action_url(course_module, checklist))
+        expanded_checklists.append(localize_checklist_text(expand_checklist_action_url(course_module, checklist)))
     return expanded_checklists
 
 
@@ -127,3 +129,20 @@ def expand_checklist_action_url(course_module, checklist):
             item['action_url'] = location.url_reverse(url_prefix, '')
 
     return expanded_checklist
+
+def localize_checklist_text(checklist):
+    """
+    Localize texts for a given checklist and returns the modified version.
+
+    The method does an in-place operation so the input checklist is modified directly.
+    """
+    # Localize checklist name
+    checklist['short_description'] = ugettext(checklist['short_description'])
+
+    # Localize checklist items
+    for item in checklist.get('items'):
+        item['short_description'] = ugettext(item['short_description'])
+        item['long_description'] = ugettext(item['long_description'])
+        item['action_text'] = ugettext(item['action_text']) if item['action_text'] != "" else u""
+
+    return checklist
