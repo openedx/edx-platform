@@ -67,7 +67,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             try:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
             except InvalidKeyError:
-                msg = u'Course id invalid.' 
+                msg = u'Course id invalid.'
                 msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
                 msg += 'Please recheck that you have supplied a valid course id.'
                 raise forms.ValidationError(msg)
