@@ -13,7 +13,9 @@ import csv
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
+from opaque_keys import InvalidKeyError
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -35,16 +37,16 @@ class Command(BaseCommand):
             raise CommandError("Usage: unique_id_mapping %s" %
                                " ".join(("<%s>" % arg for arg in Command.args)))
 
-        course_id = args[0]
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
         # Generate the output filename from the course ID.
         # Change slashes to dashes first, and then append .csv extension.
-        output_filename = course_id.replace('/', '-') + ".csv"
+        output_filename = course_key.to_deprecated_string().replace('/', '-') + ".csv"
 
         # Figure out which students are enrolled in the course
-        students = User.objects.filter(courseenrollment__course_id=course_id)
+        students = User.objects.filter(courseenrollment__course_id=course_key)
         if len(students) == 0:
-            self.stdout.write("No students enrolled in %s" % course_id)
+            self.stdout.write("No students enrolled in %s" % course_key.to_deprecated_string())
             return
 
         # Write mapping to output file in CSV format with a simple header
@@ -60,7 +62,7 @@ class Command(BaseCommand):
                     csv_writer.writerow((
                         student.id,
                         anonymous_id_for_user(student, None),
-                        anonymous_id_for_user(student, course_id)
+                        anonymous_id_for_user(student, course_key)
                     ))
         except IOError:
             raise CommandError("Error writing to file: %s" % output_filename)
