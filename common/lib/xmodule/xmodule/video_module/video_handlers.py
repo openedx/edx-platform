@@ -11,7 +11,6 @@ from webob import Response
 
 from xblock.core import XBlock
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
@@ -49,14 +48,10 @@ class VideoStudentViewHandlers(object):
         ]
 
         conversions = {
-            'cumulative_score': json.loads,
+            'cumulative_score': self.cumulative_score_save_action,
             'speed': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
-        }
-
-        save_actions = {
-            'cumulative_score': self.cumulative_score_save_action,
         }
 
         if dispatch == 'save_user_state':
@@ -67,10 +62,7 @@ class VideoStudentViewHandlers(object):
                     else:
                         value = data[key]
 
-                    if key in save_actions:
-                        setattr(self, key, save_actions[key](value))
-                    else:
-                        setattr(self, key, value)
+                    setattr(self, key, value)
 
                     if key == 'speed':
                         self.global_speed = self.speed
@@ -325,6 +317,7 @@ class VideoStudentViewHandlers(object):
         grader_name = request.POST.get('graderName', None)
 
         if not grader_name or grader_name not in self.active_graders:
+            log.debug(u"Grader '%s' is not active.", grader_name)
             return Response(status=400)
 
         if not all(
@@ -337,12 +330,14 @@ class VideoStudentViewHandlers(object):
             try:
                 self.update_score(self.max_score())
                 self.cumulative_score[grader_name]['isScored'] = True
+                log.debug(u"Graded video reached max score.")
             except NotImplementedError:
                 if getattr(self.system, 'is_author_mode', False):
                     return Response(json.dumps(self.module_score), status=200)
                 else:
                     return Response(status=501)
             except AssertionError:
+                log.debug(u"No real user exists for graded video.")
                 return Response(status=500)
 
         return Response(json.dumps(self.module_score), status=200)

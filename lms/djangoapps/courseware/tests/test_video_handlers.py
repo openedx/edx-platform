@@ -845,3 +845,34 @@ class TestVideoGradeHandler(TestVideo):
         response = self.item.grade_handler(request=request, dispatch='')
         self.assertFalse(self.item.cumulative_score['scored_on_percent']['isScored'])
         self.assertEqual(response.status_code, 501)  # NotImplemented
+
+    def test_handle_ajax_graded(self):
+        expected_graders_before = {
+            'scored_on_end': {
+                'isScored': False, 'graderValue': True,
+                'graderState': None, 'saveState': False,
+            },
+            'scored_on_percent': {
+                'isScored': False, 'graderValue': 75,
+                'graderState': None, 'saveState': True,
+            },
+        }
+        self.assertEqual(self.item_descriptor.cumulative_score, expected_graders_before)
+        
+        graders = {
+            'cumulative_score':
+            '{"scored_on_percent": true}'
+        }
+        self.item_descriptor.handle_ajax('save_user_state', graders)
+        
+        expected_graders_after = {
+           'scored_on_end': {
+                'isScored': False, 'graderValue': True,
+                'graderState': None, 'saveState': False,
+            },
+            'scored_on_percent': {
+                'isScored': False, 'graderValue': 75,
+                'graderState': True, 'saveState': True,
+            },
+        }
+        self.assertEqual(self.item_descriptor.cumulative_score, expected_graders_after)

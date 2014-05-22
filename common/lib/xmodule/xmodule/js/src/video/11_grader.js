@@ -41,7 +41,7 @@ function(GraderCollection) {
             this.statusMsgElement = this.statusElement
                                         .find('.problem-feedback-message');
 
-            if (this.score && isFinite(this.score)) {
+            if (this.score && _.isFinite(this.score)) {
                 this.setScore(this.score);
                 this.updateStatusText(
                     this.i18n['You\'ve received credit for viewing this video.']
@@ -148,7 +148,7 @@ function(GraderCollection) {
          * @param {jquery XHR} jqXHR
          */
         onSuccess: function (response) {
-            if (isFinite(response)) {
+            if (_.isFinite(response)) {
                 this.setScore(response);
                 this.el.addClass('is-scored');
                 this.updateStatusText(

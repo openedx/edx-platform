@@ -603,8 +603,7 @@ class VideoExportTestCase(unittest.TestCase):
     def test_graded_video_export_to_xml(self):
         """Test for graded video export."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
 
         desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
         desc.grade_videos = True

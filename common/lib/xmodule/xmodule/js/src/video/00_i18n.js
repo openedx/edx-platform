@@ -25,7 +25,7 @@ function() {
         // Translators: Volume level in range ]80,99]%
         'Very loud': gettext('Very loud'),
         // Translators: Volume level equals 100%.
-        'Maximum': gettext('Maximum')
+        'Maximum': gettext('Maximum'),
         // Translators: "points" is the student's achieved score, and "total_points" is the maximum number of points achievable.
         '(%(points)s / %(total_points)s points)': gettext('(%(points)s / %(total_points)s points)'),
         'You\'ve received credit for viewing this video.': gettext('You\'ve received credit for viewing this video.'),

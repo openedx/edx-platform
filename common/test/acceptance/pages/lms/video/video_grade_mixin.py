@@ -2,10 +2,7 @@
 Video player in the courseware.
 """
 
-from selenium.webdriver.common.action_chains import ActionChains
-from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, Promise
-from bok_choy.javascript import wait_for_js, js_defined
+from bok_choy.promise import EmptyPromise
 
 
 SELECTORS = {
@@ -59,7 +56,7 @@ class VideoGradeMixin(object):
 
         """
         selector = self.get_element_selector(video_display_name, SELECTORS['progress'])
-        return self.q(css=selector).visible
+        return self.q(css=selector).present
 
     def progress_message_text(self, video_display_name=None):
         """
@@ -83,6 +80,8 @@ class VideoGradeMixin(object):
             video_display_name (str or None): Display name of a Video.
 
         """
+        selector = self.get_element_selector(video_display_name, SELECTORS['status'])
+
         def _check_message():
             """
             Event occurred promise check.
@@ -91,6 +90,6 @@ class VideoGradeMixin(object):
                 bool: is event occurred.
 
             """
-            return self.q(css=SELECTORS['status']).present
+            return self.q(css=selector).present
 
         EmptyPromise(_check_message, 'Message is shown', timeout=200).fulfill()

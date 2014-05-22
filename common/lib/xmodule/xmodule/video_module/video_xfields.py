@@ -153,57 +153,57 @@ class VideoFields(object):
     )
 
     has_score = Boolean(
-        help="Select True if students receive a numerical score for viewing or interacting with the video.",
-        display_name="Video Is Scored",
+        help=_("Select True if students receive a numerical score for viewing or interacting with the video."),
+        display_name=_("Video Is Scored"),
         scope=Scope.settings,
         default=False,
     )
 
     scored_on_end = Boolean(
-        help="Select True if students receive a score for viewing the video.",
-        display_name="Video Is Scored When Viewed",
+        help=_("Select True if students receive a score for viewing the video."),
+        display_name=_("Video Is Scored When Viewed"),
         scope=Scope.settings,
         default=False,
     )
 
     scored_on_percent = Integer(
-        help=(
+        help=_(
             "The minimum percentage of the video that students must watch to receive credit. "
             "Enter a number between 1 and 100, without a percent sign. "
             "Partial credit is not possible."
         ),
-        display_name="Video Percent to View",
+        display_name=_("Video Percent to View"),
         values={"min": 0, "max": 100},
         scope=Scope.settings,
     )
 
     module_score = Float(
-        help="The score kept in the xblock KVS -- duplicate of the published score in django DB",
+        help=_("The score kept in the xblock KVS -- duplicate of the published score in django DB"),
         default=None,
         scope=Scope.user_state
     )
 
     weight = Float(
-        display_name="Weight",
-        help=(
+        help=_(
             "The number of points that students receive "
             "if they view the required video. To use this setting, "
             "you must set Video Is Scored to True."
         ),
+        display_name=_("Weight"),
         default=1.0,
         scope=Scope.settings,
         values={"min": 0},
     )
 
     cumulative_score = Dict(
-        help="Accumulates results from particular graders.",
-        display_name="Cumulative scores.",
+        help=_("Accumulates results from particular graders."),
+        display_name=_("Cumulative scores."),
         scope=Scope.user_state,
         default={}
     )
 
     grade_videos = Boolean(
-        help="Whether videos in the course are gradeable",
+        help=_("Whether videos in the course are gradeable"),
         default=False,
         scope=Scope.settings
     )

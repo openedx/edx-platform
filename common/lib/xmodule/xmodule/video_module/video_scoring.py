@@ -1,21 +1,30 @@
 """
 Contani methods for scoring video.
 """
-import logging
 
-
-log = logging.getLogger(__name__)
+import json
 
 
 class VideoScoringMixin(object):
     """
-    Contain method for scoring video
+    Contains methods for scoring video.
     """
     @property
     def really_has_score(self):
+        """
+        Determine if video is graded and cousre has graded videos.
+
+        Return True if video has not only numerical score
+        but course marked as it has gradeable videos.
+        """
         return self.has_score and self.grade_videos
 
     def max_score(self):
+        """
+        Get maximum score possible in this module.
+
+        Return the max score if video is gradeable, None if not.
+        """
         return self.weight if self.really_has_score else None
 
     def update_score(self, score):
@@ -43,7 +52,6 @@ class VideoScoringMixin(object):
         )
 
         self.module_score = score
-        log.debug("[Video]: Grade is saved.")
 
     @property
     def non_default_graders(self):
@@ -130,7 +138,7 @@ class VideoScoringMixin(object):
 
     def cumulative_score_save_action(self, values):
         """
-        Stores state for grader
+        Stores state for grader.
 
         Stores state for grader in copy of cumulative_score to update it in database later.
 
@@ -138,7 +146,7 @@ class VideoScoringMixin(object):
         """
         cumulative_score = dict(self.cumulative_score)
 
-        for grader_name, status in values.items():
+        for grader_name, status in json.loads(values).items():
             if grader_name in self.active_graders:
                 cumulative_score[grader_name]['graderState'] = status
 

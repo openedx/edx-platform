@@ -4,6 +4,7 @@ Acceptance tests for Video grading functionality.
 """
 from ...pages.lms.progress import ProgressPage
 from .test_video_module import VideoBaseTest
+from bok_choy.promise import Promise
 
 
 class VideoGradedTest(VideoBaseTest):
@@ -23,8 +24,23 @@ class VideoGradedTest(VideoBaseTest):
 
     def _assert_video_is_graded_successfully(self, weight=1.0):
         self.tab_nav.go_to_tab('Progress')
-        actual_scores = self.progress_page.scores('Test Chapter', 'Test Section')
-        self.assertEqual(actual_scores, [(int(weight), int(weight))])
+
+        def _has_progress():
+            actual_scores = self.progress_page.scores('Test Chapter', 'Test Section')
+            if actual_scores == [(int(weight), int(weight))]:
+                return [True, True]
+            else:
+                self.browser.refresh()
+                self.video.progress_page.wait_for_page()
+                return [False, False]
+
+        self.assertTrue(
+            Promise(
+                _has_progress,
+                'Video progress is not reflected on the page',
+                timeout=200, try_interval=5
+            ).fulfill()
+        )
 
 
 class YouTubeVideoGradedTest(VideoGradedTest):
@@ -33,7 +49,7 @@ class YouTubeVideoGradedTest(VideoGradedTest):
     def setUp(self):
         super(YouTubeVideoGradedTest, self).setUp()
 
-    def test_video_is_scored_by_percent_to_view(self):
+    def test_video_youtube_is_scored_by_percent_to_view(self):
         """
         Scenario: Video Percent to View
         Given the course has a Video component in "Youtube" mode:
@@ -270,7 +286,7 @@ class VideoGradedWithStartEndTimesTest(VideoGradedTest):
     def setUp(self):
         super(VideoGradedWithStartEndTimesTest, self).setUp()
 
-    def test_video_is_scored_by_percent_to_view(self):
+    def test_video_youtube_with_start_end_times_is_scored_by_percent_to_view(self):
         """
         Scenario: Video Percent to View with start-end times
         Given the course has a Video component in "Youtube" mode:
@@ -398,10 +414,10 @@ class VideoGradedWithStartEndTimesTest(VideoGradedTest):
 
         self.video.click_player_button('play')
         self.video.wait_for_position('0:13')
-        # Video total time is 5 sec.
-        # So 100 * 3/5 = 60% of video is played and it means that
-        # `scored_on_percent` grader is passed. So, we pause the video and
-        # verify that status and progress messages are still the same.
+        # Start-end time interval is 10 sec.
+        # So 100 * (13-10)/10 = 30% of the video is played and it means that
+        # `scored_on_percent` grader is still not passed. So, we pause the video
+        # and verify that status and progress messages are still the same.
         self.video.click_player_button('pause')
         self._assert_video_is_not_scored()
 
@@ -409,11 +425,14 @@ class VideoGradedWithStartEndTimesTest(VideoGradedTest):
         self.browser.refresh()
         self.video.wait_for_page()
 
-        self.assertEquals(self.video.position(), '0:13')
+        # Verify stored position
+        self.assertIn(self.video.position(), ['0:13', '0:14'])
         self.video.click_player_button('play')
 
         # Play the video until the end.
         self.video.wait_for_position('0:15')
+        # 100 * (15-10)/10 = 50% of the video is played, so the video have to be
+        # scored.
         self.video.click_player_button('pause')
         self.video.wait_for_status_message()
 

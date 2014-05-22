@@ -330,7 +330,7 @@ function (HTML5Video, Resizer) {
     function update(time) {
         this.videoPlayer.currentTime = time || this.videoPlayer.player.getCurrentTime();
 
-        if (isFinite(this.videoPlayer.currentTime)) {
+        if (_.isFinite(this.videoPlayer.currentTime)) {
             this.el.trigger('progress', [this.videoPlayer.currentTime]);
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
 
@@ -459,7 +459,7 @@ function (HTML5Video, Resizer) {
     function seekTo(time, silent) {
         var duration = this.videoPlayer.duration();
 
-        if ((typeof time !== 'number') || (time > duration) || (time < 0)) {
+        if (!_.isNumber(time) || time > duration || time < 0) {
             return false;
         }
 

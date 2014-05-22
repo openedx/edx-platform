@@ -128,6 +128,7 @@ describe('VideoGrader', function () {
 
     describe('BasicGrader', function () {
         beforeEach(function () {
+            jasmine.Clock.useMock();
             state.config.graders['basic_grader'] = {
                 isScored: false,
                 graderValue: true,
@@ -141,11 +142,15 @@ describe('VideoGrader', function () {
 
         it('updates status message when done on play', function () {
             state.el.trigger('play');
+            jasmine.Clock.tick(10);
             expect($('.problem-feedback').text()).toBe(SUCCESS_MESSAGE);
         });
 
         it('updates status message when done on video download', function () {
             state.el.find('.video-download-button').trigger('click');
+            jasmine.Clock.tick(10);
+            expect($('.problem-feedback').text()).not.toBe(SUCCESS_MESSAGE);
+            jasmine.Clock.tick(25);
             expect($('.problem-feedback').text()).toBe(SUCCESS_MESSAGE);
         });
     });
@@ -160,6 +165,7 @@ describe('VideoGrader', function () {
         it('updates status message when done on video download', function () {
             new Grader(state, i18n);
             state.el.find('.video-download-button').trigger('click');
+            jasmine.Clock.tick(25);
             expect($('.problem-feedback').text()).toBe(SUCCESS_MESSAGE);
         });
 
@@ -290,7 +296,7 @@ describe('VideoGrader', function () {
         });
 
         it('shows success message if duration is less than 20s', function () {
-            state.videoPlayer.duration.andReturn(1);
+            state.videoPlayer.duration.andReturn(2);
             state.config.graders.scored_on_percent.graderValue = 50;
             new Grader(state, i18n);
             state.el.trigger('play');
@@ -302,7 +308,7 @@ describe('VideoGrader', function () {
 
             expect($('.problem-feedback').text()).toBe(SUCCESS_MESSAGE);
             expect(state.videoGrader).assertState({
-                'scored_on_percent': createStateList(3, 1)
+                'scored_on_percent': createStateList(2, 1)
             });
         });
 
