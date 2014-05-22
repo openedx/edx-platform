@@ -270,14 +270,12 @@ function goto( mode)
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
-      ${_("Specify a particular problem in the course here by its location:")}
+      ${_("Specify a problem in the course here with its complete location:")}
       <input type="text" name="problem_for_all_students" size="60">
     </p>
-    <p>
-      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
-      location="<tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt>")
-      }
-    </p>
+    ## Translators: A location (string of text) follows this sentence.
+    <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+    <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
     <p>
       ${_("Then select an action:")}
       <input type="submit" name="action" value="Reset ALL students' attempts">
@@ -303,14 +301,12 @@ function goto( mode)
       <input type="submit" name="action" value="Get link to student's progress page">
     </p>
     <p>
-      ${_("Specify a particular problem in the course here by its location:")}
+      ${_("Specify a problem in the course here with its complete location:")}
       <input type="text" name="problem_for_student" size="60">
     </p>
-    <p>
-      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
-      location="<tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt>")
-      }
-    </p>
+    ## Translators: A location (string of text) follows this sentence.
+    <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+    <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
 
     <p>
       ${_("Then select an action:")}
