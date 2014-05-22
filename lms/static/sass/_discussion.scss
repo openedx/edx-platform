@@ -113,6 +113,11 @@
 
 // ===============
 
+
+.tooltip {
+  @extend %tooltip;
+}
+
 // main styling
 body.discussion {
 
