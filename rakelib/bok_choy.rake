@@ -147,7 +147,7 @@ def run_bok_choy(test_spec)
     # Construct the nosetests command, specifying where to save screenshots and XUnit XML reports
     cmd = [
         "SCREENSHOT_DIR='#{BOK_CHOY_LOG_DIR}'", "nosetests", test_spec,
-        "--with-xunit", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}", "--verbosity=2"
+        "--with-xunit", "--with-flaky", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}", "--verbosity=2"
     ]
 
     # Configure parallel test execution, if specified
