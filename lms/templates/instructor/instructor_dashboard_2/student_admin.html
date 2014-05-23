@@ -45,15 +45,13 @@
   </p>
   <br>
 
-  <p> ${_('Specify a particular problem in the course here by its location:')}
+  <p> ${_("Specify a problem in the course here with its complete location:")}
   <input type="text" name="problem-select-single" placeholder="${_("Problem location")}">
   </p>
 
-  <p>
-    ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
-    location="<tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt>")
-    }
-  </p>
+  ## Translators: A location (string of text) follows this sentence.
+  <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+  <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
 
   <p>
   ${_("Next, select an action to perform for the given user and problem:")}
@@ -93,14 +91,12 @@
     <div class="request-response-error"></div>
 
     <p>
-      ${_("Specify a particular problem in the course here by its location:")}
+      ${_("Specify a problem in the course here with its complete location:")}
       <input type="text" name="problem-select-all" size="60" placeholder="${_("Problem location")}">
     </p>
-    <p>
-      ${_("You should provide the full location of a problem. A location will look like this: {location}").format(
-      location="<tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt>")
-      }
-    </p>
+    ## Translators: A location (string of text) follows this sentence.
+    <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+    <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
     <p>
       ${_("Then select an action")}:
       <input type="button" class="molly-guard" name="reset-attempts-all" value="${_("Reset ALL students' attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
