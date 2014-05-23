@@ -17,9 +17,6 @@ class Env(object):
     # Root of the git repository (edx-platform)
     REPO_ROOT = path(__file__).abspath().parent.parent.parent
 
-    # Reports Directory
-    REPORT_DIR = REPO_ROOT / 'reports'
-
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
