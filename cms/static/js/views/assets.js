@@ -1,11 +1,13 @@
-define(["jquery", "underscore", "gettext", "js/views/paging", "js/views/asset", "js/views/paging_header", "js/views/paging_footer"],
-    function($, _, gettext, PagingView, AssetView, PagingHeader, PagingFooter) {
+define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging", "js/views/asset",
+    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal"],
+    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils) {
 
         var AssetsView = PagingView.extend({
             // takes AssetCollection as model
 
             events : {
-                "click .column-sort-link": "onToggleColumn"
+                "click .column-sort-link": "onToggleColumn",
+                "click .upload-button": "showUploadModal"
             },
 
             initialize : function() {
@@ -17,10 +19,20 @@ define(["jquery", "underscore", "gettext", "js/views/paging", "js/views/asset", 
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
                 this.setInitialSortColumn('js-asset-date-col');
                 this.showLoadingIndicator();
+                this.setPage(0);
+                assetsView = this;
             },
 
             render: function() {
                 // Wait until the content is loaded the first time to render
+                return this;
+            },
+
+            afterRender: function(){
+                // Bind events with html elements
+                $('li a.upload-button').on('click', this.showUploadModal);
+                $('.upload-modal .close-button').on('click', this.hideModal);
+                $('.upload-modal .choose-file-button').on('click', this.showFileSelectionMenu);
                 return this;
             },
 
@@ -47,9 +59,9 @@ define(["jquery", "underscore", "gettext", "js/views/paging", "js/views/asset", 
 
             renderPageItems: function() {
                 var self = this,
-                    assets = this.collection,
-                    hasAssets = assets.length > 0,
-                    tableBody = this.getTableBody();
+                assets = this.collection,
+                hasAssets = assets.length > 0,
+                tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
                     assets.each(
@@ -91,6 +103,92 @@ define(["jquery", "underscore", "gettext", "js/views/paging", "js/views/asset", 
             onToggleColumn: function(event) {
                 var columnName = event.target.id;
                 this.toggleSortOrder(columnName);
+            },
+
+            hideModal: function (event) {
+                if (event) {
+                    event.preventDefault();
+                }
+                $('.file-input').unbind('change.startUpload');
+                ModalUtils.hideModal();
+            },
+
+            showUploadModal: function (event) {
+                var self = assetsView;
+                event.preventDefault();
+                self.resetUploadModal();
+                ModalUtils.showModal();
+                $('.file-input').bind('change', self.startUpload);
+                $('.upload-modal .file-chooser').fileupload({
+                    dataType: 'json',
+                    type: 'POST',
+                    maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+                    autoUpload: true,
+                    progressall: function(event, data) {
+                        var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
+                        self.showUploadFeedback(event, percentComplete);
+                    },
+                    maxFileSize: 100 * 1000 * 1000,   // 100 MB
+                    maxNumberofFiles: 100,
+                    add: function(event, data) {
+                        data.process().done(function () {
+                            data.submit();
+                        });
+                    },
+                    done: function(event, data) {
+                        self.displayFinishedUpload(data.result);
+                    }
+
+                });
+            },
+
+            showFileSelectionMenu: function(event) {
+                event.preventDefault();
+                $('.file-input').click();
+            },
+
+            startUpload: function (event) {
+                var file = event.target.value;
+
+                $('.upload-modal h1').text(gettext('Uploading…'));
+                $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+                $('.upload-modal .choose-file-button').hide();
+                $('.upload-modal .progress-bar').removeClass('loaded').show();
+            },
+
+            resetUploadModal: function () {
+                // Reset modal so it no longer displays information about previously
+                // completed uploads.
+                var percentVal = '0%';
+                $('.upload-modal .progress-fill').width(percentVal);
+                $('.upload-modal .progress-fill').html(percentVal);
+                $('.upload-modal .progress-bar').hide();
+
+                $('.upload-modal .file-name').show();
+                $('.upload-modal .file-name').html('');
+                $('.upload-modal .choose-file-button').text(gettext('Choose File'));
+                $('.upload-modal .embeddable-xml-input').val('');
+                $('.upload-modal .embeddable').hide();
+            },
+
+            showUploadFeedback: function (event, percentComplete) {
+                var percentVal = percentComplete + '%';
+                $('.upload-modal .progress-fill').width(percentVal);
+                $('.upload-modal .progress-fill').html(percentVal);
+            },
+
+            displayFinishedUpload: function (resp) {
+                var asset = resp.asset;
+
+                $('.upload-modal h1').text(gettext('Upload New File'));
+                $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+                $('.upload-modal .embeddable').show();
+                $('.upload-modal .file-name').hide();
+                $('.upload-modal .progress-fill').html(resp.msg);
+                $('.upload-modal .choose-file-button').text(gettext('Load Another File')).show();
+                $('.upload-modal .progress-fill').width('100%');
+
+                assetsView.addAsset(new AssetModel(asset));
             }
         });
 

@@ -220,6 +220,7 @@ define([
 
     "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
+    "js/spec/views/assets_spec",
 
     "js/spec/views/container_spec",
     "js/spec/views/unit_spec",

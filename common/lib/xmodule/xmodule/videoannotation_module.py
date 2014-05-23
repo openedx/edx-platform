@@ -11,10 +11,13 @@ from xmodule.annotator_token import retrieve_token
 
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class AnnotatableFields(object):
     """ Fields for `VideoModule` and `VideoDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"), scope=Scope.content, default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -24,15 +27,15 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default='Video Annotation',
     )
-    sourceurl = String(help="The external source URL for the video.", display_name="Source URL", scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4")
-    poster_url = String(help="Poster Image URL", display_name="Poster URL", scope=Scope.settings, default="")
-    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
-    annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    sourceurl = String(help=_("The external source URL for the video."), display_name=_("Source URL"), scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4")
+    poster_url = String(help=_("Poster Image URL"), display_name=_("Poster URL"), scope=Scope.settings, default="")
+    annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
+    annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
 
 class VideoAnnotationModule(AnnotatableFields, XModule):
     '''Video Annotation Module'''

@@ -32,6 +32,9 @@ from .util.duedate import get_extended_due_date
 
 log = logging.getLogger("edx.courseware")
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -86,101 +89,103 @@ class CapaFields(object):
     Define the possible fields for a Capa problem
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
         default="Blank Advanced Problem"
     )
-    attempts = Integer(help="Number of attempts taken by the student on this problem",
-                       default=0, scope=Scope.user_state)
+    attempts = Integer(
+        help=_("Number of attempts taken by the student on this problem"),
+        default=0,
+        scope=Scope.user_state)
     max_attempts = Integer(
-        display_name="Maximum Attempts",
-        help=("Defines the number of times a student can try to answer this problem. "
+        display_name=_("Maximum Attempts"),
+        help=_("Defines the number of times a student can try to answer this problem. "
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
+        help=_("Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
              "date if it is set to a date that is later than the global due "
-             "date.",
+             "date."),
         default=None,
         scope=Scope.user_state,
     )
     graceperiod = Timedelta(
-        help="Amount of time after the due date that submissions will be accepted",
+        help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
     )
     showanswer = String(
-        display_name="Show Answer",
-        help=("Defines when to show the answer to the problem. "
+        display_name=_("Show Answer"),
+        help=_("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
         default="finished",
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "Answered", "value": "answered"},
-            {"display_name": "Attempted", "value": "attempted"},
-            {"display_name": "Closed", "value": "closed"},
-            {"display_name": "Finished", "value": "finished"},
-            {"display_name": "Past Due", "value": "past_due"},
-            {"display_name": "Never", "value": "never"}]
+            {"display_name": _("Always"), "value": "always"},
+            {"display_name": _("Answered"), "value": "answered"},
+            {"display_name": _("Attempted"), "value": "attempted"},
+            {"display_name": _("Closed"), "value": "closed"},
+            {"display_name": _("Finished"), "value": "finished"},
+            {"display_name": _("Past Due"), "value": "past_due"},
+            {"display_name": _("Never"), "value": "never"}]
     )
     force_save_button = Boolean(
-        help="Whether to force the save button to appear on the page",
+        help=_("Whether to force the save button to appear on the page"),
         scope=Scope.settings,
         default=False
     )
     rerandomize = Randomization(
-        display_name="Randomization",
-        help="Defines how often inputs are randomized when a student loads the problem. "
+        display_name=_("Randomization"),
+        help=_("Defines how often inputs are randomized when a student loads the problem. "
              "This setting only applies to problems that can have randomly generated numeric values. "
-             "A default value can be set in Advanced Settings.",
+             "A default value can be set in Advanced Settings."),
         default="never",
         scope=Scope.settings,
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "On Reset", "value": "onreset"},
-            {"display_name": "Never", "value": "never"},
-            {"display_name": "Per Student", "value": "per_student"}
+            {"display_name": _("Always"), "value": "always"},
+            {"display_name": _("On Reset"), "value": "onreset"},
+            {"display_name": _("Never"), "value": "never"},
+            {"display_name": _("Per Student"), "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
-    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+    data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
+    correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
-    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
-    done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
-    last_submission_time = Date(help="Last submission time", scope=Scope.user_state)
+    input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
+    student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
+    done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
+    seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
+    last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
-        display_name="Timer Between Attempts",
-        help="Seconds a student must wait between submissions for a problem with multiple attempts.",
+        display_name=_("Timer Between Attempts"),
+        help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
         scope=Scope.settings,
         default=0)
     weight = Float(
-        display_name="Problem Weight",
-        help=("Defines the number of points each problem is worth. "
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. "
               "If the value is not set, each response field in the problem is worth one point."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
+    markdown = String(help=_("Markdown source of this module"), default=None, scope=Scope.settings)
     source_code = String(
-        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
         scope=Scope.settings
     )
     text_customization = Dict(
-        help="String customization substitutions for particular locations",
+        help=_("String customization substitutions for particular locations"),
         scope=Scope.settings
         # TODO: someday it should be possible to not duplicate this definition here
         # and in inheritance.py
     )
     use_latex_compiler = Boolean(
-        help="Enable LaTeX templates?",
+        help=_("Enable LaTeX templates?"),
         default=False,
         scope=Scope.settings
     )

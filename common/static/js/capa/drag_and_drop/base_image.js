@@ -17,7 +17,9 @@ define([], function () {
             '></div>'
         );
 
-        state.baseImageEl = $('<img />');
+        state.baseImageEl = $('<img />', {
+                alt: gettext("Drop target image")
+            });
 
         state.baseImageEl.attr('src', state.config.baseImage);
         state.baseImageEl.load(function () {

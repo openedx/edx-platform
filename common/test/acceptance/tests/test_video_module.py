@@ -13,6 +13,7 @@ from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from box.test.flaky import flaky
 
 VIDEO_SOURCE_PORT = 8777
 YOUTUBE_STUB_PORT = 9080
@@ -36,6 +37,7 @@ class YouTubeConfigError(Exception):
     pass
 
 
+@flaky
 class VideoBaseTest(UniqueCourseTest):
     """
     Base class for tests of the Video Player

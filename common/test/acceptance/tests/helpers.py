@@ -27,14 +27,17 @@ class UniqueCourseTest(WebAppTest):
         """
         Create a unique course ID.
         """
+        super(UniqueCourseTest, self).__init__(*args, **kwargs)
+
+    def setUp(self):
+        super(UniqueCourseTest, self).setUp()
+
         self.course_info = {
             'org': 'test_org',
             'number': self.unique_id,
             'run': 'test_run',
             'display_name': 'Test Course' + self.unique_id
         }
-
-        super(UniqueCourseTest, self).__init__(*args, **kwargs)
 
     @property
     def course_id(self):

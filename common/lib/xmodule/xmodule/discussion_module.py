@@ -6,30 +6,33 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope
 from uuid import uuid4
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings, default="$$GUID$$")
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         default="Discussion",
         scope=Scope.settings
     )
     data = String(
-        help="XML data for the problem",
+        help=_("XML data for the problem"),
         scope=Scope.content,
         default="<discussion></discussion>"
     )
     discussion_category = String(
-        display_name="Category",
+        display_name=_("Category"),
         default="Week 1",
-        help="A category name for the discussion. This name appears in the left pane of the discussion forum for the course.",
+        help=_("A category name for the discussion. This name appears in the left pane of the discussion forum for the course."),
         scope=Scope.settings
     )
     discussion_target = String(
-        display_name="Subcategory",
+        display_name=_("Subcategory"),
         default="Topic-Level Student-Visible Label",
-        help="A subcategory name for the discussion. This name appears in the left pane of the discussion forum for the course.",
+        help=_("A subcategory name for the discussion. This name appears in the left pane of the discussion forum for the course."),
         scope=Scope.settings
     )
     sort_key = String(scope=Scope.settings)

@@ -25,8 +25,11 @@ def go_to_uploads(_step):
 
 
 @step(u'I upload the( test)? file "([^"]*)"$')
-def upload_file(_step, is_test_file, file_name):
-    world.click_link('Upload New File')
+def upload_file(_step, is_test_file, file_name, button_text=None):
+    if button_text:
+        world.click_link(button_text)
+    else:
+        world.click_link('Upload New File')
 
     if not is_test_file:
         _write_test_file(file_name, "test file")
@@ -37,6 +40,11 @@ def upload_file(_step, is_test_file, file_name):
     world.browser.attach_file('file', os.path.abspath(path))
     close_css = 'a.close-button'
     world.css_click(close_css)
+
+
+@step(u'I upload the file "([^"]*)" by clicking "([^"]*)"')
+def upload_file_on_button_press(_step, file_name, button_text=None):
+    upload_file(_step, '', file_name, button_text)
 
 
 @step(u'I upload the files "([^"]*)"$')
