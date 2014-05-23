@@ -16,7 +16,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50

@@ -5,7 +5,7 @@ is to delete the course from the split mongo datastore.
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator
 
 
 class Command(BaseCommand):

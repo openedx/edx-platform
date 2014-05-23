@@ -23,7 +23,7 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)

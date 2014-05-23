@@ -20,7 +20,7 @@ from courseware.access import has_access
 from student.models import CourseEnrollment
 from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class ChooseModeView(View):

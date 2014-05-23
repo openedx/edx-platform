@@ -38,7 +38,7 @@ from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
-from xmodule.modulestore.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 

@@ -5,7 +5,7 @@ import uuid
 import random
 
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import MongoModuleStore, DraftMongoModuleStore
 from xmodule.modulestore.mongo.draft import DIRECT_ONLY_CATEGORIES

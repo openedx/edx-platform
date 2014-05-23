@@ -7,7 +7,7 @@ from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.tests.test_util_open_ended import DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
