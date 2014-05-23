@@ -264,7 +264,8 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
 
     checkers = {
         'load': can_load,
-        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_context)
+        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_context),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, descriptor, course_context),
         }
 
     return _dispatch(checkers, action, user, descriptor)

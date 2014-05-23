@@ -154,7 +154,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_markup(user, access, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -242,5 +242,6 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
                      'render_histogram': render_histogram,
                      'block_content': frag.content,
                      'is_released': is_released,
+                     'access': access
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
