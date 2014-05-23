@@ -27,6 +27,9 @@ PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
+from edxmako import add_lookup, lookup_template
+add_lookup('main', 'templates', package='discussion_app')
+
 
 @newrelic.agent.function_trace()
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
@@ -310,6 +313,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables
+            'has_permission_to_create_thread': cached_has_permission(request.user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(request.user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(request.user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(request.user, "openclose_thread", course_id),
         }
 
         return render_to_response('discussion/index.html', context)
