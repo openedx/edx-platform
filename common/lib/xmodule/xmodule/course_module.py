@@ -361,6 +361,17 @@ class CourseFields(object):
                                       "action_text": _("Edit Course Schedule &amp; Details"),
                                       "action_external": False}]}
         ])
+
+    utilities = List(scope=Scope.settings,
+                     default=[
+                         {"short_description": "Bulk Operations",
+                          "items": [
+                              {"short_description": "Get all captions from YouTube",
+                               "long_description": "This utility will attempt to get or update captions for all videos in the course from YouTube. Please allow it a couple of minutes to run.",
+                               "action_url": "UtilitiesVideoCaptions",
+                               "action_text": "Check Captions",
+                               "action_external": False}]}
+                     ])
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
     show_timezone = Boolean(
         help="True if timezones should be shown on dates in the courseware. Deprecated in favor of due_date_display_format.",

@@ -20,6 +20,7 @@
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             index_url = location.url_reverse('course')
             checklists_url = location.url_reverse('checklists')
+            utilities_url = location.url_reverse('utility')
             course_team_url = location.url_reverse('course_team')
             assets_url = location.url_reverse('assets')
             textbooks_url = location.url_reverse('textbooks')
@@ -105,6 +106,9 @@
                   </li>
                   <li class="nav-item nav-course-tools-export">
                     <a href="${export_url}">${_("Export")}</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-utilities">
+                    <a href="${utilities_url}">${_("Utilities")}</a>
                   </li>
                   % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">

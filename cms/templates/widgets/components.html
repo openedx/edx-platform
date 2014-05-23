@@ -1,0 +1,33 @@
+<!--
+This def will enumerate through a passed in components and list all them all.
+-->
+<%def name="enum_components(unit_components, actions=True, selected=None, sortable=True)">
+  % for component in unit_components:
+
+  <li class="courseware-unit unit is-draggable" data-locator=${component['location']}>
+
+    <%include file="_ui-dnd-indicator-before.html" />
+
+    <label class="section-item">
+
+      <input type="checkbox" class="selectedId" name=${component['location']} value="" onclick="resetSelectAll();" />
+      <span class="component-name">${component['name']}</span>
+
+      <div class="popup">
+        <i class="icon-youtube icon-large" id="platform"></i>
+        <i class="icon-thumbs-up icon-large" id="local"></i>
+        <i class="icon-thumbs-up icon-large" id="remote"></i>
+        <i class="icon-thumbs-up icon-large" id="sync"></i>
+      </div>
+
+      <div class="item-actions">
+        <i class="icon-spinner icon-spin icon-large"></i>
+      </div>
+
+    </label>
+
+    <%include file="_ui-dnd-indicator-after.html" />
+  </li>
+  % endfor
+</%def>
+

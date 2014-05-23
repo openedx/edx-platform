@@ -79,6 +79,9 @@ urlpatterns += patterns(
     url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
     url(r'(?ix)^container($|/){}$'.format(parsers.URL_RE_SOURCE), 'container_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'(?ix)^utility/{}(/)?(?P<utilities_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'utility_handler'),
+    url(r'(?ix)^utilities/captions/{}(/)?(?P<utilities_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'utility_captions_handler'),
+
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
