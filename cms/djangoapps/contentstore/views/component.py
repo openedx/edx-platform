@@ -249,6 +249,7 @@ def container_handler(request, usage_key_string):
         unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
+            'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
             'unit_publish_state': unit_publish_state,
             'xblock_locator': usage_key,
