@@ -119,9 +119,6 @@ FEATURES = {
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
-    # analytics experiments
-    'ENABLE_INSTRUCTOR_ANALYTICS': False,
-
     # Enables the LMS bulk email feature for course staff
     'ENABLE_INSTRUCTOR_EMAIL': True,
     # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
@@ -130,11 +127,14 @@ FEATURES = {
     #   for all Mongo-backed courses.
     'REQUIRE_COURSE_EMAIL_AUTH': True,
 
+    # Analytics experiments - shows instructor analytics tab in LMS instructor dashboard.
+    # Enabling this feature depends on installation of a separate analytics server.
+    'ENABLE_INSTRUCTOR_ANALYTICS': False,
+
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
     # this does.
-
     'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
 
     # Flip to True when the YouTube iframe API breaks (again)
