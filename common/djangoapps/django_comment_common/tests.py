@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django_comment_common.models import Role
 from student.models import CourseEnrollment, User
 
@@ -37,7 +37,7 @@ class RoleAssignmentTest(TestCase):
 
     # The following was written on the assumption that unenrolling from a course
     # should remove all forum Roles for that student for that course. This is
-    # not necessarily the case -- please see comments at the top of 
+    # not necessarily the case -- please see comments at the top of
     # django_comment_client.models.assign_default_role(). Leaving it for the
     # forums team to sort out.
     #

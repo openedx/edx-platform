@@ -10,7 +10,7 @@ from courseware.tests.factories import UserFactory, StaffFactory, InstructorFact
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 # pylint: disable=protected-access

@@ -7,7 +7,7 @@ import lxml
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.locator import Locator
+from opaque_keys.edx.locator import Locator
 
 
 class TestCourseIndex(CourseTestCase):

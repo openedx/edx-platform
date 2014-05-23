@@ -18,7 +18,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from mock import patch
 
 from bulk_email.models import CourseAuthorization
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

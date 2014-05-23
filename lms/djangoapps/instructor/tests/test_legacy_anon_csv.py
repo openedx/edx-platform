@@ -21,7 +21,7 @@ import instructor.views.legacy
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from mock import Mock, patch
 

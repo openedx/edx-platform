@@ -9,7 +9,7 @@ from student.tests.factories import AnonymousUserFactory
 
 from student.roles import GlobalStaff, CourseRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole, \
     CourseInstructorRole
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class RolesTestCase(TestCase):

@@ -20,7 +20,7 @@ from courseware.models import XModuleUserStateSummaryField
 import courseware.module_render as module_render
 import courseware.model_data as model_data
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 

@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from shoppingcart.models import CertificateItem
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
