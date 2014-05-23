@@ -11,6 +11,9 @@ Change Log
 
    * - Date
      - Change
+   * - 05/23/14
+     - Added descriptions of the enrollment upgrade events to the
+       :ref:`Tracking Logs` chapter.
    * - 05/22/14
      - Added descriptions of five video- and problem-related events to the
        :ref:`Tracking Logs` chapter.
