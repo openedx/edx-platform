@@ -20,7 +20,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 

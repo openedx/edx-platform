@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_url, reverse_course_url
 from student.roles import CourseInstructorRole, CourseStaffRole
 from contentstore.views.access import has_course_access

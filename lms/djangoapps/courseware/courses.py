@@ -9,7 +9,7 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import XML_MODULESTORE_TYPE
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError

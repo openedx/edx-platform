@@ -6,7 +6,7 @@ from bson.son import SON
 
 from opaque_keys import InvalidKeyError, OpaqueKey
 
-from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
+from opaque_keys.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
 import json
 
 log = logging.getLogger(__name__)
@@ -55,8 +55,12 @@ class SlashSeparatedCourseKey(CourseKey):
         return cls(*serialized.split('/'))
 
     def _to_string(self):
+        if getattr(self, 'deprecated', False):
+            joinchar = u'/'
+        else:
+            joinchar = u'+'
         # Turns slashes into pluses
-        return u'+'.join([self.org, self.course, self.run])
+        return joinchar.join([self.org, self.course, self.run])
 
     @property
     def offering(self):
@@ -73,7 +77,9 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def from_deprecated_string(cls, serialized):
-        return cls._from_string(serialized)
+        newobj = cls._from_string(serialized)
+        setattr(newobj, 'deprecated', True)
+        return newobj
 
     def make_usage_key_from_deprecated_string(self, location_url):
         """
@@ -87,7 +93,12 @@ class SlashSeparatedCourseKey(CourseKey):
         if match is None:
             raise InvalidKeyError(Location, location_url)
         groups = match.groupdict()
-        return Location(run=self.run, **groups)
+        newobj = Location(run=self.run, **groups)
+        setattr(newobj, 'deprecated', True)
+        return newobj
+
+# register SSCK as the deprecated fallback for CourseKey
+CourseKey.deprecated_fallback = SlashSeparatedCourseKey
 
 
 class LocationBase(object):
@@ -203,7 +214,9 @@ class LocationBase(object):
         if match is None:
             raise InvalidKeyError(Location, serialized)
         groups = match.groupdict()
-        return cls(run=None, **groups)
+        newobj = cls(run=None, **groups)
+        setattr(newobj, 'deprecated', True)
+        return newobj
 
     def to_deprecated_string(self):
         url = u"{0.DEPRECATED_TAG}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
@@ -212,6 +225,9 @@ class LocationBase(object):
         return url
 
     def _to_string(self):
+        if getattr(self, 'deprecated', False):
+            return self.to_deprecated_string()
+
         output = u"+".join(
             unicode(val)
             for val in (self.org, self.course, self.run, self.category, self.name)
@@ -226,16 +242,21 @@ class LocationBase(object):
         if not match:
             raise InvalidKeyError(cls, serialized)
 
-        return cls(**match.groupdict())
+        newobj = cls(**match.groupdict())
+        setattr(newobj, 'deprecated', False)
+        return newobj
 
     def html_id(self):
         """
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_fields = [self.DEPRECATED_TAG, self.org, self.course, self.category, self.name, self.revision]
-        id_string = u"-".join([v for v in id_fields if v is not None])
-        return Location.clean_for_html(id_string)
+        if getattr(self, 'deprecated', False):
+            id_fields = [self.DEPRECATED_TAG, self.org, self.course, self.category, self.name, self.revision]
+            id_string = u"-".join([v for v in id_fields if v is not None])
+            return Location.clean_for_html(id_string)
+        else:
+            return unicode(self)
 
     @property
     def course_key(self):
@@ -258,8 +279,9 @@ class LocationBase(object):
         """
         Return the Location decoding this id_dict and run
         """
-        return cls(id_dict['org'], id_dict['course'], run, id_dict['category'], id_dict['name'], id_dict['revision'])
-
+        newobj = cls(id_dict['org'], id_dict['course'], run, id_dict['category'], id_dict['name'], id_dict['revision'])
+        setattr(newobj, 'deprecated', True)
+        return newobj
 
 class Location(LocationBase, UsageKey, DefinitionKey):
     """
@@ -283,6 +305,9 @@ class Location(LocationBase, UsageKey, DefinitionKey):
             A new :class:`CourseObjectMixin` instance.
         """
         return Location(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)
+
+# register Location as the deprecated fallback for UsageKey
+UsageKey.deprecated_fallback = Location
 
 
 class AssetLocation(LocationBase, AssetKey):
@@ -318,7 +343,9 @@ class AssetLocation(LocationBase, AssetKey):
         if match is None:
             raise InvalidKeyError(Location, serialized)
         groups = match.groupdict()
-        return cls(run=None, **groups)
+        newobj = cls(run=None, **groups)
+        setattr(newobj, 'deprecated', True)
+        return newobj
 
     def map_into_course(self, course_key):
         """
@@ -340,6 +367,9 @@ class AssetLocation(LocationBase, AssetKey):
         Location fields as an array in the old order with the tag.
         """
         return ['c4x', self.org, self.course, self.block_type, self.name, None]
+
+# register Location as the deprecated fallback for UsageKey
+AssetKey.deprecated_fallback = AssetLocation
 
 
 class i4xEncoder(json.JSONEncoder):

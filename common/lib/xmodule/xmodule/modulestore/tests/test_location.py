@@ -5,7 +5,8 @@ import ddt
 
 from unittest import TestCase
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import Location, AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.locations import Location, AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.keys import UsageKey
 
 # Pairs for testing the clean* functions.
 # The first item in the tuple is the input string.
@@ -26,11 +27,16 @@ class TestLocations(TestCase):
     Tests of :class:`.Location`
     """
     @ddt.data(
-        "org+course+run+category+name",
-        "org+course+run+category+name@revision"
+        "location:org+course+run+category+name",
+        "location:org+course+run+category+name@revision",
+        "i4x://org/course/category/name",
+        "i4x://org/course/category/name@draft",
+        # now try the extended char sets
+        "location:org.dept%sub-prof+course.num%section-4+run.hour%min-99+category+name:12%33-44",
+        "i4x://org.dept%sub-prof/course.num%section-4/category/name:12%33-44",
     )
     def test_string_roundtrip(self, url):
-        self.assertEquals(url, Location._from_string(url)._to_string())  # pylint: disable=protected-access
+        self.assertEquals(url, unicode(UsageKey.from_string(url)))  # pylint: disable=protected-access
 
     @ddt.data(
         "i4x://org/course/category/name",
@@ -161,6 +167,8 @@ class TestLocations(TestCase):
 
     def test_html_id(self):
         loc = Location('org', 'course', 'run', 'cat', 'name:more_name', 'rev')
+        self.assertEquals(loc.html_id(), "location:org+course+run+cat+name:more_name@rev")
+        loc.deprecated = True
         self.assertEquals(loc.html_id(), "i4x-org-course-cat-name_more_name-rev")
 
     def test_replacement(self):

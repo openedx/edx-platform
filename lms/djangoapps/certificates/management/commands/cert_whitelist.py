@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import CourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
 

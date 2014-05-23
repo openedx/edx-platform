@@ -1,4 +1,4 @@
-from xmodule.modulestore.locator import DefinitionLocator
+from opaque_keys.locator import DefinitionLocator
 
 
 class DefinitionLazyLoader(object):

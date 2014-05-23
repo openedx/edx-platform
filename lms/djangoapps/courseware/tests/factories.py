@@ -20,7 +20,7 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')

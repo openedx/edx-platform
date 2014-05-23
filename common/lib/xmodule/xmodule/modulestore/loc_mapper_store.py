@@ -8,9 +8,9 @@ import bson.son
 import urllib
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import UsageKey
 
 
 class LocMapperStore(object):

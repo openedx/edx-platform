@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from django_comment_common.models import Role
 from student.models import CourseEnrollment, User
 

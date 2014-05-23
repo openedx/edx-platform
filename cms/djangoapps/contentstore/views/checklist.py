@@ -9,7 +9,7 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_modulestore, reverse_course_url
 

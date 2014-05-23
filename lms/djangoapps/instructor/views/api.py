@@ -69,7 +69,7 @@ from .tools import (
     bulk_email_is_enabled_for_course,
 )
 from xmodule.modulestore import Location
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 
 log = logging.getLogger(__name__)

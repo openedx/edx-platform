@@ -13,7 +13,7 @@ from bson.errors import InvalidId
 
 from opaque_keys import OpaqueKey, InvalidKeyError
 
-from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey
+from opaque_keys.keys import CourseKey, UsageKey, DefinitionKey
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class LocalId(object):
 
 class Locator(OpaqueKey):
     """
-    A locator is like a URL, it refers to a course resource.
+    A locator identifies a course resource.
 
     Locator is an abstract base class: do not instantiate
     """

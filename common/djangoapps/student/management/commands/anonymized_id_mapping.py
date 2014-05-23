@@ -15,7 +15,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from opaque_keys import InvalidKeyError
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):

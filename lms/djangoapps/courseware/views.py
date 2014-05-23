@@ -46,8 +46,8 @@ import shoppingcart
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.locations import SlashSeparatedCourseKey
+from opaque_keys.keys import UsageKey
 
 log = logging.getLogger("edx.courseware")
 

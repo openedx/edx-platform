@@ -11,7 +11,7 @@ from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore import Location
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 

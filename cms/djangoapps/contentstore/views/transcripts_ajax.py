@@ -22,7 +22,7 @@ from opaque_keys import InvalidKeyError
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.keys import UsageKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
