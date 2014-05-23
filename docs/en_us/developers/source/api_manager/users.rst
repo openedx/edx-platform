@@ -1,5 +1,5 @@
 ###############################
-Users Module in api_manager
+Users API Module
 ###############################
 
 .. module:: api_manager

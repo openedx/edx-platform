@@ -1,5 +1,5 @@
 ###############################
-System Module in api_manager
+System API Module
 ###############################
 
 .. module:: api_manager

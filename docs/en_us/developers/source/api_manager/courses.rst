@@ -1,27 +1,18 @@
-###############################
-Courses Module in api_manager
-###############################
+##############################
+Courses API Module
+##############################
 
 .. module:: api_manager
 
 The page contains docstrings for:
 
-* `Courses Views`_
-* `Courses Tests`_
+* `View a List of Courses`_
 
-**************
-Courses Views
-**************
+.. _View a List of Courses:
 
-.. automodule:: courses.views
+**************************
+View a List of Courses
+**************************
+
+.. autoclass:: courses.views.CoursesList
     :members:
-    :show-inheritance:
-
-
-**************
-Courses Tests
-**************
-
-.. automodule:: courses.tests
-    :members:
-    :show-inheritance:

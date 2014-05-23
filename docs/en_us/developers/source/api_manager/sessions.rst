@@ -1,5 +1,5 @@
 ###############################
-Sessions Module in api_manager
+Sessions API Module
 ###############################
 
 .. module:: api_manager

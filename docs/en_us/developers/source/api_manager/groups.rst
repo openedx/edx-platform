@@ -1,5 +1,5 @@
 ###############################
-Gruops Module in api_manager
+Gruops API Module
 ###############################
 
 .. module:: api_manager

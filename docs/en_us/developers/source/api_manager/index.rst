@@ -1,14 +1,19 @@
-.. _API Manager:
+.. _API:
 
 ###############################
-API Manager
+edX Platform ReST API
 ###############################
 
-The modules in the API Manager enable the edX :ref:`ReST API`.
+This section contains information on edX Platform ReST API.
+
+View the following chapters to understand the ReST API, how to test it, and the
+available endpoints.
 
 .. toctree::
     :maxdepth: 2
 
+    api_overview
+    api_testing
     courses
     groups
     sessions

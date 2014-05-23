@@ -372,7 +372,8 @@ class CourseContentDetail(SecureAPIView):
 class CoursesList(SecureAPIView):
     """
     
-    Retrieves a list of courses in the edX Platform as a JSON representation (array) of the set of Course entities.
+    Retrieves a list of courses in the edX Platform as a JSON representation
+    (array) of the set of Course entities.
 
     **Example request**:
 
@@ -380,19 +381,19 @@ class CoursesList(SecureAPIView):
 
     **Example response**:
 
-          HTTP 200 OK\n  
-          Vary: Accept\n  
-          Content-Type: text/html; charset=utf-8\n
-          Allow: GET, HEAD, OPTIONS
+          HTTP 200 OK  
+          Vary: Accept   
+          Content-Type: text/html; charset=utf-8   
+          Allow: GET, HEAD, OPTIONS 
 
           [
             {
-                "category": "course",\n   
-                "name": "edX Demonstration Course",\n   
-                "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course",\n   
-                "number": "Open_DemoX",\n   
-                "due": null,\n   
-                "org": "edX",\n   
+                "category": "course",   
+                "name": "edX Demonstration Course",   
+                "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course",   
+                "number": "Open_DemoX",   
+                "due": null,   
+                "org": "edX",   
                 "id": "edX/Open_DemoX/edx_demo_course"  
             }
           ]
