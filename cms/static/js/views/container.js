@@ -41,12 +41,12 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         // avoid creating an orphan if the addition fails.
                         if (newParent) {
                             removeFromParent = oldParent;
-                            self.reorder(newParent, function () {
-                                self.reorder(removeFromParent, hideSaving);
+                            self.updateChildren(newParent, function () {
+                                self.updateChildren(removeFromParent, hideSaving);
                             });
                         } else {
                             // No new parent, only reordering within same container.
-                            self.reorder(oldParent, hideSaving);
+                            self.updateChildren(oldParent, hideSaving);
                         }
 
                         oldParent = undefined;
@@ -79,7 +79,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                 });
             },
 
-            reorder: function (targetParent, successCallback) {
+            updateChildren: function (targetParent, successCallback) {
                 var children, childLocators;
 
                 // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.

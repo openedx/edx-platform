@@ -218,9 +218,14 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                         clickDelete(componentIndex);
                         create_sinon.respondWithJson(requests, {});
 
-                        // expect request URL to contain given component's id
-                        expect(lastRequest().url).toMatch(
+                        // first request contains given component's id (to delete the component)
+                        expect(requests[requests.length - 2].url).toMatch(
                             new RegExp("locator-component-" + GROUP_TO_TEST + (componentIndex + 1))
+                        );
+
+                        // second request contains parent's id (to remove as child)
+                        expect(lastRequest().url).toMatch(
+                            new RegExp("locator-group-" + GROUP_TO_TEST)
                         );
                     };
 

@@ -152,9 +152,12 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                                     type: 'DELETE',
                                     url: self.getURLRoot() + "/" +
                                         xblockElement.data('locator') + "?" +
-                                        $.param({recurse: true, all_versions: true})
+                                        $.param({recurse: true, all_versions: false})
                                 }).success(function() {
+                                    // get the parent so we can remove this component from its parent.
+                                    var parent = self.findXBlockElement(xblockElement.parent());
                                     xblockElement.remove();
+                                    self.xblockView.updateChildren(parent);
                                 });
                             });
                     });
