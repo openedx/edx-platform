@@ -741,22 +741,21 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_illegal_draft_crud_ops(self):
         draft_store = modulestore('draft')
-        direct_store = modulestore('direct')
 
         course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         location = course.id.make_usage_key('chapter', 'neuvo')
-        # Ensure draft mongo store does not allow us to create chapters either directly or via convert to draft
-        with self.assertRaises(InvalidVersionError):
-            draft_store.create_and_save_xmodule(location)
-        direct_store.create_and_save_xmodule(location)
+        # Ensure draft mongo store does not create drafts for things that shouldn't be draft
+        newobject = draft_store.create_and_save_xmodule(location)
+        self.assertFalse(getattr(newobject, 'is_draft', False))
         with self.assertRaises(InvalidVersionError):
             draft_store.convert_to_draft(location)
         chapter = draft_store.get_item(location)
         chapter.data = 'chapter data'
 
-        with self.assertRaises(InvalidVersionError):
-            draft_store.update_item(chapter, self.user.id)
+        draft_store.update_item(chapter, self.user.id)
+        newobject = draft_store.get_item(chapter.location)
+        self.assertFalse(getattr(newobject, 'is_draft', False))
 
         with self.assertRaises(InvalidVersionError):
             draft_store.unpublish(location)
