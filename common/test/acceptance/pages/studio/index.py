@@ -11,7 +11,7 @@ class DashboardPage(PageObject):
     My Courses page in Studio
     """
 
-    url = BASE_URL + "/course"
+    url = BASE_URL + "/course/"
 
     def is_browser_on_page(self):
         return self.q(css='body.view-dashboard').present

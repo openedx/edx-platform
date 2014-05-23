@@ -16,6 +16,7 @@ from wiki.models import URLPath, Article
 
 from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=W0613
     as it's home page. A course's wiki must be an article on the root (for
     example, "/6.002x") to keep things simple.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
     course_slug = course_wiki_slug(course)
 
     valid_slug = True

@@ -54,10 +54,10 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
 
-        self.instructor = InstructorFactory(course=self.course.location)
+        self.instructor = InstructorFactory(course=self.course.id)
 
         # Create staff
-        self.staff = [StaffFactory(course=self.course.location)
+        self.staff = [StaffFactory(course=self.course.id)
                       for _ in xrange(STAFF_COUNT)]
 
         # Create students
@@ -71,16 +71,16 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         # Pull up email view on instructor dashboard
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
         response = self.client.get(self.url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
         self.assertTrue(email_section in response.content)
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.success_content = {
-            'course_id': self.course.id,
+            'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
 

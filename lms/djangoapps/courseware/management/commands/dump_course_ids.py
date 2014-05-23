@@ -24,18 +24,12 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        results = []
-
         try:
             name = options['modulestore']
             store = modulestore(name)
         except KeyError:
             raise CommandError("Unknown modulestore {}".format(name))
 
-        for course in store.get_courses():
-            course_id = course.location.course_id
-            results.append(course_id)
-
-        output = '\n'.join(results) + '\n'
+        output = u'\n'.join(course.id.to_deprecated_string() for course in store.get_courses()) + '\n'
 
         return output.encode('utf-8')

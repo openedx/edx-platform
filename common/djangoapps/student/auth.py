@@ -35,7 +35,7 @@ def has_access(user, role):
         return True
     # if not, then check inferred permissions
     if (isinstance(role, (CourseStaffRole, CourseBetaTesterRole)) and
-            CourseInstructorRole(role.location).has_user(user)):
+            CourseInstructorRole(role.course_key).has_user(user)):
         return True
     return False
 
@@ -81,6 +81,6 @@ def _check_caller_authority(caller, role):
     if isinstance(role, (GlobalStaff, CourseCreatorRole)):
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
-        if not has_access(caller, CourseInstructorRole(role.location)):
+        if not has_access(caller, CourseInstructorRole(role.course_key)):
             raise PermissionDenied
 

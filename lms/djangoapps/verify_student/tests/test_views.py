@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -63,9 +64,9 @@ class TestVerifyView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        self.course_id = 'Robot/999/Test_Course'
+        self.course_key = SlashSeparatedCourseKey('Robot', '999', 'Test_Course')
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        verified_mode = CourseMode(course_id=self.course_id,
+        verified_mode = CourseMode(course_id=self.course_key,
                                    mode_slug="verified",
                                    mode_display_name="Verified Certificate",
                                    min_price=50)
@@ -88,14 +89,14 @@ class TestVerifiedView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="abc", password="test")
         self.client.login(username="abc", password="test")
-        self.course_id = "MITx/999.1x/Verified_Course"
         self.course = CourseFactory.create(org='MITx', number='999.1x', display_name='Verified Course')
+        self.course_id = self.course.id
 
     def test_verified_course_mode_none(self):
         """
         Test VerifiedView when there is no active verified mode for course.
         """
-        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id})
+        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id.to_deprecated_string()})
 
         verify_mode = CourseMode.mode_for_course(self.course_id, "verified")
         # Verify mode should be None.
@@ -117,8 +118,8 @@ class TestReverifyView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        self.course_id = "MITx/999/Robot_Super_Course"
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course_key = self.course.id
 
     @patch('verify_student.views.render_to_response', render_mock)
     def test_reverify_get(self):
@@ -160,8 +161,8 @@ class TestPhotoVerificationResultsCallback(TestCase):
     Tests for the results_callback view.
     """
     def setUp(self):
-        self.course_id = 'Robot/999/Test_Course'
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course_id = self.course.id
         self.user = UserFactory.create()
         self.attempt = SoftwareSecurePhotoVerification(
             status="submitted",
@@ -372,7 +373,7 @@ class TestMidCourseReverifyView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        self.course_id = 'Robot/999/Test_Course'
+        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
         patcher = patch('student.models.tracker')
@@ -382,7 +383,7 @@ class TestMidCourseReverifyView(TestCase):
     @patch('verify_student.views.render_to_response', render_mock)
     def test_midcourse_reverify_get(self):
         url = reverse('verify_student_midcourse_reverify',
-                      kwargs={"course_id": self.course_id})
+                      kwargs={"course_id": self.course_key.to_deprecated_string()})
         response = self.client.get(url)
 
         # Check that user entering the reverify flow was logged
@@ -390,7 +391,7 @@ class TestMidCourseReverifyView(TestCase):
             'edx.course.enrollment.reverify.started',
             {
                 'user_id': self.user.id,
-                'course_id': self.course_id,
+                'course_id': self.course_key.to_deprecated_string(),
                 'mode': "verified",
             }
         )
@@ -402,8 +403,8 @@ class TestMidCourseReverifyView(TestCase):
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_midcourse_reverify_post_success(self):
-        window = MidcourseReverificationWindowFactory(course_id=self.course_id)
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_id})
+        window = MidcourseReverificationWindowFactory(course_id=self.course_key)
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
 
         response = self.client.post(url, {'face_image': ','})
 
@@ -412,7 +413,7 @@ class TestMidCourseReverifyView(TestCase):
             'edx.course.enrollment.reverify.submitted',
             {
                 'user_id': self.user.id,
-                'course_id': self.course_id,
+                'course_id': self.course_key.to_deprecated_string(),
                 'mode': "verified",
             }
         )
@@ -428,11 +429,11 @@ class TestMidCourseReverifyView(TestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_midcourse_reverify_post_failure_expired_window(self):
         window = MidcourseReverificationWindowFactory(
-            course_id=self.course_id,
+            course_id=self.course_key,
             start_date=datetime.now(pytz.UTC) - timedelta(days=100),
             end_date=datetime.now(pytz.UTC) - timedelta(days=50),
         )
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_id})
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
         response = self.client.post(url, {'face_image': ','})
         self.assertEquals(response.status_code, 302)
         with self.assertRaises(ObjectDoesNotExist):
@@ -445,9 +446,9 @@ class TestMidCourseReverifyView(TestCase):
         # not enrolled in any courses
         self.assertEquals(response.status_code, 200)
 
-        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_id)
+        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_key)
         enrollment.update_enrollment(mode="verified", is_active=True)
-        MidcourseReverificationWindowFactory(course_id=self.course_id)
+        MidcourseReverificationWindowFactory(course_id=self.course_key)
         response = self.client.get(url)
         # enrolled in a verified course, and the window is open
         self.assertEquals(response.status_code, 200)

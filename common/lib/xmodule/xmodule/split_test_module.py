@@ -84,7 +84,7 @@ class SplitTestModule(SplitTestFields, XModule):
         # we've picked a choice.  Use self.descriptor.get_children() instead.
 
         for child in self.descriptor.get_children():
-            if child.location.url() == location:
+            if child.location == location:
                 return child
 
         return None
@@ -159,7 +159,7 @@ class SplitTestModule(SplitTestFields, XModule):
 
             contents.append({
                 'group_id': group_id,
-                'id': child.id,
+                'id': child.location.to_deprecated_string(),
                 'content': rendered_child.content
             })
 
@@ -184,7 +184,7 @@ class SplitTestModule(SplitTestFields, XModule):
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
-                'id': child.id,
+                'id': child.location.to_deprecated_string(),
                 'content': rendered_child.content
             })
 
@@ -254,7 +254,11 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def definition_to_xml(self, resource_fs):
 
         xml_object = etree.Element('split_test')
-        xml_object.set('group_id_to_child', json.dumps(self.group_id_to_child))
+        renderable_groups = {}
+        # json.dumps doesn't know how to handle Location objects
+        for group in self.group_id_to_child:
+            renderable_groups[group] = self.group_id_to_child[group].to_deprecated_string()
+        xml_object.set('group_id_to_child', json.dumps(renderable_groups))
         xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)

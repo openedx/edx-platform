@@ -32,7 +32,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 'run': run
             });
 
-            $.postJSON('/course', {
+            $.postJSON('/course/', {
                     'org': org,
                     'number': number,
                     'display_name': display_name,

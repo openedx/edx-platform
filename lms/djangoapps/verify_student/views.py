@@ -34,6 +34,7 @@ from verify_student.models import (
 from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from .exceptions import WindowExpiredException
 
 log = logging.getLogger(__name__)
@@ -55,12 +56,13 @@ class VerifyView(View):
         """
         upgrade = request.GET.get('upgrade', False)
 
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
             return redirect(
                 reverse('verify_student_verified',
-                        kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade)
+                        kwargs={'course_id': course_id.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
             )
         elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
@@ -76,8 +78,8 @@ class VerifyView(View):
         # from the flow
         if not verify_mode:
             return redirect(reverse('dashboard'))
-        if course_id in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id]
+        if course_id.to_deprecated_string() in request.session.get("donation_for_course", {}):
+            chosen_price = request.session["donation_for_course"][course_id.to_deprecated_string()]
         else:
             chosen_price = verify_mode.min_price
 
@@ -85,7 +87,8 @@ class VerifyView(View):
         context = {
             "progress_state": progress_state,
             "user_full_name": request.user.profile.name,
-            "course_id": course_id,
+            "course_id": course_id.to_deprecated_string(),
+            "course_modes_choose_url": reverse('course_modes_choose', kwargs={'course_id': course_id.to_deprecated_string()}),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
@@ -114,25 +117,33 @@ class VerifiedView(View):
         Handle the case where we have a get request
         """
         upgrade = request.GET.get('upgrade', False)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
+
         if verify_mode is None:
             return redirect(reverse('dashboard'))
-        if course_id in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id]
-        else:
-            chosen_price = verify_mode.min_price.format("{:g}")
+
+        chosen_price = request.session.get(
+            "donation_for_course",
+            {}
+        ).get(
+            course_id.to_deprecated_string(),
+            verify_mode.min_price
+        )
 
         course = course_from_id(course_id)
         context = {
-            "course_id": course_id,
+            "course_id": course_id.to_deprecated_string(),
+            "course_modes_choose_url": reverse('course_modes_choose', kwargs={'course_id': course_id.to_deprecated_string()}),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
+            "create_order_url": reverse("verify_student_create_order"),
             "upgrade": upgrade,
         }
         return render_to_response('verify_student/verified.html', context)
@@ -155,6 +166,7 @@ def create_order(request):
         attempt.save()
 
     course_id = request.POST['course_id']
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
     current_donation = donation_for_course.get(course_id, decimal.Decimal(0))
     contribution = request.POST.get("contribution", donation_for_course.get(course_id, 0))
@@ -271,13 +283,16 @@ def show_requirements(request, course_id):
     """
     Show the requirements necessary for the verification flow.
     """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
 
     upgrade = request.GET.get('upgrade', False)
     course = course_from_id(course_id)
     context = {
-        "course_id": course_id,
+        "course_id": course_id.to_deprecated_string(),
+        "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()}),
+        "verify_student_url": reverse('verify_student_verify', kwargs={'course_id': course_id.to_deprecated_string()}),
         "course_name": course.display_name_with_default,
         "course_org": course.display_org_with_default,
         "course_num": course.display_number_with_default,
@@ -356,6 +371,7 @@ class MidCourseReverifyView(View):
         """
         display this view
         """
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         course = course_from_id(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
@@ -363,7 +379,7 @@ class MidCourseReverifyView(View):
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
-            "course_id": course_id,
+            "course_id": course_id.to_deprecated_string(),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
@@ -379,6 +395,7 @@ class MidCourseReverifyView(View):
         """
         try:
             now = datetime.datetime.now(UTC)
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
             window = MidcourseReverificationWindow.get_window(course_id, now)
             if window is None:
                 raise WindowExpiredException

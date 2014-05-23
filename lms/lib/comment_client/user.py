@@ -86,7 +86,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
-        params = {'course_id': self.course_id}
+        params = {'course_id': self.course_id.to_deprecated_string()}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -102,7 +102,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
-        params = {'course_id': self.course_id}
+        params = {'course_id': self.course_id.to_deprecated_string()}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -118,7 +118,7 @@ class User(models.Model):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = self.course_id
+            retrieve_params['course_id'] = self.course_id.to_deprecated_string()
         try:
             response = perform_request(
                 'get',
@@ -162,8 +162,5 @@ def _url_for_user_active_threads(user_id):
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
-
-def _url_for_user_stats(user_id,course_id):
-    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
 
 

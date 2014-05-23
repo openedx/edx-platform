@@ -21,6 +21,7 @@ import instructor.views.legacy
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from mock import Mock, patch
 
@@ -34,7 +35,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
     # Note -- I copied this setUp from a similar test
     def setUp(self):
         clear_existing_modulestores()
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        self.toy = modulestore().get_course(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -45,7 +46,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.id).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -55,7 +56,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
     @patch.object(instructor.views.legacy, 'unique_id_for_user', Mock(return_value='41'))
     def test_download_anon_csv(self):
         course = self.toy
-        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
 
         self.assertEqual(response['Content-Type'], 'text/csv')

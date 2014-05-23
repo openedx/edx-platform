@@ -5,11 +5,11 @@ from contentstore.views.helpers import xblock_studio_url
 <%namespace name='static' file='static_content.html'/>
 
 % if is_reorderable:
-<li class="studio-xblock-wrapper is-draggable" data-locator="${locator}">
+<li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}">
 % else:
 <div class="studio-xblock-wrapper">
 % endif
-<section class="wrapper-xblock xblock-type-container level-element" data-locator="${locator}">
+<section class="wrapper-xblock xblock-type-container level-element" data-locator="${xblock.location}">
     <header class="xblock-header">
         <div class="header-details">
             ${xblock.display_name_with_default}

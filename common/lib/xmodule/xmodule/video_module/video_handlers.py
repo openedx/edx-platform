@@ -194,12 +194,10 @@ class VideoStudentViewHandlers(object):
             transcript_name = self.sub
 
         if transcript_name:
-            course_location = CourseDescriptor.id_to_location(self.course_id)
-
             # Get the asset path for course
             asset_path = None
             if hasattr(self.descriptor.runtime, 'modulestore'):
-                course = self.descriptor.runtime.modulestore.get_item(course_location)
+                course = self.descriptor.runtime.modulestore.get_course(self.course_id)
                 asset_path = course.static_asset_path
             else:
                 # Handle XML Courses that don't have modulestore in the runtime

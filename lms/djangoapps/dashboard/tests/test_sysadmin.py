@@ -14,7 +14,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from django.utils.html import escape
 from django.utils.translation import ugettext as _
 import mongoengine
 
@@ -28,6 +27,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 TEST_MONGODB_LOG = {
@@ -48,7 +48,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_BRANCH = 'testing_do_not_delete'
-    TEST_BRANCH_COURSE = 'MITx/edx4edx_branch/edx4edx'
+    TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
 
     def setUp(self):
         """Setup test case by adding primary user."""
@@ -80,12 +80,16 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
             course = def_ms.courses.get(course_path, None)
         except AttributeError:
             # Using mongo store
-            course = def_ms.get_course('MITx/edx4edx/edx4edx')
+            course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
 
         # Delete git loaded course
-        response = self.client.post(reverse('sysadmin_courses'),
-                                {'course_id': course.id,
-                                 'action': 'del_course', })
+        response = self.client.post(
+            reverse('sysadmin_courses'),
+            {
+                'course_id': course.id.to_deprecated_string(),
+                'action': 'del_course',
+            }
+        )
         self.addCleanup(self._rm_glob, '{0}_deleted_*'.format(course_path))
 
         return response
@@ -322,7 +326,7 @@ class TestSysadmin(SysadminBaseTestCase):
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNotNone(course)
-        self.assertIn(self.TEST_BRANCH_COURSE, course.location.course_id)
+        self.assertEqual(self.TEST_BRANCH_COURSE, course.id)
         self._rm_edx4edx()
 
         # Try and delete a non-existent course
@@ -364,8 +368,8 @@ class TestSysadmin(SysadminBaseTestCase):
         self._add_edx4edx()
 
         def_ms = modulestore()
-        course = def_ms.get_course('MITx/edx4edx/edx4edx')
-        CourseStaffRole(course.location).add_users(self.user)
+        course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
+        CourseStaffRole(course.id).add_users(self.user)
 
         response = self.client.post(reverse('sysadmin_staffing'),
                                     {'action': 'get_staff_csv', })
@@ -448,11 +452,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertFalse(isinstance(def_ms, XMLModuleStore))
 
         self._add_edx4edx()
-        course = def_ms.get_course('MITx/edx4edx/edx4edx')
+        course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
         self.assertIsNotNone(course)
 
         self._rm_edx4edx()
-        course = def_ms.get_course('MITx/edx4edx/edx4edx')
+        course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
         self.assertIsNone(course)
 
     def test_course_info(self):
@@ -498,7 +502,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'MITx/edx4edx/edx4edx'}))
 
-        self.assertIn('======&gt; IMPORTING course to location',
+        self.assertIn('======&gt; IMPORTING course',
                       response.content)
 
         self._rm_edx4edx()
@@ -531,23 +535,25 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertEqual(response.status_code, 404)
         # Or specific logs
         response = self.client.get(reverse('gitlogs_detail', kwargs={
-            'course_id': 'MITx/edx4edx/edx4edx'}))
+            'course_id': 'MITx/edx4edx/edx4edx'
+        }))
         self.assertEqual(response.status_code, 404)
 
         # Add user as staff in course team
         def_ms = modulestore()
-        course = def_ms.get_course('MITx/edx4edx/edx4edx')
-        CourseStaffRole(course.location).add_users(self.user)
+        course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
+        CourseStaffRole(course.id).add_users(self.user)
 
-        self.assertTrue(CourseStaffRole(course.location).has_user(self.user))
+        self.assertTrue(CourseStaffRole(course.id).has_user(self.user))
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
         self.assertTrue(logged_in)
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
-                'course_id': 'MITx/edx4edx/edx4edx'}))
-        self.assertIn('======&gt; IMPORTING course to location',
+                'course_id': 'MITx/edx4edx/edx4edx'
+            }))
+        self.assertIn('======&gt; IMPORTING course',
                       response.content)
 
         self._rm_edx4edx()

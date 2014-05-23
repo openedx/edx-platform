@@ -4,7 +4,6 @@ Tests for wiki permissions
 
 from django.contrib.auth.models import Group
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -48,12 +47,9 @@ class TestWikiAccessBase(ModuleStoreTestCase):
     def create_staff_for_course(self, course):
         """Creates and returns users with instructor and staff access to course."""
 
-        course_locator = loc_mapper().translate_location(course.id, course.location)
         return [
-            InstructorFactory(course=course.location),  # Creates instructor_org/number/run role name
-            StaffFactory(course=course.location),  # Creates staff_org/number/run role name
-            InstructorFactory(course=course_locator),  # Creates instructor_org.number.run role name
-            StaffFactory(course=course_locator),  # Creates staff_org.number.run role name
+            InstructorFactory(course=course.id),  # Creates instructor_org/number/run role name
+            StaffFactory(course=course.id),  # Creates staff_org/number/run role name
         ]
 
 

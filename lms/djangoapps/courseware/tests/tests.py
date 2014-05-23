@@ -11,7 +11,7 @@ from textwrap import dedent
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -48,6 +48,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
     Base class that adds a function to load all pages in a modulestore.
     """
 
+    # TODO once everything is merged can someone please check whether this function takes a course_id or course_key
     def check_all_pages_load(self, course_id):
         """
         Assert that all pages in the course load correctly.
@@ -61,18 +62,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         self.enroll(course, True)
 
         # Search for items in the course
-        # None is treated as a wildcard
-        course_loc = course.location
-        location_query = Location(
-            course_loc.tag, course_loc.org,
-            course_loc.course, None, None, None
-        )
-
-        items = store.get_items(
-            location_query,
-            course_id=course_id,
-            depth=2
-        )
+        items = store.get_items(course_id)
 
         if len(items) < 1:
             self.fail('Could not retrieve any items from course')
@@ -82,22 +72,22 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': course_id},
+                                   {'course_id': course_id.to_deprecated_string()},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': course_id,
+                kwargs = {'course_id': course_id.to_deprecated_string(),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': course_id},
+                self._assert_loads('info', {'course_id': course_id.to_deprecated_string()},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': course_id,
-                          'location': descriptor.location.url()}
+                kwargs = {'course_id': course_id.to_deprecated_string(),
+                          'location': descriptor.location.to_deprecated_string()}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,
@@ -118,7 +108,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
         if response.status_code != 200:
             self.fail('Status %d for page %s' %
-                      (response.status_code, descriptor.location.url()))
+                      (response.status_code, descriptor.location))
 
         if expect_redirect:
             self.assertEqual(response.redirect_chain[0][1], 302)
@@ -142,7 +132,7 @@ class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         # Load one of the XML based courses
         # Our test mapping rules allow the MixedModuleStore
         # to load this course from XML, not Mongo.
-        self.check_all_pages_load('edX/toy/2012_Fall')
+        self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
 
 # Importing XML courses isn't possible with MixedModuleStore,
@@ -169,7 +159,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
             </table_of_contents>
         """).strip()
 
-        location = Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None])
+        location = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall').make_usage_key('course', '2012_Fall')
         course = self.store.get_item(location)
         self.assertGreater(len(course.textbooks), 0)
 
@@ -180,8 +170,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(Location(None, None, 'vertical', None, None),
-                        course_id='abc', depth=0)
+        store.get_items(SlashSeparatedCourseKey('abc', 'def', 'ghi'), category='vertical')
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was

@@ -6,7 +6,6 @@ import json
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views.helpers import xblock_studio_url
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
@@ -26,7 +25,7 @@ class StudioPageTestCase(CourseTestCase):
         """
         Returns the HTML for the page representing the xblock.
         """
-        url = xblock_studio_url(xblock, self.course)
+        url = xblock_studio_url(xblock)
         self.assertIsNotNone(url)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
@@ -36,8 +35,7 @@ class StudioPageTestCase(CourseTestCase):
         """
         Returns the HTML for the xblock when shown within a unit or container page.
         """
-        locator = loc_mapper().translate_location(self.course.id, xblock.location, published=False)
-        preview_url = '/xblock/{locator}/{view_name}'.format(locator=locator, view_name=view_name)
+        preview_url = '/xblock/{usage_key}/{view_name}'.format(usage_key=xblock.location, view_name=view_name)
         resp = self.client.get_json(preview_url)
         self.assertEqual(resp.status_code, 200)
         resp_content = json.loads(resp.content)

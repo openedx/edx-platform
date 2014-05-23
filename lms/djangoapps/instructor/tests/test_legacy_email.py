@@ -32,7 +32,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
 
@@ -50,7 +50,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
 
         # Select the Email view of the instructor dash
         session = self.client.session
-        session[u'idash_mode:{0}'.format(self.course.location.course_id)] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
         session.save()
         response = self.client.get(self.url)
 
@@ -131,7 +131,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         course_authorization.save()
 
         session = self.client.session
-        session[u'idash_mode:{0}'.format(self.course.location.course_id)] = 'Email'
+        session[u'idash_mode:{0}'.format(self.course.location.course_key.to_deprecated_string())] = 'Email'
         session.save()
 
         response = self.client.post(

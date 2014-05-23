@@ -72,7 +72,7 @@ def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):
     return re.sub(_url_replace_regex('/jump_to_id/'), replace_jump_to_id_url, text)
 
 
-def replace_course_urls(text, course_id):
+def replace_course_urls(text, course_key):
     """
     Replace /course/$stuff urls with /courses/$course_id/$stuff urls
 
@@ -81,6 +81,8 @@ def replace_course_urls(text, course_id):
 
     returns: text with the links replaced
     """
+
+    course_id = course_key.to_deprecated_string()
 
     def replace_course_url(match):
         quote = match.group('quote')

@@ -80,6 +80,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
     def get_html(self):
         """ Renders parameters to template. """
         context = {
+            'course_key': self.runtime.course_id,
             'display_name': self.display_name_with_default,
             'tag': self.instructor_tags,
             'source': self.source,

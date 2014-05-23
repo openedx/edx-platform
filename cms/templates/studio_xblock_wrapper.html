@@ -2,16 +2,16 @@
 
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${locator}">
+    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${locator}">
+    <div class="studio-xblock-wrapper" data-locator="${xblock.location}">
     % endif
 
     <%
     section_class = "level-nesting" if xblock.has_children else "level-element"
     collapsible_class = "is-collapsible" if xblock.has_children else ""
     %>
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}">
+    <section class="wrapper-xblock ${section_class} ${collapsible_class}" data-course-key="${xblock.location.course_key}">
 % endif
 
     <header class="xblock-header">

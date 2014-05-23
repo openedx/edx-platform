@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -10,14 +11,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError("check_course requires one argument: <location>")
+            raise CommandError("check_course requires one argument: <course_id>")
 
-        loc_str = args[0]
+        try:
+            course_key = CourseKey.from_string(args[0])
+        except InvalidKeyError:
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
-        loc = CourseDescriptor.id_to_location(loc_str)
         store = modulestore()
 
-        course = store.get_item(loc, depth=3)
+        course = store.get_course(course_key, depth=3)
 
         err_cnt = 0
 
@@ -33,7 +36,7 @@ class Command(BaseCommand):
         def _check_xml_attributes_field(module):
             err_cnt = 0
             if hasattr(module, 'xml_attributes') and isinstance(module.xml_attributes, basestring):
-                print 'module = {0} has xml_attributes as a string. It should be a dict'.format(module.location.url())
+                print 'module = {0} has xml_attributes as a string. It should be a dict'.format(module.location)
                 err_cnt = err_cnt + 1
             for child in module.get_children():
                 err_cnt = err_cnt + _check_xml_attributes_field(child)
@@ -45,7 +48,7 @@ class Command(BaseCommand):
         def _get_discussion_items(module):
             discussion_items = []
             if module.location.category == 'discussion':
-                discussion_items = discussion_items + [module.location.url()]
+                discussion_items = discussion_items + [module.location]
 
             for child in module.get_children():
                 discussion_items = discussion_items + _get_discussion_items(child)
@@ -55,17 +58,8 @@ class Command(BaseCommand):
         discussion_items = _get_discussion_items(course)
 
         # now query all discussion items via get_items() and compare with the tree-traversal
-        queried_discussion_items = store.get_items(
-            Location(
-                'i4x',
-                course.location.org,
-                course.location.course,
-                'discussion',
-                None,
-                None
-            )
-        )
+        queried_discussion_items = store.get_items(course_key=course_key, category='discussion',)
 
         for item in queried_discussion_items:
-            if item.location.url() not in discussion_items:
-                print 'Found dangling discussion module = {0}'.format(item.location.url())
+            if item.location not in discussion_items:
+                print 'Found dangling discussion module = {0}'.format(item.location)

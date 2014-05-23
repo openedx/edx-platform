@@ -121,7 +121,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             settings.EDX_ROOT_URL,
             escape(cdir),
             escape(cdir),
-            course.location.url()
+            course.location.to_deprecated_string()
         )
     html += '</ol>'
 

@@ -23,16 +23,20 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import SerializationError
-from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
+
+from .access import has_course_access
 
 from .access import has_course_access
 from extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from util.json_request import JsonResponse
+
+from contentstore.utils import reverse_course_url, reverse_usage_url
 
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
@@ -45,10 +49,11 @@ log = logging.getLogger(__name__)
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def import_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def import_handler(request, course_key_string):
     """
     The restful handler for importing a course.
 
@@ -58,18 +63,17 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(location)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
             data_root = path(settings.GITHUB_REPO_ROOT)
-            course_subdir = "{0}-{1}-{2}".format(old_location.org, old_location.course, old_location.name)
+            course_subdir = "{0}-{1}-{2}".format(course_key.org, course_key.course, course_key.run)
             course_dir = data_root / course_subdir
 
             filename = request.FILES['course-data'].name
@@ -137,7 +141,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                                   "size": size,
                                   "deleteUrl": "",
                                   "deleteType": "",
-                                  "url": location.url_reverse('import'),
+                                  "url": reverse_course_url('import_handler', course_key),
                                   "thumbnailUrl": ""
                               }]
                 })
@@ -146,7 +150,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
-                key = location.package_id + filename
+                key = unicode(course_key) + filename
                 session_status[key] = 1
                 request.session.modified = True
 
@@ -219,7 +223,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                         [course_subdir],
                         load_error_modules=False,
                         static_content_store=contentstore(),
-                        target_location_namespace=old_location,
+                        target_course_id=course_key,
                         draft_store=modulestore()
                     )
 
@@ -247,20 +251,21 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
 
                 return JsonResponse({'Status': 'OK'})
     elif request.method == 'GET':  # assume html
-        course_module = modulestore().get_item(old_location)
+        course_module = modulestore().get_course(course_key)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': location.url_reverse("course"),
-            'import_status_url': location.url_reverse("import_status", "fillerName"),
+            'successful_import_redirect_url': reverse_course_url('course_handler', course_key),
+            'import_status_url': reverse_course_url("import_status_handler", course_key, kwargs={'filename': "fillerName"}),
         })
     else:
         return HttpResponseNotFound()
 
 
+# pylint: disable=unused-argument
 @require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, filename=None):
+def import_status_handler(request, course_key_string, filename=None):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -270,23 +275,24 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[location.package_id + filename]
+        status = session_status[course_key_string + filename]
     except KeyError:
         status = 0
 
     return JsonResponse({"ImportStatus": status})
 
 
+# pylint: disable=unused-argument
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
-def export_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def export_handler(request, course_key_string):
     """
     The restful handler for exporting a course.
 
@@ -301,65 +307,62 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(location)
-    course_module = modulestore().get_item(old_location)
+    course_module = modulestore().get_course(course_key)
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    export_url = location.url_reverse('export') + '?_accept=application/x-tgz'
+    export_url = reverse_course_url('export_handler', course_key) + '?_accept=application/x-tgz'
     if 'application/x-tgz' in requested_format:
-        name = old_location.name
+        name = course_module.url_name
         export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
         root_dir = path(mkdtemp())
 
         try:
-            export_to_xml(modulestore('direct'), contentstore(), old_location, root_dir, name, modulestore())
+            export_to_xml(modulestore('direct'), contentstore(), course_module.id, root_dir, name, modulestore())
 
             logging.debug('tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
-        except SerializationError, e:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+        except SerializationError as exc:
+            log.exception('There was an error exporting course %s', course_module.id)
             unit = None
             failed_item = None
             parent = None
             try:
-                failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
-                parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
+                failed_item = modulestore().get_item(exc.location)
+                parent_locs = modulestore().get_parent_locations(failed_item.location)
 
                 if len(parent_locs) > 0:
                     parent = modulestore().get_item(parent_locs[0])
                     if parent.location.category == 'vertical':
                         unit = parent
-            except:
+            except:  # pylint: disable=bare-except
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
-
-            unit_locator = loc_mapper().translate_location(old_location.course_id, parent.location, False, True)
 
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
-                'raw_err_msg': str(e),
+                'raw_err_msg': str(exc),
                 'failed_module': failed_item,
                 'unit': unit,
-                'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
-                'course_home_url': location.url_reverse("course"),
+                'edit_unit_url': reverse_usage_url("unit_handler", parent.location) if parent else "",
+                'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
-        except Exception, e:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+        except Exception as exc:
+            log.exception('There was an error exporting course %s', course_module.id)
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
                 'unit': None,
-                'raw_err_msg': str(e),
-                'course_home_url': location.url_reverse("course"),
+                'raw_err_msg': str(exc),
+                'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
         finally:

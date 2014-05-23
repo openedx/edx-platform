@@ -38,9 +38,9 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.success_content = {
-            'course_id': self.course.id,
+            'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
 
@@ -53,9 +53,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
         # Pull up email view on instructor dashboard
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        # Response loads the whole instructor dashboard, so no need to explicitly
-        # navigate to a particular email section
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
@@ -69,7 +67,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         url = reverse('change_email_settings')
         # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
         # the Post that is sent will not contain 'receive_emails'
-        response = self.client.post(url, {'course_id': self.course.id})
+        response = self.client.post(url, {'course_id': self.course.id.to_deprecated_string()})
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
@@ -95,7 +93,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         Make sure student receives course email after opting in.
         """
         url = reverse('change_email_settings')
-        response = self.client.post(url, {'course_id': self.course.id, 'receive_emails': 'on'})
+        response = self.client.post(url, {'course_id': self.course.id.to_deprecated_string(), 'receive_emails': 'on'})
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()

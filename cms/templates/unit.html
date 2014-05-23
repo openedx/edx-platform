@@ -1,10 +1,9 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "unit" %></%def>
 <%!
-from django.core.urlresolvers import reverse
+from contentstore import utils
 from contentstore.views.helpers import EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
-from xmodule.modulestore.django import loc_mapper
 %>
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -24,7 +23,7 @@ from xmodule.modulestore.django import loc_mapper
 require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "js/collections/component_template",
     "jquery.ui", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function(doc, $, ModuleModel, UnitEditView, ComponentTemplates) {
-  window.unit_location_analytics = '${unit_locator}';
+  window.unit_location_analytics = '${unit_usage_key}';
 
   var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
 
@@ -32,7 +31,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
     el: $('.main-wrapper'),
     view: 'unit',
     model: new ModuleModel({
-      id: '${unit_locator}',
+      id: '${unit_usage_key}',
       state: '${unit_state}'
     }),
     templates: templates
@@ -47,7 +46,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 </%block>
 
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_locator}">
+  <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_usage_key}" data-course-key="${unit_usage_key.course_key}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
@@ -61,8 +60,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         <article class="unit-body window">
         <p class="unit-name-input"><label for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" id="unit-display-name-input" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for locator in locators:
-            <li class="component" data-locator="${locator}"/>
+            % for usage_key in child_usage_keys:
+            <li class="component" data-locator="${usage_key}" data-course-key="${usage_key.course_key}"/>
             % endfor
           </ol>
           <div class="add-xblock-component new-component-item adding"></div>
@@ -70,11 +69,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
 
       <%
-        ctx_loc = context_course.location
-        index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course')
-        subsection_url = loc_mapper().translate_location(
-            ctx_loc.course_id, subsection.location, False, True
-        ).url_reverse('subsection')
+        index_url = utils.reverse_course_url('course_handler', context_course.id)
+        subsection_url = utils.reverse_usage_url('subsection_handler', subsection.location)
       %>
       <div class="sidebar">
         <div class="unit-settings window">

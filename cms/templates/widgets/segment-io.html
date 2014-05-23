@@ -1,11 +1,6 @@
-<%!
-from xmodule.modulestore.django import loc_mapper
-%>
-
 % if context_course:
 <%
-    ctx_loc = context_course.location
-    locator = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+    locator = context_course.id
 %>
 % endif
 
