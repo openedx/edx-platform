@@ -122,6 +122,7 @@ def ensure_settings_visible():
 def edit_component():
     world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
     world.css_click('a.edit-button')
+    world.wait_for_ajax_complete()
 
 
 @world.absorb
