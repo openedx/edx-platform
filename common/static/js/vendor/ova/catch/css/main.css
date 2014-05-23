@@ -225,7 +225,14 @@
    margin-top: 15px;
 }
 
-#mainCatch .playMediaButton {
+#mainCatch .zoomToImageBounds {
+   width: 20em;
+   text-align:center;
+   margin-top: 15px;
+   margin-bottom: 5px;
+}
+
+#mainCatch .playMediaButton, #mainCatch .zoomToImageBounds {
    border-top: 2px solid #d3bd89;
    border-bottom: 2px solid #b3ad69;
    border-right: 2px solid #b3ad69;
@@ -242,7 +249,7 @@
    border-radius: 24px;
    color: #000000;
    }
-#mainCatch .playMediaButton:hover {
+#mainCatch .playMediaButton:hover, #mainCatch .zoomToImageBounds:hover  {
    border-top: 2px solid #d3bd89;
    border-bottom: 2px solid #b3ad69;
    border-right: 2px solid #b3ad69;
@@ -250,7 +257,7 @@
    background: #f5c105;
    color: #080708;
    }
-#mainCatch .playMediaButton:active {
+#mainCatch .playMediaButton:active, #mainCatch .zoomToImageBounds:active  {
    border-top: 2px solid #d3bd89;
    border-bottom: 2px solid #b3ad69;
    border-right: 2px solid #b3ad69;

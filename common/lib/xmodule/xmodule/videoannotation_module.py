@@ -7,6 +7,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.annotator_mixin import get_instructions, get_extension
 from xmodule.annotator_token import retrieve_token
 
 import textwrap
@@ -65,24 +66,11 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
-    def _get_extension(self, srcurl):
+    def _get_extension(self, src_url):
         ''' get the extension of a given url '''
-        if 'youtu' in srcurl:
-            return 'video/youtube'
-        else:
-            spliturl = srcurl.split(".")
-            extensionplus1 = spliturl[len(spliturl) - 1]
-            spliturl = extensionplus1.split("?")
-            extensionplus2 = spliturl[0]
-            spliturl = extensionplus2.split("#")
-            return 'video/' + spliturl[0]
+        return get_extension(src_url)
 
     def get_html(self):
         """ Renders parameters to template. """
