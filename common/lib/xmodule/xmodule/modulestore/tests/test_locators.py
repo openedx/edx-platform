@@ -158,12 +158,12 @@ class LocatorTest(TestCase):
         )
         testobj = UsageKey.from_string(testurn)
         self.check_block_locn_fields(
-             testobj,
-             org=expected_org,
-             offering=expected_offering,
-             branch=expected_branch,
-             block_type='problem',
-             block=expected_block_ref
+            testobj,
+            org=expected_org,
+            offering=expected_offering,
+            branch=expected_branch,
+            block_type='problem',
+            block=expected_block_ref
         )
         self.assertEqual(unicode(testobj), testurn)
         testobj = testobj.for_version(ObjectId())

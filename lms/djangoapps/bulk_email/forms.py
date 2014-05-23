@@ -11,7 +11,6 @@ from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
-from opaque_keys import InvalidKeyError
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
@@ -67,7 +66,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             try:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
             except InvalidKeyError:
-                msg = u'Course id invalid.' 
+                msg = u'Course id invalid.'
                 msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
                 msg += 'Please recheck that you have supplied a valid course id.'
                 raise forms.ValidationError(msg)

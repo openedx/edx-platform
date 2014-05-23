@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
 from student.models import CourseAccessRole
-from xmodule_django.models import CourseKeyField
 
 
 class AccessRole(object):

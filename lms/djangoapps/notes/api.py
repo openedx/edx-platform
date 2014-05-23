@@ -148,7 +148,7 @@ def create(request, course_key):
     return ApiResponse(http_response=response, data=None)
 
 
-def read(request, course_key, note_id):
+def read(request, course_key, note_id):  # pylint: disable=unused-argument (course_key)
     '''
     Returns a single annotation object.
     '''
@@ -163,7 +163,7 @@ def read(request, course_key, note_id):
     return ApiResponse(http_response=HttpResponse(), data=note.as_dict())
 
 
-def update(request, course_key, note_id):
+def update(request, course_key, note_id):  # pylint: disable=unused-argument (course_key)
     '''
     Updates an annotation object and returns a 303 with the read location.
     '''
@@ -247,7 +247,7 @@ def search(request, course_key):
     return ApiResponse(http_response=HttpResponse(), data=result)
 
 
-def root(request, course_key):
+def root(request, course_key):  # pylint: disable=unused-argument (course_key, request)
     '''
     Returns version information about the API.
     '''

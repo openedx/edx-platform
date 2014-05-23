@@ -1,8 +1,8 @@
 #!/usr/bin/python
-#
-# django management command: dump grades to csv files
-# for use by batch processes
-
+"""
+django management command: dump grades to csv files
+for use by batch processes
+"""
 import csv
 
 from instructor.views.legacy import get_student_grade_summary_data
@@ -52,7 +52,9 @@ class Command(BaseCommand):
 
         try:
             course = get_course_by_id(course_key)
-        except Exception as err:
+        # Ok with catching general exception here because this is run as a management command
+        # and the exception is exposed right away to the user.
+        except Exception as err:  # pylint: disable=broad-except
             print "-----------------------------------------------------------------------------"
             print "Sorry, cannot find course with id {}".format(course_id)
             print "Got exception {}".format(err)
