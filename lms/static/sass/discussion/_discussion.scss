@@ -603,10 +603,12 @@ body.discussion {
   box-shadow: none;
   line-height: 1.4;
 
-<<<<<<< HEAD:lms/static/sass/discussion/_discussion.scss
-=======
   .sr {
     @extend %text-sr;
+  }
+
+  .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px;
   }
 
   .bottom-post-status {
@@ -1255,10 +1257,6 @@ body.discussion {
     h4 {
       font-size: 16px;
       font-weight: 700;
-    }
-
-    textarea.wmd-input {
-      margin-bottom: 0px;
     }
   }
 
