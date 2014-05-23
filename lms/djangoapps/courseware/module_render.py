@@ -506,12 +506,8 @@ def get_module_system_for_user(user, field_data_cache,
             make_psychometrics_data_update_handler(course_id, user, descriptor.location)
         )
 
-<<<<<<< HEAD
     system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
-=======
-    system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
-    system.set(u'user_is_admin', has_access(user, 'global', 'staff'))
->>>>>>> edx/master
+    system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
