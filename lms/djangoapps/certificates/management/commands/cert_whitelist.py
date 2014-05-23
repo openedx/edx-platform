@@ -5,6 +5,9 @@ from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
