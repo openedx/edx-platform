@@ -14,4 +14,8 @@ urlpatterns = patterns(
         r'^v1/preferences/(?P<pref_key>{})/users/$'.format(UserPreference.KEY_REGEX),
         user_api_views.PreferenceUsersListView.as_view()
     ),
+    url(
+        r'^v1/forum_roles/(?P<name>[a-zA-Z]+)/users/$',
+        user_api_views.ForumRoleUsersListView.as_view()
+    ),
 )
