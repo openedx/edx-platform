@@ -32,39 +32,40 @@ def run_pylint(options):
     """
     Run pylint on system code
     """
-    system = getattr(options, 'system', 'lms')
     errors = getattr(options, 'errors', False)
+    systems = getattr(options, 'system', 'lms,cms,common').split(',')
 
-    # Directory to put the pylint report in.
-    # This makes the folder if it doesn't already exist.
-    report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
+    for system in systems:
+        # Directory to put the pylint report in.
+        # This makes the folder if it doesn't already exist.
+        report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
 
-    flags = '-E' if errors else ''
+        flags = '-E' if errors else ''
 
-    apps = [system]
+        apps = [system]
 
-    for directory in ['djangoapps', 'lib']:
-        dirs = os.listdir(os.path.join(system, directory))
-        apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
+        for directory in ['djangoapps', 'lib']:
+            dirs = os.listdir(os.path.join(system, directory))
+            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
 
-    apps_list = ' '.join(apps)
+        apps_list = ' '.join(apps)
 
-    pythonpath_prefix = (
-        "PYTHONPATH={system}:{system}/djangoapps:{system}/"
-        "lib:common/djangoapps:common/lib".format(
-            system=system
+        pythonpath_prefix = (
+            "PYTHONPATH={system}:{system}/djangoapps:{system}/"
+            "lib:common/djangoapps:common/lib".format(
+                system=system
+            )
         )
-    )
 
-    sh(
-        "{pythonpath_prefix} pylint {flags} -f parseable {apps} | "
-        "tee {report_dir}/pylint.report".format(
-            pythonpath_prefix=pythonpath_prefix,
-            flags=flags,
-            apps=apps_list,
-            report_dir=report_dir
+        sh(
+            "{pythonpath_prefix} pylint {flags} -f parseable {apps} | "
+            "tee {report_dir}/pylint.report".format(
+                pythonpath_prefix=pythonpath_prefix,
+                flags=flags,
+                apps=apps_list,
+                report_dir=report_dir
+            )
         )
-    )
 
 
 @task
@@ -76,13 +77,14 @@ def run_pep8(options):
     """
     Run pep8 on system code
     """
-    system = getattr(options, 'system', 'lms')
+    systems = getattr(options, 'system', 'lms,cms,common').split(',')
 
-    # Directory to put the pep8 report in.
-    # This makes the folder if it doesn't already exist.
-    report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
+    for system in systems:
+        # Directory to put the pep8 report in.
+        # This makes the folder if it doesn't already exist.
+        report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
 
-    sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
+        sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
 
 
 @task
