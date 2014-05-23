@@ -93,92 +93,7 @@ Feature: LMS.Video component
     Then the video has rendered in "HTML5" mode
     And the video does not show the captions
 
-# Disabling because this test is not reliable and needs to be improved.
-# Sometimes by the time it checks the video slider is at 10,
-# it is actually at 11, so the test fails.
-  # 10
-#  Scenario: Start time works for Youtube video
-#    Given I am registered for the course "test_course"
-#    And it has a video in "Youtube" mode:
-#      | start_time |
-#      | 00:00:10   |
-#    And I click video button "play"
-#    Then I see video slider at "0:10" position
-
   # 4
-  Scenario: End time works for Youtube video
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | end_time |
-      | 00:00:02 |
-    And I click video button "play"
-    And I wait "5" seconds
-    Then I see video slider at "0:02" position
-
-  # 5
-  Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | end_time |
-      | 00:01:00 |
-    And I wait for video controls appear
-    And I seek video to "0:58" position
-    And I click video button "play"
-    And I wait "5" seconds
-    Then I see video slider at "1:00" position
-
-  # 6
-  Scenario: Start time and end time work together for Youtube video
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | start_time | end_time |
-      | 00:00:10   | 00:00:12 |
-    And I click video button "play"
-    Then I see video slider at "0:10" position
-    And I wait "5" seconds
-    Then I see video slider at "0:12" position
-
-  # 7
-  Scenario: Youtube video after pausing at end time video plays to the end from end time
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | start_time | end_time |
-      | 00:01:51   | 00:01:52 |
-    And I click video button "play"
-    And I wait "5" seconds
-    # The end time is 00:01:52.
-    Then I see video slider at "1:52" position
-    And I click video button "play"
-    And I wait "8" seconds
-    # The default video length is 00:01:55.
-    Then I see video slider at "1:55" position
-
-  # 8
-  Scenario: Youtube video with end-time at 0:32 and start-time at 0:30, the video starts playing from 0:28
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | start_time | end_time |
-      | 00:00:30   | 00:00:32 |
-    And I wait for video controls appear
-    And I seek video to "0:28" position
-    And I click video button "play"
-    And I wait "8" seconds
-    Then I see video slider at "0:32" position
-
-  # 9
-  Scenario: Youtube video with end-time at 1:00, the video starts playing from 1:52
-    Given I am registered for the course "test_course"
-    And it has a video in "Youtube" mode:
-      | end_time |
-      | 00:01:00 |
-    And I wait for video controls appear
-    And I seek video to "1:52" position
-    And I click video button "play"
-    And I wait "5" seconds
-    # Video stops at the end.
-    Then I see video slider at "1:55" position
-
-  # 10
   @skip_firefox
   Scenario: Quality button appears on play
     Given the course has a Video component in "Youtube" mode
@@ -186,7 +101,7 @@ Feature: LMS.Video component
     And I click video button "play"
     Then I see video button "quality" is visible
 
-  # 11
+  # 5
   @skip_firefox
   Scenario: Quality button works correctly
     Given the course has a Video component in "Youtube" mode
