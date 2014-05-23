@@ -6,9 +6,12 @@ Feature: CMS.Upload Files
     @skip_safari
     Scenario: Users can upload files
         Given I am at the files and upload page of a Studio course
-        When I upload the file "test"
+        When I upload the file "test" by clicking "Upload your first asset"
         Then I should see the file "test" was uploaded
         And The url for the file "test" is valid
+        When I upload the file "test2"
+        Then I should see the file "test2" was uploaded
+        And The url for the file "test2" is valid
 
     # Uploading isn't working on safari with sauce labs
     @skip_safari
