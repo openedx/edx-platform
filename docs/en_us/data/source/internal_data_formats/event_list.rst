@@ -38,6 +38,8 @@ Event List
      - :ref:`enrollment` and :ref:`instructor_enrollment`
    * - ``edx.course.enrollment.deactivated`` 
      - :ref:`enrollment` and :ref:`instructor_enrollment`
+   * - ``edx.forum.searched``
+     - :ref:`forum_events`
    * - ``get_anon_ids``
      - :ref:`Instructor_Event_Types`
    * - ``get_student_progress_page``

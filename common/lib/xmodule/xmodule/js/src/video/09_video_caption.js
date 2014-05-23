@@ -119,10 +119,10 @@ function (Sjson, AsyncProcess) {
                     'caption:update': function (event, time) {
                         self.updatePlayTime(time);
                     },
-                    'ended': this.pause,
+                    'ended': this.pause.bind(this),
                     'fullscreen': this.onResize.bind(this),
-                    'pause': this.pause,
-                    'play': this.play,
+                    'pause': this.pause.bind(this),
+                    'play': this.play.bind(this)
                 });
 
             if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {

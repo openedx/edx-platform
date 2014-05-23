@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 05/20/14
+     - Added the :ref:`Analytics` chapter.
    * - 04/25/2014
      - Added the :ref:`Contributing to Open edX` chapter.
    * - 03/28/2014

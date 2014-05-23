@@ -18,6 +18,8 @@ The primary collection that holds all of the discussion posts written by users i
 
 A sample of the field/value pairs that are in the mongo file, and descriptions of the attributes that these two types of objects share and that are specific to each type, follow.
 
+In addition to these collections, events are also emitted to track specific user activities. See :ref:`forum_events`.
+
 *********
 Samples
 *********

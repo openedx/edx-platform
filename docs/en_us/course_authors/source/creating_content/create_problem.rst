@@ -242,6 +242,8 @@ Maximum Attempts
 This setting specifies the number of times a student can try to answer
 the problem. By default, a student has an unlimited number of attempts.
 
+.. note:: Only questions that have a **Maximum Attempts** setting of 1 or higher are included on the Student Answer Distribution report that you can download during your course.
+
 .. _Problem Weight:
 
 ==============================

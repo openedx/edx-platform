@@ -19,26 +19,29 @@ from xblock.core import XBlock
 
 log = logging.getLogger("edx.courseware")
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class HtmlFields(object):
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
         default="Text"
     )
-    data = String(help="Html contents to display for this module", default=u"", scope=Scope.content)
-    source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
+    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    source_code = String(help=_("Source code for LaTeX documents. This feature is not well-supported."), scope=Scope.settings)
     use_latex_compiler = Boolean(
-        help="Enable LaTeX templates?",
+        help=_("Enable LaTeX templates?"),
         default=False,
         scope=Scope.settings
     )
     editor = String(
-        help="Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit HTML directly. If you change this setting, you must save the component and then re-open it for editing.",
-        display_name="Editor",
+        help=_("Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit HTML directly. If you change this setting, you must save the component and then re-open it for editing."),
+        display_name=_("Editor"),
         default="visual",
         values=[
             {"display_name": "Visual", "value": "visual"},
@@ -234,12 +237,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
 class AboutFields(object):
     display_name = String(
-        help="Display name for this module",
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default="overview",
     )
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default=u"",
         scope=Scope.content
     )
@@ -268,8 +271,8 @@ class StaticTabFields(object):
     The overrides for Static Tabs
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         default="Empty",
     )
@@ -278,7 +281,7 @@ class StaticTabFields(object):
             <p>Add the content you want students to see on this page.</p>
         """),
         scope=Scope.content,
-        help="HTML for the additional pages"
+        help=_("HTML for the additional pages")
     )
 
 
@@ -305,12 +308,12 @@ class CourseInfoFields(object):
     Field overrides
     """
     items = List(
-        help="List of course update items",
+        help=_("List of course update items"),
         default=[],
         scope=Scope.content
     )
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default=u"<ol></ol>",
         scope=Scope.content
     )

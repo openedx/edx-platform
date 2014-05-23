@@ -48,13 +48,18 @@
 // UI: xblocks - calls-to-action
 .wrapper-xblock .header-actions {
   @extend %actions-header;
+
+  .action-button [class^="icon-"] {
+    font-style: normal;
+  }
 }
 
 // UI: xblock is collapsible
-.wrapper-xblock.is-collapsible, .wrapper-xblock.xblock-type-container {
+.wrapper-xblock.is-collapsible,
+.wrapper-xblock.xblock-type-container {
 
   [class^="icon-"] {
-  font-style: normal;
+    font-style: normal;
   }
 
   .expand-collapse {

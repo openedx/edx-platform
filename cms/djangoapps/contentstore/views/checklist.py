@@ -16,6 +16,8 @@ from contentstore.utils import get_modulestore, reverse_course_url
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
 
+from django.utils.translation import ugettext
+
 __all__ = ['checklists_handler']
 
 
@@ -76,7 +78,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
             course_module.save()
             get_modulestore(course_module.location).update_item(course_module, request.user.id)
             expanded_checklist = expand_checklist_action_url(course_module, persisted_checklist)
-            return JsonResponse(expanded_checklist)
+            return JsonResponse(localize_checklist_text(expanded_checklist))
         else:
             return HttpResponseBadRequest(
                 ("Could not save checklist state because the checklist index "
@@ -96,7 +98,7 @@ def expand_all_action_urls(course_module):
     """
     expanded_checklists = []
     for checklist in course_module.checklists:
-        expanded_checklists.append(expand_checklist_action_url(course_module, checklist))
+        expanded_checklists.append(localize_checklist_text(expand_checklist_action_url(course_module, checklist)))
     return expanded_checklists
 
 
@@ -121,3 +123,20 @@ def expand_checklist_action_url(course_module, checklist):
             item['action_url'] = reverse_course_url(urlconf_map[action_url], course_module.id)
 
     return expanded_checklist
+
+def localize_checklist_text(checklist):
+    """
+    Localize texts for a given checklist and returns the modified version.
+
+    The method does an in-place operation so the input checklist is modified directly.
+    """
+    # Localize checklist name
+    checklist['short_description'] = ugettext(checklist['short_description'])
+
+    # Localize checklist items
+    for item in checklist.get('items'):
+        item['short_description'] = ugettext(item['short_description'])
+        item['long_description'] = ugettext(item['long_description'])
+        item['action_text'] = ugettext(item['action_text']) if item['action_text'] != "" else u""
+
+    return checklist

@@ -517,7 +517,7 @@
     visibility: hidden;
     pointer-events: none;
     display: none;
-    position: absolute;
+    position: fixed;
     top: 0;
     overflow: scroll;
     background: $black-t2;

@@ -292,6 +292,8 @@ outside the Instructor Dashboard.
 
 * :ref:`AB_Event_Types`
 
+* :ref:`forum_events`
+
 The descriptions that follow include what each event represents, the system
 component it originates from, the history of any changes made to the event over
 time, and any additional member fields that the ``context`` and ``event`` fields contain.
@@ -490,10 +492,11 @@ The browser emits these events when a user works with a video.
      - EdX ID of the video being watched (for example, i4x-HarvardX-PH207x-video-Simple_Random_Sample).
    * - ``code``
      - string
-     - YouTube ID of the video being watched (for example, FU3fCJNs94Y).
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
    * - ``currentTime``
      - float
-     - Time the video was played at, in seconds. 
+     - Time the video was played, in seconds. 
    * - ``speed``
      - string
      - Video speed in use: '0.75', '1.0', '1.25', '1.50'.
@@ -552,34 +555,69 @@ playing speed for the video.
      - 
      - The speed that the user selected for the video to play. 
 
-.. types needed
+``load_video``
+-----------------
 
-.. ``load_video``
-.. -----------------
+The browser emits  ``load_video`` events when the video is fully rendered and ready to play. 
 
-.. %%TBD
+``event`` **Member Fields**: 
 
-.. The browser emits  ``load_video`` events when . 
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-.. ``event`` **Member Fields**: None
+   * - Field
+     - Type
+     - Details
+   * - ``code``
+     - string
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
 
-.. ``hide_transcript``
-.. -------------------
+``hide_transcript``
+-------------------
 
-.. %%TBD
+The browser emits  ``hide_transcript`` events when the user clicks **CC** to
+suppress display of the video transcript.
 
-.. The browser emits  ``hide_transcript`` events when . 
+``event`` **Member Fields**: 
 
-.. ``event`` **Member Fields**: 
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
 
-.. ``show_transcript``
-.. --------------------
+   * - Field
+     - Type
+     - Details
+   * - ``code``
+     - string
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
+   * - ``currentTime``
+     - float
+     - The point in the video file at which the transcript was hidden, in seconds. 
 
-.. %%TBD
+``show_transcript``
+--------------------
 
-.. The browser emits  ``show_transcript`` events when . 
+The browser emits  ``show_transcript`` events when the user clicks **CC** to
+display the video transcript.
 
-.. ``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``code``
+     - string
+     - For YouTube videos, the ID of the video being loaded (for example,
+       OEyXaRPEzfM). For non-YouTube videos, 'html5'.
+   * - ``currentTime``
+     - float
+     - The point in the video file at which the transcript was opened, in seconds. 
 
 .. _pdf:
 
@@ -1268,16 +1306,27 @@ The server emits ``problem_check_fail`` events when a problem cannot be checked 
      - string
      - 'closed', 'unreset'
 
-.. ``problem_reset``
-.. -----------------------------
-.. no sample to check
-.. The browser emits ``problem_reset`` events when a user resets a problem.
-.. %%is this an instructor initiated event?
+``problem_reset``
+--------------------
+
+The browser emits ``problem_reset`` events when a user clicks **Reset** to reset the answer to a problem.
+
 .. return Logger.log('problem_reset', [_this.answers, response.contents], _this.id);
 
-.. **Event Source**: Browser
+**Event Source**: Browser
 
-.. ``event`` **Member Fields**: None
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``answers``
+     - string
+     - The value reset by the user. 
 
 ``problem_rescore``
 -----------------------------
@@ -1512,16 +1561,27 @@ The server emits ``save_problem_success`` events when a problem is saved success
      -  dict
      -  
 
-.. ``problem_graded``
-.. -------------------
-
-.. %%TBD
-
-.. The server emits a ``problem_graded`` event %%%
-
+``problem_graded``
+-------------------
 .. return Logger.log('problem_graded', [_this.answers, response.contents], _this.id);
+The server emits a ``problem_graded`` event each time a user clicks **Check**
+for a problem and it is graded successfully.
 
-.. ``event`` **Member Fields**: The ``event`` field delivers the values entered for the problem component in Studio as a string. The display name, problem text, and choices or response field labels are included.
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``[answers, contents]``
+     - array
+     - ``answers`` provides the value checked by the user. ``contents`` delivers
+       HTML using data entered for the problem in Studio, including the display
+       name, problem text, and choices or response field labels. The array
+       includes each problem in a problem component that has multiple problems.
 
 .. _ora:
 
@@ -1761,6 +1821,33 @@ the child module that was shown to the student.
    * - ``child-id``
      - string
      - ID of the module that displays to the student. 
+
+.. _forum_events:
+
+==========================
+Forum Events
+==========================
+
+``edx.forum.searched``
+----------------------------------
+
+After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.text_search`` event.
+
+**Component**: Discussion Tab
+
+**Event Source**: Server
+
+**History**: Added 16 May 2014.
+
+``event`` **Fields**:
+
++---------------------+---------------+---------------------------------------------------------------------+
+| Field               | Type          | Details                                                             |
++=====================+===============+=====================================================================+
+| ``query``           | string        | The text entered into the search box by the user.                   |
++---------------------+---------------+---------------------------------------------------------------------+
+| ``total_results``   | integer       | The total number of results matching the query.                     |
++---------------------+---------------+---------------------------------------------------------------------+
 
 .. _Instructor_Event_Types:
 

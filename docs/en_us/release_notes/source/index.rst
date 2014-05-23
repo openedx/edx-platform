@@ -3,22 +3,34 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-The edX *Release Notes for edX Course Staff* provides a cumulative
-list of changes that affect course authoring in edX Studio and the edX Learning
-Management System. 
+####################################
+edX Course Staff Release Notes
+####################################
 
-There is a page in this document for each update to the edX system on `edx.org`_ and `edX Edge`_. Each page contains information on new or changed documentation, and new features and changes in edX Studio, the edX Learning Management System, Discussions, Analytics, accessibility, and more.
+The *edX Course Staff Release Notes* provide a cumulative list of changes
+that affect course authoring in edX Studio and the edX Learning Management
+System.
+
+This document contains a page for each update to the edX system, which includes
+both `edx.org`_ and `edX Edge`_. Each page contains information on new or
+changed documentation, as well as new features and changes in edX Studio, the
+edX Learning Management System, Discussion Forums, Analytics, accessibility, and
+more.
+
+You can sign up for the new `edX Release Announcements mailing list`_ to get an
+email message when we have updated the edX Course Staff Release Notes.
 
 
 
-#########
+*************
 2014
-#########
+*************
 
 .. toctree::
    :maxdepth: 1
 
    read_me
+   05-20-2014
    05-15-2014
    05-12-2014
    04-29-2014
@@ -38,9 +50,9 @@ There is a page in this document for each update to the edX system on `edx.org`_
    01-16-2014
    01-07-2014
 
-#########
+*************
 2013
-#########
+*************
 
 .. toctree::
    :maxdepth: 1

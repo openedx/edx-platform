@@ -763,6 +763,13 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 json_choice = field.to_json(json_choice)
             return json_choice
 
+        def get_text(value):
+            """Localize a text value that might be None."""
+            if value is None:
+                return None
+            else:
+                return self.runtime.service(self, "i18n").ugettext(value)
+
         metadata_fields = {}
 
         # Only use the fields from this class, not mixins
@@ -776,8 +783,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             # gets the 'default_value' and 'explicitly_set' attrs
             metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
             metadata_fields[field.name]['field_name'] = field.name
-            metadata_fields[field.name]['display_name'] = field.display_name
-            metadata_fields[field.name]['help'] = field.help
+            metadata_fields[field.name]['display_name'] = get_text(field.display_name)
+            metadata_fields[field.name]['help'] = get_text(field.help)
             metadata_fields[field.name]['value'] = field.read_json(self)
 
             # We support the following editors:

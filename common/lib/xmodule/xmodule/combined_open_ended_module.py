@@ -13,6 +13,9 @@ import textwrap
 
 log = logging.getLogger("edx.courseware")
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",
     "max_attempts",
@@ -190,131 +193,136 @@ class VersionInteger(Integer):
 
 class CombinedOpenEndedFields(object):
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         default="Open Response Assessment",
         scope=Scope.settings
     )
     current_task_number = Integer(
-        help="Current task that the student is on.",
+        help=_("Current task that the student is on."),
         default=0,
         scope=Scope.user_state
     )
     old_task_states = List(
-        help=("A list of lists of state dictionaries for student states that are saved."
+        help=_("A list of lists of state dictionaries for student states that are saved."
                "This field is only populated if the instructor changes tasks after"
                "the module is created and students have attempted it (for example changes a self assessed problem to "
                "self and peer assessed."),
         scope = Scope.user_state
     )
     task_states = List(
-        help="List of state dictionaries of each task within this module.",
+        help=_("List of state dictionaries of each task within this module."),
         scope=Scope.user_state
     )
     state = String(
-        help="Which step within the current task that the student is on.",
+        help=_("Which step within the current task that the student is on."),
         default="initial",
         scope=Scope.user_state
     )
     graded = Boolean(
-        display_name="Graded",
-        help='Defines whether the student gets credit for this problem. Credit is based on peer grades of this problem.',
+        display_name=_("Graded"),
+        help=_("Defines whether the student gets credit for this problem. Credit is based on peer grades of this problem."),
         default=False,
         scope=Scope.settings
     )
     student_attempts = Integer(
-        help="Number of attempts taken by the student on this problem",
+        help=_("Number of attempts taken by the student on this problem"),
         default=0,
         scope=Scope.user_state
     )
     ready_to_reset = Boolean(
-        help="If the problem is ready to be reset or not.",
+        help=_("If the problem is ready to be reset or not."),
         default=False,
         scope=Scope.user_state
     )
     max_attempts = Integer(
-        display_name="Maximum Attempts",
-        help="The number of times the student can try to answer this problem.",
+        display_name=_("Maximum Attempts"),
+        help=_("The number of times the student can try to answer this problem."),
         default=1,
         scope=Scope.settings,
         values={"min": 1 }
     )
     accept_file_upload = Boolean(
-        display_name="Allow File Uploads",
-        help="Whether or not the student can submit files as a response.",
+        display_name=_("Allow File Uploads"),
+        help=_("Whether or not the student can submit files as a response."),
         default=False,
         scope=Scope.settings
     )
     skip_spelling_checks = Boolean(
-        display_name="Disable Quality Filter",
-        help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
+        display_name=_("Disable Quality Filter"),
+        help=_("If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed."),
         default=False,
         scope=Scope.settings
     )
     due = Date(
-        help="Date that this problem is due by",
+        help=_("Date that this problem is due by"),
         scope=Scope.settings
     )
     extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
+        help=_("Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
              "date if it is set to a date that is later than the global due "
-             "date.",
+             "date."),
         default=None,
         scope=Scope.user_state,
     )
     graceperiod = Timedelta(
-        help="Amount of time after the due date that submissions will be accepted",
+        help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
     )
-    version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content,
+    version = VersionInteger(
+        help=_("Current version number"),
+        default=DEFAULT_VERSION,
+        scope=Scope.settings)
+    data = String(
+        help=_("XML data for the problem"),
+        scope=Scope.content,
         default=DEFAULT_DATA)
     weight = Float(
-        display_name="Problem Weight",
-        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. If the value is not set, each problem is worth one point."),
         scope=Scope.settings,
         values={"min": 0, "step": ".1"},
         default=1
     )
     min_to_calibrate = Integer(
-        display_name="Minimum Peer Grading Calibrations",
-        help="The minimum number of calibration essays each student will need to complete for peer grading.",
+        display_name=_("Minimum Peer Grading Calibrations"),
+        help=_("The minimum number of calibration essays each student will need to complete for peer grading."),
         default=3,
         scope=Scope.settings,
         values={"min": 1, "max": 20, "step": "1"}
     )
     max_to_calibrate = Integer(
-        display_name="Maximum Peer Grading Calibrations",
-        help="The maximum number of calibration essays each student will need to complete for peer grading.",
+        display_name=_("Maximum Peer Grading Calibrations"),
+        help=_("The maximum number of calibration essays each student will need to complete for peer grading."),
         default=6,
         scope=Scope.settings,
         values={"min": 1, "max": 20, "step": "1"}
     )
     peer_grader_count = Integer(
-        display_name="Peer Graders per Response",
-        help="The number of peers who will grade each submission.",
+        display_name=_("Peer Graders per Response"),
+        help=_("The number of peers who will grade each submission."),
         default=3,
         scope=Scope.settings,
         values={"min": 1, "step": "1", "max": 5}
     )
     required_peer_grading = Integer(
-        display_name="Required Peer Grading",
-        help="The number of other students each student making a submission will have to grade.",
+        display_name=_("Required Peer Grading"),
+        help=_("The number of other students each student making a submission will have to grade."),
         default=3,
         scope=Scope.settings,
         values={"min": 1, "step": "1", "max": 5}
     )
     peer_grade_finished_submissions_when_none_pending = Boolean(
-        display_name='Allow "overgrading" of peer submissions',
-        help=("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
+        display_name=_('Allow "overgrading" of peer submissions'),
+        help=_("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
               "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
               "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"),
         default=False,
         scope=Scope.settings,
     )
     markdown = String(
-        help="Markdown source of this module",
+        help=_("Markdown source of this module"),
         default=textwrap.dedent("""\
                     [prompt]
                         <h3>Censorship in the Libraries</h3>

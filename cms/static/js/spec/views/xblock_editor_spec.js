@@ -29,7 +29,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                 var mockXBlockEditorHtml;
 
                 beforeEach(function () {
-                    edit_helpers.installMockXBlock(mockSaveResponse);
+                    edit_helpers.installMockXBlock();
                 });
 
                 afterEach(function() {

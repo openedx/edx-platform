@@ -1,0 +1,8 @@
+<ol class="reorderable-container">
+    % for item in items:
+    ${item['content']}
+    % endfor
+</ol>
+% if not xblock_context['read_only']:
+<div class="add-xblock-component new-component-item adding"></div>
+% endif

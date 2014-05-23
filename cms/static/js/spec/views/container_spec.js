@@ -1,7 +1,7 @@
 define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers",
-    "js/views/container", "js/models/xblock_info", "js/views/feedback_notification", "jquery.simulate",
+    "js/views/container", "js/models/xblock_info", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, view_helpers, ContainerView, XBlockInfo, Notification) {
+    function ($, create_sinon, view_helpers, ContainerView, XBlockInfo) {
 
         describe("Container View", function () {
 
@@ -9,7 +9,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                 var model, containerView, mockContainerHTML, respondWithMockXBlockFragment, init, getComponent,
                     getDragHandle, dragComponentVertically, dragComponentAbove,
-                    verifyRequest, verifyNumReorderCalls, respondToRequest,
+                    verifyRequest, verifyNumReorderCalls, respondToRequest, notificationSpy,
 
                     rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
                     containerTestUrl = '/xblock/' + rootLocator,
@@ -35,7 +35,8 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                 beforeEach(function () {
                     view_helpers.installViewTemplates();
-                    appendSetFixtures('<div class="wrapper-xblock level-page" data-locator="' + rootLocator + '"></div>');
+                    appendSetFixtures('<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="' + rootLocator + '"></div>');
+                    notificationSpy = view_helpers.createNotificationSpy();
                     model = new XBlockInfo({
                         id: rootLocator,
                         display_name: 'Test AB Test',
@@ -63,16 +64,29 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                     });
 
                     $('body').append(containerView.$el);
+
+                    // Give the whole container enough height to contain everything.
+                    $('.xblock[data-locator=locator-container]').css('height', 2000);
+
+                    // Give the groups enough height to contain their child vertical elements.
+                    $('.is-draggable[data-locator=locator-group-A]').css('height', 800);
+                    $('.is-draggable[data-locator=locator-group-B]').css('height', 800);
+
+
+                    // Give the leaf elements some height to mimic actual components. Otherwise
+                    // drag and drop fails as the elements on bunched on top of each other.
+                    $('.level-element').css('height', 200);
+
                     return requests;
                 };
 
                 getComponent = function(locator) {
-                    return containerView.$('[data-locator="' + locator + '"]');
+                    return containerView.$('.studio-xblock-wrapper[data-locator="' + locator + '"]');
                 };
 
                 getDragHandle = function(locator) {
                     var component = getComponent(locator);
-                    return component.prev();
+                    return $(component.find('.drag-handle')[0]);
                 };
 
                 dragComponentVertically = function (locator, dy) {
@@ -166,31 +180,17 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                 });
 
                 describe("Shows a saving message", function () {
-                    var savingSpies;
-
-                    beforeEach(function () {
-                        savingSpies = spyOnConstructor(Notification, "Mini",
-                            ["show", "hide"]);
-                        savingSpies.show.andReturn(savingSpies);
-                    });
-
                     it('hides saving message upon success', function () {
                         var requests, savingOptions;
                         requests = init(this);
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-
-                        expect(savingSpies.constructor).toHaveBeenCalled();
-                        expect(savingSpies.show).toHaveBeenCalled();
-                        expect(savingSpies.hide).not.toHaveBeenCalled();
-                        savingOptions = savingSpies.constructor.mostRecentCall.args[0];
-                        expect(savingOptions.title).toMatch(/Saving/);
-
+                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 200);
-                        expect(savingSpies.hide).not.toHaveBeenCalled();
+                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 1, 200);
-                        expect(savingSpies.hide).toHaveBeenCalled();
+                        view_helpers.verifyNotificationHidden(notificationSpy);
                     });
 
                     it('does not hide saving message if failure', function () {
@@ -198,13 +198,9 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-
-                        expect(savingSpies.constructor).toHaveBeenCalled();
-                        expect(savingSpies.show).toHaveBeenCalled();
-                        expect(savingSpies.hide).not.toHaveBeenCalled();
-
+                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 500);
-                        expect(savingSpies.hide).not.toHaveBeenCalled();
+                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
 
                         // Since the first reorder call failed, the removal will not be called.
                         verifyNumReorderCalls(requests, 1);

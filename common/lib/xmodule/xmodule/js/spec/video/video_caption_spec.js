@@ -236,18 +236,18 @@
 
                 it('render the caption', function () {
                     runs(function () {
-                        var captionsData;
+                        var captionsData = jasmine.stubbedCaption,
+                        items = $('.subtitles li[data-index]');
 
-                        captionsData = jasmine.stubbedCaption;
-                        $('.subtitles li[data-index]').each(
-                            function (index, link) {
+                        _.each(captionsData.text, function (text, index) {
+                            var item = items.eq(index);
 
-                            expect($(link)).toHaveData('index', index);
-                            expect($(link)).toHaveData(
+                            expect(item).toHaveData('index', index);
+                            expect(item).toHaveData(
                                 'start', captionsData.start[index]
                             );
-                            expect($(link)).toHaveAttr('tabindex', 0);
-                            expect($(link)).toHaveText(captionsData.text[index]);
+                            expect(item).toHaveAttr('tabindex', 0);
+                            expect(item).toHaveText(text);
                         });
                     });
                 });
@@ -324,11 +324,37 @@
                     $.fn.scrollTo.reset();
                 });
 
-                it('show explaination message', function () {
+                it('show explanation message', function () {
                     expect($('.subtitles li')).toHaveHtml(
                         'Caption will be displayed when you start playing ' +
                         'the video.'
                     );
+                });
+
+                it('show captions on play', function () {
+                    runs(function () {
+                        state.el.trigger('play');
+                    });
+
+                    waitsFor(function () {
+                        return state.videoCaption.rendered;
+                    }, 'Captions are not rendered', WAIT_TIMEOUT);
+
+                    runs(function () {
+                        var captionsData = jasmine.stubbedCaption,
+                        items = $('.subtitles li[data-index]');
+
+                        _.each(captionsData.text, function (text, index) {
+                            var item = items.eq(index);
+
+                            expect(item).toHaveData('index', index);
+                            expect(item).toHaveData(
+                                'start', captionsData.start[index]
+                            );
+                            expect(item).toHaveAttr('tabindex', 0);
+                            expect(item).toHaveText(text);
+                        });
+                    });
                 });
 
                 it('does not set rendered to true', function () {

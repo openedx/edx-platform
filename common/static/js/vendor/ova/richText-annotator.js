@@ -31,11 +31,21 @@ Annotator.Plugin.RichText = (function(_super) {
 	RichText.prototype.options = {
 		tinymce:{
 			selector: "li.annotator-item textarea",
-			plugins: "media image insertdatetime link code",
+			skin: 'studio-tmce4',
+			formats: {
+          		code: {
+            	inline: 'code'
+          		}
+          	},
+          	codemirror: {
+          		path: "static/js/vendor"
+        	},
+			plugins: "image link codemirror",
 			menubar: false,
 			toolbar_items_size: 'small',
 			extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-    		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+    		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image rubric | code ",
+    		resize: "both",
 		}
 	};
 

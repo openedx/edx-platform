@@ -130,6 +130,62 @@ class EmbargoMiddlewareTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_ip_network_exceptions(self):
+        # Explicitly whitelist/blacklist some IP networks
+        IPFilter(
+            whitelist='1.0.0.1/24',
+            blacklist='5.0.0.0/16,1.1.0.0/24',
+            changed_by=self.user,
+            enabled=True
+        ).save()
+
+        # Accessing an embargoed page from a blocked IP that's been whitelisted with a network
+        # should succeed
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 200)
+
+        # Accessing a regular course from a blocked IP that's been whitelisted with a network
+        # should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 200)
+
+        # Accessing an embargoed course from non-embargoed IP that's been blacklisted with a network
+        #  should cause a redirect
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.100', REMOTE_ADDR='5.0.0.100')
+        self.assertEqual(response.status_code, 302)
+        # Following the redirect should give us the embargo page
+        response = self.client.get(
+            self.embargoed_page,
+            HTTP_X_FORWARDED_FOR='5.0.0.100',
+            REMOTE_ADDR='5.0.0.100',
+            follow=True
+        )
+        self.assertIn(self.embargo_text, response.content)
+
+        # Accessing an embargoed course from non-embargoed IP that's been blaclisted with a network
+        # should cause a redirect
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.1.0.1', REMOTE_ADDR='1.1.0.1')
+        self.assertEqual(response.status_code, 302)
+        # Following the redirect should give us the embargo page
+        response = self.client.get(
+            self.embargoed_page,
+            HTTP_X_FORWARDED_FOR='1.1.0.0',
+            REMOTE_ADDR='1.1.0.0',
+            follow=True
+        )
+        self.assertIn(self.embargo_text, response.content)
+
+        # Accessing an embargoed from a blocked IP that's not blacklisted by the network rule.
+        # should succeed
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.1.1.0', REMOTE_ADDR='1.1.1.0')
+        self.assertEqual(response.status_code, 200)
+
+        # Accessing a regular course from a non-embargoed IP that's been blacklisted
+        # should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False})
     def test_countries_embargo_off(self):
         # When the middleware is turned off, all requests should go through
@@ -157,3 +213,25 @@ class EmbargoMiddlewareTests(TestCase):
         # Accessing a regular course from a non-embargoed IP that's been blacklisted should succeed
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
+    def test_embargo_off_embargo_site_on(self):
+        # When the middleware is turned on with SITE, main site access should be restricted
+        # Accessing a regular page from a blocked IP is denied.
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 403)
+
+        # Accessing a regular page from a non blocked IP should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
+    @override_settings(EMBARGO_SITE_REDIRECT_URL='https://www.edx.org/')
+    def test_embargo_off_embargo_site_on_with_redirect_url(self):
+        # When the middleware is turned on with SITE_EMBARGOED, main site access
+        # should be restricted. Accessing a regular page from a blocked IP is
+        # denied, and redirected to EMBARGO_SITE_REDIRECT_URL rather than returning a 403.
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 302)
