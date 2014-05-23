@@ -29,7 +29,7 @@ from courseware.access import has_access
 from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_prev_next_section, get_course_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
@@ -254,10 +254,7 @@ def index(request, course_id, chapter=None, section=None,
     masq = setup_masquerade(request, staff_access)
 
     try:
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, user, course, depth=2)
-
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        course_module = get_course_module(user, request, course)
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
@@ -317,6 +314,26 @@ def index(request, course_id, chapter=None, section=None,
                     return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
 
+            # Find the names of the next and previous sections in the TOC
+            prev_section, next_section = get_prev_next_section(user, request, course, chapter, section)
+
+            # Compute links associated with the section names.
+            prev_section_url = None
+            if prev_section:
+                prev_section_url = reverse(
+                    'courseware_section',
+                    kwargs={'course_id': course_id,
+                            'chapter': chapter_descriptor.url_name,
+                            'section': prev_section.url_name})
+
+            next_section_url = None
+            if next_section:
+                next_section_url = reverse(
+                    'courseware_section',
+                    kwargs={'course_id': course_id,
+                            'chapter': chapter_descriptor.url_name,
+                            'section': next_section.url_name})
+
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
             section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
@@ -332,7 +349,9 @@ def index(request, course_id, chapter=None, section=None,
                 section_descriptor,
                 section_field_data_cache,
                 course_id,
-                position
+                position,
+                prev_section_url=prev_section_url,
+                next_section_url=next_section_url
             )
 
             if section_module is None:

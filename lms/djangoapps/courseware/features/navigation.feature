@@ -26,3 +26,15 @@ Feature: LMS.Navigate Course
         And I see the content of the section
         And I return to the courseware
         Then I see that I was most recently in the subsection
+
+    Scenario: I can navigate to next subsection using next arrow
+        Given I am viewing a section with multiple subsections
+        When I navigate to the first subsection
+        And I press the next arrow
+        Then I see the content of the next subsection
+
+    Scenario: I can navigate to previous subsection using previous arrow
+        Given I am viewing a section with multiple subsections
+        When I navigate to the last subsection
+        And I press the previous arrow
+        Then I see the content of the previous subsection

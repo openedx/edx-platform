@@ -140,6 +140,42 @@ def then_i_see_that_i_was_most_recently_in_the_subsection(step):
     assert_in("You were most recently in Test Subsection 2", message)
 
 
+@step(u'I navigate to the first subsection')
+def when_i_navigate_to_the_first_section(step):
+    subsection_css = 'a[href*="Test_Subsection_1/"]'
+
+    # Click on the subsection to see the content
+    world.css_click(subsection_css)
+
+
+@step(u'I press the next arrow')
+def and_i_press_the_next_arrow(step):
+    world.css_click('.sequence-nav-buttons .next')
+
+
+@step(u'I see the content of the next subsection')
+def then_i_see_the_content_of_the_next_section(step):
+    wait_for_problem('PROBLEM 4')
+
+
+@step(u'I navigate to the last subsection')
+def when_i_navigate_to_the_last_section(step):
+    subsection_css = 'a[href*="Test_Subsection_1/"]'
+
+    # Click on the subsection to see the content
+    world.css_click(subsection_css)
+
+
+@step(u'I press the previous arrow')
+def and_i_press_the_previous_arrow(step):
+    world.css_click('.sequence-nav-buttons .prev')
+
+
+@step(u'I see the content of the previous subsection')
+def then_i_see_the_content_of_the_previous_section(step):
+    wait_for_problem('PROBLEM 3')
+
+
 def create_course():
     world.clear_courses()
     world.scenario_dict['COURSE'] = world.CourseFactory.create(

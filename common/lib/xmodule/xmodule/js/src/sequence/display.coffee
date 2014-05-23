@@ -7,6 +7,8 @@ class @Sequence
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
     @base_page_title = " | " + document.title
+    @prev_section_url = @el.data('prev_section_url')
+    @next_section_url = @el.data('next_section_url')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -77,19 +79,19 @@ class @Sequence
       @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
       return
 
-    if @position == 1
+    if @position == 1 && @prev_section_url == "None"
       @$('.sequence-nav-buttons .prev a').addClass('disabled').attr('aria-hidden', 'true')
     else
       @$('.sequence-nav-buttons .prev a').removeClass('disabled').attr('aria-hidden', 'false').click(@previous)
 
-    if @position == @contents.length
+    if @position == @contents.length && @next_section_url == "None"
       @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
     else
       @$('.sequence-nav-buttons .next a').removeClass('disabled').attr('aria-hidden', 'false').click(@next)
 
   render: (new_position) ->
     if @position != new_position
-      if @position != undefined
+      if @position != undefined && new_position > 0 && new_position <= @num_contents
         @mark_visited @position
         modx_full_url = "#{@ajaxUrl}/goto_position"
         $.postWithPrefix modx_full_url, position: new_position
@@ -106,8 +108,18 @@ class @Sequence
 
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
-      @position = new_position
-      @toggleArrows()
+      if new_position <= 0
+        @position = new_position = 1
+        window.location.href = @prev_section_url
+      else if new_position > @num_contents
+        @position = new_position = @num_contents
+        window.location.href = @next_section_url
+      else
+        @position = new_position
+        @toggleArrows()
+        sequence_links = @$('#seq_content a.seqnav')
+        sequence_links.click @goto
+
       @hookUpProgressEvent()
       @updatePageTitle()
 

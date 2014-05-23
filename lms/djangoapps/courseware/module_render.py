@@ -79,6 +79,39 @@ def make_track_function(request):
     return function
 
 
+def get_course_module(user, request, course):
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, user, course, depth=2)
+    course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+    return course_module
+
+
+def get_prev_next_section(user, request, course, active_chapter, active_section):
+    '''
+    Find the previous and next sections around the current one.
+    Return format:
+    ( {'display_name':name, 'url_name':url_name},
+      {'display_name':name, 'url_name':url_name} )
+    '''
+   course_module = get_course_module(user, request, course)
+    if course_module is None:
+        return (None, None)
+    for chapter in course_module.get_display_items():
+        prev_section = None
+        next_section = None
+
+        sections = chapter.get_display_items()
+        for index, section in enumerate(sections):
+            active = (chapter.url_name == active_chapter
+                      and section.url_name == active_section)
+            if active:
+                if (index + 1 < len(sections)):
+                    next_section = sections[index + 1]
+                return (prev_section, next_section)
+
+            prev_section = section
+    return (None, None)
+
 def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
@@ -198,7 +231,7 @@ def get_xqueue_callback_url_prefix(request):
 
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                              static_asset_path=''):
+                              static_asset_path='', prev_section_url=None, next_section_url=None):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -214,14 +247,14 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
                                               position, wrap_xmodule_display, grade_bucket_type,
-                                              static_asset_path)
+                                              static_asset_path, prev_section_url=prev_section_url, next_section_url=next_section_url)
 
 
 def get_module_system_for_user(user, field_data_cache,
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
                                position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path=''):
+                               static_asset_path='', prev_section_url=None, next_section_url=None):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -494,6 +527,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
+    system.set('prev_section_url', prev_section_url)
+    system.set('next_section_url', next_section_url)
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
@@ -515,7 +550,7 @@ def get_module_system_for_user(user, field_data_cache,
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path=''):
+                                       static_asset_path='', prev_section_url=None, next_section_url=None):
     """
     Actually implement get_module, without requiring a request.
 
@@ -531,7 +566,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     (system, student_data) = get_module_system_for_user(
         user, field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-        grade_bucket_type, static_asset_path
+        grade_bucket_type, static_asset_path, prev_section_url, next_section_url
     )
 
     descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
