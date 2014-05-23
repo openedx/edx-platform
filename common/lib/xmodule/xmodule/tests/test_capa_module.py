@@ -1454,17 +1454,17 @@ class CapaModuleTest(unittest.TestCase):
         """
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            get_request_dict = {CapaFactory.input_key(): 'mask_1'}  # the correct choice
+            get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
             module.check_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            # 'answers' key modified to use unmasked name
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
                               ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
             self.assertEquals(event_info['success'], 'correct')
 
+    @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
         """On problem save, unmasked data should appear on track_function."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
@@ -1476,6 +1476,7 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEquals(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
+    @unittest.skip("masking temporarily disabled")
     def test_reset_unmask(self):
         """On problem reset, unmask names should appear track_function."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
@@ -1490,6 +1491,7 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEquals(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
+    @unittest.skip("masking temporarily disabled")
     def test_rescore_unmask(self):
         """On problem rescore, unmasked names should appear on track_function."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
@@ -1520,12 +1522,10 @@ class CapaModuleTest(unittest.TestCase):
         """)
         module = CapaFactory.create(xml=xml)
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            get_request_dict = {CapaFactory.input_key(): 'mask_0'}
+            get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
             module.check_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            print event_info
-            # 'answers' key modified to use unmasked name
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
