@@ -608,6 +608,10 @@ body.discussion {
     @extend %text-sr;
   }
 
+  .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px;
+  }
+
   .sidebar {
     @include box-sizing(border-box);
     float: left;
@@ -1811,10 +1815,6 @@ body.discussion {
     h4 {
       font-size: 16px;
       font-weight: 700;
-    }
-
-    textarea.wmd-input {
-      margin-bottom: 0px;
     }
   }
 
