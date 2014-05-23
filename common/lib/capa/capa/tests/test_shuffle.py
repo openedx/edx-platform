@@ -34,7 +34,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>")
         # Check that choice name masking is enabled and that unmasking works
         response = problem.responders.values()[0]
-        self.assertTrue(response.has_mask())
+        self.assertFalse(response.has_mask())
         self.assertEqual(response.unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
 
@@ -55,7 +55,7 @@ class CapaShuffleTest(unittest.TestCase):
         # B A C D
         # Check that the custom name= names come through
         response = problem.responders.values()[0]
-        self.assertTrue(response.has_mask())
+        self.assertFalse(response.has_mask())
         self.assertTrue(response.has_shuffle())
         self.assertEqual(response.unmask_order(), ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd'])
 
@@ -90,10 +90,9 @@ class CapaShuffleTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'Apple'.*\].*</div>")
         response = problem.responders.values()[0]
-        self.assertTrue(response.has_mask())
+        self.assertFalse(response.has_mask())
         self.assertTrue(response.has_shuffle())
         self.assertEqual(response.unmask_order(), ['choice_0'])
-        self.assertEqual(response.unmask_name('mask_0'), 'choice_0')
 
     def test_shuffle_6_choices(self):
         xml_str = textwrap.dedent("""
@@ -279,9 +278,8 @@ class CapaShuffleTest(unittest.TestCase):
                                        r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
         # Look at the responses in their authored order
         responses = sorted(problem.responders.values(), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
-        self.assertTrue(responses[0].has_mask())
+        self.assertFalse(responses[0].has_mask())
         self.assertTrue(responses[0].has_shuffle())
-        self.assertTrue(hasattr(responses[1], 'has_mask'))
         self.assertTrue(responses[1].has_shuffle())
         self.assertEqual(responses[0].unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
         self.assertEqual(responses[1].unmask_order(), ['choice_2', 'choice_0', 'choice_3', 'choice_1'])
