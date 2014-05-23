@@ -2,15 +2,21 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 from mock import patch
+from django.test.utils import override_settings
 
 from django.test import TestCase
 from django.test.client import RequestFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import AdminFactory
 from django.utils import simplejson
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from class_dashboard import views
 
 
-class TestViews(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py
     """
@@ -81,3 +87,18 @@ class TestViews(TestCase):
         response = views.section_problem_grade_distrib(self.request, 'test/test/test', '1')
 
         self.assertEqual("{\"error\": \"Access Denied: User does not have access to this course\'s data\"}", response.content)
+
+    def test_sending_deprecated_id(self):
+
+        course = CourseFactory.create()
+        instructor = AdminFactory.create()
+        self.request.user = instructor
+
+        response = views.all_sequential_open_distrib(self.request, course.id.to_deprecated_string())
+        self.assertEqual('[]', response.content)
+
+        response = views.all_problem_grade_distribution(self.request, course.id.to_deprecated_string())
+        self.assertEqual('[]', response.content)
+
+        response = views.section_problem_grade_distrib(self.request, course.id.to_deprecated_string(), 'no section')
+        self.assertEqual('{"error": "error"}', response.content)
