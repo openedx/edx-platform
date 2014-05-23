@@ -62,6 +62,16 @@ xqueue_interface = XQueueInterface(
     requests_auth,
 )
 
+# TODO: course_id and course_key are used interchangeably in this file, which is wrong.
+# Some brave person should make the variable names consistently someday, but the code's
+# coupled enough that it's kind of tricky--you've been warned!
+
+class LmsModuleRenderError(Exception):
+    """
+    An exception class for exceptions thrown by module_render that don't fit well elsewhere
+    """
+    pass
+
 
 def make_track_function(request):
     '''
