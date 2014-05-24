@@ -1,16 +1,18 @@
-##
-## A script to create some dummy users
-
+"""
+A script to create some dummy users
+"""
 from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment
-
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.views import _do_create_account, get_random_post_override
 
 
-def create(n, course_key):
-    """Create n users, enrolling them in course_key if it's not None"""
-    for i in range(n):
-        (user, user_profile, _) = _do_create_account(get_random_post_override())
+def create(num, course_key):
+    """Create num users, enrolling them in course_key if it's not None"""
+    for idx in range(num):
+        (user, user_profile, __) = _do_create_account(get_random_post_override())
         if course_key is not None:
             CourseEnrollment.enroll(user, course_key)
 
@@ -31,7 +33,7 @@ Examples:
             print Command.help
             return
 
-        n = int(args[0])
+        num = int(args[0])
 
         if len(args) == 2:
             try:
@@ -41,4 +43,4 @@ Examples:
         else:
             course_key = None
 
-        create(n, course_key)
+        create(num, course_key)

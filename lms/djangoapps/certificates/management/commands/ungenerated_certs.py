@@ -1,3 +1,7 @@
+"""
+Management command to find all students that need certificates for
+courses that have finished, and put their cert requests on the queue.
+"""
 from django.core.management.base import BaseCommand, CommandError
 from certificates.models import certificate_status_for_student
 from certificates.queue import XQueueCertInterface
@@ -73,7 +77,7 @@ class Command(BaseCommand):
             try:
                 course = CourseKey.from_string(options['course'])
             except InvalidKeyError:
-                log.warning("Course id %s could not be parsed as a CourseKey; falling back to SSCK.from_dep_str", course_id)
+                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
                 course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
             ended_courses = [course]
         else:

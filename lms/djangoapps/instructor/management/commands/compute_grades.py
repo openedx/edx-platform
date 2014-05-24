@@ -1,8 +1,8 @@
 #!/usr/bin/python
-#
-# django management command: dump grades to csv files
-# for use by batch processes
-
+"""
+django management command: dump grades to csv files
+for use by batch processes
+"""
 from instructor.offline_gradecalc import offline_grade_calculation
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         except InvalidKeyError:
             course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         try:
-            course = get_course_by_id(course_key)
+            _course = get_course_by_id(course_key)
         except Exception as err:
             print "-----------------------------------------------------------------------------"
             print "Sorry, cannot find course with id {}".format(course_id)
