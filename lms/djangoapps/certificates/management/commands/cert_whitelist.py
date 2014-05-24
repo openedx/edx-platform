@@ -5,6 +5,8 @@ from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -56,7 +58,7 @@ class Command(BaseCommand):
         try:
             course = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            log.warning("Course id %s could not be parsed as a CourseKey; falling back to SSCK.from_dep_str", course_id)
+            logger.warning("Course id %s could not be parsed as a CourseKey; falling back to SSCK.from_dep_str", course_id)
             course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         if options['add'] and options['del']:
