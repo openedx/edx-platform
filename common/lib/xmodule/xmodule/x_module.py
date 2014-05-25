@@ -756,9 +756,12 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Can be limited by extending `non_editable_metadata_fields`.
         """
         def jsonify_value(field, json_choice):
-            if isinstance(json_choice, dict) and 'value' in json_choice:
+            if isinstance(json_choice, dict):
                 json_choice = dict(json_choice)  # make a copy so below doesn't change the original
-                json_choice['value'] = field.to_json(json_choice['value'])
+                if 'display_name' in json_choice:
+                    json_choice['display_name'] = get_text(json_choice['display_name'])
+                if 'value' in json_choice:
+                    json_choice['value'] = field.to_json(json_choice['value'])
             else:
                 json_choice = field.to_json(json_choice)
             return json_choice
