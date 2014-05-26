@@ -195,7 +195,7 @@ class CombinedOpenEndedFields(object):
     display_name = String(
         display_name=_("Display Name"),
         help=_("This name appears in the horizontal navigation at the top of the page."),
-        default="Open Response Assessment",
+        default=_("Open Response Assessment"),
         scope=Scope.settings
     )
     current_task_number = Integer(
