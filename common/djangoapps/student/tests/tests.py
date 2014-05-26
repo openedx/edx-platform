@@ -491,3 +491,4 @@ class AnonymousLookupTable(TestCase):
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
+        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))

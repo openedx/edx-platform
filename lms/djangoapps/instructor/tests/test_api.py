@@ -1334,7 +1334,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
-            '"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
             '\n"2","41","42"\n'
         ))
         self.assertTrue(body.endswith('"7","41","42"\n'))

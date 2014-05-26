@@ -63,6 +63,6 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         body = response.content.replace('\r', '')
         self.assertEqual(
             body,
-            ('"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            ('"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
              '\n"2","41","42"\n')
         )
