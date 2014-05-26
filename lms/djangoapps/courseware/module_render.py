@@ -433,7 +433,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, 'staff', descriptor, course_id):
-            block_wrappers.append(partial(add_staff_markup, user))
+            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

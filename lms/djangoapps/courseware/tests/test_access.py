@@ -90,6 +90,7 @@ class AccessTestCase(TestCase):
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(user, 'load', date))
+        self.assertTrue(access._has_access_descriptor(user, 'instructor', date))
         with self.assertRaises(ValueError):
             access._has_access_descriptor(user, 'not_load_or_staff', date)
 
