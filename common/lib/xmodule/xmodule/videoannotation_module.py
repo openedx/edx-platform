@@ -31,7 +31,7 @@ class AnnotatableFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Video Annotation',
+        default=_('Video Annotation'),
     )
     sourceurl = String(help=_("The external source URL for the video."), display_name=_("Source URL"), scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4")
     poster_url = String(help=_("Poster Image URL"), display_name=_("Poster URL"), scope=Scope.settings, default="")
