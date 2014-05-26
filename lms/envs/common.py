@@ -784,6 +784,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences

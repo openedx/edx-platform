@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
+
 Studio: Move Peer Assessment into advanced problems menu.
 
 Studio: Support creation and editing of split_test instances (Content Experiments)
