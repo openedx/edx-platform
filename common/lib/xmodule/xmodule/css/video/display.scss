@@ -458,14 +458,14 @@ div.video {
           float: left;
           position: relative;
 
-          &.open {
+          &.is-opened {
             .volume-slider-container {
               display: block;
               opacity: 1;
             }
           }
 
-          &.muted {
+          &.is-muted {
             & > a {
               background-image: url('../images/mute.png');
             }
