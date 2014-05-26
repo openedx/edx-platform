@@ -218,17 +218,19 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
+    user_location = getattr(request, 'session', {}).get('country_code')
+
     return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
                                               position, wrap_xmodule_display, grade_bucket_type,
-                                              static_asset_path)
+                                              static_asset_path, user_location)
 
 
 def get_module_system_for_user(user, field_data_cache,
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
                                position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path=''):
+                               static_asset_path='', user_location=None):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -310,7 +312,7 @@ def get_module_system_for_user(user, field_data_cache,
         return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                                   track_function, make_xqueue_callback,
                                                   position, wrap_xmodule_display, grade_bucket_type,
-                                                  static_asset_path)
+                                                  static_asset_path, user_location)
 
     def handle_grade_event(block, event_type, event):
         user_id = event.get('user_id', user.id)
@@ -379,7 +381,7 @@ def get_module_system_for_user(user, field_data_cache,
         (inner_system, inner_student_data) = get_module_system_for_user(
             real_user, field_data_cache_real_user,  # These have implicit user bindings, rest of args considered not to
             module.descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-            grade_bucket_type, static_asset_path
+            grade_bucket_type, static_asset_path, user_location
         )
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
         module.descriptor.bind_for_student(
@@ -500,6 +502,7 @@ def get_module_system_for_user(user, field_data_cache,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
+        user_location=user_location,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -525,7 +528,7 @@ def get_module_system_for_user(user, field_data_cache,
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path=''):
+                                       static_asset_path='', user_location=None):
     """
     Actually implement get_module, without requiring a request.
 
@@ -541,7 +544,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     (system, student_data) = get_module_system_for_user(
         user, field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-        grade_bucket_type, static_asset_path
+        grade_bucket_type, static_asset_path, user_location
     )
 
     descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access

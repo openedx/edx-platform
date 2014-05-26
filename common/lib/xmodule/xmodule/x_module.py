@@ -1244,7 +1244,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            **kwargs):
+            user_location=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1340,6 +1340,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         self.xmodule_instance = None
 
         self.get_real_user = get_real_user
+        self.user_location = user_location
 
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
