@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Remove Video player outline. BLD-975.
+
 Blades: Fix Youtube regular expression in video player editor. BLD-967.
 
 Blades: Fix displaying transcripts on touch devices. BLD-1033.
