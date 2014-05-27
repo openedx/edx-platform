@@ -154,7 +154,8 @@ def xml_only_video(step):
     world.ItemFactory.create(
         parent_location=parent_location,
         category='video',
-        data='<video youtube="1.00:%s"></video>' % youtube_id
+        data='<video youtube="1.00:%s"></video>' % youtube_id,
+        modulestore=store,
     )
 
 

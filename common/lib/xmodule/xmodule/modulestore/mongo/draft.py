@@ -75,25 +75,27 @@ class DraftModuleStore(MongoModuleStore):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-
-        try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
-        except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
+        if usage_key.category not in DIRECT_ONLY_CATEGORIES:
+            try:
+                return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
+            except ItemNotFoundError:
+                return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
+        else:
+            return super(DraftModuleStore, self).get_item(usage_key, depth=depth)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """
-        Create the new xmodule but don't save it. Returns the new module with a draft locator
+        Create the new xmodule but don't save it. Returns the new module with a draft locator if
+        the category allows drafts. If the category does not allow drafts, just creates a published module.
 
         :param location: a Location--must have a category
         :param definition_data: can be empty. The initial definition_data for the kvs
         :param metadata: can be empty, the initial metadata for the kvs
         :param system: if you already have an xmodule from the course, the xmodule.system value
         """
-        if location.category in DIRECT_ONLY_CATEGORIES:
-            raise InvalidVersionError(location)
-        draft_loc = as_draft(location)
-        return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system, fields)
+        if location.category not in DIRECT_ONLY_CATEGORIES:
+            location = as_draft(location)
+        return super(DraftModuleStore, self).create_xmodule(location, definition_data, metadata, system, fields)
 
     def get_items(self, course_key, settings=None, content=None, revision=None, **kwargs):
         """
@@ -139,12 +141,12 @@ class DraftModuleStore(MongoModuleStore):
 
         :param source: the location of the source (its revision must be None)
         """
-        original = self.collection.find_one({'_id': source_location.to_deprecated_son()})
-        draft_location = as_draft(source_location)
-        if draft_location.category in DIRECT_ONLY_CATEGORIES:
+        if source_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
+        original = self.collection.find_one({'_id': source_location.to_deprecated_son()})
         if not original:
             raise ItemNotFoundError(source_location)
+        draft_location = as_draft(source_location)
         original['_id'] = draft_location.to_deprecated_son()
         try:
             self.collection.insert(original)
@@ -161,6 +163,9 @@ class DraftModuleStore(MongoModuleStore):
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
         already draft.
         """
+        if xblock.location.category in DIRECT_ONLY_CATEGORIES:
+            return super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+
         draft_loc = as_draft(xblock.location)
         try:
             if not self.has_item(draft_loc):
@@ -180,6 +185,9 @@ class DraftModuleStore(MongoModuleStore):
 
         location: Something that can be passed to Location
         """
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return super(DraftModuleStore, self).delete_item(as_published(location))
+
         super(DraftModuleStore, self).delete_item(as_draft(location))
         if delete_all_versions:
             super(DraftModuleStore, self).delete_item(as_published(location))
@@ -190,6 +198,10 @@ class DraftModuleStore(MongoModuleStore):
         """
         Save a current draft to the underlying modulestore
         """
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            # ignore noop attempt to publish something that can't be draft.
+            # ignoring v raising exception b/c bok choy tests always pass make_public which calls publish
+            return
         try:
             original_published = super(DraftModuleStore, self).get_item(location)
         except ItemNotFoundError:
