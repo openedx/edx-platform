@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+All: refactored code to handle course_ids, module_ids, etc in a cleaner way.
+See https://github.com/edx/edx-platform/wiki/Opaque-Keys for details. 
+
 Blades: Remove Video player outline. BLD-975.
 
 Blades: Fix Youtube regular expression in video player editor. BLD-967.
