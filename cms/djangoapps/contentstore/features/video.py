@@ -1,8 +1,6 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_less
-from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
 
@@ -22,7 +20,6 @@ SELECTORS = {
 # We should wait 300 ms for event handler invocation + 200ms for safety.
 DELAY = 0.5
 
-
 @step('youtube stub server (.*) YouTube API')
 def configure_youtube_api(_step, action):
     action=action.strip()
@@ -32,7 +29,6 @@ def configure_youtube_api(_step, action):
         world.youtube.config['youtube_api_blocked'] = True
     else:
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
-
 
 @step('I have created a Video component$')
 def i_created_a_video_component(_step):
