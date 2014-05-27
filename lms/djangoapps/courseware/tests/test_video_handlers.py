@@ -858,15 +858,15 @@ class TestVideoGradeHandler(TestVideo):
             },
         }
         self.assertEqual(self.item_descriptor.cumulative_score, expected_graders_before)
-        
+
         graders = {
             'cumulative_score':
             '{"scored_on_percent": true}'
         }
         self.item_descriptor.handle_ajax('save_user_state', graders)
-        
+
         expected_graders_after = {
-           'scored_on_end': {
+            'scored_on_end': {
                 'isScored': False, 'graderValue': True,
                 'graderState': None, 'saveState': False,
             },
