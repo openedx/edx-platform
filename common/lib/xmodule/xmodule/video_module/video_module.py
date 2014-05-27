@@ -37,6 +37,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from urlparse import urlparse
 
+
 def get_ext(filename):
     # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
     path = urlparse(filename).path
