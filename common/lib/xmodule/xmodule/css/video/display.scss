@@ -13,6 +13,7 @@ div.video {
   margin: 0 -12px;
   padding: 12px;
   border-radius: 5px;
+  outline: none;
 
   &:focus, &:active, &:hover {
     border: 0;
