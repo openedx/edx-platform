@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-19 08:16-0400\n"
-"PO-Revision-Date: 2014-05-12 18:15+0000\n"
-"Last-Translator: mcolomer <mcmlilhity@gmail.com>\n"
+"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"PO-Revision-Date: 2014-05-25 02:51+0000\n"
+"Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/edx-platform/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,12 +35,11 @@ msgstr ""
 msgid "OK"
 msgstr "D'acord"
 
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
-#: cms/static/js/base.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
+#: cms/static/js/views/asset.js cms/static/js/views/baseview.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
-#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -233,6 +232,49 @@ msgstr ""
 "mòdul de seqüència actual. Si us plau, posa't en contacte amb el personal "
 "del curs."
 
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Volume"
+msgstr "Volum"
+
+#. Translators: Volume level equals 0%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Muted"
+msgstr "Mut"
+
+#. Translators: Volume level in range ]0,20]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very low"
+msgstr "Molt baix"
+
+#. Translators: Volume level in range ]20,40]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Low"
+msgstr "Baix"
+
+#. Translators: Volume level in range ]40,60]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Average"
+msgstr "Mig"
+
+#. Translators: Volume level in range ]60,80]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Loud"
+msgstr "Alt"
+
+#. Translators: Volume level in range ]80,99]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very loud"
+msgstr "Molt alt"
+
+#. Translators: Volume level equals 100%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Maximum"
+msgstr "Màxim"
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or "
+msgstr ""
+
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr "Slider de vídeo"
@@ -287,45 +329,6 @@ msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s segon"
 msgstr[1] "%(value)s segons"
-
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Volume"
-msgstr "Volum"
-
-#. Translators: Volume level equals 0%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Muted"
-msgstr "Mut"
-
-#. Translators: Volume level in range (0,20]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very low"
-msgstr "Molt baix"
-
-#. Translators: Volume level in range (20,40]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Low"
-msgstr "Baix"
-
-#. Translators: Volume level in range (40,60]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Average"
-msgstr "Mig"
-
-#. Translators: Volume level in range (60,80]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Loud"
-msgstr "Alt"
-
-#. Translators: Volume level in range (80,100)%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very loud"
-msgstr "Molt alt"
-
-#. Translators: Volume level equals 100%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Maximum"
-msgstr "Màxim"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -576,6 +579,26 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
 msgstr "Segur que vols esborrar aquesta resposta?"
+
+#: common/static/js/capa/drag_and_drop/base_image.js
+msgid "Drop target image"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging out of slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped in slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped on target"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
@@ -1093,11 +1116,9 @@ msgstr "Si us plau entra una adreça d'email d'estudiant o nom d'usuari."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error getting student progress url for '<%= student_id %>'. Check that the "
-"student identifier is spelled correctly."
+"Error getting student progress url for '<%= student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
 msgstr ""
-"Error obtenint el progrés de l'estudiant '<%= student_id %>'. Comprova que "
-"l'identificador d'estudiant està correctament escrit."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1106,8 +1127,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Please enter a problem urlname."
-msgstr "Si us plau, entra un nom per al problema."
+msgid "Please enter a problem location."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1120,12 +1141,9 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+" '<%= student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
-"Error reiniciant els intents de problema per al problema '<%= problem_id %>'"
-" i l'estudiant '<%= student_id %>'. Comprova que els identificadors del "
-"problema i d'estudiant han estat escrits correctament."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1137,11 +1155,9 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Check that the problem and student identifiers are spelled correctly."
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
 msgstr ""
-"Error esborrant l'estat de l'estudiant '<%= student_id %>' sobre el problema"
-" '<%= problem_id %>'. Comprova que els identificadors d'estudiant i problema"
-" estan correctament escrits."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -1161,22 +1177,16 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+"'<%= student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
 msgstr ""
-"Error iniciant una tasca de re-puntuació de problema per al problema '<%= "
-"problem_id %>' per a l'estudiant '<%= student_id %>'. Comprova que els "
-"identificadors de problema i estudiant estiguin escrits correctament."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Check that the problem and student identifiers are spelled "
-"correctly."
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
 msgstr ""
-"Error obtenint l'històric de tasques per al problema '<%= problem_id %> i "
-"estudiant '<%= student_id %>'. Comprova que els identificadors de problema i"
-" estudiant estan escrits correctament."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -1197,11 +1207,9 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Check that the problem identifier is spelled correctly."
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
 msgstr ""
-"Error iniciant una tasca per re-iniciar els intents de tots els estudiants "
-"per al problema '<%= problem_id %>'. Comprova que l'identificador de "
-"problema està escrit correctament."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
@@ -1220,11 +1228,9 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
-" problem identifier is spelled correctly."
+"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
-"Error iniciant una tasca per re-puntuar el problema '<%= problem_id %>'. "
-"Comprova que l'identificador de problema està escrit correctament."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
@@ -1540,10 +1546,6 @@ msgstr "Segur que vols esborrar aquest component? No es pot desfer!"
 msgid "Deleting&hellip;"
 msgstr "Esborrant&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
-msgid "Adding&hellip;"
-msgstr "Afegint&hellip;"
-
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr "Duplicant&hellip;"
@@ -1703,6 +1705,22 @@ msgstr "Nom"
 msgid "Date Added"
 msgstr "Data afegida"
 
+#: cms/static/js/views/assets.js
+msgid "Uploading…"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Choose File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Upload New File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Load Another File"
+msgstr ""
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "Segur que vols esborrar aquesta actualització?"
@@ -1856,6 +1874,10 @@ msgstr "Editor"
 #: cms/static/js/views/xblock_editor.js
 msgid "Settings"
 msgstr "Configuració"
+
+#: cms/static/js/views/components/add_xblock.js
+msgid "Adding&hellip;"
+msgstr "Afegint&hellip;"
 
 #: cms/static/js/views/modals/base_modal.js
 msgid "Save"
