@@ -39,7 +39,7 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
-        # TODO this course_id is actually a course_key; please change this ASAP!
+        # Note: this course_id is actually a course_key
         context_id = self.item_descriptor.course_id.to_deprecated_string()
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname

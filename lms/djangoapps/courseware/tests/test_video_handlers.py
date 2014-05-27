@@ -22,7 +22,6 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
-from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""

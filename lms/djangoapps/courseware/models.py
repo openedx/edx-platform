@@ -113,7 +113,12 @@ class StudentModuleHistory(models.Model):
     max_grade = models.FloatField(null=True, blank=True)
 
     @receiver(post_save, sender=StudentModule)
-    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument
+    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+        """
+        Checks the instance's module_type, and creates & saves a
+        StudentModuleHistory entry if the module_type is one that
+        we save.
+        """
         if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
             history_entry = StudentModuleHistory(student_module=instance,
                                                  version=None,
