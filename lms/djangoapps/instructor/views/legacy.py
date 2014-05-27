@@ -1423,42 +1423,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 #-----------------------------------------------------------------------------
 
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - only displayed to course staff
-    - shows students who are enrolled.
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # TODO (vshnayder): implement pagination.
-    enrolled_students = enrolled_students[:1000]   # HACK!
-
-    student_info = [{'username': student.username,
-                     'id': student.id,
-                     'email': student.email,
-                     'grade_summary': student_grades(student, request, course),
-                     'realname': student.profile.name,
-                     }
-                    for student in enrolled_students]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
-
+# Gradebook has moved to instructor.api.spoc_gradebook #
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_key):
