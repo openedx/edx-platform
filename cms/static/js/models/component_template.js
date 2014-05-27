@@ -15,6 +15,7 @@ define(["backbone"], function (Backbone) {
         parse: function (response) {
             this.type = response.type;
             this.templates = response.templates;
+            this.display_name = response.display_name;
 
             // Sort the templates.
             this.templates.sort(function (a, b) {
