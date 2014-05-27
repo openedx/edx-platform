@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import json
 import logging
-from collections import defaultdict
 
 from django.http import HttpResponseBadRequest, Http404
 from django.contrib.auth.decorators import login_required
