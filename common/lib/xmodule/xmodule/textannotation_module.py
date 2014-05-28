@@ -8,7 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions
 from xmodule.annotator_token import retrieve_token
-
+from xblock.fragment import Fragment
 import textwrap
 
 # Make '_' a no-op so we can scrape strings
@@ -73,7 +73,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'course_key': self.runtime.course_id,
@@ -85,7 +85,10 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
         }
-        return self.system.render_template('textannotation.html', context)
+        fragment = Fragment(self.system.render_template('textannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):

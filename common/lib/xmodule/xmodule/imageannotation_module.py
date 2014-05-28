@@ -9,6 +9,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions, html_to_text
 from xmodule.annotator_token import retrieve_token
+from xblock.fragment import Fragment
 
 import textwrap
 
@@ -91,7 +92,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
@@ -102,7 +103,10 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             'openseadragonjson': self.openseadragonjson,
         }
 
-        return self.system.render_template('imageannotation.html', context)
+        fragment = Fragment(self.system.render_template('imageannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=abstract-method

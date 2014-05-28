@@ -9,6 +9,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions, get_extension
 from xmodule.annotator_token import retrieve_token
+from xblock.fragment import Fragment
 
 import textwrap
 
@@ -72,7 +73,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         ''' get the extension of a given url '''
         return get_extension(src_url)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         extension = self._get_extension(self.sourceurl)
 
@@ -87,8 +88,10 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
         }
-
-        return self.system.render_template('videoannotation.html', context)
+        fragment = Fragment(self.system.render_template('videoannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
