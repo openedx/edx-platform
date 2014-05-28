@@ -31,7 +31,6 @@ from contentstore.utils import (
     get_lms_link_for_item,
     add_extra_panel_tab,
     remove_extra_panel_tab,
-    get_modulestore,
     reverse_course_url
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
@@ -165,7 +164,7 @@ def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
-    courses = modulestore('direct').get_courses()
+    courses = modulestore().get_courses()
 
     # filter out courses that we don't have access to
     def course_filter(course):
@@ -202,14 +201,15 @@ def _accessible_courses_list_from_groups(request):
         if course_key is None:
             # If the course_access does not have a course_id, it's an org-based role, so we fall back
             raise AccessListFallback
-        try:
-            course = modulestore('direct').get_course(course_key)
-        except ItemNotFoundError:
-            # If a user has access to a course that doesn't exist, don't do anything with that course
-            pass
-        if course is not None and not isinstance(course, ErrorDescriptor):
-            # ignore deleted or errored courses
-            courses_list[course_key] = course
+        if course_key not in courses_list:
+            try:
+                course = modulestore().get_course(course_key)
+            except ItemNotFoundError:
+                # If a user has access to a course that doesn't exist, don't do anything with that course
+                pass
+            if course is not None and not isinstance(course, ErrorDescriptor):
+                # ignore deleted or errored courses
+                courses_list[course_key] = course
 
     return courses_list.values()
 
@@ -333,7 +333,7 @@ def create_new_course(request):
         fields.update(metadata)
 
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-        new_course = modulestore('direct').create_course(
+        new_course = modulestore().create_course(
             course_key.org,
             course_key.offering,
             fields=fields,
@@ -440,7 +440,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         raise PermissionDenied()
 
     if request.method == 'GET':
-        course_updates = get_course_updates(usage_key, provided_id)
+        course_updates = get_course_updates(usage_key, provided_id, request.user.id)
         if isinstance(course_updates, dict) and course_updates.get('error'):
             return JsonResponse(course_updates, course_updates.get('status', 400))
         else:
@@ -739,7 +739,7 @@ def textbooks_list_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     course = _get_course_module(course_key, request.user)
-    store = get_modulestore(course.location)
+    store = modulestore()
 
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         # return HTML page
@@ -814,7 +814,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     """
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
-    store = get_modulestore(course_module.location)
+    store = modulestore()
     matching_id = [tb for tb in course_module.pdf_textbooks
                    if unicode(tb.get("id")) == unicode(textbook_id)]
     if matching_id:

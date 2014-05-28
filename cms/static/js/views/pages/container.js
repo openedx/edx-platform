@@ -161,8 +161,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                                 return $.ajax({
                                     type: 'DELETE',
                                     url: self.getURLRoot() + "/" +
-                                        xblockElement.data('locator') + "?" +
-                                        $.param({recurse: true, all_versions: false})
+                                        xblockElement.data('locator')
                                 }).success(_.bind(self.onDelete, self, xblockElement));
                             });
                     });

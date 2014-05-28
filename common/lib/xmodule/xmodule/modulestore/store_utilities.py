@@ -2,6 +2,7 @@ import re
 import logging
 
 from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore import REVISION_OPTION_PUBLISHED_ONLY, REVISION_OPTION_DRAFT_ONLY
 
 
 def _prefix_only_url_replace_regex(prefix):
@@ -87,10 +88,12 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     return text
 
 
-def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
+def _clone_modules(modulestore, modules, source_course_id, dest_course_id, user_id):
     for module in modules:
         original_loc = module.location
         module.location = module.location.map_into_course(dest_course_id)
+        if module.location.category == 'course':
+            module.location = module.location.replace(name=module.location.run)
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
@@ -108,10 +111,10 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
 
             module.children = new_children
 
-        modulestore.update_item(module, '**replace_user**')
+        modulestore.update_item(module, user_id, allow_not_found=True)
 
 
-def clone_course(modulestore, contentstore, source_course_id, dest_course_id):
+def clone_course(modulestore, contentstore, source_course_id, dest_course_id, user_id):
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
     if not modulestore.has_course(dest_course_id):
@@ -120,29 +123,26 @@ def clone_course(modulestore, contentstore, source_course_id, dest_course_id):
     # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
     dest_modules = modulestore.get_items(dest_course_id)
 
-    basically_empty = True
     for module in dest_modules:
-        if module.location.category == 'course' or (module.location.category == 'about'
-                                                    and module.location.name == 'overview'):
+        if module.location.category == 'course' or (
+                module.location.category == 'about' and module.location.name == 'overview'
+        ):
             continue
-
-        basically_empty = False
-        break
-
-    if not basically_empty:
-        raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_location))
+        # only course and about overview allowed
+        raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_course_id))
 
     # check to see if the source course is actually there
     if not modulestore.has_course(source_course_id):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_course_id))
 
     # Get all modules under this namespace which is (tag, org, course) tuple
+    modules = modulestore.get_items(source_course_id, revision=REVISION_OPTION_PUBLISHED_ONLY)
+    _clone_modules(modulestore, modules, source_course_id, dest_course_id, user_id)
+    course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
+    modulestore.publish(course_location, user_id)
 
-    modules = modulestore.get_items(source_course_id, revision=None)
-    _clone_modules(modulestore, modules, source_course_id, dest_course_id)
-
-    modules = modulestore.get_items(source_course_id, revision='draft')
-    _clone_modules(modulestore, modules, source_course_id, dest_course_id)
+    modules = modulestore.get_items(source_course_id, revision=REVISION_OPTION_DRAFT_ONLY)
+    _clone_modules(modulestore, modules, source_course_id, dest_course_id, user_id)
 
     # now iterate through all of the assets and clone them
     # first the thumbnails

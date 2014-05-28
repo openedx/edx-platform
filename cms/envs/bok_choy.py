@@ -27,9 +27,16 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=E11
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
-# Configure Mongo modulestore to use the test folder within the repo
-for store in ["default", "direct"]:
-    MODULESTORE[store]['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()  # pylint: disable=E1120
+# Configure modulestore to use the test folder within the repo
+update_module_store_settings(
+    MODULESTORE,
+    module_store_options={
+        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
+    },
+    xml_store_options={
+        'data_dir': (TEST_ROOT / "data").abspath(),
+    },
+)
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()

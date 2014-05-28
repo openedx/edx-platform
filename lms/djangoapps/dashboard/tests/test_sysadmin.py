@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 import mongoengine
 
 from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
@@ -110,6 +110,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
@@ -395,7 +396,6 @@ class TestSysadmin(SysadminBaseTestCase):
         self._rm_edx4edx()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")

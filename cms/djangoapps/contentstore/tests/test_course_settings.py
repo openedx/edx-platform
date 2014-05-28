@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
-from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS, reverse_course_url, reverse_usage_url
+from contentstore.utils import EXTRA_TAB_PANELS, reverse_course_url, reverse_usage_url
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
@@ -335,7 +335,7 @@ class CourseGradingTest(CourseTestCase):
 
     def test_update_section_grader_type(self):
         # Get the descriptor and the section_grader_type and assert they are the default values
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
@@ -344,7 +344,7 @@ class CourseGradingTest(CourseTestCase):
 
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Homework', section_grader_type['graderType'])
@@ -353,7 +353,7 @@ class CourseGradingTest(CourseTestCase):
 
         # Change the grader type back to notgraded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
@@ -413,8 +413,7 @@ class CourseGradingTest(CourseTestCase):
         Populate the course, grab a section, get the url for the assignment type access
         """
         self.populate_course()
-        sequential_usage_key = self.course.id.make_usage_key("sequential", None)
-        sections = get_modulestore(self.course.id).get_items(sequential_usage_key)
+        sections = modulestore().get_items(self.course.id, category="sequential")
         # see if test makes sense
         self.assertGreater(len(sections), 0, "No sections found")
         section = sections[0]  # just take the first one
@@ -470,7 +469,7 @@ class CourseMetadataEditingTest(CourseTestCase):
          )
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
-        fresh = modulestore('direct').get_course(self.course.id)
+        fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
         self.update_check(test_model)
         # now change some of the existing metadata
