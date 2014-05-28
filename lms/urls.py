@@ -67,7 +67,7 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
-    
+
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
@@ -95,6 +95,10 @@ if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
     urlpatterns += (
         url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
     )
+
+urlpatterns += (
+    url(r'support/', include('dashboard.support_urls')),
+)
 
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
 urlpatterns += (
@@ -352,7 +356,7 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
-        'courseware.views.static_tab', name="static_tab"),
+            'courseware.views.static_tab', name="static_tab"),
     )
 
     if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
