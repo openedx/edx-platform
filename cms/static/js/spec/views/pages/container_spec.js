@@ -209,16 +209,6 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
             });
 
-            describe("Empty container", function() {
-                var mockEmptyContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
-
-                it('shows the "no children" message', function() {
-                    renderContainerPage(mockEmptyContainerXBlockHtml, this);
-                    expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');
-                    expect(containerPage.$('.wrapper-xblock')).toHaveClass('is-hidden');
-                });
-            });
-
             describe("xblock operations", function() {
                 var getGroupElement, expectNumComponents,
                     NUM_GROUPS = 2, NUM_COMPONENTS_PER_GROUP = 3, GROUP_TO_TEST = "A",
