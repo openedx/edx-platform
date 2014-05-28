@@ -48,15 +48,22 @@ class VideoStudentViewHandlers(object):
         ]
 
         conversions = {
-            'cumulative_score': self.cumulative_score_save_action,
+
             'speed': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
         }
 
+        save_actions = {
+            'cumulative_score': self.cumulative_score_save_action
+        }
+
         if dispatch == 'save_user_state':
             for key in data:
                 if hasattr(self, key) and key in accepted_keys:
+                    if key in save_actions:
+                        save_actions[key](data[key])
+                        continue
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:

@@ -139,16 +139,8 @@ class VideoScoringMixin(object):
 
     def cumulative_score_save_action(self, values):
         """
-        Stores state for grader.
-
-        Stores state for grader in copy of cumulative_score to update it in database later.
-
-        Values is dict of grader_name: grader_value
+        Update state of grader in self.cumulative_score
         """
-        cumulative_score = dict(self.cumulative_score)
-
         for grader_name, status in json.loads(values).items():
             if grader_name in self.active_graders:
-                cumulative_score[grader_name]['graderState'] = status
-
-        return cumulative_score
+                self.cumulative_score[grader_name]['graderState'] = status
