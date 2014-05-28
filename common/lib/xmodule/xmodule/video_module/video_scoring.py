@@ -87,7 +87,7 @@ class VideoScoringMixin(object):
             dumped dict of next format:
                 {
                     grader_name: {
-                        isScored: bool, was grader succeed
+                        isScored: bool, was grader successful,
                         saveState: bool, does grade store its intermediate state in database,
                         graderState: intermediate state of grader,
                         graderValue: value of grader, depends of Xfield type of grader
