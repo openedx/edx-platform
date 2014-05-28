@@ -15,6 +15,7 @@ from django.db.models import Q
 
 from api_manager.permissions import SecureAPIView
 from api_manager.models import GroupProfile
+from .serializers import UserSerializer
 
 from courseware import module_render
 from courseware.model_data import FieldDataCache
@@ -117,6 +118,19 @@ class UsersList(SecureAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
+    - GET: Provides paginated list of users, it supports email, username and id filters
+        Possible use cases
+        GET /api/users?ids=23
+        GET /api/users?ids=11,12,13&page=2
+        GET /api/users?email={john@example.com}
+        GET /api/users?username={john}
+            * email: string, filters user set by email address
+            * username: string, filters user set by username
+
+        Example JSON output {'count': '25', 'next': 'https://testserver/api/users?page=2', num_pages='3',
+        'previous': None, 'results':[]}
+        'next' and 'previous' keys would have value of None if there are not next or previous page after current page.
+
     - POST: Provides the ability to append to the User entity set
         * email: __required__, The unique email address for the User being created
         * username: __required__, The unique username for the User being created
@@ -151,11 +165,25 @@ class UsersList(SecureAPIView):
                 "avatar_url" : "http://example.com/avatar.png"
             }
     ### Use Cases/Notes:
-    * GET requests for _all_ users are not currently allowed via the API
     * Password formatting policies can be enabled through the "ENFORCE_PASSWORD_POLICY" feature flag
     * The first_name and last_name fields are additionally concatenated and stored in the 'name' field of UserProfile
     * Values for level_of_education can be found in the LEVEL_OF_EDUCATION_CHOICES enum, located in common/student/models.py
     """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_fields = ('email', 'username', )
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET /api/users?ids=11,12,13.....&page=2
+        """
+        email = request.QUERY_PARAMS.get('email', None)
+        username = request.QUERY_PARAMS.get('username', None)
+        ids = request.QUERY_PARAMS.get('ids', None)
+        if email or username or ids:
+            return self.list(request, *args, **kwargs)
+        else:
+            return Response({'message': _('Unfiltered request is not allowed.')}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         """
