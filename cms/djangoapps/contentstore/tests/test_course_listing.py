@@ -3,7 +3,9 @@ Unit tests for getting the list of courses for a user through iterating all cour
 by reversing group name formats.
 """
 import random
+
 from chrono import Timer
+from mock import patch, Mock
 
 from django.test import RequestFactory
 
@@ -11,11 +13,13 @@ from contentstore.views.course import _accessible_courses_list, _accessible_cour
 from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
-from student.roles import CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore
+from xmodule.error_module import ErrorDescriptor
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
@@ -78,6 +82,48 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(courses_list_by_groups), 1)
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
+
+    def test_errored_course_global_staff(self):
+        """
+        Test the course list for global staff when get_course returns an ErrorDescriptor
+        """
+        GlobalStaff().add_users(self.user)
+
+        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_key, self.user)
+
+        with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
+            self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
+
+            # get courses through iterating all courses
+            courses_list = _accessible_courses_list(self.request)
+            self.assertEqual(courses_list, [])
+
+            # get courses by reversing group name formats
+            courses_list_by_groups = _accessible_courses_list_from_groups(self.request)
+            self.assertEqual(courses_list_by_groups, [])
+
+    def test_errored_course_regular_access(self):
+        """
+        Test the course list for regular staff when get_course returns an ErrorDescriptor
+        """
+        GlobalStaff().remove_users(self.user)
+        CourseStaffRole(SlashSeparatedCourseKey('Non', 'Existent', 'Course')).add_users(self.user)
+
+        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_key, self.user)
+
+        with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
+            self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
+
+            # get courses through iterating all courses
+            courses_list = _accessible_courses_list(self.request)
+            self.assertEqual(courses_list, [])
+
+            # get courses by reversing group name formats
+            courses_list_by_groups = _accessible_courses_list_from_groups(self.request)
+            self.assertEqual(courses_list_by_groups, [])
+            self.assertEqual(courses_list, courses_list_by_groups)
 
     def test_get_course_list_with_invalid_course_location(self):
         """
