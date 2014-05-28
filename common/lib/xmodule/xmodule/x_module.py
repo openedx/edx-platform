@@ -721,6 +721,18 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
+    def editor_saved(self, **kwargs):
+        """
+        This method is called when "Save" is pressed on the Studio editor.
+
+        Note that after this method is called, the modulestore update_item method will
+        be called on this xmodule. Therefore, any modifications to the xmodule that are
+        performed in editor_saved will automatically be persisted (implementors of this method
+        should not call update_item themselves).
+        """
+        pass
+
+
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         return (self.scope_ids == other.scope_ids and
@@ -747,7 +759,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
 
-
     @property
     def editable_metadata_fields(self):
         """
@@ -755,6 +766,21 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
         Can be limited by extending `non_editable_metadata_fields`.
         """
+        metadata_fields = {}
+
+        # Only use the fields from this class, not mixins
+        fields = getattr(self, 'unmixed_class', self.__class__).fields
+
+        for field in fields.values():
+
+            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+                continue
+
+            metadata_fields[field.name] = self._create_metadata_editor_info(field)
+
+        return metadata_fields
+
+    def _create_metadata_editor_info(self, field, disabled=False):
         def jsonify_value(field, json_choice):
             if isinstance(json_choice, dict) and 'value' in json_choice:
                 json_choice = dict(json_choice)  # make a copy so below doesn't change the original
@@ -770,46 +796,37 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             else:
                 return self.runtime.service(self, "i18n").ugettext(value)
 
-        metadata_fields = {}
+        # gets the 'default_value' and 'explicitly_set' attrs
+        metadata_field_editor_info = self.runtime.get_field_provenance(self, field)
+        metadata_field_editor_info['field_name'] = field.name
+        metadata_field_editor_info['display_name'] = get_text(field.display_name)
+        metadata_field_editor_info['help'] = get_text(field.help)
+        metadata_field_editor_info['value'] = field.read_json(self)
+        metadata_field_editor_info['disabled'] = disabled
 
-        # Only use the fields from this class, not mixins
-        fields = getattr(self, 'unmixed_class', self.__class__).fields
+        # We support the following editors:
+        # 1. A select editor for fields with a list of possible values (includes Booleans).
+        # 2. Number editors for integers and floats.
+        # 3. A generic string editor for anything else (editing JSON representation of the value).
+        editor_type = "Generic"
+        values = field.values
+        if isinstance(values, (tuple, list)) and len(values) > 0:
+            editor_type = "Select"
+            values = [jsonify_value(field, json_choice) for json_choice in values]
+        elif isinstance(field, Integer):
+            editor_type = "Integer"
+        elif isinstance(field, Float):
+            editor_type = "Float"
+        elif isinstance(field, List):
+            editor_type = "List"
+        elif isinstance(field, Dict):
+            editor_type = "Dict"
+        elif isinstance(field, RelativeTime):
+            editor_type = "RelativeTime"
+        metadata_field_editor_info['type'] = editor_type
+        metadata_field_editor_info['options'] = [] if values is None else values
 
-        for field in fields.values():
-
-            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
-                continue
-
-            # gets the 'default_value' and 'explicitly_set' attrs
-            metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
-            metadata_fields[field.name]['field_name'] = field.name
-            metadata_fields[field.name]['display_name'] = get_text(field.display_name)
-            metadata_fields[field.name]['help'] = get_text(field.help)
-            metadata_fields[field.name]['value'] = field.read_json(self)
-
-            # We support the following editors:
-            # 1. A select editor for fields with a list of possible values (includes Booleans).
-            # 2. Number editors for integers and floats.
-            # 3. A generic string editor for anything else (editing JSON representation of the value).
-            editor_type = "Generic"
-            values = field.values
-            if isinstance(values, (tuple, list)) and len(values) > 0:
-                editor_type = "Select"
-                values = [jsonify_value(field, json_choice) for json_choice in values]
-            elif isinstance(field, Integer):
-                editor_type = "Integer"
-            elif isinstance(field, Float):
-                editor_type = "Float"
-            elif isinstance(field, List):
-                editor_type = "List"
-            elif isinstance(field, Dict):
-                editor_type = "Dict"
-            elif isinstance(field, RelativeTime):
-                editor_type = "RelativeTime"
-            metadata_fields[field.name]['type'] = editor_type
-            metadata_fields[field.name]['options'] = [] if values is None else values
-
-        return metadata_fields
+        return metadata_field_editor_info
 
     # ~~~~~~~~~~~~~~~ XModule Indirection ~~~~~~~~~~~~~~~~
     @property

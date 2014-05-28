@@ -5,11 +5,13 @@ Module for running content split tests
 import logging
 import json
 from webob import Response
+from uuid import uuid4
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule
 from xmodule.x_module import XModule, module_attr
+from xmodule.modulestore.inheritance import UserPartitionList
 
 from lxml import etree
 
@@ -18,6 +20,21 @@ from xblock.fields import Scope, Integer, String, ReferenceValueDict
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
+
+user_partition_values = []
+no_partition_selected = {'display_name': "Not Selected", 'value': -1}
+
+
+def build_partition_values(all_user_partitions):
+    """
+    This helper method builds up the user_partition values that will
+    be passed to the Studio editor
+    """
+    user_partition_values[:] = []
+    user_partition_values.insert(0, no_partition_selected)
+    for user_partition in all_user_partitions:
+        user_partition_values.append({"display_name": user_partition.name, "value": user_partition.id})
+    return user_partition_values
 
 
 class SplitTestFields(object):
@@ -31,9 +48,19 @@ class SplitTestFields(object):
         default="Experiment Block"
     )
 
+    # Specified here so we can see what the value set at the course-level is.
+    user_partitions = UserPartitionList(
+        help="List of user partitions of this course into groups, used e.g. for experiments",
+        default=[],
+        scope=Scope.settings
+    )
+
     user_partition_id = Integer(
-        help="Which user partition is used for this test",
-        scope=Scope.content
+        help="The user partition (experiment) to be used for this test. Currently this value cannot be changed once it has been set.",
+        scope=Scope.content,  # We only show fields with Scope.settings in the Studio settings editor.
+        display_name="Partition",
+        default=no_partition_selected["value"],
+        values=lambda: user_partition_values  # Will be populated before the Studio editor is shown.
     )
 
     # group_id is an int
@@ -244,6 +271,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
     filename_extension = "xml"
 
+    mako_template = "widgets/split-edit.html"
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
     get_content_titles = module_attr('get_content_titles')
@@ -294,10 +322,58 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         return True
 
+    def editor_saved(self, **kwargs):
+        """
+        Used to create default verticals for the groups.
+
+        Assumes that a mutable modulestore is being used.
+        """
+        old_data = kwargs.get('old_data', {})
+        if 'user_partition_id' not in old_data or old_data['user_partition_id'] != self.user_partition_id:
+            for user_partition in self.user_partitions:
+                assert hasattr(self.system, 'modulestore'), \
+                    "editor_saved should only be called when a mutable modulestore is available"
+                modulestore = self.system.modulestore
+                group_id_mapping = {}
+                if user_partition.id == self.user_partition_id:
+                    for group in user_partition.groups:
+                        dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
+                        metadata = {'display_name': group.name}
+                        modulestore.create_and_save_xmodule(
+                            dest_usage_key,
+                            definition_data=None,
+                            metadata=metadata,
+                            system=self.system,
+                        )
+                        self.children.append(dest_usage_key)
+                        group_id_mapping[unicode(group.id)] = dest_usage_key
+
+                    self.group_id_to_child = group_id_mapping
+                    # Don't need to call update_item in the modulestore because the caller of this method will do it.
+                    break
+
+    @property
+    def editable_metadata_fields(self):
+        # Update the list of partitions based on the currently available user_partitions.
+        build_partition_values(self.user_partitions)
+
+        editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
+
+        # If user_partition_id has been set to anything besides the default value, disable editing.
+        disable_user_partition_editing = self.user_partition_id != SplitTestFields.user_partition_id.default
+
+        # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
+
+        editable_fields[SplitTestFields.user_partition_id.name] = \
+            self._create_metadata_editor_info(SplitTestFields.user_partition_id, disabled=disable_user_partition_editing)
+
+        return editable_fields
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
             SplitTestDescriptor.due,
+            SplitTestDescriptor.user_partitions
         ])
         return non_editable_fields
