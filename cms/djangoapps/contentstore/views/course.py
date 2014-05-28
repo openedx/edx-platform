@@ -189,9 +189,9 @@ def _accessible_courses_list_from_groups(request):
         course_key = course_access.course_id
         if course_key not in courses_list:
             course = modulestore('direct').get_course(course_key)
-            if course is None:
-                raise ItemNotFoundError(course_key)
-            courses_list[course_key] = course
+            if course is not None:
+                # ignore deleted or errored courses
+                courses_list[course_key] = course
 
     return courses_list.values()
 
