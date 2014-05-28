@@ -84,7 +84,7 @@ class VideoScoringMixin(object):
         If grader was added or removed, or it's value was changed update self.cumulative_score.
 
         Returns:
-            dumped dict of next format:
+            dumped dict with the following format:
                 {
                     grader_name: {
                         isScored: bool, was grader successful,
