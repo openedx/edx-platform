@@ -9,7 +9,7 @@ from fs.memoryfs import MemoryFS
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
-from xmodule.split_test_module import SplitTestDescriptor
+from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
 
@@ -177,10 +177,52 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.assertNotIn('HTML FOR GROUP 0', html)
         self.assertNotIn('HTML FOR GROUP 1', html)
 
-    def test_settings(self):
+    def test_non_editable_settings(self):
         """
-        Test the settings configuration.
+        Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.split_test_module.non_editable_metadata_fields
         self.assertIn(SplitTestDescriptor.due, non_editable_metadata_fields)
+        self.assertIn(SplitTestDescriptor.user_partitions, non_editable_metadata_fields)
         self.assertNotIn(SplitTestDescriptor.display_name, non_editable_metadata_fields)
+
+    def test_editable_settings(self):
+        """
+        Test the setting information passed back from editable_metadata_fields.
+        """
+        editable_metadata_fields = self.split_test_module.editable_metadata_fields
+        self.assertIn(SplitTestDescriptor.display_name.name, editable_metadata_fields)
+        self.assertNotIn(SplitTestDescriptor.due.name, editable_metadata_fields)
+        self.assertNotIn(SplitTestDescriptor.user_partitions.name, editable_metadata_fields)
+
+        # user_partition_id will only appear in the editable settings if the value is the
+        # default "unselected" value. This split instance has user_partition_id = 0, so
+        # user_partition_id will not be editable.
+        self.assertNotIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
+
+        # Explicitly set user_partition_id to the default value. Now user_partition_id will be editable.
+        self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
+        editable_metadata_fields = self.split_test_module.editable_metadata_fields
+        self.assertIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
+
+    def test_available_partitions(self):
+        """
+        Tests that the available partitions are populated correctly when editable_metadata_fields are called
+        """
+        self.assertEqual([], SplitTestDescriptor.user_partition_id.values)
+
+        # user_partitions is empty, only the "Not Selected" item will appear.
+        self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
+        partitions = SplitTestDescriptor.user_partition_id.values
+        self.assertEqual(1, len(partitions))
+        self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
+
+        # Populate user_partitions and call editable_metadata_fields again
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+        self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
+        self.assertEqual(2, len(partitions))
+        self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
+        self.assertEqual(0, partitions[1]['value'])
+        self.assertEqual("first_partition", partitions[1]['display_name'])

@@ -138,3 +138,30 @@
     }
   }
 }
+
+.xblock-message-area {
+
+  .xblock-message {
+    @extend %t-copy-sub1;
+    background-color: $gray-d2;
+    padding: ($baseline/2) $baseline;
+    color: $white;
+
+    &.warning [class^="icon-"] {
+      color: $orange;
+      font-style: normal;
+    }
+
+    &.error [class^="icon-"] {
+      color: $red-l2;
+      font-style: normal;
+    }
+
+    .message-text {
+      display: inline-block;
+      width: 93%;
+      vertical-align: top;
+      margin-left: ($baseline/2);
+    }
+  }
+}

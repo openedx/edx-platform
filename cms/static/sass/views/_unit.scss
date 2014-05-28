@@ -176,6 +176,24 @@ body.course.unit,
       }
     }
 
+    .xblock-message-area {
+      .xblock-student_view {
+        padding: 0px;
+      }
+
+      .validation-message {
+        margin: 0px;
+        border-radius: 0 0 0 2px;
+        padding: 10px;
+      }
+
+      .xmodule_DiscussionModule,
+      .xmodule_HtmlModule,
+      .xblock {
+        margin-top: 0px;
+      }
+    }
+
     // UI: DnD - specific elems/cases - unit
     .courseware-unit {
 

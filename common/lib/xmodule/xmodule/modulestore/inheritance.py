@@ -5,10 +5,21 @@ Support for inheritance of fields down an XBlock hierarchy.
 from datetime import datetime
 from pytz import UTC
 
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer
+from xmodule.partitions.partitions import UserPartition
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
+
+
+class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
+    def from_json(self, values):
+        return [UserPartition.from_json(v) for v in values]
+
+    def to_json(self, values):
+        return [user_partition.to_json()
+                for user_partition in values]
 
 
 class InheritanceMixin(XBlockMixin):
@@ -93,6 +104,13 @@ class InheritanceMixin(XBlockMixin):
              "Please do not share the API key with other courses and notify MathWorks immediately "
              "if you believe the key is exposed or compromised. To obtain a key for your course, "
              "or to report and issue, please contact moocsupport@mathworks.com",
+        scope=Scope.settings
+    )
+    # This is should be scoped to content, but since it's defined in the policy
+    # file, it is currently scoped to settings.
+    user_partitions = UserPartitionList(
+        help="List of user partitions of this course into groups, used e.g. for experiments",
+        default=[],
         scope=Scope.settings
     )
 

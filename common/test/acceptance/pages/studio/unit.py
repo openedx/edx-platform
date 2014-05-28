@@ -28,8 +28,7 @@ class UnitPage(PageObject):
         def _is_finished_loading():
             # Wait until all components have been loaded
             number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)).results)
-            number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)).results)
-            is_done = len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks + number_of_container_xblocks
+            is_done = len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks
             return (is_done, is_done)
 
         # First make sure that an element with the view-unit class is present on the page,
