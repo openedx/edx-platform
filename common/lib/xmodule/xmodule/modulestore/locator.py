@@ -110,13 +110,6 @@ class BlockLocatorBase(Locator):
             raise InvalidKeyError(cls, string)
         return match.groupdict()
 
-    @property
-    def package_id(self):
-        if self.org and self.offering:
-            return u'{}{}{}'.format(self.org, self.ORG_SEPARATOR, self.offering)
-        else:
-            return None
-
 
 class CourseLocator(BlockLocatorBase, CourseKey):
     """
@@ -266,7 +259,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         """
         parts = []
         if self.offering:
-            parts.append(unicode(self.package_id))
+            parts.extend([self.org, self.offering])
             if self.branch:
                 parts.append(u"{prefix}+{branch}".format(prefix=self.BRANCH_PREFIX, branch=self.branch))
         if self.version_guid:
@@ -388,10 +381,6 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):
     @property
     def offering(self):
         return self.course_key.offering
-
-    @property
-    def package_id(self):
-        return self.course_key.package_id
 
     @property
     def branch(self):
