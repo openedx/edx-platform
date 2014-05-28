@@ -23,7 +23,6 @@ import xmodule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
@@ -345,8 +344,8 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
                         return JsonResponse({"error": "Invalid data"}, 400)
                     field.write_to(existing_item, value)
 
-        if existing_item.category == 'video':
-            manage_video_subtitles_save(existing_item, request.user, old_metadata, generate_translation=True)
+        if callable(getattr(existing_item, "editor_saved", None)):
+            existing_item.editor_saved(user=request.user, old_metadata=old_metadata)
 
     # commit to datastore
     store.update_item(existing_item, request.user.id)

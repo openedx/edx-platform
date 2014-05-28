@@ -721,6 +721,13 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
+    def editor_saved(self, **kwargs):
+        """
+        This method is called when "Save" is pressed on the Studio editor.
+        """
+        pass
+
+
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         return (self.scope_ids == other.scope_ids and

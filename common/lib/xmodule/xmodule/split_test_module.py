@@ -16,6 +16,7 @@ from lxml import etree
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String, ReferenceValueDict
 from xblock.fragment import Fragment
+from pkg_resources import resource_string
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -248,6 +249,10 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     log_child_render = module_attr('log_child_render')
     get_content_titles = module_attr('get_content_titles')
 
+    # js = {'js': [resource_string(__name__, 'js/src/split/edit.js')]}
+    # js_module_name = "HTMLEditingDescriptor"
+    # css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
+
     def definition_to_xml(self, resource_fs):
 
         xml_object = etree.Element('split_test')
@@ -293,6 +298,12 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
+
+    def editor_saved(self, **kwargs):
+        """
+        Used to create default verticals for the groups.
+        """
+        pass
 
     @property
     def non_editable_metadata_fields(self):
