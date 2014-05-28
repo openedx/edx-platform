@@ -4,8 +4,7 @@ import logging
 from django.conf import settings
 
 from api_manager.utils import get_client_ip_address, address_exists_in_network
-from rest_framework import permissions
-from rest_framework.views import APIView
+from rest_framework import permissions, generics, filters, pagination, serializers
 
 
 log = logging.getLogger(__name__)
@@ -79,8 +78,37 @@ class IPAddressRestrictedPermission(permissions.BasePermission):
             return True
 
 
-class SecureAPIView(APIView):
+class IdsInFilterBackend(filters.BaseFilterBackend):
     """
-        Inherited from APIView
+        This backend support filtering queryset by a list of ids
+    """
+    def filter_queryset(self, request, queryset, view):
+        """
+        Parse querystring to get ids and the filter the queryset
+        Max of 100 values are allowed for performance reasons
+        """
+        ids = request.QUERY_PARAMS.get('ids')
+        if ids:
+            if ',' in ids:
+                ids = ids.split(",")[:100]
+            return queryset.filter(id__in=ids)
+        return queryset
+
+
+class CustomPaginationSerializer(pagination.PaginationSerializer):
+    """
+    Custom PaginationSerializer to include num_pages field
+    """
+    num_pages = serializers.Field(source='paginator.num_pages')
+
+
+class SecureAPIView(generics.ListAPIView):
+    """
+        Inherited from ListAPIView
     """
     permission_classes = (ApiKeyHeaderPermission, IPAddressRestrictedPermission)
+    filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend,)
+    pagination_serializer_class = CustomPaginationSerializer
+    paginate_by = getattr(settings, 'API_PAGE_SIZE', 20)
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100
