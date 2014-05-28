@@ -1,5 +1,5 @@
 """
-Module containts utils specific for video_module but not for transcripts.
+Module contains utils specific for video_module but not for transcripts.
 """
 
 
@@ -27,7 +27,7 @@ def create_youtube_string(module):
 
 def get_course_for_item(module):
     '''
-    Get course for item
+    Get course for item.
 
     This is workaround and can be removed as soos as
     ihneritance will work for video descriptor.
