@@ -2,8 +2,6 @@
 <%namespace name='static' file='/static_content.html'/>
 ${static.css(group='style-vendor-tinymce-content', raw=True)}
 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
 
 <div class="annotatable-wrapper">
     <div class="annotatable-header">
@@ -167,7 +165,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     };
 
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-    tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
 
     //remove old instances
     if (Annotator._instances.length !== 0) {
