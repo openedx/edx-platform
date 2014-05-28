@@ -12,6 +12,9 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/27/14
+     - Based on the new requirement to specify the complete location identifier
+       of a problem to adjust student grades, revised the :ref:`Grades` section.
    * - 05/22/14
      - Reorganized, updated, and streamlined these sections in the :ref:`Running
        Your Course Index` chapter:
