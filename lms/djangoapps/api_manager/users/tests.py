@@ -190,7 +190,7 @@ class UsersApiTests(TestCase):
             lst_username.append(local_username)
             data = {
                 'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
-                'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male'}
+                'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male', "title": 'Software developer'}
             response = self.do_post(test_uri, data)
             self.assertEqual(response.status_code, 201)
 
@@ -232,7 +232,7 @@ class UsersApiTests(TestCase):
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
-            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male'}
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male', "title": 'Software Engineer'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = test_uri + '/' + str(response.data['id'])
@@ -258,7 +258,7 @@ class UsersApiTests(TestCase):
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
-            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': 'abcd', "gender": 'male'}
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': 'abcd', "gender": 'male', "title": 'Software Engineer'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri_1 = test_uri + '/' + str(response.data['id'])
@@ -870,6 +870,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['city'], data["city"])
         self.assertEqual(response.data['country'], data["country"])
         self.assertEqual(response.data['gender'], data["gender"])
+        self.assertEqual(response.data['title'], data["title"])
         self.assertEqual(
             response.data['level_of_education'], data["level_of_education"])
         self.assertEqual(
