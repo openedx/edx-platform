@@ -287,6 +287,9 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
 
+PLATFORM_NAME = "edX"
+SITE_NAME = "edx.org"
+
 # set up some testing for microsites
 MICROSITE_CONFIGURATION = {
     "test_microsite": {

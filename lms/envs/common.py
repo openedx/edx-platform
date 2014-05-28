@@ -37,8 +37,10 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
+PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
+PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -523,7 +525,7 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
@@ -536,6 +538,8 @@ SERVER_EMAIL = 'devops@example.com'
 TECH_SUPPORT_EMAIL = 'technical@example.com'
 CONTACT_EMAIL = 'info@example.com'
 BUGS_EMAIL = 'bugs@example.com'
+UNIVERSITY_EMAIL = 'university@example.com'
+PRESS_EMAIL = 'press@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
