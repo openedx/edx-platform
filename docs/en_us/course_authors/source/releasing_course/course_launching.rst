@@ -107,7 +107,11 @@ recipients by selecting one of these predefined groups:
 * **All (students, staff and instructors)**, to communicate with currently
   enrolled students and the administrative team. 
 
-.. note:: Students can opt not to receive email messages through the **Email Settings** link for each course on their dashboards. Email messages are not sent to these students.
+  Email messages are not sent to every enrolled student. Students can opt not to
+  receive email messages through the **Email Settings** link present on their
+  dashboards for each course. Email messages are not sent to these students. In
+  addition, email is not sent to students who are enrolled in the course but who
+  have not yet activated their user accounts.
 
 When you use the bulk email feature, consider that messages **cannot be
 cancelled** after they are sent. Before you send a message to all course
@@ -203,13 +207,18 @@ To produce the Email Task History report:
        :width: 800
        :alt: A tabular report with a row for each message sent and columns for requester, date and time submitted, duration, state, task status, and task progress.
 
-For messages with a State of "Success", the Task Progress can show an informational message such as "Message successfully emailed for 13457 recipients (skipping 29) (out of 13486)". To interpret this message, note that:
+For messages with a State of "Success", the Task Progress can show an
+informational message such as "Message successfully emailed for 13457 recipients
+(skipping 29) (out of 13486)". To interpret this message, note that:
 
 * The first number indicates the number of messages sent to the selected
   recipients.
-* The second "skipping" number indicates the number of enrolled users who have
-  opted out of receiving course email messages on their dashboards.
-* The final "out of" number indicates the number of users in the set of selected
-  recipients who were enrolled in the course when you sent the email message.
-  For email messages addressed to a large number of users, the number of
-  enrolled students can change while the message is queued for processing.
+* The second number ("skipping") indicates the number of enrolled users who will
+  not be sent the message. This count includes students have opted out of
+  receiving course email messages and students who have not yet activated their
+  user accounts.
+* The final number ("out of") indicates the number of users in the set of
+  recipients you selected who were enrolled in the course when you sent the
+  email message. For email messages addressed to a large number of users, the
+  number of enrolled students can change while the message is queued for
+  processing.
