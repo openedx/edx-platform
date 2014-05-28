@@ -303,6 +303,7 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
+<<<<<<< HEAD
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
 
@@ -313,6 +314,9 @@ class UserProfile(models.Model):
         this user has uploaded a profile image.
         """
         return self.profile_image_uploaded_at is not None
+=======
+    title = models.CharField(blank=True, max_length=255, null=True)
+>>>>>>> 947d2c7... asadiqbal08/api_support_title_field_userprofile: [MCKIN-1241] Added support for title field to edX user profile
 
     @property
     def age(self):
