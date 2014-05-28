@@ -95,13 +95,15 @@ def test_raw_static_check():
 @patch('static_replace.modulestore')
 def test_static_url_with_query(mock_modulestore, mock_storage):
     """
-    Make sure urls with query have the parameter section unaltered
+    Make sure that for urls with query params:
+     query params that contain "^/static/" are converted to full location urls
+     query params that do not contain "^/static/" are left unchanged
     """
     mock_storage.exists.return_value = False
     mock_modulestore.return_value = Mock(MongoModuleStore)
 
-    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
-    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
+    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2"'
+    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2"'
     assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
 
 
