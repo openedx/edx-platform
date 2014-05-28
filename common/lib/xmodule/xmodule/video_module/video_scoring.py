@@ -81,7 +81,7 @@ class VideoScoringMixin(object):
         """
         Fields that start with 'scored' are counted as possible graders.
 
-        If grader was added or removed, or it's value was changed update self.cumulative_score.
+        If grader was added or removed, or its value was changed, update self.cumulative_score.
 
         Returns:
             dumped dict with the following format:
