@@ -48,7 +48,6 @@ class VideoStudentViewHandlers(object):
         ]
 
         conversions = {
-
             'speed': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
@@ -327,13 +326,19 @@ class VideoStudentViewHandlers(object):
             log.debug(u"Grader '%s' is not active.", grader_name)
             return Response(status=400)
 
+        # If we came here, then current grader 'grade_name' has just scored.
+        # Here we check if all other graders have already been scored.
+        # If they are not scored, then mark that current grader has scored and return.
         if not all(
             [values['isScored'] for name, values in self.cumulative_score.items() if name != grader_name]
         ):
             self.cumulative_score[grader_name]['isScored'] = True
             return Response(json.dumps(self.module_score), status=200)
 
-        if not(self.module_score and self.module_score == self.max_score()):
+        # At this point all graders have scored, so we should update score in database, but only if
+        # a) self.max_score() is True, that means that module is score-able,
+        # b) `module_score` not equals to `max_score`.
+        if self.max_score() and self.module_score != self.max_score():
             try:
                 self.update_score(self.max_score())
                 self.cumulative_score[grader_name]['isScored'] = True

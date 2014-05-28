@@ -1,7 +1,6 @@
 """
 Contains methods for scoring video.
 """
-
 import json
 
 
