@@ -2554,6 +2554,7 @@ class ImageResponse(LoncapaResponse):
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
     def get_score(self, student_answers):
+        _ = self.capa_system.i18n.ugettext
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
         for aid in self.answer_ids:  # loop through IDs of <imageinput>
@@ -2565,8 +2566,12 @@ class ImageResponse(LoncapaResponse):
             # Parse given answer
             acoords = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not acoords:
-                raise Exception('[capamodule.capa.responsetypes.imageinput] '
-                                'error grading {0} (input={1})'.format(aid, given))
+                msg = _('error grading {image_input_id} (input={user_input})').format(
+                    image_input_id=aid,
+                    user_input=given
+                )
+                raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+
             (ans_x, ans_y) = [int(x) for x in acoords.groups()]
 
             rectangles, regions = expectedset
@@ -2581,10 +2586,12 @@ class ImageResponse(LoncapaResponse):
                         r'[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
                         solution_rectangle.strip().replace(' ', ''))
                     if not sr_coords:
-                        msg = 'Error in problem specification! cannot parse rectangle in %s' % (
-                            etree.tostring(self.ielements[aid], pretty_print=True))
-                        raise Exception(
-                            '[capamodule.capa.responsetypes.imageinput] ' + msg)
+                        # Translators: {sr_coords} are the coordinates of a rectangle
+                        msg = _('Error in problem specification! Cannot parse rectangle in {sr_coords}').format(
+                            sr_coords=etree.tostring(self.ielements[aid], pretty_print=True)
+                        )
+                        raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+
                     (llx, lly, urx, ury) = [int(x) for x in sr_coords.groups()]
 
                     # answer is correct if (x,y) is within the specified
@@ -2632,7 +2639,7 @@ class ImageResponse(LoncapaResponse):
         Input:
             None
         Returns:
-            dict (str, (str, str)) - a map of inputs to a tuple of their rectange
+            dict (str, (str, str)) - a map of inputs to a tuple of their rectangle
                 and their regions
         """
         answers = {}
