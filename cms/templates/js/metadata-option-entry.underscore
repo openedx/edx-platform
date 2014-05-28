@@ -1,6 +1,10 @@
 <div class="wrapper-comp-setting">
     <label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
-    <select class="input setting-input" id="<%= uniqueId %>" name="<%= model.get('display_name') %>">
+    <select class="input setting-input" id="<%= uniqueId %>" name="<%= model.get('display_name') %>"
+        <% if (model.get('disabled')) { %>
+            disabled
+        <% } %>
+    >
         <% _.each(model.get('options'), function(option) { %>
             <% if (option.display_name !== undefined) { %>
                 <option value="<%= option['display_name'] %>"><%= option['display_name'] %></option>
@@ -9,7 +13,11 @@
             <% } %>
         <% }) %>
     </select>
-    <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
+    <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>"
+    <% if (model.get('disabled')) { %>
+            disabled
+        <% } %>
+    >
         <i class="icon-undo"></i><span class="sr">"<%= gettext("Clear Value") %>"</span>
     </button>
 </div>
