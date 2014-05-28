@@ -141,8 +141,7 @@ function (VideoPlayer) {
 
                         state.videoEl = $('video, iframe');
 
-                        expect(state.videoVolumeControl).toBeUndefined();
-                        expect(state.el.find('div.volume')).not.toExist();
+                        expect(state.el.find('.volume')).not.toExist();
                     });
                 });
             });
@@ -450,42 +449,34 @@ function (VideoPlayer) {
                     }, 'currentTime got updated', 10000);
                 });
             });
-        });
 
-        describe('when the video is not playing', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
+            describe('when the video is not playing', function () {
+                beforeEach(function () {
+                    state = jasmine.initializePlayer();
 
-                spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
-                spyOn(state, 'setSpeed').andCallThrough();
-                spyOn(state.videoPlayer, 'log').andCallThrough();
-                spyOn(state.videoPlayer.player, 'setPlaybackRate').andCallThrough();
-                spyOn(state.videoPlayer, 'setPlaybackRate').andCallThrough();
-            });
+                    spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
+                    spyOn(state, 'setSpeed').andCallThrough();
+                    spyOn(state.videoPlayer, 'log').andCallThrough();
+                    spyOn(state.videoPlayer.player, 'setPlaybackRate').andCallThrough();
+                    spyOn(state.videoPlayer, 'setPlaybackRate').andCallThrough();
+                });
 
-            it('video has a correct speed', function () {
-                state.speed = '2.0';
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.setPlaybackRate)
-                    .toHaveBeenCalledWith('2.0');
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.setPlaybackRate.calls.length)
-                    .toEqual(1);
-            });
-
-            it('video has a correct volume', function () {
-                spyOn(state.videoPlayer.player, 'setVolume');
-                state.currentVolume = '0.26';
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.player.setVolume)
-                    .toHaveBeenCalledWith('0.26');
+                it('video has a correct speed', function () {
+                    state.speed = '2.0';
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.setPlaybackRate)
+                        .toHaveBeenCalledWith('2.0');
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.setPlaybackRate.calls.length)
+                        .toEqual(1);
+                });
             });
         });
 
         describe('onVolumeChange', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-
+                state.videoPlayer.onReady();
                 state.videoEl = $('video, iframe');
             });
 
@@ -502,10 +493,10 @@ function (VideoPlayer) {
 
                 it('video has a correct volume', function () {
                     spyOn(state.videoPlayer.player, 'setVolume');
-                    state.currentVolume = '0.26';
-                    state.videoPlayer.onPlay();
+                    state.videoVolumeControl.volume = 26;
+                    state.el.trigger('play');
                     expect(state.videoPlayer.player.setVolume)
-                        .toHaveBeenCalledWith('0.26');
+                        .toHaveBeenCalledWith(26);
                 });
             });
         });

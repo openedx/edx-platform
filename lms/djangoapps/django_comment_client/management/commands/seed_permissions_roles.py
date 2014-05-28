@@ -1,3 +1,6 @@
+"""
+Management command to seed default permissions and roles.
+"""
 from django.core.management.base import BaseCommand, CommandError
 from django_comment_common.utils import seed_permissions_roles
 from xmodule.modulestore.locations import SlashSeparatedCourseKey

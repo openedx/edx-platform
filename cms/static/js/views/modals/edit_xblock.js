@@ -132,17 +132,11 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             changeMode: function(event) {
+                this.removeCheatsheetVisibility();
                 var parent = $(event.target.parentElement),
                     mode = parent.data('mode');
                 event.preventDefault();
                 this.selectMode(mode);
-                var $cheatsheet = $('.simple-editor-cheatsheet');
-                if ($cheatsheet.length == 0){
-                    $cheatsheet = $('.simple-editor-open-ended-cheatsheet');
-                }
-                $(".CodeMirror").css({"overflow": "none"});
-                $(".modal-content").removeAttr("style");
-                $cheatsheet.removeClass('shown');
             },
 
             selectMode: function(mode) {
@@ -204,6 +198,17 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     mode: mode,
                     displayName: displayName
                 }));
+            },
+
+            removeCheatsheetVisibility: function() {
+                var cheatsheet = $('article.simple-editor-open-ended-cheatsheet');
+                if (cheatsheet.length === 0) {
+                    cheatsheet = $('article.simple-editor-cheatsheet');
+                }
+                if (cheatsheet.hasClass('shown')) {
+                    cheatsheet.removeClass('shown');
+                    $('.modal-content').removeClass('cheatsheet-is-shown');
+                }
             }
         });
 

@@ -7,7 +7,6 @@ import json
 from courseware.models import StudentModule
 from track.models import TrackingLog
 from psychometrics.models import PsychometricData
-from xmodule.modulestore.keys import UsageKey
 
 from django.conf import settings
 from django.core.management.base import BaseCommand

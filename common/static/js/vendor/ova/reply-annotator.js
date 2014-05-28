@@ -82,6 +82,7 @@ Annotator.Plugin.Reply = (function(_super) {
 				var string;
 				return self;
 			});
+		field.remove();
 		this.annotation = annotation;
 		//Create the actions for the buttons
 		return ret;

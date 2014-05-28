@@ -5,6 +5,13 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+All: refactored code to handle course_ids, module_ids, etc in a cleaner way.
+See https://github.com/edx/edx-platform/wiki/Opaque-Keys for details. 
+
+Blades: Remove Video player outline. BLD-975.
+
+Blades: Fix Youtube regular expression in video player editor. BLD-967.
+
 Blades: Fix displaying transcripts on touch devices. BLD-1033.
 
 Blades: Tolerance expressed in percentage now computes correctly. BLD-522.
@@ -754,3 +761,5 @@ LMS: Option to email students when enroll/un-enroll them.
 
 Blades: Added WAI-ARIA markup to the video player controls. These are now fully
 accessible by screen readers.
+
+Common: Added advanced_module for annotating images to go with the ones for text and videos.

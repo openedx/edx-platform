@@ -6,6 +6,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.annotator_mixin import get_instructions
 from xmodule.annotator_token import retrieve_token
 
 import textwrap
@@ -32,7 +33,7 @@ class AnnotatableFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Text Annotation',
+        default=_('Text Annotation'),
     )
     instructor_tags = String(
         display_name=_("Tags for Assignments"),
@@ -70,12 +71,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
     def get_html(self):
         """ Renders parameters to template. """

@@ -23,7 +23,6 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_cms_course_link, get_course_with_access
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from instructor.offline_gradecalc import student_grades
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
@@ -263,44 +262,3 @@ def _section_metrics(course_key, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
-
-
-#---- Gradebook (shown to small courses only) ----
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def spoc_gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    - Only displayed to course staff
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # TODO (vshnayder): implement pagination to show to large courses
-    max_num_students = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    enrolled_students = enrolled_students[:max_num_students]   # HACK!
-
-    student_info = [
-        {
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
-        }
-        for student in enrolled_students
-    ]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })

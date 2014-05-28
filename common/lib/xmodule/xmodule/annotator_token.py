@@ -25,7 +25,7 @@ def retrieve_token(userid, secret):
     delta = dtnow - dtutcnow
     newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
     newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    # uses the issued time (UTC plus timezone), the consumer key and the user's email to maintain a 
+    # uses the issued time (UTC plus timezone), the consumer key and the user's email to maintain a
     # federated system in the annotation backend server
     custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": userid, "ttl": 86400}
     newtoken = create_token(secret, custom_data)

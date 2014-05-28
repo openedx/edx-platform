@@ -48,8 +48,8 @@ class TestWikiAccessBase(ModuleStoreTestCase):
         """Creates and returns users with instructor and staff access to course."""
 
         return [
-            InstructorFactory(course=course.id),  # Creates instructor_org/number/run role name
-            StaffFactory(course=course.id),  # Creates staff_org/number/run role name
+            InstructorFactory(course_key=course.id),  # Creates instructor_org/number/run role name
+            StaffFactory(course_key=course.id),  # Creates staff_org/number/run role name
         ]
 
 

@@ -88,12 +88,11 @@ class BlockLocatorBase(Locator):
         ({BLOCK_TYPE_PREFIX}\+(?P<block_type>{ALLOWED_ID_CHARS}+)\+?)?
         ({BLOCK_PREFIX}\+(?P<block_id>{ALLOWED_ID_CHARS}+))?
         """.format(
-            ALLOWED_ID_CHARS=Locator.ALLOWED_ID_CHARS, BRANCH_PREFIX=BRANCH_PREFIX,
-            VERSION_PREFIX=Locator.VERSION_PREFIX, BLOCK_TYPE_PREFIX=Locator.BLOCK_TYPE_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX
-        )
+        ALLOWED_ID_CHARS=Locator.ALLOWED_ID_CHARS, BRANCH_PREFIX=BRANCH_PREFIX,
+        VERSION_PREFIX=Locator.VERSION_PREFIX, BLOCK_TYPE_PREFIX=Locator.BLOCK_TYPE_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX
+    )
 
     URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.UNICODE)
-
 
     @classmethod
     def parse_url(cls, string):

@@ -6,14 +6,15 @@ Acceptance tests for Video.
 
 import json
 import requests
-from .helpers import UniqueCourseTest
-from ..pages.lms.video import VideoPage
-from ..pages.lms.tab_nav import TabNavPage
-from ..pages.lms.course_nav import CourseNavPage
-from ..pages.lms.auto_auth import AutoAuthPage
-from ..pages.lms.course_info import CourseInfoPage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..helpers import UniqueCourseTest
+from ...pages.lms.video.video import VideoPage
+from ...pages.lms.tab_nav import TabNavPage
+from ...pages.lms.course_nav import CourseNavPage
+from ...pages.lms.auto_auth import AutoAuthPage
+from ...pages.lms.course_info import CourseInfoPage
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from box.test.flaky import flaky
+
 
 VIDEO_SOURCE_PORT = 8777
 YOUTUBE_STUB_PORT = 9080
@@ -263,7 +264,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # Verify that we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
     def test_cc_button_transcripts_and_sub_fields_empty(self):
         """
@@ -278,7 +279,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # Verify that we see "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
 
     def test_cc_button_hidden_no_translations(self):
         """
@@ -342,7 +343,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
@@ -352,7 +353,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
@@ -519,10 +520,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.select_language('zh')
 
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
         self.video.select_language('en')
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
@@ -562,7 +563,7 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # Verify that the video has autoplay mode disabled
-        self.assertFalse(self.video.is_autoplay_enabled)
+        self.assertFalse(self.video.is_autoplay_enabled())
 
     def test_html5_video_rendering_with_unsupported_sources(self):
         """
@@ -576,11 +577,11 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video_no_render()
 
         # Verify that error message is shown
-        self.assertTrue(self.video.is_error_message_shown)
+        self.assertTrue(self.video.is_error_message_shown())
 
         # Verify that error message has correct text
         correct_error_message_text = 'No playable video sources found.'
-        self.assertIn(correct_error_message_text, self.video.error_message_text)
+        self.assertIn(correct_error_message_text, self.video.error_message_text())
 
         # Verify that spinner is not shown
         self.assertFalse(self.video.is_spinner_shown())
@@ -603,7 +604,7 @@ class Html5VideoTest(VideoBaseTest):
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
@@ -628,7 +629,7 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
 
         # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
@@ -639,7 +640,7 @@ class Html5VideoTest(VideoBaseTest):
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
 
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
         #Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
@@ -690,7 +691,7 @@ class Html5VideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # check if we see "Hi, welcome to Edx." text in the captions
-        self.assertIn("Hi, welcome to Edx.", self.video.captions_text)
+        self.assertIn("Hi, welcome to Edx.", self.video.captions_text())
 
     def test_cc_button_wo_english_transcript(self):
         """
@@ -712,7 +713,7 @@ class Html5VideoTest(VideoBaseTest):
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
+        self.assertIn(unicode_text, self.video.captions_text())
 
     def test_video_rendering(self):
         """
