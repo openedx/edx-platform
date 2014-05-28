@@ -14,8 +14,7 @@ class VideoScoringMixin(object):
         """
         Determine if video is graded and cousre has graded videos.
 
-        Return True if video has not only numerical score
-        but course marked as it has gradeable videos.
+        Return True if video has numerical score AND course has marked it as gradeable.
         """
         return self.has_score and self.grade_videos
 
