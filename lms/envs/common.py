@@ -35,7 +35,10 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
-from discussion_app.views import get_js_urls as discussion_get_js_urls
+from discussion_app.views import (
+    get_js_urls as discussion_get_js_urls,
+    get_css_urls as discussion_get_css_urls
+)
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -917,9 +920,7 @@ PIPELINE_CSS = {
         'output_filename': 'css/lms-style-app-extend2.css',
     },
     'style-discussion-app': {
-        'source_filenames': [
-            'sass/discussion-app.css',
-        ],
+        'source_filenames': discussion_get_css_urls(),
         'output_filename': 'css/lms-style-discussion-app.css',
     },
     'style-course-vendor': {
