@@ -90,7 +90,7 @@ class VideoScoringMixin(object):
                         isScored: bool, was grader succeed
                         saveState: bool, does grade store it's intermediate state in database,
                         graderState: intermediate state of grader,
-                        graderValue: value of grader, depends of Xfiled type of grader
+                        graderValue: value of grader, depends of Xfield type of grader
                     }
                 }
         """
