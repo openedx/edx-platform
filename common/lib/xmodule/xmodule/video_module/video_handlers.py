@@ -251,8 +251,8 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
-            except NotFoundError as ex:
-                log.info(ex.message)
+            except NotFoundError as exc:
+                log.info(exc.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 return self.get_static_transcript(request)
@@ -260,8 +260,8 @@ class VideoStudentViewHandlers(object):
                 TranscriptException,
                 UnicodeDecodeError,
                 TranscriptsGenerationException
-            ) as ex:
-                log.info(ex.message)
+            ) as exc:
+                log.info(exc.message)
                 response = Response(status=404)
             else:
                 response = Response(transcript, headerlist=[('Content-Language', language)])

@@ -12,7 +12,7 @@ class VideoScoringMixin(object):
     @property
     def really_has_score(self):
         """
-        Determine if video is graded and cousre has graded videos.
+        Determine if video is graded and course has graded videos.
 
         Return True if video has numerical score AND course has marked it as gradeable.
         """
