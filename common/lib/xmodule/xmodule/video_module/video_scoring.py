@@ -1,5 +1,5 @@
 """
-Contani methods for scoring video.
+Contains methods for scoring video.
 """
 
 import json
