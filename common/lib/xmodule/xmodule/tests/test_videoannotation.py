@@ -62,10 +62,10 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertEqual(expectedyoutube, result2)
         self.assertEqual(expectednotyoutube, result1)
 
-    def test_get_html(self):
+    def test_student_view(self):
         """
         Tests to make sure variables passed in truly exist within the html once it is all rendered.
         """
-        context = self.mod.get_html()
+        context = self.mod.student_view({}).content
         for key in ['display_name', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'annotation_storage']:
             self.assertIn(key, context)
