@@ -204,7 +204,7 @@ function goto( mode)
     % endif
 
     <p>
-    <a href="${reverse('gradebook_legacy', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    <a href="${reverse('spoc_gradebook', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>

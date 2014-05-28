@@ -21,7 +21,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
@@ -53,7 +53,6 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.roles import CourseRole, UserBasedRole
 
-from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils

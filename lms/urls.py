@@ -273,8 +273,6 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
             include('instructor.views.api_urls')),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.instructor_dashboard.spoc_gradebook', name='spoc_gradebook'),
 
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
@@ -367,8 +365,6 @@ if settings.COURSEWARE_ENABLED:
 
 if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_gradebook$',
-            'instructor.views.legacy.gradebook', name='gradebook_legacy'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_grade_summary$',
             'instructor.views.legacy.grade_summary', name='grade_summary_legacy'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_instructor_dash$',

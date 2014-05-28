@@ -10,7 +10,6 @@ import urllib
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import UsageKey
 
 
 class LocMapperStore(object):

@@ -60,12 +60,12 @@ from xmodule.modulestore.locator import (
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
-from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import inheritance, ModuleStoreWriteBase, SPLIT_MONGO_MODULESTORE_TYPE
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
-from xblock.fields import Scope
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from bson.objectid import ObjectId
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xblock.core import XBlock
@@ -132,12 +132,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.render_template = render_template
         self.i18n_service = i18n_service
 
-    def cache_items(self, system, base_block_ids, depth=0, lazy=True):
+    def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True):
         '''
         Handles caching of items once inheritance and any other one time
         per course per fetch operations are done.
         :param system: a CachingDescriptorSystem
         :param base_block_ids: list of block_ids to fetch
+        :param course_key: the destination course providing the context
         :param depth: how deep below these to prefetch
         :param lazy: whether to fetch definitions or use placeholders
         '''
@@ -152,7 +153,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         if lazy:
             for block in new_module_data.itervalues():
-                block['definition'] = DefinitionLazyLoader(self, block['category'], block['definition'])
+                block['definition'] = DefinitionLazyLoader(
+                    self, block['category'], block['definition'],
+                    lambda fields: self.convert_references_to_keys(
+                        course_key, system.load_block_type(block['category']),
+                        fields, system.course_entry['structure']['blocks'],
+                    )
+                )
         else:
             # Load all descendants by id
             descendent_definitions = self.db_connection.find_matching_definitions({
@@ -164,7 +171,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
             for block in new_module_data.itervalues():
                 if block['definition'] in definitions:
-                    block['fields'].update(definitions[block['definition']].get('fields'))
+                    converted_fields = self.convert_references_to_keys(
+                        course_key, system.load_block_type(block['category']),
+                        definitions[block['definition']].get('fields'),
+                        system.course_entry['structure']['blocks'],
+                    )
+                    block['fields'].update(converted_fields)
 
         system.module_data.update(new_module_data)
         return system.module_data
@@ -195,7 +207,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 services=services,
             )
             self._add_cache(course_entry['structure']['_id'], system)
-            self.cache_items(system, block_ids, depth, lazy)
+            course_key = CourseLocator(
+                version_guid=course_entry['structure']['_id'],
+                org=course_entry.get('org'),
+                offering=course_entry.get('offering'),
+                branch=course_entry.get('branch'),
+            )
+            self.cache_items(system, block_ids, course_key, depth, lazy)
         return [system.load_item(block_id, course_entry) for block_id in block_ids]
 
     def _get_cache(self, course_version_guid):
@@ -359,16 +377,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        # intended for temporary support of some pointers being old-style
-        if isinstance(usage_key, Location):
-            if self.loc_mapper is None:
-                raise InsufficientSpecificationError('No location mapper configured')
-            else:
-                usage_key = self.loc_mapper.translate_location(
-                    usage_key,
-                    usage_key.revision is None,
-                    add_entry_if_missing=False
-                )
         assert isinstance(usage_key, BlockUsageLocator)
         course = self._lookup_course(usage_key)
         items = self._load_items(course, [usage_key.block_id], depth, lazy=True)
@@ -631,7 +639,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         :param user_id: request.user object
         """
-        new_def_data = self._filter_special_fields(new_def_data)
+        new_def_data = self._serialize_fields(category, new_def_data)
         new_id = ObjectId()
         document = {
             '_id': new_id,
@@ -656,7 +664,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         :param user_id: request.user
         """
-        new_def_data = self._filter_special_fields(new_def_data)
         def needs_saved():
             for key, value in new_def_data.iteritems():
                 if key not in old_definition['fields'] or value != old_definition['fields'][key]:
@@ -669,8 +676,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # actual change b/c the descriptor and cache probably point to the same objects
         old_definition = self.db_connection.get_definition(definition_locator.definition_id)
         if old_definition is None:
-            raise ItemNotFoundError(definition_locator.to_deprecated_string())
+            raise ItemNotFoundError(definition_locator)
 
+        new_def_data = self._serialize_fields(old_definition['category'], new_def_data)
         if needs_saved():
             # new id to create new version
             old_definition['_id'] = ObjectId()
@@ -791,7 +799,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self._update_block_in_structure(new_structure, new_block_id, {
             "category": category,
             "definition": definition_locator.definition_id,
-            "fields": block_fields,
+            "fields": self._serialize_fields(category, block_fields),
             'edit_info': {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
@@ -891,7 +899,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         block_fields = partitioned_fields.setdefault(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
-        definition_fields = self._filter_special_fields(partitioned_fields.get(Scope.content, {}))
+        definition_fields = self._serialize_fields(root_category, partitioned_fields.get(Scope.content, {}))
 
         # build from inside out: definition, structure, index entry
         # if building a wholly new structure
@@ -934,7 +942,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 encoded_block_id = LocMapperStore.encode_key_for_mongo(draft_structure['root'])
                 root_block = draft_structure['blocks'][encoded_block_id]
                 if block_fields is not None:
-                    root_block['fields'].update(block_fields)
+                    root_block['fields'].update(self._serialize_fields(root_category, block_fields))
                 if definition_fields is not None:
                     definition = self.db_connection.get_definition(root_block['definition'])
                     definition['fields'].update(definition_fields)
@@ -985,17 +993,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         descriptor.definition_locator, is_updated = self.update_definition_from_data(
             descriptor.definition_locator, descriptor.get_explicitly_set_fields_by_scope(Scope.content), user_id)
-        # check children
+
         original_entry = self._get_block_from_structure(original_structure, descriptor.location.block_id)
-        is_updated = is_updated or (
-            descriptor.has_children and original_entry['fields'].get('children', []) != descriptor.children
-        )
         # check metadata
+        settings = descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
+        settings = self._serialize_fields(descriptor.category, settings)
         if not is_updated:
-            is_updated = self._compare_settings(
-                descriptor.get_explicitly_set_fields_by_scope(Scope.settings),
-                original_entry['fields']
-            )
+            is_updated = self._compare_settings(settings, original_entry['fields'])
+
+        # check children
+        if descriptor.has_children:
+            serialized_children = [child.block_id for child in descriptor.children]
+            is_updated = is_updated or original_entry['fields'].get('children', []) != serialized_children
+            if is_updated:
+                settings['children'] = serialized_children
 
         # if updated, rev the structure
         if is_updated:
@@ -1003,9 +1014,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_data = self._get_block_from_structure(new_structure, descriptor.location.block_id)
 
             block_data["definition"] = descriptor.definition_locator.definition_id
-            block_data["fields"] = descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-            if descriptor.has_children:
-                block_data['fields']["children"] = descriptor.children
+            block_data["fields"] = settings
 
             new_id = new_structure['_id']
             block_data['edit_info'] = {
@@ -1105,7 +1114,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
-        new_def_data = self._filter_special_fields(xblock.get_explicitly_set_fields_by_scope(Scope.content))
+        new_def_data = self._serialize_fields(xblock.category, xblock.get_explicitly_set_fields_by_scope(Scope.content))
         is_updated = False
         if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
@@ -1137,10 +1146,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     is_updated = self._persist_subdag(child_block, user_id, structure_blocks, new_id) or is_updated
                     children.append(child_block.location.block_id)
                 else:
-                    children.append(child)
+                    children.append(child.block_id)
             is_updated = is_updated or structure_blocks[encoded_block_id]['fields']['children'] != children
 
         block_fields = xblock.get_explicitly_set_fields_by_scope(Scope.settings)
+        block_fields = self._serialize_fields(xblock.category, block_fields)
         if not is_new and not is_updated:
             is_updated = self._compare_settings(block_fields, structure_blocks[encoded_block_id]['fields'])
         if children:
@@ -1204,12 +1214,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Note, if the branch doesn't exist, then the source_course structure's root must be in subtree_list;
         otherwise, the publish will violate the parents must exist rule.
 
-        :param subtree_list: a list of xblock ids whose subtrees to publish. The ids can be the block
-        id or BlockUsageLocator. If a Locator and if the Locator's course id != source_course, this will
-        raise InvalidLocationError(locator)
+        :param subtree_list: a list of usage keys whose subtrees to publish.
 
-        :param blacklist: a list of xblock ids to not change in the destination: i.e., don't add
+        :param blacklist: a list of usage keys to not change in the destination: i.e., don't add
         if not there, don't update if there.
+
+        Raises:
+            ItemNotFoundError: if it cannot find the course. if the request is to publish a
+                subtree but the ancestors up to and including the course root are not published.
         """
         # get the destination's index, and source and destination structures.
         source_structure = self._lookup_course(source_course)['structure']
@@ -1219,20 +1231,22 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(destination_course)
         if destination_course.branch not in index_entry['versions']:
             # must be publishing the dag root if there's no current dag
-            if source_structure['root'] not in subtree_list:
-                raise ItemNotFoundError(source_structure['root'])
+            root_block_id = source_structure['root']
+            if not any(root_block_id == subtree.block_id for subtree in subtree_list):
+                raise ItemNotFoundError(u'Must publish course root {}'.format(root_block_id))
             # create branch
-            destination_structure = self._new_structure(user_id, source_structure['root'])
+            destination_structure = self._new_structure(user_id, root_block_id)
         else:
             destination_structure = self._lookup_course(destination_course)['structure']
             destination_structure = self._version_structure(destination_structure, user_id)
 
+        blacklist = [shunned.block_id for shunned in blacklist or []]
         # iterate over subtree list filtering out blacklist.
         orphans = set()
         destination_blocks = destination_structure['blocks']
         for subtree_root in subtree_list:
             # find the parents and put root in the right sequence
-            parents = self._get_parents_from_structure(subtree_root, source_structure)
+            parents = self._get_parents_from_structure(subtree_root.block_id, source_structure)
             if not all(parent in destination_blocks for parent in parents):
                 raise ItemNotFoundError(parents)
             for parent_loc in parents:
@@ -1240,12 +1254,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     self._sync_children(
                         source_structure['blocks'][parent_loc],
                         destination_blocks[parent_loc],
-                        subtree_root
+                        subtree_root.block_id
                 ))
             # update/create the subtree and its children in destination (skipping blacklist)
             orphans.update(
                 self._publish_subdag(
-                    user_id, subtree_root, source_structure['blocks'], destination_blocks, blacklist or []
+                    user_id, subtree_root.block_id, source_structure['blocks'], destination_blocks, blacklist
                 )
             )
         # remove any remaining orphans
@@ -1444,6 +1458,47 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # clear cache again b/c inheritance may be wrong over orphans
         self._clear_cache(original_structure['_id'])
 
+    def convert_references_to_keys(self, course_key, xblock_class, jsonfields, blocks):
+        """
+        Convert the given serialized fields to the deserialized values by finding all references
+        and converting them.
+        :param jsonfields: the serialized copy of the xblock's fields
+        """
+        def robust_usage_key(block_id):
+            """
+            create a course_key relative usage key for the block_id. If the block_id is in blocks,
+            use its correct category; otherwise, use 'unknown'.
+            The purpose for this is that some operations add pointers as they build up the
+            structure without worrying about order of creation. Because the category of the
+            usage_key is for the most part inert, it's better to hack a value than to work
+            out a dependency graph algorithm for those functions which may prereference blocks.
+            """
+            # if this was taken from cache, then its fields are already converted
+            if isinstance(block_id, BlockUsageLocator):
+                return block_id
+            try:
+                return course_key.make_usage_key(
+                    blocks[LocMapperStore.encode_key_for_mongo(block_id)]['category'], block_id
+                )
+            except KeyError:
+                return course_key.make_usage_key('unknown', block_id)
+
+        xblock_class = self.mixologist.mix(xblock_class)
+        for field_name, value in jsonfields.iteritems():
+            if value:
+                field = xblock_class.fields.get(field_name)
+                if field is None:
+                    continue
+                elif isinstance(field, Reference):
+                    jsonfields[field_name] = robust_usage_key(value)
+                elif isinstance(field, ReferenceList):
+                    jsonfields[field_name] = [robust_usage_key(ele) for ele in value]
+                elif isinstance(field, ReferenceValueDict):
+                    for key, subvalue in value.iteritems():
+                        assert isinstance(subvalue, basestring)
+                        value[key] = robust_usage_key(subvalue)
+        return jsonfields
+
     def _get_index_if_valid(self, locator, force=False, continue_version=False):
         """
         If the locator identifies a course and points to its draft (or plausibly its draft),
@@ -1514,15 +1569,36 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         index_entry['versions'][branch] = new_id
         self.db_connection.update_course_index(index_entry)
 
-    def _filter_special_fields(self, fields):
+    def _serialize_fields(self, category, fields):
         """
+        Convert any references to their serialized form.
+
         Remove any fields which split or its kvs computes or adds but does not want persisted.
 
         :param fields: a dict of fields
         """
+        assert isinstance(fields, dict)
+        xblock_class = XBlock.load_class(category, self.default_class)
+        xblock_class = self.mixologist.mix(xblock_class)
+        for field_name, value in fields.iteritems():
+            if value:
+                if isinstance(xblock_class.fields[field_name], Reference):
+                    fields[field_name] = value.block_id
+                elif isinstance(xblock_class.fields[field_name], ReferenceList):
+                    fields[field_name] = [
+                        ele.block_id for ele in value
+                    ]
+                elif isinstance(xblock_class.fields[field_name], ReferenceValueDict):
+                    for key, subvalue in value.iteritems():
+                        assert isinstance(subvalue, Location)
+                        value[key] = subvalue.block_id
+
+        # I think these are obsolete conditions; so, I want to confirm that. Thus the warnings
         if 'location' in fields:
+            log.warn('attempt to persist location')
             del fields['location']
         if 'category' in fields:
+            log.warn('attempt to persist category')
             del fields['category']
         return fields
 
@@ -1616,7 +1692,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 user_id, new_block['category'],
                 self._filter_blacklist(copy.copy(new_block['fields']), blacklist),
                 new_block['definition'],
-                new_block['edit_info']['update_version']
+                new_block['edit_info']['update_version'],
+                raw=True
             )
         for child in destination_block['fields'].get('children', []):
             if child not in blacklist:
@@ -1642,7 +1719,17 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 self._delete_if_true_orphan(child, structure)
             del structure['blocks'][encoded_block_id]
 
-    def _new_block(self, user_id, category, block_fields, definition_id, new_id):
+    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False):
+        """
+        Create the core document structure for a block.
+
+        :param block_fields: the settings and children scoped fields as a dict or son
+        :param definition_id: the pointer to the content scoped fields
+        :param new_id: the structure's version id
+        :param raw: true if this block already has all references serialized
+        """
+        if not raw:
+            block_fields = self._serialize_fields(category, block_fields)
         return {
             'category': category,
             'definition': definition_id,
