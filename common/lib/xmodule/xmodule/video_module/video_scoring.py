@@ -58,6 +58,8 @@ class VideoScoringMixin(object):
         """
         Returns active graders from possible graders.
 
+        Fields that start with 'scored' are counted as possible graders.
+
         Returns:
             dict of next format: { grader_name: grader_value }
         """
