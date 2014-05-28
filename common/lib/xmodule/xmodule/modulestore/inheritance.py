@@ -86,6 +86,12 @@ class InheritanceMixin(XBlockMixin):
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
+    grade_videos = Boolean(
+        help="pass",
+        display_name='Grade videos',
+        scope=Scope.settings,
+        default=False
+    )
 
 
 

@@ -151,3 +151,9 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
+    grade_videos = Boolean(
+        help="pass",
+        display_name='Grade videos',
+        scope=Scope.settings,
+        default=False
+    )
