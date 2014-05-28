@@ -44,7 +44,6 @@ class CorsCSRFMiddleware(CsrfViewMiddleware):
         return True
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        log.warn('oooooo')
         if not self.is_enabled(request):
             return
 
