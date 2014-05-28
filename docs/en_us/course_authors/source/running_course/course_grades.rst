@@ -36,13 +36,13 @@ You can review the assignment types that are graded and their respective weights
 
 You establish a grading policy for your course when you create it in Studio. While the course is running, you can view an XML representation of the assignment types in your course and how they are weighted to determine students' grades.
 
+..  DOC-290: research this statement before including anything like it: Below the list of graded assignment types and their weights, each *public* subsection and unit that contains an assignment is listed.
+
 #. View the live version of your course.
 
 #. Click **Instructor**, then click **Data Download** > **Grading Configuration**.
 
    A list of the assignment types in your course displays. In this example, Homework is weighted as 0.3 (30%) of the grade. 
-
-..  DOC-290: research this statement before including anything like it: Below the list of graded assignment types and their weights, each *public* subsection and unit that contains an assignment is listed.
 
    .. image:: ../Images/Grading_Configuration.png
      :alt: XML of course assignment types and weights for grading
