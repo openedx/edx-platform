@@ -787,6 +787,7 @@ class TestVideoGradeHandler(TestVideo):
         has_score="True"
         scored_on_end="True"
         scored_on_percent="75"
+        grade_videos="True"
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
