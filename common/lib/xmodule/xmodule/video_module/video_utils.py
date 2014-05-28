@@ -28,5 +28,8 @@ def create_youtube_string(module):
 def get_course_for_item(module):
     '''
     Get course for item
+
+    This is workaround and can be removed as soos as
+    ihneritance will work for video descriptor.
     '''
     return module.runtime.modulestore.get_course(module.location.course_key, depth=0)
