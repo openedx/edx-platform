@@ -163,6 +163,9 @@ def _accessible_courses_list(request):
         """
         Get courses to which this user has access
         """
+        if isinstance(course, ErrorDescriptor):
+            return False
+
         if GlobalStaff().has_user(request.user):
             return course.location.course != 'templates'
 
