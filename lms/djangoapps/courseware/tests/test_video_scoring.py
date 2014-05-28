@@ -117,11 +117,11 @@ class TestVideoScoring(BaseTestXmodule):
         self.assertDictEqual(self.item.graders(), expected_grader_before)
 
         new_grader_state = json.dumps({'scored_on_end': True})
-        output = self.item.cumulative_score_save_action(new_grader_state)
+        self.item.cumulative_score_save_action(new_grader_state)
         expected_grader_after = {
             'scored_on_end': {
                 'isScored': False, 'graderValue': True,
                 'graderState': True, 'saveState': False,
             },
         }
-        self.assertDictEqual(output, expected_grader_after)
+        self.assertDictEqual(self.item_descriptor.cumulative_score, expected_grader_after)
