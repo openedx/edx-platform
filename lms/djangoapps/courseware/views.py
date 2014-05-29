@@ -38,6 +38,7 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
+from xmodule.modulestore import Location, mongo
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
@@ -421,7 +422,17 @@ def jump_to_id(request, course_id, module_id):
                 module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
             ))
 
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    location = items[0].location
+
+    # If a DraftModuleStore is used, the draft revision is actually stripped
+    # from the item location in `get_items()`, but is needed later in
+    # `path_to_location()` in order to find the draft item in the store. So the
+    # draft revision is re-added here.
+    # See https://github.com/edx/edx-platform/pull/3679.
+    if getattr(items[0], 'is_draft', False):
+        location = mongo.draft.as_draft(location)
+
+    return jump_to(request, course_id, location.to_deprecated_string())
 
 
 @ensure_csrf_cookie
