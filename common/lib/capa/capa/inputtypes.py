@@ -433,6 +433,7 @@ class ChoiceGroup(InputTypeBase):
     tags = ['choicegroup', 'radiogroup', 'checkboxgroup']
 
     def setup(self):
+        i18n = self.capa_system.i18n
         # suffix is '' or [] to change the way the input is handled in --as a scalar or vector
         # value.  (VS: would be nice to make this less hackish).
         if self.tag == 'choicegroup':
@@ -445,16 +446,20 @@ class ChoiceGroup(InputTypeBase):
             self.html_input_type = "checkbox"
             self.suffix = '[]'
         else:
-            raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
+            _ = i18n.ugettext
+            # Translators: 'ChoiceGroup' is an input type and should not be translated.
+            msg = _("ChoiceGroup: unexpected tag {tag_name}").format(tag_name=self.tag)
+            raise Exception(msg)
 
-        self.choices = self.extract_choices(self.xml)
-        self._choices_map = dict(self.choices)  # pylint: disable=attribute-defined-outside-init
+        self.choices = self.extract_choices(self.xml, i18n)
+        self._choices_map = dict(self.choices,)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
     def get_attributes(cls):
+        _ = lambda text: text
         return [Attribute("show_correctness", "always"),
                 Attribute('label', ''),
-                Attribute("submitted_message", "Answer received.")]
+                Attribute("submitted_message", _("Answer received."))]
 
     def _extra_context(self):
         return {'input_type': self.html_input_type,
@@ -462,7 +467,7 @@ class ChoiceGroup(InputTypeBase):
                 'name_array_suffix': self.suffix}
 
     @staticmethod
-    def extract_choices(element):
+    def extract_choices(element, i18n):
         """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
@@ -474,12 +479,17 @@ class ChoiceGroup(InputTypeBase):
         """
 
         choices = []
+        _ = i18n.ugettext
 
         for choice in element:
             if choice.tag != 'choice':
-                raise Exception(
-                    "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
-                    % choice.tag)
+                msg = u"[capa.inputtypes.extract_choices] {error_message}".format(
+                    # Translators: '<choice>' is a tag name and should not be translated.
+                    error_message=_("Expected a <choice> tag; got {given_tag} instead").format(
+                        given_tag=choice.tag
+                    )
+                )
+                raise Exception(msg)
             choices.append((choice.get("name"), stringify_children(choice)))
         return choices
 
