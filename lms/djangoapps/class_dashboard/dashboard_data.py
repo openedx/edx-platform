@@ -558,7 +558,7 @@ def post_metrics_data_csv(request):
         header = [_("Section").encode('utf-8'), _("Subsection").encode('utf-8'), _("Opened by this number of students").encode('utf-8')]
         filename = sanitize_filename(_('subsections') + '_' + course_id)
     elif data_type == 'problem':
-        header = [_("Section").encode('utf-8'), _("Problem").encode('utf-8'), _("Name").encode('utf-8'), _("Count of Students").encode('utf-8'), _("% of Students").encode('utf-8'), _("Score").encode('utf-8')]
+        header = [_("Section").encode('utf-8'), _("Problem").encode('utf-8'), _("Name").encode('utf-8'), _("Count of Students").encode('utf-8'), _("Percent of Students").encode('utf-8'), _("Score").encode('utf-8')]
         filename = sanitize_filename(_('problems') + '_' + course_id)
 
     for index, section in enumerate(sections):
