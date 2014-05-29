@@ -31,7 +31,7 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
-from .video_utils import create_youtube_string
+from .video_utils import create_youtube_string, get_course
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -99,13 +99,18 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         track_url = None
         transcript_download_format = self.transcript_download_format
 
-        sources = {get_ext(src): src for src in self.html5_sources}
+        substituted_html5_sources = self.html5_sources
+        new_url = get_course(self).html5_video_url
+        if new_url:
+            substituted_html5_sources = [new_url + x.rpartition('/')[-1] for x in self.html5_sources]
+
+        sources = {get_ext(src): src for src in substituted_html5_sources}
 
         if self.download_video:
             if self.source:
                 sources['main'] = self.source
-            elif self.html5_sources:
-                sources['main'] = self.html5_sources[0]
+            elif substituted_html5_sources:
+                sources['main'] = substituted_html5_sources[0]
 
         if self.download_track:
             if self.track:

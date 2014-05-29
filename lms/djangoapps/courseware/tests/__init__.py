@@ -96,8 +96,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_url = self.item_descriptor.location.to_deprecated_string()
 
-    def setup_course(self):
-        self.course = CourseFactory.create(data=self.COURSE_DATA)
+    def setup_course(self, **kwargs):
+        self.course = CourseFactory.create(data=self.COURSE_DATA, **kwargs)
 
         # Turn off cache.
         modulestore().request_cache = None

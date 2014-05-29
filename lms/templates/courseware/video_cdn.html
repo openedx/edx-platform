@@ -1,0 +1,77 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+
+<a href="#video_add_cdn" id="video_add_cdn_button" class="sr">${_("Add CDN")}</a>
+
+<section id="video_add_cdn" class="modal" aria-hidden="true" style="display: none;">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="video_add_cdn_title">
+    <button class="close-modal" tabindex="1">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        Close
+      </span>
+    </button>
+
+    <header>
+      <h2>${_("Add CDN")}
+        <span class="sr">,
+          window open
+        </span>
+      </h2>
+      <hr>
+    </header>
+    <div id="video_add_cdn_body">
+      <form id="video_add_cdn_form" action="www.example.org" method="POST">
+        <div id="video_add_cdn_error" class="modal-form-error"> </div>
+        <fieldset>
+          <div class="input-group">
+            <label>${_("Please enter your CDN address:")}</label>
+            <input id="video_new_cdn_field" name="video_cdn" type="text" value="" tabindex="2" >
+          </div>
+          <section>
+            <p>${_("If this setting is set, the video will play with the CDN")}</p>
+          </section>
+          <div class="submit">
+            <input type="submit" id="submit_new_cdn" value="Change CDN" tabindex="3">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+$(document).ready(function ($) {
+    $(document).keydown(function(event) {
+      var key = {
+        J: 74
+      };
+
+      if (event.metaKey && event.keyCode === key.J) {
+        if ($("#video_add_cdn").is(":hidden")) {
+          $(this).click();
+        }
+      }
+    }.bind($("#video_add_cdn_button")));
+
+    $("#video_add_cdn_button").leanModal({
+      top : 120,
+      overlay: 1,
+      closeButton: ".close-modal",
+      position: 'fixed'
+    });
+
+    $("#video_add_cdn_form").on( "submit", function( event ) {
+      var data = $(this).serializeArray();
+
+      if(data.length && data[0].value) {
+        $.ajaxWithPrefix({
+          url: this.action,
+          type: this.method,
+          data: data
+        });
+      };
+
+      event.preventDefault();
+    });
+});
+</script>
