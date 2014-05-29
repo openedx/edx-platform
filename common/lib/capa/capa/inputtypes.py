@@ -834,7 +834,7 @@ class MatlabInput(CodeInput):
                     'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
                     'img': ['src', 'width', 'height', 'class']})
             self.queue_msg = bleach.clean(self.input_state['queue_msg'],
-                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img'],
+                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
                     styles=['white-space'],
                     attributes=attributes
                     )
