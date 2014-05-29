@@ -328,7 +328,7 @@ class VideoStudentViewHandlers(object):
 
         # If we came here, then current grader 'grade_name' has just scored.
         # Here we check if all other graders have already been scored.
-        # If they are not scored, then mark that current grader has scored and return.
+        # If they are not scored, then mark current grader as scored and return.
         if not all(
             [values['isScored'] for name, values in self.cumulative_score.items() if name != grader_name]
         ):
