@@ -35,6 +35,8 @@ def run():
 def add_mimetypes():
     """
     Add extra mimetypes. Used in xblock_resource.
+
+    If you add a mimetype here, be sure to also add it in cms/startup.py.
     """
     import mimetypes
 
