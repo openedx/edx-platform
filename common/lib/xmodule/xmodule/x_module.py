@@ -18,12 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.runtime import Runtime
+from xblock.runtime import Runtime, IdReader
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -31,6 +31,33 @@ from dogapi import dog_stats_api
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
+
+
+class OpaqueKeyReader(IdReader):
+    """
+    IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
+    """
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
+
+        Args:
+            usage_id: The id of the usage to query
+
+        Returns:
+            The `definition_id` the usage is derived from
+        """
+        return usage_id.definition_key
+
+    def get_block_type(self, def_id):
+        """Retrieve the block_type of a particular definition
+
+        Args:
+            def_id: The id of the definition to query
+
+        Returns:
+            The `block_type` of the definition
+        """
+        return def_id.block_type
 
 
 def dummy_track(_event_type, _event):

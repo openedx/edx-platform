@@ -1,7 +1,7 @@
 """Test of models for embargo middleware app"""
 from django.test import TestCase
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 

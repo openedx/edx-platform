@@ -8,7 +8,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
 from student.auth import add_users
 from contentstore.views.access import get_user_role
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class RolesTest(TestCase):

@@ -6,9 +6,9 @@ from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 #

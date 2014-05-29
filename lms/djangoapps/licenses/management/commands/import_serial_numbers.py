@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 
 from licenses.models import CourseSoftware, UserLicense
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
