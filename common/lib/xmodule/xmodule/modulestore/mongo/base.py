@@ -557,7 +557,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         Returns a list of course descriptors.
         '''
-        return sum(
+        base_list = sum(
             [
                 self._load_items(
                     SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
@@ -574,6 +574,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             ],
             []
         )
+        return [course for course in base_list if not isinstance(course, ErrorDescriptor)]
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
