@@ -5,6 +5,7 @@ Module for running content split tests
 import logging
 import json
 from webob import Response
+from uuid import uuid4
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
@@ -325,8 +326,28 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         Used to create default verticals for the groups.
         """
-        # TODO: implement
-        pass
+        old_data = kwargs.get('old_data', {})
+        if 'user_partition_id' not in old_data or old_data['user_partition_id'] != self.user_partition_id:
+            print('create verticals')
+            for user_partition in self.user_partitions:
+                modulestore = self.system.modulestore
+                group_id_mapping = {}
+                if user_partition.id == self.user_partition_id:
+                    for group in user_partition.groups:
+                        dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
+                        metadata = {'display_name': group.name}
+                        modulestore.create_and_save_xmodule(
+                            dest_usage_key,
+                            definition_data=None,
+                            metadata=metadata,
+                            system=self.system,
+                        )
+                        self.children.append(dest_usage_key)
+                        group_id_mapping[unicode(group.id)] = dest_usage_key
+
+                    self.group_id_to_child = group_id_mapping
+                    # Don't need to call update_item in the modulestore because the caller of this method will do it.
+                    break
 
     @property
     def editable_metadata_fields(self):

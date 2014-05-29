@@ -288,6 +288,7 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
         return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
     old_metadata = own_metadata(existing_item)
+    old_data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
     if publish:
         if publish == 'make_private':
@@ -309,7 +310,7 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
         existing_item.data = data
     else:
-        data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
+        data = old_data
 
     if children is not None:
         children_usage_keys = [
@@ -345,7 +346,7 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
                     field.write_to(existing_item, value)
 
         if callable(getattr(existing_item, "editor_saved", None)):
-            existing_item.editor_saved(user=request.user, old_metadata=old_metadata)
+            existing_item.editor_saved(user=request.user, old_metadata=old_metadata, old_data=old_data)
 
     # commit to datastore
     store.update_item(existing_item, request.user.id)

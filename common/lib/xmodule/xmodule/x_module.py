@@ -724,6 +724,11 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     def editor_saved(self, **kwargs):
         """
         This method is called when "Save" is pressed on the Studio editor.
+
+        Note that after this method is called, the modulestore update_item method will
+        be called on this xmodule. Therefore, any modifications to the xmodule that are
+        performed in editor_saved will automatically be persisted (implementors of this method
+        should not call update_item themselves).
         """
         pass
 
