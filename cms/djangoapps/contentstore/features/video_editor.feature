@@ -1,4 +1,4 @@
-@shard_1
+@shard_1 @requires_stub_youtube
 Feature: CMS Video Component Editor
   As a course author, I want to be able to create video components
 
