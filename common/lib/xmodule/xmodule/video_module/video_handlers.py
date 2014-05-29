@@ -338,6 +338,13 @@ class VideoStudentViewHandlers(object):
         # At this point all graders have scored, so we should update score in database, but only if
         # a) self.max_score() is True, that means that module is score-able,
         # b) `module_score` not equals to `max_score`.
+
+        # We do not update score if module_score is already equal to max_score.
+        # If it is already equal to max_score, then student has already scored 100% for this video.
+        # After that teacher can change graders settings, so video score can be updated again.
+        # But when student had already scored 100% and if graders then were reset, we do not allow to rewrite student score.
+        # It means that if student got his grade, we do not take his grade away from him.
+
         if self.max_score() and self.module_score != self.max_score():
             try:
                 self.update_score(self.max_score())
