@@ -22,7 +22,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true  # pylint: disable=no-name-in-module
 
 
 REQUIREJS_WAIT = {
@@ -303,6 +303,25 @@ def css_has_text(css_selector, text, index=0, strip=False):
         text = text.strip()
 
     return actual_text == text
+
+
+@world.absorb
+def css_contains_text(css_selector, partial_text, index=0):
+    """
+    Return a boolean indicating whether the element with `css_selector`
+    contains `partial_text`.
+
+    If there are multiple elements matching the css selector,
+    use `index` to indicate which one.
+    """
+    # If we're expecting a non-empty string, give the page
+    # a chance to fill in text fields.
+    if partial_text:
+        wait_for(lambda _: css_text(css_selector, index=index))
+
+    actual_text = css_text(css_selector, index=index)
+
+    return partial_text in actual_text
 
 
 @world.absorb
