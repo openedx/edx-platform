@@ -543,7 +543,9 @@ class JavascriptResponse(LoncapaResponse):
         # Node.js code is un-sandboxed. If the LoncapaSystem says we aren't
         # allowed to run unsafe code, then stop now.
         if not self.capa_system.can_execute_unsafe_code():
-            raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
+            _ = self.capa_system.i18n.ugettext
+            msg = _("Execution of unsafe Javascript code is not allowed.")
+            raise LoncapaProblemError(msg)
 
         subprocess_args = ["node"]
         subprocess_args.extend(args)
