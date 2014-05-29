@@ -24,6 +24,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from nose.tools import assert_true  # pylint: disable=E0611
 
+GLOBAL_WAIT_FOR_TIMEOUT = 60
 
 REQUIREJS_WAIT = {
     # Settings - Schedule & Details
@@ -342,7 +343,7 @@ def wait_for(func, timeout=5, timeout_msg=None):
 
 
 @world.absorb
-def wait_for_present(css_selector, timeout=30):
+def wait_for_present(css_selector, timeout=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Wait for the element to be present in the DOM.
     """
@@ -354,7 +355,7 @@ def wait_for_present(css_selector, timeout=30):
 
 
 @world.absorb
-def wait_for_visible(css_selector, index=0, timeout=30):
+def wait_for_visible(css_selector, index=0, timeout=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Wait for the element to be visible in the DOM.
     """
@@ -366,7 +367,7 @@ def wait_for_visible(css_selector, index=0, timeout=30):
 
 
 @world.absorb
-def wait_for_invisible(css_selector, timeout=30):
+def wait_for_invisible(css_selector, timeout=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Wait for the element to be either invisible or not present on the DOM.
     """
@@ -378,7 +379,7 @@ def wait_for_invisible(css_selector, timeout=30):
 
 
 @world.absorb
-def wait_for_clickable(css_selector, timeout=30):
+def wait_for_clickable(css_selector, timeout=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Wait for the element to be present and clickable.
     """
@@ -390,7 +391,7 @@ def wait_for_clickable(css_selector, timeout=30):
 
 
 @world.absorb
-def css_find(css, wait_time=30):
+def css_find(css, wait_time=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Wait for the element(s) as defined by css locator
     to be present.
@@ -402,7 +403,7 @@ def css_find(css, wait_time=30):
 
 
 @world.absorb
-def css_click(css_selector, index=0, wait_time=30, dismiss_alert=False):
+def css_click(css_selector, index=0, wait_time=GLOBAL_WAIT_FOR_TIMEOUT, dismiss_alert=False):
     """
     Perform a click on a CSS selector, first waiting for the element
     to be present and clickable.
@@ -431,7 +432,7 @@ def css_click(css_selector, index=0, wait_time=30, dismiss_alert=False):
 
 
 @world.absorb
-def css_check(css_selector, wait_time=30):
+def css_check(css_selector, wait_time=GLOBAL_WAIT_FOR_TIMEOUT):
     """
     Checks a check box based on a CSS selector, first waiting for the element
     to be present and clickable. This is just a wrapper for calling "click"
@@ -446,7 +447,7 @@ def css_check(css_selector, wait_time=30):
 
 
 @world.absorb
-def select_option(name, value, wait_time=30):
+def select_option(name, value, wait_time=GLOBAL_WAIT_FOR_TIMEOUT):
     '''
     A method to select an option
     Then for synchronization purposes, wait for the option to be selected.
@@ -494,7 +495,7 @@ def click_link_by_text(text, index=0):
 
 
 @world.absorb
-def css_text(css_selector, index=0, timeout=30):
+def css_text(css_selector, index=0, timeout=GLOBAL_WAIT_FOR_TIMEOUT):
     # Wait for the css selector to appear
     if is_css_present(css_selector):
         return retry_on_exception(lambda: css_find(css_selector, wait_time=timeout)[index].text)
