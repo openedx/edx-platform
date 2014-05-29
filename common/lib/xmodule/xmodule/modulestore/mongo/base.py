@@ -208,7 +208,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 module.save()
                 return module
             except:
-                log.warning("Failed to load descriptor", exc_info=True)
+                log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
