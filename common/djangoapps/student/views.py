@@ -85,6 +85,7 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
+from xmodule.error_module import ErrorDescriptor
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -242,7 +243,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         course = course_from_id(enrollment.course_id)
-        if course:
+        if course and not isinstance(course, ErrorDescriptor):
 
             # if we are in a Microsite, then filter out anything that is not
             # attributed (by ORG) to that Microsite
@@ -255,8 +256,9 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
 
             yield (course, enrollment)
         else:
-            log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+            log.error("User {0} enrolled in {2} course {1}".format(
+                        user.username, enrollment.course_id, "broken" if course else "non-existent"
+                     ))
 
 
 def _cert_info(user, course, cert_status):

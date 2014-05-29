@@ -14,7 +14,6 @@ from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
