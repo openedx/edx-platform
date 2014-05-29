@@ -43,7 +43,8 @@
             'video/06_video_progress_slider.js',
             'video/07_video_volume_control.js',
             'video/08_video_speed_control.js',
-            'video/09_video_caption.js'
+            'video/09_video_caption.js',
+            'video/11_grader.js'
         ],
         function (
             initialize,
@@ -54,7 +55,8 @@
             VideoProgressSlider,
             VideoVolumeControl,
             VideoSpeedControl,
-            VideoCaption
+            VideoCaption,
+            VideoGrader
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
@@ -68,6 +70,7 @@
                 if (previousState && previousState.videoPlayer) {
                     previousState.saveState(true);
                     $(window).off('unload', previousState.saveState);
+                    previousState.videoPlayer.destroy();
                 }
 
                 state = {};
@@ -87,7 +90,8 @@
                     VideoProgressSlider,
                     VideoVolumeControl,
                     VideoSpeedControl,
-                    VideoCaption
+                    VideoCaption,
+                    VideoGrader
                 ];
 
                 state.youtubeXhr = youtubeXhr;

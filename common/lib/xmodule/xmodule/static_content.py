@@ -99,6 +99,7 @@ def _write_styles(selector, output_root, classes):
     module_styles_lines.append("@import 'bourbon/bourbon';")
     module_styles_lines.append("@import 'bourbon/addons/button';")
     module_styles_lines.append("@import 'assets/anims';")
+    module_styles_lines.append("@import 'assets/xmodule';")
     for class_, fragment_names in css_imports.items():
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector

@@ -1,7 +1,23 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! import json %>
 
 % if display_name is not UNDEFINED and display_name is not None:
-    <h2>${display_name}</h2>
+    <h2 class="video-header">${display_name}</h2>
+% endif
+
+% if has_score and max_score is not 'null':
+    <div class="problem-progress video-progress">
+        % if module_score is not 'null':
+            ## Translators: "points" is the student's achieved score, and "total_points" is the maximum number of points achievable.
+            (${_("{points} / {total_points} points").format(
+              points=module_score,
+              total_points=max_score
+            )})
+        % else:
+            ## Translators: "total_points" is the maximum number of points achievable
+            (${_("{total_points} points possible").format(total_points=max_score)})
+        % endif
+    </div>
 % endif
 
 <div
@@ -33,6 +49,11 @@
     data-yt-test-url="${yt_test_url}"
     data-transcript-translation-url="${transcript_translation_url}"
     data-transcript-available-translations-url="${transcript_available_translations_url}"
+    data-grade-url = "${grade_url}"
+    data-max-score = "${max_score}"
+    data-score = "${module_score}"
+    data-has-score = "${has_score}"
+    data-graders= '${graders}'
 
     ## For now, the option "data-autohide-html5" is hard coded. This option
     ## either enables or disables autohiding of controls and captions on mouse
@@ -146,3 +167,7 @@
     % endif
   </ul>
 </div>
+
+% if module_score is not 'null':
+  <div class="problem-feedback video-feedback">${_('You\'ve received credit for viewing this video.')}</div>
+% endif

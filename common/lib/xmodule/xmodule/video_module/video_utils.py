@@ -1,5 +1,5 @@
 """
-Module containts utils specific for video_module but not for transcripts.
+Module contains utils specific for video_module but not for transcripts.
 """
 
 
@@ -23,3 +23,13 @@ def create_youtube_string(module):
         in zip(youtube_speeds, youtube_ids)
         if pair[1]
     ])
+
+
+def get_course_for_item(module):
+    '''
+    Get course for item.
+
+    This is workaround and can be removed as soon as
+    inheritance will work for video descriptor.
+    '''
+    return module.runtime.modulestore.get_course(module.location.course_key, depth=0)

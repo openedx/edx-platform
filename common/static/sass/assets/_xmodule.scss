@@ -1,0 +1,22 @@
+
+// These animations are used in Video Module
+@include keyframes(gradeSuccess) {
+  0% {
+    background: $green;
+  }
+
+  100% {
+    background: #f3f3f3;
+  }
+}
+
+@include keyframes(gradeError) {
+  0% {
+    background: darken($error-red, 11%);
+  }
+
+  100% {
+    background: #f3f3f3;
+  }
+}
+// ============================================

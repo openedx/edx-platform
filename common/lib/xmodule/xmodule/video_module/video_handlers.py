@@ -11,7 +11,6 @@ from webob import Response
 
 from xblock.core import XBlock
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
@@ -38,14 +37,14 @@ class VideoStudentViewHandlers(object):
     """
     Handlers for video module instance.
     """
-
     def handle_ajax(self, dispatch, data):
         """
         Update values of xfields, that were changed by student.
         """
         accepted_keys = [
             'speed', 'saved_video_position', 'transcript_language',
-            'transcript_download_format', 'youtube_is_available'
+            'transcript_download_format', 'youtube_is_available',
+            'cumulative_score',
         ]
 
         conversions = {
@@ -54,9 +53,16 @@ class VideoStudentViewHandlers(object):
             'youtube_is_available': json.loads,
         }
 
+        save_actions = {
+            'cumulative_score': self.cumulative_score_save_action
+        }
+
         if dispatch == 'save_user_state':
             for key in data:
                 if hasattr(self, key) and key in accepted_keys:
+                    if key in save_actions:
+                        save_actions[key](data[key])
+                        continue
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:
@@ -251,8 +257,8 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
-            except NotFoundError, ex:
-                log.info(ex.message)
+            except NotFoundError as exc:
+                log.info(exc.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 return self.get_static_transcript(request)
@@ -260,8 +266,8 @@ class VideoStudentViewHandlers(object):
                 TranscriptException,
                 UnicodeDecodeError,
                 TranscriptsGenerationException
-            ) as ex:
-                log.info(ex.message)
+            ) as exc:
+                log.info(exc.message)
                 response = Response(status=404)
             else:
                 response = Response(transcript, headerlist=[('Content-Language', language)])
@@ -309,11 +315,58 @@ class VideoStudentViewHandlers(object):
 
         return response
 
+    @XBlock.handler
+    def grade_handler(self, request, dispatch):
+        """
+        Accumulate score from graders and save if all graders succeed.
+        """
+        grader_name = request.POST.get('graderName', None)
+
+        if not grader_name or grader_name not in self.active_graders:
+            log.debug(u"Grader '%s' is not active.", grader_name)
+            return Response(status=400)
+
+        # If we came here, then current grader 'grade_name' has just scored.
+        # Here we check if all other graders have already been scored.
+        # If they are not scored, then mark current grader as scored and return.
+        if not all(
+            [values['isScored'] for name, values in self.cumulative_score.items() if name != grader_name]
+        ):
+            self.cumulative_score[grader_name]['isScored'] = True
+            return Response(json.dumps(self.module_score), status=200)
+
+        # At this point all graders have scored, so we should update score in database, but only if
+        # a) self.max_score() is True, that means that module is score-able,
+        # b) `module_score` not equals to `max_score`.
+
+        # We do not update score if module_score is already equal to max_score.
+        # If it is already equal to max_score, then student has already scored 100% for this video.
+        # After that teacher can change graders settings, so video score can be updated again.
+        # But when student had already scored 100% and if graders then were reset, we do not allow to rewrite student score.
+        # It means that if student got his grade, we do not take his grade away from him.
+
+        if self.max_score() and self.module_score != self.max_score():
+            try:
+                self.update_score(self.max_score())
+                self.cumulative_score[grader_name]['isScored'] = True
+                log.debug(u"Graded video reached max score.")
+            except NotImplementedError:  # get_real_user is not a function: Studio or tests case.
+                if getattr(self.system, 'is_author_mode', False):  # Studio, just mimic LMS behaviour for end user.
+                    return Response(json.dumps(self.module_score), status=200)
+                else:
+                    return Response(status=501)
+            except AssertionError:  # No anon_user_id or real_user. Look at docs for self.update_score()
+                log.debug(u"No real user exists for graded video.")
+                return Response(status=500)
+
+        return Response(json.dumps(self.module_score), status=200)
+
 
 class VideoStudioViewHandlers(object):
     """
     Handlers for Studio view.
     """
+
     @XBlock.handler
     def studio_transcript(self, request, dispatch):
         """
@@ -342,8 +395,6 @@ class VideoStudioViewHandlers(object):
                     no SRT extension or not parse-able by PySRT
                 UnicodeDecodeError: non-UTF8 uploaded file content encoding.
         """
-        _ = self.runtime.service(self, "i18n").ugettext
-
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 

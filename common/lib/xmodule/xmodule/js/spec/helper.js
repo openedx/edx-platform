@@ -168,6 +168,8 @@
                 return;
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if (settings.url === '/grade_url') {
+                return '0.5';
             } else if (settings.url === 'http://www.youtube.com/iframe_api') {
                 // Stub YouTube API.
                 window.YT = stubbedYT;

@@ -158,6 +158,7 @@ function (Initialize) {
                     url: state.config.saveStateUrl,
                     type: 'POST',
                     async: asyncVal,
+                    notifyOnError : false,
                     dataType: 'json',
                     data: ajaxData
                 });
