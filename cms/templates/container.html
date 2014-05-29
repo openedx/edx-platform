@@ -54,9 +54,9 @@ main_xblock_info = {
 
 
 <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
-    <header class="mast has-actions has-navigation">
+    <header class="mast has-actions has-navigation has-subtitle">
         <h1 class="page-header">
-            <small class="navigation navigation-parents">
+            <small class="navigation navigation-parents subtitle">
                 % for ancestor in ancestor_xblocks:
                     <%
                     ancestor_url = xblock_studio_url(ancestor)
@@ -68,11 +68,20 @@ main_xblock_info = {
                 % endfor
                 <a href="#" class="navigation-link navigation-current">${xblock.display_name_with_default | h}</a>
             </small>
+            <span class="page-header-title">${xblock.display_name_with_default | h}</span>
         </h1>
 
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
+                % if not unit_publish_state == 'public':
+                <li class="action-item action-edit nav-item">
+                    <a href="#" class="button edit-button action-button">
+                        <i class="icon-pencil"></i>
+                        <span class="action-button-text">${_("Edit")}</span>
+                    </a>
+                </li>
+                % endif
             </ul>
         </nav>
     </header>

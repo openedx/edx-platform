@@ -1,11 +1,15 @@
 """
 Acceptance tests for Studio related to the container page.
 """
+
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from .helpers import UniqueCourseTest
+from ..pages.studio.component_editor import ComponentEditorView
+
+from unittest import skip
 
 
 class ContainerBase(UniqueCourseTest):
@@ -85,13 +89,17 @@ class ContainerBase(UniqueCourseTest):
         ).install()
 
     def go_to_container_page(self, make_draft=False):
+        unit = self.go_to_unit_page(make_draft)
+        container = unit.components[0].go_to_container()
+        return container
+
+    def go_to_unit_page(self, make_draft=False):
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
         if make_draft:
             unit.edit_draft()
-        container = unit.components[0].go_to_container()
-        return container
+        return unit
 
     def verify_ordering(self, container, expected_orderings):
         xblocks = container.xblocks
@@ -131,6 +139,7 @@ class DragAndDropTest(ContainerBase):
             expected_ordering
         )
 
+    @skip("Sporadically drags outside of the Group.")
     def test_reorder_in_group(self):
         """
         Drag Group A Item 2 before Group A Item 1.
@@ -303,3 +312,36 @@ class DeleteComponentTest(ContainerBase):
                              {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
                              {self.group_empty: []}]
         self.delete_and_verify(self.group_a_item_1_action_index, expected_ordering)
+
+
+class EditContainerTest(ContainerBase):
+    """
+    Tests of editing a container.
+    """
+    __test__ = True
+
+    def modify_display_name_and_verify(self, component):
+        """
+        Helper method for changing a display name.
+        """
+        modified_name = 'modified'
+        self.assertNotEqual(component.name, modified_name)
+        component.edit()
+        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor.set_field_value_and_save('Display Name', modified_name)
+        self.assertEqual(component.name, modified_name)
+
+    def test_edit_container_on_unit_page(self):
+        """
+        Test the "edit" button on a container appearing on the unit page.
+        """
+        unit = self.go_to_unit_page(make_draft=True)
+        component = unit.components[0]
+        self.modify_display_name_and_verify(component)
+
+    def test_edit_container_on_container_page(self):
+        """
+        Test the "edit" button on a container appearing on the container page.
+        """
+        container = self.go_to_container_page(make_draft=True)
+        self.modify_display_name_and_verify(container)

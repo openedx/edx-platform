@@ -3,15 +3,22 @@
     <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
         <header class="mast has-actions has-navigation">
             <h1 class="page-header">
-                <small class="navigation navigation-parents">
+                <small class="navigation navigation-parents subtitle">
                     <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
-                    <a href="#" class="navigation-link navigation-current">Nested Vertical Test</a>
+                    <a href="#" class="navigation-link navigation-current">Test Container</a>
                 </small>
+                <span class="page-header-title">Test Container</span>
             </h1>
 
             <nav class="nav-actions">
                 <h3 class="sr">Page Actions</h3>
                 <ul>
+                    <li class="action-item action-edit nav-item">
+                        <a href="#" class="button edit-button action-button">
+                            <i class="icon-pencil"></i>
+                            <span class="action-button-text">${_("Edit")}</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </header>
@@ -22,7 +29,7 @@
             <section class="content-area">
 
                 <article class="content-primary window">
-                    <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="TestCourse/branch/draft/block/vertical131">
+                    <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
                     <div class="no-container-content is-hidden">
                         <p>This page has no content yet.</p>

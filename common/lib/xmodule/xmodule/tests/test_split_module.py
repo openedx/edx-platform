@@ -43,7 +43,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         xml.HtmlFactory(parent=split_test, url_name='split_test_cond1', text='HTML FOR GROUP 1')
 
         self.course = self.process_xml(course)
-        course_seq = self.course.get_children()[0]
+        self.course_sequence = self.course.get_children()[0]
         self.module_system = get_test_system()
 
         def get_module(descriptor):
@@ -71,7 +71,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         )
         self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
 
-        self.split_test_module = course_seq.get_children()[0]
+        self.split_test_module = self.course_sequence.get_children()[0]
         self.split_test_module.bind_for_student(self.module_system, self.split_test_module._field_data)  # pylint: disable=protected-access
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
@@ -147,3 +147,40 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.assertEquals(fields.get('user_partition_id'), '0')
         self.assertIsNotNone(fields.get('group_id_to_child'))
         self.assertEquals(len(children), 2)
+
+    def test_render_studio_view(self):
+        """
+        Test the rendering of the Studio view.
+        """
+
+        # The split_test module should render both its groups when it is the root
+        reorderable_items = set()
+        context = {
+            'runtime_type': 'studio',
+            'container_view': True,
+            'reorderable_items': reorderable_items,
+            'root_xblock': self.split_test_module,
+        }
+        html = self.module_system.render(self.split_test_module, 'student_view', context).content
+        self.assertIn('HTML FOR GROUP 0', html)
+        self.assertIn('HTML FOR GROUP 1', html)
+
+        # When rendering as a child, it shouldn't render either of its groups
+        reorderable_items = set()
+        context = {
+            'runtime_type': 'studio',
+            'container_view': True,
+            'reorderable_items': reorderable_items,
+            'root_xblock': self.course_sequence,
+        }
+        html = self.module_system.render(self.split_test_module, 'student_view', context).content
+        self.assertNotIn('HTML FOR GROUP 0', html)
+        self.assertNotIn('HTML FOR GROUP 1', html)
+
+    def test_settings(self):
+        """
+        Test the settings configuration.
+        """
+        non_editable_metadata_fields = self.split_test_module.non_editable_metadata_fields
+        self.assertIn(SplitTestDescriptor.due, non_editable_metadata_fields)
+        self.assertNotIn(SplitTestDescriptor.display_name, non_editable_metadata_fields)

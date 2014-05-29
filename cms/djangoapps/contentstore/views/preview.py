@@ -180,12 +180,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
         }
-        # For child xblocks with their own page, render a link to the page
-        if xblock_has_own_studio_page(xblock) and not is_root:
-            template = 'studio_container_wrapper.html'
-        else:
-            template = 'studio_xblock_wrapper.html'
-        html = render_to_string(template, template_context)
+        html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag
 

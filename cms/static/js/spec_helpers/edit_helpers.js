@@ -9,11 +9,17 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
         var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
             mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
 
-        installMockXBlock = function() {
+        installMockXBlock = function(mockResult) {
             window.MockXBlock = function(runtime, element) {
-                return {
+                var block = {
                     runtime: runtime
                 };
+                if (mockResult) {
+                    block.save = function() {
+                        return mockResult;
+                    };
+                }
+                return block;
             };
         };
 

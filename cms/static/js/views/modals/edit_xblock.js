@@ -111,13 +111,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             getTitle: function() {
-                var displayName = this.xblockElement.find('.xblock-header .header-details').text().trim();
-                // If not found, try the old unit page style rendering
+                var displayName = this.xblockInfo.get('display_name');
                 if (!displayName) {
-                    displayName = this.xblockElement.find('.component-header').text().trim();
-                    if (!displayName) {
-                        displayName = gettext('Component');
-                    }
+                    displayName = gettext('Component');
                 }
                 return interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
             },
@@ -180,13 +176,16 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {
                 var xblockInfo = defaultXBlockInfo,
-                    xblockElement;
+                    xblockElement,
+                    displayName;
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
+                    displayName = xblockWrapperElement.find('.xblock-header .header-details').text().trim();
                     xblockInfo = new XBlockInfo({
                         id: xblockWrapperElement.data('locator'),
                         courseKey: xblockWrapperElement.data('course-key'),
-                        category: xblockElement.data('block-type')
+                        category: xblockElement.data('block-type'),
+                        display_name: displayName
                     });
                 }
                 return xblockInfo;
