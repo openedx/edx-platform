@@ -343,12 +343,12 @@ class VideoStudentViewHandlers(object):
                 self.update_score(self.max_score())
                 self.cumulative_score[grader_name]['isScored'] = True
                 log.debug(u"Graded video reached max score.")
-            except NotImplementedError:
-                if getattr(self.system, 'is_author_mode', False):
+            except NotImplementedError:  # get_real_user is not a function: Studio or tests case.
+                if getattr(self.system, 'is_author_mode', False):  # Studio, just mimic LMS behaviour for end user.
                     return Response(json.dumps(self.module_score), status=200)
                 else:
                     return Response(status=501)
-            except AssertionError:
+            except AssertionError:  # No anon_user_id or real_user. Look at docs for self.update_score()
                 log.debug(u"No real user exists for graded video.")
                 return Response(status=500)
 
