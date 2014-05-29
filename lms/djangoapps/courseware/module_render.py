@@ -140,7 +140,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
 
 def get_module(user, request, usage_key, field_data_cache,
-               position=None, not_found_ok=False, wrap_xmodule_display=True,
+               position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
     """
@@ -152,11 +152,13 @@ def get_module(user, request, usage_key, field_data_cache,
       - user                  : User for whom we're getting the module
       - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
                                 and such works based on user.
-      - location              : A Location-like object identifying the module to load
+      - usage_key             : A UsageKey object identifying the module to load
       - field_data_cache      : a FieldDataCache
-      - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
+      - log_if_not_found      : If this is True, we log a debug message if we cannot find the requested xmodule.
+      - wrap_xmodule_display  : If this is True, wrap the output display in a single div to allow for the
+                                XModule javascript to be bound correctly
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
       - static_asset_path     : static asset path to use (overrides descriptor's value); needed
@@ -176,9 +178,10 @@ def get_module(user, request, usage_key, field_data_cache,
                                          grade_bucket_type=grade_bucket_type,
                                          static_asset_path=static_asset_path)
     except ItemNotFoundError:
-        if not not_found_ok:
-            log.exception("Error in get_module")
+        if log_if_not_found:
+            log.debug("Error in get_module: ItemNotFoundError")
         return None
+
     except:
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
