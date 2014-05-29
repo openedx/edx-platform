@@ -1,0 +1,24 @@
+<header class="xblock-header">
+    <div class="xblock-header-primary">
+        <div class="header-details">
+            <span>Updated Test Container</span>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+            </ul>
+        </div>
+    </div>
+</header>
+<article class="xblock-render">
+    <div class="xblock" data-block-type="vertical" data-locator="locator-container"
+         data-init="MockXBlock" data-runtime-class="StudioRuntime" data-runtime-version="1">
+        <ol class="reorderable-container">
+            <li class="studio-xblock-wrapper is-draggable" data-locator="testCourse/branch/draft/split_test/splitFFF">
+                <div class="xblock" data-block-type="vertical">
+                    <ol class="reorderable-container">
+                    </ol>
+                </div>
+            </li>
+        </ol>
+    </div>
+</article>

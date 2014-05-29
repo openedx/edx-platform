@@ -5,7 +5,7 @@ from bok_choy.promise import Promise
 from selenium.webdriver.common.action_chains import ActionChains
 
 
-def click_css(page, css, source_index, require_notification=True):
+def click_css(page, css, source_index=0, require_notification=True):
     """
     Click the button/link with the given css and index on the specified page (subclass of PageObject).
 

@@ -1,6 +1,7 @@
 define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext", "js/views/feedback_notification"],
     function ($, _, XBlockView, ModuleUtils, gettext, NotificationView) {
         var reorderableClass = '.reorderable-container',
+            sortableInitializedClass = '.ui-sortable',
             studioXBlockWrapperClass = '.studio-xblock-wrapper';
 
         var ContainerView = XBlockView.extend({
@@ -8,7 +9,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             xblockReady: function () {
                 XBlockView.prototype.xblockReady.call(this);
                 var reorderableContainer = this.$(reorderableClass),
-                    alreadySortable = this.$('.ui-sortable'),
+                    alreadySortable = this.$(sortableInitializedClass),
                     newParent,
                     oldParent,
                     self = this;
@@ -113,7 +114,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             },
 
             refresh: function() {
-                this.$(reorderableClass).sortable('refresh');
+                this.$(sortableInitializedClass).sortable('refresh');
             }
         });
 

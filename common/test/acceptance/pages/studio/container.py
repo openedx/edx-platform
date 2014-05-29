@@ -3,7 +3,7 @@ Container page in Studio
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import Promise
+from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -15,15 +15,24 @@ class ContainerPage(PageObject):
     """
     Container page in Studio
     """
+    NAME_SELECTOR = 'a.navigation-current'
 
-    def __init__(self, browser, unit_locator):
+    def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
-        self.unit_locator = unit_locator
+        self.locator = locator
 
     @property
     def url(self):
         """URL to the container page for an xblock."""
-        return "{}/container/{}".format(BASE_URL, self.unit_locator)
+        return "{}/container/{}".format(BASE_URL, self.locator)
+
+    @property
+    def name(self):
+        titles = self.q(css=self.NAME_SELECTOR).text
+        if titles:
+            return titles[0]
+        else:
+            return None
 
     def is_browser_on_page(self):
 
@@ -91,6 +100,14 @@ class ContainerPage(PageObject):
         # Click the confirmation dialog button
         click_css(self, 'a.button.action-primary', 0)
 
+    def edit(self):
+        self.q(css='.edit-button').first.click()
+        EmptyPromise(
+            lambda: self.q(css='.xblock-studio_view').present,
+            'Wait for the Studio editor to be present'
+        ).fulfill()
+
+        return self
 
 
 class XBlockWrapper(PageObject):
