@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 def user_from_str(identifier):

@@ -43,7 +43,7 @@ from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 log = logging.getLogger(__name__)

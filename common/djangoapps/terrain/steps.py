@@ -21,7 +21,7 @@ from .course_helpers import *
 from .ui_helpers import *
 from nose.tools import assert_equals  # pylint: disable=E0611
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from logging import getLogger
 logger = getLogger(__name__)

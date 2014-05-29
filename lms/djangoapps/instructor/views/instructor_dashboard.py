@@ -28,7 +28,7 @@ from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @ensure_csrf_cookie

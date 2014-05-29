@@ -13,7 +13,7 @@ from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import (InsufficientSpecificationError, ItemNotFoundError, VersionConflictError,
             DuplicateItemError, DuplicateCourseError)
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta

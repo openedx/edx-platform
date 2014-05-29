@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from datetime import datetime, timedelta
 import pytz
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 

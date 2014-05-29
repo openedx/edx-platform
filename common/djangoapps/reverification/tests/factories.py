@@ -5,7 +5,7 @@ from reverification.models import MidcourseReverificationWindow
 from factory.django import DjangoModelFactory
 import pytz
 from datetime import timedelta, datetime
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting

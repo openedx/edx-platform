@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<chapter display_name="Assessment Problems">
+  <sequential url_name="Sample_Problems_sequential"/>
+  <sequential url_name="Advanced_Problems_Custom_Response_and_Randomization_sequential"/>
+  <sequential url_name="Advanced_Problems_Hints_sequential"/>
+  <sequential url_name="Advanced_Problems_Scripts_and_Javascript_sequential"/>
+  <sequential url_name="Advanced_Problems_Code_Grading_sequential"/>
+  <sequential url_name="Rich_Interface_Examples"/>
+</chapter>
