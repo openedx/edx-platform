@@ -66,7 +66,9 @@ if [ -e $HOME/edx-rbenv_clean.tar.gz ]; then
     tar -C $HOME -xf $HOME/edx-rbenv_clean.tar.gz
 fi
 
-# Bootstrap Ruby requirements so we can run the tests
+# Ensure the Ruby environment is in a clean state and
+# bootstrap Ruby requirements so we can run the tests
+bundle clean --force
 bundle install
 
 # Reset the jenkins worker's virtualenv back to the
