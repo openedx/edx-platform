@@ -8,7 +8,7 @@
 %endfor
 <section id="choicetextinput_${id}" class="choicetextinput">
 <form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
-    <div class="script_placeholder" data-src="/static/js/capa/choicetextinput.js"/>
+    <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
     <div class="indicator_container">
     % if input_type == 'checkbox' or not element_checked:
         <span class="status ${status.classname}" id="status_${id}"></span>
