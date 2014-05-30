@@ -25,7 +25,6 @@ class ContainerBase(UniqueCourseTest):
         # Ensure that the superclass sets up
         super(ContainerBase, self).setUp()
 
-        self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.outline = CourseOutlinePage(
             self.browser,
             self.course_info['org'],
@@ -58,6 +57,13 @@ class ContainerBase(UniqueCourseTest):
 
         self.setup_fixtures()
 
+        self.auth_page = AutoAuthPage(
+            self.browser,
+            staff=False,
+            username=self.user.get('username'),
+            email=self.user.get('email'),
+            password=self.user.get('password')
+        )
         self.auth_page.visit()
 
     def setup_fixtures(self):
@@ -87,6 +93,8 @@ class ContainerBase(UniqueCourseTest):
                 )
             )
         ).install()
+
+        self.user = course_fix.user
 
     def go_to_container_page(self, make_draft=False):
         unit = self.go_to_unit_page(make_draft)
