@@ -27,3 +27,10 @@ def get_client_ip_address(request):
     else:
         ip_address = request.META.get('REMOTE_ADDR')
     return ip_address
+
+
+def str2bool(value):
+    """
+    convert string to bool
+    """
+    return value.lower() in ("true",)
