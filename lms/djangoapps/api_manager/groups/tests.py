@@ -37,6 +37,8 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
         self.test_group_name = str(uuid.uuid4())
+        self.test_first_name = str(uuid.uuid4())
+        self.test_last_name = str(uuid.uuid4())
         self.base_users_uri = '/api/users'
         self.base_groups_uri = '/api/groups'
 
@@ -346,6 +348,54 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(users[0]['email'], self.test_email)
         self.assertEqual(users[0]['first_name'], 'Joe')
         self.assertEqual(users[0]['last_name'], 'Smith')
+
+    def test_group_users_list_get_with_is_active_flag(self):
+
+        group_data = {'name': 'Alpha Group', 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, group_data)
+        group_id = response.data['id']
+        is_active = True
+
+        for num in range(0, 5):
+            local_username = self.test_username + str(randint(11, 99))
+
+            if num == 3:
+                is_active = False
+
+            data = {
+                'email': self.test_email,
+                'username': local_username,
+                'password': self.test_password,
+                'first_name': self.test_first_name,
+                'last_name': self.test_last_name,
+                'is_active': is_active
+            }
+
+            # associating a user with a group
+            response = self.do_post(self.base_users_uri, data)
+            user_id = response.data['id']
+            test_uri = self.base_groups_uri + '/' + str(group_id) + '/users'
+            response = self.do_post(test_uri, data={'user_id': user_id})
+            self.assertEqual(response.status_code, 201)
+
+        # getting users without is_active in query params
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        users = response.data['users']
+        self.assertEqual(len(users), 5)
+
+        # getting users with is_active=false
+        test_uri_inactive_user = test_uri + '/?is_active=false'
+        response = self.do_get(test_uri_inactive_user)
+        users = response.data['users']
+        self.assertEqual(len(users), 2)
+
+        # getting users with is_active=true
+        test_uri_active_user = test_uri + '/?is_active=true'
+        response = self.do_get(test_uri_active_user)
+        self.assertEqual(response.status_code, 200)
+        users = response.data['users']
+        self.assertEqual(len(users), 3)
 
     def test_group_users_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/users'
