@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "register" %></%def>
 <%! from django.core.urlresolvers import reverse %>
 
 <%block name="title">${_("Sign Up")}</%block>
