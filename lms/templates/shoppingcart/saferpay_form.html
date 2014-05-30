@@ -1,0 +1,14 @@
+        <form action="${action}" method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+
+            % if is_secure:
+            <input type="hidden" name="site_base_url" value="https://${site}" >
+            % else:
+            <input type="hidden" name="site_base_url" value="http://${site}" >
+            % endif
+
+            % for pk, pv in params.iteritems():
+                <input type="hidden" name="${pk}" value="${pv}" />
+            % endfor
+                <input type="submit" value="Check Out" />
+        </form>

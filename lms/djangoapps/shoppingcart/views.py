@@ -16,7 +16,7 @@ from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, Universit
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 from .models import Order, PaidCourseRegistration, OrderItem
-from .processors import process_postpay_callback, render_purchase_form_html
+from .processors import process_postpay_callback, render_purchase_form_html, start_payment_process
 
 log = logging.getLogger("shoppingcart")
 
@@ -96,8 +96,26 @@ def remove_item(request):
     return HttpResponse('OK')
 
 
+@login_required
+def start_payment(request):
+    """
+    This is the entry point that *can* be used when the user clicks 'Buy' (or something similar).
+    Certain processor modules (such as CyberSource) will not use this entry point because they immediately
+    redirect to a 3rd party from the webform itself.
+    However, in other cases (such as SaferPay), we need to do some server-side setup before
+    control can be turned over to the 3rd party payment provider.
+    """
+    params = request.POST.dict()
+
+    result = start_payment_process(params)
+    if result['success'] and 'redirect_url' in result:
+        return HttpResponseRedirect(result['redirect_url'])
+    else:
+        return render_to_response('shoppingcart/error.html', {'order': result['order'],
+                                                              'error_html': result['error_html']})
+
+
 @csrf_exempt
-@require_POST
 def postpay_callback(request):
     """
     Receives the POST-back from processor.
@@ -108,7 +126,11 @@ def postpay_callback(request):
     If unsuccessful the order will be left untouched and HTML messages giving more detailed error info will be
     returned.
     """
-    params = request.POST.dict()
+    if request.method == 'POST':
+        params = request.POST.dict()
+    else:
+        params = request.GET.dict()
+
     result = process_postpay_callback(params)
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
@@ -134,6 +156,15 @@ def show_receipt(request, ordernum):
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
+
+    # only show billed to information on receipt if we have any
+    # note, SaferPay does not capture Bill To information
+    show_billed_to_info = order.bill_to_cardtype or order.bill_to_ccnum or \
+                          order.bill_to_first or order.bill_to_last or \
+                          order.bill_to_street1 or order.bill_to_street2 or \
+                          order.bill_to_city or order.bill_to_state or order.bill_to_postalcode or \
+                          order.bill_to_country
+
     # we want to have the ability to override the default receipt page when
     # there is only one item in the order
     context = {
@@ -141,6 +172,7 @@ def show_receipt(request, ordernum):
         'order_items': order_items,
         'any_refunds': any_refunds,
         'instructions': instructions,
+        'show_billed_to_info': show_billed_to_info,
     }
 
     if order_items.count() == 1:

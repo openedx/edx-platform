@@ -3,6 +3,7 @@ from django.conf import settings
 
 urlpatterns = patterns('shoppingcart.views',  # nopep8
     url(r'^postpay_callback/$', 'postpay_callback'),  # Both the ~accept and ~reject callback pages are handled here
+    url(r'^start_payment/$', 'start_payment'),
     url(r'^receipt/(?P<ordernum>[0-9]*)/$', 'show_receipt'),
     url(r'^csv_report/$', 'csv_report', name='payment_csv_report'),
 )

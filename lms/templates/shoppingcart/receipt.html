@@ -76,6 +76,7 @@
           </p>
         % endif
 
+        % if show_billed_to_info:
         <h2>${_("Billed To:")}</h2>
         <p>
           ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br />
@@ -85,6 +86,7 @@
           ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br />
           ${order.bill_to_country.upper()}<br />
         </p>
+        % endif
     </div>
   </section>
 </div>
