@@ -91,7 +91,7 @@ When you create your video, edX recommends the following compression specs.
 Video Formats
 ==================
 
-The edX video player supports videos in .mp4, .mpeg, .ogg, and .webm format.
+The edX video player supports videos in .mp4, .webm, .mpeg, and .ogg format. **However, to help make sure all standard browsers can play your video, we strongly recommend that you use the .mp4 or .webm format.**
 
 .. _Create Transcript:
 
@@ -167,7 +167,7 @@ You can use any video backup site that you want. However, keep in mind that the
 site where you post the videos may have to handle a lot of traffic.
 
 .. note:: The URL for the video that you post on a third-party site must end in
- .mp4, .mpeg, .ogg, or .webm. EdX can't support videos that you post on sites
+ .mp4, .webm., .mpeg, or .ogg. (To help make sure all standard browsers can play your video, we **strongly** recommend that you use .mp4 or .webm format.) EdX can't support videos that you post on sites
  such as Vimeo.
 
 .. _Create a Video Component:
@@ -272,7 +272,10 @@ The following options appear on the **Advanced** tab in the Video component.
     * - **Video Download Allowed**
       - Specifies whether students can download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. If you set this value to **True**, you must add at least one non-YouTube URL in the **Video File URLs** field. 
     * - **Video File URLs**
-      - The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, you must set **Video Download Allowed** to **True**.
+      - The URL or URLs where you've posted non-YouTube versions of the video. Every URL should end in .mpeg, .webm, .mp4, or .ogg and cannot be a YouTube URL. Each student will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, you must set **Video Download Allowed** to **True**.
+
+        .. note:: To help make sure all standard browsers can play your video, we **strongly** recommend that you use the .mp4 or .webm format.
+
     * - **Video Start Time**
       - The time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59.
     * - **Video Stop Time**
