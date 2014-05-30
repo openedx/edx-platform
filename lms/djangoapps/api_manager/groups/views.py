@@ -16,6 +16,7 @@ from api_manager.models import GroupRelationship, CourseGroupRelationship, Group
 from xmodule.modulestore.django import modulestore
 from api_manager.permissions import SecureAPIView
 from xmodule.modulestore import Location, InvalidLocationError
+from api_manager.utils import str2bool
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
@@ -287,6 +288,11 @@ class GroupsUsersList(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
         users = existing_group.user_set.all()
+
+        is_active = request.QUERY_PARAMS.get('is_active', None)
+        if is_active:
+            users = users.filter(is_active=str2bool(is_active))
+
         response_data = {}
         response_data['users'] = []
         for user in users:
