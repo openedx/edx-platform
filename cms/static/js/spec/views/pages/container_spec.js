@@ -87,14 +87,13 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
 
                 it('can edit itself', function() {
-                    var editButtons, modalElement,
+                    var editButtons,
                         updatedTitle = 'Updated Test Container';
                     renderContainerPage(mockContainerXBlockHtml, this);
 
                     // Click the root edit button
                     editButtons = containerPage.$('.nav-actions .edit-button');
                     editButtons.first().click();
-                    modalElement = edit_helpers.getModalElement();
 
                     // Expect a request to be made to show the studio view for the container
                     expect(lastRequest().url).toBe(
@@ -107,7 +106,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(edit_helpers.isShowingModal()).toBeTruthy();
 
                     // Expect the correct title to be shown
-                    expect(modalElement.find('.modal-window-title').text()).toBe('Editing: Test Container');
+                    expect(edit_helpers.getModalTitle()).toBe('Editing: Test Container');
 
                     // Press the save button and respond with a success message to the save
                     edit_helpers.pressModalButton('.action-save');

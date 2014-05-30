@@ -27,6 +27,11 @@ define(["jquery", "js/spec_helpers/view_helpers"],
             return modalElement;
         };
 
+        getModalTitle = function(modal) {
+            var modalElement = getModalElement(modal);
+            return modalElement.find('.modal-window-title').text();
+        };
+
         isShowingModal = function(modal) {
             var modalElement = getModalElement(modal);
             return modalElement.length > 0;
@@ -58,6 +63,7 @@ define(["jquery", "js/spec_helpers/view_helpers"],
 
         return $.extend(view_helpers, {
             'getModalElement': getModalElement,
+            'getModalTitle': getModalTitle,
             'installModalTemplates': installModalTemplates,
             'isShowingModal': isShowingModal,
             'hideModalIfShowing': hideModalIfShowing,

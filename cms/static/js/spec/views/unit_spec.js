@@ -211,7 +211,11 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
                         html: mockXBlockEditorHtml,
                         resources: []
                     });
+
+                    // Expect that a modal is shown with the correct title
                     expect(edit_helpers.isShowingModal()).toBeTruthy();
+                    expect(edit_helpers.getModalTitle()).toBe('Editing: Test Child Container');
+
                 });
             });
 

@@ -181,6 +181,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
                     displayName = xblockWrapperElement.find('.xblock-header .header-details').text().trim();
+                    // If not found, try looking for the old unit page style rendering
+                    if (!displayName) {
+                        displayName = this.xblockElement.find('.component-header').text().trim();
+                    }
                     xblockInfo = new XBlockInfo({
                         id: xblockWrapperElement.data('locator'),
                         courseKey: xblockWrapperElement.data('course-key'),
