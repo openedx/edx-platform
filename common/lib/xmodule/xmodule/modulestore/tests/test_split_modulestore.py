@@ -506,6 +506,42 @@ class SplitModuleTest(unittest.TestCase):
                 return element
 
 
+class TestHasChildrenAtDepth(SplitModuleTest):
+    """Test the has_children_at_depth method of XModuleMixin. """
+
+    def test_has_children_at_depth(self):
+        course_locator = CourseLocator(
+            org='testx', offering='GreekHero', branch='draft'
+        )
+        block_locator = BlockUsageLocator(
+            course_locator, 'course', 'head12345'
+        )
+        block = modulestore().get_item(block_locator)
+
+        self.assertRaises(
+            ValueError, block.has_children_at_depth, -1,
+        )
+        self.assertTrue(block.has_children_at_depth(0))
+        self.assertTrue(block.has_children_at_depth(1))
+        self.assertFalse(block.has_children_at_depth(2))
+
+        ch1 = modulestore().get_item(
+            BlockUsageLocator(course_locator, 'chapter', block_id='chapter1')
+        )
+        self.assertFalse(ch1.has_children_at_depth(0))
+
+        ch2 = modulestore().get_item(
+            BlockUsageLocator(course_locator, 'chapter', block_id='chapter2')
+        )
+        self.assertFalse(ch2.has_children_at_depth(0))
+
+        ch3 = modulestore().get_item(
+            BlockUsageLocator(course_locator, 'chapter', block_id='chapter3')
+        )
+        self.assertTrue(ch3.has_children_at_depth(0))
+        self.assertFalse(ch3.has_children_at_depth(1))
+
+
 class SplitModuleCourseTests(SplitModuleTest):
     '''
     Course CRUD operation tests

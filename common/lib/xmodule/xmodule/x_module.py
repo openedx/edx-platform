@@ -236,6 +236,29 @@ class XModuleMixin(XBlockMixin):
                 result[field.name] = field.read_json(self)
         return result
 
+    def has_children_at_depth(self, depth):
+        """
+        Returns true if self has children at the given depth. depth==0 returns
+        false if self is a leaf, true otherwise.
+
+                           SELF
+                            |
+                     [child at depth 0]
+                     /           \
+                 [depth 1]    [depth 1]
+                 /       \
+           [depth 2]   [depth 2]
+
+        So the example above would return True for `has_children_at_depth(2)`, and False
+        for depth > 2
+        """
+        if depth < 0:
+            raise ValueError("negative depth argument is invalid")
+        elif depth == 0:
+            return bool(self.get_children())
+        else:
+            return any(child.has_children_at_depth(depth - 1) for child in self.get_children())
+
     def get_content_titles(self):
         """
         Returns list of content titles for all of self's children.
