@@ -31,8 +31,6 @@
                 <%namespace name='static' file='/static_content.html'/>
                 ${static.css(group='style-vendor-tinymce-content', raw=True)}
                 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
-                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
-                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
             </div> 
 			<div id="catchDIV">
                 ## Translators: Notes below refer to annotations. They wil later be put under a "Notes" section.
@@ -180,7 +178,6 @@
         optionsOSDA:{},
 
     };
-    tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	
     if (typeof Annotator != 'undefined'){
