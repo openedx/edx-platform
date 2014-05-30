@@ -29,8 +29,3 @@
 -e git+https://github.com/edx/edx-ora2.git@release-2014-06-02T15.45#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@91b7ec93cfb57c6739332e85805296626b4fb1db#egg=opaque-keys
 git+https://github.com/edx/ease.git@a990b25ed4238acb1b15ee6f027465db3a10960e#egg=ease
-
-# Prototype XBlocks for limited roll-outs and user testing. These are not for general use.
--e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
--e git+https://github.com/pmitros/DoneXBlock.git@72b6efdcd92471905670c4d344055fccf6bb16b0#egg=done-xblock
--e git+https://github.com/pmitros/AudioXBlock.git@9540b13bcdf25225191d8a1e73862deb1f1f30f8#egg=audio-xblock
