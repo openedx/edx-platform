@@ -793,14 +793,10 @@ class MatlabInput(CodeInput):
     """
     InputType for handling Matlab code input
 
-    TODO: API_KEY will go away once we have a way to specify it per-course
     Example:
      <matlabinput rows="10" cols="80" tabsize="4">
         Initial Text
-        <plot_payload>
-          %api_key=API_KEY
-        </plot_payload>
-    </matlabinput>
+     </matlabinput>
     """
     template = "matlabinput.html"
     tags = ['matlabinput']
@@ -817,8 +813,8 @@ class MatlabInput(CodeInput):
         self.setup_code_response_rendering()
 
         xml = self.xml
-        self.plot_payload = xml.findtext('./plot_payload')
 
+        self.plot_payload = xml.findtext('./plot_payload')
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''
@@ -967,7 +963,10 @@ class MatlabInput(CodeInput):
         contents = {
             'grader_payload': self.plot_payload,
             'student_info': json.dumps(student_info),
-            'student_response': response
+            'student_response': response,
+            'token': getattr(self.capa_system, 'matlab_api_key', None),
+            'endpoint_version': "2",
+            'requestor_id': anonymous_student_id,
         }
 
         (error, msg) = qinterface.send_to_queue(header=xheader,

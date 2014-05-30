@@ -14,6 +14,7 @@ PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
 TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
+MATLAB_API_KEY = "Matlab API key"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
@@ -40,11 +41,12 @@ def i_see_advanced_settings_with_values(step):
     world.verify_all_setting_entries(
         [
             [DISPLAY_NAME, "Blank Common Problem", True],
+            [MATLAB_API_KEY, "", False],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
             [SHOW_ANSWER, "Finished", False],
-            [TIMER_BETWEEN_ATTEMPTS, "0", False]
+            [TIMER_BETWEEN_ATTEMPTS, "0", False],
         ])
 
 
