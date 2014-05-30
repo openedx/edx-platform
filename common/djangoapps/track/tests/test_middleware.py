@@ -117,10 +117,10 @@ class TrackMiddlewareTestCase(TestCase):
         SessionMiddleware().process_request(request)
         request.session.save()
         session_key = request.session.session_key
-
+        expected_session_key = self.track_middleware.encrypt_session_key(session_key)
         context = self.get_context_for_request(request)
         self.assert_dict_subset(context, {
-            'session': session_key,
+            'session': expected_session_key,
         })
 
     def test_request_headers(self):
