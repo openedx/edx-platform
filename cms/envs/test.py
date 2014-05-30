@@ -188,9 +188,6 @@ PASSWORD_HASHERS = (
 # dummy segment-io key
 SEGMENT_IO_KEY = '***REMOVED***'
 
-# disable NPS survey in test mode
-FEATURES['STUDIO_NPS_SURVEY'] = False
-
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # This is to disable a test under the common directory that will not pass when run under CMS
