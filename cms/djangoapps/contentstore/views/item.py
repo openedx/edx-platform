@@ -526,7 +526,7 @@ def orphan_handler(request, course_key_string):
             for itemloc in items:
                 # get_orphans returns the deprecated string format
                 usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
-                modulestore('draft').delete_item(usage_key, delete_all_versions=True)
+                modulestore().delete_item(usage_key, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()
