@@ -174,9 +174,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
-# disable NPS survey in dev mode
-FEATURES['STUDIO_NPS_SURVEY'] = False
-
 # Enable URL that shows information about the status of variuous services
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
