@@ -257,7 +257,7 @@ def students_update_enrollment(request, course_id):
     email_params = {}
     if email_students:
         course = get_course_by_id(course_id)
-        email_params = get_email_params(course, auto_enroll)
+        email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
 
     results = []
     for identifier in identifiers:
@@ -348,7 +348,8 @@ def bulk_beta_modify_access(request, course_id):
 
     email_params = {}
     if email_students:
-        email_params = get_email_params(course, auto_enroll=auto_enroll)
+        secure = request.is_secure()
+        email_params = get_email_params(course, auto_enroll=auto_enroll, secure=secure)
 
     for identifier in identifiers:
         try:
