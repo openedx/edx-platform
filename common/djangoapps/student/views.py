@@ -53,7 +53,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
 

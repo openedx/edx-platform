@@ -8,7 +8,7 @@ from pytz import UTC
 from django.test.utils import override_settings
 
 import capa.xqueue_interface as xqueue_interface
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.tests.test_util_open_ended import (

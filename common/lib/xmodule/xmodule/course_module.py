@@ -8,7 +8,7 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import UserPartition
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf

@@ -19,7 +19,7 @@ from mock import Mock
 
 from . import LogicTest
 from lxml import etree
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.video_module import VideoDescriptor, create_youtube_string, get_ext
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData

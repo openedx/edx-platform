@@ -11,7 +11,8 @@ from mock import Mock, patch
 from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
-from xmodule.modulestore import Location, only_xmodules
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.x_module import XModuleMixin

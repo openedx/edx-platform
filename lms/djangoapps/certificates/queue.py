@@ -17,7 +17,6 @@ import random
 import logging
 import lxml
 from lxml.etree import XMLSyntaxError, ParserError
-from xmodule.modulestore import Location
 
 
 logger = logging.getLogger(__name__)

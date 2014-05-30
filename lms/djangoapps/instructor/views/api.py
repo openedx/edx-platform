@@ -69,7 +69,6 @@ from .tools import (
     strip_if_string,
     bulk_email_is_enabled_for_course,
 )
-from xmodule.modulestore import Location
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 

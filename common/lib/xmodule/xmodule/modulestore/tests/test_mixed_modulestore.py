@@ -5,8 +5,8 @@ from mock import patch, Mock
 from importlib import import_module
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, \
-    XML_MODULESTORE_TYPE
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator

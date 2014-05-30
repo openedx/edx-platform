@@ -18,7 +18,8 @@ from xblock.exceptions import InvalidScopeError
 from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
