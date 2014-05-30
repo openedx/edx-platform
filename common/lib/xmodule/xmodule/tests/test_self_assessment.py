@@ -6,7 +6,7 @@ from webob.multidict import MultiDict
 from pytz import UTC
 from xblock.fields import ScopeIds
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from lxml import etree
 
 from . import get_test_system

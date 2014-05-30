@@ -15,7 +15,7 @@ from mock import Mock
 
 import xmodule
 from xmodule.capa_module import CapaModule
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

@@ -1,6 +1,5 @@
 import json
 from textwrap import dedent
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_system
 

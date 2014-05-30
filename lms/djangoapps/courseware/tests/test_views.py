@@ -21,7 +21,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from edxmako.middleware import MakoMiddleware
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
