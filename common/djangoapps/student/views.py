@@ -1240,8 +1240,10 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
       
-    # don't send email if we are doing load testing or random user generation for some reason or external auth with bypass activated
-    if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')) and not (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and DoExternalAuth):
+    # don't send email if we are doing load testing or random user generation for some reason 
+    # or external auth with bypass activated
+    if (not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')) 
+        and not (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and DoExternalAuth)):
         from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
