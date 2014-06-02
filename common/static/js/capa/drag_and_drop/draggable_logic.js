@@ -241,7 +241,9 @@ return {
         this.state.baseImageEl.attr('aria-dropeffect', effect);
 
         $.each(this.state.targets, function (target) {
-            target.targetEl.attr('aria-dropeffect', effect);
+            if (target.targetEl) {
+                target.targetEl.attr('aria-dropeffect', effect);
+            }
         });
     },
 
