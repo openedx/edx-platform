@@ -1915,7 +1915,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_(u'Error checking problem: no external queueing server is configured.'))
+                     msg=_(u'Error: No grader has been set up for this problem.'))
             return cmap
 
         # Prepare xqueue request
