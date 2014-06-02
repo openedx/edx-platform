@@ -230,7 +230,9 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         fragment = Fragment()
         (message, message_type) = self.descriptor.validation_message()
         if message:
-            fragment.add_content(self.render_validation_message(message, message_type))
+            fragment.add_content(u'<div class="xblock-message-area">{message}</div>'.format(
+                message=self.render_validation_message(message, message_type))
+            )
         # Only render the children when this block is being shown as the container
         root_xblock = context.get('root_xblock')
         if root_xblock and root_xblock.location == self.location:
@@ -446,7 +448,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
     def validation_message(self):
         """
-        Returns a validation message if the block is misconfigured, or None if not.
+        Returns a validation message describing the current state of the block, as well as a message type
+        indicating whether the message represents information, a warning or an error.
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         if self.user_partition_id < 0:
@@ -459,6 +462,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         groups = user_partition.groups
         if not len(groups) == len(self.get_children()):
             return _(u"This experiment block is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
+
         return _(u"This block is part of experiment {experiment_name}").format(
             experiment_name=user_partition.name
         ), ValidationMessageType.information
