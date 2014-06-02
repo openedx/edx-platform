@@ -14,33 +14,45 @@ elif message_type == ValidationMessageType.error:
     message_prefix = _(u"Error:")
 else:
     message_prefix = None
+
+is_configured = split_test.user_partition_id >= 0
 %>
 
-% if message:
-    <div class="xblock-message-area">
+% if message or not is_configured:
+    % if is_root and not is_configured:
+        <div class="no-container-content">
+    % else:
+        <div class="xblock-message-area">
         <div class="xblock-message ${message_type}">
-            <p>
-                % if message_type == 'warning':
-                    <i class='icon-warning-sign'></i>
-                % elif message_type == 'error':
-                    <i class='icon-exclamation-sign'></i>
-                % endif
-            <span class='message-text'>
-                % if message_prefix:
-                    <span class='sr'>${message_prefix}</span>
-                % endif
-                ${message}
-            </span>
-            </p>
-        </div>
-    </div>
-% endif
+    % endif
 
-    <div class="no-container-content">
-        <p>${_("This experiment content needs to be assigned to an experiment grouping.")}
+    % if not is_configured:
+        <p>${_("This content experiment content needs to have a group configuration.")}
             <a href="#" class="button edit-button action-button">
                 <i class="icon-pencil"></i>
-                <span class="action-button-text">${_("Select an Experiment Grouping")}</span>
+                <span class="action-button-text">${_("Select a Group Configuration")}</span>
             </a>
         </p>
-    </div>
+    % else:
+        <p>
+            % if message_type == 'warning':
+                <i class='icon-warning-sign'></i>
+            % elif message_type == 'error':
+                <i class='icon-exclamation-sign'></i>
+            % endif
+        <span class='message-text'>
+            % if message_prefix:
+                <span class='sr'>${message_prefix}</span>
+            % endif
+            ${message}
+        </span>
+        </p>
+    % endif
+
+    % if is_root and not is_configured:
+        </div>
+    % else:
+        </div>
+        </div>
+    % endif
+% endif

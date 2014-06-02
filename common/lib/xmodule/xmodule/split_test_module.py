@@ -228,15 +228,17 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
         fragment = Fragment()
+        root_xblock = context.get('root_xblock')
+        is_root = root_xblock and root_xblock.location == self.location
 
         # First render a header at the top of the split test module...
         fragment.add_content(self.system.render_template('split_test_studio_header.html', {
             'split_test': self,
+            'is_root': is_root,
         }))
 
         # ... then render the children only when this block is being shown as the container
-        root_xblock = context.get('root_xblock')
-        if root_xblock and root_xblock.location == self.location:
+        if is_root:
             self.render_children(context, fragment, can_reorder=False)
 
         return fragment
