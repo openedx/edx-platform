@@ -43,7 +43,8 @@ class StaffDebugTest(UniqueCourseTest):
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1', data=problem_data)
+                    XBlockFixtureDesc('problem', 'Test Problem 1', data=problem_data),
+                    XBlockFixtureDesc('problem', 'Test Problem 2', data=problem_data)
                 )
             )
         ).install()
@@ -149,3 +150,47 @@ class StaffDebugTest(UniqueCourseTest):
         msg = staff_debug_page.idash_msg[0]
         self.assertEqual(u'Failed to delete student state. '
                          'User does not exist.', msg)
+
+    def test_reset_attempts_for_problem_loaded_via_ajax(self):
+        """
+        Successfully reset the student attempts for problem loaded via ajax.
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.load_problem_via_ajax()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.reset_attempts()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertEqual(u'Successfully reset the attempts '
+                         'for user {}'.format(self.USERNAME), msg)
+
+    def test_rescore_state_for_problem_loaded_via_ajax(self):
+        """
+        Rescore the student for problem loaded via ajax.
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.load_problem_via_ajax()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.rescore()
+        msg = staff_debug_page.idash_msg[0]
+        # Since we aren't running celery stuff, this will fail badly
+        # for now, but is worth excercising that bad of a response
+        self.assertEqual(u'Failed to rescore problem. '
+                         'Unknown Error Occurred.', msg)
+
+    def test_student_state_delete_for_problem_loaded_via_ajax(self):
+        """
+        Successfully delete the student state for problem loaded via ajax.
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.load_problem_via_ajax()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.delete_state()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertEqual(u'Successfully deleted student state '
+                         'for user {}'.format(self.USERNAME), msg)
