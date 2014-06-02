@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix bug with incorrect RelativeTime value after XML serialization. BLD-1060
+
 LMS: Update bulk email implementation to lessen load on the database
 by consolidating chunked queries for recipients into a single query.
 
