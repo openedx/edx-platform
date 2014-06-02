@@ -79,6 +79,50 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
+class LmsCourse(object):
+    """
+    A runtime mixin that provides the course object.
+
+    This must be mixed in to a runtime that already accepts and stores
+    a course_id.
+    """
+
+    @property
+    def course(self):
+        # TODO using 'modulestore().get_course(self._course_id)' doesn't work. return None
+        from courseware.courses import get_course
+        return get_course(self.course_id)
+
+
+class LmsUser(object):
+    """
+    A runtime mixin that provides the user object.
+
+    This must be mixed in to a runtime that already accepts and stores
+    a anonymous_student_id and has get_real_user method.
+    """
+
+    @property
+    def user(self):
+        return self.get_real_user(self.anonymous_student_id)
+
+
+class LmsPartitionService(PartitionService):
+    """
+    Another runtime mixin that provides access to the student partitions defined on the
+    course.
+
+    (If and when XBlock directly provides access from one block (e.g. a split_test_module)
+    to another (e.g. a course_module), this won't be necessary, but for now it seems like
+    the least messy way to hook things through)
+
+    """
+    @property
+    def course_partitions(self):
+        course = modulestore().get_course(self._course_id)
+        return course.user_partitions
+
+
 class UserTagsService(object):
     """
     A runtime class that provides an interface to the user service.  It handles filling in
@@ -127,7 +171,7 @@ class UserTagsService(object):
         )
 
 
-class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
