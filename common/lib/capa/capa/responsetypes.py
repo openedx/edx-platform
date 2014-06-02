@@ -783,19 +783,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         for response in self.xml.xpath("choicegroup"):
             # Is Masking enabled? -- check for shuffle or answer-pool features
             ans_str = response.get("answer-pool")
-            if response.get("shuffle") == "true" or (ans_str is not None and ans_str != "0"):
-                self._has_mask = True  # pylint: disable=W0201
-                self._mask_dict = {}   # pylint: disable=W0201
-                # We do not want the random mask names to be the same
-                # for all responses in a problem (sharing the one seed),
-                # like mask_2 in view-source turns out to always be the correct choice.
-                # But it must be repeatable and a function of the seed.
-                # Therefore we add the _1 number from the .id to the seed.
-                seed_delta = int(self.id[self.id.rindex("_") + 1:])
-                rng = random.Random(self.context["seed"] + seed_delta)
-                # e.g. mask_ids = [3, 1, 0, 2]
-                mask_ids = range(len(response))
-                rng.shuffle(mask_ids)
+            # Masking (self._has_mask) is off, to be re-enabled with a future PR.
             rtype = response.get('type')
             if rtype not in ["MultipleChoice"]:
                 # force choicegroup to be MultipleChoice if not valid
@@ -856,11 +844,11 @@ class MultipleChoiceResponse(LoncapaResponse):
         """
         Returns a list of the choice names in the order displayed to the user,
         using the regular (non-masked) names.
-        Fails with LoncapaProblemError if called on a response that is not masking.
         """
+        # With masking disabled, this computation remains interesting to see
+        # the displayed order, even though there is no unmasking.
         choices = self.xml.xpath('choicegroup/choice')
-        # We let the unmask_name() raise the error for us if this response is not masking.
-        return [self.unmask_name(choice.get("name")) for choice in choices]
+        return [choice.get("name") for choice in choices]
 
     def do_shuffle(self, tree, problem):
         """

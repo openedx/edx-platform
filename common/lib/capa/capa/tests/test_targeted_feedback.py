@@ -586,7 +586,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
     def test_targeted_feedback_multiple_answer_2(self):
         problem = new_loncapa_problem(load_fixture('targeted_feedback_multiple.xml'))
         problem.done = True
-        problem.student_answers = {'1_2_1': 'choice_0', '1_3_1': 'mask_1'}  # Q1 wrong, Q2 correct
+        problem.student_answers = {'1_2_1': 'choice_0', '1_3_1': 'choice_2'}  # Q1 wrong, Q2 correct
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
         # Q1 has feedback1 and Q2 has feedbackC
