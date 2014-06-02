@@ -228,15 +228,17 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
         fragment = Fragment()
-        (message, message_type) = self.descriptor.validation_message()
-        if message:
-            fragment.add_content(u'<div class="xblock-message-area">{message}</div>'.format(
-                message=self.render_validation_message(message, message_type))
-            )
-        # Only render the children when this block is being shown as the container
+
+        # First render a header at the top of the split test module...
+        fragment.add_content(self.system.render_template('split_test_studio_header.html', {
+            'split_test': self,
+        }))
+
+        # ... then render the children only when this block is being shown as the container
         root_xblock = context.get('root_xblock')
         if root_xblock and root_xblock.location == self.location:
             self.render_children(context, fragment, can_reorder=False)
+
         return fragment
 
     def render_validation_message(self, message, message_type):
@@ -453,7 +455,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         if self.user_partition_id < 0:
-            return _(u"This content experiment needs to be assigned to a group configuration."), ValidationMessageType.warning
+            return None, None
         user_partition = self._get_selected_partition()
         if not user_partition:
             return \
