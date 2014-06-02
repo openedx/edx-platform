@@ -60,7 +60,7 @@ end
 namespace :'test:js' do
 
     desc "Run the JavaScript tests and print results to the console"
-    task :run, [:env] => [:clean_test_files, JS_REPORT_DIR] do |t, args|
+    task :run, [:env] => [:clean_test_files, JS_REPORT_DIR, :install_node_prereqs] do |t, args|
         compile_coffeescript()
 
         if args[:env].nil?
@@ -71,7 +71,7 @@ namespace :'test:js' do
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:clean_test_files] do |t, args|
+    task :dev, [:env] => [:clean_test_files, :install_node_prereqs] do |t, args|
         compile_coffeescript()
 
         if args[:env].nil?
@@ -83,7 +83,7 @@ namespace :'test:js' do
     end
 
     desc "Run all JavaScript tests and collect coverage information"
-    task :coverage => [:clean_reports_dir, :clean_test_files, JS_REPORT_DIR] do
+    task :coverage => [:clean_reports_dir, :clean_test_files, JS_REPORT_DIR, :install_node_prereqs] do
         compile_coffeescript()
         js_test_tool(nil, 'run', true)
     end
