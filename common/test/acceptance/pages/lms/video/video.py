@@ -33,7 +33,8 @@ CSS_CLASS_NAMES = {
     'video_init': '.is-initialized',
     'video_time': 'div.vidtime',
     'video_display_name': '.vert h2',
-    'captions_lang_list': '.langs-list li'
+    'captions_lang_list': '.langs-list li',
+    'video_speed': '.speeds .value'
 }
 
 VIDEO_MODES = {
@@ -353,6 +354,20 @@ class VideoPage(PageObject):
 
         speed_selector = self.get_element_selector(video_display_name, 'li[data-speed="{speed}"] a'.format(speed=speed))
         self.q(css=speed_selector).first.click()
+
+    def get_speed(self, video_display_name=None):
+        """
+        Get current video speed value.
+
+         Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Return:
+            str: speed value
+
+        """
+        speed_selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['video_speed'])
+        return self.q(css=speed_selector).text[0]
 
     def click_player_button(self, button, video_display_name=None):
         """
@@ -701,11 +716,12 @@ class VideoPage(PageObject):
 
     def _wait_for(self, check_func, desc, result=False, timeout=200):
         """
-        Calls the method provided as an argument until the return value is not False.
+        Calls the method provided as an argument until the Promise satisfied or BrokenPromise
 
         Arguments:
             check_func (callable): Function that accepts no arguments and returns a boolean indicating whether the promise is fulfilled.
             desc (str): Description of the Promise, used in log messages.
+            result (bool): Indicates whether we need a results from Promise or not
             timeout (float): Maximum number of seconds to wait for the Promise to be satisfied before timing out.
 
         """
@@ -756,3 +772,44 @@ class VideoPage(PageObject):
         js_code = "$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
             seek_selector=seek_selector, seek_time=seek_time)
         self.browser.execute_script(js_code)
+
+    def reload_page(self):
+        """
+        Reload/Refresh the current video page.
+        """
+        self.browser.refresh()
+        self.wait_for_video_player_render()
+
+    def duration(self, video_display_name=None):
+        """
+        Extract video duration.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            str: duration in format min:sec
+
+        """
+        selector = self.get_element_selector(video_display_name, CSS_CLASS_NAMES['video_time'])
+
+        # The full time has the form "0:32 / 3:14" elapsed/duration
+        all_times = self.q(css=selector).text[0]
+
+        duration_str = all_times.split('/')[1]
+
+        return duration_str.strip()
+
+    def wait_for_position(self, position, video_display_name=None):
+        """
+        Wait until current will be equal to `position`.
+
+        Arguments:
+            position (str): position we wait for.
+            video_display_name (str or None): Display name of a Video.
+
+        """
+        self._wait_for(
+            lambda: self.position(video_display_name) == position,
+            'Position is {position}'.format(position=position)
+        )

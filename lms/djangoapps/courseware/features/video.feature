@@ -3,68 +3,6 @@ Feature: LMS.Video component
   As a student, I want to view course videos in LMS
 
   # 1
-  Scenario: Multiple videos in sequentials all load and work, switching between sequentials
-    Given I am registered for the course "test_course"
-    And it has a video "A" in "Youtube" mode in position "1" of sequential
-    And a video "B" in "HTML5" mode in position "1" of sequential
-    And a video "C" in "Youtube" mode in position "1" of sequential
-    And a video "D" in "Youtube" mode in position "1" of sequential
-    And a video "E" in "Youtube" mode in position "2" of sequential
-    And a video "F" in "Youtube" mode in position "2" of sequential
-    And a video "G" in "Youtube" mode in position "2" of sequential
-    And I open the section with videos
-    Then video "A" should start playing at speed "1.0"
-    And I select the "2.0" speed on video "B"
-    And I select the "2.0" speed on video "C"
-    And I select the "2.0" speed on video "D"
-    When I open video "E"
-    Then video "E" should start playing at speed "2.0"
-    And I select the "1.0" speed on video "F"
-    And I select the "1.0" speed on video "G"
-    When I open video "A"
-    Then video "A" should start playing at speed "2.0"
-
-  # 2
-  Scenario: Video component stores speed correctly when each video is in separate sequence
-    Given I am registered for the course "test_course"
-    And it has a video "A" in "Youtube" mode in position "1" of sequential
-    And a video "B" in "Youtube" mode in position "2" of sequential
-    And a video "C" in "HTML5" mode in position "3" of sequential
-    And I open the section with videos
-    And I select the "2.0" speed on video "A"
-    And I select the "0.50" speed on video "B"
-    When I open video "C"
-    Then video "C" should start playing at speed "0.75"
-    When I open video "A"
-    Then video "A" should start playing at speed "2.0"
-    And I reload the page with video
-    When I open video "A"
-    Then video "A" should start playing at speed "2.0"
-    And I select the "1.0" speed on video "A"
-    When I open video "B"
-    Then video "B" should start playing at speed "0.50"
-    When I open video "C"
-    Then video "C" should start playing at speed "1.0"
-
-  # 9
-#  Scenario: Youtube video has correct transcript if fields for other speeds are filled
-#    Given I am registered for the course "test_course"
-#    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-#    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
-#    And it has a video in "Youtube" mode:
-#      | sub         | youtube_id_1_5 |
-#      | OEoXaMPEzfM | b7xgknqkQk8    |
-#    And I make sure captions are opened
-#    Then I see "Hi, welcome to Edx." text in the captions
-#    And I select the "1.50" speed
-#    And I reload the page with video
-#    Then I see "Hi, welcome to Edx." text in the captions
-    # The 1:56 time is the duration from metadata. 1:54 time is the duration reported
-    # by the video API once the video starts playing. The next step is correct because
-    # "1:56" is the duration in the VCR timer before the video plays.
-#    And I see duration "1:56"
-
-  # 3
   Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries
     Given youtube server is up and response time is 2 seconds
     And I am registered for the course "test_course"
@@ -140,15 +78,3 @@ Feature: LMS.Video component
   #  Then I select the "1.25" speed
   #  And I click video button "pause"
   #  And I click on caption line "2", video module shows elapsed time "4"
-
-  # 31 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Video component stores position correctly when page is reloaded
-  #  Given the course has a Video component in "Youtube" mode
-  #  When the video has rendered in "Youtube" mode
-  #  And I click video button "play"
-  #  And I click video button "pause"
-  #  Then I seek video to "0:10" position
-  #  And I click video button "play"
-  #  And I click video button "pause"
-  #  And I reload the page with video
-  #  Then I see video slider at "0:10" position
