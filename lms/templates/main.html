@@ -63,6 +63,10 @@ from branding import api as branding_api
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-main'/>
+  <%static:css group='style-app'/>
+  <%static:css group='style-app-extend1'/>
+  <%static:css group='style-app-extend2'/>
+  <%static:css group='style-discussion-app'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -157,6 +161,17 @@ from branding import api as branding_api
     % endif
 
 % if not disable_window_wrap:
+<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
+
+  <%include file="mathjax_include.html" />
+  <%include file="mathjax_accessible.html" />
+
+  <%include file="${header_file}" />
+
+  <div class="content-wrapper" id="content">
+    ${self.body()}
+    <%block name="bodyextra"/>
   </div>
 % endif
 
@@ -167,8 +182,6 @@ from branding import api as branding_api
 
   <%block name="js_extra"/>
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
-</body>
-</html>
 
 <%def name="login_query()">${
   u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
@@ -203,3 +216,5 @@ from branding import api as branding_api
   }());
 </script>
 % endif
+</body>
+</html>

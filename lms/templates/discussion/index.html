@@ -14,12 +14,10 @@ from django.core.urlresolvers import reverse
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
-
-<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+<%include file="/discussion/_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
@@ -47,3 +45,5 @@ from django.core.urlresolvers import reverse
 
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />
+<%include file="/discussion/_discussion_course.html" />
+

@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
+from edxmako import add_lookup
 from edxmako.shortcuts import render_to_string, render_to_response
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
@@ -37,6 +38,14 @@ GRADER_TYPES = {
 }
 
 
+# Add Discussion templates
+add_lookup('lms.main', 'templates', package='discussion_app')
+
+
+# Add Discussion templates
+add_lookup('lms.main', 'templates', package='discussion_app')
+
+
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
@@ -60,6 +69,22 @@ def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     Render a template using the LMS MAKO_TEMPLATES
     """
     return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+
+
+def _xmodule_recurse(item, action, ignore_exception=()):
+    """
+    Recursively apply provided action on item and its children
+
+    ignore_exception (Exception Object): A optional argument; when passed ignores the corresponding
+        exception raised during xmodule recursion,
+    """
+    for child in item.get_children():
+        _xmodule_recurse(child, action, ignore_exception)
+
+    try:
+        return action(item)
+    except ignore_exception:
+        return
 
 
 def get_parent_xblock(xblock):
