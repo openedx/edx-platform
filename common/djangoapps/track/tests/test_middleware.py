@@ -118,6 +118,7 @@ class TrackMiddlewareTestCase(TestCase):
         request.session.save()
         session_key = request.session.session_key
         expected_session_key = self.track_middleware.encrypt_session_key(session_key)
+        self.assertEquals(len(session_key), len(expected_session_key))
         context = self.get_context_for_request(request)
         self.assert_dict_subset(context, {
             'session': expected_session_key,

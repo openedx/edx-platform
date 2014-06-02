@@ -125,12 +125,12 @@ class TrackMiddleware(object):
             return ''
 
         # Follow the model of django.utils.crypto.salted_hmac() and
-        # django.contrib.sessions.backends.base._hash(), but use MD5
-        # so that the result has the same length (32) as the original
-        # session_key.
+        # django.contrib.sessions.backends.base._hash() but use MD5
+        # instead of SHA1 so that the result has the same length (32)
+        # as the original session_key.
         key_salt = "common.djangoapps.track" + self.__class__.__name__
-        key = hashlib.sha1(key_salt + settings.SECRET_KEY).digest()
-        encrypted_session_key = hmac.new(key, msg=session_key).hexdigest()
+        key = hashlib.md5(key_salt + settings.SECRET_KEY).digest()
+        encrypted_session_key = hmac.new(key, msg=session_key, digestmod=hashlib.md5).hexdigest()
         return encrypted_session_key
 
     def get_user_primary_key(self, request):
