@@ -565,6 +565,7 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
+    ('am', u'አማርኛ'),  # Amharic
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)

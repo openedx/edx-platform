@@ -2,6 +2,7 @@
 
 locales:
     - en  # English - Source Language
+    - am  # Amharic
     - ar  # Arabic
     - az  # Azerbaijani
     - bg_BG  # Bulgarian (Bulgaria)
