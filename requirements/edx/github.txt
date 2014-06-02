@@ -28,4 +28,5 @@
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2014-06-13T11.52#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@5929789900b3d0a354ce7274bde74edfd0430f03#egg=opaque-keys
-git+https://github.com/edx/ease.git@a990b25ed4238acb1b15ee6f027465db3a10960e#egg=ease
+-e git+https://github.com/edx/i18n-tools.git@c186d9d877773734908e49ccc5c01407e6ad8199#egg=i18n-tools
+-e git+https://github.com/edx/ease.git@a990b25ed4238acb1b15ee6f027465db3a10960e#egg=ease
