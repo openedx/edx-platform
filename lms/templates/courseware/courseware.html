@@ -60,6 +60,14 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
 
 <link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
   ${HTML(fragment.head_html())}
+  % if show_chat:
+    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
+    ## It'd be better to have this in a place like lms/css/vendor/candy,
+    ## but the candy_res/ folder contains images and other junk, and it
+    ## all needs to stay together for the Candy.js plugin to work.
+    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
+  % endif
+  ${fragment.head_html()}
 </%block>
 
 <%block name="js_extra">
