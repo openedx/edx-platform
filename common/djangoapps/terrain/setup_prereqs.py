@@ -15,6 +15,9 @@ from terrain.stubs.video_source import VideoSourceHttpService
 import re
 import requests
 
+from logging import getLogger
+
+LOGGER = getLogger(__name__)
 
 SERVICES = {
     "youtube": {"port": settings.YOUTUBE_PORT, "class": StubYouTubeService},
@@ -77,7 +80,9 @@ def process_requires_tags(scenario):
 
         if requires:
             if requires.group('server') == 'youtube':
-                if not is_youtube_available(scenario, YOUTUBE_API_URLS):
+                if not is_youtube_available(YOUTUBE_API_URLS):
+                    # A hackish way to skip a test in lettuce as there is no proper way to skip a test conditionally
+                    scenario.steps = []
                     return
 
             start_stub(requires.group('server'))
@@ -96,21 +101,22 @@ def start_stub(name):
         setattr(world, name, fake_server)
 
 
-def is_youtube_available(scenario, urls):
+def is_youtube_available(urls):
     """
     Check if the required youtube urls are available.
     If they are not, then skip the scenario.
     """
     for name, url in urls.iteritems():
-        response = requests.get(url, allow_redirects=False)
-        status = response.status_code
-        if status != 200:
-            print "ERROR: YouTube {0} service not available. Status code: {1}".format(
-                name, status)
+        try:
+            response = requests.get(url, allow_redirects=False)
+        except requests.exceptions.ConnectionError:
+            LOGGER.warning("Connection Error. YouTube {0} service not available. Skipping this test.".format(name))
+            return False
 
-            # This is a hackish way to skip a test in lettuce as there is
-            # no proper way to skip a test conditionally
-            scenario.steps = []
+        status = response.status_code
+        if status >= 300:
+            LOGGER.warning(
+                "YouTube {0} service not available. Status code: {1}. Skipping this test.".format(name, status))
 
             # No need to check all the URLs
             return False
