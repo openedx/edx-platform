@@ -209,7 +209,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 module.save()
                 return module
             except:
-                log.warning("Failed to load descriptor", exc_info=True)
+                log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
@@ -558,7 +558,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         Returns a list of course descriptors.
         '''
-        return sum(
+        base_list = sum(
             [
                 self._load_items(
                     SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
@@ -575,6 +575,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             ],
             []
         )
+        return [course for course in base_list if not isinstance(course, ErrorDescriptor)]
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not

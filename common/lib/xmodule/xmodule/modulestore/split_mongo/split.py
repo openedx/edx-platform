@@ -70,6 +70,7 @@ from bson.objectid import ObjectId
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xblock.core import XBlock
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
+from xmodule.error_module import ErrorDescriptor
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -331,7 +332,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 'structure': entry,
             }
             root = entry['root']
-            result.extend(self._load_items(envelope, [root], 0, lazy=True))
+            course_list = self._load_items(envelope, [root], 0, lazy=True)
+            if not isinstance(course_list[0], ErrorDescriptor):
+                result.append(course_list[0])
         return result
 
     def get_course(self, course_id, depth=None):

@@ -30,6 +30,7 @@ locales:
     - fi_FI  # Finnish (Finland)
     - fr  # French
     - gl  # Galician
+    - gu  # Gujarati
     - he  # Hebrew
     - hi  # Hindi
     - hr  # Croatian
@@ -49,6 +50,7 @@ locales:
     - nb  # Norwegian Bokmål
     - ne  # Nepali
     - nl_NL  # Dutch (Netherlands)
+    - or  # Oriya
     - pl  # Polish
     - pt_BR  # Portuguese (Brazil)
     - pt_PT  # Portuguese (Portugal)

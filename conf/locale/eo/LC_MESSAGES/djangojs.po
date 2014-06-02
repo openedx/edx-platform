@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-19 08:29-0400\n"
-"PO-Revision-Date: 2014-05-19 12:30:25.098977\n"
+"POT-Creation-Date: 2014-05-27 07:56-0400\n"
+"PO-Revision-Date: 2014-05-27 11:57:03.040250\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -24,12 +24,11 @@ msgstr ""
 msgid "OK"
 msgstr "ÖK Ⱡ'#"
 
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
-#: cms/static/js/base.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
+#: cms/static/js/views/asset.js cms/static/js/views/baseview.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
-#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -226,6 +225,10 @@ msgstr ""
 "Séqüénçé érrör! Çännöt nävïgäté tö täß %(tab_name)s ïn thé çürrént "
 "SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢ση#"
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or "
+msgstr "Thïs ßröwsér çännöt pläý .mp4, .ögg, ör  Ⱡ'σяєм ιρѕυ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
@@ -574,6 +577,26 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
 msgstr "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм #"
+
+#: common/static/js/capa/drag_and_drop/base_image.js
+msgid "Drop target image"
+msgstr "Dröp tärgét ïmägé Ⱡ'σ#"
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging out of slider"
+msgstr "dräggïng öüt öf slïdér Ⱡ'σяє#"
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging"
+msgstr "dräggïng #"
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped in slider"
+msgstr "dröppéd ïn slïdér Ⱡ'σ#"
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped on target"
+msgstr "dröppéd ön tärgét Ⱡ'σ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
@@ -1107,11 +1130,12 @@ msgstr "Pléäsé éntér ä stüdént émäïl äddréss ör üsérnämé. Ⱡ'
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error getting student progress url for '<%= student_id %>'. Check that the "
-"student identifier is spelled correctly."
+"Error getting student progress url for '<%= student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
 msgstr ""
-"Érrör géttïng stüdént prögréss ürl för '<%= student_id %>'. Çhéçk thät thé "
-"stüdént ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"Érrör géttïng stüdént prögréss ürl för '<%= student_id %>'. Mäké süré thät "
+"thé stüdént ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢ση#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1120,8 +1144,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Please enter a problem urlname."
-msgstr "Pléäsé éntér ä prößlém ürlnämé. Ⱡ'σяєм ι#"
+msgid "Please enter a problem location."
+msgstr "Pléäsé éntér ä prößlém löçätïön. Ⱡ'σяєм ι#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1134,12 +1158,12 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+" '<%= student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
 "Érrör réséttïng prößlém ättémpts för prößlém '<%= problem_id %>' änd stüdént"
-" '<%= student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré "
-"spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+" '<%= student_id %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré"
+" çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1151,11 +1175,12 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Check that the problem and student identifiers are spelled correctly."
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
 msgstr ""
 "Érrör délétïng stüdént '<%= student_id %>'s stäté ön prößlém '<%= problem_id"
-" %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré spélléd çörréçtlý. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+" %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré çömplété änd "
+"çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -1175,22 +1200,22 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+"'<%= student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
 msgstr ""
 "Érrör stärtïng ä täsk tö résçöré prößlém '<%= problem_id %>' för stüdént "
-"'<%= student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré "
-"spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"'<%= student_id %>'. Mäké süré thät thé thé prößlém änd stüdént ïdéntïfïérs "
+"äré çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Check that the problem and student identifiers are spelled "
-"correctly."
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
 msgstr ""
 "Érrör géttïng täsk hïstörý för prößlém '<%= problem_id %>' änd stüdént '<%= "
-"student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré spélléd "
-"çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"student_id %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré "
+"çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -1211,11 +1236,12 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Check that the problem identifier is spelled correctly."
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
 msgstr ""
 "Érrör stärtïng ä täsk tö rését ättémpts för äll stüdénts ön prößlém '<%= "
-"problem_id %>'. Çhéçk thät thé prößlém ïdéntïfïér ïs spélléd çörréçtlý. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"problem_id %>'. Mäké süré thät thé prößlém ïdéntïfïér ïs çömplété änd "
+"çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
@@ -1233,11 +1259,12 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
-" problem identifier is spelled correctly."
+"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
-"Érrör stärtïng ä täsk tö résçöré prößlém '<%= problem_id %>'. Çhéçk thät thé"
-" prößlém ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"Érrör stärtïng ä täsk tö résçöré prößlém '<%= problem_id %>'. Mäké süré thät"
+" thé prößlém ïdéntïfïér ïs çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
@@ -1556,10 +1583,6 @@ msgstr ""
 msgid "Deleting&hellip;"
 msgstr "Délétïng&hellip; Ⱡ#"
 
-#: cms/static/coffee/src/views/unit.js
-msgid "Adding&hellip;"
-msgstr "Àddïng&hellip; #"
-
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr "Düplïçätïng&hellip; Ⱡ'#"
@@ -1728,6 +1751,22 @@ msgstr "Nämé Ⱡ'σяєм#"
 msgid "Date Added"
 msgstr "Däté Àddéd Ⱡ#"
 
+#: cms/static/js/views/assets.js
+msgid "Uploading…"
+msgstr "Ûplöädïng… Ⱡ#"
+
+#: cms/static/js/views/assets.js
+msgid "Choose File"
+msgstr "Çhöösé Fïlé Ⱡ#"
+
+#: cms/static/js/views/assets.js
+msgid "Upload New File"
+msgstr "Ûplöäd Néw Fïlé Ⱡ'#"
+
+#: cms/static/js/views/assets.js
+msgid "Load Another File"
+msgstr "Löäd Ànöthér Fïlé Ⱡ'σ#"
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "Àré ýöü süré ýöü wänt tö délété thïs üpdäté? Ⱡ'σяєм ιρѕυм#"
@@ -1884,6 +1923,10 @@ msgstr "Édïtör Ⱡ'σяєм ιρѕ#"
 #: cms/static/js/views/xblock_editor.js
 msgid "Settings"
 msgstr "Séttïngs #"
+
+#: cms/static/js/views/components/add_xblock.js
+msgid "Adding&hellip;"
+msgstr "Àddïng&hellip; #"
 
 #: cms/static/js/views/modals/base_modal.js
 msgid "Save"
