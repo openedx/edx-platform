@@ -113,6 +113,15 @@
 
 // ===============
 
+
+.tooltip {
+  @extend %tooltip;
+}
+
+.loading-animation {
+  @extend %loading-animation;
+}
+
 // main styling
 body.discussion {
 
@@ -587,13 +596,21 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
+.container .discussion-body, .discussion-module {
   @include clearfix;
   display: block;
   border: none;
   background: transparent;
   box-shadow: none;
   line-height: 1.4;
+
+  .sr {
+    @extend %text-sr;
+  }
+
+  .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px;
+  }
 
   .sidebar {
     @include box-sizing(border-box);
