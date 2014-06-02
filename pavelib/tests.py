@@ -5,14 +5,21 @@ import os
 import sys
 from paver.easy import sh, task, cmdopts, needs
 from pavelib.utils.test import suites
-from pavelib.utils.test import utils as test_utils
 from pavelib.utils.envs import Env
+
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
 
 __test__ = False  # do not collect
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs(
+    'pavelib.prereqs.install_prereqs',
+    'pavelib.utils.test.utils.clean_reports_dir',
+)
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("test_id=", "t", "Test id"),
@@ -34,7 +41,8 @@ def test_system(options):
     }
 
     if test_id:
-        system = test_id.split('/')[0]
+        if not system:
+            system = test_id.split('/')[0]
         opts['test_id'] = test_id
 
     if test_id or system:
@@ -49,7 +57,10 @@ def test_system(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs(
+    'pavelib.prereqs.install_prereqs',
+    'pavelib.utils.test.utils.clean_reports_dir',
+)
 @cmdopts([
     ("lib=", "l", "lib to test"),
     ("test_id=", "t", "Test id"),
@@ -80,7 +91,10 @@ def test_lib(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs(
+    'pavelib.prereqs.install_prereqs',
+    'pavelib.utils.test.utils.clean_reports_dir',
+)
 @cmdopts([
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
@@ -94,7 +108,10 @@ def test_python():
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs(
+    'pavelib.prereqs.install_python_prereqs',
+    'pavelib.utils.test.utils.clean_reports_dir',
+)
 def test_i18n():
     """
     Run all i18n tests
@@ -104,7 +121,10 @@ def test_i18n():
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs(
+    'pavelib.prereqs.install_prereqs',
+    'pavelib.utils.test.utils.clean_reports_dir',
+)
 def test():
     """
     Run all tests
@@ -116,15 +136,16 @@ def test():
 
     # Main suite to be run
     all_unittests_suite = suites.TestSuite('All Tests', subsuites=[i18n_suite, js_suite, python_suite])
-    all_unittests_suite.run(with_build_docs=True)
+    all_unittests_suite.run()
 
 
 @task
+@needs('pavelib.prereqs.install_prereqs')
 def coverage():
     """
     Build the html, xml, and diff coverage reports
     """
-    for directory in Env.LIB_TEST_DIRS:
+    for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
         report_dir = os.path.join(Env.REPORT_DIR, directory)
 
         if os.path.isfile(os.path.join(report_dir, '.coverage')):
@@ -145,7 +166,7 @@ def coverage():
             xml_reports.append(os.path.join(subdir, 'coverage.xml'))
 
     if len(xml_reports) < 1:
-        err_msg = test_utils.colorize(
+        err_msg = colorize(
             "No coverage info found.  Run `paver test` before running `paver coverage`.",
             'RED'
         )

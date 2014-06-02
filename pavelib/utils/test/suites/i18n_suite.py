@@ -15,7 +15,11 @@ class I18nTestSuite(TestSuite):
     """
     def __init__(self, *args, **kwargs):
         super(I18nTestSuite, self).__init__(*args, **kwargs)
-        self.xunit_report = self._required_dirs()
+        self.report_dir, self.xunit_report = self._required_dirs
+
+    def __enter__(self):
+        super(I18nTestSuite, self).__enter__()
+        test_utils.get_or_make_dir(self.report_dir)
 
     @property
     def cmd(self):
@@ -27,15 +31,12 @@ class I18nTestSuite(TestSuite):
         )
         return cmd
 
-    def _set_up(self):
-        super(I18nTestSuite, self)._set_up()
-        test_utils.clean_reports_dir()
-
+    @property
     def _required_dirs(self):
         """
         Makes sure that the reports directory is present. Returns paths of report directories and files.
         """
-        report_dir = test_utils.get_or_make_dir(Env.I18N_REPORT_DIR)
+        report_dir = Env.I18N_REPORT_DIR
         xunit_report = os.path.join(report_dir, 'nosetests.xml')
 
-        return xunit_report
+        return report_dir, xunit_report

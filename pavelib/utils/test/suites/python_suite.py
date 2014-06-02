@@ -19,6 +19,11 @@ class PythonTestSuite(TestSuite):
         self.fail_fast = kwargs.get('fail_fast', None)
         self.subsuites = kwargs.get('subsuites', self._default_subsuites)
 
+    def __enter__(self):
+        super(PythonTestSuite, self).__enter__()
+        if not self.fasttest:
+            test_utils.clean_test_files()
+
     @property
     def _default_subsuites(self):
         """
@@ -41,9 +46,3 @@ class PythonTestSuite(TestSuite):
         ]
 
         return system_suites + lib_suites
-
-    def _set_up(self):
-        if not self.fasttest:
-            test_utils.clean_test_files()
-
-        test_utils.clean_reports_dir()

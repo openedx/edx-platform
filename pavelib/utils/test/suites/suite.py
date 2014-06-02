@@ -3,9 +3,12 @@ A class used for defining and running test suites
 """
 import sys
 import subprocess
-from paver.easy import call_task
 from pavelib.utils.process import kill_process
-from pavelib.utils.test import utils as test_utils
+
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
 
 __test__ = False  # do not collect
 
@@ -17,11 +20,32 @@ class TestSuite(object):
     def __init__(self, *args, **kwargs):
         self.root = args[0]
         self.subsuites = kwargs.get('subsuites', [])
-        self.run_under_coverage = kwargs.get('with_coverage', False)
-
-        # Initialize vars for tracking failures
         self.failed_suites = []
-        self.failed = False
+
+    def __enter__(self):
+        """
+        This will run before the test suite is run with the run_suite_tests method.
+        If self.run_test is called directly, it should be run in a 'with' block to
+        ensure that the proper context is created.
+
+        Specific setup tasks should be defined in each subsuite.
+
+        i.e. Checking for and defining required directories.
+        """
+        sys.stdout.write("\nSetting up for {suite_name}\n".format(suite_name=self.root))
+        self.failed_suites = []
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        This is run after the tests run with the run_suite_tests method finish.
+        Specific clean up tasks should be defined in each subsuite.
+
+        If self.run_test is called directly, it should be run in a 'with' block
+        to ensure that clean up happens properly.
+
+        i.e. Cleaning mongo after the lms tests run.
+        """
+        sys.stdout.write("\nCleaning up after {suite_name}\n".format(suite_name=self.root))
 
     @property
     def cmd(self):
@@ -30,39 +54,15 @@ class TestSuite(object):
         """
         return None
 
-    @property
-    def under_coverage_cmd(self):
-        """
-        Returns the given command (str), reformatted to be run with coverage.
-        """
-        return None
-
-    def _clean_up(self):
-        """
-        This is run after the tests in this suite finish. Specific
-        clean up tasks should be defined in each subsuite.
-
-        i.e. Cleaning mongo after a the lms tests run.
-        """
-        pass
-
-    def _set_up(self):
-        """
-        This will run before the test suite is run. Specific setup
-        tasks should be defined in each subsuite.
-
-        i.e. Checking for and defining required directories.
-        """
-        pass
-
     def run_test(self):
         """
-        Runs a test command in a subprocess and waits for it to finish.
-        It records the outcome in the self.failed variable.
+        Runs a self.cmd in a subprocess and waits for it to finish.
+        It returns False if errors or failures occur. Otherwise, it
+        returns True.
         """
-        msg = test_utils.colorize(
+        msg = colorize(
+            'green',
             '\n{bar}\n Running tests for {suite_name} \n{bar}\n'.format(suite_name=self.root, bar='=' * 40),
-            'GREEN'
         )
 
         sys.stdout.write(msg)
@@ -71,72 +71,54 @@ class TestSuite(object):
         kwargs = {'shell': True, 'cwd': None}
         process = None
 
-        if self.run_under_coverage and self.under_coverage_cmd:
-            cmd = self.under_coverage_cmd
-        else:
-            cmd = self.cmd
+        cmd = self.cmd
 
-        print cmd
+        print(cmd)
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
             process.communicate()
         except KeyboardInterrupt:
             kill_process(process)
-            sys.stderr.write("\nCleaning up before exiting...\n")
-            self._clean_up()
             sys.exit(1)
         else:
-            self.failed = (process.returncode != 0)
+            return (process.returncode == 0)
 
     def run_suite_tests(self):
         """
-        Runs each of the specified suites while tracking failures
+        Runs each of the suites in self.subsuites while tracking failures
         """
-        # set up
-        sys.stdout.write("Setting up for {suite_name}\n".format(suite_name=self.root))
-        self._set_up()
-        self.failed_suites = []
+        # Uses __enter__ and __exit__ for context
+        with self:
+            # run the tests for this class, and for all subsuites
+            if self.cmd:
+                passed = self.run_test()
+                if not passed:
+                    self.failed_suites.append(self)
 
-        # run the tests for this class, and for all subsuites
-        if self.cmd:
-            self.run_test()
-            if self.failed:
-                self.failed_suites.append(self)
+            for suite in self.subsuites:
+                suite.run_suite_tests()
+                if len(suite.failed_suites) > 0:
+                    self.failed_suites.extend(suite.failed_suites)
 
-        for suite in self.subsuites:
-            suite.run_suite_tests()
-            if suite.failed:
-                self.failed = True
-                self.failed_suites.extend(suite.failed_suites)
-
-        # clean up
-        sys.stdout.write("Cleaning up after {suite_name}\n".format(suite_name=self.root))
-        self._clean_up()
-
-    def report_test_failures(self):
+    def report_test_results(self):
         """
-        Runs each of the specified suites while tracking and reporting failures
+        Writes a list of failed_suites to sys.stderr
         """
-        if self.failed:
-            msg = test_utils.colorize("\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48), 'RED')
-            msg += test_utils.colorize('\n* '.join([s.root for s in self.failed_suites]) + '\n\n', 'RED')
+        if len(self.failed_suites) > 0:
+            msg = colorize('red', "\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
+            msg += colorize('red', '\n* '.join([s.root for s in self.failed_suites]) + '\n\n')
         else:
-            msg = test_utils.colorize("\n\n{bar}\nNo test failures\n ".format(bar="=" * 48), 'GREEN')
+            msg = colorize('green', "\n\n{bar}\nNo test failures\n ".format(bar="=" * 48))
 
         sys.stderr.write(msg)
 
-    def run(self, with_build_docs=False):
+    def run(self):
         """
         Runs the tests in the suite while tracking and reporting failures.
-        Optionally, it will also build docs.
         """
         self.run_suite_tests()
+        self.report_test_results()
 
-        if with_build_docs:
-            call_task('pavelib.docs.build_docs')
-
-        self.report_test_failures()
-
-        if self.failed:
+        if len(self.failed_suites) > 0:
             sys.exit(1)

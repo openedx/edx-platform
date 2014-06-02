@@ -60,23 +60,3 @@ def clean_mongo():
     Clean mongo test databases
     """
     sh("mongo {repo_root}/scripts/delete-mongo-test-dbs.js".format(repo_root=Env.REPO_ROOT))
-
-
-# For colorizing stdout/stderr
-COLORS = {
-    'PURPLE': '\033[95m',
-    'BLUE': '\033[94m',
-    'GREEN': '\033[92m',
-    'YELLOW': '\033[93m',
-    'RED': '\033[91m',
-    'ENDC': '\033[0m',
-}
-
-
-def colorize(msg, color):
-    """
-    :returns: a string that when used as the msg arg to sys.stdout or sys.stderr will be
-    the specified color
-    """
-    color = COLORS.get(color, 'ENDC')
-    return(color + msg + COLORS['ENDC'])

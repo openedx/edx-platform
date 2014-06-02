@@ -18,16 +18,33 @@ class NoseTestSuite(TestSuite):
         super(NoseTestSuite, self).__init__(*args, **kwargs)
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
-        self.report_dir, self.test_id_dir, self.test_ids = self._required_dirs()
+        self.run_under_coverage = kwargs.get('with_coverage', True)
+        self.report_dir, self.test_id_dir, self.test_ids = self._required_dirs
 
-    @property
-    def under_coverage_cmd(self):
-        cmd0, cmd_rest = self.cmd.split(" ", 1)
-        # We use "python -m coverage" so that the proper python will run the importable coverage
-        # rather than the coverage that OS path finds.
+    def __enter__(self):
+        super(NoseTestSuite, self).__enter__()
+        test_utils.get_or_make_dir(self.report_dir)
+        test_utils.get_or_make_dir(self.test_id_dir)
 
-        cmd = "python -m coverage run --rcfile={root}/.coveragerc `which {cmd0}` {cmd_rest}".format(
-            root=self.root, cmd0=cmd0, cmd_rest=cmd_rest)
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Cleans mongo afer the tests run.
+        """
+        super(NoseTestSuite, self).__exit__(exc_type, exc_value, traceback)
+        test_utils.clean_mongo()
+
+    def _under_coverage_cmd(self, cmd):
+        """
+        If self.run_under_coverage is True, it returns the arg 'cmd' altered to be run
+        under coverage. It returns the command unaltered otherwise.
+        """
+        if self.run_under_coverage:
+            cmd0, cmd_rest = cmd.split(" ", 1)
+            # We use "python -m coverage" so that the proper python will run the importable coverage
+            # rather than the coverage that OS path finds.
+
+            cmd = "python -m coverage run --rcfile={root}/.coveragerc `which {cmd0}` {cmd_rest}".format(
+                root=self.root, cmd0=cmd0, cmd_rest=cmd_rest)
 
         return cmd
 
@@ -53,26 +70,14 @@ class NoseTestSuite(TestSuite):
 
         return opts
 
-    def _clean_up(self):
-        """
-        Cleans mongo afer the tests run.
-        """
-        test_utils.clean_mongo()
-
+    @property
     def _required_dirs(self):
         """
         Makes sure that the reports directory and the nodeids
         directory are present.
         """
-        report_dir = test_utils.get_or_make_dir(
-            os.path.join(Env.REPORT_DIR, self.root)
-        )
-
-        test_id_dir = test_utils.get_or_make_dir(
-            os.path.join(Env.TEST_DIR, self.root)
-        )
-
-        # no need to create test_ids file, since nose will do that
+        report_dir = os.path.join(Env.REPORT_DIR, self.root)
+        test_id_dir = os.path.join(Env.TEST_DIR, self.root)
         test_ids = os.path.join(test_id_dir, 'noseids')
 
         return report_dir, test_id_dir, test_ids
@@ -86,13 +91,24 @@ class SystemTestSuite(NoseTestSuite):
         super(SystemTestSuite, self).__init__(*args, **kwargs)
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
-        self.run_under_coverage = kwargs.get('with_coverage', True)
+
+    def __enter__(self):
+        super(SystemTestSuite, self).__enter__()
+        args = [self.root, '--settings=test']
+
+        if self.fasttest:
+            # TODO: Fix the tests so that collectstatic isn't needed ever
+            # add --skip-collect to this when the tests are fixed
+            args.append('--skip-collect')
+
+        call_task('pavelib.assets.update_assets', args=args)
 
     @property
     def cmd(self):
         cmd = './manage.py {system} test {test_id} {test_opts} --traceback --settings=test'.format(
             system=self.root, test_id=self.test_id, test_opts=self.test_options_flags)
-        return cmd
+
+        return self._under_coverage_cmd(cmd)
 
     @property
     def _default_test_id(self):
@@ -116,14 +132,6 @@ class SystemTestSuite(NoseTestSuite):
 
         return default_test_id
 
-    def _set_up(self):
-        super(SystemTestSuite, self)._set_up()
-        if not self.fasttest:
-            # TODO: Fix the tests so that collectstatic isn't needed ever
-            # add --skip-collect to this when the tests are fixed
-            args = [self.root, '--settings=test']
-            call_task('pavelib.assets.update_assets', args=args)
-
 
 class LibTestSuite(NoseTestSuite):
     """
@@ -132,16 +140,15 @@ class LibTestSuite(NoseTestSuite):
     def __init__(self, *args, **kwargs):
         super(LibTestSuite, self).__init__(*args, **kwargs)
         self.test_id = kwargs.get('test_id', self.root)
-        self.run_under_coverage = kwargs.get('with_coverage', True)
+
+    def __enter__(self):
+        super(LibTestSuite, self).__enter__()
+        if os.path.exists(os.path.join(self.report_dir, "nosetests.xml")):
+            os.environ['NOSE_XUNIT_FILE'] = os.path.join(self.report_dir, "nosetests.xml")
 
     @property
     def cmd(self):
         cmd = "nosetests --id-file={test_ids} {test_id} {test_opts}".format(
             test_ids=self.test_ids, test_id=self.test_id, test_opts=self.test_options_flags)
 
-        return cmd
-
-    def _set_up(self):
-        super(LibTestSuite, self)._set_up()
-        if os.path.exists(os.path.join(self.report_dir, "nosetests.xml")):
-            os.environ['NOSE_XUNIT_FILE'] = os.path.join(self.report_dir, "nosetests.xml")
+        return self._under_coverage_cmd(cmd)

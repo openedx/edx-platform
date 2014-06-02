@@ -89,7 +89,3 @@ namespace :i18n do
   end
 
 end
-
-
-# Add i18n tests to the main test command
-task :test => :'i18n:test'
