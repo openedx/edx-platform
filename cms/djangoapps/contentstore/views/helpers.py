@@ -11,6 +11,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from edxmako import add_lookup
 from edxmako.shortcuts import render_to_string, render_to_response
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
@@ -35,6 +36,14 @@ GRADER_TYPES = {
     "MIDTERM_EXAM": "Midterm Exam",
     "FINAL_EXAM": "Final Exam"
 }
+
+
+# Add Discussion templates
+add_lookup('lms.main', 'templates', package='discussion_app')
+
+
+# Add Discussion templates
+add_lookup('lms.main', 'templates', package='discussion_app')
 
 
 def event(request):
