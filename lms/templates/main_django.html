@@ -14,6 +14,10 @@
 
   {% stylesheet 'style-vendor' %}
   {% stylesheet 'style-main-v1' %}
+  {% compressed_css 'style-course-vendor' %}
+  {% compressed_css 'style-course' %}
+  {% compressed_css 'style-discussion-app' %}
+
 
   {% block main_vendor_js %}
   {% javascript 'main_vendor' %}
@@ -43,6 +47,7 @@
   </div>
 
     {% javascript 'base_application' %}
+    {% include "mathjax_include.html" %}
 
     {% render_block "js" %}
 </body>

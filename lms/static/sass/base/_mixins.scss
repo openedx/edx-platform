@@ -217,3 +217,40 @@
     text-decoration: underline !important;
   }
 }
+
+%tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  padding: 0 10px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .85);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 26px;
+  color: #fff;
+  pointer-events: none;
+  opacity: 0;
+  @include transition(opacity .1s linear 0s);
+
+  &:after {
+    content: '▾';
+    display: block;
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    margin-left: -7px;
+    font-size: 20px;
+    color: rgba(0, 0, 0, .85);
+  }
+}
+
+%loading-animation {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  background: url(../images/spinner.gif) no-repeat;
+}
