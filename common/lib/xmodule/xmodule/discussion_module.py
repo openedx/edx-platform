@@ -55,9 +55,9 @@ class DiscussionModule(DiscussionFields, XModule):
             'course': self.get_course(),
         }
         if getattr(self.system, 'is_author_mode', False):
-            template = 'discussion/_discussion_module_studio.html'
+            template = '/discussion/_discussion_inline_studio.html'
         else:
-            template = 'discussion/_discussion_module.html'
+            template = '/discussion/_discussion_inline.html'
         return self.system.render_template(template, context)
 
     def get_course(self):

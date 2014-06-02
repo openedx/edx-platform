@@ -58,6 +58,7 @@
   <%static:css group='style-app'/>
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
+  <%static:css group='style-discussion-app'/>
 
   <%static:js group='main_vendor'/>
 
@@ -119,6 +120,7 @@
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
+  <%include file="mathjax_include.html" />
   <%include file="mathjax_accessible.html" />
 
   <%include file="${header_file}" />

@@ -1,8 +1,31 @@
 // forums - main app styling
 // ====================
-body.discussion {
+body.discussion, .discussion-course {
 
-  .course-tabs .right {
+  // new post creation
+  .new-post-form-errors {
+    display: none;
+    background: $error-red;
+    padding: 0;
+    border: 1px solid $dark-gray;
+    list-style: none;
+    color: $white;
+    line-height: 1.6;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
+
+    li {
+      padding: ($baseline/2) $baseline 12px 45px;
+      border-bottom: 1px solid #dc4949;
+      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .course-tabs .right, .discussion-course-new.right {
     float: right;
 
     .new-post-btn {
@@ -109,7 +132,7 @@ body.discussion {
   }
 
   .wmd-panel {
-    min-width: 500px;
+    min-width: 425px;
     width: 100%;
   }
 
@@ -224,13 +247,27 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
+.container .discussion-body, .discussion-module, .discussion-course {
   @include clearfix;
   display: block;
   border: none;
   background: transparent;
   box-shadow: none;
   line-height: 1.4;
+
+  .sidebar ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .sr {
+    @extend %text-sr;
+  }
+
+  .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px;
+  }
 
   .bottom-post-status {
     padding: 30px;

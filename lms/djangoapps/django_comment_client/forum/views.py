@@ -13,7 +13,7 @@ import newrelic.agent
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, get_cohorted_threads_privacy,
-                                   get_course_cohorts, get_cohort_by_id)
+                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -229,6 +229,7 @@ def forum_form_discussion(request, course_id):
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id, # read from container in NewPostView
+            'cohorted_commentables': (get_cohorted_commentables(course_id)),
             'is_course_cohorted': is_course_cohorted(course_id),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
@@ -319,7 +320,12 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': _attr_safe_json(course_settings),
+            'cohorted_commentables': (get_cohorted_commentables(course_id)),
+            'has_permission_to_create_thread': cached_has_permission(request.user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(request.user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(request.user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(request.user, "openclose_thread", course_id)
         }
         return render_to_response('discussion/index.html', context)
 
