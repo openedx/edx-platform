@@ -24,6 +24,8 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts,
 )
 from courseware.tabs import EnrolledTab
+from course_groups.cohorts import (is_course_cohorted, get_cohort_id, get_cohorted_threads_privacy,
+                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 
@@ -281,8 +283,9 @@ def forum_form_discussion(request, course_key):
             'roles': json.dumps(utils.get_role_ids(course_key)),
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
+            'user_cohort': user_cohort_id, # read from container in NewPostView
+            'cohorted_commentables': (get_cohorted_commentables(course_key)),
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': json.dumps(course_settings),
@@ -401,6 +404,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': json.dumps(course_settings),
+            'cohorted_commentables': (get_cohorted_commentables(course_id)),
+            'has_permission_to_create_thread': cached_has_permission(request.user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(request.user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(request.user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(request.user, "openclose_thread", course_id),
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }

@@ -1,11 +1,44 @@
 // forums - main app styling
 // ====================
-// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
+body.discussion, .discussion-course {
 
-body.discussion {
+  // new post creation
+  .new-post-form-errors {
+    display: none;
+    background: $error-red;
+    padding: 0;
+    border: 1px solid $dark-gray;
+    list-style: none;
+    color: $white;
+    line-height: 1.6;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
 
-  .course-tabs .right {
+    li {
+      padding: ($baseline/2) $baseline 12px 45px;
+      border-bottom: 1px solid #dc4949;
+      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .course-tabs .right, .discussion-course-new.right {
     @include float(right);
+
+    .new-post-btn {
+      @include blue-button;
+      @include margin-right(4px);
+    }
+
+    .new-post-icon {
+      @include margin-right(7px);
+      font-size: 16px;
+      vertical-align: middle;
+      color: $white;
+    }
   }
 
   .edit-post-form {
@@ -99,6 +132,7 @@ body.discussion {
   }
 
   .wmd-panel {
+    min-width: 425px;
     width: 100%;
   }
 
@@ -211,13 +245,27 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
-  @include clearfix();
+.container .discussion-body, .discussion-module, .discussion-course {
+  @include clearfix;
   display: block;
   border: none;
   background: transparent;
   box-shadow: none;
   line-height: 1.4;
+
+  .sidebar ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .sr {
+    @extend %text-sr;
+  }
+
+  .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px;
+  }
 
   .bottom-post-status {
     padding: 30px;

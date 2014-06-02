@@ -15,6 +15,9 @@ from django.core.urlresolvers import reverse
 <%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
 <%include file="_js_head_dependencies.html" />
 </%block>
 
@@ -56,3 +59,5 @@ from django.core.urlresolvers import reverse
 
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />
+<%include file="/discussion/_discussion_course.html" />
+

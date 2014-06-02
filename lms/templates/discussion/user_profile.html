@@ -11,12 +11,10 @@ from django.template.defaultfilters import escapejs
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
-
-<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+<%include file="/discussion/_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
@@ -28,7 +26,7 @@ from django.template.defaultfilters import escapejs
       <nav aria-label="${_('User Profile')}">
 
         <article class="sidebar-module discussion-sidebar">
-          <%include file="_user_profile.html" />
+          <%include file="/discussion/_user_profile.html" />
         </article>
 
       </nav>
@@ -37,4 +35,4 @@ from django.template.defaultfilters import escapejs
   </div>
 </section>
 
-<%include file="_underscore_templates.html" />
+<%include file="/discussion/_underscore_templates.html" />
