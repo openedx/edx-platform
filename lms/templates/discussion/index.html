@@ -12,26 +12,13 @@
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
-
-<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+<%include file="/discussion/_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<%include file="_new_post.html" />
-
-<section class="discussion container" id="discussion-container" data-roles="${roles}" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}" data-thread-pages="${thread_pages}" data-content-info="${annotated_content_info}" data-sort-preference="${sort_preference}" data-flag-moderator="${flag_moderator}">
-    <div class="discussion-body">
-        <div class="sidebar"></div>
-        <div class="discussion-column">
-        </div>
-    </div>
-</section>
-
-<%include file="_underscore_templates.html" />
-<%include file="_thread_list_template.html" />
+<%include file="/discussion/_discussion_course.html" />

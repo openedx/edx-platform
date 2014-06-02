@@ -318,6 +318,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables,
             'sort_preference': cc_user.default_sort_key,
+            'has_permission_to_create_thread': cached_has_permission(request.user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(request.user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(request.user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(request.user, "openclose_thread", course_id)
         }
         return render_to_response('discussion/index.html', context)
 
