@@ -8,11 +8,12 @@ from glob import glob
 from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 
 

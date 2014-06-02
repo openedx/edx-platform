@@ -4,8 +4,8 @@ from django import forms
 
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class CourseModeForm(forms.ModelForm):

@@ -8,7 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions
 from xmodule.annotator_token import retrieve_token
-
+from xblock.fragment import Fragment
 import textwrap
 
 # Make '_' a no-op so we can scrape strings
@@ -33,7 +33,7 @@ class AnnotatableFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Text Annotation',
+        default=_('Text Annotation'),
     )
     instructor_tags = String(
         display_name=_("Tags for Assignments"),
@@ -47,8 +47,24 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='None',
     )
-    annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
-    annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
+    annotation_storage_url = String(
+        help=_("Location of Annotation backend"),
+        scope=Scope.settings,
+        default="http://your_annotation_storage.com",
+        display_name=_("Url for Annotation Storage"),
+    )
+    annotation_token_secret = String(
+        help=_("Secret string for annotation storage"),
+        scope=Scope.settings,
+        default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        display_name=_("Secret Token String for Annotation"),
+    )
+    diacritics = String(
+        display_name=_("Diacritic Marks"),
+        help=_("Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"),
+        scope=Scope.settings,
+        default='',
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -73,7 +89,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'course_key': self.runtime.course_id,
@@ -84,8 +100,12 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
         }
-        return self.system.render_template('textannotation.html', context)
+        fragment = Fragment(self.system.render_template('textannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):

@@ -34,13 +34,13 @@ from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
@@ -67,12 +67,15 @@ class AnonymousUserId(models.Model):
     unique_together = (user, course_id)
 
 
-def anonymous_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id, save=True):
     """
     Return a unique id for a (user, course) pair, suitable for inserting
     into e.g. personalized survey links.
 
     If user is an `AnonymousUser`, returns `None`
+
+    Keyword arguments:
+    save -- Whether the id should be saved in an AnonymousUserId object.
     """
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     if user.is_anonymous():
@@ -89,6 +92,14 @@ def anonymous_id_for_user(user, course_id):
     if course_id:
         hasher.update(course_id.to_deprecated_string())
     digest = hasher.hexdigest()
+
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}  # pylint: disable=protected-access
+
+    user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
+
+    if save is False:
+        return digest
 
     try:
         anonymous_user_id, __ = AnonymousUserId.objects.get_or_create(
@@ -110,11 +121,6 @@ def anonymous_id_for_user(user, course_id):
         # Another thread has already created this entry, so
         # continue
         pass
-
-    if not hasattr(user, '_anonymous_id'):
-        user._anonymous_id = {}
-
-    user._anonymous_id[course_id] = digest
 
     return digest
 
@@ -263,14 +269,17 @@ class UserProfile(models.Model):
         self.save()
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, save=True):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
+
+    Keyword arguments:
+    save -- Whether the id should be saved in an AnonymousUserId object.
     """
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
-    return anonymous_id_for_user(user, None)
+    return anonymous_id_for_user(user, None, save=save)
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly

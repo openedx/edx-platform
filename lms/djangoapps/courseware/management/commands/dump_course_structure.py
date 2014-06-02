@@ -26,7 +26,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata, compute_inherited_metadata
 from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 FILTER_LIST = ['xml_attributes', 'checklists']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes', 'checklists']

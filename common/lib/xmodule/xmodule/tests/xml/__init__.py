@@ -8,7 +8,7 @@ from unittest import TestCase
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.xml import create_block_from_xml, CourseLocationGenerator
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 

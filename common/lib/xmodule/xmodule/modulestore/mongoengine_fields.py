@@ -2,9 +2,9 @@
 Custom field types for mongoengine
 """
 import mongoengine
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from types import NoneType
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class CourseKeyField(mongoengine.StringField):

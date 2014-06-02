@@ -54,9 +54,20 @@ class VerticalModuleTestCase(BaseVerticalModuleTest):
         """
         Test the rendering of the Studio view
         """
+        # Vertical shouldn't render children on the unit page
+        context = {
+            'runtime_type': 'studio',
+            'container_view': False,
+        }
+        html = self.module_system.render(self.vertical, 'student_view', context).content
+        self.assertNotIn(self.test_html_1, html)
+        self.assertNotIn(self.test_html_2, html)
+
+        # Vertical should render reorderable children on the container page
         reorderable_items = set()
         context = {
             'runtime_type': 'studio',
+            'container_view': True,
             'reorderable_items': reorderable_items,
         }
         html = self.module_system.render(self.vertical, 'student_view', context).content

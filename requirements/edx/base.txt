@@ -4,8 +4,6 @@
 #   * @jtauber - to check licensing
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
--r repo.txt
-
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
@@ -47,6 +45,7 @@ Markdown==2.2.1
 mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
+nose==1.3.3
 oauthlib==0.5.1
 paramiko==1.9.0
 path.py==3.0.1

@@ -11,7 +11,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                     getDragHandle, dragComponentVertically, dragComponentAbove,
                     verifyRequest, verifyNumReorderCalls, respondToRequest, notificationSpy,
 
-                    rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
+                    rootLocator = 'locator-container',
                     containerTestUrl = '/xblock/' + rootLocator,
 
                     groupAUrl = "/xblock/locator-group-A",

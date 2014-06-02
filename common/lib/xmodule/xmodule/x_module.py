@@ -18,12 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.runtime import Runtime
+from xblock.runtime import Runtime, IdReader
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -31,6 +31,33 @@ from dogapi import dog_stats_api
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
+
+
+class OpaqueKeyReader(IdReader):
+    """
+    IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
+    """
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
+
+        Args:
+            usage_id: The id of the usage to query
+
+        Returns:
+            The `definition_id` the usage is derived from
+        """
+        return usage_id.definition_key
+
+    def get_block_type(self, def_id):
+        """Retrieve the block_type of a particular definition
+
+        Args:
+            def_id: The id of the definition to query
+
+        Returns:
+            The `block_type` of the definition
+        """
+        return def_id.block_type
 
 
 def dummy_track(_event_type, _event):
@@ -208,6 +235,29 @@ class XModuleMixin(XBlockMixin):
             if (field.scope == scope and field.is_set_on(self)):
                 result[field.name] = field.read_json(self)
         return result
+
+    def has_children_at_depth(self, depth):
+        """
+        Returns true if self has children at the given depth. depth==0 returns
+        false if self is a leaf, true otherwise.
+
+                           SELF
+                            |
+                     [child at depth 0]
+                     /           \
+                 [depth 1]    [depth 1]
+                 /       \
+           [depth 2]   [depth 2]
+
+        So the example above would return True for `has_children_at_depth(2)`, and False
+        for depth > 2
+        """
+        if depth < 0:
+            raise ValueError("negative depth argument is invalid")
+        elif depth == 0:
+            return bool(self.get_children())
+        else:
+            return any(child.has_children_at_depth(depth - 1) for child in self.get_children())
 
     def get_content_titles(self):
         """
@@ -756,9 +806,12 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Can be limited by extending `non_editable_metadata_fields`.
         """
         def jsonify_value(field, json_choice):
-            if isinstance(json_choice, dict) and 'value' in json_choice:
+            if isinstance(json_choice, dict):
                 json_choice = dict(json_choice)  # make a copy so below doesn't change the original
-                json_choice['value'] = field.to_json(json_choice['value'])
+                if 'display_name' in json_choice:
+                    json_choice['display_name'] = get_text(json_choice['display_name'])
+                if 'value' in json_choice:
+                    json_choice['value'] = field.to_json(json_choice['value'])
             else:
                 json_choice = field.to_json(json_choice)
             return json_choice

@@ -430,6 +430,7 @@ class LoncapaResponse(object):
 
 #-----------------------------------------------------------------------------
 
+
 @registry.register
 class JavascriptResponse(LoncapaResponse):
     """
@@ -543,7 +544,9 @@ class JavascriptResponse(LoncapaResponse):
         # Node.js code is un-sandboxed. If the LoncapaSystem says we aren't
         # allowed to run unsafe code, then stop now.
         if not self.capa_system.can_execute_unsafe_code():
-            raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
+            _ = self.capa_system.i18n.ugettext
+            msg = _("Execution of unsafe Javascript code is not allowed.")
+            raise LoncapaProblemError(msg)
 
         subprocess_args = ["node"]
         subprocess_args.extend(args)
@@ -780,19 +783,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         for response in self.xml.xpath("choicegroup"):
             # Is Masking enabled? -- check for shuffle or answer-pool features
             ans_str = response.get("answer-pool")
-            if response.get("shuffle") == "true" or (ans_str is not None and ans_str != "0"):
-                self._has_mask = True  # pylint: disable=W0201
-                self._mask_dict = {}   # pylint: disable=W0201
-                # We do not want the random mask names to be the same
-                # for all responses in a problem (sharing the one seed),
-                # like mask_2 in view-source turns out to always be the correct choice.
-                # But it must be repeatable and a function of the seed.
-                # Therefore we add the _1 number from the .id to the seed.
-                seed_delta = int(self.id[self.id.rindex("_") + 1:])
-                rng = random.Random(self.context["seed"] + seed_delta)
-                # e.g. mask_ids = [3, 1, 0, 2]
-                mask_ids = range(len(response))
-                rng.shuffle(mask_ids)
+            # Masking (self._has_mask) is off, to be re-enabled with a future PR.
             rtype = response.get('type')
             if rtype not in ["MultipleChoice"]:
                 # force choicegroup to be MultipleChoice if not valid
@@ -853,11 +844,11 @@ class MultipleChoiceResponse(LoncapaResponse):
         """
         Returns a list of the choice names in the order displayed to the user,
         using the regular (non-masked) names.
-        Fails with LoncapaProblemError if called on a response that is not masking.
         """
+        # With masking disabled, this computation remains interesting to see
+        # the displayed order, even though there is no unmasking.
         choices = self.xml.xpath('choicegroup/choice')
-        # We let the unmask_name() raise the error for us if this response is not masking.
-        return [self.unmask_name(choice.get("name")) for choice in choices]
+        return [choice.get("name") for choice in choices]
 
     def do_shuffle(self, tree, problem):
         """
@@ -1523,7 +1514,7 @@ class CustomResponse(LoncapaResponse):
             submission = [student_answers[k] for k in idset]
         except Exception as err:
             msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
-                message= _("error getting student answer from {student_answers}").format(student_answers=student_answers),
+                message=_("error getting student answer from {student_answers}").format(student_answers=student_answers),
                 idset=idset,
                 err=err
             )
@@ -1876,11 +1867,18 @@ class CodeResponse(LoncapaResponse):
             self.answer (an answer to display to the student in the LMS)
             self.payload
         """
-        # Note that CodeResponse is agnostic to the specific contents of
-        # grader_payload
         grader_payload = codeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
-        self.payload = {'grader_payload': grader_payload}
+        self.payload = {
+            'grader_payload': grader_payload,
+        }
+
+        # matlab api key can be defined in course settings. if so, add it to the grader payload
+        api_key = getattr(self.capa_system, 'matlab_api_key', None)
+        if self.xml.find('matlabinput') and api_key:
+            self.payload['token'] = api_key
+            self.payload['endpoint_version'] = "2"
+            self.payload['requestor_id'] = self.capa_system.anonymous_student_id
 
         self.initial_display = find_with_default(
             codeparam, 'initial_display', '')
@@ -1905,7 +1903,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_(u'Error checking problem: no external queueing server is configured.'))
+                     msg=_(u'Error: No grader has been set up for this problem.'))
             return cmap
 
         # Prepare xqueue request
@@ -2554,6 +2552,7 @@ class ImageResponse(LoncapaResponse):
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
     def get_score(self, student_answers):
+        _ = self.capa_system.i18n.ugettext
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
         for aid in self.answer_ids:  # loop through IDs of <imageinput>
@@ -2565,8 +2564,12 @@ class ImageResponse(LoncapaResponse):
             # Parse given answer
             acoords = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not acoords:
-                raise Exception('[capamodule.capa.responsetypes.imageinput] '
-                                'error grading {0} (input={1})'.format(aid, given))
+                msg = _('error grading {image_input_id} (input={user_input})').format(
+                    image_input_id=aid,
+                    user_input=given
+                )
+                raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+
             (ans_x, ans_y) = [int(x) for x in acoords.groups()]
 
             rectangles, regions = expectedset
@@ -2581,10 +2584,12 @@ class ImageResponse(LoncapaResponse):
                         r'[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
                         solution_rectangle.strip().replace(' ', ''))
                     if not sr_coords:
-                        msg = 'Error in problem specification! cannot parse rectangle in %s' % (
-                            etree.tostring(self.ielements[aid], pretty_print=True))
-                        raise Exception(
-                            '[capamodule.capa.responsetypes.imageinput] ' + msg)
+                        # Translators: {sr_coords} are the coordinates of a rectangle
+                        msg = _('Error in problem specification! Cannot parse rectangle in {sr_coords}').format(
+                            sr_coords=etree.tostring(self.ielements[aid], pretty_print=True)
+                        )
+                        raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+
                     (llx, lly, urx, ury) = [int(x) for x in sr_coords.groups()]
 
                     # answer is correct if (x,y) is within the specified
@@ -2632,7 +2637,7 @@ class ImageResponse(LoncapaResponse):
         Input:
             None
         Returns:
-            dict (str, (str, str)) - a map of inputs to a tuple of their rectange
+            dict (str, (str, str)) - a map of inputs to a tuple of their rectangle
                 and their regions
         """
         answers = {}
@@ -2804,11 +2809,13 @@ class ChoiceTextResponse(LoncapaResponse):
         and `answer_values` is used for displaying correct answers.
 
         """
+        _ = self.capa_system.i18n.ugettext
         context = self.context
         self.answer_values = {self.answer_id: []}
         self.assign_choice_names()
         correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                      id=self.xml.get('id'))
+
         for node in correct_xml:
             # For each correct choice, set the `parent_name` to the
             # current choice's name
@@ -2826,7 +2833,7 @@ class ChoiceTextResponse(LoncapaResponse):
                     # If the question creator does not specify an answer for a
                     # <numtolerance_input> inside of a correct choice, raise an error
                     raise LoncapaProblemError(
-                        "Answer not provided for numtolerance_input"
+                        _("Answer not provided for {input_type}").format(input_type="numtolerance_input")
                     )
                 # Contextualize the answer to allow script generated answers.
                 answer = contextualize_text(answer, context)

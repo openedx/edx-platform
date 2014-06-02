@@ -601,7 +601,6 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'queued')
 
 
@@ -612,7 +611,6 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'unsubmitted')
         self.assertEqual(the_input.msg, 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT))
 
@@ -625,9 +623,24 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'unsubmitted')
 
+    def test_matlab_api_key(self):
+        """
+        Test that api_key ends up in the xqueue payload
+        """
+        elt = etree.fromstring(self.xml)
+        system = test_capa_system()
+        system.matlab_api_key = 'test_api_key'
+        the_input = lookup_tag('matlabinput')(system, elt, {})
+
+        data = {'submission': 'x = 1234;'}
+        response = the_input.handle_ajax("plot", data)
+
+        body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
+        payload = json.loads(body)
+        self.assertEqual('test_api_key', payload['token'])
+        self.assertEqual('2', payload['endpoint_version'])
 
     def test_get_html(self):
         # usual output
@@ -714,6 +727,35 @@ class MatlabTest(unittest.TestCase):
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
 
+    def test_matlab_queue_message_allowed_tags(self):
+        """
+        Test allowed tags.
+        """
+        allowed_tags = ['div', 'p', 'audio', 'pre', 'span']
+        for tag in allowed_tags:
+            queue_msg = "<{0}>Test message</{0}>".format(tag)
+            state = {
+                'input_state': {'queue_msg': queue_msg},
+                'status': 'queued',
+            }
+            elt = etree.fromstring(self.xml)
+            the_input = self.input_class(test_capa_system(), elt, state)
+            self.assertEqual(the_input.queue_msg, queue_msg)
+
+    def test_matlab_queue_message_not_allowed_tag(self):
+        """
+        Test not allowed tag.
+        """
+        not_allowed_tag = 'script'
+        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        state = {
+            'input_state': {'queue_msg': queue_msg},
+            'status': 'queued',
+        }
+        elt = etree.fromstring(self.xml)
+        the_input = self.input_class(test_capa_system(), elt, state)
+        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        self.assertEqual(the_input.queue_msg, expected)
 
 def html_tree_equal(received, expected):
     """

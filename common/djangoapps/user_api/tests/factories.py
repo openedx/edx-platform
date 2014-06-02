@@ -3,7 +3,7 @@ from factory.django import DjangoModelFactory
 from factory import SubFactory
 from student.tests.factories import UserFactory
 from user_api.models import UserPreference, UserCourseTag
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111

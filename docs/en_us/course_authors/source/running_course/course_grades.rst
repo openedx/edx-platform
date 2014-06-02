@@ -36,13 +36,13 @@ You can review the assignment types that are graded and their respective weights
 
 You establish a grading policy for your course when you create it in Studio. While the course is running, you can view an XML representation of the assignment types in your course and how they are weighted to determine students' grades.
 
+..  DOC-290: research this statement before including anything like it: Below the list of graded assignment types and their weights, each *public* subsection and unit that contains an assignment is listed.
+
 #. View the live version of your course.
 
 #. Click **Instructor**, then click **Data Download** > **Grading Configuration**.
 
    A list of the assignment types in your course displays. In this example, Homework is weighted as 0.3 (30%) of the grade. 
-
-..  DOC-290: research this statement before including anything like it: Below the list of graded assignment types and their weights, each *public* subsection and unit that contains an assignment is listed.
 
    .. image:: ../Images/Grading_Configuration.png
      :alt: XML of course assignment types and weights for grading
@@ -236,11 +236,12 @@ either:
   zero so that the student can try again. See :ref:`reset_attempts`.
 
 You can make these adjustments for a single student or for all of the students
-enrolled in your course. To make an adjustment for all students, you need the unique identifier of the problem. See :ref:`find_URL`.
+enrolled in your course. To make an adjustment, you need the unique location
+identifier of the problem. See :ref:`find_URL`.
 
 Another grade adjustment technique is to delete a student's database history, or
 "state", completely for a problem. You can only delete student state for
-individual students. For example, you realize that a problem needs to be
+one student at a time. For example, you realize that a problem needs to be
 rewritten after only a few of your students have answered it. To resolve this
 situation, you rewrite the problem and then delete student state for the
 affected students only so that they can try again. See :ref:`delete_state`.
@@ -248,27 +249,28 @@ affected students only so that they can try again. See :ref:`delete_state`.
 .. _find_URL:
 
 ==================================================
-Find the Unique Identifier for a Problem
+Find the Unique Location Identifier for a Problem
 ==================================================
 
-When you create each of the problems for a course, edX assigns a unique identifier. To make grading adjustments for a problem, or to view data about it, you need to specify this identifier.
+When you create each of the problems for a course, edX assigns a unique location
+to it. To make grading adjustments for a problem, or to view data about it, you
+need to specify the problem location.
 
-To find the unique identifier in the URL for a problem:
+To find the unique location identifier for a problem:
 
 #. View the live version of your course.
 
-#. Click **Courseware** and navigate to the component that contains the problem you want to review.
+#. Click **Courseware** and navigate to the unit that contains the problem.
 
-#. Display the problem, and click **Staff Debug Info**.
+#. Display the problem and then click **Staff Debug Info**.
 
-   Information about the problem displays, including its location or URL. This URL ends with the type of module, which is typically "problem", and the unique identifier. 
+   Information about the problem displays, including its **location**. 
 
    .. image:: ../Images/Problem_URL.png
-      :alt: The Staff Debug view of a problem with the unique identifier indicated at the end of a URL address
+      :alt: The Staff Debug view of a problem with the location identifier indicated
 
-4. To copy the identifier for the problem, select it, right click, and choose **Copy**.
-
-.. note:: If the URL does not include "problem/" before the identifier, you will need to specify that module identifier as well. Select and copy both the module identifier and the problem identifier.
+4. To copy the location of the problem, select the entire location, right click,
+   and choose **Copy**.
 
 To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
@@ -310,14 +312,15 @@ email address.
 Rescore Submissions for All Students
 ------------------------------------
 
-To specify the problem you want to rescore, you need its unique identifier. See :ref:`find_URL`. To rescore a problem:
+To specify the problem you want to rescore, you need its location identifier.
+See :ref:`find_URL`. To rescore a problem:
 
 #. View the live version of your course.
 
 #. Click **Instructor**, then click **Student Admin**. 
 
 #. In the **Course-Specific Grade Adjustment** section of the page, enter the
-   unique problem identifier, and then click **Rescore ALL students' problem
+   unique problem location, and then click **Rescore ALL students' problem
    submissions**.
 
 #. When you see a dialog box that notifies you that the rescore process is in
@@ -378,7 +381,7 @@ attempts for all students:
 
 #. To reset the number of attempts for all enrolled students, you work in the
    **Course-Specific Grade Adjustment** section of the page. Enter the unique
-   problem identifier, then click **Reset ALL students' attempts**.
+   problem location, then click **Reset ALL students' attempts**.
 
 #. A dialog opens to indicate that the reset process is in progress. Click **OK**. 
 

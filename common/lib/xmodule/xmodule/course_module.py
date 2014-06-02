@@ -8,7 +8,7 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import UserPartition
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
@@ -17,7 +17,7 @@ import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
-from xmodule.modulestore.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)

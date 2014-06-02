@@ -9,8 +9,12 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions, html_to_text
 from xmodule.annotator_token import retrieve_token
+from xblock.fragment import Fragment
 
 import textwrap
+
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 
 class AnnotatableFields(object):
@@ -36,28 +40,28 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Image Annotation',
+        default=_('Image Annotation'),
     )
     instructor_tags = String(
-        display_name="Tags for Assignments",
-        help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
+        display_name=_("Tags for Assignments"),
+        help=_("Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue"),
         scope=Scope.settings,
         default='professor:green,teachingAssistant:blue',
     )
     annotation_storage_url = String(
-        help="Location of Annotation backend",
+        help=_("Location of Annotation backend"),
         scope=Scope.settings,
         default="http://your_annotation_storage.com",
-        display_name="Url for Annotation Storage"
+        display_name=_("Url for Annotation Storage")
     )
     annotation_token_secret = String(
-        help="Secret string for annotation storage",
+        help=_("Secret string for annotation storage"),
         scope=Scope.settings,
         default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        display_name="Secret Token String for Annotation"
+        display_name=_("Secret Token String for Annotation")
     )
 
 
@@ -91,7 +95,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
@@ -102,7 +106,10 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             'openseadragonjson': self.openseadragonjson,
         }
 
-        return self.system.render_template('imageannotation.html', context)
+        fragment = Fragment(self.system.render_template('imageannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=abstract-method

@@ -13,7 +13,7 @@ from mock import Mock, MagicMock, patch
 from celery.states import SUCCESS, FAILURE
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locations import i4xEncoder
+from opaque_keys.edx.locations import i4xEncoder
 
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory

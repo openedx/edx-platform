@@ -18,7 +18,7 @@ from path import path
 from warnings import filterwarnings
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (WIKI_ENABLED)
+from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME)
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -187,9 +187,6 @@ PASSWORD_HASHERS = (
 
 # dummy segment-io key
 SEGMENT_IO_KEY = '***REMOVED***'
-
-# disable NPS survey in test mode
-FEATURES['STUDIO_NPS_SURVEY'] = False
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 

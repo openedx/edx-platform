@@ -12,13 +12,42 @@
   .mast {
     border-bottom: none;
     padding-bottom: 0;
+
+    .page-header {
+      @extend %t-title;
+      @include font-size(28);
+      @include line-height(32);
+
+      .subtitle .navigation-link {
+        color: $gray;
+
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
   }
 
   .wrapper-mast .mast.has-navigation .nav-actions {
-    bottom: -($baseline*.75);
 
-    .nav-item .button {
+    .nav-item {
 
+      .edit-button {
+        @include blue-button;
+        @extend %t-action4;
+        padding: ($baseline/4) ($baseline/2);
+        text-align: center;
+
+        .action-button-text {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        [class^="icon-"] {
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
     }
   }
 
@@ -140,6 +169,10 @@ body.view-container .content-primary {
       }
 
       .xblock-header {
+        display: block;
+      }
+
+      .xblock-header-primary {
         @include ui-flexbox();
         margin-bottom: 0;
         border-bottom: none;
@@ -168,6 +201,10 @@ body.view-container .content-primary {
       }
 
       .xblock-header {
+        display: block;
+      }
+
+      .xblock-header-primary {
         display: flex;
         margin-bottom: 0;
         border-bottom: 1px solid $gray-l4;
@@ -183,7 +220,7 @@ body.view-container .content-primary {
       // STATE: xBlock containers styled as rows.
       &.xblock-type-container {
 
-        .xblock-header {
+        .xblock-header-primary {
           margin-bottom: 0;
           border-bottom: 0;
           border-radius: ($baseline/5);

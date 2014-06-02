@@ -37,6 +37,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from urlparse import urlparse
 
+
 def get_ext(filename):
     # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
     path = urlparse(filename).path
@@ -71,6 +72,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/00_video_storage.js'),
             resource_string(module, 'js/src/video/00_resizer.js'),
             resource_string(module, 'js/src/video/00_async_process.js'),
+            resource_string(module, 'js/src/video/00_i18n.js'),
             resource_string(module, 'js/src/video/00_sjson.js'),
             resource_string(module, 'js/src/video/00_iterator.js'),
             resource_string(module, 'js/src/video/01_initialize.js'),

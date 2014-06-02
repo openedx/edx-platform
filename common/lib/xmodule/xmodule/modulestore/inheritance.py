@@ -86,7 +86,15 @@ class InheritanceMixin(XBlockMixin):
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-
+    matlab_api_key = String(
+        display_name="Matlab API key",
+        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+             "This key is granted for exclusive use by this course for the specified duration. "
+             "Please do not share the API key with other courses and notify MathWorks immediately "
+             "if you believe the key is exposed or compromised. To obtain a key for your course, "
+             "or to report and issue, please contact moocsupport@mathworks.com",
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

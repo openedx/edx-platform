@@ -30,7 +30,7 @@ from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from opaque_keys import InvalidKeyError
@@ -79,7 +79,7 @@ from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
-from xmodule.modulestore.locations import i4xEncoder
+from opaque_keys.edx.locations import i4xEncoder
 
 log = logging.getLogger(__name__)
 
@@ -691,8 +691,8 @@ def instructor_dashboard(request, course_id):
             courseenrollment__course_id=course_key,
         ).order_by('id')
 
-        datatable = {'header': ['User ID', 'Anonymized user ID', 'Course Specific Anonymized user ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)] for s in students]
+        datatable = {'header': ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']}
+        datatable['data'] = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_key, save=False)] for s in students]
         return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
@@ -813,7 +813,8 @@ def instructor_dashboard(request, course_id):
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
         email_students = bool(request.POST.get('email_students'))
-        ret = _do_enroll_students(course, course_key, students, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
+        secure = request.is_secure()
+        ret = _do_enroll_students(course, course_key, students, secure=secure, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
         datatable = ret['datatable']
 
     elif action == 'Unenroll multiple students':
@@ -839,7 +840,8 @@ def instructor_dashboard(request, course_id):
         if not 'List' in action:
             students = ','.join([x['email'] for x in datatable['retdata']])
             overload = 'Overload' in action
-            ret = _do_enroll_students(course, course_key, students, overload=overload)
+            secure = request.is_secure()
+            ret = _do_enroll_students(course, course_key, students, secure=secure, overload=overload)
             datatable = ret['datatable']
 
     #----------------------------------------
@@ -1423,42 +1425,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 #-----------------------------------------------------------------------------
 
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - only displayed to course staff
-    - shows students who are enrolled.
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # TODO (vshnayder): implement pagination.
-    enrolled_students = enrolled_students[:1000]   # HACK!
-
-    student_info = [{'username': student.username,
-                     'id': student.id,
-                     'email': student.email,
-                     'grade_summary': student_grades(student, request, course),
-                     'realname': student.profile.name,
-                     }
-                    for student in enrolled_students]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
-
+# Gradebook has moved to instructor.api.spoc_gradebook #
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_key):
@@ -1474,7 +1441,7 @@ def grade_summary(request, course_key):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_key, students, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
+def _do_enroll_students(course, course_key, students, secure=False, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """
     Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns
@@ -1503,26 +1470,30 @@ def _do_enroll_students(course, course_key, students, overload=False, auto_enrol
         ceaset.delete()
 
     if email_students:
+        protocol = 'https' if secure else 'http'
         stripped_site_name = microsite.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
-        # TODO: Use request.build_absolute_uri rather than 'https://{}{}'.format
+        # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
         # and check with the Services team that this works well with microsites
-        registration_url = 'https://{}{}'.format(
-            stripped_site_name,
-            reverse('student.views.register_user')
+        registration_url = '{proto}://{site}{path}'.format(
+            proto=protocol,
+            site=stripped_site_name,
+            path=reverse('student.views.register_user')
         )
-        course_url = 'https://{}{}'.format(
-            stripped_site_name,
-            reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
+        course_url = '{proto}://{site}{path}'.format(
+            proto=protocol,
+            site=stripped_site_name,
+            path=reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
         )
         # We can't get the url to the course's About page if the marketing site is enabled.
         course_about_url = None
         if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-            course_about_url = u'https://{}{}'.format(
-                stripped_site_name,
-                reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
+            course_about_url = u'{proto}://{site}{path}'.format(
+                proto=protocol,
+                site=stripped_site_name,
+                path=reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
             )
 
         # Composition of email

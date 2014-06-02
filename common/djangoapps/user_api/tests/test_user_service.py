@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from student.tests.factories import UserFactory
 from user_api import user_service
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class TestUserService(TestCase):

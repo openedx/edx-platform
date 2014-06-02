@@ -12,6 +12,12 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/30/14
+     - Update :ref:`Working with Video Components` to include recommendations to
+       use .mp4 and .webm video formats for browser compatibility
+   * - 05/27/14
+     - Based on the new requirement to specify the complete location identifier
+       of a problem to adjust student grades, revised the :ref:`Grades` section.
    * - 05/22/14
      - Reorganized, updated, and streamlined these sections in the :ref:`Running
        Your Course Index` chapter:

@@ -8,12 +8,13 @@ from webob import Response
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.studio_editable import StudioEditableModule
 from xmodule.x_module import XModule, module_attr
 
 from lxml import etree
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, ReferenceValueDict
+from xblock.fields import Scope, Integer, String, ReferenceValueDict
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
@@ -22,6 +23,13 @@ log = logging.getLogger('edx.' + __name__)
 class SplitTestFields(object):
     """Fields needed for split test module"""
     has_children = True
+
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        default="Experiment Block"
+    )
 
     user_partition_id = Integer(
         help="Which user partition is used for this test",
@@ -45,7 +53,7 @@ class SplitTestFields(object):
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
-class SplitTestModule(SplitTestFields, XModule):
+class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
     API to figure out which child to show.
@@ -177,21 +185,10 @@ class SplitTestModule(SplitTestFields, XModule):
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
         fragment = Fragment()
-        contents = []
-
-        for child in self.descriptor.get_children():
-            rendered_child = self.runtime.get_module(child).render('student_view', context)
-            fragment.add_frag_resources(rendered_child)
-
-            contents.append({
-                'id': child.location.to_deprecated_string(),
-                'content': rendered_child.content
-            })
-
-        fragment.add_content(self.system.render_template('vert_module.html', {
-            'items': contents
-        }))
-
+        # Only render the children when this block is being shown as the container
+        root_xblock = context.get('root_xblock')
+        if root_xblock and root_xblock.location == self.location:
+            self.render_children(context, fragment, can_reorder=False)
         return fragment
 
     def student_view(self, context):
@@ -296,3 +293,11 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([
+            SplitTestDescriptor.due,
+        ])
+        return non_editable_fields

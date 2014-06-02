@@ -148,8 +148,7 @@ function () {
                 this.el = $('#' + el);
 
                 if (this.el.length === 0) {
-                    errorMessage = 'VideoPlayer: Element corresponding to ' +
-                        'the given selector does not found.';
+                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector does not found.');
                     if (window.console && console.log) {
                         console.log(errorMessage);
                     } else {
@@ -216,9 +215,8 @@ function () {
             // video element via jquery (http://bugs.jquery.com/ticket/9174) we
             // create it using native JS.
             this.video = document.createElement('video');
-            errorMessage = gettext('This browser cannot play .mp4, .ogg, or ' +
-                '.webm files. Try using a different browser, such as Google ' +
-                'Chrome.');
+            errorMessage = gettext('This browser cannot play .mp4, .ogg, or .webm files.')
+                         + gettext('Try using a different browser, such as Google Chrome.');
             this.video.innerHTML = _.values(sourceStr).join('') + errorMessage;
 
             // Get the jQuery object, and set the player state to UNSTARTED.

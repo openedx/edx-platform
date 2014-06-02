@@ -1,4 +1,4 @@
-@shard_1
+@shard_1 @requires_stub_lti
 Feature: LMS.LTI component
   As a student, I want to view LTI component in LMS.
 

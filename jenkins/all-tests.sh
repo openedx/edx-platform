@@ -69,6 +69,9 @@ fi
 # Bootstrap Ruby requirements so we can run the tests
 bundle install
 
+# Ensure the Ruby environment contains no stray gems
+bundle clean --force
+
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
 if [ -e $HOME/edx-venv_clean.tar.gz ]; then

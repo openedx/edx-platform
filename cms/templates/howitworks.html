@@ -1,4 +1,5 @@
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "welcome" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.core.urlresolvers import reverse
@@ -15,7 +16,7 @@
     <header>
       ## "edX Studio" should not be translated
       <h1><span class="wrapper-text-welcome">${_('Welcome to')}</span><span class="logo">edX Studio</span></h1>
-      <p class="tagline">${_("Studio helps manage your courses online, so you can focus on teaching them")}</p>
+      <p class="tagline">${_("Studio helps manage your online courses, so you can focus on teaching them")}</p>
     </header>
   </section>
 </div>
@@ -50,7 +51,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Change Your Mind Anytime")}</h4>
-              <p>${_("Draft your outline and build content anywhere. Simple drag and drop tools let your reorganize quickly.")}</p>
+              <p>${_("Draft your outline and build content anywhere. Simple drag and drop tools let you reorganize quickly.")}</p>
             </li>
 
             <li class="proofpoint">
@@ -74,12 +75,12 @@
 
         <div class="copy">
           <h3>${_("Learning is More than Just Lectures")}</h3>
-          <p>${_("Studio lets you weave your content together in a way that reinforces learning &mdash; short video lectures interleaved with exercises and more. Insert videos and author a wide variety of exercise types with just a few clicks.")} </p>
+          <p>${_("Studio lets you weave your content together in a way that reinforces learning. Insert videos, discussions, and a wide variety of exercises with just a few clicks.")} </p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Create Learning Pathways")}</h4>
-              <p>${_("Help your students understand a small interactive piece at a time with multimedia, HTML, and exercises.")}</p>
+              <p>${_("Help your students understand one concept at a time with multimedia, HTML, and exercises.")}</p>
             </li>
 
             <li class="proofpoint">
@@ -89,7 +90,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("A Broad Library of Problem Types")}</h4>
-              <p>${_("It's more than just multiple choice. Studio has nearly a dozen types of problems to challenge your learners.")}</p>
+              <p>${_("It's more than just multiple choice. Studio supports more than a dozen types of problems to challenge your learners.")}</p>
             </li>
           </ul>
         </div>
@@ -113,7 +114,7 @@
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Instant Changes")}</h4>
-              <p>${_("Caught a bug? No problem. When you want, your changes to live when you hit Save.")}</p>
+              <p>${_("Caught a bug? No problem. When you want, your changes go live when you click Save.")}</p>
             </li>
 
             <li class="proofpoint">
