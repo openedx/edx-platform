@@ -55,10 +55,17 @@ You establish a grading policy for your course when you create it in Studio. Whi
 .. _Access_grades:
 
 ********************************************************
-Generate Grades for Enrolled Students
+Generate Grades for Enrolled Students (All Courses)
 ********************************************************
 
-When you initiate calculations to grade student work, a process starts on the edX servers. The complexity of your grading configuration and the number of students enrolled in your course affect how long this process takes. You can download the calculated grades in a CSV (comma-separated values) file when the grading process is complete. You cannot view student grades on the Instructor Dashboard. 
+For any course, you can generate grades and then download a file with the
+resulting calculations. 
+
+When you initiate calculations to grade student work, a process starts on the
+edX servers. The complexity of your grading configuration and the number of
+students enrolled in your course affect how long this process takes. You can
+download the calculated grades in a CSV (comma-separated values) file when the
+grading process is complete. 
 
 To generate grades for the students who are currently enrolled in your course:
 
@@ -68,9 +75,15 @@ To generate grades for the students who are currently enrolled in your course:
 
 #. To start the grading process, click **Generate Grade Report**.
 
-  A status message indicates that the grading process is in progress. This process can take some time to complete, but you can navigate away from this page and do other work while it runs.
+  A status message indicates that the grading process is in progress. This
+  process can take some time to complete, but you can navigate away from this
+  page and do other work while it runs.
 
-4. To track the progress of the grading process, reload the page in your browser and scroll down to the **Pending Instructor Tasks** section. 
+4. To track the progress of the grading process, reload the page in your browser
+   and scroll down to the **Pending Instructor Tasks** section.
+
+For courses with fewer than 200 students enrolled, you also have the option to
+review a student gradebook on the Instructor Dashboard. See :ref:`gradebook`.
 
 ==========================================
 Download Grades for Enrolled Students
@@ -114,6 +127,53 @@ The CSV file contains one row of data for each student, and columns that provide
 * An **{assignment type} Avg** with each student's current average score for that assignment type: for example, HW Avg.
 
 .. note:: The grade reports do not include information about individual questions within the assignments, or include student answer distributions.
+
+.. _gradebook:
+
+********************************************************
+Review Grades for Enrolled Students (Small Courses)
+********************************************************
+
+For courses with enrollments of up to 200 students, you can review a gradebook
+on the Instructor Dashboard. 
+
+#. View the live version of your course.
+
+#. Click **Instructor**, then click **Student Admin**. For courses with fewer
+   than 200 students enrolled, this tab includes a **Student Gradebook**
+   section.
+
+#. Click **View Gradebook**.
+
+  The gradebook displays.
+
+  %%image
+
+The gradebook includes the following features.
+
+* You can click the student username in each row to review that student's
+  **Course Progress** page. See %%.
+
+* There is a column for each **{assignment type} {number}** defined in your
+  grading configuration, with the score a student attained for that specific
+  assignment. 
+
+  The gradebook does not have a scroll bar, but it is draggable: to see columns
+  that are hidden at one side of the grade book, click the gradebook and then
+  drag left or right to reveal those columns.
+
+* For assignment types that include more than one assignment, an **{assignment
+  type} Avg** column displays each student's current average score for that
+  assignment type.
+
+* The **Total** column presents the total score a student has currently attained
+  in the course. This value is expressed as a whole number: a student with a
+  grade of 65 has earned 65% of the credit in the course, and a student with a
+  grade of 100 has earned 100%.
+
+* To filter the number of rows that display, a **Search students** option is
+  available. This option is case-sensitive and limits the rows shown in the
+  gradebook to usernames that match your entry.
 
 .. _check_student_progress:
 
