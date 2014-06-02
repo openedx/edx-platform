@@ -2012,7 +2012,7 @@ def reactivation_email_for_user(user):
     if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
         message_html = render_to_string('emails/html/activation_email.html', d)
 
-    from_address = MicrositeConfiguration.get_microsite_configuration_value(
+    from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -2143,7 +2143,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         message_html = None
         if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
             message_html = render_to_string('emails/html/confirm_email_change.html', address_context)
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )

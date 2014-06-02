@@ -1034,6 +1034,7 @@ def send_mail_to_student(student, param_dict):
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
 
+    message_html = None
     if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
         message_html = render_to_string(html_template, param_dict)
 
