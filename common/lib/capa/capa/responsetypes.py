@@ -430,6 +430,7 @@ class LoncapaResponse(object):
 
 #-----------------------------------------------------------------------------
 
+
 @registry.register
 class JavascriptResponse(LoncapaResponse):
     """
@@ -1525,7 +1526,7 @@ class CustomResponse(LoncapaResponse):
             submission = [student_answers[k] for k in idset]
         except Exception as err:
             msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
-                message= _("error getting student answer from {student_answers}").format(student_answers=student_answers),
+                message=_("error getting student answer from {student_answers}").format(student_answers=student_answers),
                 idset=idset,
                 err=err
             )
@@ -2820,11 +2821,13 @@ class ChoiceTextResponse(LoncapaResponse):
         and `answer_values` is used for displaying correct answers.
 
         """
+        _ = self.capa_system.i18n.ugettext
         context = self.context
         self.answer_values = {self.answer_id: []}
         self.assign_choice_names()
         correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                      id=self.xml.get('id'))
+
         for node in correct_xml:
             # For each correct choice, set the `parent_name` to the
             # current choice's name
@@ -2842,7 +2845,7 @@ class ChoiceTextResponse(LoncapaResponse):
                     # If the question creator does not specify an answer for a
                     # <numtolerance_input> inside of a correct choice, raise an error
                     raise LoncapaProblemError(
-                        "Answer not provided for numtolerance_input"
+                        _("Answer not provided for {input_type}").format(input_type="numtolerance_input")
                     )
                 # Contextualize the answer to allow script generated answers.
                 answer = contextualize_text(answer, context)
