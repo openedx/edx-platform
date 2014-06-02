@@ -99,6 +99,9 @@ def _serialize_content(request, course_id, content):
     if hasattr(content, 'due'):
         data['due'] = content.due
 
+    data['start'] = getattr(content, 'start', None)
+    data['end'] = getattr(content, 'end', None)
+
     return data
 
 

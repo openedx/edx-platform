@@ -1,5 +1,4 @@
 # pylint: disable=E1103
-
 """
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
@@ -42,7 +41,10 @@ class CoursesApiTests(TestCase):
         self.base_users_uri = '/api/users'
         self.test_group_name = 'Alpha Group'
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            start="2014-06-16T14:30:00Z",
+            end="2015-01-16T14:30:00Z"
+        )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
         self.chapter = ItemFactory.create(
@@ -175,6 +177,14 @@ class CoursesApiTests(TestCase):
                 matched_course = True
         self.assertTrue(matched_course)
 
+    def test_course_detail_without_date_values(self):
+        create_course_with_out_date_values = CourseFactory.create()  # pylint: disable=C0103
+        test_uri = self.base_courses_uri + '/' + create_course_with_out_date_values.id
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['start'], create_course_with_out_date_values.start)
+        self.assertEqual(response.data['end'], create_course_with_out_date_values.end)
+
     def test_courses_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id
         response = self.do_get(test_uri)
@@ -182,6 +192,8 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['id'], self.test_course_id)
         self.assertEqual(response.data['name'], self.test_course_name)
+        self.assertEqual(response.data['start'], self.course.start)
+        self.assertEqual(response.data['end'], self.course.end)
         self.assertEqual(response.data['number'], self.test_course_number)
         self.assertEqual(response.data['org'], self.test_course_org)
         confirm_uri = self.test_server_prefix + test_uri
