@@ -124,6 +124,13 @@ class TrackMiddlewareTestCase(TestCase):
             'session': expected_session_key,
         })
 
+    @override_settings(SECRET_KEY='85920908f28904ed733fe576320db18cabd7b6cd')
+    def test_session_key_encryption(self):
+        session_key = '665924b49a93e22b46ee9365abf28c2a'
+        expected_session_key = '3b81f559d14130180065d635a4f35dd2'
+        encrypted_session_key = self.track_middleware.encrypt_session_key(session_key)
+        self.assertEquals(encrypted_session_key, expected_session_key)
+
     def test_request_headers(self):
         ip_address = '10.0.0.0'
         user_agent = 'UnitTest/1.0'
