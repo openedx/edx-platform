@@ -463,6 +463,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         if not len(groups) == len(self.get_children()):
             return _(u"This content experiment is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
 
-        return _(u"This content experiment is part of group configuration'{experiment_name}'.").format(
+        return _(u"This content experiment is part of group configuration '{experiment_name}'.").format(
             experiment_name=user_partition.name
         ), ValidationMessageType.information
