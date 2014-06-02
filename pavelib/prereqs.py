@@ -85,20 +85,22 @@ def prereq_cache(cache_name, paths, install_func):
                 raise
 
         with open(cache_file_path, "w") as cache_file:
-            cache_file.write(new_hash)
-
+            # Since the pip requirement files are modified during the install
+            # process, we need to store the hash generated AFTER the installation
+            post_install_hash = compute_fingerprint(paths)
+            cache_file.write(post_install_hash)
     else:
         print('{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
-def install_ruby_prereqs():
+def ruby_prereqs_installation():
     """
     Installs Ruby prereqs
     """
     sh('bundle install --quiet')
 
 
-def install_node_prereqs():
+def node_prereqs_installation():
     """
     Installs Node prerequisites
     """
@@ -106,13 +108,36 @@ def install_node_prereqs():
     sh('npm install')
 
 
-@task
-def install_python_prereqs():
+def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
     for req_file in PYTHON_REQ_FILES:
         sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
+
+
+@task
+def install_ruby_prereqs():
+    """
+    Installs Ruby prereqs
+    """
+    prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
+
+
+@task
+def install_node_prereqs():
+    """
+    Installs Node prerequisites
+    """
+    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+
+
+@task
+def install_python_prereqs():
+    """
+    Installs Python prerequisites
+    """
+    prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
 
 
 @task
@@ -123,6 +148,6 @@ def install_prereqs():
     if os.environ.get("NO_PREREQ_INSTALL", False):
         return
 
-    prereq_cache("Ruby prereqs", ["Gemfile"], install_ruby_prereqs)
-    prereq_cache("Node prereqs", ["package.json"], install_node_prereqs)
-    prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], install_python_prereqs)
+    install_ruby_prereqs()
+    install_node_prereqs()
+    install_python_prereqs()
