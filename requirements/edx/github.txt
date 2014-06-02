@@ -28,7 +28,7 @@
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2014-06-02T15.45#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@91b7ec93cfb57c6739332e85805296626b4fb1db#egg=opaque-keys
-git+https://github.com/edx/ease.git@ea5770eaba4ce129cb5db8a41662435649ba6d4c#egg=ease
+git+https://github.com/edx/ease.git@a990b25ed4238acb1b15ee6f027465db3a10960e#egg=ease
 
 # Prototype XBlocks for limited roll-outs and user testing. These are not for general use.
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
