@@ -61,7 +61,7 @@ class SplitTestFields(object):
         display_name=_("Display Name"),
         help=_("This name is not shown to students."),
         scope=Scope.settings,
-        default=_("Experiment Block")
+        default=_("Content Experiment")
     )
 
     # Specified here so we can see what the value set at the course-level is.
@@ -72,9 +72,9 @@ class SplitTestFields(object):
     )
 
     user_partition_id = Integer(
-        help=_("The experiment that this block should be included in. Currently this value can only be set once."),
+        help=_("The grouping of users for this content experiment. Currently, this value can only be set once."),
         scope=Scope.content,
-        display_name=_("Experiment"),
+        display_name=_("Experiment Grouping"),
         default=no_partition_selected["value"],
         values=lambda: SplitTestFields.user_partition_values  # Will be populated before the Studio editor is shown.
     )
@@ -453,16 +453,16 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         if self.user_partition_id < 0:
-            return _(u"This experiment block needs to be assigned to an experiment."), ValidationMessageType.warning
+            return _(u"This content experiment needs to be assigned to an experiment grouping."), ValidationMessageType.warning
         user_partition = self._get_selected_partition()
         if not user_partition:
             return \
-                _(u"This experiment block will not be shown to students because it refers to an experiment that has been deleted. You can delete this block or reinstate the experiment to repair it."), \
+                _(u"This content experiment will not be shown to students because it refers to an experiment grouping that has been deleted. You can delete this component or reinstate the experiment grouping to repair it."), \
                 ValidationMessageType.error
         groups = user_partition.groups
         if not len(groups) == len(self.get_children()):
-            return _(u"This experiment block is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
+            return _(u"This content experiment is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
 
-        return _(u"This block is part of experiment {experiment_name}").format(
+        return _(u"This content experiment is part of experiment grouping '{experiment_name}'").format(
             experiment_name=user_partition.name
         ), ValidationMessageType.information

@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%include file="metadata-edit.html" />
 % if disable_user_partition_editing:
 <div class="message setting-message">
-  <p>This block is part of experiment <strong>'${selected_partition.name}'</strong>.</p>
-  <p class="tip setting-help">Selecting a different experiment is not supported at this time.</p>
+  <p>${_("This content experiment is part of experiment grouping {0}.".format("<strong>"+str(selected_partition.name)+"</strong>"))}</p>
+  <p class="tip setting-help">${_("Selecting a different experiment grouping is not supported at this time.")}</p>
 </div>
 % endif
