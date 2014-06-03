@@ -50,7 +50,7 @@ _FIELDS_STORED_IN_SESSION = ['auth_entry']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
 )
-_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
 
 def _merge_auth_info(django_settings, auth_info):
@@ -104,12 +104,12 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.auth_allowed',
         'social.pipeline.social_auth.social_user',
         'social.pipeline.user.get_username',
-        'third_party_auth.pipeline.redirect_to_supplementary_form',
         'social.pipeline.user.create_user',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
         'third_party_auth.pipeline.login_analytics',
+        'third_party_auth.pipeline.create_user_from_oauth',
     )
 
     # We let the user specify their email address during signup.

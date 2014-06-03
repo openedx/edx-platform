@@ -9,6 +9,7 @@ import time
 import json
 from collections import defaultdict
 from pytz import UTC
+from requests import request, ConnectionError
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -26,7 +27,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
 from django.shortcuts import redirect
 from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date, base36_to_int
+from django.utils.http import cookie_date, base36_to_int, urlquote
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
@@ -90,6 +91,7 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
+from social.apps.django_app.default import models
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
 
@@ -335,59 +337,62 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
-    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
-            external_auth.views.ssl_get_cert_from_request(request)):
-        # SSL login doesn't require a view, so redirect
-        # branding and allow that to process the login if it
-        # is enabled and the header is in the request.
-        return external_auth.views.redirect_with_get('root', request.GET)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        # If CAS is enabled, redirect auth handling to there
-        return redirect(reverse('cas-login'))
-    if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
+    if not settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
+                external_auth.views.ssl_get_cert_from_request(request)):
+            # SSL login doesn't require a view, so redirect
+            # branding and allow that to process the login if it
+            # is enabled and the header is in the request.
+            return external_auth.views.redirect_with_get('root', request.GET)
+        if settings.FEATURES.get('AUTH_USE_CAS'):
+            # If CAS is enabled, redirect auth handling to there
+            return redirect(reverse('cas-login'))
+        if request.user.is_authenticated():
+            return redirect(reverse('dashboard'))
 
-    context = {
-        'course_id': request.GET.get('course_id'),
-        'enrollment_action': request.GET.get('enrollment_action'),
-        # Bool injected into JS to submit form if we're inside a running third-
-        # party auth pipeline; distinct from the actual instance of the running
-        # pipeline, if any.
-        'pipeline_running': 'true' if pipeline.running(request) else 'false',
-        'platform_name': microsite.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
-        ),
-    }
+        context = {
+            'course_id': request.GET.get('course_id'),
+            'enrollment_action': request.GET.get('enrollment_action'),
+            # Bool injected into JS to submit form if we're inside a running third-
+            # party auth pipeline; distinct from the actual instance of the running
+            # pipeline, if any.
+            'pipeline_running': 'true' if pipeline.running(request) else 'false',
+            'platform_name': microsite.get_value(
+                'platform_name',
+                settings.PLATFORM_NAME
+            ),
+        }
 
-    return render_to_response('login.html', context)
-
+        return render_to_response('login.html', context)
+    else:
+        return redirect("/auth/login/portal-oauth2/?auth_entry=login")
 
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
     """
     This view will display the non-modal registration form
     """
-    if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
-        # Redirect to branding to process their certificate if SSL is enabled
-        # and registration is disabled.
-        return external_auth.views.redirect_with_get('root', request.GET)
+    if not settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        if request.user.is_authenticated():
+            return redirect(reverse('dashboard'))
+        if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
+            # Redirect to branding to process their certificate if SSL is enabled
+            # and registration is disabled.
+            return external_auth.views.redirect_with_get('root', request.GET)
 
-    context = {
-        'course_id': request.GET.get('course_id'),
-        'email': '',
-        'enrollment_action': request.GET.get('enrollment_action'),
-        'name': '',
-        'running_pipeline': None,
-        'platform_name': microsite.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
-        ),
-        'selected_provider': '',
-        'username': '',
-    }
+        context = {
+            'course_id': request.GET.get('course_id'),
+            'email': '',
+            'enrollment_action': request.GET.get('enrollment_action'),
+            'name': '',
+            'running_pipeline': None,
+            'platform_name': microsite.get_value(
+                'platform_name',
+                settings.PLATFORM_NAME
+            ),
+            'selected_provider': '',
+            'username': '',
+        }
 
     # We save this so, later on, we can determine what course motivated a user's signup
     # if they actually complete the registration process
@@ -396,8 +401,8 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
-        return render_to_response('register-shib.html', context)
+        if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+            return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
     # selected provider.
@@ -409,7 +414,13 @@ def register_user(request, extra_context=None):
         overrides['selected_provider'] = current_provider.NAME
         context.update(overrides)
 
-    return render_to_response('register.html', context)
+        return render_to_response('register.html', context)
+    else:
+        if request.user.is_authenticated():
+            if 'course_id' in request.GET:
+                return redirect("/courses/{0}/about".format(request.GET.get('course_id')))
+        else:
+            return redirect("/auth/login/portal-oauth2/?auth_entry=login&next={0}".format(urlquote(request.get_full_path())))
 
 
 def complete_course_mode_info(course_id, enrollment):
@@ -826,6 +837,12 @@ def _get_course_enrollment_domain(course_id):
 
 @never_cache
 @ensure_csrf_cookie
+def auth_with_no_login(request):
+    return redirect("/auth/login/portal-oauth2/?auth_entry=login&next={0}".format(request.REQUEST.get('next', '')))
+
+
+@never_cache
+@ensure_csrf_cookie
 def accounts_login(request):
     """
     This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
@@ -1075,6 +1092,17 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
+def logout_portal(user_mail):
+    try:
+        user = models.DjangoStorage.user.objects.get(uid=user_mail)
+        response = request('POST', settings.IONISX_AUTH['SYNC_LOGOUT_URL'],
+            params={ 'access_token': user.extra_data['access_token'] })
+    except ConnectionError as err:
+        log.warning(err)
+    except Exception as err:
+        log.warning(err)
+
+
 @ensure_csrf_cookie
 def logout_user(request):
     """
@@ -1084,6 +1112,11 @@ def logout_user(request):
     """
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
+    if isinstance(request.user, AnonymousUser):
+        user_mail = None
+    else:
+        user_mail = request.user.email
+
     logout(request)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
@@ -1094,6 +1127,8 @@ def logout_user(request):
         settings.EDXMKTG_COOKIE_NAME,
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,
     )
+    if user_mail:
+        logout_portal(user_mail)
     return response
 
 
