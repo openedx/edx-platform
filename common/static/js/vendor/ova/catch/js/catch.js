@@ -76,6 +76,17 @@ annotationList:
         '<div class="moreButtonCatch">More</div>'+
     '</div>',
     
+//Main->PublicPrivateInstructor
+annotationPublicPrivateInstructor:
+    '<div class="selectors"><div class="PublicPrivate myNotes active">My Notes<span class="action">myNotes</span></div>'+ 
+    '<div class="PublicPrivate instructor"> Instructor<span class="action">instructor</span></div>'+
+    '<div class="PublicPrivate public"> Public<span class="action">public</span></div></div>'+
+    '<div class="searchbox"><div class="searchinst">Search</div><select class="dropdown-list">'+
+    '<option>Users</option>'+
+    '<option>Tags</option>'+
+    '<option>Annotation Text</option>'+
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">Clear</div></div>',
+    
 //Main->PublicPrivate
 annotationPublicPrivate:
     '<div class="selectors"><div class="PublicPrivate myNotes active">My Notes<span class="action">myNotes</span></div>'+ 
@@ -84,7 +95,7 @@ annotationPublicPrivate:
     '<option>Users</option>'+
     '<option>Tags</option>'+
     '<option>Annotation Text</option>'+
-    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div></div>',
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">Clear</div></div>',
     
 //Main->MediaSelector
 annotationMediaSelector:
@@ -290,14 +301,14 @@ CatchAnnotation = function (element, options) {
     
     //Reset element an create a new element div
     element.html('<div id="mainCatch" class="annotationListContainer"></div>');
-    
+    this.current_tab = this.options.default_tab;
     //INIT
     var self = this;
     $( document ).ready(function() {
         self.init();
         self.refreshCatch(true);
-    var moreBut = self.element.find('.annotationListButtons .moreButtonCatch');
-    moreBut.hide(); 
+        var moreBut = self.element.find('.annotationListButtons .moreButtonCatch');
+        moreBut.hide(); 
     });
     
     return this;
@@ -310,6 +321,7 @@ CatchAnnotation.prototype = {
         this.TEMPLATENAMES = [
             "annotationList", //Main
             "annotationPublicPrivate", //Main->PublicPrivate
+            "annotationPublicPrivateInstructor", //Main->PublicPrivateInstructor
             "annotationMediaSelector", //Main->MediaSelector
             "annotationItem", //Main->ContainerRow
             "annotationReply",//Main->ContainerRow->Reply
@@ -317,8 +329,8 @@ CatchAnnotation.prototype = {
             "annotationDetail",//Main->ContainerRow->DetailRow
         ];
         //annotator
-        var wrapper = $('.annotator-wrapper').parent()[0],
-            annotator = $.data(wrapper, 'annotator');
+        var wrapper = $('.annotator-wrapper').parent()[0];
+        var annotator = $.data(wrapper, 'annotator');
         this.annotator = annotator;
         
         //Subscribe to annotator
@@ -336,6 +348,10 @@ CatchAnnotation.prototype = {
         this.HTMLTEMPLATES = CatchSources.HTMLTEMPLATES(this.options.imageUrlRoot);
         this.TEMPLATES = {};
         this._compileTemplates();
+        if(this.options.default_tab.toLowerCase() == 'instructor'){
+            this.options.userId = this.options.instructor_username;
+            this._refresh('','');
+        }
     },
 //    
 //     GLOBAL UTILITIES
@@ -380,10 +396,18 @@ CatchAnnotation.prototype = {
         
         if (newInstance){
             var videoFormat = (mediaType === "video") ? true:false;
+            var publicprivatetemplate = '';
+            if (self.options.showPublicPrivate) {
+                if(self.options.instructor_username != ''){
+                    publicprivatetemplate = self.TEMPLATES.annotationPublicPrivateInstructor();
+                } else{
+                    publicprivatetemplate = self.TEMPLATES.annotationPublicPrivate();
+                }
+            }
             el.html(self.TEMPLATES.annotationList({ 
                 annotationItems: annotationItems, 
                 videoFormat: videoFormat,
-                PublicPrivate: self.options.showPublicPrivate?self.TEMPLATES.annotationPublicPrivate():'',
+                PublicPrivate: publicprivatetemplate,
                 MediaSelector: self.options.showMediaSelector?self.TEMPLATES.annotationMediaSelector():'',
             }));
         }else{
@@ -402,10 +426,21 @@ CatchAnnotation.prototype = {
         //Set PublicPrivate
         var PublicPrivateButtons = el.find('.annotationListButtons .PublicPrivate').removeClass('active'); //reset
         for (var index=0;index<PublicPrivateButtons.length;index++) {
-            var span = $(PublicPrivateButtons[index]).find('span'),
-                isUser = (typeof self.options.userId!='undefined' && self.options.userId!='' && self.options.userId!=null);
-            if (isUser && span.html()=="myNotes") $(PublicPrivateButtons[index]).addClass('active');
-            else if (!isUser && span.html()=="public") $(PublicPrivateButtons[index]).addClass('active');
+            var span = $(PublicPrivateButtons[index]).find('span');
+            if (span.html().toLowerCase()==self.current_tab.toLowerCase()) {
+                switch (self.current_tab.toLowerCase()){
+                    case 'public':
+                        self.options.userId = '';
+                        break;
+                    case 'instructor':
+                        self.options.userId = this.options.instructor_username;
+                        break;
+                    default:
+                        self.options.userId = this.annotator.plugins.Permissions.user.id;
+                        break;
+                }
+                $(PublicPrivateButtons[index]).addClass('active');
+            }
         }
         
         //reset all old events
@@ -423,6 +458,7 @@ CatchAnnotation.prototype = {
             onControlRepliesClick = this.__bind(this._onControlRepliesClick, this),
             onMoreButtonClick = this.__bind(this._onMoreButtonClick, this),
             onSearchButtonClick = this.__bind(this._onSearchButtonClick, this),
+            onClearSearchButtonClick = this.__bind(this._onClearSearchButtonClick, this),
             onDeleteReplyButtonClick = this.__bind(this._onDeleteReplyButtonClick, this),
             onZoomToImageBoundsButtonClick = this.__bind(this._onZoomToImageBoundsButtonClick, this);
     
@@ -463,6 +499,9 @@ CatchAnnotation.prototype = {
         
         //Search Button
         el.on("click",".searchbox .search-icon", onSearchButtonClick);
+
+        //Clear Search Button
+        el.on("click",".searchbox .clear-search-icon", onClearSearchButtonClick);
         
         //Delete Reply Button
         el.on("click", ".replies .replyItem .deleteReply", onDeleteReplyButtonClick);
@@ -471,16 +510,16 @@ CatchAnnotation.prototype = {
     changeMedia: function(media) {
         var media = media || 'text';
         this.options.media = media;
-    this._refresh();
+        this._refresh();
         this.refreshCatch(true);
-    this.checkTotAnnotations();
+        this.checkTotAnnotations();
     },
     changeUserId: function(userId) {
         var userId = userId || '';
         this.options.userId = userId;
         this._refresh();
         this.refreshCatch(true);
-    this.checkTotAnnotations();
+        this.checkTotAnnotations();
     },
     loadAnnotations: function() {
         var annotator = this.annotator,
@@ -1011,8 +1050,18 @@ CatchAnnotation.prototype = {
             userId = '';
     
         //Get userI
-         userId = (action.html()=="myNotes")? this.annotator.plugins.Permissions.user.id : '';
-        
+        switch (action.html()){
+            case 'public':
+                userId = '';
+                break;
+            case 'instructor':
+                userId = this.options.instructor_username;
+                break;
+            default:
+                userId = this.annotator.plugins.Permissions.user.id;
+                break;
+        }
+        this.current_tab = action.html();
         //Change userid and refresh
         this.changeUserId(userId);
     },
@@ -1068,6 +1117,9 @@ CatchAnnotation.prototype = {
         var searchInput = this.element.find('.searchbox input').val();
         this._refresh(searchtype,searchInput);
         
+    },
+    _onClearSearchButtonClick: function(evt){
+        this._refresh("","");    
     },
     _clearAnnotator: function(){
         var annotator = this.annotator,
