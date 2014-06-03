@@ -2,10 +2,12 @@
 
 """ Database ORM models managed by this Django app """
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db import models
 from django.utils import timezone
 from model_utils.models import TimeStampedModel
+
+from projects.models import Workgroup
 
 
 class GroupRelationship(TimeStampedModel):
@@ -101,7 +103,7 @@ class GroupProfile(TimeStampedModel):
     class Meta:
         db_table = "auth_groupprofile"
 
-    group = models.ForeignKey(Group, db_index=True)
+    group = models.OneToOneField(Group, db_index=True)
     group_type = models.CharField(null=True, max_length=32, db_index=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
@@ -126,3 +128,13 @@ class CourseContentGroupRelationship(TimeStampedModel):
         Mapping model to enable grouping of course content such as chapters
         """
         unique_together = ("course_id", "content_id", "group_profile")
+
+
+class Organization(TimeStampedModel):
+    """
+    Main table representing the Organization concept.  Organizations are
+    primarily a collection of Users.
+    """
+    name = models.CharField(max_length=255)
+    workgroups = models.ManyToManyField(Workgroup, related_name="organizations")
+    users = models.ManyToManyField(User, related_name="organizations")

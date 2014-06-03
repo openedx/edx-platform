@@ -10,7 +10,11 @@
 
 from django.conf.urls import include, patterns, url
 
+from rest_framework.routers import SimpleRouter
+
+from api_manager.organizations.views import OrganizationsViewSet
 from api_manager.system import views as system_views
+from projects import views as project_views
 
 urlpatterns = patterns(
     '',
@@ -21,3 +25,16 @@ urlpatterns = patterns(
     url(r'^sessions/*', include('api_manager.sessions.urls')),
     url(r'^courses/*', include('api_manager.courses.urls')),
 )
+
+router = SimpleRouter()
+router.register(r'organizations', OrganizationsViewSet)
+
+# Project-related ViewSets
+router.register(r'projects', project_views.ProjectsViewSet)
+router.register(r'workgroups', project_views.WorkgroupsViewSet)
+router.register(r'submissions', project_views.SubmissionsViewSet)
+router.register(r'submission_reviews', project_views.SubmissionReviewsViewSet)
+router.register(r'peer_reviews', project_views.PeerReviewsViewSet)
+router.register(r'groups', project_views.GroupViewSet)
+router.register(r'users', project_views.UserViewSet)
+urlpatterns += router.urls
