@@ -5,11 +5,14 @@ Module for running content split tests
 import logging
 import json
 from webob import Response
+from uuid import uuid4
+from pkg_resources import resource_string
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule
 from xmodule.x_module import XModule, module_attr
+from xmodule.modulestore.inheritance import UserPartitionList
 
 from lxml import etree
 
@@ -19,21 +22,77 @@ from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
+
+class ValidationMessageType(object):
+    """
+    The type for a validation message -- currently 'information', 'warning' or 'error'.
+    """
+    information = 'information'
+    warning = 'warning'
+    error = 'error'
+
+    @staticmethod
+    def display_name(message_type):
+        """
+        Returns the display name for the specified validation message type.
+        """
+        if message_type == ValidationMessageType.warning:
+            # Translators: This message will be added to the front of messages of type warning,
+            # e.g. "Warning: this component has not been configured yet".
+            return _(u"Warning")
+        elif message_type == ValidationMessageType.error:
+            # Translators: This message will be added to the front of messages of type error,
+            # e.g. "Error: required field is missing".
+            return _(u"Error")
+        else:
+            return None
+
 
 class SplitTestFields(object):
     """Fields needed for split test module"""
     has_children = True
 
+    # All available user partitions (with value and display name). This is updated each time
+    # editable_metadata_fields is called.
+    user_partition_values = []
+    # Default value used for user_partition)_id
+    no_partition_selected = {'display_name': _("Not Selected"), 'value': -1}
+
+    @staticmethod
+    def build_partition_values(all_user_partitions):
+        """
+        This helper method builds up the user_partition values that will
+        be passed to the Studio editor
+        """
+        SplitTestFields.user_partition_values[:] = []
+        SplitTestFields.user_partition_values.insert(0, SplitTestFields.no_partition_selected)
+        for user_partition in all_user_partitions:
+            SplitTestFields.user_partition_values.append({"display_name": user_partition.name, "value": user_partition.id})
+        return SplitTestFields.user_partition_values
+
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name is not shown to students."),
         scope=Scope.settings,
-        default="Experiment Block"
+        default=_("Content Experiment")
+    )
+
+    # Specified here so we can see what the value set at the course-level is.
+    user_partitions = UserPartitionList(
+        help=_("List of user partitions of this course into groups, used e.g. for experiments"),
+        default=[],
+        scope=Scope.settings
     )
 
     user_partition_id = Integer(
-        help="Which user partition is used for this test",
-        scope=Scope.content
+        help=_("The configuration which specifies how users are grouped for this content experiment. Currently, this value can only be set once."),
+        scope=Scope.content,
+        display_name=_("Group Configuration"),
+        default=no_partition_selected["value"],
+        values=lambda: SplitTestFields.user_partition_values  # Will be populated before the Studio editor is shown.
     )
 
     # group_id is an int
@@ -46,7 +105,7 @@ class SplitTestFields(object):
     # be run on course load or in studio or ....
 
     group_id_to_child = ReferenceValueDict(
-        help="Which child module students in a particular group_id should see",
+        help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
     )
 
@@ -185,15 +244,43 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
         fragment = Fragment()
-        # Only render the children when this block is being shown as the container
         root_xblock = context.get('root_xblock')
-        if root_xblock and root_xblock.location == self.location:
-            self.render_children(context, fragment, can_reorder=False)
+        is_root = root_xblock and root_xblock.location == self.location
+        active_groups_preview = None
+        inactive_groups_preview = None
+        if is_root:
+            active_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.active_children(), context
+            )
+            inactive_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.inactive_children(), context
+            )
+
+        fragment.add_content(self.system.render_template('split_test_studio_preview.html', {
+            'split_test': self,
+            'is_root': is_root,
+            'active_groups_preview': active_groups_preview,
+            'inactive_groups_preview': inactive_groups_preview,
+        }))
+
         return fragment
+
+    def studio_render_children(self, fragment, children, context):
+        """
+        Renders the specified children and returns it as an HTML string. In addition, any
+        dependencies are added to the specified fragment.
+        """
+        html = ""
+        for active_child_descriptor in children:
+            active_child = self.system.get_module(active_child_descriptor)
+            rendered_child = active_child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+            html = html + rendered_child.content
+        return html
 
     def student_view(self, context):
         """
-        Render the contents of the chosen condition for students, and all the
+        Renders the contents of the chosen condition for students, and all the
         conditions for staff.
         """
         # When rendering a Studio preview, render all of the block's children
@@ -244,12 +331,14 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
     filename_extension = "xml"
 
+    mako_template = "widgets/split-edit.html"
+    css = {'scss': [resource_string(__name__, 'css/split_test/edit.scss')]}
+
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
     get_content_titles = module_attr('get_content_titles')
 
     def definition_to_xml(self, resource_fs):
-
         xml_object = etree.Element('split_test')
         renderable_groups = {}
         # json.dumps doesn't know how to handle Location objects
@@ -287,6 +376,13 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
             'user_partition_id': user_partition_id
         }, children)
 
+    def get_context(self):
+        _context = super(SplitTestDescriptor, self).get_context()
+        _context.update({
+            'selected_partition': self._get_selected_partition()
+        })
+        return _context
+
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
@@ -294,10 +390,122 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         return True
 
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Used to create default verticals for the groups.
+
+        Assumes that a mutable modulestore is being used.
+        """
+        # Any existing value of user_partition_id will be in "old_content" instead of "old_metadata"
+        # because it is Scope.content.
+        if 'user_partition_id' not in old_content or old_content['user_partition_id'] != self.user_partition_id:
+            selected_partition = self._get_selected_partition()
+            if selected_partition is not None:
+                assert hasattr(self.system, 'modulestore'), \
+                    "editor_saved should only be called when a mutable modulestore is available"
+                modulestore = self.system.modulestore
+                group_id_mapping = {}
+                for group in selected_partition.groups:
+                    dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
+                    metadata = {'display_name': group.name}
+                    modulestore.create_and_save_xmodule(
+                        dest_usage_key,
+                        definition_data=None,
+                        metadata=metadata,
+                        system=self.system,
+                    )
+                    self.children.append(dest_usage_key)  # pylint: disable=no-member
+                    group_id_mapping[unicode(group.id)] = dest_usage_key
+
+                self.group_id_to_child = group_id_mapping
+                # Don't need to call update_item in the modulestore because the caller of this method will do it.
+
+    @property
+    def editable_metadata_fields(self):
+        # Update the list of partitions based on the currently available user_partitions.
+        SplitTestFields.build_partition_values(self.user_partitions)
+
+        editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
+
+        # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
+        # Note that this means it will be saved by the Studio editor as "metadata", but the field will
+        # still update correctly.
+        editable_fields[SplitTestFields.user_partition_id.name] = self._create_metadata_editor_info(
+            SplitTestFields.user_partition_id
+        )
+
+        return editable_fields
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
             SplitTestDescriptor.due,
+            SplitTestDescriptor.user_partitions
         ])
         return non_editable_fields
+
+    def _get_selected_partition(self):
+        """
+        Returns the partition that this split module is currently using, or None
+        if the currently selected partition ID does not match any of the defined partitions.
+        """
+        for user_partition in self.user_partitions:
+            if user_partition.id == self.user_partition_id:
+                return user_partition
+
+        return None
+
+    def active_children(self):
+        """
+        Returns the active children of this split test, in the order of the groups.
+        """
+        children = self.get_children()
+
+        def get_child_descriptor_by_location(location):
+            for child in children:
+                if child.location == location:
+                    return child
+            return None
+
+        active_children = []
+        user_partition = self._get_selected_partition()
+        if not user_partition:
+            return active_children
+        for group in user_partition.groups:
+            child_location = self.group_id_to_child[unicode(group.id)]
+            child = get_child_descriptor_by_location(child_location)
+            active_children.append(child)
+        return active_children
+
+    def inactive_children(self):
+        """
+        Returns the inactive children of this split test, in the order of the groups.
+        """
+        inactive_children = []
+        active_children = self.active_children()
+        for child in self.get_children():
+            if not child in active_children:
+                inactive_children.append(child)
+        return inactive_children
+
+    def validation_message(self):
+        """
+        Returns a validation message describing thgroup.ide current state of the block, as well as a message type
+        indicating whether the message represents information, a warning or an error.
+        """
+        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        if self.user_partition_id < 0:
+            return _(u"This content experiment needs to be assigned to a group configuration."), ValidationMessageType.warning
+        user_partition = self._get_selected_partition()
+        if not user_partition:
+            return \
+                _(u"This content experiment will not be shown to students because it refers to a group configuration that has been deleted. You can delete this experiment or reinstate the group configuration to repair it."), \
+                ValidationMessageType.error
+        groups = user_partition.groups
+        if not len(groups) == len(self.get_children()):
+            return _(u"This content experiment is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
+
+        return _(u"This content experiment is part of group configuration '{experiment_name}'.").format(
+            experiment_name=user_partition.name
+        ), ValidationMessageType.information

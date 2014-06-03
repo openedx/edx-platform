@@ -59,7 +59,8 @@ else:
         'graphical_slider_tool',
         'lti',
         'concept',
-        'openassessment',  # edx-ora2
+        'openassessment',  # edx-ora2,
+        'split_test'
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'

@@ -1,0 +1,63 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.split_test_module import ValidationMessageType %>
+
+<%
+split_test = context.get('split_test')
+(message, message_type) = split_test.descriptor.validation_message()
+message_type_display_name = ValidationMessageType.display_name(message_type) if message_type else None
+is_configured = split_test.user_partition_id >= 0
+%>
+
+% if message or not is_configured:
+    % if is_root and not is_configured:
+        <div class="no-container-content">
+    % else:
+        <div class="xblock-message-area">
+        <div class="xblock-message ${message_type}">
+    % endif
+
+    % if not is_configured:
+        <p>${_("This content experiment content needs to have a group configuration.")}
+            <a href="#" class="button edit-button action-button">
+                <i class="icon-pencil"></i>
+                <span class="action-button-text">${_("Select a Group Configuration")}</span>
+            </a>
+        </p>
+    % else:
+        <p>
+            % if message_type == 'warning':
+                <i class='icon-warning-sign'></i>
+            % elif message_type == 'error':
+                <i class='icon-exclamation-sign'></i>
+            % endif
+        <span class='message-text'>
+            % if message_type_display_name:
+                <span class='sr'>${message_type_display_name}:</span>
+            % endif
+            ${message}
+        </span>
+        </p>
+    % endif
+
+    % if is_root and not is_configured:
+        </div>
+    % else:
+        </div>
+        </div>
+    % endif
+% endif
+
+% if is_root:
+    <div class="wrapper-groups is-active">
+        <h3 class="sr">${_("Active Groups")}</h3>
+        ${active_groups_preview}
+    </div>
+
+    % if inactive_groups_preview:
+        <div class="wrapper-groups is-inactive">
+            <h3 class="sr">${_("Inactive Groups")}</h3>
+            ${inactive_groups_preview}
+        </div>
+    % endif
+% endif
+

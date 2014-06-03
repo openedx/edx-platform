@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE

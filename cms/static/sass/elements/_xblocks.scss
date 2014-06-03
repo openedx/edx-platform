@@ -138,3 +138,55 @@
     }
   }
 }
+
+.xblock-message-area {
+
+  .xblock-message {
+    @extend %t-copy-sub1;
+    background-color: $gray-d2;
+    padding: ($baseline/2) ($baseline*.75);
+    color: $white;
+
+    .message-text {
+      display: inline-block;
+      width: 93%;
+      vertical-align: top;
+    }
+
+    &.information {
+      border-top: 1px solid $gray-l3;
+      background-color: $gray-l4;
+      color: $gray-l1;
+    }
+
+    &.warning {
+      background-color: $gray-d2;
+      padding: ($baseline/2) $baseline;
+      color: $white;
+
+      [class^="icon-"] {
+        margin-right: ($baseline/2);
+        color: $orange;
+        font-style: normal;
+      }
+
+      .message-text {
+        display: inline-block;
+        width: 93%;
+        vertical-align: top;
+      }
+    }
+
+    &.error {
+      background-color: $gray-d2;
+      padding: ($baseline/2) $baseline;
+      color: $white;
+
+      [class^="icon-"] {
+        margin-right: ($baseline/2);
+        color: $red-l2;
+        font-style: normal;
+      }
+    }
+  }
+}
