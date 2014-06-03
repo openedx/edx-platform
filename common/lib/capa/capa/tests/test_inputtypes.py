@@ -757,6 +757,16 @@ class MatlabTest(unittest.TestCase):
         expected = "&lt;script&gt;Test message&lt;/script&gt;"
         self.assertEqual(the_input.queue_msg, expected)
 
+    def test_matlab_sanitize_msg(self):
+        """
+        Check that the_input.msg is sanitized.
+        """
+        not_allowed_tag = 'script'
+        self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        self.assertEqual(self.the_input._get_render_context()['msg'], expected)
+
+
 def html_tree_equal(received, expected):
     """
     Returns whether two etree Elements are the same, with insensitivity to attribute order.
