@@ -58,7 +58,13 @@ else:
         'word_cloud',
         'graphical_slider_tool',
         'lti',
-        'concept',
+        # XBlocks from pmitros repos are prototypes. They should not be used
+        # except for edX Learning Sciences experiments on edge.edx.org without
+        # further work to make them robust, maintainable, finalize data formats,
+        # etc. 
+        'concept', # Concept mapper. See https://github.com/pmitros/ConceptXBlock
+        'done', # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
+        'audio', # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         'openassessment',  # edx-ora2
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
