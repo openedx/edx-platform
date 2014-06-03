@@ -165,7 +165,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_course(self, course_id, depth=None):
+    def get_course(self, course_id, depth=0):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
         Returns the course descriptor, or None if not found.
@@ -332,7 +332,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         return {}
 
-    def get_course(self, course_id, depth=None):
+    def get_course(self, course_id, depth=0):
         """
         See ModuleStoreRead.get_course
 

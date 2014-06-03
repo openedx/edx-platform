@@ -589,7 +589,7 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    course = student.views.course_from_id(course_id)
+    course = modulestore().get_course(course_id)
     if not course:
         # couldn't find the course, will just return vanilla signin page
         return redirect_with_get('signin_user', request.GET)
@@ -607,7 +607,7 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    course = student.views.course_from_id(course_id)
+    course = modulestore().get_course(course_id)
 
     if not course:
         # couldn't find the course, will just return vanilla registration page
