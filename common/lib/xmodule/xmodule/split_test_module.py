@@ -442,7 +442,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def _get_selected_partition(self):
         """
         Returns the partition that this split module is currently using, or None
-        if the currently selected partition ID does not patch any of the defined partitions.
+        if the currently selected partition ID does not match any of the defined partitions.
         """
         for user_partition in self.user_partitions:
             if user_partition.id == self.user_partition_id:
@@ -457,7 +457,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         if self.user_partition_id < 0:
-            return None, None
+            return _(u"This content experiment needs to be assigned to a group configuration."), ValidationMessageType.warning
         user_partition = self._get_selected_partition()
         if not user_partition:
             return \

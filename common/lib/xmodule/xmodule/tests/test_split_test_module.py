@@ -9,7 +9,7 @@ from fs.memoryfs import MemoryFS
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
-from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields
+from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, ValidationMessageType
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
 
@@ -21,12 +21,10 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     tag = 'split_test'
 
 
-@ddt.ddt
 class SplitTestModuleTest(XModuleXmlImportTest):
     """
-    Test the split test module
+    Base class for all split_module tests.
     """
-
     def setUp(self):
         self.course_id = 'test_org/test_course_number/test_run'
         # construct module
@@ -73,6 +71,13 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
         self.split_test_module = self.course_sequence.get_children()[0]
         self.split_test_module.bind_for_student(self.module_system, self.split_test_module._field_data)  # pylint: disable=protected-access
+
+
+@ddt.ddt
+class SplitTestModuleLMSTest(SplitTestModuleTest):
+    """
+    Test the split test module
+    """
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
     @ddt.unpack
@@ -148,6 +153,12 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.assertIsNotNone(fields.get('group_id_to_child'))
         self.assertEquals(len(children), 2)
 
+
+class SplitTestModuleStudioTest(SplitTestModuleTest):
+    """
+    Unit tests for how split test interacts with Studio.
+    """
+
     def test_render_studio_view(self):
         """
         Test the rendering of the Studio view.
@@ -177,15 +188,6 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.assertNotIn('HTML FOR GROUP 0', html)
         self.assertNotIn('HTML FOR GROUP 1', html)
 
-    def test_non_editable_settings(self):
-        """
-        Test the settings that are marked as "non-editable".
-        """
-        non_editable_metadata_fields = self.split_test_module.non_editable_metadata_fields
-        self.assertIn(SplitTestDescriptor.due, non_editable_metadata_fields)
-        self.assertIn(SplitTestDescriptor.user_partitions, non_editable_metadata_fields)
-        self.assertNotIn(SplitTestDescriptor.display_name, non_editable_metadata_fields)
-
     def test_editable_settings(self):
         """
         Test the setting information passed back from editable_metadata_fields.
@@ -204,6 +206,15 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
         editable_metadata_fields = self.split_test_module.editable_metadata_fields
         self.assertIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
+
+    def test_non_editable_settings(self):
+        """
+        Test the settings that are marked as "non-editable".
+        """
+        non_editable_metadata_fields = self.split_test_module.non_editable_metadata_fields
+        self.assertIn(SplitTestDescriptor.due, non_editable_metadata_fields)
+        self.assertIn(SplitTestDescriptor.user_partitions, non_editable_metadata_fields)
+        self.assertNotIn(SplitTestDescriptor.display_name, non_editable_metadata_fields)
 
     def test_available_partitions(self):
         """
@@ -226,3 +237,46 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
         self.assertEqual(0, partitions[1]['value'])
         self.assertEqual("first_partition", partitions[1]['display_name'])
+
+    def test_validation_messages(self):
+        """
+        Test the validation messages produced for different split_test configurations.
+        """
+
+        def verify_validation_message(split_test_module, expected_message, expected_message_type):
+            (message, message_type) = split_test_module.validation_message()
+            self.assertEqual(message, expected_message)
+            self.assertEqual(message_type, expected_message_type)
+
+        # Verify the message for an unconfigured experiment
+        self.split_test_module.user_partition_id = -1
+        verify_validation_message(self.split_test_module,
+                                  u"This content experiment needs to be assigned to a group configuration.",
+                                  ValidationMessageType.warning)
+
+        # Verify the message for a correctly configured experiment
+        self.split_test_module.user_partition_id = 0
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+        verify_validation_message(self.split_test_module,
+                                  u"This content experiment is part of group configuration 'first_partition'.",
+                                  ValidationMessageType.information)
+
+        # Verify the message for a block with the wrong number of groups
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition',
+                          [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'gamma')])
+        ]
+        verify_validation_message(self.split_test_module,
+                                  u"This content experiment is in an invalid state and cannot be repaired. "
+                                  u"Please delete and recreate.",
+                                  ValidationMessageType.error)
+
+        # Verify the message for a block referring to a non-existent experiment
+        self.split_test_module.user_partition_id = 2
+        verify_validation_message(self.split_test_module,
+                                  u"This content experiment will not be shown to students because it refers "
+                                  u"to a group configuration that has been deleted. "
+                                  u"You can delete this experiment or reinstate the group configuration to repair it.",
+                                  ValidationMessageType.error)
