@@ -246,22 +246,41 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
+        active_groups_preview = None
+        inactive_groups_preview = None
+        if is_root:
+            active_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.active_children(), context
+            )
+            inactive_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.inactive_children(), context
+            )
 
-        # First render a header at the top of the split test module...
-        fragment.add_content(self.system.render_template('split_test_studio_header.html', {
+        fragment.add_content(self.system.render_template('split_test_studio_preview.html', {
             'split_test': self,
             'is_root': is_root,
+            'active_groups_preview': active_groups_preview,
+            'inactive_groups_preview': inactive_groups_preview,
         }))
-
-        # ... then render the children only when this block is being shown as the container
-        if is_root:
-            self.render_children(context, fragment, can_reorder=False)
 
         return fragment
 
+    def studio_render_children(self, fragment, children, context):
+        """
+        Renders the specified children and returns it as an HTML string. In addition, any
+        dependencies are added to the specified fragment.
+        """
+        html = ""
+        for active_child_descriptor in children:
+            active_child = self.system.get_module(active_child_descriptor)
+            rendered_child = active_child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+            html = html + rendered_child.content
+        return html
+
     def student_view(self, context):
         """
-        Render the contents of the chosen condition for students, and all the
+        Renders the contents of the chosen condition for students, and all the
         conditions for staff.
         """
         # When rendering a Studio preview, render all of the block's children
@@ -445,9 +464,42 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
         return None
 
+    def active_children(self):
+        """
+        Returns the active children of this split test, in the order of the groups.
+        """
+        children = self.get_children()
+
+        def get_child_descriptor_by_location(location):
+            for child in children:
+                if child.location == location:
+                    return child
+            return None
+
+        active_children = []
+        user_partition = self._get_selected_partition()
+        if not user_partition:
+            return active_children
+        for group in user_partition.groups:
+            child_location = self.group_id_to_child[unicode(group.id)]
+            child = get_child_descriptor_by_location(child_location)
+            active_children.append(child)
+        return active_children
+
+    def inactive_children(self):
+        """
+        Returns the inactive children of this split test, in the order of the groups.
+        """
+        inactive_children = []
+        active_children = self.active_children()
+        for child in self.get_children():
+            if not child in active_children:
+                inactive_children.append(child)
+        return inactive_children
+
     def validation_message(self):
         """
-        Returns a validation message describing the current state of the block, as well as a message type
+        Returns a validation message describing thgroup.ide current state of the block, as well as a message type
         indicating whether the message represents information, a warning or an error.
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name

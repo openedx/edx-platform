@@ -46,3 +46,18 @@ is_configured = split_test.user_partition_id >= 0
         </div>
     % endif
 % endif
+
+% if is_root:
+    <div class="wrapper-groups is-active">
+        <h3 class="sr">${_("Active Groups")}</h3>
+        ${active_groups_preview}
+    </div>
+
+    % if inactive_groups_preview:
+        <div class="wrapper-groups is-inactive">
+            <h3 class="sr">${_("Inactive Groups")}</h3>
+            ${inactive_groups_preview}
+        </div>
+    % endif
+% endif
+
