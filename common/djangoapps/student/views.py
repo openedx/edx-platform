@@ -795,7 +795,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "success": False,
             "value": _('Your password has expired due to password policy on this account. You must '
                        'reset your password before you can log in again. Please click the '
-                       'Forgot Password" link on this page to reset your password before logging in again.'),
+                       '"Forgot Password" link on this page to reset your password before logging in again.'),
         })  # TODO: this should be status code 403  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
