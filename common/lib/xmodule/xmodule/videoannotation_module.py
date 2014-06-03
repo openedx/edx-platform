@@ -7,7 +7,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-from xmodule.annotator_mixin import get_instructions, get_extension
+from xmodule.annotator_mixin import CommonAnnotatorMixin, get_instructions, get_extension
 from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 
@@ -32,14 +32,24 @@ class AnnotatableFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Video Annotation',
+        default=_('Video Annotation'),
     )
-    sourceurl = String(help=_("The external source URL for the video."), display_name=_("Source URL"), scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4")
-    poster_url = String(help=_("Poster Image URL"), display_name=_("Poster URL"), scope=Scope.settings, default="")
+    sourceurl = String(
+        help=_("The external source URL for the video."),
+        display_name=_("Source URL"),
+        scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4"
+    )
+    poster_url = String(
+        help=_("Poster Image URL"),
+        display_name=_("Poster URL"),
+        scope=Scope.settings,
+        default=""
+    )
     annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
     annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
 
-class VideoAnnotationModule(AnnotatableFields, XModule):
+
+class VideoAnnotationModule(AnnotatableFields, CommonAnnotatorMixin, XModule):
     '''Video Annotation Module'''
     js = {
         'coffee': [
@@ -85,8 +95,11 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'typeSource': extension,
             'poster': self.poster_url,
             'content_html': self.content,
-            'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
         fragment = Fragment(self.system.render_template('videoannotation.html', context))
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")

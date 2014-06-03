@@ -7,7 +7,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-from xmodule.annotator_mixin import get_instructions, html_to_text
+from xmodule.annotator_mixin import CommonAnnotatorMixin, get_instructions, html_to_text
 from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 
@@ -62,7 +62,7 @@ class AnnotatableFields(object):
     )
 
 
-class ImageAnnotationModule(AnnotatableFields, XModule):
+class ImageAnnotationModule(AnnotatableFields, CommonAnnotatorMixin, XModule):
     '''Image Annotation Module'''
     js = {
         'coffee': [
@@ -97,12 +97,14 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         context = {
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
-            'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user, self.annotation_token_secret),
             'tag': self.instructor_tags,
             'openseadragonjson': self.openseadragonjson,
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-
         fragment = Fragment(self.system.render_template('imageannotation.html', context))
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")

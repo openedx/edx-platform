@@ -6,7 +6,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-from xmodule.annotator_mixin import get_instructions
+from xmodule.annotator_mixin import CommonAnnotatorMixin, get_instructions
 from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 import textwrap
@@ -47,11 +47,17 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='None',
     )
+    diacritics = String(
+        display_name=_("Diacritic Marks"),
+        help=_("Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"),
+        scope=Scope.settings,
+        default='',
+    )
     annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
     annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
 
 
-class TextAnnotationModule(AnnotatableFields, XModule):
+class TextAnnotationModule(AnnotatableFields, CommonAnnotatorMixin, XModule):
     ''' Text Annotation Module '''
     js = {'coffee': [],
           'js': []}
@@ -82,8 +88,12 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'source': self.source,
             'instructions_html': self.instructions,
             'content_html': self.content,
-            'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
         fragment = Fragment(self.system.render_template('textannotation.html', context))
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")

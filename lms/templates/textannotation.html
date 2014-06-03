@@ -174,17 +174,24 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
 
+    var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+            '${instructor_email}':
+            '${user.email}';
+
     //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
+    var annotator = ova.annotator;
+    var catchOptions = {
             media:'text',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-            userId:'${user.email}',
+            userId:userId,
             pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            flags:is_staff,
+            default_tab: "${default_tab}",
+            instructor_email: "${instructor_email}",
+            annotation_mode: "${annotation_mode}",
+        };
+    var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>
