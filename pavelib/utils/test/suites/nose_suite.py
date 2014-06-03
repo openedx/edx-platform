@@ -12,7 +12,8 @@ __test__ = False  # do not collect
 
 class NoseTestSuite(TestSuite):
     """
-    A subclass of TestSuite with extra methods that are specific to nose tests
+    A subclass of TestSuite with extra methods that are specific
+    to nose tests
     """
     def __init__(self, *args, **kwargs):
         super(NoseTestSuite, self).__init__(*args, **kwargs)
@@ -35,23 +36,32 @@ class NoseTestSuite(TestSuite):
 
     def _under_coverage_cmd(self, cmd):
         """
-        If self.run_under_coverage is True, it returns the arg 'cmd' altered to be run
-        under coverage. It returns the command unaltered otherwise.
+        If self.run_under_coverage is True, it returns the arg 'cmd'
+        altered to be run under coverage. It returns the command
+        unaltered otherwise.
         """
         if self.run_under_coverage:
             cmd0, cmd_rest = cmd.split(" ", 1)
-            # We use "python -m coverage" so that the proper python will run the importable coverage
-            # rather than the coverage that OS path finds.
+            # We use "python -m coverage" so that the proper python
+            # will run the importable coverage rather than the
+            # coverage that OS path finds.
 
-            cmd = "python -m coverage run --rcfile={root}/.coveragerc `which {cmd0}` {cmd_rest}".format(
-                root=self.root, cmd0=cmd0, cmd_rest=cmd_rest)
+            cmd = (
+                "python -m coverage run --rcfile={root}/.coveragerc "
+                "`which {cmd0}` {cmd_rest}".format(
+                    root=self.root,
+                    cmd0=cmd0,
+                    cmd_rest=cmd_rest,
+                )
+            )
 
         return cmd
 
     @property
     def test_options_flags(self):
         """
-        Takes the test options and returns the appropriate flags for the command.
+        Takes the test options and returns the appropriate flags
+        for the command.
         """
         opts = " "
 
@@ -65,7 +75,11 @@ class NoseTestSuite(TestSuite):
         # This makes it so we use nose's fail-fast feature in two cases.
         # Case 1: --fail_fast is passed as an arg in the paver command
         # Case 2: The environment variable TESTS_FAIL_FAST is set as True
-        if self.fail_fast or ('TESTS_FAIL_FAST' in os.environ and os.environ['TEST_FAIL_FAST']):
+        env_fail_fast_set = (
+            'TESTS_FAIL_FAST' in os.environ and os.environ['TEST_FAIL_FAST']
+        )
+
+        if self.fail_fast or env_fail_fast_set:
             opts += " --stop"
 
         return opts
@@ -105,8 +119,14 @@ class SystemTestSuite(NoseTestSuite):
 
     @property
     def cmd(self):
-        cmd = './manage.py {system} test {test_id} {test_opts} --traceback --settings=test'.format(
-            system=self.root, test_id=self.test_id, test_opts=self.test_options_flags)
+        cmd = (
+            './manage.py {system} test {test_id} {test_opts} '
+            '--traceback --settings=test'.format(
+                system=self.root,
+                test_id=self.test_id,
+                test_opts=self.test_options_flags,
+            )
+        )
 
         return self._under_coverage_cmd(cmd)
 
@@ -122,7 +142,9 @@ class SystemTestSuite(NoseTestSuite):
         # django-nose will import them early in the test process,
         # thereby making sure that we load any django models that are
         # only defined in test files.
-        default_test_id = "{system}/djangoapps/* common/djangoapps/*".format(system=self.root)
+        default_test_id = "{system}/djangoapps/* common/djangoapps/*".format(
+            system=self.root
+        )
 
         if self.root in ('lms', 'cms'):
             default_test_id += " {system}/lib/*".format(system=self.root)
@@ -140,15 +162,18 @@ class LibTestSuite(NoseTestSuite):
     def __init__(self, *args, **kwargs):
         super(LibTestSuite, self).__init__(*args, **kwargs)
         self.test_id = kwargs.get('test_id', self.root)
-
-    def __enter__(self):
-        super(LibTestSuite, self).__enter__()
-        if os.path.exists(os.path.join(self.report_dir, "nosetests.xml")):
-            os.environ['NOSE_XUNIT_FILE'] = os.path.join(self.report_dir, "nosetests.xml")
+        self.xunit_report = os.path.join(self.report_dir, "nosetests.xml")
 
     @property
     def cmd(self):
-        cmd = "nosetests --id-file={test_ids} {test_id} {test_opts}".format(
-            test_ids=self.test_ids, test_id=self.test_id, test_opts=self.test_options_flags)
+        cmd = (
+            "nosetests --id-file={test_ids} {test_id} {test_opts} "
+            "--with-xunit --xunit-file={xunit_report}".format(
+                test_ids=self.test_ids,
+                test_id=self.test_id,
+                test_opts=self.test_options_flags,
+                xunit_report=self.xunit_report,
+            )
+        )
 
         return self._under_coverage_cmd(cmd)

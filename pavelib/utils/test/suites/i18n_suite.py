@@ -23,18 +23,28 @@ class I18nTestSuite(TestSuite):
 
     @property
     def cmd(self):
-        pythonpath_prefix = "PYTHONPATH={repo_root}/i18n:$PYTHONPATH".format(repo_root=Env.REPO_ROOT)
-        cmd = "{pythonpath_prefix} nosetests {repo_root}/i18n/tests --with-xunit --xunit-file={xunit_report}".format(
-            pythonpath_prefix=pythonpath_prefix,
-            repo_root=Env.REPO_ROOT,
-            xunit_report=self.xunit_report,
+        pythonpath_prefix = (
+            "PYTHONPATH={repo_root}/i18n:$PYTHONPATH".format(
+                repo_root=Env.REPO_ROOT
+            )
         )
+
+        cmd = (
+            "{pythonpath_prefix} nosetests {repo_root}/i18n/tests "
+            "--with-xunit --xunit-file={xunit_report}".format(
+                pythonpath_prefix=pythonpath_prefix,
+                repo_root=Env.REPO_ROOT,
+                xunit_report=self.xunit_report,
+            )
+        )
+
         return cmd
 
     @property
     def _required_dirs(self):
         """
-        Makes sure that the reports directory is present. Returns paths of report directories and files.
+        Makes sure that the reports directory is present.
+        Returns paths of report directories and files.
         """
         report_dir = Env.I18N_REPORT_DIR
         xunit_report = os.path.join(report_dir, 'nosetests.xml')

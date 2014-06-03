@@ -27,8 +27,8 @@ class PythonTestSuite(TestSuite):
     @property
     def _default_subsuites(self):
         """
-        The default subsuites to be run. They include lms, cms, and all of
-        the libraries in common/lib.
+        The default subsuites to be run. They include lms, cms,
+        and all of the libraries in common/lib.
         """
         opts = {
             'failed_only': self.failed_only,

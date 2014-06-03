@@ -40,21 +40,30 @@ class JsTestSuite(TestSuite):
     @property
     def cmd(self):
         """
-        Run the tests using js-test-tool
-        See js-test-tool docs for description of different command line arguments
+        Run the tests using js-test-tool. See js-test-tool docs for
+        description of different command line arguments.
         """
-        cmd = "js-test-tool {mode} {test_id} --use-firefox --timeout-sec 600 --xunit-report {xunit_report}".format(
-            mode=self.mode, test_id=self.test_id, xunit_report=self.xunit_report)
+        cmd = (
+            "js-test-tool {mode} {test_id} --use-firefox --timeout-sec "
+            "600 --xunit-report {xunit_report}".format(
+                mode=self.mode,
+                test_id=self.test_id,
+                xunit_report=self.xunit_report,
+            )
+        )
 
         if self.run_under_coverage:
-            cmd += " --coverage-xml {report_dir}".format(report_dir=self.coverage_report)
+            cmd += " --coverage-xml {report_dir}".format(
+                report_dir=self.coverage_report
+            )
 
         return cmd
 
     @property
     def _required_dirs(self):
         """
-        Makes sure that the reports directory is present. Returns paths of report directories and files.
+        Makes sure that the reports directory is present. Returns
+        paths of report directories and files.
         """
         report_dir = Env.JS_REPORT_DIR
         coverage_report = os.path.join(report_dir, 'coverage.xml')

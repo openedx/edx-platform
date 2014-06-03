@@ -60,6 +60,9 @@ class TestSuite(object):
         It returns False if errors or failures occur. Otherwise, it
         returns True.
         """
+        cmd = self.cmd
+        sys.stdout.write(cmd)
+
         msg = colorize(
             'green',
             '\n{bar}\n Running tests for {suite_name} \n{bar}\n'.format(suite_name=self.root, bar='=' * 40),
@@ -70,10 +73,6 @@ class TestSuite(object):
 
         kwargs = {'shell': True, 'cwd': None}
         process = None
-
-        cmd = self.cmd
-
-        print(cmd)
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
