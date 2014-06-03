@@ -3,6 +3,19 @@ Change Log
 ############
 
 ***********
+June, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 06/03/14   
+     - Added :ref:`gradebook` to the :ref:`Grades` section.
+
+***********
 May, 2014
 ***********
 
@@ -12,8 +25,6 @@ May, 2014
 
    * - Date
      - Change
-   * - 06/04/14   
-     - Added :ref:`gradebook` to the :ref:`Grades` section.
    * - 05/27/14
      - Based on the new requirement to specify the complete location identifier
        of a problem to adjust student grades, revised the :ref:`Grades` section.
