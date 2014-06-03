@@ -34,7 +34,7 @@
             </div> 
 			<div id="catchDIV">
                 ## Translators: Notes below refer to annotations. They wil later be put under a "Notes" section.
-				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
+				<div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
 			</div>
 		</div>
 	</div>
@@ -72,7 +72,7 @@
 	var unit_id = $('#sequence-list').find('.active').attr("data-element");
         uri += unit_id;
 	var pagination = 100,
-	 is_staff = !('${user.is_staff}'=='False'),
+	 is_staff = ('${user.email}'=='${instructor_username}'),
         options = {
         optionsAnnotator: {
             permissions:{
@@ -172,6 +172,8 @@
         },
         optionsOpenSeadragon:{
             id:                 "imageHolder",
+            annotation_mode: "${annotation_mode}",
+            flags: is_staff,
             prefixUrl:           "${settings.STATIC_URL}" + "js/vendor/ova/images/",
             ${openseadragonjson}
         },
@@ -195,8 +197,8 @@
         }
 
 	    //Catch
-	    var annotator = osda.annotator,
-		catchOptions = {
+	    var annotator = osda.annotator;
+		var catchOptions = {
 		    media:'image',
 		    externalLink:false,
 		    imageUrlRoot:imgURLRoot,
@@ -208,8 +210,10 @@
             default_tab: "${default_tab}",
             instructor_username: "${instructor_username}",
             annotation_mode: "${annotation_mode}",
-		},
-		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
-
+		};
+		if ("${annotation_mode}" == "2" || ("${annotation_mode}" == 1 && "${instructor_username}" != ""))
+            var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        if ("${annotation_mode}" == 1 && "${instructor_username}" == "" && !is_staff)
+            osda.annotator.destroy();
     }
 </script>

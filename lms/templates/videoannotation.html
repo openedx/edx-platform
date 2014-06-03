@@ -181,8 +181,8 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     }
 
     //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
+    var annotator = ova.annotator;
+    var catchOptions = {
             media:'video',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
@@ -190,11 +190,10 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
             showPublicPrivate: true,
 	        userId:userId,
             pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
             flags:is_staff,
             default_tab: "${default_tab}",
             instructor_username: "${instructor_username}",
             annotation_mode: "${annotation_mode}",
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        };
+        var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>

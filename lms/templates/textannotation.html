@@ -183,8 +183,8 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     }
 
     //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
+    var annotator = ova.annotator;
+    var catchOptions = {
             media:'text',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
@@ -196,6 +196,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
             default_tab: "${default_tab}",
             instructor_username: "${instructor_username}",
             annotation_mode: "${annotation_mode}",
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        };
+    var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>
