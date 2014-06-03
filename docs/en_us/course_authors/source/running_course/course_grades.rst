@@ -14,6 +14,8 @@ changes you can make, see the following topics:
 
 * :ref:`Access_grades`
 
+* :ref:`gradebook`
+
 * :ref:`check_student_progress`
 
 * :ref:`Adjust_grades`
@@ -59,19 +61,23 @@ Generate Grades for Enrolled Students (All Courses)
 ********************************************************
 
 For any course, you can generate grades and then download a file with the
-resulting calculations. 
+results for each enrolled student. 
 
 When you initiate calculations to grade student work, a process starts on the
 edX servers. The complexity of your grading configuration and the number of
 students enrolled in your course affect how long this process takes. You can
-download the calculated grades in a CSV (comma-separated values) file when the
-grading process is complete. 
+download a report of the calculated grades in a CSV (comma-separated values)
+file when the grading process is complete.
 
-To generate grades for the students who are currently enrolled in your course:
+For courses with fewer than 200 students enrolled, you also have the option to
+review student grades on the Instructor Dashboard. See :ref:`gradebook`.
+
+To generate the grade report for the students who are currently enrolled in your
+course:
 
 #. View the live version of your course.
 
-#. Click **Instructor**, then click  **Data Download**.
+#. Click **Instructor**, then click **Data Download**.
 
 #. To start the grading process, click **Generate Grade Report**.
 
@@ -81,9 +87,6 @@ To generate grades for the students who are currently enrolled in your course:
 
 4. To track the progress of the grading process, reload the page in your browser
    and scroll down to the **Pending Instructor Tasks** section.
-
-For courses with fewer than 200 students enrolled, you also have the option to
-review a student gradebook on the Instructor Dashboard. See :ref:`gradebook`.
 
 ==========================================
 Download Grades for Enrolled Students
@@ -120,7 +123,7 @@ The CSV file contains one row of data for each student, and columns that provide
 
 * Student identifiers, including an internal **id**, **email** address, and **username**.
 
-* **grade**, with the total score a student has currently attained in the course. This value is expressed as a decimal: a student with a grade of 0.65 has earned 65% of the credit in the course, and a student with a grade of 1 has earned 100%. 
+* The overall **grade**, with the total score a student has currently attained in the course. This value is expressed as a decimal: a student with a grade of 0.65 has earned 65% of the credit in the course, and a student with a grade of 1 has earned 100%. 
 
 * Each **{assignment type} {number}** defined in your grading configuration, with the score a student attained for that specific assignment. For example, column HW 03 shows the scores for the third homework assignment.
 
@@ -143,19 +146,19 @@ on the Instructor Dashboard.
    than 200 students enrolled, this tab includes a **Student Gradebook**
    section.
 
-#. Click **View Gradebook**.
+#. Click **View Gradebook**. Grades are calculated and the gradebook displays.
 
-  The gradebook displays.
-
-  %%image
+   .. image:: ../Images/Student_Gradebook.png
+     :alt: Course gradebook with rows for students and columns for assignment
+         types
 
 The gradebook includes the following features.
 
 * You can click the student username in each row to review that student's
-  **Course Progress** page. See %%.
+  **Course Progress** page. See :ref:`check_student_progress`.
 
 * There is a column for each **{assignment type} {number}** defined in your
-  grading configuration, with the score a student attained for that specific
+  grading configuration, with the scores your student attained for that specific
   assignment. 
 
   The gradebook does not have a scroll bar, but it is draggable: to see columns
@@ -171,9 +174,9 @@ The gradebook includes the following features.
   grade of 65 has earned 65% of the credit in the course, and a student with a
   grade of 100 has earned 100%.
 
-* To filter the number of rows that display, a **Search students** option is
-  available. This option is case-sensitive and limits the rows shown in the
-  gradebook to usernames that match your entry.
+* To filter the data that displays you can use the **Search students** option.
+  This option is case-sensitive and limits the rows shown in the gradebook to
+  usernames that match your entry.
 
 .. _check_student_progress:
 
