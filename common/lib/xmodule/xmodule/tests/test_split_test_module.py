@@ -197,14 +197,8 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertNotIn(SplitTestDescriptor.due.name, editable_metadata_fields)
         self.assertNotIn(SplitTestDescriptor.user_partitions.name, editable_metadata_fields)
 
-        # user_partition_id will only appear in the editable settings if the value is the
-        # default "unselected" value. This split instance has user_partition_id = 0, so
-        # user_partition_id will not be editable.
-        self.assertNotIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
-
-        # Explicitly set user_partition_id to the default value. Now user_partition_id will be editable.
-        self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
-        editable_metadata_fields = self.split_test_module.editable_metadata_fields
+        # user_partition_id will always appear in editable_metadata_settings, regardless
+        # of the selected value.
         self.assertIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
 
     def test_non_editable_settings(self):

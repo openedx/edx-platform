@@ -379,7 +379,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def get_context(self):
         _context = super(SplitTestDescriptor, self).get_context()
         _context.update({
-            'disable_user_partition_editing': self._disable_user_partition_editing(),
             'selected_partition': self._get_selected_partition()
         })
         return _context
@@ -428,13 +427,12 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
         editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
 
-        if not self._disable_user_partition_editing():
-            # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
-            # Note that this means it will be saved by the Studio editor as "metadata", but the field will
-            # still update correctly.
-            editable_fields[SplitTestFields.user_partition_id.name] = self._create_metadata_editor_info(
-                SplitTestFields.user_partition_id
-            )
+        # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
+        # Note that this means it will be saved by the Studio editor as "metadata", but the field will
+        # still update correctly.
+        editable_fields[SplitTestFields.user_partition_id.name] = self._create_metadata_editor_info(
+            SplitTestFields.user_partition_id
+        )
 
         return editable_fields
 
@@ -446,12 +444,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
             SplitTestDescriptor.user_partitions
         ])
         return non_editable_fields
-
-    def _disable_user_partition_editing(self):
-        """
-        If user_partition_id has been set to anything besides the default value, disable editing.
-        """
-        return self.user_partition_id != SplitTestFields.user_partition_id.default
 
     def _get_selected_partition(self):
         """

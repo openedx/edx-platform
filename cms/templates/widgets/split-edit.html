@@ -1,8 +1,2 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%include file="metadata-edit.html" />
-% if disable_user_partition_editing:
-<div class="message setting-message">
-  <p>${_("This content experiment is part of group configuration {0}.".format("<strong>"+str(selected_partition.name)+"</strong>"))}</p>
-  <p class="tip setting-help">${_("Selecting a different group configuration is not supported at this time.")}</p>
-</div>
-% endif
