@@ -5,6 +5,7 @@ invoke the Django armature.
 """
 
 from social.backends import google, linkedin
+from . import portal
 
 _DEFAULT_ICON_CLASS = 'icon-signin'
 
@@ -139,6 +140,26 @@ class LinkedInOauth2(BaseProvider):
     SETTINGS = {
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY': None,
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET': None,
+    }
+
+    @classmethod
+    def get_email(cls, provider_details):
+        return provider_details.get('email')
+
+    @classmethod
+    def get_name(cls, provider_details):
+        return provider_details.get('fullname')
+
+
+class PortalOauth2(BaseProvider):
+    """Provider for Portal's Oauth2 auth system."""
+
+    BACKEND_CLASS = portal.PortalOAuth2
+    ICON_CLASS = 'icon-linkedin'
+    NAME = 'Portal'
+    SETTINGS = {
+        'SOCIAL_AUTH_PORTAL_OAUTH2_KEY': None,
+        'SOCIAL_AUTH_PORTAL_OAUTH2_SECRET': None,
     }
 
     @classmethod

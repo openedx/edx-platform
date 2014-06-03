@@ -49,6 +49,9 @@ urlpatterns += patterns(
 
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
+    url(r'^signin$', 'student.views.signin_user', name="login"),
+    url(r'^signup$', 'student.views.signin_user', name='signup'),
+
 
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
@@ -62,8 +65,6 @@ urlpatterns += patterns(
 
     url(r'^$', 'howitworks', name='homepage'),
     url(r'^howitworks$', 'howitworks'),
-    url(r'^signup$', 'signup', name='signup'),
-    url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
     url(r'^course_team/{}/(?P<email>.+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_team_handler'),
@@ -133,6 +134,12 @@ urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
+# Third-party auth.
+if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    urlpatterns += (
+        url(r'', include('third_party_auth.urls')),
     )
 
 if settings.DEBUG:

@@ -59,6 +59,8 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 
 import random
 import string  # pylint: disable-msg=deprecated-module
+import uuid
+import logging
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -66,9 +68,14 @@ from django.shortcuts import redirect
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
+from django.db import IntegrityError, transaction
+from student.models import (
+    Registration, UserProfile, create_comments_service_user
+)
 
 from . import provider
 
+log = logging.getLogger("third_party_auth.pipeline")
 
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_ENTRY_DASHBOARD = 'dashboard'
@@ -332,31 +339,20 @@ def parse_query_params(strategy, response, *args, **kwargs):
     }
 
 
-@partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_register=None, user=None, *args, **kwargs):
-    """Dispatches user to views outside the pipeline if necessary."""
+def create_user_from_oauth(strategy, details, response, uid, is_dashboard=None, is_login=None, is_register=None, user=None, *args, **kwargs):
+    if 'is_new' in kwargs and kwargs['is_new'] is True:
+        user = User.objects.get(username=details['username'])
+        registration = Registration()
+        registration.register(user)
+        profile = UserProfile(user=user)
+        profile.name = details['fullname']
 
-    # We're deliberately verbose here to make it clear what the intended
-    # dispatch behavior is for the three pipeline entry points, given the
-    # current state of the pipeline. Keep in mind the pipeline is re-entrant
-    # and values will change on repeated invocations (for example, the first
-    # time through the login flow the user will be None so we dispatch to the
-    # login form; the second time it will have a value so we continue to the
-    # next pipeline step directly).
-    #
-    # It is important that we always execute the entire pipeline. Even if
-    # behavior appears correct without executing a step, it means important
-    # invariants have been violated and future misbehavior is likely.
+        try:
+            profile.save()
+        except Exception:
+            log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+            raise
 
-    user_inactive = user and not user.is_active
-    user_unset = user is None
-    dispatch_to_login = is_login and (user_unset or user_inactive)
-
-    if is_dashboard:
-        return
-
-    if dispatch_to_login:
-        return redirect('/login', name='signin_user')
-
-    if is_register and user_unset:
-        return redirect('/register', name='register_user')
+        registration.activate()
+        registration.save()
+        create_comments_service_user(user)
