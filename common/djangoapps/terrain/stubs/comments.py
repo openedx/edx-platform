@@ -17,6 +17,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
         pattern_handlers = {
             "/api/v1/users/(?P<user_id>\\d+)/active_threads$": self.do_user_profile,
             "/api/v1/users/(?P<user_id>\\d+)$": self.do_user,
+            "/api/v1/search/threads$": self.do_search_threads,
             "/api/v1/threads$": self.do_threads,
             "/api/v1/threads/(?P<thread_id>\\w+)$": self.do_thread,
             "/api/v1/comments/(?P<comment_id>\\w+)$": self.do_comment,
@@ -85,6 +86,9 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     def do_threads(self):
         self.send_json_response({"collection": [], "page": 1, "num_pages": 1})
+
+    def do_search_threads(self):
+        self.send_json_response(self.server.config.get('search_result', {}))
 
     def do_comment(self, comment_id):
         # django_comment_client calls GET comment before doing a DELETE, so that's what this is here to support.
