@@ -243,27 +243,6 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
         return fragment
 
-    def render_validation_message(self, message, message_type):
-        """
-        Renders an HTML version of the validation message, based upon its type.
-        """
-        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
-        if message_type == ValidationMessageType.warning:
-            # Translators: This message will be added to the front of messages of type warning,
-            # e.g. "Warning: this component has not been configured yet".
-            message_prefix = _(u"Warning:")
-        elif message_type == ValidationMessageType.error:
-            # Translators: This message will be added to the front of messages of type error,
-            # e.g. "Error: required field is missing".
-            message_prefix = _(u"Error:")
-        else:
-            message_prefix = None
-        return self.system.render_template('validation-message.html', {
-            'message': message,
-            'message_type': message_type,
-            'message_prefix': message_prefix,
-        })
-
     def student_view(self, context):
         """
         Render the contents of the chosen condition for students, and all the
