@@ -22,7 +22,6 @@ import os.path
 import logging
 import sys
 import argparse
-import copy
 
 from path import path
 from polib import pofile
@@ -85,9 +84,6 @@ def main(verbosity=1):
     make_djangojs_cmd = makemessages + ' -d djangojs --extension js'
     execute(make_djangojs_cmd, working_directory=BASE_DIR, stderr=stderr)
 
-    # Extract and megre strings from underscore files
-    extract_and_merge_underscore()
-
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
     os.rename(
@@ -137,76 +133,6 @@ def main(verbosity=1):
         # remove key strings which belong in messages.po
         strip_key_strings(po)
         po.save()
-
-
-def extract_and_merge_underscore():
-    source_msgs_dir = CONFIGURATION.source_messages_dir
-
-    # Extract strings from .underscore file by using grep and sed into
-    # a temp file 'underscore.po'. It is done by the following steps:
-    #
-    # 1. Extract all the patterns of gettext('...') or gettext("...")
-    #    using grep's regexp "gettext\([\'\"][^\(\)]+\)", and grep will
-    #    return each occurence as "<filename>:<line number>:<string>"
-    # 2. Replace all the single quotes in grep's output into double quotes
-    #    by using two consequent sed's regexps s/\(\'/\(\"/ and s/\'\)/\"\)/
-    # 3. Replace the starting './' of each line into '#: ' to make the filename
-    #    looks like occurrence string already in .po files, by using sed's
-    #    regexp s/^\.[/]/#\:\ /
-    # 4. Replace the first occurence of ':gettext(' (which is always the matched
-    #    string returned by grep) into '\nmsgid ' by using sed's regexp
-    #    s/\:gettext\(/\\nmsgid\ /
-    # 5. Replace the last occurence of ')' by '\nmsgstr ""\n' by using sed's
-    #    regexp s/\)$/\\nmsgstr\ \"\"\\n/
-    #
-    # For example, if step 1 returns a string like the following line:
-    # ./cms/templates/js/edit-textbook.underscore:25:gettext("Save")
-    # Then after steps 2 - 5, it will be converted into the following three lines:
-    # #: cms/templates/js/edit-textbook.underscore:25
-    # msgid "Save"
-    # msgstr ""
-    #
-    extract_underscore_cmd = 'find -name *.underscore -exec {step1_cmd} \\; '\
-                             '| {step2_cmd_1} | {step2_cmd_2} | {step3_cmd} '\
-                             '| {step4_cmd} | {step5_cmd} > {output}'
-    extract_underscore_cmd = extract_underscore_cmd.format(
-        step1_cmd='grep -HnoE "gettext\\([\\\'\\"][^\\(\\)]+\\)" \'{}\'',
-        step2_cmd_1='sed s/\\(\\\'/\\(\\"/',
-        step2_cmd_2='sed s/\\\'\\)/\\"\\)/',
-        step3_cmd='sed s/^\\.[/]/#\\:\\ /',
-        step4_cmd='sed s/\\:gettext\\(/\\\\nmsgid\\ /',
-        step5_cmd='sed s/\\)$/\\\\nmsgstr\\ \\"\\"\\\\n/',
-        output=source_msgs_dir.joinpath('underscore.po')
-    )
-    execute(extract_underscore_cmd, working_directory=BASE_DIR)
-
-    # Construct a dictionary by using the string as key and occurrence as value
-    # from underscore.po. This dictionary is used for merging later
-    underscore_po = pofile(source_msgs_dir.joinpath('underscore.po'))
-    underscore_po_occurrences = {}
-    for msg in underscore_po:
-        if msg.msgid in underscore_po_occurrences:
-            if msg.occurrences[0] not in underscore_po_occurrences[msg.msgid]:
-                underscore_po_occurrences[msg.msgid].extend(msg.occurrences)
-        else:
-            underscore_po_occurrences[msg.msgid] = msg.occurrences
-    # The temp file can be safely deleted
-    os.remove(source_msgs_dir.joinpath('underscore.po'))
-
-    # Merge the messages into djangojs.po
-    djangojs_po = pofile(source_msgs_dir.joinpath('djangojs.po'))
-    # Step 1:
-    # Append new occurrences from .underscore files for the strings already in djangojs.po 
-    for msg in djangojs_po:
-        msg.occurrences.extend(underscore_po_occurrences.pop(msg.msgid, []))
-    # Step 2:
-    # Append all the remaining strings into djangojs.po
-    for msgid in underscore_po_occurrences:
-        msg = copy.deepcopy(djangojs_po[0])
-        msg.msgid = msgid
-        msg.occurrences = underscore_po_occurrences[msgid]
-        djangojs_po.append(msg)
-    djangojs_po.save(source_msgs_dir.joinpath('djangojs.po'))
 
 
 def fix_header(po):
