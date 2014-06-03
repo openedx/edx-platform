@@ -49,11 +49,10 @@ from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReve
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from dark_lang.models import DarkLangConfig
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -126,11 +125,6 @@ def index(request, extra_context={}, user=AnonymousUser()):
 
     context.update(extra_context)
     return render_to_response('index.html', context)
-
-
-def course_from_id(course_id):
-    """Return the CourseDescriptor corresponding to this course_id"""
-    return modulestore().get_course(course_id)
 
 
 def embargo(_request):
@@ -242,7 +236,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        course = course_from_id(enrollment.course_id)
+        course = modulestore().get_course(enrollment.course_id)
         if course and not isinstance(course, ErrorDescriptor):
 
             # if we are in a Microsite, then filter out anything that is not
@@ -603,7 +597,7 @@ def change_enrollment(request):
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         try:
-            course = course_from_id(course_id)
+            course = modulestore().get_course(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
@@ -671,7 +665,7 @@ def _get_course_enrollment_domain(course_id):
     @param course_id:
     @return:
     """
-    course = course_from_id(course_id)
+    course = modulestore().get_course(course_id)
     if course is None:
         return None
 
