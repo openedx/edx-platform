@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
-from student.views import course_from_id, reverification_info
+from student.views import reverification_info
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors.CyberSource import (
     get_signed_purchase_params, get_purchase_endpoint
@@ -36,6 +36,7 @@ import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from .exceptions import WindowExpiredException
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ class VerifyView(View):
         else:
             chosen_price = verify_mode.min_price
 
-        course = course_from_id(course_id)
+        course = modulestore().get_course(course_id)
         context = {
             "progress_state": progress_state,
             "user_full_name": request.user.profile.name,
@@ -133,7 +134,7 @@ class VerifiedView(View):
             verify_mode.min_price
         )
 
-        course = course_from_id(course_id)
+        course = modulestore().get_course(course_id)
         context = {
             "course_id": course_id.to_deprecated_string(),
             "course_modes_choose_url": reverse('course_modes_choose', kwargs={'course_id': course_id.to_deprecated_string()}),
@@ -271,7 +272,6 @@ def results_callback(request):
     # If this is a reverification, log an event
     if attempt.window:
         course_id = attempt.window.course_id
-        course = course_from_id(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
 
@@ -288,7 +288,7 @@ def show_requirements(request, course_id):
         return redirect(reverse('dashboard'))
 
     upgrade = request.GET.get('upgrade', False)
-    course = course_from_id(course_id)
+    course = modulestore().get_course(course_id)
     context = {
         "course_id": course_id.to_deprecated_string(),
         "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()}),
@@ -372,7 +372,7 @@ class MidCourseReverifyView(View):
         display this view
         """
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        course = course_from_id(course_id)
+        course = modulestore().get_course(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
         course_enrollment.emit_event(EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW)
@@ -440,7 +440,7 @@ def midcourse_reverify_dash(request):
     course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+            course_enrollment_pairs.append((modulestore().get_course(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
