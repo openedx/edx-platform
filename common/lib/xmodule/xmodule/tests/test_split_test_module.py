@@ -238,12 +238,23 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(0, partitions[1]['value'])
         self.assertEqual("first_partition", partitions[1]['display_name'])
 
+    def test_validation_message_types(self):
+        """
+        Test the behavior of validation message types.
+        """
+        self.assertEqual(ValidationMessageType.display_name(ValidationMessageType.error), u"Error")
+        self.assertEqual(ValidationMessageType.display_name(ValidationMessageType.warning), u"Warning")
+        self.assertIsNone(ValidationMessageType.display_name(ValidationMessageType.information))
+
     def test_validation_messages(self):
         """
         Test the validation messages produced for different split_test configurations.
         """
 
         def verify_validation_message(split_test_module, expected_message, expected_message_type):
+            """
+            Verify that the module has the expected validation message and type.
+            """
             (message, message_type) = split_test_module.validation_message()
             self.assertEqual(message, expected_message)
             self.assertEqual(message_type, expected_message_type)

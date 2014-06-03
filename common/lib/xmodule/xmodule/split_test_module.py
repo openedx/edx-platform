@@ -34,6 +34,22 @@ class ValidationMessageType(object):
     warning = 'warning'
     error = 'error'
 
+    @staticmethod
+    def display_name(message_type):
+        """
+        Returns the display name for the specified validation message type.
+        """
+        if message_type == ValidationMessageType.warning:
+            # Translators: This message will be added to the front of messages of type warning,
+            # e.g. "Warning: this component has not been configured yet".
+            return _(u"Warning")
+        elif message_type == ValidationMessageType.error:
+            # Translators: This message will be added to the front of messages of type error,
+            # e.g. "Error: required field is missing".
+            return _(u"Error")
+        else:
+            return None
+
 
 class SplitTestFields(object):
     """Fields needed for split test module"""

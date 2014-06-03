@@ -4,17 +4,7 @@
 <%
 split_test = context.get('split_test')
 (message, message_type) = split_test.descriptor.validation_message()
-if message_type == ValidationMessageType.warning:
-    # Translators: This message will be added to the front of messages of type warning,
-    # e.g. "Warning: this component has not been configured yet".
-    message_prefix = _(u"Warning:")
-elif message_type == ValidationMessageType.error:
-    # Translators: This message will be added to the front of messages of type error,
-    # e.g. "Error: required field is missing".
-    message_prefix = _(u"Error:")
-else:
-    message_prefix = None
-
+message_type_display_name = ValidationMessageType.display_name(message_type) if message_type else None
 is_configured = split_test.user_partition_id >= 0
 %>
 
@@ -41,8 +31,8 @@ is_configured = split_test.user_partition_id >= 0
                 <i class='icon-exclamation-sign'></i>
             % endif
         <span class='message-text'>
-            % if message_prefix:
-                <span class='sr'>${message_prefix}</span>
+            % if message_type_display_name:
+                <span class='sr'>${message_type_display_name}:</span>
             % endif
             ${message}
         </span>
