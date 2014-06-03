@@ -63,6 +63,24 @@ class AnnotatableFields(object):
         default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         display_name=_("Secret Token String for Annotation")
     )
+    default_tab = String(
+        display_name=_("Default Annotations Tab"),
+        help=_("Select which tab will be the default in the annotations table: myNotes, Instructor, or Public."),
+        scope=Scope.settings,
+        default="myNotes",
+    )
+    instructor_username = String(
+        display_name=_("Username for 'Instructor' Annotations"),
+        help=_("Username that will be attached to all annotations that will be found in 'Instructor' tab."),
+        scope=Scope.settings,
+        default="",
+    )
+    annotation_mode = String(
+        display_name=_("Mode for Annotation Tool"),
+        help=_("Type in number corresponding to following modes: 1 = only instructor can annotate , 2 = Everyone can annotate"),
+        scope=Scope.settings,
+        default="2",
+    )
 
 
 class ImageAnnotationModule(AnnotatableFields, XModule):
@@ -104,6 +122,9 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             'token': retrieve_token(self.user, self.annotation_token_secret),
             'tag': self.instructor_tags,
             'openseadragonjson': self.openseadragonjson,
+            'default_tab': self.default_tab,
+            'instructor_username': self.instructor_username,
+            'annotation_mode': self.annotation_mode,
         }
 
         fragment = Fragment(self.system.render_template('imageannotation.html', context))

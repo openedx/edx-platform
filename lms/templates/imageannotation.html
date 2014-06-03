@@ -189,6 +189,11 @@
 	    //Load the plugin Image/Text Annotation
 	    var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
 	    
+        var userId = '${user.email}';
+        if('${default_tab}'.toLowerCase() == 'instructor'){
+            userId = '${instructor_username}';
+        }
+
 	    //Catch
 	    var annotator = osda.annotator,
 		catchOptions = {
@@ -197,9 +202,12 @@
 		    imageUrlRoot:imgURLRoot,
 		    showMediaSelector: false,
 		    showPublicPrivate: true,
-		    userId:'${user.email}',
-		    pagination:pagination,//Number of Annotations per load in the pagination,
-		    flags:is_staff
+		    userId:userId,
+            pagination:pagination,//Number of Annotations per load in the pagination,
+            flags:is_staff,
+            default_tab: "${default_tab}",
+            instructor_username: "${instructor_username}",
+            annotation_mode: "${annotation_mode}",
 		},
 		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 
