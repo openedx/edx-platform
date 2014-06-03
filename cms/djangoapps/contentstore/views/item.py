@@ -180,7 +180,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock = store.get_item(usage_key)
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
-        unit_views = ['student_view']
+        unit_views = ['student_view', 'author_view']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -213,7 +213,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # Note: this special case logic can be removed once the unit page is replaced
             # with the new container view.
             context = {
-                'runtime_type': 'studio',
                 'container_view': is_container_view,
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,

@@ -21,13 +21,14 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
+from cms.lib.xblock.field_data import CmsFieldData
 from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .helpers import render_from_lms, xblock_has_own_studio_page
+from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
 
@@ -143,15 +144,20 @@ def _preview_module_system(request, descriptor):
 
 def _load_preview_module(request, descriptor):
     """
-    Return a preview XModule instantiated from the supplied descriptor.
+    Return a preview XModule instantiated from the supplied descriptor. Will use mutable fields
+    if XModule supports an author_view. Otherwise, will use immutable fields and student_view.
 
     request: The active django request
     descriptor: An XModuleDescriptor
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
+    if _has_author_view(descriptor):
+        field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    else:
+        field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor),
-        LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
+        field_data
     )
     return descriptor
 
@@ -169,7 +175,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view == 'student_view':
+    if context.get('container_view', None) and view in ['student_view', 'author_view']:
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
@@ -187,14 +193,25 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
 
 def get_preview_fragment(request, descriptor, context):
     """
-    Returns the HTML returned by the XModule's student_view,
+    Returns the HTML returned by the XModule's student_view or author_view (if available),
     specified by the descriptor and idx.
     """
     module = _load_preview_module(request, descriptor)
 
+    preview_view = 'author_view' if _has_author_view(module) else 'student_view'
+
     try:
-        fragment = module.render("student_view", context)
+        fragment = module.render(preview_view, context)
     except Exception as exc:                          # pylint: disable=W0703
-        log.warning("Unable to render student_view for %r", module, exc_info=True)
+        log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment
+
+
+def _has_author_view(descriptor):
+    """
+    Returns True if the xmodule linked to the descriptor supports "author_view".
+
+    If False, "student_view" and LmsFieldData should be used.
+    """
+    return getattr(descriptor, 'has_author_view', False)

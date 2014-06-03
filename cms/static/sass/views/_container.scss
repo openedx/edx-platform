@@ -253,6 +253,46 @@ body.view-container .content-primary {
     }
   }
 
+  // groups in experiments
+  .wrapper-groups {
+
+    .title {
+      @extend %t-title7;
+      margin-left: ($baseline/2);
+      color: $gray-l1;
+    }
+
+    &.is-active {
+
+      // Don't show delete buttons on active groups
+      .wrapper-xblock.level-nesting > .xblock-header .action-delete {
+        display: none;
+      }
+
+
+    }
+
+    &.is-inactive {
+      margin: $baseline 0 0 0;
+      border-top: 2px dotted $gray-l2;
+      padding: ($baseline/2) 0;
+      background-color: $gray-l4;
+
+      .wrapper-xblock.level-nesting {
+        @include transition(all $tmg-f2 linear 0s);
+        opacity: .7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      .new-component-item {
+        display: none;
+      }
+    }
+  }
+
   // add a new component menu override - most styles currently live in _unit.scss
   .new-component-item {
     margin: $baseline ($baseline/2);

@@ -28,6 +28,11 @@
       display: inline-block;
       width: 50%;
       vertical-align: middle;
+
+      .xblock-display-name {
+        display: inline-block;
+        vertical-align: middle;
+      }
     }
 
     .header-actions {

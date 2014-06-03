@@ -71,7 +71,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 // Notify the runtime that the modal has been shown
                 if (runtime) {
                     this.runtime = runtime;
-                    runtime.notify("edit-modal-shown", this);
+                    runtime.notify('modal-shown', this);
                 }
 
                 // Update the modal's header
@@ -166,7 +166,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
                 // Notify the runtime that the modal has been hidden
                 if (this.runtime) {
-                    this.runtime.notify('edit-modal-hidden');
+                    this.runtime.notify('modal-hidden');
                 }
 
                 // Completely clear the contents of the modal
@@ -180,7 +180,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     displayName;
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
-                    displayName = xblockWrapperElement.find('.xblock-header .header-details').text().trim();
+                    displayName = xblockWrapperElement.find('.xblock-header .header-details .xblock-display-name').text().trim();
                     // If not found, try looking for the old unit page style rendering
                     if (!displayName) {
                         displayName = this.xblockElement.find('.component-header').text().trim();
