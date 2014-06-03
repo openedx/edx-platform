@@ -345,8 +345,8 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
                         return JsonResponse({"error": "Invalid data"}, 400)
                     field.write_to(existing_item, value)
 
-        if callable(getattr(existing_item, "editor_saved", None)):
-            existing_item.editor_saved(request.user, old_metadata, old_content)
+    if callable(getattr(existing_item, "editor_saved", None)):
+        existing_item.editor_saved(request.user, old_metadata, old_content)
 
     # commit to datastore
     store.update_item(existing_item, request.user.id)

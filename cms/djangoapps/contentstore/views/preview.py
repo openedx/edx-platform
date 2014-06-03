@@ -21,13 +21,14 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
+from cms.lib.xblock.field_data import CmsFieldData
 from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .helpers import render_from_lms, xblock_has_own_studio_page
+from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
 
@@ -141,17 +142,24 @@ def _preview_module_system(request, descriptor):
     )
 
 
-def _load_preview_module(request, descriptor):
+def _load_preview_module(request, descriptor, studio_view=False):
     """
     Return a preview XModule instantiated from the supplied descriptor.
 
     request: The active django request
     descriptor: An XModuleDescriptor
+    studio_view: if False (default value), editing of the descriptor's field data
+      will not be allowed. If the preview is being rendered in Studio and in-place editing is
+      desired, specify True.
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
+    if studio_view:
+        field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    else:
+        field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor),
-        LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
+        field_data
     )
     return descriptor
 
@@ -189,8 +197,11 @@ def get_preview_fragment(request, descriptor, context):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
+
+    Note though that this method will allow editing of the descriptor's content and settings
+    via the returned HTML. This is normally not the case when student_view is called.
     """
-    module = _load_preview_module(request, descriptor)
+    module = _load_preview_module(request, descriptor, studio_view=True)
 
     try:
         fragment = module.render("student_view", context)

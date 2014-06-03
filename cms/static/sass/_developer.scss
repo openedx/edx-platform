@@ -8,3 +8,22 @@
 // }
 
 // --------------------
+
+.wrapper-groups.is-inactive {
+  padding-top: 20px;
+  background-color: yellow;
+}
+
+// Don't show delete buttons by default for verticals
+.xblock-header-vertical {
+  .delete-button {
+    display: none;
+  }
+}
+
+// For inactive groups, we do want to allow the user to delete the associated vertical
+.wrapper-groups.is-inactive .xblock-header-vertical {
+  .delete-button {
+    display: none;
+  }
+}

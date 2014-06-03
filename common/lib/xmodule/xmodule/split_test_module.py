@@ -246,22 +246,52 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
+        active_groups_preview = None
+        inactive_groups_preview = None
+        if is_root:
+            active_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.active_children(), context
+            )
+            inactive_groups_preview = self.studio_render_children(
+                fragment, self.descriptor.inactive_children(), context
+            )
 
-        # First render a header at the top of the split test module...
-        fragment.add_content(self.system.render_template('split_test_studio_header.html', {
+        is_missing_group = False
+        user_partition = self.descriptor._get_selected_partition()
+        if user_partition:
+            for group in user_partition.groups:
+                if unicode(group.id) not in self.group_id_to_child:
+                    is_missing_group = True
+                    break
+
+        fragment.add_content(self.system.render_template('split_test_studio_preview.html', {
             'split_test': self,
             'is_root': is_root,
+            'active_groups_preview': active_groups_preview,
+            'inactive_groups_preview': inactive_groups_preview,
+            'is_missing_group': is_missing_group
         }))
-
-        # ... then render the children only when this block is being shown as the container
-        if is_root:
-            self.render_children(context, fragment, can_reorder=False)
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_studio_preview.js'))
+        fragment.initialize_js('SplitTestStudioPreviewView')
 
         return fragment
 
+    def studio_render_children(self, fragment, children, context):
+        """
+        Renders the specified children and returns it as an HTML string. In addition, any
+        dependencies are added to the specified fragment.
+        """
+        html = ""
+        for active_child_descriptor in children:
+            active_child = self.system.get_module(active_child_descriptor)
+            rendered_child = active_child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+            html = html + rendered_child.content
+        return html
+
     def student_view(self, context):
         """
-        Render the contents of the chosen condition for students, and all the
+        Renders the contents of the chosen condition for students, and all the
         conditions for staff.
         """
         # When rendering a Studio preview, render all of the block's children
@@ -360,7 +390,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def get_context(self):
         _context = super(SplitTestDescriptor, self).get_context()
         _context.update({
-            'disable_user_partition_editing': self._disable_user_partition_editing(),
             'selected_partition': self._get_selected_partition()
         })
         return _context
@@ -383,24 +412,16 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         if 'user_partition_id' not in old_content or old_content['user_partition_id'] != self.user_partition_id:
             selected_partition = self._get_selected_partition()
             if selected_partition is not None:
-                assert hasattr(self.system, 'modulestore'), \
-                    "editor_saved should only be called when a mutable modulestore is available"
-                modulestore = self.system.modulestore
-                group_id_mapping = {}
+                self.group_id_mapping = {}
                 for group in selected_partition.groups:
-                    dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
-                    metadata = {'display_name': group.name}
-                    modulestore.create_and_save_xmodule(
-                        dest_usage_key,
-                        definition_data=None,
-                        metadata=metadata,
-                        system=self.system,
-                    )
-                    self.children.append(dest_usage_key)  # pylint: disable=no-member
-                    group_id_mapping[unicode(group.id)] = dest_usage_key
-
-                self.group_id_to_child = group_id_mapping
+                    self._create_vertical_for_group(group)
                 # Don't need to call update_item in the modulestore because the caller of this method will do it.
+        else:
+            # If children referenced in group_id_to_child have been deleted, remove them from the map.
+            for str_group_id, usage_key in self.group_id_to_child.items():
+                if usage_key not in self.children:
+                    del self.group_id_to_child[str_group_id]
+
 
     @property
     def editable_metadata_fields(self):
@@ -409,13 +430,12 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
         editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
 
-        if not self._disable_user_partition_editing():
-            # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
-            # Note that this means it will be saved by the Studio editor as "metadata", but the field will
-            # still update correctly.
-            editable_fields[SplitTestFields.user_partition_id.name] = self._create_metadata_editor_info(
-                SplitTestFields.user_partition_id
-            )
+        # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
+        # Note that this means it will be saved by the Studio editor as "metadata", but the field will
+        # still update correctly.
+        editable_fields[SplitTestFields.user_partition_id.name] = self._create_metadata_editor_info(
+            SplitTestFields.user_partition_id
+        )
 
         return editable_fields
 
@@ -428,12 +448,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         ])
         return non_editable_fields
 
-    def _disable_user_partition_editing(self):
-        """
-        If user_partition_id has been set to anything besides the default value, disable editing.
-        """
-        return self.user_partition_id != SplitTestFields.user_partition_id.default
-
     def _get_selected_partition(self):
         """
         Returns the partition that this split module is currently using, or None
@@ -444,6 +458,44 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
                 return user_partition
 
         return None
+
+    def active_children(self):
+        """
+        Returns the active children of this split test, in the order of the groups.
+        """
+        children = self.get_children()
+
+        def get_child_descriptor_by_location(location):
+            """
+            Returns the child descriptor which matches the specified location, or None if one is not found.
+            """
+            for child in children:
+                if child.location == location:
+                    return child
+            return None
+
+        active_children = []
+        user_partition = self._get_selected_partition()
+        if not user_partition:
+            return active_children
+        for group in user_partition.groups:
+            group_id = unicode(group.id)
+            child_location = self.group_id_to_child.get(group_id, None)
+            child = get_child_descriptor_by_location(child_location) if child_location else None
+            if child:
+                active_children.append(child)
+        return active_children
+
+    def inactive_children(self):
+        """
+        Returns the inactive children of this split test, in the order of the groups.
+        """
+        inactive_children = []
+        active_children = self.active_children()
+        for child in self.get_children():
+            if not child in active_children:
+                inactive_children.append(child)
+        return inactive_children
 
     def validation_message(self):
         """
@@ -458,10 +510,46 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
             return \
                 _(u"This content experiment will not be shown to students because it refers to a group configuration that has been deleted. You can delete this experiment or reinstate the group configuration to repair it."), \
                 ValidationMessageType.error
-        groups = user_partition.groups
-        if not len(groups) == len(self.get_children()):
-            return _(u"This content experiment is in an invalid state and cannot be repaired. Please delete and recreate."), ValidationMessageType.error
+        if len(self.active_children()) < len(user_partition.groups):
+            return _(u"This content experiment is missing groups that are defined in the current configuration. You can press the 'Fix Me' button to have the missing groups created."), ValidationMessageType.error
+        if len(self.inactive_children()) > 0:
+            return _(u"This content experiment has children that are not associated with the selected group configuration. You can move content into an active group or delete it if it is unneeded."), ValidationMessageType.warning
 
         return _(u"This content experiment is part of group configuration '{experiment_name}'.").format(
             experiment_name=user_partition.name
         ), ValidationMessageType.information
+
+    @XBlock.handler
+    def add_missing_groups(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Create verticals for any missing groups in the split test instance.
+
+        Called from Studio view.
+        """
+        user_partition = self._get_selected_partition()
+        for group in user_partition.groups:
+            str_group_id = unicode(group.id)
+            changed = False
+            if str_group_id not in self.group_id_to_child:
+                self._create_vertical_for_group(group)
+                changed = True
+
+            if changed:
+                # request does not have a user attribute, so pass None for user.
+                self.system.modulestore.update_item(self, None)
+        return Response()
+
+    def _create_vertical_for_group(self, group):
+        assert hasattr(self.system, 'modulestore'), \
+            "editor_saved should only be called when a mutable modulestore is available"
+        modulestore = self.system.modulestore
+        dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
+        metadata = {'display_name': group.name}
+        modulestore.create_and_save_xmodule(
+            dest_usage_key,
+            definition_data=None,
+            metadata=metadata,
+            system=self.system,
+        )
+        self.children.append(dest_usage_key)  # pylint: disable=no-member
+        self.group_id_to_child[unicode(group.id)] = dest_usage_key

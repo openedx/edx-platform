@@ -28,7 +28,7 @@ is_configured = split_test.user_partition_id >= 0
             % if message_type == 'warning':
                 <i class='icon-warning-sign'></i>
             % elif message_type == 'error':
-                <i class='icon-exclamation-sign'></i>
+                <i  class='icon-exclamation-sign'></i>
             % endif
         <span class='message-text'>
             % if message_type_display_name:
@@ -37,6 +37,11 @@ is_configured = split_test.user_partition_id >= 0
             ${message}
         </span>
         </p>
+        % if is_missing_group:
+            <a href="#" class="button add-missing-groups-button action-button">
+                <span class="action-button-text">${_("Create Missing Groups")}</span>
+            </a>
+        % endif
     % endif
 
     % if is_root and not is_configured:
@@ -46,3 +51,18 @@ is_configured = split_test.user_partition_id >= 0
         </div>
     % endif
 % endif
+
+% if is_root:
+    <div class="wrapper-groups is-active">
+        <h3 class="sr">${_("Active Groups")}</h3>
+        ${active_groups_preview}
+    </div>
+
+    % if inactive_groups_preview:
+        <div class="wrapper-groups is-inactive">
+            <h3 class="sr">${_("Inactive Groups")}</h3>
+            ${inactive_groups_preview}
+        </div>
+    % endif
+% endif
+
