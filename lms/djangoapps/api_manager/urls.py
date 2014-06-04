@@ -32,9 +32,10 @@ router.register(r'organizations', OrganizationsViewSet)
 # Project-related ViewSets
 router.register(r'projects', project_views.ProjectsViewSet)
 router.register(r'workgroups', project_views.WorkgroupsViewSet)
-router.register(r'submissions', project_views.SubmissionsViewSet)
-router.register(r'submission_reviews', project_views.SubmissionReviewsViewSet)
-router.register(r'peer_reviews', project_views.PeerReviewsViewSet)
+router.register(r'submissions', project_views.WorkgroupSubmissionsViewSet)
+router.register(r'workgroup_reviews', project_views.WorkgroupReviewsViewSet)
+router.register(r'submission_reviews', project_views.WorkgroupSubmissionReviewsViewSet)
+router.register(r'peer_reviews', project_views.WorkgroupPeerReviewsViewSet)
 router.register(r'groups', project_views.GroupViewSet)
 router.register(r'users', project_views.UserViewSet)
 urlpatterns += router.urls
