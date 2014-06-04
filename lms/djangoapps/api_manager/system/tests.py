@@ -76,3 +76,5 @@ class SystemApiTests(TestCase):
         self.assertGreater(len(response.data['name']), 0)
         self.assertIsNotNone(response.data['description'])
         self.assertGreater(len(response.data['description']), 0)
+        self.assertIsNotNone(response.data['resources'])
+
