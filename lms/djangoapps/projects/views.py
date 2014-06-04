@@ -6,15 +6,15 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, link
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Workgroup, Project, Submission
-from .models import SubmissionReview, PeerReview
+from .models import Project, Workgroup, WorkgroupSubmission
+from .models import WorkgroupReview, WorkgroupSubmissionReview, WorkgroupPeerReview
 from .serializers import UserSerializer, GroupSerializer
-from .serializers import WorkgroupSerializer, ProjectSerializer, SubmissionSerializer
-from .serializers import SubmissionReviewSerializer, PeerReviewSerializer
+from .serializers import ProjectSerializer, WorkgroupSerializer, WorkgroupSubmissionSerializer
+from .serializers import WorkgroupReviewSerializer, WorkgroupSubmissionReviewSerializer, WorkgroupPeerReviewSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -40,37 +40,69 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
     serializer_class = WorkgroupSerializer
     model = Workgroup
 
-    @action()
+    @action(methods=['get', 'post'])
     def groups(self, request, pk):
         """
         Add a Group to a Workgroup
         """
-        group_id = request.DATA.get('id')
-        try:
-            group = Group.objects.get(id=group_id)
-        except ObjectDoesNotExist:
-            message = 'Group {} does not exist'.format(group_id)
-            return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
-        workgroup = self.get_object()
-        workgroup.groups.add(group)
-        workgroup.save()
-        return Response({}, status=status.HTTP_201_CREATED)
+        if request.method == 'GET':
+            groups = Group.objects.filter(workgroups=pk)
+            response_data = []
+            if groups:
+                for group in groups:
+                    serializer = GroupSerializer(group)
+                    response_data.append(serializer.data)
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            group_id = request.DATA.get('id')
+            try:
+                group = Group.objects.get(id=group_id)
+            except ObjectDoesNotExist:
+                message = 'Group {} does not exist'.format(group_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            workgroup = self.get_object()
+            workgroup.groups.add(group)
+            workgroup.save()
+            print workgroup.groups.all()
+            return Response({}, status=status.HTTP_201_CREATED)
 
-    @action()
+    @action(methods=['get', 'post'])
     def users(self, request, pk):
         """
         Add a User to a Workgroup
         """
-        user_id = request.DATA.get('id')
-        try:
-            user = User.objects.get(id=user_id)
-        except ObjectDoesNotExist:
-            message = 'User {} does not exist'.format(user_id)
-            return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
-        workgroup = self.get_object()
-        workgroup.users.add(user)
-        workgroup.save()
-        return Response({}, status=status.HTTP_201_CREATED)
+        if request.method == 'GET':
+            users = User.objects.filter(workgroups=pk)
+            response_data = []
+            if users:
+                for user in users:
+                    serializer = UserSerializer(user)
+                    response_data.append(serializer.data)
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            user_id = request.DATA.get('id')
+            try:
+                user = User.objects.get(id=user_id)
+            except ObjectDoesNotExist:
+                message = 'User {} does not exist'.format(user_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            workgroup = self.get_object()
+            workgroup.users.add(user)
+            workgroup.save()
+            return Response({}, status=status.HTTP_201_CREATED)
+
+    @link()
+    def peer_reviews(self, request, pk):
+        """
+        View Peer Reviews for a specific Workgroup
+        """
+        peer_reviews = WorkgroupPeerReview.objects.filter(workgroup=pk)
+        response_data = []
+        if peer_reviews:
+            for peer_review in peer_reviews:
+                serializer = WorkgroupPeerReviewSerializer(peer_review)
+                response_data.append(serializer.data)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class ProjectsViewSet(viewsets.ModelViewSet):
@@ -80,42 +112,59 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     model = Project
 
-    @action()
+    @action(methods=['get', 'post'])
     def workgroups(self, request, pk):
         """
         Add a Workgroup to a Project
         """
-        workgroup_id = request.DATA.get('id')
-        try:
-            workgroup = Workgroup.objects.get(id=workgroup_id)
-        except ObjectDoesNotExist:
-            message = 'Workgroup {} does not exist'.format(workgroup_id)
-            return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
-        project = self.get_object()
-        project.workgroups.add(workgroup)
-        project.save()
-        return Response({}, status=status.HTTP_201_CREATED)
+        if request.method == 'GET':
+            workgroups = Workgroup.objects.filter(project=pk)
+            response_data = []
+            if workgroups:
+                for workgroup in workgroups:
+                    serializer = WorkgroupSerializer(workgroup)
+                    response_data.append(serializer.data)
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            workgroup_id = request.DATA.get('id')
+            try:
+                workgroup = Workgroup.objects.get(id=workgroup_id)
+            except ObjectDoesNotExist:
+                message = 'Workgroup {} does not exist'.format(workgroup_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            project = self.get_object()
+            project.workgroups.add(workgroup)
+            project.save()
+            return Response({}, status=status.HTTP_201_CREATED)
 
 
-class SubmissionsViewSet(viewsets.ModelViewSet):
+class WorkgroupSubmissionsViewSet(viewsets.ModelViewSet):
     """
     Django Rest Framework ViewSet for the Submission model.
     """
-    serializer_class = SubmissionSerializer
-    model = Submission
+    serializer_class = WorkgroupSubmissionSerializer
+    model = WorkgroupSubmission
 
 
-class SubmissionReviewsViewSet(viewsets.ModelViewSet):
+class WorkgroupReviewsViewSet(viewsets.ModelViewSet):
+    """
+    Django Rest Framework ViewSet for the ProjectReview model.
+    """
+    serializer_class = WorkgroupReviewSerializer
+    model = WorkgroupReview
+
+
+class WorkgroupSubmissionReviewsViewSet(viewsets.ModelViewSet):
     """
     Django Rest Framework ViewSet for the SubmissionReview model.
     """
-    serializer_class = SubmissionReviewSerializer
-    model = SubmissionReview
+    serializer_class = WorkgroupSubmissionReviewSerializer
+    model = WorkgroupSubmissionReview
 
 
-class PeerReviewsViewSet(viewsets.ModelViewSet):
+class WorkgroupPeerReviewsViewSet(viewsets.ModelViewSet):
     """
     Django Rest Framework ViewSet for the PeerReview model.
     """
-    serializer_class = PeerReviewSerializer
-    model = PeerReview
+    serializer_class = WorkgroupPeerReviewSerializer
+    model = WorkgroupPeerReview
