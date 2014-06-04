@@ -58,18 +58,26 @@ def main(verbosity=1):
     }
     babel_verbosity = verbosity_map.get(verbosity, "")
 
+    if verbosity:
+        stderr = None
+    else:
+        stderr = DEVNULL
+
     babel_mako_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
     babel_mako_cmd = babel_mako_cmd.format(
         verbosity=babel_verbosity,
         config=base(LOCALE_DIR, 'babel_mako.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
     )
-    if verbosity:
-        stderr = None
-    else:
-        stderr = DEVNULL
-
     execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=stderr)
+
+    babel_underscore_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
+    babel_underscore_cmd = babel_underscore_cmd.format(
+        verbosity=babel_verbosity,
+        config=base(LOCALE_DIR, 'babel_underscore.cfg'),
+        output=base(CONFIGURATION.source_messages_dir, 'underscore.po'),
+    )
+    execute(babel_underscore_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     makemessages = "django-admin.py makemessages -l en -v{}".format(verbosity)
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
@@ -99,6 +107,8 @@ def main(verbosity=1):
     )
 
     files_to_clean = set()
+
+    files_to_clean.add(source_msgs_dir / "underscore.po")
 
     # Extract strings from third-party applications.
     for app_name in CONFIGURATION.third_party:
