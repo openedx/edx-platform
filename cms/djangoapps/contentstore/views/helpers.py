@@ -2,6 +2,7 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from edxmako import add_lookup
 from edxmako.shortcuts import render_to_string, render_to_response
 from xmodule.modulestore.django import loc_mapper, modulestore
 
@@ -10,6 +11,10 @@ __all__ = ['edge', 'event', 'landing']
 EDITING_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal"
 ]
+
+# Add Discussion templates
+add_lookup('lms.main', 'templates', package='discussion_app')
+
 
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
