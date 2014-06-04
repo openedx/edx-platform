@@ -351,7 +351,7 @@ def instructor_dashboard(request, course_id):
                 msg += message
 
     elif "Show Background Task History" in action:
-        problem_location = strip_if_string(request.POST.get('problem_for_all_students', ''))
+        problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
             problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
         except InvalidKeyError:
