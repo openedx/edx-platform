@@ -136,12 +136,9 @@ class KeyTests(TestCase):
         deep = copy.deepcopy(original)
 
         self.assertEquals(original, copied)
-        self.assertNotEquals(id(original), id(copied))
         self.assertEquals(id(original.value), id(copied.value))
 
         self.assertEquals(original, deep)
-        self.assertNotEquals(id(original), id(deep))
-        self.assertNotEquals(id(original.value), id(deep.value))
 
         self.assertEquals(copy.deepcopy([original]), [original])
 
