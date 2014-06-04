@@ -9,11 +9,12 @@ from mock import patch, Mock
 
 from django.test import RequestFactory
 
-from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups
+from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups, course_listing, AccessListFallback
 from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, UserBasedRole, OrgInstructorRole
+from student.models import CourseAccessRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -271,3 +272,38 @@ class TestCourseListing(ModuleStoreTestCase):
 
         courses_list = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), 1, courses_list)
+
+    def test_course_listing_org_permissions(self):
+        """
+        Create multiple courses within the same org.  Verify that someone with org-wide permissions can access
+        all of them.
+        """
+        org_course_one = SlashSeparatedCourseKey('AwesomeOrg', 'Course1', 'RunBabyRun')
+        course = CourseFactory.create(
+            org=org_course_one.org,
+            number=org_course_one.course,
+            run=org_course_one.run
+        )
+
+        org_course_two = SlashSeparatedCourseKey('AwesomeOrg', 'Course2', 'RunRunRun')
+        course = CourseFactory.create(
+            org=org_course_two.org,
+            number=org_course_two.course,
+            run=org_course_two.run
+        )
+
+        # Two types of org-wide roles have edit permissions: staff and instructor.  We test both
+        OrgStaffRole('AwesomeOrg').add_users(self.user)
+
+        with self.assertRaises(AccessListFallback):
+            _accessible_courses_list_from_groups(self.request)
+        courses_list = _accessible_courses_list(self.request)
+        self.assertEqual(len(courses_list), 2)
+
+        OrgStaffRole('AwesomeOrg').remove_users(self.user)
+        OrgInstructorRole('AwesomeOrg').add_users(self.user)
+
+        with self.assertRaises(AccessListFallback):
+            _accessible_courses_list_from_groups(self.request)
+        courses_list = _accessible_courses_list(self.request)
+        self.assertEqual(len(courses_list), 2)
