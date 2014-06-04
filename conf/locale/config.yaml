@@ -121,3 +121,4 @@ generate_merge:
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - underscore.po
