@@ -204,9 +204,7 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
                     expect(editButtons.length).toBe(2);
                     editButtons[1].click();
                     // Make sure that the correct xblock is requested to be edited
-                    expect(lastRequest().url).toBe(
-                        '/xblock/loc_2/studio_view'
-                    );
+                    expect(lastRequest().url.startsWith('/xblock/loc_2/studio_view')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []

@@ -17,6 +17,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 return $.ajax({
                     url: decodeURIComponent(xblockUrl) + "/" + view,
                     type: 'GET',
+                    cache: false,
                     headers: { Accept: 'application/json' },
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
