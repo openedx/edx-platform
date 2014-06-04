@@ -54,18 +54,17 @@ class SubmissionsApiTests(TestCase):
             is_active=True
         )
 
-        self.test_workgroup = Workgroup.objects.create(
-            name="Test Workgroup",
-        )
-        self.test_workgroup.users.add(self.test_user)
-        self.test_workgroup.save()
-
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,
             content_id=self.test_course_content_id,
         )
-        self.test_project.workgroups.add(self.test_workgroup)
-        self.test_project.save()
+
+        self.test_workgroup = Workgroup.objects.create(
+            name="Test Workgroup",
+            project=self.test_project,
+        )
+        self.test_workgroup.users.add(self.test_user)
+        self.test_workgroup.save()
 
         self.client = SecureClient()
         cache.clear()
@@ -102,7 +101,6 @@ class SubmissionsApiTests(TestCase):
     def test_submissions_list_post(self):
         submission_data = {
             'user': self.test_user.id,
-            'project': self.test_project.id,
             'workgroup': self.test_workgroup.id,
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
@@ -116,21 +114,21 @@ class SubmissionsApiTests(TestCase):
             self.test_submissions_uri,
             str(response.data['id'])
         )
+
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
         self.assertEqual(response.data['user'], self.test_user.id)
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
-        self.assertEqual(response.data['project'], self.test_project.id)
         self.assertEqual(response.data['document_id'], self.test_document_id)
         self.assertEqual(response.data['document_url'], self.test_document_url)
         self.assertEqual(response.data['document_mime_type'], self.test_document_mime_type)
+        self.assertIsNotNone(response.data['reviews'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
     def test_submissions_list_post_invalid_relationships(self):
         submission_data = {
             'user': 123456,
-            'project': self.test_project.id,
             'workgroup': self.test_workgroup.id,
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
@@ -141,18 +139,6 @@ class SubmissionsApiTests(TestCase):
 
         submission_data = {
             'user': self.test_user.id,
-            'project': 123456,
-            'workgroup': self.test_workgroup.id,
-            'document_id': self.test_document_id,
-            'document_url': self.test_document_url,
-            'document_mime_type': self.test_document_mime_type,
-        }
-        response = self.do_post(self.test_submissions_uri, submission_data)
-        self.assertEqual(response.status_code, 400)
-
-        submission_data = {
-            'user': self.test_user.id,
-            'project': self.test_project.id,
             'workgroup': 123456,
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
@@ -164,7 +150,6 @@ class SubmissionsApiTests(TestCase):
     def test_submissions_detail_get(self):
         submission_data = {
             'user': self.test_user.id,
-            'project': self.test_project.id,
             'workgroup': self.test_workgroup.id,
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
@@ -184,10 +169,10 @@ class SubmissionsApiTests(TestCase):
         self.assertGreater(response.data['id'], 0)
         self.assertEqual(response.data['user'], self.test_user.id)
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
-        self.assertEqual(response.data['project'], self.test_project.id)
         self.assertEqual(response.data['document_id'], self.test_document_id)
         self.assertEqual(response.data['document_url'], self.test_document_url)
         self.assertEqual(response.data['document_mime_type'], self.test_document_mime_type)
+        self.assertIsNotNone(response.data['reviews'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -196,10 +181,9 @@ class SubmissionsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_submnissions_detail_delete(self):
+    def test_submissions_detail_delete(self):
         submission_data = {
             'user': self.test_user.id,
-            'project': self.test_project.id,
             'workgroup': self.test_workgroup.id,
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,

@@ -2,7 +2,7 @@
 
 """
 Run these tests @ Devstack:
-    rake fasttest_lms[common/djangoapps/projects/tests/test_submissions.py]
+    rake fasttest_lms[common/djangoapps/projects/tests/test_workgroup_reviews.py]
 """
 import json
 import uuid
@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from projects.models import Project, Workgroup
+from projects.models import Project, Workgroup, WorkgroupSubmission
 from student.models import anonymous_id_for_user
 
 TEST_API_KEY = str(uuid.uuid4())
@@ -29,7 +29,7 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class PeerReviewsApiTests(TestCase):
+class WorkgroupReviewsApiTests(TestCase):
 
     """ Test suite for Users API views """
 
@@ -38,7 +38,7 @@ class PeerReviewsApiTests(TestCase):
         self.test_users_uri = '/api/users/'
         self.test_workgroups_uri = '/api/workgroups/'
         self.test_projects_uri = '/api/projects/'
-        self.test_peer_reviews_uri = '/api/peer_reviews/'
+        self.test_workgroup_reviews_uri = '/api/workgroup_reviews/'
 
         self.test_course_id = 'edx/demo/course'
         self.test_bogus_course_id = 'foo/bar/baz'
@@ -48,19 +48,12 @@ class PeerReviewsApiTests(TestCase):
         self.test_question = "Does the question data come from the XBlock definition?"
         self.test_answer = "It sure does!  And so does the answer data!"
 
-        self.test_peer_user = User.objects.create(
-            email="peer_user@edx.org",
-            username="peer",
+        self.test_user = User.objects.create(
+            email="test@edx.org",
+            username="testing",
             is_active=True
         )
-
-        self.test_reviewer_user = User.objects.create(
-            email="reviewer_user@edx.org",
-            username="reviewer",
-            is_active=True
-        )
-        self.anonymous_user_id = anonymous_id_for_user(self.test_reviewer_user, self.test_course_id)
-
+        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.test_course_id)
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,
             content_id=self.test_course_content_id,
@@ -70,8 +63,16 @@ class PeerReviewsApiTests(TestCase):
             name="Test Workgroup",
             project=self.test_project,
         )
-        self.test_workgroup.users.add(self.test_peer_user)
+        self.test_workgroup.users.add(self.test_user)
         self.test_workgroup.save()
+
+        self.test_submission = WorkgroupSubmission.objects.create(
+            user=self.test_user,
+            workgroup=self.test_workgroup,
+            document_id="Document12345.pdf",
+            document_url="http://test-s3.amazonaws.com/bucketname",
+            document_mime_type="application/pdf"
+        )
 
         self.client = SecureClient()
         cache.clear()
@@ -105,85 +106,71 @@ class PeerReviewsApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
-    def test_peer_reviews_list_post(self):
+    def test_workgroup_reviews_list_post(self):
         data = {
             'workgroup': self.test_workgroup.id,
-            'user': self.test_peer_user.id,
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
-        response = self.do_post(self.test_peer_reviews_uri, data)
+        response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
         confirm_uri = '{}{}{}/'.format(
             self.test_server_prefix,
-            self.test_peer_reviews_uri,
+            self.test_workgroup_reviews_uri,
             str(response.data['id'])
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['user'], self.test_peer_user.id)
         self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
+        self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
-        self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
-    def test_peer_reviews_list_post_invalid_relationships(self):
-        data = {
-            'user': 123456,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-        }
-        response = self.do_post(self.test_peer_reviews_uri, data)
-        self.assertEqual(response.status_code, 400)
-
-    def test_peer_reviews_detail_get(self):
+    def test_workgroup_reviews_detail_get(self):
         data = {
             'workgroup': self.test_workgroup.id,
-            'user': self.test_peer_user.id,
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
-        response = self.do_post(self.test_peer_reviews_uri, data)
+        response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_peer_reviews_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.test_workgroup_reviews_uri, str(response.data['id']))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = '{}{}{}/'.format(
             self.test_server_prefix,
-            self.test_peer_reviews_uri,
+            self.test_workgroup_reviews_uri,
             str(response.data['id'])
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['user'], self.test_peer_user.id)
         self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
+        self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
-    def test_peer_reviews_detail_get_undefined(self):
-        test_uri = '/api/peer_reviews/123456789/'
+    def test_workgroup_reviews_detail_get_undefined(self):
+        test_uri = '/api/workgroup_reviews/123456789/'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_peer_reviews_detail_delete(self):
+    def test_workgroup_reviews_detail_delete(self):
         data = {
             'workgroup': self.test_workgroup.id,
-            'user': self.test_peer_user.id,
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
-        response = self.do_post(self.test_peer_reviews_uri, data)
+        response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_peer_reviews_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.test_workgroup_reviews_uri, str(response.data['id']))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         response = self.do_delete(test_uri)
