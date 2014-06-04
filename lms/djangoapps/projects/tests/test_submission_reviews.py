@@ -12,7 +12,8 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from projects.models import Project, Workgroup, Submission
+from projects.models import Project, Workgroup, WorkgroupSubmission
+from student.models import anonymous_id_for_user
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -52,24 +53,23 @@ class SubmissionReviewsApiTests(TestCase):
             username="testing",
             is_active=True
         )
-
-        self.test_workgroup = Workgroup.objects.create(
-            name="Test Workgroup",
-        )
-        self.test_workgroup.users.add(self.test_user)
-        self.test_workgroup.save()
+        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.test_course_id)
 
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,
             content_id=self.test_course_content_id,
         )
-        self.test_project.workgroups.add(self.test_workgroup)
-        self.test_project.save()
 
-        self.test_submission = Submission.objects.create(
+        self.test_workgroup = Workgroup.objects.create(
+            name="Test Workgroup",
+            project=self.test_project,
+        )
+        self.test_workgroup.users.add(self.test_user)
+        self.test_workgroup.save()
+
+        self.test_submission = WorkgroupSubmission.objects.create(
             user=self.test_user,
             workgroup=self.test_workgroup,
-            project=self.test_project,
             document_id="Document12345.pdf",
             document_url="http://test-s3.amazonaws.com/bucketname",
             document_mime_type="application/pdf"
@@ -110,7 +110,7 @@ class SubmissionReviewsApiTests(TestCase):
     def test_submission_reviews_list_post(self):
         data = {
             'submission': self.test_submission.id,
-            'reviewer': self.test_user.id,
+            'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
@@ -124,7 +124,7 @@ class SubmissionReviewsApiTests(TestCase):
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['reviewer'], self.test_user.id)
+        self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
         self.assertEqual(response.data['submission'], self.test_submission.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
@@ -134,7 +134,7 @@ class SubmissionReviewsApiTests(TestCase):
     def test_submission_reviews_detail_get(self):
         data = {
             'submission': self.test_submission.id,
-            'reviewer': self.test_user.id,
+            'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
@@ -150,7 +150,7 @@ class SubmissionReviewsApiTests(TestCase):
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['reviewer'], self.test_user.id)
+        self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
         self.assertEqual(response.data['submission'], self.test_submission.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
@@ -165,11 +165,12 @@ class SubmissionReviewsApiTests(TestCase):
     def test_submission_reviews_detail_delete(self):
         data = {
             'submission': self.test_submission.id,
-            'reviewer': self.test_user.id,
+            'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
         }
         response = self.do_post(self.test_submission_reviews_uri, data)
+        print response.data
         self.assertEqual(response.status_code, 201)
         test_uri = '{}{}/'.format(self.test_submission_reviews_uri, str(response.data['id']))
         response = self.do_get(test_uri)

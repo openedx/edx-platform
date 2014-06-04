@@ -8,12 +8,26 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Project'
+        db.create_table('projects_project', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
+            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('content_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
+        ))
+        db.send_create_signal('projects', ['Project'])
+
+        # Adding unique constraint on 'Project', fields ['course_id', 'content_id']
+        db.create_unique('projects_project', ['course_id', 'content_id'])
+
         # Adding model 'Workgroup'
         db.create_table('projects_workgroup', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
             ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('project', self.gf('django.db.models.fields.related.ForeignKey')(related_name='workgroups', to=orm['projects.Project'])),
         ))
         db.send_create_signal('projects', ['Workgroup'])
 
@@ -33,68 +47,63 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('projects_workgroup_groups', ['workgroup_id', 'group_id'])
 
-        # Adding model 'Project'
-        db.create_table('projects_project', (
+        # Adding model 'WorkgroupReview'
+        db.create_table('projects_workgroupreview', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
             ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('content_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('workgroup', self.gf('django.db.models.fields.related.ForeignKey')(related_name='workgroup_reviews', to=orm['projects.Workgroup'])),
+            ('reviewer', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('question', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('answer', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
-        db.send_create_signal('projects', ['Project'])
+        db.send_create_signal('projects', ['WorkgroupReview'])
 
-        # Adding unique constraint on 'Project', fields ['course_id', 'content_id']
-        db.create_unique('projects_project', ['course_id', 'content_id'])
-
-        # Adding M2M table for field workgroups on 'Project'
-        db.create_table('projects_project_workgroups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('project', models.ForeignKey(orm['projects.project'], null=False)),
-            ('workgroup', models.ForeignKey(orm['projects.workgroup'], null=False))
-        ))
-        db.create_unique('projects_project_workgroups', ['project_id', 'workgroup_id'])
-
-        # Adding model 'Submission'
-        db.create_table('projects_submission', (
+        # Adding model 'WorkgroupSubmission'
+        db.create_table('projects_workgroupsubmission', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
             ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('workgroup', self.gf('django.db.models.fields.related.ForeignKey')(related_name='submissions', to=orm['projects.Workgroup'])),
-            ('project', self.gf('django.db.models.fields.related.ForeignKey')(related_name='projects', to=orm['projects.Project'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='submissions', to=orm['auth.User'])),
             ('document_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('document_url', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('document_mime_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
-        db.send_create_signal('projects', ['Submission'])
+        db.send_create_signal('projects', ['WorkgroupSubmission'])
 
-        # Adding model 'SubmissionReview'
-        db.create_table('projects_submissionreview', (
+        # Adding model 'WorkgroupSubmissionReview'
+        db.create_table('projects_workgroupsubmissionreview', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
             ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('submission', self.gf('django.db.models.fields.related.ForeignKey')(related_name='submission_reviews', to=orm['projects.Submission'])),
-            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='submission_reviews', to=orm['auth.User'])),
+            ('submission', self.gf('django.db.models.fields.related.ForeignKey')(related_name='reviews', to=orm['projects.WorkgroupSubmission'])),
+            ('reviewer', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('question', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('answer', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
-        db.send_create_signal('projects', ['SubmissionReview'])
+        db.send_create_signal('projects', ['WorkgroupSubmissionReview'])
 
-        # Adding model 'PeerReview'
-        db.create_table('projects_peerreview', (
+        # Adding model 'WorkgroupPeerReview'
+        db.create_table('projects_workgrouppeerreview', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
             ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='peer_reviewees', to=orm['auth.User'])),
-            ('reviewer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='peer_reviewers', to=orm['auth.User'])),
+            ('workgroup', self.gf('django.db.models.fields.related.ForeignKey')(related_name='peer_reviews', to=orm['projects.Workgroup'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='workgroup_peer_reviewees', to=orm['auth.User'])),
+            ('reviewer', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('question', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('answer', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
-        db.send_create_signal('projects', ['PeerReview'])
+        db.send_create_signal('projects', ['WorkgroupPeerReview'])
+
 
     def backwards(self, orm):
         # Removing unique constraint on 'Project', fields ['course_id', 'content_id']
         db.delete_unique('projects_project', ['course_id', 'content_id'])
+
+        # Deleting model 'Project'
+        db.delete_table('projects_project')
 
         # Deleting model 'Workgroup'
         db.delete_table('projects_workgroup')
@@ -105,20 +114,18 @@ class Migration(SchemaMigration):
         # Removing M2M table for field groups on 'Workgroup'
         db.delete_table('projects_workgroup_groups')
 
-        # Deleting model 'Project'
-        db.delete_table('projects_project')
+        # Deleting model 'WorkgroupReview'
+        db.delete_table('projects_workgroupreview')
 
-        # Removing M2M table for field workgroups on 'Project'
-        db.delete_table('projects_project_workgroups')
+        # Deleting model 'WorkgroupSubmission'
+        db.delete_table('projects_workgroupsubmission')
 
-        # Deleting model 'Submission'
-        db.delete_table('projects_submission')
+        # Deleting model 'WorkgroupSubmissionReview'
+        db.delete_table('projects_workgroupsubmissionreview')
 
-        # Deleting model 'SubmissionReview'
-        db.delete_table('projects_submissionreview')
+        # Deleting model 'WorkgroupPeerReview'
+        db.delete_table('projects_workgrouppeerreview')
 
-        # Deleting model 'PeerReview'
-        db.delete_table('projects_peerreview')
 
     models = {
         'auth.group': {
@@ -157,55 +164,65 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'projects.peerreview': {
-            'Meta': {'object_name': 'PeerReview'},
-            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'peer_reviewers'", 'to': "orm['auth.User']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'peer_reviewees'", 'to': "orm['auth.User']"})
-        },
         'projects.project': {
             'Meta': {'unique_together': "(('course_id', 'content_id'),)", 'object_name': 'Project'},
             'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'workgroups': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'projects'", 'symmetrical': 'False', 'to': "orm['projects.Workgroup']"})
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'})
         },
-        'projects.submission': {
-            'Meta': {'object_name': 'Submission'},
+        'projects.workgroup': {
+            'Meta': {'object_name': 'Workgroup'},
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'workgroups'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['auth.Group']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroups'", 'to': "orm['projects.Project']"}),
+            'users': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'workgroups'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['auth.User']"})
+        },
+        'projects.workgrouppeerreview': {
+            'Meta': {'object_name': 'WorkgroupPeerReview'},
+            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_peer_reviewees'", 'to': "orm['auth.User']"}),
+            'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'peer_reviews'", 'to': "orm['projects.Workgroup']"})
+        },
+        'projects.workgroupreview': {
+            'Meta': {'object_name': 'WorkgroupReview'},
+            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_reviews'", 'to': "orm['projects.Workgroup']"})
+        },
+        'projects.workgroupsubmission': {
+            'Meta': {'object_name': 'WorkgroupSubmission'},
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'document_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'document_mime_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'document_url': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'projects'", 'to': "orm['projects.Project']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['auth.User']"}),
             'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['projects.Workgroup']"})
         },
-        'projects.submissionreview': {
-            'Meta': {'object_name': 'SubmissionReview'},
+        'projects.workgroupsubmissionreview': {
+            'Meta': {'object_name': 'WorkgroupSubmissionReview'},
             'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
             'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submission_reviews'", 'to': "orm['auth.User']"}),
-            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submission_reviews'", 'to': "orm['projects.Submission']"})
-        },
-        'projects.workgroup': {
-            'Meta': {'object_name': 'Workgroup'},
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'workgroups'", 'symmetrical': 'False', 'to': "orm['auth.Group']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'workgroups'", 'symmetrical': 'False', 'to': "orm['auth.User']"})
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reviews'", 'to': "orm['projects.WorkgroupSubmission']"})
         }
     }
 
