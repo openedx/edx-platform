@@ -452,7 +452,7 @@ class CoursesDetail(SecureAPIView):
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/groups/'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/overview'.format(base_uri)
+        resource_uri = '{}/overview/'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/updates/'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
