@@ -7,9 +7,11 @@ import hmac
 import binascii
 import re
 import json
+import logging
+import datetime
 from collections import OrderedDict, defaultdict
 from decimal import Decimal, InvalidOperation
-from hashlib import sha1
+from hashlib import sha256
 from textwrap import dedent
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -53,24 +55,25 @@ def processor_hash(value):
     """
     Performs the base64(HMAC_SHA1(key, value)) used by CyberSource Hosted Order Page
     """
-    shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET', '')
-    hash_obj = hmac.new(shared_secret.encode('utf-8'), value.encode('utf-8'), sha1)
+    #shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET', '')
+    shared_secret = '51c8b01198464f2aba584782982611b1ae1fec4badb64f35b0eb9f3f06f10282049df0e3aa9b48019fcebb945a19e2e39dd983c2fd174a7786d50d8d8f5ac37fee751141720145c3b1b490e1c9356470eb5c76bc3909428bb2cd73c1c0390852952eea8a93c0418facdd1f3773a05882f209b79ff8724347bd8baf51c7b2f430'
+    hash_obj = hmac.new(shared_secret.encode('utf-8'), value.encode('utf-8'), sha256)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
 
-def sign(params, signed_fields_key='orderPage_signedFields', full_sig_key='orderPage_signaturePublic'):
+def sign(params, signed_fields_key='signed_field_names', full_sig_key='orderPage_signaturePublic'):
     """
     params needs to be an ordered dict, b/c cybersource documentation states that order is important.
     Reverse engineered from PHP version provided by cybersource
     """
-    merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID', '')
-    order_page_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION', '7')
-    serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER', '')
+    #merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID', '')
+    #order_page_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION', '7')
+    #serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER', '')
 
-    params['merchantID'] = merchant_id
-    params['orderPage_timestamp'] = int(time.time() * 1000)
-    params['orderPage_version'] = order_page_version
-    params['orderPage_serialNumber'] = serial_number
+    #params['merchantID'] = merchant_id
+    #params['orderPage_timestamp'] = int(time.time() * 1000)
+    #params['orderPage_version'] = order_page_version
+    #params['orderPage_serialNumber'] = serial_number
     fields = u",".join(params.keys())
     values = u",".join([u"{0}={1}".format(i, params[i]) for i in params.keys()])
     fields_sig = processor_hash(fields)
@@ -115,15 +118,47 @@ def get_purchase_params(cart):
     amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
     params = OrderedDict()
+    
     params['amount'] = amount
     params['currency'] = cart.currency
-    params['orderPage_transactionType'] = 'sale'
-    params['orderNumber'] = "{0:d}".format(cart.id)
+    #params['orderPage_transactionType'] = 'sale'
+    #params['orderNumber'] = "{0:d}".format(cart.id)
+
+    params['access_key'] = 'b5124bf80dba3a24a817522814e352d3'
+    params['profile_id'] = 'test_pr'
+    params['reference_number'] = '123456789'
+    params['transaction_type'] = 'authorization,create_payment_token'
+ 
+    params['locale'] = 'en'
+    #params['signed_date_time'] =  '2014-06-03T14:29:17.256Z'
+    params['signed_date_time'] =  (datetime.datetime.now() + datetime.timedelta(0, 14400)).isoformat() + 'Z'
+    #params['signed_field_names'] = 'access_key,profile_id,transaction_uuid,payment_token,signed_field_names,unsigned_field_names,signed_date_time,locale,transaction_type,reference_number,amount,currency'
+    #params['signed_field_names'] = 'access_key,profile_id,transaction_uuid,signed_field_names,unsigned_field_names,signed_date_time,locale,transaction_type,reference_number,amount,currency' 
+    params['signed_field_names'] = ''
+    params['unsigned_field_names'] = ''
+    params['transaction_uuid'] = '02815b4f08e56882751a043839b7b491'
+    params['payment_method']='card'
+
+    params['card_type']='001'
+    params['card_number']='4111111111111111'
+    params['card_expiry_date']='12-2022'
+    params['card_cvn']='005'
+    params['bill_to_forename']='Joe'
+    params['bill_to_surname']='Smith'
+    params['bill_to_email']='joesmith@example.com'
+    params['bill_to_address_line1']='1 My Apartment'
+    params['bill_to_address_state']='CA'
+    params['bill_to_address_country']='US'
+    params['bill_to_address_city']='Boston'
+    params['bill_to_address_postal_code']='11111'
 
     return params
+  
 
 def get_purchase_endpoint():
-    return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
+    
+    #return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
+    return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', 'https://testsecureacceptance.cybersource.com/pay')
 
 def payment_accepted(params):
     """

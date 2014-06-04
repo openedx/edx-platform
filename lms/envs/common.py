@@ -724,7 +724,7 @@ CC_PROCESSOR = {
         'MERCHANT_ID': '',
         'SERIAL_NUMBER': '',
         'ORDERPAGE_VERSION': '7',
-        'PURCHASE_ENDPOINT': '',
+        'PURCHASE_ENDPOINT': 'https://testsecureacceptance.cybersource.com/pay',
     }
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
