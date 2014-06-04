@@ -3,7 +3,7 @@ Asset compilation and collection.
 """
 from __future__ import print_function
 import argparse
-from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task
+from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import glob
@@ -113,6 +113,8 @@ def coffeescript_files():
     return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
 
 
+@task
+@no_help
 def compile_coffeescript(*files):
     """
     Compile CoffeeScript to JavaScript.

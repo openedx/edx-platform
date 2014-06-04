@@ -4,15 +4,6 @@ require 'colorize'
 require 'timeout'
 require 'net/http'
 
-def find_executable(exec)
-    path = %x(which #{exec}).strip
-    $?.exitstatus == 0 ? path : nil
-end
-
-def select_executable(*cmds)
-    cmds.find_all{ |cmd| !find_executable(cmd).nil? }[0] || fail("No executables found from #{cmds.join(', ')}")
-end
-
 def django_admin(system, env, command, *args)
     return "./manage.py #{system} --settings #{env} #{command} --traceback #{args.join(' ')}"
 end
