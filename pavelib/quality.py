@@ -5,7 +5,6 @@ from paver.easy import sh, task, cmdopts, needs
 import os
 import errno
 from .utils.envs import Env
-from .utils.test.utils import get_or_make_dir
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
@@ -23,7 +22,7 @@ def run_pylint(options):
     for system in systems:
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
-        report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
+        report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
         flags = '-E' if errors else ''
 
@@ -67,7 +66,7 @@ def run_pep8(options):
     for system in systems:
         # Directory to put the pep8 report in.
         # This makes the folder if it doesn't already exist.
-        report_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, system))
+        report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
         sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
 
@@ -81,7 +80,7 @@ def run_quality():
 
     # Directory to put the diff reports in.
     # This makes the folder if it doesn't already exist.
-    dquality_dir = get_or_make_dir(os.path.join(Env.REPORT_DIR, "diff_quality"))
+    dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
 
     # Generage diff-quality html report for pep8, and print to console
     # If pep8 reports exist, use those

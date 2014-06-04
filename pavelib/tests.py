@@ -146,9 +146,9 @@ def coverage():
     Build the html, xml, and diff coverage reports
     """
     for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
-        report_dir = os.path.join(Env.REPORT_DIR, directory)
+        report_dir = Env.REPORT_DIR / directory
 
-        if os.path.isfile(os.path.join(report_dir, '.coverage')):
+        if (report_dir / '.coverage').isfile():
             # Generate the coverage.py HTML report
             sh("coverage html --rcfile={dir}/.coveragerc".format(dir=directory))
 
@@ -161,14 +161,14 @@ def coverage():
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = []
 
-    for subdir, _dirs, files in os.walk(Env.REPORT_DIR):
-        if 'coverage.xml' in files:
-            xml_reports.append(os.path.join(subdir, 'coverage.xml'))
+    for filepath in Env.REPORT_DIR.walk():
+        if filepath.basename() == 'coverage.xml':
+            xml_reports.append(filepath)
 
     if len(xml_reports) < 1:
         err_msg = colorize(
-            "No coverage info found.  Run `paver test` before running `paver coverage`.",
-            'RED'
+            'red',
+            "No coverage info found.  Run `paver test` before running `paver coverage`."
         )
         sys.stderr.write(err_msg)
     else:

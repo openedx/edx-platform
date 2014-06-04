@@ -24,8 +24,8 @@ class NoseTestSuite(TestSuite):
 
     def __enter__(self):
         super(NoseTestSuite, self).__enter__()
-        test_utils.get_or_make_dir(self.report_dir)
-        test_utils.get_or_make_dir(self.test_id_dir)
+        self.report_dir.makedirs_p()
+        self.test_id_dir.makedirs_p()
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
@@ -90,9 +90,9 @@ class NoseTestSuite(TestSuite):
         Makes sure that the reports directory and the nodeids
         directory are present.
         """
-        report_dir = os.path.join(Env.REPORT_DIR, self.root)
-        test_id_dir = os.path.join(Env.TEST_DIR, self.root)
-        test_ids = os.path.join(test_id_dir, 'noseids')
+        report_dir = Env.REPORT_DIR / self.root
+        test_id_dir = Env.TEST_DIR / self.root
+        test_ids = test_id_dir / 'noseids'
 
         return report_dir, test_id_dir, test_ids
 
@@ -162,7 +162,7 @@ class LibTestSuite(NoseTestSuite):
     def __init__(self, *args, **kwargs):
         super(LibTestSuite, self).__init__(*args, **kwargs)
         self.test_id = kwargs.get('test_id', self.root)
-        self.xunit_report = os.path.join(self.report_dir, "nosetests.xml")
+        self.xunit_report = self.report_dir / "nosetests.xml"
 
     @property
     def cmd(self):

@@ -1,27 +1,10 @@
 """
 Helper functions for test tasks
 """
-import os
 from paver.easy import sh, task
 from pavelib.utils.envs import Env
-import errno
 
 __test__ = False  # do not collect
-
-
-def get_or_make_dir(directory_path):
-    """
-    Ensure that a directory exists, and return its path
-    """
-    try:
-        os.makedirs(directory_path)
-    except OSError as err:
-        if err.errno != errno.EEXIST:
-            # If we get an error other than one that says
-            # that the file already exists
-            raise
-
-    return directory_path
 
 
 @task
@@ -50,7 +33,7 @@ def clean_reports_dir():
     """
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
-    reports_dir = get_or_make_dir(Env.REPORT_DIR)
+    reports_dir = Env.REPORT_DIR.makedirs_p()
     clean_dir(reports_dir)
 
 

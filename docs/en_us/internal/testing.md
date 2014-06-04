@@ -138,12 +138,14 @@ To run a single django test:
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
     
-To re-run all failing django tests from lms or cms: (see note at end of section)
+To re-run all failing django tests from lms or cms, use the `--failed`,`-f` flag (see note at end of section)
 
     paver test_system -s lms --failed
     paver test_system -s cms --failed
-    
-common/lib tests are tested with the test_lib task, which also accepts the --failed argument. For example:
+
+There is also a `--fail_fast`, `-x` option that will stop nosetests after the first failure.
+
+common/lib tests are tested with the `test_lib` task, which also accepts the `--failed` and `--fail_fast` options. For example:
 
     paver test_lib -l common/lib/calc
 
@@ -191,7 +193,7 @@ Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you i
 
 Note: More on the `--failed` functionality
 * In order to use this, you must run the tests first. If you haven't already run the tests, or if no tests failed in the previous run, then using the `--failed` switch will result in **all** of the tests being run.  See more about this in the [nose documentation](http://nose.readthedocs.org/en/latest/plugins/testid.html#looping-over-failed-tests).
-* Note that `paver test_python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `rake test:python[--failed]` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `paver test_system -s lms --failed` or `paver test_system -s cms --failed` commands. 
+* Note that `paver test_python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `paver test_python --failed` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `paver test_system -s lms --failed` or `paver test_system -s cms --failed` commands. 
 
 
 ### Running Javascript Unit Tests

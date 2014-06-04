@@ -5,7 +5,6 @@ from pavelib import assets
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
-import os
 
 __test__ = False  # do not collect
 
@@ -29,7 +28,7 @@ class JsTestSuite(TestSuite):
 
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
-        test_utils.get_or_make_dir(self.report_dir)
+        self.report_dir.makedirs_p()
         test_utils.clean_test_files()
 
         if self.mode == 'run' and not self.run_under_coverage:
@@ -66,7 +65,7 @@ class JsTestSuite(TestSuite):
         paths of report directories and files.
         """
         report_dir = Env.JS_REPORT_DIR
-        coverage_report = os.path.join(report_dir, 'coverage.xml')
-        xunit_report = os.path.join(report_dir, 'javascript_xunit.xml')
+        coverage_report = report_dir / 'coverage.xml'
+        xunit_report = report_dir / 'javascript_xunit.xml'
 
         return report_dir, coverage_report, xunit_report

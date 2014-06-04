@@ -1,10 +1,8 @@
 """
 Classes used for defining and running i18n test suites
 """
-import os
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
-from pavelib.utils.test import utils as test_utils
 
 __test__ = False  # do not collect
 
@@ -19,7 +17,7 @@ class I18nTestSuite(TestSuite):
 
     def __enter__(self):
         super(I18nTestSuite, self).__enter__()
-        test_utils.get_or_make_dir(self.report_dir)
+        self.report_dir.makedirs_p()
 
     @property
     def cmd(self):
@@ -47,6 +45,6 @@ class I18nTestSuite(TestSuite):
         Returns paths of report directories and files.
         """
         report_dir = Env.I18N_REPORT_DIR
-        xunit_report = os.path.join(report_dir, 'nosetests.xml')
+        xunit_report = report_dir / 'nosetests.xml'
 
         return report_dir, xunit_report

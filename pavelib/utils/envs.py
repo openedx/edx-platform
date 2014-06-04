@@ -42,16 +42,16 @@ class Env(object):
         'common',
     ]
 
-    JS_REPORT_DIR = os.path.join(REPORT_DIR, 'javascript')
+    JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
     # Directories used for common/lib/ tests
     LIB_TEST_DIRS = []
-    for item in os.listdir('{}/common/lib'.format(REPO_ROOT)):
-        if os.path.isdir(os.path.join('{}/common/lib'.format(REPO_ROOT), item)):
-            LIB_TEST_DIRS.append(os.path.join('common/lib', item))
+    for item in (REPO_ROOT / "common/lib").listdir():
+        if (REPO_ROOT / 'common/lib' / item).isdir():
+            LIB_TEST_DIRS.append(path("common/lib") / item.basename())
 
     # Directory for i18n test reports
-    I18N_REPORT_DIR = os.path.join(REPORT_DIR, 'i18n')
+    I18N_REPORT_DIR = REPORT_DIR / 'i18n'
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
