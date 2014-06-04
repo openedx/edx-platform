@@ -7,11 +7,12 @@ Run these tests @ Devstack:
 import json
 import uuid
 
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from projects.models import Workgroup
+from projects.models import Project, Workgroup
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -41,9 +42,23 @@ class ProjectsApiTests(TestCase):
         self.test_course_content_id = "i4x://blah"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
 
+        self.test_user = User.objects.create(
+            email="test@edx.org",
+            username="testing",
+            is_active=True
+        )
+
+        self.test_project = Project.objects.create(
+            course_id=self.test_course_id,
+            content_id=self.test_course_content_id,
+        )
+
         self.test_workgroup = Workgroup.objects.create(
             name="Test Workgroup",
+            project=self.test_project,
         )
+        self.test_workgroup.users.add(self.test_user)
+        self.test_workgroup.save()
 
         self.client = SecureClient()
         cache.clear()
@@ -78,10 +93,11 @@ class ProjectsApiTests(TestCase):
         return response
 
     def test_projects_list_post(self):
+        test_course_content_id = "i4x://blahblah1234"
         data = {
             'name': self.test_project_name,
             'course_id': self.test_course_id,
-            'content_id': self.test_course_content_id
+            'content_id': test_course_content_id
         }
         response = self.do_post(self.test_projects_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -94,20 +110,13 @@ class ProjectsApiTests(TestCase):
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
         self.assertEqual(response.data['course_id'], self.test_course_id)
-        self.assertEqual(response.data['content_id'], self.test_course_content_id)
+        self.assertEqual(response.data['content_id'], test_course_content_id)
         self.assertIsNotNone(response.data['workgroups'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
     def test_projects_detail_get(self):
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': self.test_course_content_id
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_projects_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = self.test_server_prefix + test_uri
@@ -120,36 +129,20 @@ class ProjectsApiTests(TestCase):
         self.assertIsNotNone(response.data['modified'])
 
     def test_projects_workgroups_post(self):
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': self.test_course_content_id
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_projects_uri, str(response.data['id']))
-        workgroups_uri = '{}workgroups/'.format(test_uri)
+        test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
         data = {"id": self.test_workgroup.id}
-        response = self.do_post(workgroups_uri, data)
+        response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['workgroups'][0]['id'], self.test_workgroup.id)
+        self.assertEqual(response.data[0]['id'], self.test_workgroup.id)
 
     def test_projects_workgroups_post_invalid_workgroup(self):
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': self.test_course_content_id
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_projects_uri, str(response.data['id']))
-        workgroups_uri = '{}workgroups/'.format(test_uri)
+        test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
         data = {
             'id': 123456,
         }
-        response = self.do_post(workgroups_uri, data)
+        response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_projects_detail_get_undefined(self):
@@ -158,14 +151,7 @@ class ProjectsApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_projects_detail_delete(self):
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': self.test_course_content_id
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_projects_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         response = self.do_delete(test_uri)
