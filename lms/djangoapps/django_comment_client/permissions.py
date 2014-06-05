@@ -3,9 +3,8 @@ Module for checking permissions with the comment_client backend
 """
 
 import logging
-from types import NoneType
 from django.core import cache
-from xmodule.modulestore.keys import CourseKey
+
 
 CACHE = cache.get_cache('default')
 CACHE_LIFESPAN = 60
@@ -16,7 +15,6 @@ def cached_has_permission(user, permission, course_id=None):
     Call has_permission if it's not cached. A change in a user's role or
     a role's permissions will only become effective after CACHE_LIFESPAN seconds.
     """
-    assert isinstance(course_id, (NoneType, CourseKey))
     key = u"permission_{user_id:d}_{course_id}_{permission}".format(
         user_id=user.id, course_id=course_id, permission=permission)
     val = CACHE.get(key, None)
@@ -27,7 +25,6 @@ def cached_has_permission(user, permission, course_id=None):
 
 
 def has_permission(user, permission, course_id=None):
-    assert isinstance(course_id, (NoneType, CourseKey))
     for role in user.roles.filter(course_id=course_id):
         if role.has_permission(permission):
             return True
@@ -37,7 +34,7 @@ def has_permission(user, permission, course_id=None):
 CONDITIONS = ['is_open', 'is_author']
 
 
-def _check_condition(user, condition, course_id, data):
+def check_condition(user, condition, course_id, data):
     def check_open(user, condition, course_id, data):
         try:
             return data and not data['content']['closed']
@@ -58,7 +55,7 @@ def _check_condition(user, condition, course_id, data):
     return handlers[condition](user, condition, course_id, data)
 
 
-def _check_conditions_permissions(user, permissions, course_id, **kwargs):
+def check_conditions_permissions(user, permissions, course_id, **kwargs):
     """
     Accepts a list of permissions and proceed if any of the permission is valid.
     Note that ["can_view", "can_edit"] will proceed if the user has either
@@ -69,7 +66,7 @@ def _check_conditions_permissions(user, permissions, course_id, **kwargs):
     def test(user, per, operator="or"):
         if isinstance(per, basestring):
             if per in CONDITIONS:
-                return _check_condition(user, per, course_id, kwargs)
+                return check_condition(user, per, course_id, kwargs)
             return cached_has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
@@ -110,9 +107,8 @@ VIEW_PERMISSIONS = {
 
 
 def check_permissions_by_view(user, course_id, content, name):
-    assert isinstance(course_id, CourseKey)
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py" % name)
-    return _check_conditions_permissions(user, p, course_id, content=content)
+    return check_conditions_permissions(user, p, course_id, content=content)

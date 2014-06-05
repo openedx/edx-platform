@@ -13,9 +13,6 @@ from .prompt import query_yes_no
 from courseware.courses import get_course_by_id
 
 from contentstore.views import tabs
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import CourseKey
 
 
 def print_course(course):
@@ -67,12 +64,7 @@ command again, adding --insert or --delete to edit the list.
         if not options['course']:
             raise CommandError(Command.course_option.help)
 
-        try:
-            course_key = CourseKey.from_string(options['course'])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
-
-        course = get_course_by_id(course_key)
+        course = get_course_by_id(options['course'])
 
         print 'Warning: this command directly edits the list of course tabs in mongo.'
         print 'Tabs before any changes:'

@@ -3,7 +3,6 @@ import re
 
 from django.conf import settings
 from microsite_configuration import microsite
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
 
@@ -27,17 +26,11 @@ def course_id_from_url(url):
     """
     Extracts the course_id from the given `url`.
     """
-    if not url:
-        return None
+    url = url or ''
 
     match = COURSE_REGEX.match(url)
+    course_id = ''
+    if match:
+        course_id = match.group('course_id') or ''
 
-    if match is None:
-        return None
-
-    course_id = match.group('course_id')
-
-    if course_id is None:
-        return None
-
-    return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    return course_id

@@ -6,7 +6,6 @@ from collections import namedtuple, defaultdict
 
 
 from edxmako.shortcuts import render_to_string
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -60,7 +59,6 @@ def user_software_license(request):
     if not match:
         raise Http404
     course_id = match.groupdict().get('id', '')
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     user_id = request.session.get('_auth_user_id')
     software_name = request.POST.get('software')
@@ -68,7 +66,7 @@ def user_software_license(request):
 
     try:
         software = CourseSoftware.objects.get(name=software_name,
-                                              course_id=course_key)
+                                              course_id=course_id)
     except CourseSoftware.DoesNotExist:
         raise Http404
 

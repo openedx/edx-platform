@@ -1,10 +1,12 @@
+from ..utils import get_course_location_for_item
+from xmodule.modulestore.locator import CourseLocator
 from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from student import auth
 
 
-def has_course_access(user, course_key, role=CourseStaffRole):
+def has_course_access(user, location, role=CourseStaffRole):
     """
-    Return True if user allowed to access this course_id
+    Return True if user allowed to access this piece of data
     Note that the CMS permissions model is with respect to courses
     There is a super-admin permissions if user.is_staff is set
     Also, since we're unifying the user database between LMS and CAS,
@@ -14,22 +16,21 @@ def has_course_access(user, course_key, role=CourseStaffRole):
     """
     if GlobalStaff().has_user(user):
         return True
-    return auth.has_access(user, role(course_key))
+    if not isinstance(location, CourseLocator):
+        # this can be expensive if location is not category=='course'
+        location = get_course_location_for_item(location)
+    return auth.has_access(user, role(location))
 
 
-def get_user_role(user, course_id):
+def get_user_role(user, location, context=None):
     """
-    What type of access: staff or instructor does this user have in Studio?
-
-    No code should use this for access control, only to quickly serialize the type of access
-    where this code knows that Instructor trumps Staff and assumes the user has one or the other.
-
+    Return corresponding string if user has staff or instructor role in Studio.
     This will not return student role because its purpose for using in Studio.
 
-    :param course_id: the course_id of the course we're interested in
+    :param location: a descriptor.location (which may be a Location or a CourseLocator)
+    :param context: a course_id. This is not used if location is a CourseLocator.
     """
-    # afaik, this is only used in lti
-    if auth.has_access(user, CourseInstructorRole(course_id)):
+    if auth.has_access(user, CourseInstructorRole(location, context)):
         return 'instructor'
     else:
         return 'staff'

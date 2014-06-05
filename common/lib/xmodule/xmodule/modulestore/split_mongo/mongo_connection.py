@@ -1,9 +1,7 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
-import re
 import pymongo
-from bson import son
 
 class MongoConnection(object):
     """
@@ -20,7 +18,6 @@ class MongoConnection(object):
                 host=host,
                 port=port,
                 tz_aware=tz_aware,
-                document_class=son.SON,
                 **kwargs
             ),
             db
@@ -66,17 +63,11 @@ class MongoConnection(object):
         """
         self.structures.update({'_id': structure['_id']}, structure)
 
-    def get_course_index(self, key, ignore_case=False):
+    def get_course_index(self, key):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        case_regex = r"(?i)^{}$" if ignore_case else r"{}"
-        return self.course_index.find_one(
-            son.SON([
-                (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
-                for key_attr in ('org', 'offering')
-            ])
-        )
+        return self.course_index.find_one({'_id': key})
 
     def find_matching_course_indexes(self, query):
         """
@@ -95,16 +86,13 @@ class MongoConnection(object):
         """
         Update the db record for course_index
         """
-        self.course_index.update(
-            son.SON([('org', course_index['org']), ('offering', course_index['offering'])]),
-            course_index
-        )
+        self.course_index.update({'_id': course_index['_id']}, course_index)
 
-    def delete_course_index(self, course_index):
+    def delete_course_index(self, key):
         """
-        Delete the course_index from the persistence mechanism whose id is the given course_index
+        Delete the course_index from the persistence mechanism whose id is the given key
         """
-        return self.course_index.remove(son.SON([('org', course_index['org']), ('offering', course_index['offering'])]))
+        return self.course_index.remove({'_id': key})
 
     def get_definition(self, key):
         """

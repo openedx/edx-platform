@@ -4,7 +4,6 @@ import unittest
 from mock import Mock, MagicMock
 from webob.multidict import MultiDict
 from pytz import UTC
-from xblock.fields import ScopeIds
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
 from lxml import etree
@@ -30,7 +29,8 @@ class SelfAssessmentTest(unittest.TestCase):
         'hintprompt': 'Consider this...',
     }
 
-    location = Location("edX", "sa_test", "run", "selfassessment", "SampleQuestion", None)
+    location = Location(["i4x", "edX", "sa_test", "selfassessment",
+                         "SampleQuestion"])
 
     descriptor = Mock()
 
@@ -56,10 +56,7 @@ class SelfAssessmentTest(unittest.TestCase):
         }
 
         system = get_test_system()
-
-        usage_key = system.course_id.make_usage_key('combinedopenended', 'test_loc')
-        scope_ids = ScopeIds(1, 'combinedopenended', usage_key, usage_key)
-        system.xmodule_instance = Mock(scope_ids=scope_ids)
+        system.xmodule_instance = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
         self.module = SelfAssessmentModule(
             system,
             self.location,

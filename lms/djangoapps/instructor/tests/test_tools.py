@@ -17,7 +17,6 @@ from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.keys import CourseKey
 
 from ..views import tools
 
@@ -87,8 +86,10 @@ class TestFindUnit(ModuleStoreTestCase):
         Fixtures.
         """
         course = CourseFactory.create()
-        week1 = ItemFactory.create(parent=course)
-        homework = ItemFactory.create(parent=week1)
+        week1 = ItemFactory.create()
+        homework = ItemFactory.create(parent_location=week1.location)
+        week1.children.append(homework.location)
+        course.children.append(week1.location)
 
         self.course = course
         self.homework = homework
@@ -97,7 +98,7 @@ class TestFindUnit(ModuleStoreTestCase):
         """
         Test finding a nested unit.
         """
-        url = self.homework.location.to_deprecated_string()
+        url = self.homework.location.url()
         self.assertEqual(tools.find_unit(self.course, url), self.homework)
 
     def test_find_unit_notfound(self):
@@ -120,13 +121,15 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
+        week1 = ItemFactory.create(due=due)
+        week2 = ItemFactory.create(due=due)
+        course.children = [week1.location.url(), week2.location.url()]
 
         homework = ItemFactory.create(
-            parent=week1,
+            parent_location=week1.location,
             due=due
         )
+        week1.children = [homework.location.url()]
 
         self.course = course
         self.week1 = week1
@@ -136,7 +139,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
 
         def urls(seq):
             "URLs for sequence of nodes."
-            return sorted(i.location.to_deprecated_string() for i in seq)
+            return sorted(i.location.url() for i in seq)
 
         self.assertEquals(
             urls(tools.get_units_with_due_date(self.course)),
@@ -153,7 +156,7 @@ class TestTitleOrUrl(unittest.TestCase):
 
     def test_url(self):
         unit = mock.Mock(display_name=None)
-        unit.location.to_deprecated_string.return_value = 'test:hello'
+        unit.location.url.return_value = 'test:hello'
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
@@ -168,25 +171,27 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
+        week1 = ItemFactory.create(due=due)
+        week2 = ItemFactory.create(due=due)
+        course.children = [week1.location.url(), week2.location.url()]
 
         homework = ItemFactory.create(
-            parent=week1,
+            parent_location=week1.location,
             due=due
         )
+        week1.children = [homework.location.url()]
 
         user = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         self.course = course
         self.week1 = week1
@@ -221,60 +226,63 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
-        week3 = ItemFactory.create(due=due, parent=course)
+        week1 = ItemFactory.create(due=due)
+        week2 = ItemFactory.create(due=due)
+        week3 = ItemFactory.create(due=due)
+        course.children = [week1.location.url(), week2.location.url(),
+                           week3.location.url()]
 
         homework = ItemFactory.create(
-            parent=week1,
+            parent_location=week1.location,
             due=due
         )
+        week1.children = [homework.location.url()]
 
         user1 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location).save()
+            module_state_key=week2.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location).save()
+            module_state_key=week3.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         self.course = course
         self.week1 = week1
@@ -329,22 +337,10 @@ def get_extended_due(course, unit, student):
     student_module = StudentModule.objects.get(
         student_id=student.id,
         course_id=course.id,
-        module_state_key=unit.location
+        module_state_key=unit.location.url()
     )
 
     state = json.loads(student_module.state)
     extended = state.get('extended_due', None)
     if extended:
         return DATE_FIELD.from_json(extended)
-
-
-def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
-    """
-    Convert a 'problem urlname' to a module state key (db field)
-    """
-    if not isinstance(course_id, CourseKey):
-        raise ValueError
-    if urlname.endswith(".xml"):
-        urlname = urlname[:-4]
-
-    return course_id.make_usage_key(block_type, urlname)

@@ -18,7 +18,6 @@ from xblock.fields import ScopeIds
 from xmodule import peer_grading_module
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
@@ -53,7 +52,7 @@ def make_instructor(course, user_email):
     """
     Makes a given user an instructor in a course.
     """
-    CourseStaffRole(course.id).add_users(User.objects.get(email=user_email))
+    CourseStaffRole(course.location).add_users(User.objects.get(email=user_email))
 
 
 class StudentProblemListMockQuery(object):
@@ -109,13 +108,13 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
+        self.location = 'TestLocation'
         self.create_account('u1', self.student, self.password)
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
-        self.location_string = self.course_id.make_usage_key('html', 'TestLocation').to_deprecated_string()
+        self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
 
         make_instructor(self.toy, self.instructor)
@@ -132,15 +131,15 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # both get and post should return 404
         for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
-            url = reverse(view_name, kwargs={'course_id': self.course_id.to_deprecated_string()})
+            url = reverse(view_name, kwargs={'course_id': self.course_id})
             check_for_get_code(self, 404, url)
             check_for_post_code(self, 404, url)
 
     def test_get_next(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id.to_deprecated_string()})
-        data = {'location': self.location_string}
+        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
+        data = {'location': self.location}
 
         response = check_for_post_code(self, 200, url, data)
 
@@ -160,12 +159,12 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def save_grade_base(self, skip=False):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id.to_deprecated_string()})
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
 
         data = {'score': '12',
                 'feedback': 'great!',
                 'submission_id': '123',
-                'location': self.location_string,
+                'location': self.location,
                 'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
         if skip:
@@ -185,7 +184,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_get_problem_list(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id.to_deprecated_string()})
+        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
         data = {}
 
         response = check_for_post_code(self, 200, url, data)
@@ -208,7 +207,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             user=instructor,
         )
         # Get the response and load its content.
-        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id.to_deprecated_string()).content)
+        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id).content)
 
         # A valid response will have an "error" key.
         self.assertTrue('error' in response)
@@ -221,13 +220,13 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id.to_deprecated_string()})
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
 
         data = {
             'score': '12',
             'feedback': '',
             'submission_id': '123',
-            'location': self.location_string,
+            'location': self.location,
             'submission_flagged': "false",
             'rubric_scores[]': ['1', '2']
         }
@@ -262,13 +261,13 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
+        self.location = 'TestLocation'
         self.create_account('u1', self.student, self.password)
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
-        self.location_string = self.course_id.make_usage_key('html', 'TestLocation').to_deprecated_string()
+        self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
@@ -292,7 +291,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.logout()
 
     def test_get_next_submission_success(self):
-        data = {'location': self.location_string}
+        data = {'location': self.location}
 
         response = self.peer_module.get_next_submission(data)
         content = response
@@ -312,7 +311,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_save_grade_success(self):
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location_string,
+            'location': self.location,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,
@@ -342,7 +341,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
-        data = {'location': self.location_string}
+        data = {'location': self.location}
         response = self.peer_module.is_student_calibrated(data)
 
         self.assertTrue(response['success'])
@@ -355,7 +354,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse('calibrated' in response)
 
     def test_show_calibration_essay_success(self):
-        data = {'location': self.location_string}
+        data = {'location': self.location}
 
         response = self.peer_module.show_calibration_essay(data)
 
@@ -376,7 +375,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_save_calibration_essay_success(self):
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location_string,
+            'location': self.location,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,
@@ -410,7 +409,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         data = {
             'rubric_scores[]': [0, 0],
-            'location': self.location_string,
+            'location': self.location,
             'submission_id': 1,
             'submission_key': 'fake key',
             'score': 2,
@@ -445,8 +444,8 @@ class TestPanel(ModuleStoreTestCase):
 
     def setUp(self):
         # Toy courses should be loaded
-        self.course_key = SlashSeparatedCourseKey('edX', 'open_ended', '2012_Fall')
-        self.course = modulestore().get_course(self.course_key)
+        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
         self.user = factories.UserFactory()
 
     def test_open_ended_panel(self):
@@ -472,7 +471,7 @@ class TestPanel(ModuleStoreTestCase):
         @return:
         """
         request = Mock(user=self.user)
-        response = views.student_problem_list(request, self.course.id.to_deprecated_string())
+        response = views.student_problem_list(request, self.course.id)
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
 
@@ -483,8 +482,8 @@ class TestPeerGradingFound(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('edX', 'open_ended_nopath', '2012_Fall')
-        self.course = modulestore().get_course(self.course_key)
+        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
 
     def test_peer_grading_nopath(self):
         """
@@ -504,8 +503,8 @@ class TestStudentProblemList(ModuleStoreTestCase):
 
     def setUp(self):
         # Load an open ended course with several problems.
-        self.course_key = SlashSeparatedCourseKey('edX', 'open_ended', '2012_Fall')
-        self.course = modulestore().get_course(self.course_key)
+        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
         self.user = factories.UserFactory()
         # Enroll our user in our course and make them an instructor.
         make_instructor(self.course, self.user.email)

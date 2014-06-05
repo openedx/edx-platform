@@ -7,9 +7,6 @@ import csv
 
 from instructor.views.legacy import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 from django.core.management.base import BaseCommand
@@ -42,26 +39,20 @@ class Command(BaseCommand):
             get_raw_scores = args[2].lower() == 'raw'
 
         request = DummyRequest()
-        # parse out the course into a coursekey
         try:
-            course_key = CourseKey.from_string(course_id)
-        # if it's not a new-style course key, parse it from an old-style
-        # course key
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-        try:
-            course = get_course_by_id(course_key)
-        except Exception as err:
-            print "-----------------------------------------------------------------------------"
-            print "Sorry, cannot find course with id {}".format(course_id)
-            print "Got exception {}".format(err)
-            print "Please provide a course ID or course data directory name, eg content-mit-801rq"
-            return
+            course = get_course_by_id(course_id)
+        except Exception:
+            if course_id in modulestore().courses:
+                course = modulestore().courses[course_id]
+            else:
+                print "-----------------------------------------------------------------------------"
+                print "Sorry, cannot find course %s" % course_id
+                print "Please provide a course ID or course data directory name, eg content-mit-801rq"
+                return
 
         print "-----------------------------------------------------------------------------"
-        print "Dumping grades from {} to file {} (get_raw_scores={})".format(course.id, fn, get_raw_scores)
-        datatable = get_student_grade_summary_data(request, course, get_raw_scores=get_raw_scores)
+        print "Dumping grades from %s to file %s (get_raw_scores=%s)" % (course.id, fn, get_raw_scores)
+        datatable = get_student_grade_summary_data(request, course, course.id, get_raw_scores=get_raw_scores)
 
         fp = open(fn, 'w')
 
@@ -72,4 +63,4 @@ class Command(BaseCommand):
             writer.writerow(encoded_row)
 
         fp.close()
-        print "Done: {} records dumped".format(len(datatable['data']))
+        print "Done: %d records dumped" % len(datatable['data'])

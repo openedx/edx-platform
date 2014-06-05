@@ -354,7 +354,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': unable to find subtasks of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
-        dog_stats_api.increment('instructor_task.subtask.duplicate.nosubtasks', tags=[_statsd_tag(entry.course_id)])
+        dog_stats_api.increment('instructor_task.subtask.duplicate.nosubtasks', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask knows about this particular subtask.
@@ -364,7 +364,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': unable to find status for subtask of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
-        dog_stats_api.increment('instructor_task.subtask.duplicate.unknown', tags=[_statsd_tag(entry.course_id)])
+        dog_stats_api.increment('instructor_task.subtask.duplicate.unknown', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask doesn't think that this subtask has already been
@@ -375,7 +375,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': already completed - status {} for subtask of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
         TASK_LOG.warning(msg)
-        dog_stats_api.increment('instructor_task.subtask.duplicate.completed', tags=[_statsd_tag(entry.course_id)])
+        dog_stats_api.increment('instructor_task.subtask.duplicate.completed', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask doesn't think that this subtask is already being
@@ -389,7 +389,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
             format_str = "Unexpected task_id '{}': already retried - status {} for subtask of instructor task '{}': rejecting task {}"
             msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
             TASK_LOG.warning(msg)
-            dog_stats_api.increment('instructor_task.subtask.duplicate.retried', tags=[_statsd_tag(entry.course_id)])
+            dog_stats_api.increment('instructor_task.subtask.duplicate.retried', tags=[entry.course_id])
             raise DuplicateTaskException(msg)
 
     # Now we are ready to start working on this.  Try to lock it.
@@ -399,7 +399,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': already being executed - for subtask of instructor task '{}'"
         msg = format_str.format(current_task_id, entry)
         TASK_LOG.warning(msg)
-        dog_stats_api.increment('instructor_task.subtask.duplicate.locked', tags=[_statsd_tag(entry.course_id)])
+        dog_stats_api.increment('instructor_task.subtask.duplicate.locked', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
 
@@ -531,11 +531,3 @@ def _update_subtask_status(entry_id, current_task_id, new_subtask_status):
     else:
         TASK_LOG.debug("about to commit....")
         transaction.commit()
-
-
-def _statsd_tag(course_id):
-    """
-    Calculate the tag we will use for DataDog.
-    """
-    tag = unicode(course_id).encode('utf-8')
-    return tag[:200]

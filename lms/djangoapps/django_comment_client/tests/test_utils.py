@@ -41,11 +41,9 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class AccessUtilsTestCase(TestCase):
     def setUp(self):
-        self.course = CourseFactory.create()
-        self.course_id = self.course.id
+        self.course_id = 'edX/toy/2012_Fall'
         self.student_role = RoleFactory(name='Student', course_id=self.course_id)
         self.moderator_role = RoleFactory(name='Moderator', course_id=self.course_id)
         self.community_ta_role = RoleFactory(name='Community TA', course_id=self.course_id)
@@ -123,8 +121,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                 reverse(
                     "jump_to",
                     kwargs={
-                        "course_id": self.course.id.to_deprecated_string(),
-                        "location": discussion.location.to_deprecated_string()
+                        "course_id": self.course.location.course_id,
+                        "location": discussion.location
                     }
                 )
             )

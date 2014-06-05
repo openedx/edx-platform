@@ -12,8 +12,7 @@ import unittest
 
 from datetime import datetime
 from lxml import etree
-from lxml.html import fragment_fromstring
-from mock import Mock, MagicMock, patch
+from mock import Mock, MagicMock, ANY, patch
 from pytz import UTC
 from webob.multidict import MultiDict
 
@@ -21,6 +20,7 @@ from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
@@ -48,7 +48,8 @@ class OpenEndedChildTest(unittest.TestCase):
     """
     Test the open ended child class
     """
-    location = Location("edX", "sa_test", "2012_Fall", "selfassessment", "SampleQuestion")
+    location = Location(["i4x", "edX", "sa_test", "selfassessment",
+                         "SampleQuestion"])
 
     metadata = json.dumps({'attempts': '10'})
     prompt = etree.XML("<prompt>This is a question prompt</prompt>")
@@ -172,7 +173,8 @@ class OpenEndedModuleTest(unittest.TestCase):
     """
     Test the open ended module class
     """
-    location = Location("edX", "sa_test", "2012_Fall", "selfassessment", "SampleQuestion")
+    location = Location(["i4x", "edX", "sa_test", "selfassessment",
+                         "SampleQuestion"])
 
     metadata = json.dumps({'attempts': '10'})
     prompt = etree.XML("<prompt>This is a question prompt</prompt>")
@@ -444,7 +446,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     """
     Unit tests for the combined open ended xmodule
     """
-    location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
+    location = Location(["i4x", "edX", "open_ended", "combinedopenended",
+                         "SampleQuestion"])
     definition_template = """
                     <combinedopenended attempts="10000">
                     {rubric}
@@ -514,9 +517,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
-    usage_key = test_system.course_id.make_usage_key('combinedopenended', 'test_loc')
-    # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-    scope_ids = ScopeIds(1, 'combinedopenended', usage_key, usage_key)
     combinedoe_container = CombinedOpenEndedModule(
         descriptor=descriptor,
         runtime=test_system,
@@ -524,7 +524,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'data': full_definition,
             'weight': '1',
         }),
-        scope_ids=scope_ids,
+        scope_ids=ScopeIds(None, None, None, None),
     )
 
     def setUp(self):
@@ -799,7 +799,8 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
 
     # location, definition_template, prompt, rubric, max_score, metadata, oeparam, task_xml1, task_xml2
     # All these variables are used to construct the xmodule descriptor.
-    location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
+    location = Location(["i4x", "edX", "open_ended", "combinedopenended",
+                         "SampleQuestion"])
     definition_template = """
                     <combinedopenended attempts="10000">
                     {rubric}
@@ -870,9 +871,6 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
-    usage_key = test_system.course_id.make_usage_key('combinedopenended', 'test_loc')
-    # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-    scope_ids = ScopeIds(1, 'combinedopenended', usage_key, usage_key)
     combinedoe_container = CombinedOpenEndedModule(
         descriptor=descriptor,
         runtime=test_system,
@@ -880,7 +878,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
             'data': full_definition,
             'weight': '1',
         }),
-        scope_ids=scope_ids,
+        scope_ids=ScopeIds(None, None, None, None),
     )
 
     def setUp(self):
@@ -966,7 +964,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
     Test the student flow in the combined open ended xmodule
     """
-    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
     assessment = [0, 1]
     hint = "blah"
@@ -1001,7 +999,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location)
+        return self.get_module_from_location(self.problem_location, COURSE)
 
     def test_open_ended_load_and_save(self):
         """
@@ -1214,7 +1212,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
     """
     Test if student is able to reset the problem
     """
-    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion1Attempt")
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion1Attempt"])
     answer = "blah blah"
     assessment = [0, 1]
     hint = "blah"
@@ -1243,7 +1241,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location)
+        return self.get_module_from_location(self.problem_location, COURSE)
 
     def test_reset_fail(self):
         """
@@ -1285,13 +1283,12 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
     """
     Test if student is able to upload images properly.
     """
-    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestionImageUpload")
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestionImageUpload"])
     answer_text = "Hello, this is my amazing answer."
     file_text = "Hello, this is my amazing file."
     file_name = "Student file 1"
     answer_link = "http://www.edx.org"
     autolink_tag = '<a target="_blank" href='
-    autolink_tag_swapped = '<a href='
 
     def get_module_system(self, descriptor):
         test_system = get_test_system()
@@ -1309,7 +1306,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission without a file attached fails.
         """
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
 
         # Simulate a student saving an answer
         response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
@@ -1329,7 +1326,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission with a file is handled properly.
         """
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
 
         # Simulate a student saving an answer with a file
         response = module.handle_ajax("save_answer", {
@@ -1341,14 +1338,13 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         response = json.loads(response)
         self.assertTrue(response['success'])
         self.assertIn(self.file_name, response['student_response'])
-        self.assertTrue(self.autolink_tag in response['student_response'] or
-                        self.autolink_tag_swapped in response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
 
     def test_link_submission_success(self):
         """
         Students can submit links instead of files.  Check that the link is properly handled.
         """
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
 
         # Simulate a student saving an answer with a link.
         response = module.handle_ajax("save_answer", {
@@ -1359,8 +1355,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
 
         self.assertTrue(response['success'])
         self.assertIn(self.answer_link, response['student_response'])
-        self.assertTrue(self.autolink_tag in response['student_response'] or
-                        self.autolink_tag_swapped in response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
 
 
 class OpenEndedModuleUtilTest(unittest.TestCase):
@@ -1374,7 +1369,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200"/>'
     embed_clean = u'<embed width="200" height="200" id="cats" src="http://example.com/lolcats.swf">'
     iframe_dirty = u'<iframe class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200"/>'
-    iframe_clean = ur'<iframe (height="200" ?|class="cats" ?|width="200" ?|src="http://example.com/lolcats" ?)+></iframe>'
+    iframe_clean = u'<iframe height="200" class="cats" width="200" src="http://example.com/lolcats"></iframe>'
 
     text = u'I am a \u201c\xfcber student\u201d'
     text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
@@ -1385,74 +1380,53 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     link_text = u'I love going to www.lolcatz.com'
     link_atag = u'I love going to <a target="_blank" href="http://www.lolcatz.com">www.lolcatz.com</a>'
 
-    def assertHtmlEqual(self, actual, expected):
-        """
-        Assert that two strings represent the same html.
-        """
-        return self._assertHtmlEqual(
-            fragment_fromstring(actual, create_parent='div'),
-            fragment_fromstring(expected, create_parent='div')
-        )
-
-    def _assertHtmlEqual(self, actual, expected):
-        """
-        Assert that two HTML ElementTree elements are equal.
-        """
-        self.assertEqual(actual.tag, expected.tag)
-        self.assertEqual(actual.attrib, expected.attrib)
-        self.assertEqual(actual.text, expected.text)
-        self.assertEqual(actual.tail, expected.tail)
-        self.assertEqual(len(actual), len(expected))
-        for actual_child, expected_child in zip(actual, expected):
-            self._assertHtmlEqual(actual_child, expected_child)
-
     def test_script(self):
         """
         Basic test for stripping <script>
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
 
     def test_img(self):
         """
         Basic test for passing through img, but stripping bad attr
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
 
     def test_embed(self):
         """
         Basic test for passing through embed, but stripping bad attr
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
 
     def test_iframe(self):
         """
         Basic test for passing through iframe, but stripping bad attr
         """
-        self.assertRegexpMatches(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
 
     def test_text(self):
         """
         Test for passing through text unchanged, including unicode
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.text), self.text)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text), self.text)
 
     def test_lessthan(self):
         """
         Tests that `<` in text context is handled properly
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
 
     def test_linebreaks(self):
         """
         tests the replace_newlines function
         """
-        self.assertHtmlEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
+        self.assertEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
 
     def test_linkify(self):
         """
         tests the replace_newlines function
         """
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
+        self.assertEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
 
     def test_combined(self):
         """
@@ -1470,4 +1444,4 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
                                                                       self.embed_clean,
                                                                       self.text_lessthan_encode,
                                                                       self.img_clean)
-        self.assertHtmlEqual(OpenEndedChild.sanitize_html(test_input), test_output)
+        self.assertEqual(OpenEndedChild.sanitize_html(test_input), test_output)

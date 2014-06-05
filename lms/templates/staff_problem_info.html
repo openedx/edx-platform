@@ -61,7 +61,7 @@ ${block_content}
         <label for="sd_fu_${location.name}">${_('Username')}:</label>
         <input type="text" id="sd_fu_${location.name}" placeholder="${user.username}"/>
       </div>
-      <div data-location="${location.to_deprecated_string()}" data-location-name="${location.name}">
+      <div data-location="${location.name}">
         [
         <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
         % if has_instructor_access:
@@ -77,7 +77,7 @@ ${block_content}
 
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
-location = ${location.to_deprecated_string() | h}
+location = ${location | h}
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
@@ -106,7 +106,7 @@ category = ${category | h}
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location.to_deprecated_string()}"/>
+      <input type="hidden" id="${element_id}_history_location" value="${location}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
@@ -129,7 +129,7 @@ $(function () {
         null,
         %endif
         {
-            'location': '${location.to_deprecated_string()}',
+            'location': '${location}',
             'xqa_key': '${xqa_key}',
             'category': '${category}',
             'user': '${user}'

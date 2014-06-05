@@ -1,4 +1,3 @@
-
 import ConfigParser
 from django.conf import settings
 import logging

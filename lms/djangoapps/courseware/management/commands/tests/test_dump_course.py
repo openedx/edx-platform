@@ -22,7 +22,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 DATA_DIR = 'common/test/data/'
 
@@ -54,8 +53,7 @@ class CommandsTestBase(TestCase):
                                  modulestore=store)
 
         courses = store.get_courses()
-        # NOTE: if xml store owns these, it won't import them into mongo
-        if SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID) not in [c.id for c in courses]:
+        if TEST_COURSE_ID not in [c.id for c in courses]:
             import_from_xml(store, DATA_DIR, ['toy', 'simple'])
 
         return [course.id for course in store.get_courses()]
@@ -72,9 +70,7 @@ class CommandsTestBase(TestCase):
         output = self.call_command('dump_course_ids', **kwargs)
         dumped_courses = output.decode('utf-8').strip().split('\n')
 
-        course_ids = {course_id.to_deprecated_string() for course_id in self.loaded_courses}
-        dumped_ids = set(dumped_courses)
-        self.assertEqual(course_ids, dumped_ids)
+        self.assertEqual(self.loaded_courses, dumped_courses)
 
     def test_dump_course_structure(self):
         args = [TEST_COURSE_ID]
@@ -85,15 +81,16 @@ class CommandsTestBase(TestCase):
 
         # check that all elements in the course structure have metadata,
         # but not inherited metadata:
-        for element in dump.itervalues():
+        for element_name in dump:
+            element = dump[element_name]
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
             self.assertNotIn('inherited_metadata', element)
 
         # Check a few elements in the course dump
-        test_course_key = SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID)
-        parent_id = test_course_key.make_usage_key('chapter', 'Overview').to_deprecated_string()
+
+        parent_id = 'i4x://edX/simple/chapter/Overview'
         self.assertEqual(dump[parent_id]['category'], 'chapter')
         self.assertEqual(len(dump[parent_id]['children']), 3)
 
@@ -101,7 +98,7 @@ class CommandsTestBase(TestCase):
         self.assertEqual(dump[child_id]['category'], 'videosequence')
         self.assertEqual(len(dump[child_id]['children']), 2)
 
-        video_id = test_course_key.make_usage_key('video', 'Welcome').to_deprecated_string()
+        video_id = 'i4x://edX/simple/video/Welcome'
         self.assertEqual(dump[video_id]['category'], 'video')
         self.assertEqual(len(dump[video_id]['metadata']), 4)
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
@@ -117,7 +114,8 @@ class CommandsTestBase(TestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element_name in dump:
+            element = dump[element_name]
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -133,7 +131,8 @@ class CommandsTestBase(TestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element_name in dump:
+            element = dump[element_name]
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -159,7 +158,7 @@ class CommandsTestBase(TestCase):
             self.check_export_file(tar_file)
 
     def run_export_course(self, filename):  # pylint: disable=missing-docstring
-        args = [TEST_COURSE_ID, filename]
+        args = ['edX/simple/2012_Fall', filename]
         kwargs = {'modulestore': 'default'}
         return self.call_command('export_course', *args, **kwargs)
 

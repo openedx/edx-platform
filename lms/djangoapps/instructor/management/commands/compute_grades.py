@@ -6,9 +6,6 @@
 from instructor.offline_gradecalc import offline_grade_calculation
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from django.core.management.base import BaseCommand
 
@@ -28,24 +25,19 @@ class Command(BaseCommand):
         else:
             print self.help
             return
-        course_key = None
-        # parse out the course id into a coursekey
+
         try:
-            course_key = CourseKey.from_string(course_id)
-        # if it's not a new-style course key, parse it from an old-style
-        # course key
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        try:
-            course = get_course_by_id(course_key)
+            course = get_course_by_id(course_id)
         except Exception as err:
-            print "-----------------------------------------------------------------------------"
-            print "Sorry, cannot find course with id {}".format(course_id)
-            print "Got exception {}".format(err)
-            print "Please provide a course ID or course data directory name, eg content-mit-801rq"
-            return
+            if course_id in modulestore().courses:
+                course = modulestore().courses[course_id]
+            else:
+                print "-----------------------------------------------------------------------------"
+                print "Sorry, cannot find course %s" % course_id
+                print "Please provide a course ID or course data directory name, eg content-mit-801rq"
+                return
 
         print "-----------------------------------------------------------------------------"
-        print "Computing grades for {}".format(course_id)
+        print "Computing grades for %s" % (course.id)
 
-        offline_grade_calculation(course_key)
+        offline_grade_calculation(course.id)

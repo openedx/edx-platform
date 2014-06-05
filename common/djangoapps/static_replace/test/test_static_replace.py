@@ -4,13 +4,12 @@ from nose.tools import assert_equals, assert_true, assert_false  # pylint: disab
 from static_replace import (replace_static_urls, replace_course_urls,
                             _url_replace_regex)
 from mock import patch, Mock
-
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
-COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
+COURSE_ID = 'org/course/run'
 STATIC_SOURCE = '"/static/file.png"'
 
 
@@ -22,8 +21,8 @@ def test_multi_replace():
         replace_static_urls(replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY), DATA_DIRECTORY)
     )
     assert_equals(
-        replace_course_urls(course_source, COURSE_KEY),
-        replace_course_urls(replace_course_urls(course_source, COURSE_KEY), COURSE_KEY)
+        replace_course_urls(course_source, COURSE_ID),
+        replace_course_urls(replace_course_urls(course_source, COURSE_ID), COURSE_ID)
     )
 
 
@@ -60,10 +59,10 @@ def test_mongo_filestore(mock_modulestore, mock_static_content):
     # Namespace => content url
     assert_equals(
         '"' + mock_static_content.convert_legacy_static_url_with_course_id.return_value + '"',
-        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_KEY)
+        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_ID)
     )
 
-    mock_static_content.convert_legacy_static_url_with_course_id.assert_called_once_with('file.png', COURSE_KEY)
+    mock_static_content.convert_legacy_static_url_with_course_id.assert_called_once_with('file.png', COURSE_ID)
 
 
 @patch('static_replace.settings')
@@ -104,7 +103,7 @@ def test_static_url_with_query(mock_modulestore, mock_storage):
 
     pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2"'
     post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2"'
-    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
+    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_ID))
 
 
 def test_regex():

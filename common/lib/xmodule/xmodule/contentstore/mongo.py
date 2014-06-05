@@ -2,7 +2,8 @@ import pymongo
 import gridfs
 from gridfs.errors import NoFile
 
-from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore
+from xmodule.modulestore import Location
+from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
 import logging
@@ -12,8 +13,6 @@ from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
 import os
 import json
-import bson.son
-from xmodule.modulestore.locations import AssetLocation
 
 
 class MongoContentStore(ContentStore):
@@ -29,7 +28,6 @@ class MongoContentStore(ContentStore):
             pymongo.MongoClient(
                 host=host,
                 port=port,
-                document_class=bson.son.SON,
                 **kwargs
             ),
             db
@@ -48,10 +46,8 @@ class MongoContentStore(ContentStore):
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
         self.delete(content_id)
 
-        thumbnail_location = content.thumbnail_location.to_deprecated_list_repr() if content.thumbnail_location else None
         with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
-                              displayname=content.name,
-                              thumbnail_location=thumbnail_location,
+                              displayname=content.name, thumbnail_location=content.thumbnail_location,
                               import_path=content.import_path,
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
@@ -66,38 +62,23 @@ class MongoContentStore(ContentStore):
     def delete(self, content_id):
         if self.fs.exists({"_id": content_id}):
             self.fs.delete(content_id)
-            assert not self.fs.exists({"_id": content_id})
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
-        content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
-        if fs_pointer is None:
-            if throw_on_not_found:
-                raise NotFoundError()
-            else:
-                return None
-        content_id = fs_pointer['_id']
-
+        content_id = StaticContent.get_id_from_location(location)
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
-                thumbnail_location = getattr(fp, 'thumbnail_location', None)
-                if thumbnail_location:
-                    thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
-                    thumbnail_location=thumbnail_location,
+                    thumbnail_location=getattr(fp, 'thumbnail_location', None),
                     import_path=getattr(fp, 'import_path', None),
                     length=fp.length, locked=getattr(fp, 'locked', False)
                 )
             else:
                 with self.fs.get(content_id) as fp:
-                    thumbnail_location = getattr(fp, 'thumbnail_location', None)
-                    if thumbnail_location:
-                        thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
-                        thumbnail_location=thumbnail_location,
+                        thumbnail_location=getattr(fp, 'thumbnail_location', None),
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False)
                     )
@@ -108,11 +89,9 @@ class MongoContentStore(ContentStore):
                 return None
 
     def get_stream(self, location):
-        content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
-
+        content_id = StaticContent.get_id_from_location(location)
         try:
-            handle = self.fs.get(fs_pointer['_id'])
+            handle = self.fs.get(content_id)
         except NoFile:
             raise NotFoundError()
 
@@ -121,7 +100,7 @@ class MongoContentStore(ContentStore):
     def close_stream(self, handle):
         try:
             handle.close()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             pass
 
     def export(self, location, output_directory):
@@ -138,22 +117,21 @@ class MongoContentStore(ContentStore):
         with disk_fs.open(content.name, 'wb') as asset_file:
             asset_file.write(content.data)
 
-    def export_all_for_course(self, course_key, output_directory, assets_policy_file):
+    def export_all_for_course(self, course_location, output_directory, assets_policy_file):
         """
         Export all of this course's assets to the output_directory. Export all of the assets'
         attributes to the policy file.
 
-        Args:
-            course_key (CourseKey): the :class:`CourseKey` identifying the course
-            output_directory: the directory under which to put all the asset files
-            assets_policy_file: the filename for the policy file which should be in the same
-                directory as the other policy files.
+        :param course_location: the Location of type 'course'
+        :param output_directory: the directory under which to put all the asset files
+        :param assets_policy_file: the filename for the policy file which should be in the same
+        directory as the other policy files.
         """
         policy = {}
-        assets, __ = self.get_all_content_for_course(course_key)
+        assets, __ = self.get_all_content_for_course(course_location)
 
         for asset in assets:
-            asset_location = AssetLocation._from_deprecated_son(asset['_id'], course_key.run)  # pylint: disable=protected-access
+            asset_location = Location(asset['_id'])
             self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
@@ -162,15 +140,15 @@ class MongoContentStore(ContentStore):
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
 
-    def get_all_content_thumbnails_for_course(self, course_key):
-        return self._get_all_content_for_course(course_key, get_thumbnails=True)[0]
+    def get_all_content_thumbnails_for_course(self, location):
+        return self._get_all_content_for_course(location, get_thumbnails=True)[0]
 
-    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         return self._get_all_content_for_course(
-            course_key, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
+            location, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
         )
 
-    def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None):
+    def _get_all_content_for_course(self, location, get_thumbnails=False, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 
@@ -190,22 +168,20 @@ class MongoContentStore(ContentStore):
 
             ]
         '''
-        course_filter = course_key.make_asset_key(
-            "asset" if not get_thumbnails else "thumbnail",
-            None
-        )
+        course_filter = Location(XASSET_LOCATION_TAG, category="asset" if not get_thumbnails else "thumbnail",
+                                 course=location.course, org=location.org)
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         if maxresults > 0:
             items = self.fs_files.find(
-                location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG),
+                location_to_query(course_filter),
                 skip=start, limit=maxresults, sort=sort
             )
         else:
-            items = self.fs_files.find(location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG), sort=sort)
+            items = self.fs_files.find(location_to_query(course_filter), sort=sort)
         count = items.count()
         return list(items), count
 
-    def set_attr(self, asset_key, attr, value=True):
+    def set_attr(self, location, attr, value=True):
         """
         Add/set the given attr on the asset at the given location. Does not allow overwriting gridFS built in
         attrs such as _id, md5, uploadDate, length. Value can be any type which pymongo accepts.
@@ -215,11 +191,11 @@ class MongoContentStore(ContentStore):
         Raises NotFoundError if no such item exists
         Raises AttributeError is attr is one of the build in attrs.
 
-        :param asset_key: an AssetKey
+        :param location: a c4x asset location
         :param attr: which attribute to set
         :param value: the value to set it to (any type pymongo accepts such as datetime, number, string)
         """
-        self.set_attrs(asset_key, {attr: value})
+        self.set_attrs(location, {attr: value})
 
     def get_attr(self, location, attr, default=None):
         """
@@ -240,15 +216,15 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
+        # raises exception if location is not fully specified
+        Location.ensure_fully_specified(location)
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
-        asset_db_key = self.asset_db_key(location)
-        # FIXME remove fetch and use a form of update which fails if doesn't exist
-        item = self.fs_files.find_one(asset_db_key)
+        item = self.fs_files.find_one(location_to_query(location))
         if item is None:
-            raise NotFoundError(asset_db_key)
-        self.fs_files.update(asset_db_key, {"$set": attr_dict})
+            raise NotFoundError()
+        self.fs_files.update({"_id": item["_id"]}, {"$set": attr_dict})
 
     def get_attrs(self, location):
         """
@@ -260,26 +236,7 @@ class MongoContentStore(ContentStore):
 
         :param location: a c4x asset location
         """
-        asset_db_key = self.asset_db_key(location)
-        item = self.fs_files.find_one(asset_db_key)
+        item = self.fs_files.find_one(location_to_query(location))
         if item is None:
-            raise NotFoundError(asset_db_key)
+            raise NotFoundError()
         return item
-
-    def delete_all_course_assets(self, course_key):
-        """
-        Delete all assets identified via this course_key. Dangerous operation which may remove assets
-        referenced by other runs or other courses.
-        :param course_key:
-        """
-        course_query = MongoModuleStore._course_key_to_son(course_key, tag=XASSET_LOCATION_TAG)  # pylint: disable=protected-access
-        matching_assets = self.fs_files.find(course_query)
-        for asset in matching_assets:
-            self.fs.delete(asset['_id'])
-
-    @staticmethod
-    def asset_db_key(location):
-        """
-        Returns the database query to find the given asset location.
-        """
-        return location.to_deprecated_son(tag=XASSET_LOCATION_TAG, prefix='_id.')

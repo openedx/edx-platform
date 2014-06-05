@@ -3,6 +3,8 @@ Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
 
+import logging
+import StringIO
 import unittest
 
 from django.conf import settings
@@ -16,13 +18,12 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import Mock
 
-import external_auth.views
 from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
-from opaque_keys import InvalidKeyError
-from student.models import CourseEnrollment
+import external_auth.views
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
@@ -204,23 +205,18 @@ class SSLClientTest(ModuleStoreTestCase):
         This tests to make sure when immediate signup is on that
         the user doesn't get presented with the registration page.
         """
-        # Expect an InvalidKeyError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
-        ):
+        # Expect a NotImplementError from course page as we don't have anything else built
+        with self.assertRaisesRegexp(InsufficientSpecificationError,
+                                     'Must provide one of url, version_guid, package_id'):
             self.client.get(
                 reverse('signup'), follow=True,
-                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
-            )
+                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         # assert that we are logged in
         self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
-        ):
+        with self.assertRaisesRegexp(InsufficientSpecificationError,
+                                     'Must provide one of url, version_guid, package_id'):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -244,6 +240,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.assertEquals(('http://testserver/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
+
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -381,8 +378,13 @@ class SSLClientTest(ModuleStoreTestCase):
         user = User.objects.get(email=self.USER_EMAIL)
         CourseEnrollment.enroll(user, course.id)
 
-        CourseStaffRole(course.id).add_users(user)
-        course_private_url = reverse('course_handler', args=(unicode(course.id),))
+        CourseStaffRole(course.location).add_users(user)
+        location = Location(['i4x', 'MITx', '999', 'course',
+                             Location.clean('Robot Super Course'), None])
+        new_location = loc_mapper().translate_location(
+            location.course_id, location, True, True
+        )
+        course_private_url = new_location.url_reverse('course/', '')
         self.assertFalse(SESSION_KEY in self.client.session)
 
         response = self.client.get(

@@ -10,9 +10,6 @@ from embargo.fixtures.country_codes import COUNTRY_CODES
 import ipaddr
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
@@ -23,26 +20,23 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
 
     def clean_course_id(self):
         """Validate the course id"""
+        course_id = self.cleaned_data["course_id"]
 
-        cleaned_id = self.cleaned_data["course_id"]
+        # Try to get the course.  If this returns None, it's not a real course
         try:
-            course_key = CourseKey.from_string(cleaned_id)
-        except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
-            except InvalidKeyError:
-                msg = 'COURSE NOT FOUND'
-                msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
-                msg += 'Please recheck that you have supplied a valid course id.'
-                raise forms.ValidationError(msg)
-
-        if not modulestore().has_course(course_key):
+            course = modulestore().get_course(course_id)
+        except ValueError:
             msg = 'COURSE NOT FOUND'
-            msg += u' --- Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
+            msg += u' --- Entered course id was: "{0}". '.format(course_id)
+            msg += 'Please recheck that you have supplied a valid course id.'
+            raise forms.ValidationError(msg)
+        if not course:
+            msg = 'COURSE NOT FOUND'
+            msg += u' --- Entered course id was: "{0}". '.format(course_id)
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 
-        return course_key
+        return course_id
 
 
 class EmbargoedStateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol

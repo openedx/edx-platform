@@ -1,28 +1,34 @@
 from itertools import repeat
+
+from xmodule.course_module import CourseDescriptor
+
 from .exceptions import (ItemNotFoundError, NoPathToItem)
+from . import Location
 
 
-def path_to_location(modulestore, usage_key):
+def path_to_location(modulestore, course_id, location):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
     chapter, but any kind of module can be a "section".
 
-    Args:
-        modulestore: which store holds the relevant objects
-        usage_key: :class:`UsageKey` the id of the location to which to generate the path
+    location: something that can be passed to Location
+    course_id: Search for paths in this course.
 
-    Raises
-        ItemNotFoundError if the location doesn't exist.
-        NoPathToItem if the location exists, but isn't accessible via
-            a chapter/section path in the course(s) being searched.
+    raise ItemNotFoundError if the location doesn't exist.
 
-    Returns:
-        a tuple (course_id, chapter, section, position) suitable for the
-        courseware index view.
+    raise NoPathToItem if the location exists, but isn't accessible via
+    a chapter/section path in the course(s) being searched.
 
-    If the section is a sequential or vertical, position will be the children index
-    of this location under that sequence.
+    Return a tuple (course_id, chapter, section, position) suitable for the
+    courseware index view.
+
+    A location may be accessible via many paths. This method may
+    return any valid path.
+
+    If the section is a sequential or vertical, position will be the position
+    of this location in that sequence.  Otherwise, position will
+    be None. TODO (vshnayder): Not true yet.
     '''
 
     def flatten(xs):
@@ -49,38 +55,41 @@ def path_to_location(modulestore, usage_key):
         # tuples (location, path-so-far).  To avoid lots of
         # copying, the path-so-far is stored as a lisp-style
         # list--nested hd::tl tuples, and flattened at the end.
-        queue = [(usage_key, ())]
+        queue = [(location, ())]
         while len(queue) > 0:
-            (next_usage, path) = queue.pop()  # Takes from the end
+            (loc, path) = queue.pop()  # Takes from the end
+            loc = Location(loc)
 
             # get_parent_locations should raise ItemNotFoundError if location
             # isn't found so we don't have to do it explicitly.  Call this
             # first to make sure the location is there (even if it's a course, and
             # we would otherwise immediately exit).
-            parents = modulestore.get_parent_locations(next_usage)
+            parents = modulestore.get_parent_locations(loc, course_id)
 
-            # print 'Processing loc={0}, path={1}'.format(next_usage, path)
-            if next_usage.definition_key.block_type == "course":
-                # Found it!
-                path = (next_usage, path)
-                return flatten(path)
+            # print 'Processing loc={0}, path={1}'.format(loc, path)
+            if loc.category == "course":
+                # confirm that this is the right course
+                if course_id == CourseDescriptor.location_to_id(loc):
+                    # Found it!
+                    path = (loc, path)
+                    return flatten(path)
 
             # otherwise, add parent locations at the end
-            newpath = (next_usage, path)
+            newpath = (loc, path)
             queue.extend(zip(parents, repeat(newpath)))
 
         # If we're here, there is no path
         return None
 
-    if not modulestore.has_item(usage_key):
-        raise ItemNotFoundError(usage_key)
+    if not modulestore.has_item(course_id, location):
+        raise ItemNotFoundError
 
     path = find_path_to_course()
     if path is None:
-        raise NoPathToItem(usage_key)
+        raise NoPathToItem(location)
 
     n = len(path)
-    course_id = path[0].course_key
+    course_id = CourseDescriptor.location_to_id(path[0])
     # pull out the location names
     chapter = path[1].name if n > 1 else None
     section = path[2].name if n > 2 else None
@@ -96,9 +105,9 @@ def path_to_location(modulestore, usage_key):
     if n > 3:
         position_list = []
         for path_index in range(2, n - 1):
-            category = path[path_index].definition_key.block_type
+            category = path[path_index].category
             if category == 'sequential' or category == 'videosequence':
-                section_desc = modulestore.get_item(path[path_index])
+                section_desc = modulestore.get_instance(course_id, path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.

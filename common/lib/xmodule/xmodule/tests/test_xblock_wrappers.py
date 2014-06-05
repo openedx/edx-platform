@@ -190,7 +190,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def location(self):
-        return Location('org', 'course', 'run', 'category', self.url_name, None)
+        return Location('i4x://org/course/category/{}'.format(self.url_name))
 
     @lazy_attribute
     def block_type(self):

@@ -97,7 +97,6 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         extension = self._get_extension(self.sourceurl)
 
         context = {
-            'course_key': self.runtime.course_id,
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
             'sourceUrl': self.sourceurl,

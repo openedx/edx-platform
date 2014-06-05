@@ -22,8 +22,6 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
-from xmodule.modulestore.mongo.base import MongoModuleStore
-from xmodule.modulestore.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0
@@ -49,7 +47,7 @@ def _check_asset(location, asset_name):
     Check that asset with asset_name exists in assets.
     """
     content_location = StaticContent.compute_location(
-        location.course_key, asset_name
+        location.org, location.course, asset_name
     )
     try:
         contentstore().find(content_location)
@@ -64,12 +62,16 @@ def _clear_assets(location):
     """
     store = contentstore()
 
-    assets, __ = store.get_all_content_for_course(location.course_key)
+    content_location = StaticContent.compute_location(
+        location.org, location.course, location.name
+    )
+
+    assets, __ = store.get_all_content_for_course(content_location)
     for asset in assets:
-        asset_location = AssetLocation._from_deprecated_son(asset["_id"], location.course_key.run)
+        asset_location = Location(asset["_id"])
         del_cached_content(asset_location)
-        mongo_id = asset_location.to_deprecated_son()
-        store.delete(mongo_id)
+        id = StaticContent.get_id_from_location(asset_location)
+        store.delete(id)
 
 
 def _get_subs_id(filename):
@@ -96,7 +98,7 @@ def _upload_sjson_file(subs_file, location, default_filename='subs_{}.srt.sjson'
 def _upload_file(subs_file, location, filename):
     mime_type = subs_file.content_type
     content_location = StaticContent.compute_location(
-        location.course_key, filename
+        location.org, location.course, filename
     )
     content = StaticContent(content_location, filename, mime_type, subs_file.read())
     contentstore().save(content)

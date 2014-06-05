@@ -2,8 +2,7 @@ from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
-from xmodule.modulestore import prefer_xmodules
-from xmodule.modulestore.locations import Location
+from xmodule.modulestore import Location, prefer_xmodules
 from xblock.core import XBlock
 
 
@@ -37,7 +36,6 @@ class CourseFactory(XModuleFactory):
     number = '999'
     display_name = 'Robot Super Course'
 
-    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
 
@@ -48,10 +46,8 @@ class CourseFactory(XModuleFactory):
         # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
-        name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
-        run = kwargs.get('run', name)
 
-        location = Location(org, number, run, 'course', name)
+        location = Location('i4x', org, number, 'course', Location.clean(kwargs.get('display_name')))
 
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
@@ -86,15 +82,11 @@ class ItemFactory(XModuleFactory):
         else:
             dest_name = self.display_name.replace(" ", "_")
 
-        new_location = self.parent_location.course_key.make_usage_key(
-            self.category,
-            dest_name
-        )
-        return new_location
+        return self.parent_location.replace(category=self.category, name=dest_name)
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
+        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
@@ -135,14 +127,12 @@ class ItemFactory(XModuleFactory):
 
         # catch any old style users before they get into trouble
         assert 'template' not in kwargs
-        parent_location = kwargs.pop('parent_location', None)
+        parent_location = Location(kwargs.pop('parent_location', None))
         data = kwargs.pop('data', None)
         category = kwargs.pop('category', None)
         display_name = kwargs.pop('display_name', None)
         metadata = kwargs.pop('metadata', {})
         location = kwargs.pop('location')
-
-        assert isinstance(location, Location)
         assert location != parent_location
 
         store = kwargs.pop('modulestore')
@@ -174,7 +164,7 @@ class ItemFactory(XModuleFactory):
         store.update_item(module)
 
         if 'detached' not in module._class_tags:
-            parent.children.append(location)
+            parent.children.append(location.url())
             store.update_item(parent, '**replace_user**')
 
         return store.get_item(location)

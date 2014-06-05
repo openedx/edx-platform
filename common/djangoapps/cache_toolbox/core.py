@@ -118,9 +118,4 @@ def get_cached_content(location):
 
 
 def del_cached_content(location):
-    # delete content for the given location, as well as for content with run=None.
-    # it's possible that the content could have been cached without knowing the
-    # course_key - and so without having the run.
-    cache.delete_many(
-        [unicode(loc).encode("utf-8") for loc in [location, location.replace(run=None)]]
-    )
+    cache.delete(unicode(location).encode("utf-8"))

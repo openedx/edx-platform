@@ -14,8 +14,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
         initialize : function() {
             var self = this,
                 counter = 0,
-                locator = self.$el.closest('[data-locator]').data('locator'),
-                courseKey = self.$el.closest('[data-course-key]').data('course-key');
+                locator = self.$el.closest('[data-locator]').data('locator');
 
             this.template = this.loadTemplate('metadata-editor');
             this.$el.html(this.template({numEntries: this.collection.length}));
@@ -24,7 +23,6 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                 function (model) {
                     var data = {
                             el: self.$el.find('.metadata_entry')[counter++],
-                            courseKey: courseKey,
                             locator: locator,
                             model: model
                         },
@@ -530,7 +528,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
         upload: function (event) {
             var self = this,
                 target = $(event.currentTarget),
-                url = '/assets/' + this.options.courseKey + '/',
+                url = /assets/ + this.options.locator,
                 model = new FileUpload({
                     title: gettext('Upload File'),
                 }),

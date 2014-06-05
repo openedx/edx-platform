@@ -156,12 +156,12 @@ class CommandTest(ModuleStoreTestCase):
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [self.course_id.to_deprecated_string(), SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_2))
         with generate_serials_file(size) as temp_file:
-            args = [self.course_id.to_deprecated_string(), SOFTWARE_2, temp_file.name]
+            args = [self.course_id, SOFTWARE_2, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be only 2 course-software entries')
@@ -174,7 +174,7 @@ class CommandTest(ModuleStoreTestCase):
 
         log.debug('Adding more serial numbers to {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [self.course_id.to_deprecated_string(), SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be still only 2 course-software entries')
@@ -197,7 +197,7 @@ class CommandTest(ModuleStoreTestCase):
         with NamedTemporaryFile() as tmpfile:
             tmpfile.write('\n'.join(known_serials))
             tmpfile.flush()
-            args = [self.course_id.to_deprecated_string(), SOFTWARE_1, tmpfile.name]
+            args = [self.course_id, SOFTWARE_1, tmpfile.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Check if we added only the new ones')

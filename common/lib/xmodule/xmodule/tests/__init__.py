@@ -16,13 +16,12 @@ from mock import Mock
 from path import path
 
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.xml import LocationReader
 
 
 MODULE_DIR = path(__file__).dirname()
@@ -46,21 +45,13 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     ModuleSystem for testing
     """
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
-        return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
-            handler=handler,
-            suffix=suffix,
-            query=query,
-        )
+        return str(block.scope_ids.usage_id) + '/' + handler + '/' + suffix + '?' + query
 
     def local_resource_url(self, block, uri):
-        return 'resource/{usage_id}/{uri}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
-            uri=uri,
-        )
+        return 'resource/' + str(block.scope_ids.block_type) + '/' + uri
 
 
-def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
+def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
 
@@ -105,6 +96,7 @@ def get_test_descriptor_system():
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         field_data=DictFieldData({}),
+        id_reader=LocationReader(),
     )
 
 
@@ -139,15 +131,12 @@ class LogicTest(unittest.TestCase):
             url_name = ''
             category = 'test'
 
-        self.system = get_test_system()
+        self.system = get_test_system(course_id='test/course/id')
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class
-        usage_key = self.system.course_id.make_usage_key(self.descriptor.category, 'test_loc')
-        # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        scope_ids = ScopeIds(1, self.descriptor.category, usage_key, usage_key)
         self.xmodule = self.xmodule_class(
-            self.descriptor, self.system, DictFieldData(self.raw_field_data), scope_ids
+            self.descriptor, self.system, DictFieldData(self.raw_field_data), Mock()
         )
 
     def ajax_request(self, dispatch, data):

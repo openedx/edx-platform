@@ -6,6 +6,9 @@ from factory.django import DjangoModelFactory
 # Imported to re-export
 # pylint: disable=unused-import
 from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import GroupFactory  # Imported to re-export
+from student.tests.factories import CourseEnrollmentAllowedFactory  # Imported to re-export
+from student.tests.factories import RegistrationFactory  # Imported to re-export
 # pylint: enable=unused-import
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
@@ -20,11 +23,10 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
 
 
-course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
-location = partial(course_id.make_usage_key, u'problem')
+location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
@@ -39,10 +41,9 @@ class InstructorFactory(UserFactory):
     last_name = "Instructor"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course instructor user")
+            raise ValueError("Must specify a course location for a course instructor user")
         CourseInstructorRole(extracted).add_users(self)
 
 
@@ -54,10 +55,9 @@ class StaffFactory(UserFactory):
     last_name = "Staff"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course staff user")
+            raise ValueError("Must specify a course location for a course staff user")
         CourseStaffRole(extracted).add_users(self)
 
 
@@ -69,10 +69,9 @@ class BetaTesterFactory(UserFactory):
     last_name = "Beta-Tester"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a CourseKey for a beta-tester user")
+            raise ValueError("Must specify a course location for a beta-tester user")
         CourseBetaTesterRole(extracted).add_users(self)
 
 
@@ -84,11 +83,10 @@ class OrgStaffFactory(UserFactory):
     last_name = "Org-Staff"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-staff user")
-        OrgStaffRole(extracted.org).add_users(self)
+            raise ValueError("Must specify a course location for an org-staff user")
+        OrgStaffRole(extracted).add_users(self)
 
 
 class OrgInstructorFactory(UserFactory):
@@ -99,11 +97,10 @@ class OrgInstructorFactory(UserFactory):
     last_name = "Org-Instructor"
 
     @factory.post_generation
-    # TODO Change this from course to course_key at next opportunity
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-instructor user")
-        OrgInstructorRole(extracted.org).add_users(self)
+            raise ValueError("Must specify a course location for an org-instructor user")
+        OrgInstructorRole(extracted).add_users(self)
 
 
 class GlobalStaffFactory(UserFactory):
@@ -122,7 +119,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
+    course_id = "MITx/999/Robot_Super_Course"
     state = None
     grade = None
     max_grade = None
@@ -134,7 +131,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('usage_id')
+    usage_id = location('usage_id').url()
 
 
 class StudentPrefsFactory(DjangoModelFactory):

@@ -10,27 +10,27 @@ _MODERATOR_ROLE_PERMISSIONS = ["edit_content", "delete_thread", "openclose_threa
 _ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
 
 
-def _save_forum_role(course_key, name):
+def _save_forum_role(course_id, name):
     """
-    Save and Update 'course_key' for all roles which are already created to keep course_id same
-    as actual passed course key
+    Save and Update 'course_id' for all roles which are already created to keep course_id same
+    as actual passed course id
     """
-    role, created = Role.objects.get_or_create(name=name, course_id=course_key)
+    role, created = Role.objects.get_or_create(name=name, course_id=course_id)
     if created is False:
-        role.course_id = course_key
+        role.course_id = course_id
         role.save()
 
     return role
 
 
-def seed_permissions_roles(course_key):
+def seed_permissions_roles(course_id):
     """
     Create and assign permissions for forum roles
     """
-    administrator_role = _save_forum_role(course_key, "Administrator")
-    moderator_role = _save_forum_role(course_key, "Moderator")
-    community_ta_role = _save_forum_role(course_key, "Community TA")
-    student_role = _save_forum_role(course_key, "Student")
+    administrator_role = _save_forum_role(course_id, "Administrator")
+    moderator_role = _save_forum_role(course_id, "Moderator")
+    community_ta_role = _save_forum_role(course_id, "Community TA")
+    student_role = _save_forum_role(course_id, "Student")
 
     for per in _STUDENT_ROLE_PERMISSIONS:
         student_role.add_permission(per)
@@ -47,6 +47,25 @@ def seed_permissions_roles(course_key):
     community_ta_role.inherit_permissions(moderator_role)
 
     administrator_role.inherit_permissions(moderator_role)
+
+
+def _remove_permission_role(course_id, name):
+    try:
+        role = Role.objects.get(name=name, course_id=course_id)
+        if role.course_id == course_id:
+            role.delete()
+    except Role.DoesNotExist:
+        pass
+
+
+def unseed_permissions_roles(course_id):
+    """
+    A utility method to clean up all forum related permissions and roles
+    """
+    _remove_permission_role(name="Administrator", course_id=course_id)
+    _remove_permission_role(name="Moderator", course_id=course_id)
+    _remove_permission_role(name="Community TA", course_id=course_id)
+    _remove_permission_role(name="Student", course_id=course_id)
 
 
 def are_permissions_roles_seeded(course_id):

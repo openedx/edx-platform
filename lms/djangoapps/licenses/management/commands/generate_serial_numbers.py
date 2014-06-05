@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 
 from licenses.models import CourseSoftware, UserLicense
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -37,8 +36,10 @@ class Command(BaseCommand):
             raise CommandError("Incorrect number of arguments")
 
         course_id = args[0]
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        if not modulestore().has_course(course_key):
+        courses = modulestore().get_courses()
+        known_course_ids = set(c.id for c in courses)
+
+        if course_id not in known_course_ids:
             raise CommandError("Unknown course_id")
 
         software_name = escape(args[1].lower())
@@ -48,7 +49,7 @@ class Command(BaseCommand):
         except ValueError:
             raise CommandError("Invalid <count> argument.")
 
-        return course_key, software_name, count
+        return course_id, software_name, count
 
     def _generate_serials(self, software, count):
         print "Generating {0} serials".format(count)

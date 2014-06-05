@@ -1,12 +1,13 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
+import time
 import os
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
 from django.conf import settings
 
-from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff
+from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole
 from student.models import get_user
 
 from selenium.webdriver.common.keys import Keys
@@ -161,7 +162,7 @@ def add_course_author(user, course):
     """
     global_admin = AdminFactory()
     for role in (CourseStaffRole, CourseInstructorRole):
-        auth.add_users(global_admin, role(course.id), user)
+        auth.add_users(global_admin, role(course.location), user)
 
 
 def create_a_course():
@@ -379,17 +380,18 @@ def create_other_user(_step, name, has_extra_perms, role_name):
     user = create_studio_user(uname=name, password="test", email=email)
     if has_extra_perms:
         if role_name == "is_staff":
-            GlobalStaff().add_users(user)
+            user.is_staff = True
+            user.save()
         else:
             if role_name == "admin":
                 # admins get staff privileges, as well
                 roles = (CourseStaffRole, CourseInstructorRole)
             else:
                 roles = (CourseStaffRole,)
-            course_key = world.scenario_dict["COURSE"].id
+            location = world.scenario_dict["COURSE"].location
             global_admin = AdminFactory()
             for role in roles:
-                auth.add_users(global_admin, role(course_key), user)
+                auth.add_users(global_admin, role(location), user)
 
 
 @step('I log out')

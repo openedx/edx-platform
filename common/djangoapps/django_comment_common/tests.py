@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from django_comment_common.models import Role
 from student.models import CourseEnrollment, User
 
@@ -22,13 +21,13 @@ class RoleAssignmentTest(TestCase):
             "hacky",
             "hacky@fake.edx.org"
         )
-        self.course_key = SlashSeparatedCourseKey("edX", "Fake101", "2012")
-        CourseEnrollment.enroll(self.staff_user, self.course_key)
-        CourseEnrollment.enroll(self.student_user, self.course_key)
+        self.course_id = "edX/Fake101/2012"
+        CourseEnrollment.enroll(self.staff_user, self.course_id)
+        CourseEnrollment.enroll(self.student_user, self.course_id)
 
     def test_enrollment_auto_role_creation(self):
         student_role = Role.objects.get(
-            course_id=self.course_key,
+            course_id=self.course_id,
             name="Student"
         )
 

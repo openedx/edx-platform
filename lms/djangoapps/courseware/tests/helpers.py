@@ -130,7 +130,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
-            'course_id': course.id.to_deprecated_string(),
+            'course_id': course.id,
         })
         result = resp.status_code == 200
         if verify:
@@ -142,7 +142,5 @@ class LoginEnrollmentTestCase(TestCase):
         Unenroll the currently logged-in user, and check that it worked.
         `course` is an instance of CourseDescriptor.
         """
-        check_for_post_code(self, 200, reverse('change_enrollment'), {
-            'enrollment_action': 'unenroll',
-            'course_id': course.id.to_deprecated_string()
-        })
+        check_for_post_code(self, 200, reverse('change_enrollment'), {'enrollment_action': 'unenroll',
+                                                                      'course_id': course.id})

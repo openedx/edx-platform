@@ -289,7 +289,9 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     If `delete_old` is True, removes `old_name` files from storage.
     """
     filename = 'subs_{0}.srt.sjson'.format(old_name)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename
+    )
     transcripts = contentstore().find(content_location).data
     save_subs_to_store(json.loads(transcripts), new_name, item)
     item.sub = new_name
@@ -530,7 +532,7 @@ class Transcript(object):
         """
         Return asset location. `location` is module location.
         """
-        return StaticContent.compute_location(location.course_key, filename)
+        return StaticContent.compute_location(location.org, location.course, filename)
 
     @staticmethod
     def delete_asset(location, filename):
@@ -543,5 +545,4 @@ class Transcript(object):
             log.info("Transcript asset %s was removed from store.", filename)
         except NotFoundError:
             pass
-        return StaticContent.compute_location(location.course_key, filename)
 
