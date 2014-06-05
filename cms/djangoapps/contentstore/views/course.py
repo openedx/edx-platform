@@ -204,7 +204,7 @@ def _accessible_courses_list_from_groups(request):
         try:
             course = modulestore('direct').get_course(course_key)
         except ItemNotFoundError:
-            raise ItemNotFoundError
+            pass
         if course is not None and not isinstance(course, ErrorDescriptor):
             # ignore deleted or errored courses
             courses_list[course_key] = course
