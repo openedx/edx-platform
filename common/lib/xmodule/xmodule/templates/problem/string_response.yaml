@@ -15,7 +15,7 @@ metadata:
         
 
         [explanation]
-        Lansing is the capital of Michigan, although it is not Michigan's largest city,
+        Lansing is the capital of Michigan, although it is not Michgan's largest city, 
         or even the seat of the county in which it resides.
         [explanation]
 data: |
@@ -36,7 +36,7 @@ data: |
         <solution>
             <div class="detailed-solution">
                 <p>Explanation</p>
-                <p>Lansing is the capital of Michigan, although it is not Michigan's largest city, or even the seat of the county in which it resides.</p>
+                <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
             </div>
         </solution>
     </problem>
