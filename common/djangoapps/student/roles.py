@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
 from student.models import CourseAccessRole
+from xmodule_django.models import CourseKeyField
 
 
 class AccessRole(object):
@@ -129,6 +130,9 @@ class RoleBase(AccessRole):
         """
         Return a django QuerySet for all of the users with this role
         """
+        # Org roles don't query by CourseKey, so use CourseKeyField.Empty for that query
+        if self.course_key is None:
+            self.course_key = CourseKeyField.Empty
         entries = User.objects.filter(
             courseaccessrole__role=self._role_name,
             courseaccessrole__org=self.org,

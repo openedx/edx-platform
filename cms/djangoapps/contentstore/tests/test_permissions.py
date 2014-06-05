@@ -11,7 +11,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_url, reverse_course_url
-from student.roles import CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole
 from contentstore.views.access import has_course_access
 from student import auth
 
@@ -95,10 +95,15 @@ class TestCourseAccess(ModuleStoreTestCase):
         # doesn't use role.users_with_role b/c it's verifying the roles.py behavior
         user_by_role = {}
         # add the misc users to the course in different groups
-        for role in [CourseInstructorRole, CourseStaffRole]:
+        for role in [CourseInstructorRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole]:
             user_by_role[role] = []
-            # pylint: disable=protected-access
-            group = role(self.course_key)
+            # Org-based roles are created via org name, rather than course_key
+            if (role is OrgStaffRole) or (role is OrgInstructorRole):
+                # pylint: disable=protected-access
+                group = role(self.course_key.org)
+            else:
+                # pylint: disable=protected-access
+                group = role(self.course_key)
             # NOTE: this loop breaks the roles.py abstraction by purposely assigning
             # users to one of each possible groupname in order to test that has_course_access
             # and remove_user work
@@ -109,21 +114,27 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         course_team_url = reverse_course_url('course_team_handler', self.course_key)
         response = self.client.get_html(course_team_url)
-        for role in [CourseInstructorRole, CourseStaffRole]:
+        for role in [CourseInstructorRole, CourseStaffRole]:  # Global and org-based roles don't appear on this page
             for user in user_by_role[role]:
                 self.assertContains(response, user.email)
 
         # test copying course permissions
         copy_course_key = SlashSeparatedCourseKey('copyu', 'copydept.mycourse', 'myrun')
-        for role in [CourseInstructorRole, CourseStaffRole]:
-            auth.add_users(
-                self.user,
-                role(copy_course_key),
-                *role(self.course_key).users_with_role()
-            )
+        for role in [CourseInstructorRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole]:
+            if (role is OrgStaffRole) or (role is OrgInstructorRole):
+                auth.add_users(
+                    self.user,
+                    role(copy_course_key.org),
+                    *role(self.course_key.org).users_with_role())
+            else:
+                auth.add_users(
+                    self.user,
+                    role(copy_course_key),
+                    *role(self.course_key).users_with_role()
+                )
         # verify access in copy course and verify that removal from source course w/ the various
         # groupnames works
-        for role in [CourseInstructorRole, CourseStaffRole]:
+        for role in [CourseInstructorRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole]:
             for user in user_by_role[role]:
                 # forcefully decache the groups: premise is that any real request will not have
                 # multiple objects repr the same user but this test somehow uses different instance
@@ -132,5 +143,8 @@ class TestCourseAccess(ModuleStoreTestCase):
                     del user._roles
 
                 self.assertTrue(has_course_access(user, copy_course_key), "{} no copy access".format(user))
-                auth.remove_users(self.user, role(self.course_key), user)
+                if (role is OrgStaffRole) or (role is OrgInstructorRole):
+                    auth.remove_users(self.user, role(self.course_key.org), user)
+                else:
+                    auth.remove_users(self.user, role(self.course_key), user)
                 self.assertFalse(has_course_access(user, self.course_key), "{} remove didn't work".format(user))
