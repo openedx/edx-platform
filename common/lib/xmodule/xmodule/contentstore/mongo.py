@@ -63,10 +63,11 @@ class MongoContentStore(ContentStore):
 
         return content
 
-    def delete(self, content_id):
-        if self.fs.exists({"_id": content_id}):
-            self.fs.delete(content_id)
-            assert not self.fs.exists({"_id": content_id})
+    def delete(self, location_or_id):
+        if isinstance(location_or_id, AssetLocation):
+            location_or_id = self.asset_db_key(location_or_id)
+        if self.fs.exists({"_id": location_or_id}):
+            self.fs.delete(location_or_id)
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = self.asset_db_key(location)
@@ -282,4 +283,8 @@ class MongoContentStore(ContentStore):
         """
         Returns the database query to find the given asset location.
         """
-        return location.to_deprecated_son(tag=XASSET_LOCATION_TAG, prefix='_id.')
+        # codifying the original order which pymongo used for the dicts coming out of location_to_dict
+        # stability of order is more important than sanity of order as any changes to order make things
+        # unfindable
+        ordered_key_fields = ['category', 'name', 'course', 'tag', 'org', 'revision']
+        return SON((field_name, getattr(location, field_name)) for field_name in ordered_key_fields)

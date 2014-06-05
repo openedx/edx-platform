@@ -56,7 +56,7 @@ polib==1.0.3
 pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1
-# pymongo==2.4.1
+pymongo==2.4.1
 pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5

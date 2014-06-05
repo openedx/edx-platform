@@ -16,9 +16,6 @@
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 
-# Temporary update to 3rd party libs:
--e git+https://github.com/edx/mongo-python-driver.git@dd01bf051dd5373146f668b9c78da9cb15c82331#egg=pymongo
-
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@fc5fea25c973ec66d8db63cf69a817ce624f5ef5#egg=XBlock
 -e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
