@@ -60,6 +60,7 @@ def _serialize_user_profile(response_data, user_profile):
     response_data['level_of_education'] = user_profile.level_of_education
     response_data['year_of_birth'] = user_profile.year_of_birth
     response_data['gender'] = user_profile.gender
+    response_data['avatar_url'] = user_profile.avatar_url
 
     return response_data
 
@@ -130,6 +131,7 @@ class UsersList(SecureAPIView):
         * level_of_education
         * year_of_birth, Four-digit integer value
         * gender, Single-character value (M/F)
+        * avatar_url, pointer to the avatar/image resource
     - POST Example:
 
             {
@@ -146,6 +148,7 @@ class UsersList(SecureAPIView):
                 "level_of_education" : "hs",
                 "year_of_birth" : "1996",
                 "gender" : "F",
+                "avatar_url" : "http://example.com/avatar.png"
             }
     ### Use Cases/Notes:
     * GET requests for _all_ users are not currently allowed via the API
@@ -173,6 +176,7 @@ class UsersList(SecureAPIView):
         year_of_birth = request.DATA.get('year_of_birth', '')
         gender = request.DATA.get('gender', '')
         title = request.DATA.get('title', '')
+        avatar_url = request.DATA.get('avatar_url', None)
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -218,6 +222,7 @@ class UsersList(SecureAPIView):
         profile.level_of_education = level_of_education
         profile.gender = gender
         profile.title = title
+        profile.avatar_url = avatar_url
 
         try:
             profile.year_of_birth = int(year_of_birth)
@@ -265,6 +270,7 @@ class UsersDetail(SecureAPIView):
         * level_of_education
         * year_of_birth, Four-digit integer value
         * gender, Single-character value (M/F)
+        * avatar_url, pointer to the avatar/image resource
     - POST Example:
 
             {
@@ -281,6 +287,7 @@ class UsersDetail(SecureAPIView):
                 "level_of_education" : "hs",
                 "year_of_birth" : "1996",
                 "gender" : "F",
+                "avatar_url" : "http://example.com/avatar.png"
             }
     ### Use Cases/Notes:
     * Use the UsersDetail view to obtain the current state for a specific User
@@ -452,6 +459,10 @@ class UsersDetail(SecureAPIView):
             title = request.DATA.get('title')
             if title:
                 existing_user_profile.title = title
+            avatar_url = request.DATA.get('avatar_url')
+            if avatar_url:
+                existing_user_profile.avatar_url = avatar_url
+
             existing_user_profile.save()
         return Response(response_data, status=status.HTTP_200_OK)
 
