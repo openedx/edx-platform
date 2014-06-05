@@ -14,6 +14,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -51,10 +52,15 @@ def delete_course_and_groups(course_id, commit=False):
 
 def get_modulestore(category_or_location):
     """
-    This function no longer does anything more than just calling `modulestore()`. It used
-    to select 'direct' v 'draft' based on the category.
+    Returns the correct modulestore to use for modifying the specified location
     """
-    return modulestore()
+    if isinstance(category_or_location, Location):
+        category_or_location = category_or_location.category
+
+    if category_or_location in DIRECT_ONLY_CATEGORIES:
+        return modulestore('direct')
+    else:
+        return modulestore()
 
 
 def get_lms_link_for_item(location, preview=False):

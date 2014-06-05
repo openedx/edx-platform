@@ -369,7 +369,8 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
             # interface for publishing. However, as of now, only the DraftMongoModulestore
             # does, so we have to check for the attribute explicitly.
             store = get_modulestore(block.location)
-            store.publish(block.location, request.user.id)
+            if hasattr(store, 'publish'):
+                store.publish(block.location, request.user.id)
 
         _xmodule_recurse(
             existing_item,
