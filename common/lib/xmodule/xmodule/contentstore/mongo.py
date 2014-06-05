@@ -12,7 +12,7 @@ from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
 import os
 import json
-import bson.son
+from bson.son import SON
 from xmodule.modulestore.locations import AssetLocation
 
 
@@ -29,7 +29,7 @@ class MongoContentStore(ContentStore):
             pymongo.MongoClient(
                 host=host,
                 port=port,
-                document_class=bson.son.SON,
+                document_class=SON,
                 **kwargs
             ),
             db
@@ -43,7 +43,7 @@ class MongoContentStore(ContentStore):
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
     def save(self, content):
-        content_id = content.get_id()
+        content_id = self.asset_db_key(content.location)
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
         self.delete(content_id)
@@ -71,13 +71,6 @@ class MongoContentStore(ContentStore):
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
-        if fs_pointer is None:
-            if throw_on_not_found:
-                raise NotFoundError()
-            else:
-                return None
-        content_id = fs_pointer['_id']
 
         try:
             if as_stream:
@@ -104,13 +97,13 @@ class MongoContentStore(ContentStore):
                     )
         except NoFile:
             if throw_on_not_found:
-                raise NotFoundError()
+                raise NotFoundError(content_id)
             else:
                 return None
 
     def get_stream(self, location):
         content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
+        fs_pointer = self.fs_files.find_one({'_id': content_id}, fields={'_id': 1})
 
         try:
             handle = self.fs.get(fs_pointer['_id'])
@@ -246,10 +239,10 @@ class MongoContentStore(ContentStore):
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key = self.asset_db_key(location)
         # FIXME remove fetch and use a form of update which fails if doesn't exist
-        item = self.fs_files.find_one(asset_db_key)
+        item = self.fs_files.find_one({'_id': asset_db_key})
         if item is None:
             raise NotFoundError(asset_db_key)
-        self.fs_files.update(asset_db_key, {"$set": attr_dict})
+        self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict})
 
     def get_attrs(self, location):
         """
@@ -262,7 +255,7 @@ class MongoContentStore(ContentStore):
         :param location: a c4x asset location
         """
         asset_db_key = self.asset_db_key(location)
-        item = self.fs_files.find_one(asset_db_key)
+        item = self.fs_files.find_one({'_id': asset_db_key})
         if item is None:
             raise NotFoundError(asset_db_key)
         return item
