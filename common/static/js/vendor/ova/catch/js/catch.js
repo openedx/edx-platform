@@ -42,29 +42,29 @@ annotationList:
                 '</div>'+
 
                 '<div class="annotatedBy field">'+
-                    'User'+
+                    gettext('User')+
                 '</div>'+
 
                 '<div class="body field">'+
-                    'Annotation'+
+                    gettext('Annotation')+
                 '</div>'+  
                 
                 '{{#if videoFormat}}'+
                     '<div class="start field">'+
-                        'Start'+
+                        gettext('Start')+
                     '</div>'+
 
                     '<div class="end field">'+
-                        'End'+
+                        gettext('End')+
                     '</div>'+
                 '{{/if}}'+
                 
                 '<div class="totalreplies field">'+
-                    '#Replies'+
+                    gettext('#Replies')+
                 '</div>'+
                 
                 '<div class="annotatedAt field">'+
-                    'Date posted'+
+                    gettext('Date posted')+
                 '</div>'+
             '</div>'+
         '</div>'+
@@ -73,41 +73,41 @@ annotationList:
         '{{/each}}'+
     '</div>'+
     '<div class="annotationListButtons">'+
-        '<div class="moreButtonCatch">More</div>'+
+        '<div class="moreButtonCatch">'+gettext('More')+'</div>'+
     '</div>',
     
 //Main->PublicPrivateInstructor
 annotationPublicPrivateInstructor:
-    '<div class="selectors"><div class="PublicPrivate myNotes active">My Notes<span class="action">myNotes</span></div>'+ 
-    '<div class="PublicPrivate instructor"> Instructor<span class="action">instructor</span></div>'+
-    '<div class="PublicPrivate public"> Public<span class="action">public</span></div></div>'+
-    '<div class="searchbox"><div class="searchinst">Search</div><select class="dropdown-list">'+
-    '<option>Users</option>'+
-    '<option>Tags</option>'+
-    '<option>Annotation Text</option>'+
-    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">Clear</div></div>',
+    '<div class="selectors"><div class="PublicPrivate myNotes active">'+gettext('My Notes')+'<span class="action">myNotes</span></div>'+ 
+    '<div class="PublicPrivate instructor"> '+gettext('Instructor')+'<span class="action">instructor</span></div>'+
+    '<div class="PublicPrivate public"> '+gettext('Public')+'<span class="action">public</span></div></div>'+
+    '<div class="searchbox"><div class="searchinst">'+gettext('Search')+'</div><select class="dropdown-list">'+
+    '<option>'+gettext('Users')+'</option>'+
+    '<option>'+gettext('Tags')+'</option>'+
+    '<option>'+gettext('Annotation Text')+'</option>'+
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">'+gettext('Clear')+'</div></div>',
     
 //Main->PublicPrivate
 annotationPublicPrivate:
-    '<div class="selectors"><div class="PublicPrivate myNotes active">My Notes<span class="action">myNotes</span></div>'+ 
-    '<div class="PublicPrivate public"> Public<span class="action">public</span></div></div>'+
-    '<div class="searchbox"><div class="searchinst">Search</div><select class="dropdown-list">'+
-    '<option>Users</option>'+
-    '<option>Tags</option>'+
-    '<option>Annotation Text</option>'+
-    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">Clear</div></div>',
+    '<div class="selectors"><div class="PublicPrivate myNotes active">'+gettext('My Notes')+'<span class="action">myNotes</span></div>'+ 
+    '<div class="PublicPrivate public"> '+gettext('Public')+'<span class="action">public</span></div></div>'+
+    '<div class="searchbox"><div class="searchinst">'+gettext('Search')+'</div><select class="dropdown-list">'+
+    '<option>'+gettext('Users')+'</option>'+
+    '<option>'+gettext('Tags')+'</option>'+
+    '<option>'+gettext('Annotation Text')+'</option>'+
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">'+gettext('Clear')+'</div></div>',
     
 //Main->MediaSelector
 annotationMediaSelector:
     '<ul class="ui-tabs-nav">'+
         '<li class="ui-state-default" media="text">'+
-            'Text'+
+            gettext('Text')+
         '</li>'+
         '<li class="ui-state-default" media="video">'+
-            'Video'+
+            gettext('Video')+
         '</li>'+
         'li class="ui-state-default" media="image">'+
-            'Image'+
+            gettext('Image')+
         '</li>'+
     '</ul>',
 
@@ -137,7 +137,7 @@ annotationReply:
                         '<div class="map"></div>'+
                     '</div>'+
                     '{{/if}}'+
-                    '<div class="deleteReply">Delete</div>'+
+                    '<div class="deleteReply">'+gettext('Delete')+'</div>'+
                 '</p>'+
                 '<p>'+
                     '{{#if this.text}}'+
@@ -244,13 +244,13 @@ annotationDetail:
         '</div>'+
 
         '<div class="controlReplies">'+
-            '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
+            '<div class="newReply" style="text-decoration:underline">'+gettext('Reply')+'</div>&nbsp;'+
             '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
             '{{#if authToEditButton}}'+
-                '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
+                '<div class="editAnnotation" style="text-decoration:underline">'+gettext('Edit')+'</div>'+
             '{{/if}}'+
             '{{#if authToDeleteButton}}'+
-                '<div class="deleteAnnotation" style="text-decoration:underline">Delete</div>'+
+                '<div class="deleteAnnotation" style="text-decoration:underline">'+gettext('Delete')+'</div>'+
             '{{/if}}'+
         '</div>'+
         
@@ -259,7 +259,7 @@ annotationDetail:
         
     '{{#if tags}}'+
         '<div class="tags">'+
-            '<h3>Tags:</h3>'+
+            '<h3>'+gettext('Tags:')+'</h3>'+
             '{{#each tags}}'+
                 '<div class="tag">'+
                     '{{this}}'+
@@ -348,14 +348,22 @@ CatchAnnotation.prototype = {
         this.HTMLTEMPLATES = CatchSources.HTMLTEMPLATES(this.options.imageUrlRoot);
         this.TEMPLATES = {};
         this._compileTemplates();
+        
+        // the default annotations are the user's personal ones instead of instructor
+        // if the default tab is instructor, we must refresh the catch to pull the ones
+        // under the instructor's email. passing empty strings as arguments will default
+        // to pulling the annotations for the email within this.options.userId.
         if(this.options.default_tab.toLowerCase() == 'instructor'){
-            this.options.userId = this.options.instructor_username;
+            this.options.userId = this.options.instructor_email;
             this._refresh('','');
         }
     },
 //    
 //     GLOBAL UTILITIES
 // 
+    getTemplate: function(templateName){
+        return this.TEMPLATES[templateName]() || '';
+    },
     refreshCatch: function(newInstance) {
         var mediaType = this.options.media || 'text',
             annotationItems = [],
@@ -396,18 +404,16 @@ CatchAnnotation.prototype = {
         
         if (newInstance){
             var videoFormat = (mediaType === "video") ? true:false;
-            var publicprivatetemplate = '';
+            var publicPrivateTemplate = '';
             if (self.options.showPublicPrivate) {
-                if(self.options.instructor_username != ''){
-                    publicprivatetemplate = self.TEMPLATES.annotationPublicPrivateInstructor();
-                } else{
-                    publicprivatetemplate = self.TEMPLATES.annotationPublicPrivate();
-                }
+                var templateName = this.options.instructor_email ? 
+                    "annotationPublicPrivateInstructor" : 
+                    "annotationPublicPrivate";
             }
             el.html(self.TEMPLATES.annotationList({ 
                 annotationItems: annotationItems, 
                 videoFormat: videoFormat,
-                PublicPrivate: publicprivatetemplate,
+                PublicPrivate: this.getTemplate(templateName),
                 MediaSelector: self.options.showMediaSelector?self.TEMPLATES.annotationMediaSelector():'',
             }));
         }else{
@@ -433,7 +439,7 @@ CatchAnnotation.prototype = {
                         self.options.userId = '';
                         break;
                     case 'instructor':
-                        self.options.userId = this.options.instructor_username;
+                        self.options.userId = this.options.instructor_email;
                         break;
                     default:
                         self.options.userId = this.annotator.plugins.Permissions.user.id;
@@ -1055,7 +1061,7 @@ CatchAnnotation.prototype = {
                 userId = '';
                 break;
             case 'instructor':
-                userId = this.options.instructor_username;
+                userId = this.options.instructor_email;
                 break;
             default:
                 userId = this.annotator.plugins.Permissions.user.id;
@@ -1119,7 +1125,7 @@ CatchAnnotation.prototype = {
         
     },
     _onClearSearchButtonClick: function(evt){
-        this._refresh("","");    
+        this._refresh('','');    
     },
     _clearAnnotator: function(){
         var annotator = this.annotator,

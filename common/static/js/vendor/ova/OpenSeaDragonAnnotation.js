@@ -380,7 +380,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 clickTimeThreshold: viewer.clickTimeThreshold,
                 clickDistThreshold: viewer.clickDistThreshold
             });
-            if(this.options.viewer.annotation_mode == "2" || this.options.viewer.flags){
+            if(this.options.viewer.annotation_mode == "everyone" || this.options.viewer.flags){
                 /* Set elements to the control menu */
                 viewer.annotatorControl  = viewer.wrapperAnnotation.element;
                 if( viewer.toolbar ){

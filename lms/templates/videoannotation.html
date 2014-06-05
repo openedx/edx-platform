@@ -175,10 +175,9 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
 
     ova.annotator.addPlugin('Tags');
-    var userId = '${user.email}';
-    if('${default_tab}'.toLowerCase() == 'instructor'){
-        userId = '${instructor_username}';
-    }
+    var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+            '${instructor_email}':
+            '${user.email}';
 
     //Catch
     var annotator = ova.annotator;
@@ -192,7 +191,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff,
             default_tab: "${default_tab}",
-            instructor_username: "${instructor_username}",
+            instructor_email: "${instructor_email}",
             annotation_mode: "${annotation_mode}",
         };
         var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);

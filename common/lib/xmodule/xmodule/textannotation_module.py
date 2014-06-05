@@ -71,17 +71,18 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default="myNotes",
     )
-    instructor_username = String(
-        display_name=_("Username for 'Instructor' Annotations"),
-        help=_("Username that will be attached to all annotations that will be found in 'Instructor' tab."),
+    # currently only supports one instructor, will build functionality for multiple later
+    instructor_email = String(
+        display_name=_("Email for 'Instructor' Annotations"),
+        help=_("Email of the user that will be attached to all annotations that will be found in 'Instructor' tab."),
         scope=Scope.settings,
         default="",
     )
     annotation_mode = String(
         display_name=_("Mode for Annotation Tool"),
-        help=_("Type in number corresponding to following modes: 1 = only instructor can annotate , 2 = Everyone can annotate"),
+        help=_("Type in number corresponding to following modes:  'instructor' or 'everyone'"),
         scope=Scope.settings,
-        default="2",
+        default="everyone",
     )
 
 
@@ -120,7 +121,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
             'diacritic_marks': self.diacritics,
             'default_tab': self.default_tab,
-            'instructor_username': self.instructor_username,
+            'instructor_email': self.instructor_email,
             'annotation_mode': self.annotation_mode,
         }
         fragment = Fragment(self.system.render_template('textannotation.html', context))
