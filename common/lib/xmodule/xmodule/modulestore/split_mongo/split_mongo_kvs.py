@@ -110,7 +110,6 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         if isinstance(self._definition, DefinitionLazyLoader):
             persisted_definition = self._definition.fetch()
             if persisted_definition is not None:
-                fields = self._definition.field_converter(persisted_definition.get('fields'))
-                self._fields.update(fields)
+                self._fields.update(persisted_definition.get('fields'))
                 # do we want to cache any of the edit_info?
             self._definition = None  # already loaded

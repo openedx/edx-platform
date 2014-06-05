@@ -68,7 +68,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = modulestore('split').get_course(test_course.id.version_agnostic())
-        self.assertIn(test_chapter.location, test_course.children)
+        self.assertIn(test_chapter.location.block_id, test_course.children)
 
         with self.assertRaises(DuplicateCourseError):
             persistent_factories.PersistentCourseFactory.create(

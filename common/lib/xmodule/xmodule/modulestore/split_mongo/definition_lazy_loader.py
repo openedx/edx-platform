@@ -8,7 +8,7 @@ class DefinitionLazyLoader(object):
     object doesn't force access during init but waits until client wants the
     definition. Only works if the modulestore is a split mongo store.
     """
-    def __init__(self, modulestore, block_type, definition_id, field_converter):
+    def __init__(self, modulestore, block_type, definition_id):
         """
         Simple placeholder for yet-to-be-fetched data
         :param modulestore: the pymongo db connection with the definitions
@@ -16,7 +16,6 @@ class DefinitionLazyLoader(object):
         """
         self.modulestore = modulestore
         self.definition_locator = DefinitionLocator(block_type, definition_id)
-        self.field_converter = field_converter
 
     def fetch(self):
         """

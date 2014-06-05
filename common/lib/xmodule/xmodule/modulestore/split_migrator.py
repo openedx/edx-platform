@@ -127,15 +127,15 @@ class SplitMigrator(object):
                         block_id=new_locator.block_id,
                         fields=self._get_json_fields_translate_references(module, course_key, True)
                     )
-                    awaiting_adoption[module.location] = new_locator
-        for draft_location, new_locator in awaiting_adoption.iteritems():
+                    awaiting_adoption[module.location] = new_locator.block_id
+        for draft_location, new_block_id in awaiting_adoption.iteritems():
             for parent_loc in self.draft_modulestore.get_parent_locations(draft_location):
                 old_parent = self.draft_modulestore.get_item(parent_loc)
                 new_parent = self.split_modulestore.get_item(
                     self.loc_mapper.translate_location(old_parent.location, False)
                 )
                 # this only occurs if the parent was also awaiting adoption
-                if any(new_locator == child.version_agnostic() for child in new_parent.children):
+                if new_block_id in new_parent.children:
                     break
                 # find index for module: new_parent may be missing quite a few of old_parent's children
                 new_parent_cursor = 0
@@ -145,36 +145,36 @@ class SplitMigrator(object):
                     sibling_loc = self.loc_mapper.translate_location(old_child_loc, False)
                     # sibling may move cursor
                     for idx in range(new_parent_cursor, len(new_parent.children)):
-                        if new_parent.children[idx].version_agnostic() == sibling_loc:
+                        if new_parent.children[idx] == sibling_loc.block_id:
                             new_parent_cursor = idx + 1
                             break
-                new_parent.children.insert(new_parent_cursor, new_locator)
+                new_parent.children.insert(new_parent_cursor, new_block_id)
                 new_parent = self.split_modulestore.update_item(new_parent, user.id)
 
     def _get_json_fields_translate_references(self, xblock, old_course_id, published):
         """
         Return the json repr for explicitly set fields but convert all references to their block_id's
         """
-        def get_translation(location):
-            """
-            Convert the location and add to loc mapper
-            """
-            return self.loc_mapper.translate_location(location, published, add_entry_if_missing=True)
-
+        # FIXME change split to take field values as pythonic values not json values
         result = {}
         for field_name, field in xblock.fields.iteritems():
             if field.is_set_on(xblock):
-                field_value = getattr(xblock, field_name)
-                if isinstance(field, Reference) and field_value is not None:
-                    result[field_name] = get_translation(field_value)
+                if isinstance(field, Reference):
+                    result[field_name] = unicode(self.loc_mapper.translate_location(
+                        getattr(xblock, field_name), published, add_entry_if_missing=True
+                    ))
                 elif isinstance(field, ReferenceList):
                     result[field_name] = [
-                        get_translation(ele) for ele in field_value
+                        unicode(self.loc_mapper.translate_location(
+                            ele, published, add_entry_if_missing=True
+                        )) for ele in getattr(xblock, field_name)
                     ]
                 elif isinstance(field, ReferenceValueDict):
                     result[field_name] = {
-                        key: get_translation(subvalue)
-                        for key, subvalue in field_value.iteritems()
+                        key: unicode(self.loc_mapper.translate_location(
+                            subvalue, published, add_entry_if_missing=True
+                        ))
+                        for key, subvalue in getattr(xblock, field_name).iteritems()
                     }
                 else:
                     result[field_name] = field.read_json(xblock)
