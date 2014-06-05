@@ -146,10 +146,15 @@ def test():
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
-def coverage():
+@cmdopts([
+    ("compare_branch", "b", "Branch to compare against, defaults to origin/master"),
+])
+def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
+    compare_branch = getattr(options, 'compare_branch', 'origin/master')
+
     for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
         report_dir = Env.REPORT_DIR / directory
 
@@ -181,7 +186,24 @@ def coverage():
         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
-        sh("diff-cover {xml_report_str} --html-report {diff_html_path}".format(
-            xml_report_str=xml_report_str, diff_html_path=diff_html_path))
+
         sh("diff-cover {xml_report_str}".format(xml_report_str=xml_report_str))
+
+        sh(
+            "diff-cover {xml_report_str} --compare-branch={compare_branch} "
+            "--html-report {diff_html_path}".format(
+                xml_report_str=xml_report_str,
+                compare_branch=compare_branch,
+                diff_html_path=diff_html_path,
+            )
+        )
+
+        sh(
+            "diff-cover {xml_report_str} --compare-branch="
+            "{compare_branch}".format(
+                xml_report_str=xml_report_str,
+                compare_branch=compare_branch,
+            )
+        )
+
         print("\n")
