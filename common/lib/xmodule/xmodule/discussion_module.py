@@ -6,10 +6,6 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope
 from uuid import uuid4
 
-from edxmako.shortcuts import render_to_string
-from edxmako import add_lookup
-add_lookup('main', 'templates', package='discussion_app')
-
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
@@ -61,7 +57,7 @@ class DiscussionModule(DiscussionFields, XModule):
             template = '/discussion/_discussion_module_studio.html'
         else:
             template = '/discussion/_discussion_module.html'
-        return render_to_string(template, context)
+        return self.system.render_template(template, context)
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

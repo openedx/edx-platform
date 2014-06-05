@@ -28,8 +28,6 @@ INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
 
-from edxmako import add_lookup, lookup_template
-add_lookup('main', 'templates', package='discussion_app')
 
 def _attr_safe_json(obj):
     """
