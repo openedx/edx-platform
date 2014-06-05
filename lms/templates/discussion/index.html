@@ -13,17 +13,20 @@
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 
-<%include file="_js_head_dependencies.html" />
+<%include file="/mathjax_include.html" />
+
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+<%include file="/discussion/_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
 <article class="new-post-article"></article>
+
+<%include file="/discussion/_new_post.html" />
 
 <section class="discussion container" id="discussion-container"
          data-roles="${roles}"
@@ -43,5 +46,5 @@
     </div>
 </section>
 
-<%include file="_underscore_templates.html" />
-<%include file="_thread_list_template.html" />
+<%include file="/discussion/_underscore_templates.html" />
+<%include file="/discussion/_thread_list_template.html" />

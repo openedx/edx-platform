@@ -121,6 +121,114 @@ class LmsHandlerUrls(object):
         })
 
 
+class LmsCourse(object):
+    """
+    A runtime mixin that provides the course object.
+
+    This must be mixed in to a runtime that already accepts and stores
+    a course_id.
+    """
+
+    @property
+    def course(self):
+        # TODO using 'modulestore().get_course(self._course_id)' doesn't work. return None
+        from courseware.courses import get_course
+        return get_course(self.course_id)
+
+
+class LmsUser(object):
+    """
+    A runtime mixin that provides the user object.
+
+    This must be mixed in to a runtime that already accepts and stores
+    a anonymous_student_id and has get_real_user method.
+    """
+
+    @property
+    def user(self):
+        return self.get_real_user(self.anonymous_student_id)
+
+
+class DiscussionService(object):
+    """
+    This is a temporary service that provides everything needed to render the discussion template.
+
+    Used by xblock-discussion
+    """
+
+    def __init__(self, runtime):
+        self.runtime = runtime
+
+    def get_template_context(self, discussion_id):
+        """
+        Returns the context to render the discussion page templates.
+
+        Not currently used. Not finish.
+        """
+
+        import lms.lib.comment_client as cc
+        from course_groups.cohorts import get_cohort_id
+
+        user = self.runtime.user
+        profiled_user = cc.User(id=user.id, course_id=course_id)
+        user_cohort_id = get_cohort_id(user, course_id)
+
+        context = {
+            'django_user': user,
+            'profiled_user': profiled_user.to_dict(),
+            'user_cohort': user_cohort_id
+        }
+
+        return context
+
+    def get_inline_template_context(self, discussion_id):
+        """
+        Returns the context to render inline discussion templates.
+        """
+
+        import lms.lib.comment_client as cc
+        from courseware.courses import get_course_with_access
+        from courseware.access import has_access
+        from django_comment_client.permissions import cached_has_permission
+        from django_comment_client.utils import get_discussion_category_map
+        from course_groups.cohorts import (
+            is_course_cohorted,
+            get_cohort_id,
+            is_commentable_cohorted,
+            get_cohorted_commentables,
+            get_course_cohorts
+        )
+
+        course_id = self.runtime.course_id
+        user = self.runtime.user
+
+        course = get_course_with_access(user, course_id, 'load_forum')
+        category_map = get_discussion_category_map(course)
+
+        cohorts = get_course_cohorts(course_id)
+        cohorted_commentables = get_cohorted_commentables(course_id)
+
+        is_moderator = cached_has_permission(user, "see_all_cohorts", course_id)
+        flag_moderator =  cached_has_permission(user, 'openclose_thread', course_id) or \
+                          has_access(user, course, 'staff')
+
+        context = {
+            'course': course,
+            'category_map': category_map,
+            'cohorts': cohorts,
+            'cohorted_commentables': cohorted_commentables,
+            'is_moderator': is_moderator,
+            'flag_moderator': flag_moderator,
+            'is_course_cohorted': is_course_cohorted(course_id),
+            'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(user, "openclose_thread", course_id)
+        }
+
+        return context
+
+
 class LmsPartitionService(PartitionService):
     """
     Another runtime mixin that provides access to the student partitions defined on the
@@ -181,7 +289,7 @@ class UserTagsService(object):
                                            self.runtime.course_id, key, value)
 
 
-class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
@@ -193,4 +301,5 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
             course_id=kwargs.get('course_id', None),
             track_function=kwargs.get('track_function', None),
         )
+        services['discussion'] = DiscussionService(self)
         super(LmsModuleSystem, self).__init__(**kwargs)

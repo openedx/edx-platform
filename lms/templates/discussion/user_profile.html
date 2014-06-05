@@ -10,11 +10,12 @@
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 
-<%include file="_js_head_dependencies.html" />
+<%include file="/mathjax_include.html" />
+
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+<%include file="/discussion/_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
@@ -26,7 +27,7 @@
       <nav>
 
         <article class="sidebar-module discussion-sidebar">
-          <%include file="_user_profile.html" />
+          <%include file="/discussion/_user_profile.html" />
         </article>
 
       </nav>
@@ -36,4 +37,4 @@
   </div>
 </section>
 
-<%include file="_underscore_templates.html" />
+<%include file="/discussion/_underscore_templates.html" />
