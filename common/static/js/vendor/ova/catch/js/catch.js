@@ -106,7 +106,7 @@ annotationMediaSelector:
         '<li class="ui-state-default" media="video">'+
             gettext('Video')+
         '</li>'+
-        'li class="ui-state-default" media="image">'+
+        '<li class="ui-state-default" media="image">'+
             gettext('Image')+
         '</li>'+
     '</ul>',
@@ -815,6 +815,10 @@ CatchAnnotation.prototype = {
         var allannotations = this.annotator.plugins['Store'].annotations,
             osda = this.annotator.osda;
 
+        if(this.options.externalLink){
+            uri += (uri.indexOf('?') >= 0)?'&osdaId='+osdaId:'?osdaId='+osdaId;
+            location.href = uri;
+        }
         for(var item in allannotations){
             var an = allannotations[item];
             if (typeof an.id!='undefined' && an.id == osdaId){//this is the annotation
