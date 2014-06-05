@@ -48,7 +48,8 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
     Base class that adds a function to load all pages in a modulestore.
     """
 
-    def check_all_pages_load(self, course_key):
+    # TODO once everything is merged can someone please check whether this function takes a course_id or course_key
+    def check_all_pages_load(self, course_id):
         """
         Assert that all pages in the course load correctly.
         `course_id` is the ID of the course to check.
@@ -57,11 +58,11 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         store = modulestore()
 
         # Enroll in the course before trying to access pages
-        course = store.get_course(course_key)
+        course = store.get_course(course_id)
         self.enroll(course, True)
 
         # Search for items in the course
-        items = store.get_items(course_key)
+        items = store.get_items(course_id)
 
         if len(items) < 1:
             self.fail('Could not retrieve any items from course')
@@ -71,21 +72,21 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': course_key.to_deprecated_string()},
+                                   {'course_id': course_id.to_deprecated_string()},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': course_key.to_deprecated_string(),
+                kwargs = {'course_id': course_id.to_deprecated_string(),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': course_key.to_deprecated_string()},
+                self._assert_loads('info', {'course_id': course_id.to_deprecated_string()},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': course_key.to_deprecated_string(),
+                kwargs = {'course_id': course_id.to_deprecated_string(),
                           'location': descriptor.location.to_deprecated_string()}
 
                 self._assert_loads('jump_to', kwargs, descriptor,

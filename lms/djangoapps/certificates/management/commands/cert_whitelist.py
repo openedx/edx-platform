@@ -1,7 +1,3 @@
-"""
-Management command which sets or gets the certificate whitelist for a given
-user/course
-"""
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from opaque_keys import InvalidKeyError
@@ -60,7 +56,7 @@ class Command(BaseCommand):
         try:
             course = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(course_id))
+            log.warning("Course id %s could not be parsed as a CourseKey; falling back to SSCK.from_dep_str", course_id)
             course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         if options['add'] and options['del']:

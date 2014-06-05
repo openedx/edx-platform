@@ -1,5 +1,3 @@
-# Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232, C0111
 import json
 from functools import partial
 import factory
@@ -25,8 +23,6 @@ from student.roles import (
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
-# TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
-# pylint: disable=invalid-name
 course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
 location = partial(course_id.make_usage_key, u'problem')
 
@@ -34,11 +30,6 @@ location = partial(course_id.make_usage_key, u'problem')
 class UserProfileFactory(StudentUserProfileFactory):
     courseware = 'course.xml'
 
-
-# For the following factories, these are disabled because we're ok ignoring the
-# unused arguments create and **kwargs in the line:
-# course_key(self, create, extracted, **kwargs)
-# pylint: disable=unused-argument
 
 class InstructorFactory(UserFactory):
     """
@@ -48,7 +39,8 @@ class InstructorFactory(UserFactory):
     last_name = "Instructor"
 
     @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
+    # TODO Change this from course to course_key at next opportunity
+    def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a course instructor user")
         CourseInstructorRole(extracted).add_users(self)
@@ -62,7 +54,8 @@ class StaffFactory(UserFactory):
     last_name = "Staff"
 
     @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
+    # TODO Change this from course to course_key at next opportunity
+    def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a course staff user")
         CourseStaffRole(extracted).add_users(self)
@@ -76,7 +69,8 @@ class BetaTesterFactory(UserFactory):
     last_name = "Beta-Tester"
 
     @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
+    # TODO Change this from course to course_key at next opportunity
+    def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a beta-tester user")
         CourseBetaTesterRole(extracted).add_users(self)
@@ -90,7 +84,8 @@ class OrgStaffFactory(UserFactory):
     last_name = "Org-Staff"
 
     @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
+    # TODO Change this from course to course_key at next opportunity
+    def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for an org-staff user")
         OrgStaffRole(extracted.org).add_users(self)
@@ -104,7 +99,8 @@ class OrgInstructorFactory(UserFactory):
     last_name = "Org-Instructor"
 
     @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
+    # TODO Change this from course to course_key at next opportunity
+    def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for an org-instructor user")
         OrgInstructorRole(extracted.org).add_users(self)
@@ -119,7 +115,6 @@ class GlobalStaffFactory(UserFactory):
     @factory.post_generation
     def set_staff(self, create, extracted, **kwargs):
         GlobalStaff().add_users(self)
-# pylint: enable=unused-argument
 
 
 class StudentModuleFactory(DjangoModelFactory):

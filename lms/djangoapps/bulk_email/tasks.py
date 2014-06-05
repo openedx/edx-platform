@@ -202,6 +202,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         log.warning(u"Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
         raise ValueError(format_msg % (course_id, email_obj.course_id))
 
+
     # Fetch the course object.
     course = get_course(course_id)
 

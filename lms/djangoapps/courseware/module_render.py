@@ -60,9 +60,9 @@ XQUEUE_INTERFACE = XQueueInterface(
     REQUESTS_AUTH,
 )
 
-# TODO: course_id and course_key are used interchangeably in this file, which is wrong.
-# Some brave person should make the variable names consistently someday, but the code's
-# coupled enough that it's kind of tricky--you've been warned!
+# TODO basically all instances of course_id in this file *should* be changed to course_key, but
+# there's a couple tricky ones I'm too afraid to change before we merge the jellyfish branches.
+# This should be fixed after the jellyfish merge, before merge into master.
 
 
 class LmsModuleRenderError(Exception):

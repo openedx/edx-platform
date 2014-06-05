@@ -36,7 +36,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.graded_course = modulestore().get_course(SlashSeparatedCourseKey("edX", "graded", "2012_Fall"))
 
         # Create staff account
-        self.staff = StaffFactory(course_key=self.graded_course.id)
+        self.staff = StaffFactory(course=self.graded_course.id)
 
         self.logout()
         # self.staff.password is the sha hash but login takes the plain text

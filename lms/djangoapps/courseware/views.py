@@ -47,6 +47,7 @@ from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.keys import UsageKey
 
 log = logging.getLogger("edx.courseware")
 

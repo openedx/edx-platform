@@ -24,6 +24,7 @@ class CourseUserGroup(models.Model):
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
+    # TODO change field name to course_key
     course_id = CourseKeyField(max_length=255, db_index=True,
                                  help_text="Which course is this group associated with?")
 

@@ -9,6 +9,7 @@ from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -26,6 +27,7 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
+from .test_tools import msk_from_problem_urlname
 
 
 class TestSettableEnrollmentState(TestCase):

@@ -32,7 +32,6 @@ def local_random():
 
     return _local_random
 
-
 def is_course_cohorted(course_key):
     """
     Given a course key, return a boolean for whether or not the course is

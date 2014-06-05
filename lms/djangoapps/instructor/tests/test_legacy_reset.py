@@ -16,6 +16,7 @@ from courseware.models import StudentModule
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
+from .test_tools import msk_from_problem_urlname
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
