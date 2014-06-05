@@ -242,6 +242,7 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     title = models.CharField(blank=True, max_length=255, null=True)
+    avatar_url = models.CharField(blank=True, max_length=255, null=True)  # pointer to avatar/image resource
 
     def get_meta(self):
         js_str = self.meta
