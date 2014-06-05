@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 
 from ..utils import get_lms_link_for_item
 

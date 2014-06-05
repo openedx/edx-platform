@@ -14,7 +14,7 @@ from .access import has_course_access
 import contentstore.git_export_utils as git_export_utils
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 

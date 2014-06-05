@@ -13,7 +13,7 @@ from pytz import UTC
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.mongo.base import MongoModuleStore
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore.locations import Location
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'

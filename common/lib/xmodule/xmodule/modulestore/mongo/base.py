@@ -36,7 +36,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.tabs import StaticTab, CourseTabList
 from xblock.core import XBlock
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 

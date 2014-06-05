@@ -4,11 +4,11 @@ Test the loc mapper store
 import unittest
 import uuid
 from xmodule.modulestore import Location
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 import bson.son
 
 

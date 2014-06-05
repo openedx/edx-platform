@@ -1,4 +1,4 @@
-from opaque_keys.edx.locator import DefinitionLocator
+from xmodule.modulestore.locator import DefinitionLocator
 
 
 class DefinitionLazyLoader(object):

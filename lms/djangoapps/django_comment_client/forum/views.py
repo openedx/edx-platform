@@ -21,7 +21,7 @@ from django_comment_client.utils import (merge_dict, extract, strip_none, add_co
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20

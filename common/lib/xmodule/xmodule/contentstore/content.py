@@ -10,7 +10,7 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 

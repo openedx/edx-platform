@@ -9,7 +9,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import import_module
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
 from uuid import uuid4
 import unittest

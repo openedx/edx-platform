@@ -2,7 +2,7 @@
 from south.v2 import DataMigration
 from xmodule.modulestore.django import loc_mapper, modulestore
 import re
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 import logging
 from django.db.models.query_utils import Q

@@ -14,7 +14,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)

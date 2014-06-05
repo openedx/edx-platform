@@ -2,7 +2,7 @@
 from mock import MagicMock
 import xmodule.tabs as tabs
 import unittest
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class TabTestCase(unittest.TestCase):

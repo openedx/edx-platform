@@ -22,9 +22,8 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import Location
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.keys import UsageKey
+from xmodule.modulestore.locations import Location
 
 
 class ItemTest(CourseTestCase):

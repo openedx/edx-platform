@@ -25,7 +25,7 @@ from contentstore.utils import get_lms_link_for_item, compute_publish_state, Pub
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
-from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore.keys import UsageKey
 
 from .access import has_course_access
 from django.utils.translation import ugettext as _

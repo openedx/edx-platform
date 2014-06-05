@@ -5,7 +5,7 @@ import json
 
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 

@@ -12,7 +12,7 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 
 from django.db import DatabaseError
 from django.contrib.auth.models import User

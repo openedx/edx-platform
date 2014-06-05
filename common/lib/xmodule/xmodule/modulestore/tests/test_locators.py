@@ -1,14 +1,14 @@
 """
-Tests for opaque_keys.edx.locator.
+Tests for xmodule.modulestore.locator.
 """
 from unittest import TestCase
 
 import random
 from bson.objectid import ObjectId
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
+from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
 from ddt import ddt, data
-from opaque_keys.edx.keys import UsageKey, CourseKey, DefinitionKey
+from xmodule.modulestore.keys import UsageKey, CourseKey, DefinitionKey
 
 
 @ddt

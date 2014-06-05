@@ -13,7 +13,7 @@ from bson.errors import InvalidId
 
 from opaque_keys import OpaqueKey, InvalidKeyError
 
-from opaque_keys.edx.keys import CourseKey, UsageKey, DefinitionKey
+from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey
 
 log = logging.getLogger(__name__)
 

@@ -21,7 +21,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore

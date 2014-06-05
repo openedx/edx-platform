@@ -23,7 +23,7 @@ from xmodule.tabs import PDFTextbookTabs
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -53,7 +53,7 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.roles import CourseRole, UserBasedRole
 
-from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff

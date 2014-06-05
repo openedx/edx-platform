@@ -11,7 +11,7 @@ from textwrap import dedent
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

@@ -5,7 +5,7 @@ from lettuce import world, step
 from common import course_id, course_location
 from problems_setup import PROBLEM_DICT
 from nose.tools import assert_in
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @step(u'I am viewing a course with multiple sections')

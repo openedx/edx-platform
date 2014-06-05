@@ -14,10 +14,10 @@ from xblock.plugin import default_select
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import Location  # For import backwards compatibility
+from xmodule.modulestore.keys import CourseKey, UsageKey
+from xmodule.modulestore.locations import Location  # For import backwards compatibility
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
 import datetime

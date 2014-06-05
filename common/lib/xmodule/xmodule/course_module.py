@@ -17,7 +17,7 @@ import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
-from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)

@@ -13,7 +13,7 @@ from student.tests.factories import UserFactory
 
 from datetime import datetime, timedelta
 from pytz import UTC
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 

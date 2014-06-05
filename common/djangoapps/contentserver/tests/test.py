@@ -17,7 +17,7 @@ from student.models import CourseEnrollment
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import (studio_store_config,
     ModuleStoreTestCase)
 from xmodule.modulestore.xml_importer import import_from_xml

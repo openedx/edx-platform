@@ -18,7 +18,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
 
 
 class AssetsTestCase(CourseTestCase):

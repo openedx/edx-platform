@@ -41,7 +41,7 @@ from instructor.access import allow_access
 import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
 

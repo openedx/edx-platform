@@ -34,13 +34,13 @@ from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey
 from functools import total_ordering
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
