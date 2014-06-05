@@ -1,5 +1,6 @@
 import json
 import logging
+import warnings
 
 from lxml import etree
 
@@ -58,9 +59,18 @@ class SequenceModule(SequenceFields, XModule):
     def __init__(self, *args, **kwargs):
         super(SequenceModule, self).__init__(*args, **kwargs)
 
-        # if position is specified in system, then use that instead
-        if getattr(self.system, 'position', None) is not None:
-            self.position = int(self.system.position)
+        # If position is specified in system, then use that instead
+        # This code was made robust to avoid issues like LMS-2799 in
+        # Jira. We do not know whether this issue is still present,
+        # but regardless, we'd like to follow:
+        #   http://en.wikipedia.org/wiki/Robustness_principle
+
+        position = getattr(self.system, 'position', None)
+        if position is not None:
+            try:
+                self.position = int(self.system.position)
+            except (ValueError, TypeError):
+                warnings.warn("Sequential position is an invalid type.", RuntimeWarning)
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
