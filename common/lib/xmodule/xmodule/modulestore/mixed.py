@@ -11,8 +11,7 @@ from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
-from opaque_keys.edx.locations import Location
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from opaque_keys.edx.locator import CourseLocator, Locator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey

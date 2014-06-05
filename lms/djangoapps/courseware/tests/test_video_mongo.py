@@ -12,6 +12,7 @@ from xblock.field_data import DictFieldData
 
 from xmodule.video_module import create_youtube_string
 from xmodule.tests import get_test_descriptor_system
+from xmodule.modulestore import Location
 from xmodule.video_module import VideoDescriptor
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

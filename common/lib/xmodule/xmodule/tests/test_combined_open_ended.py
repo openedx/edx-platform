@@ -22,7 +22,7 @@ from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (

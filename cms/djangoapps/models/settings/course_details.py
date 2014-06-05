@@ -4,7 +4,7 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading

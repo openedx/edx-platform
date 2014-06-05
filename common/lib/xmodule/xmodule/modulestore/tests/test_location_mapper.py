@@ -3,7 +3,7 @@ Test the loc mapper store
 """
 import unittest
 import uuid
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore

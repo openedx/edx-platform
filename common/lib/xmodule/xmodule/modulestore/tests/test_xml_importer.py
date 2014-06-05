@@ -6,7 +6,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, ScopeIds
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import import_module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

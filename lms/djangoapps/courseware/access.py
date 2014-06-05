@@ -9,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock

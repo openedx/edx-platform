@@ -23,6 +23,7 @@ from opaque_keys import InvalidKeyError
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,

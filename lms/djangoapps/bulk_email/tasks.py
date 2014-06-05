@@ -45,6 +45,7 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
+from xmodule.modulestore import Location
 from util.query import use_read_replica_if_available
 
 log = get_task_logger(__name__)

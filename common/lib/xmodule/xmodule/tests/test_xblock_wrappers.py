@@ -24,7 +24,7 @@ from unittest.case import SkipTest, TestCase
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor

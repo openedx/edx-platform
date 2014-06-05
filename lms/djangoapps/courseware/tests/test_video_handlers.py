@@ -11,6 +11,7 @@ from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import editable_modulestore
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
