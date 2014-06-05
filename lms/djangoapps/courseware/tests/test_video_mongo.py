@@ -26,12 +26,7 @@ class TestVideoYouTube(TestVideo):
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
         context = self.item_descriptor.render('student_view').content
-
-        sources = {
-            'main': u'example.mp4',
-            u'mp4': u'example.mp4',
-            u'webm': u'example.webm',
-        }
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
@@ -42,6 +37,7 @@ class TestVideoYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'show_captions': 'true',
             'handout': None,
+            'download_video_link': u'example.mp4',
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -56,7 +52,7 @@ class TestVideoYouTube(TestVideo):
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
             'transcript_language': u'en',
-            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk":  u"Українська"})),
+            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk": u"Українська"})),
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation'
             ).rstrip('/?'),
@@ -93,13 +89,8 @@ class TestVideoNonYouTube(TestVideo):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
-        sources = {
-            'main': u'example.mp4',
-            u'mp4': u'example.mp4',
-            u'webm': u'example.webm',
-        }
-
         context = self.item_descriptor.render('student_view').content
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
@@ -107,6 +98,7 @@ class TestVideoNonYouTube(TestVideo):
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
             'sources': sources,
@@ -148,7 +140,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
-        self.setup_course();
+        self.setup_course()
 
     def test_get_html_track(self):
         SOURCE_XML = """
@@ -201,19 +193,17 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcripts': '<transcript language="uk" src="ukrainian.srt" />',
             },
         ]
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': None,
-            'sources': {
-                'main': u'example.mp4',
-                u'mp4': u'example.mp4',
-                u'webm': u'example.webm'
-            },
+            'sources': sources,
             'start': 3603.0,
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
@@ -284,9 +274,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'main': u'example_source.mp4',
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'download_video_link': u'example_source.mp4',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
             {
@@ -297,9 +286,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'main': u'example.mp4',
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'download_video_link': u'example.mp4',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
             {
@@ -318,20 +306,20 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
         ]
 
-        expected_context = {
+        initial_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': None,
             'end': 3610.0,
             'id': None,
-            'sources': None,
+            'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,
             'start': 3603.0,
@@ -358,6 +346,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             self.initialize_module(data=DATA)
             context = self.item_descriptor.render('student_view').content
 
+            expected_context = dict(initial_context)
             expected_context.update({
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation'
@@ -366,9 +355,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'sources': data['result'],
                 'id': self.item_descriptor.location.html_id(),
             })
+            expected_context.update(data['result'])
 
             self.assertEqual(
                 context,
@@ -385,7 +374,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
-        self.setup_course();
+        self.setup_course()
 
     def test_source_not_in_html5sources(self):
         metadata = {
