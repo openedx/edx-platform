@@ -138,3 +138,56 @@
     }
   }
 }
+
+.wrapper-xblock-message {
+
+  .xblock-message {
+    @extend %t-copy-sub1;
+    background-color: $gray-d2;
+    padding: ($baseline/2) ($baseline*.75);
+    color: $white;
+
+    .message-text {
+      display: inline-block;
+      width: 93%;
+      vertical-align: top;
+    }
+
+    [class^="icon-"] {
+      font-style: normal;
+    }
+
+    &.information {
+      background-color: $gray-l5;
+      color: $gray-d2;
+    }
+
+    &.warning {
+      background-color: $gray-d2;
+      padding: ($baseline/2) $baseline;
+      color: $white;
+
+      .icon-warning-sign {
+        margin-right: ($baseline/2);
+        color: $orange;
+      }
+
+      .message-text {
+        display: inline-block;
+        width: 93%;
+        vertical-align: top;
+      }
+    }
+
+    &.error {
+      background-color: $gray-d2;
+      padding: ($baseline/2) $baseline;
+      color: $white;
+
+      .icon-exclamation-sign {
+        margin-right: ($baseline/2);
+        color: $red-l2;
+      }
+    }
+  }
+}

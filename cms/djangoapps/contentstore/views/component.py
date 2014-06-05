@@ -62,10 +62,11 @@ else:
         # except for edX Learning Sciences experiments on edge.edx.org without
         # further work to make them robust, maintainable, finalize data formats,
         # etc. 
-        'concept', # Concept mapper. See https://github.com/pmitros/ConceptXBlock
-        'done', # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
-        'audio', # Embed an audio file. See https://github.com/pmitros/AudioXBlock
+        'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
+        'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
+        'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         'openassessment',  # edx-ora2
+        'split_test'
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'

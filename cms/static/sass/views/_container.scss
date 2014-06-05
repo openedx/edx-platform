@@ -40,12 +40,12 @@
 
         .action-button-text {
           display: inline-block;
-          vertical-align: middle;
+          vertical-align: baseline;
         }
 
         [class^="icon-"] {
           display: inline-block;
-          vertical-align: middle;
+          vertical-align: baseline;
         }
       }
     }
@@ -69,8 +69,15 @@
       text-align: center;
       color: $gray;
 
-      .new-button {
-        @include font-size(14);
+      .icon-warning-sign {
+        display: none;
+      }
+
+      .edit-button {
+        @include green-button;
+        @extend %t-action4;
+        padding: 8px 20px 10px;
+        text-align: center;
         margin-left: $baseline;
 
         [class^="icon-"] {
@@ -154,6 +161,19 @@ body.view-container .content-primary {
 
       .xblock-header {
         display: none;
+      }
+
+      .xblock-message {
+        border-radius: 3px 3px 0 0;
+
+        &.information {
+          @extend %t-copy-base;
+          margin-bottom: $baseline;
+          border-bottom: 1px solid $gray-l4;
+          padding: ($baseline/2) ($baseline*.75);
+          background-color: $gray-l5;
+          color: $gray-d1;
+        }
       }
     }
 

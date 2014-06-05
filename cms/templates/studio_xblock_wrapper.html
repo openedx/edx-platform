@@ -80,8 +80,12 @@ collapsible_class = "is-collapsible" if xblock.has_children else ""
  </header>
 % if is_root or not xblock_url:
     <article class="xblock-render">
-${content}
+    ${content}
     </article>
+% else:
+    <div class="xblock-message-area">
+    ${content}
+    </div>
 % endif
 
 % if not is_root:

@@ -35,6 +35,7 @@ from .video_utils import create_youtube_string
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
+from xmodule.video_module import manage_video_subtitles_save
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
@@ -223,6 +224,17 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         download_track = editable_fields['download_track']
         if not download_track['explicitly_set'] and self.track:
             self.download_track = True
+
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Used to update video subtitles.
+        """
+        manage_video_subtitles_save(
+            self,
+            user,
+            old_metadata if old_metadata else None,
+            generate_translation=True
+        )
 
     def save_with_metadata(self, user):
         """
