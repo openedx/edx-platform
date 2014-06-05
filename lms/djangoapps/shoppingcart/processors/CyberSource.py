@@ -29,7 +29,7 @@ def process_postpay_callback(params):
     It is expected to verify the callback and determine if the payment was successful.
     It returns {'success':bool, 'order':Order, 'error_html':str}
     If successful this function must have the side effect of marking the order purchased and calling the
-    purchased_callbacks of the cart items.
+    purchased_callbacks of the cart  items.
     If unsuccessful this function should not have those side effects but should try to figure out why and
     return a helpful-enough error message in error_html.
     """
