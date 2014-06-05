@@ -63,16 +63,16 @@ def main(verbosity=1):
     else:
         stderr = DEVNULL
 
-    babel_mako_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
-    babel_mako_cmd = babel_mako_cmd.format(
+    babel_cmd_template = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
+
+    babel_mako_cmd = babel_cmd_template.format(
         verbosity=babel_verbosity,
         config=base(LOCALE_DIR, 'babel_mako.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
     )
     execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=stderr)
 
-    babel_underscore_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
-    babel_underscore_cmd = babel_underscore_cmd.format(
+    babel_underscore_cmd = babel_cmd_template.format(
         verbosity=babel_verbosity,
         config=base(LOCALE_DIR, 'babel_underscore.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'underscore.po'),
@@ -107,8 +107,6 @@ def main(verbosity=1):
     )
 
     files_to_clean = set()
-
-    files_to_clean.add(source_msgs_dir / "underscore.po")
 
     # Extract strings from third-party applications.
     for app_name in CONFIGURATION.third_party:
