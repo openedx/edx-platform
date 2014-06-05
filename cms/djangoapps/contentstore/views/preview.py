@@ -152,8 +152,12 @@ def _load_preview_module(request, descriptor, studio_view=False):
       will not be allowed. If the preview is being rendered in Studio and in-place editing is
       desired, specify True.
     """
+    has_author_view = False
+    if hasattr(descriptor, 'has_author_view'):
+        has_author_view = descriptor.has_author_view
+
     student_data = KvsFieldData(SessionKeyValueStore(request))
-    if studio_view:
+    if has_author_view:
         field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     else:
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
@@ -177,7 +181,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view == 'student_view':
+    if context.get('container_view', None) and view in ['student_view', 'author_view']:
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
@@ -195,17 +199,18 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
 
 def get_preview_fragment(request, descriptor, context):
     """
-    Returns the HTML returned by the XModule's student_view,
+    Returns the HTML returned by the XModule's student_view or author_view (if available),
     specified by the descriptor and idx.
-
-    Note though that this method will allow editing of the descriptor's content and settings
-    via the returned HTML. This is normally not the case when student_view is called.
     """
-    module = _load_preview_module(request, descriptor, studio_view=True)
+    module = _load_preview_module(request, descriptor)
+
+    preview_view = 'student_view'
+    if hasattr(module, 'get_preview_view_name'):
+        preview_view = module.get_preview_view_name()
 
     try:
-        fragment = module.render("student_view", context)
+        fragment = module.render(preview_view, context)
     except Exception as exc:                          # pylint: disable=W0703
-        log.warning("Unable to render student_view for %r", module, exc_info=True)
+        log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment

@@ -16,7 +16,6 @@ from xblock.fragment import Fragment
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
-from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 
@@ -60,7 +59,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
     css_classes = ['xblock', 'xblock-' + view]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
-        if view == 'student_view':
+        if view in ['student_view', 'author_view']:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
         elif view == 'studio_view':

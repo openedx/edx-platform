@@ -1138,7 +1138,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         return result
 
     def render(self, block, view_name, context=None):
-        if view_name == 'student_view':
+        if view_name in ['student_view', 'author_view']:
             assert block.xmodule_runtime is not None
             if isinstance(block, (XModule, XModuleDescriptor)):
                 to_render = block._xmodule

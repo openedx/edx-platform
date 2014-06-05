@@ -10,7 +10,7 @@ from pkg_resources import resource_string
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.studio_editable import StudioEditableModule
+from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from xmodule.x_module import XModule, module_attr
 from xmodule.modulestore.inheritance import UserPartitionList
 
@@ -239,7 +239,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         fragment.initialize_js('ABTestSelector')
         return fragment
 
-    def studio_preview_view(self, context):
+    def author_view(self, context):
         """
         Renders the Studio preview by rendering each child so that they can all be seen and edited.
         """
@@ -284,7 +284,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         html = ""
         for active_child_descriptor in children:
             active_child = self.system.get_module(active_child_descriptor)
-            rendered_child = active_child.render('student_view', context)
+            rendered_child = active_child.render(StudioEditableModule._get_preview_view_name(active_child), context)
             fragment.add_frag_resources(rendered_child)
             html = html + rendered_child.content
         return html
@@ -294,10 +294,6 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Renders the contents of the chosen condition for students, and all the
         conditions for staff.
         """
-        # When rendering a Studio preview, render all of the block's children
-        if context and context.get('runtime_type', None) == 'studio':
-            return self.studio_preview_view(context)
-
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content=u"<div>Nothing here.  Move along.</div>")
@@ -336,7 +332,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
-class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
+class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
 
