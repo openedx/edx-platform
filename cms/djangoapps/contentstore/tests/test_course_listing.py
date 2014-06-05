@@ -265,7 +265,7 @@ class TestCourseListing(ModuleStoreTestCase):
         course_db_record = modulestore()._find_one(course.location)
         course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki" })
         modulestore().collection.update(
-            {'_id': course_db_record['_id']},
+            {'_id': course.location.to_deprecated_son()},
             {'$set': {
                 'metadata.tabs': course_db_record['metadata']['tabs'],
             }},

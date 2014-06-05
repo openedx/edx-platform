@@ -29,7 +29,7 @@ class MongoContentStore(ContentStore):
             pymongo.MongoClient(
                 host=host,
                 port=port,
-                document_class=SON,
+                document_class=dict,
                 **kwargs
             ),
             db
