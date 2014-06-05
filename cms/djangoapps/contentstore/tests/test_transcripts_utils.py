@@ -88,7 +88,7 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
         """Remove, if subtitles content exists."""
         try:
             content = contentstore().find(self.content_location)
-            contentstore().delete(content.get_id())
+            contentstore().delete(content.location)
         except NotFoundError:
             pass
 
@@ -171,7 +171,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
             content_location = StaticContent.compute_location(self.course.id, filename)
             try:
                 content = contentstore().find(content_location)
-                contentstore().delete(content.get_id())
+                contentstore().delete(content.location)
             except NotFoundError:
                 pass
 
