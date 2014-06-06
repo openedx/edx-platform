@@ -613,21 +613,26 @@ CatchAnnotation.prototype = {
             var annotations = annotator.plugins['Store'].annotations,
                 tot = typeof annotations !='undefined'?annotations.length:0,
                 attempts = 0; // max 100
+            if(annotation.media == "image"){
+            	self.refreshCatch(true);
+            	self.checkTotAnnotations();
+            } else {
             //This is to watch the annotations object, to see when is deleted the annotation
-            var ischanged = function(){
-                var new_tot = annotator.plugins['Store'].annotations.length;
-                if (attempts<100)
-                    setTimeout(function(){
-                        if (new_tot != tot){
-                            self.refreshCatch(true);
-                            self.checkTotAnnotations();
-                        }else{
-                            attempts++;
-                            ischanged();
-                        }
-                    },100); //wait for the change in the annotations
-            };
-            ischanged();
+				var ischanged = function(){
+					var new_tot = annotator.plugins['Store'].annotations.length;
+					if (attempts<100)
+						setTimeout(function(){
+							if (new_tot != tot){
+								self.refreshCatch(true);
+								self.checkTotAnnotations();
+							}else{
+								attempts++;
+								ischanged();
+							}
+						},100); //wait for the change in the annotations
+				};
+				ischanged();
+            }
         });
         annotator.subscribe("annotationCreated", function (annotation){
             var attempts = 0; // max 100

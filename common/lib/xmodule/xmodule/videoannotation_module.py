@@ -94,9 +94,11 @@ class VideoAnnotationModule(AnnotatableFields, CommonAnnotatorMixin, XModule):
             'poster': self.poster_url,
             'content_html': self.content,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-        context.update(self.extra_context)
-        print context
         fragment = Fragment(self.system.render_template('videoannotation.html', context))
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
