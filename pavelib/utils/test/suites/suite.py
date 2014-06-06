@@ -21,6 +21,16 @@ class TestSuite(object):
         self.root = args[0]
         self.subsuites = kwargs.get('subsuites', [])
         self.failed_suites = []
+        self.verbosity = kwargs.get('verbosity', 1)
+
+    @property
+    def verbose(self):
+        """
+        Boolean version of `self.verbosity`. If `self.verbosity` is greater than
+        1, `self.verbose` is True. Note that the default value for
+        `self.verbosity` is 1, so the default value for `self.verbose` is False.
+        """
+        return self.verbosity > 1
 
     def __enter__(self):
         """

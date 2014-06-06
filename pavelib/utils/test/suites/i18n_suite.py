@@ -30,10 +30,12 @@ class I18nTestSuite(TestSuite):
 
         cmd = (
             "{pythonpath_prefix} nosetests {repo_root}/i18n/tests "
-            "--with-xunit --xunit-file={xunit_report}".format(
+            "--with-xunit --xunit-file={xunit_report} "
+            "--verbosity={verbosity}.format(
                 pythonpath_prefix=pythonpath_prefix,
                 repo_root=Env.REPO_ROOT,
                 xunit_report=self.xunit_report,
+                verbosity=self.verbosity,
             )
         )
 
