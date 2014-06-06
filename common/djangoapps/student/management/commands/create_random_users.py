@@ -1,20 +1,18 @@
-"""
-A script to create some dummy users
-"""
+##
+## A script to create some dummy users
+
 from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from student.views import _do_create_account, get_random_post_override
 
 
-def create(num, course_key):
-    """Create num users, enrolling them in course_key if it's not None"""
-    for idx in range(num):
-        (user, user_profile, __) = _do_create_account(get_random_post_override())
-        if course_key is not None:
-            CourseEnrollment.enroll(user, course_key)
+def create(n, course_id):
+    """Create n users, enrolling them in course_id if it's not None"""
+    for i in range(n):
+        (user, user_profile, _) = _do_create_account(get_random_post_override())
+        if course_id is not None:
+            CourseEnrollment.enroll(user, course_id)
 
 
 class Command(BaseCommand):
@@ -33,14 +31,6 @@ Examples:
             print Command.help
             return
 
-        num = int(args[0])
-
-        if len(args) == 2:
-            try:
-                course_key = CourseKey.from_string(args[1])
-            except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[1])
-        else:
-            course_key = None
-
-        create(num, course_key)
+        n = int(args[0])
+        course_id = args[1] if len(args) == 2 else None
+        create(n, course_id)

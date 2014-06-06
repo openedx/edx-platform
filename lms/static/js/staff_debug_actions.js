@@ -22,7 +22,7 @@ var StaffDebug = (function(){
   do_idash_action = function(action){
     var pdata = {
         'problem_to_reset': action.location,
-        'unique_student_identifier': get_user(action.locationName),
+        'unique_student_identifier': get_user(action.location),
         'delete_module': action.delete_module
     }
     $.ajax({
@@ -40,7 +40,7 @@ var StaffDebug = (function(){
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
             )
-            $("#result_"+action.locationName).html(html);
+            $("#result_"+action.location).html(html);
         },
         error: function(request, status, error) {
             var response_json;
@@ -62,16 +62,15 @@ var StaffDebug = (function(){
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
             )
-            $("#result_"+action.locationName).html(html);
+            $("#result_"+action.location).html(html);
         },
         dataType: 'json'
     });
   }
 
-  reset = function(locname, location){
+  reset = function(locname){
     this.do_idash_action({
-        locationName: locname,
-        location: location,
+        location: locname,
         method: 'reset_student_attempts',
         success_msg: gettext('Successfully reset the attempts for user {user}'),
         error_msg: gettext('Failed to reset attempts.'),
@@ -79,10 +78,9 @@ var StaffDebug = (function(){
     });
   }
 
-  sdelete = function(locname, location){
+  sdelete = function(locname){
     this.do_idash_action({
-        locationName: locname,
-        location: location,
+        location: locname,
         method: 'reset_student_attempts',
         success_msg: gettext('Successfully deleted student state for user {user}'),
         error_msg: gettext('Failed to delete student state.'),
@@ -90,10 +88,9 @@ var StaffDebug = (function(){
     });
   }
 
-  rescore = function(locname, location){
+  rescore = function(locname){
     this.do_idash_action({
-        locationName: locname,
-        location: location,
+        location: locname,
         method: 'rescore_problem',
         success_msg: gettext('Successfully rescored problem for user {user}'),
         error_msg: gettext('Failed to rescore problem.'),

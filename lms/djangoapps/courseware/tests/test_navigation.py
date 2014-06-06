@@ -80,10 +80,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
+                               kwargs={'course_id': self.course.id}))
 
         self.assertRedirects(resp, reverse(
-            'courseware_section', kwargs={'course_id': self.course.id.to_deprecated_string(),
+            'courseware_section', kwargs={'course_id': self.course.id,
                                           'chapter': 'Overview',
                                           'section': 'Welcome'}))
 
@@ -97,22 +97,16 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.course, True)
         self.enroll(self.test_course, True)
 
-        self.client.get(reverse('courseware_section', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'chapter': 'Overview',
-            'section': 'Welcome',
-        }))
+        self.client.get(reverse('courseware_section', kwargs={'course_id': self.course.id,
+                                                              'chapter': 'Overview',
+                                                              'section': 'Welcome'}))
 
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
+                               kwargs={'course_id': self.course.id}))
 
-        self.assertRedirects(resp, reverse(
-            'courseware_chapter',
-            kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
-                'chapter': 'Overview'
-            }
-        ))
+        self.assertRedirects(resp, reverse('courseware_chapter',
+                                           kwargs={'course_id': self.course.id,
+                                                   'chapter': 'Overview'}))
 
     def test_accordion_state(self):
         """
@@ -124,21 +118,17 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         # Now we directly navigate to a section in a chapter other than 'Overview'.
-        check_for_get_code(self, 200, reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
-                'chapter': 'factory_chapter',
-                'section': 'factory_section'
-            }
-        ))
+        check_for_get_code(self, 200, reverse('courseware_section',
+                                              kwargs={'course_id': self.course.id,
+                                                      'chapter': 'factory_chapter',
+                                                      'section': 'factory_section'}))
 
         # And now hitting the courseware tab should redirect to 'factory_chapter'
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
+                               kwargs={'course_id': self.course.id}))
 
         self.assertRedirects(resp, reverse('courseware_chapter',
-                                           kwargs={'course_id': self.course.id.to_deprecated_string(),
+                                           kwargs={'course_id': self.course.id,
                                                    'chapter': 'factory_chapter'}))
 
     def test_incomplete_course(self):

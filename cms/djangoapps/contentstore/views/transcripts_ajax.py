@@ -17,16 +17,14 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from opaque_keys import InvalidKeyError
-
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
 
 from util.json_request import JsonResponse
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from xmodule.video_module.transcripts_utils import (
     generate_subs_from_source,
@@ -34,6 +32,7 @@ from xmodule.video_module.transcripts_utils import (
     download_youtube_subs, get_transcripts_from_youtube,
     copy_or_rename_transcript,
     manage_video_subtitles_save,
+    TranscriptsGenerationException,
     GetTranscriptsFromYouTubeException,
     TranscriptsRequestValidationException
 )
@@ -85,7 +84,7 @@ def upload_transcripts(request):
 
     try:
         item = _get_item(request, request.POST)
-    except (InvalidKeyError, ItemNotFoundError):
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
         return error_response(response, "Can't find item by locator.")
 
     if 'transcript-file' not in request.FILES:
@@ -150,7 +149,7 @@ def download_transcripts(request):
 
     try:
         item = _get_item(request, request.GET)
-    except (InvalidKeyError, ItemNotFoundError):
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
         log.debug("Can't find item by locator.")
         raise Http404
 
@@ -164,7 +163,9 @@ def download_transcripts(request):
         raise Http404
 
     filename = 'subs_{0}.srt.sjson'.format(subs_id)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename
+    )
     try:
         sjson_transcripts = contentstore().find(content_location)
         log.debug("Downloading subs for %s id", subs_id)
@@ -226,7 +227,9 @@ def check_transcripts(request):
     transcripts_presence['status'] = 'Success'
 
     filename = 'subs_{0}.srt.sjson'.format(item.sub)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename
+    )
     try:
         local_transcripts = contentstore().find(content_location).data
         transcripts_presence['current_item_subs'] = item.sub
@@ -240,7 +243,9 @@ def check_transcripts(request):
 
         # youtube local
         filename = 'subs_{0}.srt.sjson'.format(youtube_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
+        content_location = StaticContent.compute_location(
+            item.location.org, item.location.course, filename
+        )
         try:
             local_transcripts = contentstore().find(content_location).data
             transcripts_presence['youtube_local'] = True
@@ -271,7 +276,9 @@ def check_transcripts(request):
     html5_subs = []
     for html5_id in videos['html5']:
         filename = 'subs_{0}.srt.sjson'.format(html5_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
+        content_location = StaticContent.compute_location(
+            item.location.org, item.location.course, filename
+        )
         try:
             html5_subs.append(contentstore().find(content_location).data)
             transcripts_presence['html5_local'].append(html5_id)
@@ -431,7 +438,7 @@ def _validate_transcripts_data(request):
 
     try:
         item = _get_item(request, data)
-    except (InvalidKeyError, ItemNotFoundError):
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':
@@ -496,7 +503,7 @@ def save_transcripts(request):
 
     try:
         item = _get_item(request, data)
-    except (InvalidKeyError, ItemNotFoundError):
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
         return error_response(response, "Can't find item by locator.")
 
     metadata = data.get('metadata')
@@ -531,13 +538,14 @@ def _get_item(request, data):
 
     Returns the item.
     """
-    usage_key = UsageKey.from_string(data.get('locator'))
+    locator = BlockUsageLocator(data.get('locator'))
+    old_location = loc_mapper().translate_locator_to_location(locator)
 
     # This is placed before has_course_access() to validate the location,
-    # because has_course_access() raises  r if location is invalid.
-    item = modulestore().get_item(usage_key)
+    # because has_course_access() raises InvalidLocationError if location is invalid.
+    item = modulestore().get_item(old_location)
 
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     return item

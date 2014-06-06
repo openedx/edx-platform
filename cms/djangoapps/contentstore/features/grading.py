@@ -4,9 +4,8 @@
 from lettuce import world, step
 from common import *
 from terrain.steps import reload_the_page
-from selenium.common.exceptions import InvalidElementStateException
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from contentstore.utils import reverse_course_url
+from selenium.common.exceptions import (
+    InvalidElementStateException, WebDriverException)
 from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=E0611
 
 
@@ -69,12 +68,11 @@ def change_assignment_name(step, old_name, new_name):
 @step(u'I go back to the main course page')
 def main_course_page(step):
     course_name = world.scenario_dict['COURSE'].display_name.replace(' ', '_')
-    course_key = SlashSeparatedCourseKey(
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
-        course_name
+    main_page_link = '/course/{org}.{number}.{name}/branch/draft/block/{name}'.format(
+        org=world.scenario_dict['COURSE'].org,
+        number=world.scenario_dict['COURSE'].number,
+        name=course_name
     )
-    main_page_link = reverse_course_url('course_handler', course_key)
 
     world.visit(main_page_link)
     assert_in('Course Outline', world.css_text('h1.page-header'))

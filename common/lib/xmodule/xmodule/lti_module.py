@@ -456,7 +456,9 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
         Return course by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)
+        course_location = CourseDescriptor.id_to_location(self.course_id)
+        course = self.descriptor.runtime.modulestore.get_item(course_location)
+        return course
 
     @property
     def context_id(self):
@@ -466,7 +468,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
         that contains the link being launched.
         """
-        return self.course_id.to_deprecated_string()
+        return self.course_id
 
     @property
     def role(self):

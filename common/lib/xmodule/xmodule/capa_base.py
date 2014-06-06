@@ -221,7 +221,7 @@ class CapaMixin(CapaFields):
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
         # there.
-        self.runtime.set('location', self.location.to_deprecated_string())
+        self.runtime.set('location', self.location.url())
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
@@ -239,7 +239,7 @@ class CapaMixin(CapaFields):
 
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
-                loc=self.location.to_deprecated_string(), err=err)
+                loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
             if self.runtime.DEBUG:
@@ -253,7 +253,7 @@ class CapaMixin(CapaFields):
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                                    url=self.location.to_deprecated_string(),
+                                    url=self.location.url(),
                                     msg=msg)
                                 )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
@@ -273,7 +273,7 @@ class CapaMixin(CapaFields):
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
+            self.seed = randomization_bin(self.runtime.seed, self.location.url)
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -385,7 +385,7 @@ class CapaMixin(CapaFields):
         progress = self.get_progress()
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.location.to_deprecated_string(),
+            'id': self.id,
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
@@ -525,7 +525,7 @@ class CapaMixin(CapaFields):
             msg = (
                 u'[courseware.capa.capa_module] <font size="+1" color="red">'
                 u'Failed to generate HTML for problem {url}</font>'.format(
-                    url=cgi.escape(self.location.to_deprecated_string()))
+                    url=cgi.escape(self.location.url()))
             )
             msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
             msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
@@ -613,7 +613,7 @@ class CapaMixin(CapaFields):
 
         context = {
             'problem': content,
-            'id': self.location.to_deprecated_string(),
+            'id': self.id,
             'check_button': check_button,
             'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
@@ -778,7 +778,7 @@ class CapaMixin(CapaFields):
         Returns the answers: {'answers' : answers}
         """
         event_info = dict()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = self.location.url()
         self.track_function_unmask('showanswer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
@@ -921,7 +921,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
@@ -1233,7 +1233,7 @@ class CapaMixin(CapaFields):
         Returns the error messages for exceptions occurring while performing
         the rescoring, rather than throwing them.
         """
-        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.to_deprecated_string()}
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
 
         _ = self.runtime.service(self, "i18n").ugettext
 
@@ -1308,7 +1308,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
@@ -1361,7 +1361,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = self.location.url()
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.closed():

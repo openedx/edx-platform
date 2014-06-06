@@ -1,4 +1,3 @@
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ValidationError
@@ -35,11 +34,11 @@ ApiResponse = collections.namedtuple('ApiResponse', ['http_response', 'data'])
 # API requests are routed through api_request() using the resource map.
 
 
-def api_enabled(request, course_key):
+def api_enabled(request, course_id):
     '''
     Returns True if the api is enabled for the course, otherwise False.
     '''
-    course = _get_course(request, course_key)
+    course = _get_course(request, course_id)
     return notes_enabled_for_course(course)
 
 
@@ -50,11 +49,9 @@ def api_request(request, course_id, **kwargs):
     Raises a 404 if the requested resource does not exist or notes are
         disabled for the course.
     '''
-    assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # Verify that the api should be accessible to this course
-    if not api_enabled(request, course_key):
+    if not api_enabled(request, course_id):
         log.debug('Notes are disabled for course: {0}'.format(course_id))
         raise Http404
 
@@ -81,7 +78,7 @@ def api_request(request, course_id, **kwargs):
 
     log.debug('API request: {0} {1}'.format(resource_method, resource_name))
 
-    api_response = module[func](request, course_key, **kwargs)
+    api_response = module[func](request, course_id, **kwargs)
     http_response = api_format(api_response)
 
     return http_response
@@ -107,33 +104,33 @@ def api_format(api_response):
     return http_response
 
 
-def _get_course(request, course_key):
+def _get_course(request, course_id):
     '''
     Helper function to load and return a user's course.
     '''
-    return get_course_with_access(request.user, 'load', course_key)
+    return get_course_with_access(request.user, course_id, 'load')
 
 #----------------------------------------------------------------------#
 # API actions exposed via the resource map.
 
 
-def index(request, course_key):
+def index(request, course_id):
     '''
     Returns a list of annotation objects.
     '''
     MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
 
-    notes = Note.objects.order_by('id').filter(course_id=course_key,
+    notes = Note.objects.order_by('id').filter(course_id=course_id,
                                                user=request.user)[:MAX_LIMIT]
 
     return ApiResponse(http_response=HttpResponse(), data=[note.as_dict() for note in notes])
 
 
-def create(request, course_key):
+def create(request, course_id):
     '''
     Receives an annotation object to create and returns a 303 with the read location.
     '''
-    note = Note(course_id=course_key, user=request.user)
+    note = Note(course_id=course_id, user=request.user)
 
     try:
         note.clean(request.body)
@@ -148,7 +145,7 @@ def create(request, course_key):
     return ApiResponse(http_response=response, data=None)
 
 
-def read(request, course_key, note_id):  # pylint: disable=unused-argument (course_key)
+def read(request, course_id, note_id):
     '''
     Returns a single annotation object.
     '''
@@ -163,7 +160,7 @@ def read(request, course_key, note_id):  # pylint: disable=unused-argument (cour
     return ApiResponse(http_response=HttpResponse(), data=note.as_dict())
 
 
-def update(request, course_key, note_id):  # pylint: disable=unused-argument (course_key)
+def update(request, course_id, note_id):
     '''
     Updates an annotation object and returns a 303 with the read location.
     '''
@@ -206,7 +203,7 @@ def delete(request, course_id, note_id):
     return ApiResponse(http_response=HttpResponse('', status=204), data=None)
 
 
-def search(request, course_key):
+def search(request, course_id):
     '''
     Returns a subset of  annotation objects based on a search query.
     '''
@@ -231,7 +228,7 @@ def search(request, course_key):
         limit = MAX_LIMIT
 
     # set filters
-    filters = {'course_id': course_key, 'user': request.user}
+    filters = {'course_id': course_id, 'user': request.user}
     if uri != '':
         filters['uri'] = uri
 
@@ -247,7 +244,7 @@ def search(request, course_key):
     return ApiResponse(http_response=HttpResponse(), data=result)
 
 
-def root(request, course_key):  # pylint: disable=unused-argument (course_key, request)
+def root(request, course_id):
     '''
     Returns version information about the API.
     '''

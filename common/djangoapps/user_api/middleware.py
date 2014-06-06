@@ -5,7 +5,6 @@ Adds user's tags to tracking event context.
 from track.contexts import COURSE_REGEX
 from eventtracking import tracker
 from user_api.models import UserCourseTag
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class UserTagsEventContextMiddleware(object):
@@ -20,7 +19,6 @@ class UserTagsEventContextMiddleware(object):
         course_id = None
         if match:
             course_id = match.group('course_id')
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         context = {}
 
@@ -31,7 +29,7 @@ class UserTagsEventContextMiddleware(object):
                 context['course_user_tags'] = dict(
                     UserCourseTag.objects.filter(
                         user=request.user.pk,
-                        course_id=course_key,
+                        course_id=course_id
                     ).values_list('key', 'value')
                 )
             else:

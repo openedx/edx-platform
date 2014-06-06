@@ -12,7 +12,6 @@ from certificates.models import certificate_status_for_student, CertificateStatu
 from certificates.queue import XQueueCertInterface
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +30,13 @@ def request_certificate(request):
             xqci = XQueueCertInterface()
             username = request.user.username
             student = User.objects.get(username=username)
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
-            course = modulestore().get_course(course_key, depth=2)
+            course_id = request.POST.get('course_id')
+            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
 
-            status = certificate_status_for_student(student, course_key)['status']
+            status = certificate_status_for_student(student, course_id)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_key))
-                status = xqci.add_cert(student, course_key, course=course)
+                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_id))
+                status = xqci.add_cert(student, course_id, course=course)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 
@@ -60,23 +59,21 @@ def update_certificate(request):
         xqueue_header = json.loads(request.POST.get('xqueue_header'))
 
         try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
-
             cert = GeneratedCertificate.objects.get(
-                user__username=xqueue_body['username'],
-                course_id=course_key,
-                key=xqueue_header['lms_key'])
+                   user__username=xqueue_body['username'],
+                   course_id=xqueue_body['course_id'],
+                   key=xqueue_header['lms_key'])
 
         except GeneratedCertificate.DoesNotExist:
             logger.critical('Unable to lookup certificate\n'
-                            'xqueue_body: {0}\n'
-                            'xqueue_header: {1}'.format(
-                                xqueue_body, xqueue_header))
+                         'xqueue_body: {0}\n'
+                         'xqueue_header: {1}'.format(
+                                      xqueue_body, xqueue_header))
 
             return HttpResponse(json.dumps({
-                'return_code': 1,
-                'content': 'unable to lookup key'}),
-                mimetype='application/json')
+                            'return_code': 1,
+                            'content': 'unable to lookup key'}),
+                             mimetype='application/json')
 
         if 'error' in xqueue_body:
             cert.status = status.error

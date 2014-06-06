@@ -12,10 +12,11 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
-from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from ..utils import get_lms_link_for_item
+from ..utils import get_modulestore, get_lms_link_for_item
 
 __all__ = ['tabs_handler']
 
@@ -23,7 +24,7 @@ __all__ = ['tabs_handler']
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def tabs_handler(request, course_key_string):
+def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for static tabs.
 
@@ -37,11 +38,13 @@ def tabs_handler(request, course_key_string):
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
-    course_item = modulestore().get_course(course_key)
+    old_location = loc_mapper().translate_locator_to_location(locator)
+    store = get_modulestore(old_location)
+    course_item = store.get_item(old_location)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
@@ -65,13 +68,16 @@ def tabs_handler(request, course_key_string):
         ):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
-                static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
-                tab.locator = static_tab_loc
+                static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
+                tab.locator = loc_mapper().translate_location(
+                    course_item.location.course_id, static_tab_loc, False, True
+                )
             tabs_to_render.append(tab)
 
         return render_to_response('edit-tabs.html', {
             'context_course': course_item,
             'tabs_to_render': tabs_to_render,
+            'course_locator': locator,
             'lms_link': get_lms_link_for_item(course_item.location),
         })
     else:
@@ -158,11 +164,11 @@ def get_tab_by_tab_id_locator(tab_list, tab_id_locator):
     return tab
 
 
-def get_tab_by_locator(tab_list, usage_key_string):
+def get_tab_by_locator(tab_list, tab_locator):
     """
     Look for a tab with the specified locator.  Returns the first matching tab.
     """
-    tab_location = UsageKey.from_string(usage_key_string)
+    tab_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(tab_locator))
     item = modulestore('direct').get_item(tab_location)
     static_tab = StaticTab(
         name=item.display_name,

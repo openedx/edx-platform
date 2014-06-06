@@ -5,9 +5,9 @@ import json
 import lxml
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locator import Locator
+from xmodule.modulestore import parsers
 
 
 class TestCourseIndex(CourseTestCase):
@@ -30,7 +30,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of courses and then pulling up their outlines
         """
-        index_url = '/course/'
+        index_url = '/course'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
         course_link_eles = parsed_html.find_class('course-link')
@@ -38,7 +38,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/slashes:{0}'.format(Locator.ALLOWED_ID_CHARS)
+                r'course/{0}+/branch/{0}+/block/{0}+'.format(parsers.ALLOWED_ID_CHARS)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
@@ -59,7 +59,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test the error conditions for the access
         """
-        outline_url = reverse_course_url('course_handler', self.course.id)
+        outline_url = self.course_locator.url_reverse('course/', '')
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.create_non_staff_authed_user_client()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')
@@ -67,11 +67,12 @@ class TestCourseIndex(CourseTestCase):
 
     def test_course_staff_access(self):
         """
-        Make and register course_staff and ensure they can access the courses
+        Make and register an course_staff and ensure they can access the courses
         """
         course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
-            permission_url = reverse_course_url('course_team_handler', course.id, kwargs={'email': course_staff.email})
+            new_location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
+            permission_url = new_location.url_reverse("course_team/", course_staff.email)
 
             self.client.post(
                 permission_url,
@@ -84,7 +85,7 @@ class TestCourseIndex(CourseTestCase):
         self.check_index_and_outline(course_staff_client)
 
     def test_json_responses(self):
-        outline_url = reverse_course_url('course_handler', self.course.id)
+        outline_url = self.course_locator.url_reverse('course/')
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
         lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
         subsection = ItemFactory.create(parent_location=lesson.location, category='vertical', display_name='Subsection 1')
@@ -95,17 +96,17 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
+        self.assertEqual(json_response['id'], 'MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
         self.assertTrue(json_response['is_container'])
         self.assertFalse(json_response['is_draft'])
 
-        # Now verify the first child
+        # Now verify that the first child
         children = json_response['children']
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'location:MITx+999+Robot_Super_Course+chapter+Week_1')
+        self.assertEqual(first_child_response['id'], 'MITx.999.Robot_Super_Course/branch/draft/block/Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(first_child_response['is_container'])
         self.assertFalse(first_child_response['is_draft'])

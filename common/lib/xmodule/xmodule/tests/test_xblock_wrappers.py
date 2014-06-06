@@ -24,7 +24,7 @@ from unittest.case import SkipTest, TestCase
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
@@ -190,7 +190,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def location(self):
-        return Location('org', 'course', 'run', 'category', self.url_name, None)
+        return Location('i4x://org/course/category/{}'.format(self.url_name))
 
     @lazy_attribute
     def block_type(self):

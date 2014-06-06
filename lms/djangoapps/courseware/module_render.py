@@ -7,7 +7,6 @@ import static_replace
 from functools import partial
 from requests.auth import HTTPBasicAuth
 from dogapi import dog_stats_api
-from opaque_keys import InvalidKeyError
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,7 +21,7 @@ from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
+from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -34,7 +33,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
@@ -50,19 +49,15 @@ log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
-    REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
+    requests_auth = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
 else:
-    REQUESTS_AUTH = None
+    requests_auth = None
 
-XQUEUE_INTERFACE = XQueueInterface(
+xqueue_interface = XQueueInterface(
     settings.XQUEUE_INTERFACE['url'],
     settings.XQUEUE_INTERFACE['django_auth'],
-    REQUESTS_AUTH,
+    requests_auth,
 )
-
-# TODO: course_id and course_key are used interchangeably in this file, which is wrong.
-# Some brave person should make the variable names consistently someday, but the code's
-# coupled enough that it's kind of tricky--you've been warned!
 
 
 class LmsModuleRenderError(Exception):
@@ -139,7 +134,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     return chapters
 
 
-def get_module(user, request, usage_key, field_data_cache,
+def get_module(user, request, location, field_data_cache, course_id,
                position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
@@ -171,8 +166,9 @@ def get_module(user, request, usage_key, field_data_cache,
     if possible.  If not possible, return None.
     """
     try:
-        descriptor = modulestore().get_item(usage_key, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
+        location = Location(location)
+        descriptor = modulestore().get_instance(course_id, location, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
@@ -212,7 +208,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
     # allow course staff to masquerade as student
-    if has_access(user, 'staff', descriptor, course_id):
+    if has_access(user, descriptor, 'staff', course_id):
         setup_masquerade(request, True)
 
     track_function = make_track_function(request)
@@ -254,9 +250,9 @@ def get_module_system_for_user(user, field_data_cache,
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
-                course_id=course_id.to_deprecated_string(),
+                course_id=course_id,
                 userid=str(user.id),
-                mod_id=descriptor.location.to_deprecated_string(),
+                mod_id=descriptor.location.url(),
                 dispatch=dispatch
             ),
         )
@@ -268,7 +264,7 @@ def get_module_system_for_user(user, field_data_cache,
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     xqueue = {
-        'interface': XQUEUE_INTERFACE,
+        'interface': xqueue_interface,
         'construct_callback': make_xqueue_callback,
         'default_queuename': xqueue_default_queuename.replace(' ', '_'),
         'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
@@ -332,10 +328,12 @@ def get_module_system_for_user(user, field_data_cache,
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
+        course_id_dict = Location.parse_course_id(course_id)
 
         tags = [
-            u"org:{}".format(course_id.org),
-            u"course:{}".format(course_id),
+            u"org:{org}".format(**course_id_dict),
+            u"course:{course}".format(**course_id_dict),
+            u"run:{name}".format(**course_id_dict),
             u"score_bucket:{0}".format(score_bucket)
         ]
 
@@ -401,11 +399,7 @@ def get_module_system_for_user(user, field_data_cache,
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(partial(
-            wrap_xblock, 'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
-        ))
+        block_wrappers.append(partial(wrap_xblock, 'LmsRuntime', extra_data={'course-id': course_id}))
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -431,11 +425,11 @@ def get_module_system_for_user(user, field_data_cache,
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''}),
+        reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if has_access(user, 'staff', descriptor, course_id):
+        if has_access(user, descriptor, 'staff', course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
 
@@ -451,7 +445,7 @@ def get_module_system_for_user(user, field_data_cache,
     if is_pure_xblock or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
-        anonymous_student_id = anonymous_id_for_user(user, None)
+        anonymous_student_id = anonymous_id_for_user(user, '')
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -475,12 +469,12 @@ def get_module_system_for_user(user, field_data_cache,
         ),
         replace_course_urls=partial(
             static_replace.replace_course_urls,
-            course_key=course_id
+            course_id=course_id
         ),
         replace_jump_to_id_urls=partial(
             static_replace.replace_jump_to_id_urls,
             course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''})
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
@@ -507,14 +501,14 @@ def get_module_system_for_user(user, field_data_cache,
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
-            make_psychometrics_data_update_handler(course_id, user, descriptor.location)
+            make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
-    system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
+    system.set(u'user_is_admin', has_access(user, 'global', 'staff'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-    if has_access(user, u'staff', descriptor.location, course_id):
+    if has_access(user, descriptor.location, 'staff', course_id):
         system.error_descriptor_class = ErrorDescriptor
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
@@ -535,7 +529,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Do not check access when it's a noauth request.
     if getattr(user, 'known', True):
         # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, 'load', descriptor, course_id):
+        if not has_access(user, descriptor, 'load', course_id):
             return None
 
     (system, student_data) = get_module_system_for_user(
@@ -553,17 +547,15 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     """
     Retrieve target StudentModule
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    usage_key = course_id.make_usage_key_from_deprecated_string(mod_id)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
-        modulestore().get_item(usage_key),
+        modulestore().get_instance(course_id, mod_id),
         depth=0,
         select_for_update=True
     )
-    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
+    instance = get_module(user, request, mod_id, field_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
         msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
         log.debug(msg)
@@ -661,19 +653,11 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     """
     Invoke an XBlock handler, either authenticated or not.
 
-    Arguments:
-        request (HttpRequest): the current request
-        course_id (str): A string of the form org/course/run
-        usage_id (str): A string of the form i4x://org/course/category/name@revision
-        handler (str): The name of the handler to invoke
-        suffix (str): The suffix to pass to the handler when invoked
-        user (User): The currently logged in user
-
     """
-    try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
-    except InvalidKeyError:
+    location = unquote_slashes(usage_id)
+
+    # Check parameters and fail fast if there's a problem
+    if not Location.is_valid(location):
         raise Http404("Invalid location")
 
     # Check submitted files
@@ -683,12 +667,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         return HttpResponse(json.dumps({'success': error_msg}))
 
     try:
-        descriptor = modulestore().get_item(usage_key)
+        descriptor = modulestore().get_instance(course_id, location)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id {course_id}: {usage_key}".format(
-                course_id=usage_key.course_key,
-                usage_key=usage_key
+            "Invalid location for course id {course_id}: {location}".format(
+                course_id=course_id,
+                location=location
             )
         )
         raise Http404
@@ -705,11 +689,11 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         user,
         descriptor
     )
-    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
+    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", usage_key, user)
+        log.debug("No module %s for user %s -- access denied?", location, user)
         raise Http404
 
     req = django_to_webob_request(request)

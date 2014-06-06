@@ -48,7 +48,7 @@ class TestXss(ModuleStoreTestCase):
         )
         req.user = self._instructor
         req.session = {}
-        resp = legacy.instructor_dashboard(req, self._course.id.to_deprecated_string())
+        resp = legacy.instructor_dashboard(req, self._course.id)
         respUnicode = resp.content.decode(settings.DEFAULT_CHARSET)
         self.assertNotIn(self._evil_student.profile.name, respUnicode)
         self.assertIn(escape(self._evil_student.profile.name), respUnicode)

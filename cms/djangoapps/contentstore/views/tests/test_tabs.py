@@ -6,9 +6,8 @@ from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from courseware.courses import get_course_by_id
 from xmodule.tabs import CourseTabList, WikiTab
-from contentstore.utils import reverse_course_url
-from xmodule.modulestore.django import modulestore
 
 
 class TabsPageTests(CourseTestCase):
@@ -21,11 +20,11 @@ class TabsPageTests(CourseTestCase):
         super(TabsPageTests, self).setUp()
 
         # Set the URL for tests
-        self.url = reverse_course_url('tabs_handler', self.course.id)
+        self.url = self.course_locator.url_reverse('tabs')
 
         # add a static tab to the course, for code coverage
         self.test_tab = ItemFactory.create(
-            parent_location=self.course.location,
+            parent_location=self.course_location,
             category="static_tab",
             display_name="Static_1"
         )
@@ -178,7 +177,8 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        preview_url = '/xblock/{}/student_view'.format(self.test_tab.location)
+        locator = loc_mapper().translate_location(self.course.id, self.test_tab.location)
+        preview_url = '/xblock/{locator}/student_view'.format(locator=locator)
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
@@ -224,5 +224,5 @@ class PrimitiveTabEdit(TestCase):
         """Test course saving."""
         course = CourseFactory.create(org='edX', course='999')
         tabs.primitive_insert(course, 3, 'notes', 'aname')
-        course2 = modulestore().get_course(course.id)
+        course2 = get_course_by_id(course.id)
         self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})

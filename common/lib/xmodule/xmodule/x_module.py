@@ -18,12 +18,14 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.runtime import Runtime, IdReader
+from xblock.plugin import default_select
+from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
+from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -31,33 +33,6 @@ from dogapi import dog_stats_api
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
-
-
-class OpaqueKeyReader(IdReader):
-    """
-    IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
-    """
-    def get_definition_id(self, usage_id):
-        """Retrieve the definition that a usage is derived from.
-
-        Args:
-            usage_id: The id of the usage to query
-
-        Returns:
-            The `definition_id` the usage is derived from
-        """
-        return usage_id.definition_key
-
-    def get_block_type(self, def_id):
-        """Retrieve the block_type of a particular definition
-
-        Args:
-            def_id: The id of the definition to query
-
-        Returns:
-            The `block_type` of the definition
-        """
-        return def_id.block_type
 
 
 def dummy_track(_event_type, _event):
@@ -181,7 +156,11 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def course_id(self):
-        return self.location.course_key
+        return self.runtime.course_id
+
+    @property
+    def id(self):
+        return self.location.url()
 
     @property
     def category(self):
@@ -189,11 +168,16 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def location(self):
-        return self.scope_ids.usage_id
+        try:
+            return Location(self.scope_ids.usage_id)
+        except InvalidLocationError:
+            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
+                return self.scope_ids.usage_id
+            else:
+                return BlockUsageLocator(self.scope_ids.usage_id)
 
     @location.setter
     def location(self, value):
-        assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
             def_id=value,
             usage_id=value,
@@ -201,7 +185,12 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def url_name(self):
-        return self.location.name
+        if isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.block_id
+        else:
+            raise InsufficientSpecificationError()
 
     @property
     def display_name_with_default(self):
@@ -213,17 +202,6 @@ class XModuleMixin(XBlockMixin):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
-
-    @property
-    def xblock_kvs(self):
-        """
-        Retrieves the internal KeyValueStore for this XModule.
-
-        Should only be used by the persistence layer. Use with caution.
-        """
-        # if caller wants kvs, caller's assuming it's up to date; so, decache it
-        self.save()
-        return self._field_data._kvs  # pylint: disable=protected-access
 
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
@@ -258,6 +236,15 @@ class XModuleMixin(XBlockMixin):
             return bool(self.get_children())
         else:
             return any(child.has_children_at_depth(depth - 1) for child in self.get_children())
+
+    @property
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
+        return self._field_data._kvs  # pylint: disable=protected-access
 
     def get_content_titles(self):
         """
@@ -720,6 +707,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         xml = etree.tostring(node)
+        # TODO: change from_xml to not take org and course, it can use self.system.
         block = cls.from_xml(xml, runtime, id_generator)
         return block
 
@@ -1093,7 +1081,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
+        super(DescriptorSystem, self).__init__(**kwargs)
 
         # This is used by XModules to write out separate files during xml export
         self.export_fs = None
@@ -1290,7 +1278,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        super(ModuleSystem, self).__init__(id_reader=OpaqueKeyReader(), field_data=field_data, **kwargs)
+        super(ModuleSystem, self).__init__(id_reader=None, field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.xqueue = xqueue

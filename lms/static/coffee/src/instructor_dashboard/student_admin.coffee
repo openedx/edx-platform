@@ -62,7 +62,7 @@ class StudentAdmin
       unique_student_identifier = @$field_student_select_progress.val()
       if not unique_student_identifier
         return @$request_response_error_progress.text gettext("Please enter a student email address or username.")
-      error_message = gettext("Error getting student progress url for '<%= student_id %>'. Make sure that the student identifier is spelled correctly.")
+      error_message = gettext("Error getting student progress url for '<%= student_id %>'. Check that the student identifier is spelled correctly.")
       full_error_message = _.template(error_message, {student_id: unique_student_identifier})
 
       $.ajax
@@ -80,13 +80,13 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem location.")
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
         unique_student_identifier: unique_student_identifier
         problem_to_reset: problem_to_reset
         delete_module: false
       success_message = gettext("Success! Problem attempts reset for problem '<%= problem_id %>' and student '<%= student_id %>'.")
-      error_message = gettext("Error resetting problem attempts for problem '<%= problem_id %>' and student '<%= student_id %>'. Make sure that the problem and student identifiers are complete and correct.")
+      error_message = gettext("Error resetting problem attempts for problem '<%= problem_id %>' and student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
       full_success_message = _.template(success_message, {problem_id: problem_to_reset, student_id: unique_student_identifier})
       full_error_message = _.template(error_message, {problem_id: problem_to_reset, student_id: unique_student_identifier})
 
@@ -104,7 +104,7 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem location.")
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       confirm_message = gettext("Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?")
       full_confirm_message = _.template(confirm_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
@@ -113,7 +113,7 @@ class StudentAdmin
           unique_student_identifier: unique_student_identifier
           problem_to_reset: problem_to_reset
           delete_module: true
-        error_message = gettext("Error deleting student '<%= student_id %>'s state on problem '<%= problem_id %>'. Make sure that the problem and student identifiers are complete and correct.")
+        error_message = gettext("Error deleting student '<%= student_id %>'s state on problem '<%= problem_id %>'. Check that the problem and student identifiers are spelled correctly.")
         full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
         $.ajax
@@ -133,13 +133,13 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem location.")
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
         unique_student_identifier: unique_student_identifier
         problem_to_reset: problem_to_reset
       success_message = gettext("Started rescore problem task for problem '<%= problem_id %>' and student '<%= student_id %>'. Click the 'Show Background Task History for Student' button to see the status of the task.")
       full_success_message = _.template(success_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
-      error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>' for student '<%= student_id %>'. Make sure that the the problem and student identifiers are complete and correct.")
+      error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>' for student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
       full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
@@ -156,11 +156,11 @@ class StudentAdmin
       if not unique_student_identifier
         return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
       if not problem_to_reset
-        return @$request_response_error_grade.text gettext("Please enter a problem location.")
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
         unique_student_identifier: unique_student_identifier
-        problem_location_str: problem_to_reset
-      error_message = gettext("Error getting task history for problem '<%= problem_id %>' and student '<%= student_id %>'. Make sure that the problem and student identifiers are complete and correct.")
+        problem_urlname: problem_to_reset
+      error_message = gettext("Error getting task history for problem '<%= problem_id %>' and student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
       full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
@@ -175,7 +175,7 @@ class StudentAdmin
     @$btn_reset_attempts_all.click =>
       problem_to_reset = @$field_problem_select_all.val()
       if not problem_to_reset
-        return @$request_response_error_all.text gettext("Please enter a problem location.")
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
       confirm_message = gettext("Reset attempts for all students on problem '<%= problem_id %>'?")
       full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
       if window.confirm full_confirm_message
@@ -184,7 +184,7 @@ class StudentAdmin
           problem_to_reset: problem_to_reset
         success_message = gettext("Successfully started task to reset attempts for problem '<%= problem_id %>'. Click the 'Show Background Task History for Problem' button to see the status of the task.")
         full_success_message = _.template(success_message, {problem_id: problem_to_reset})
-        error_message = gettext("Error starting a task to reset attempts for all students on problem '<%= problem_id %>'. Make sure that the problem identifier is complete and correct.")
+        error_message = gettext("Error starting a task to reset attempts for all students on problem '<%= problem_id %>'. Check that the problem identifier is spelled correctly.")
         full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
@@ -201,7 +201,7 @@ class StudentAdmin
     @$btn_rescore_problem_all.click =>
       problem_to_reset = @$field_problem_select_all.val()
       if not problem_to_reset
-        return @$request_response_error_all.text gettext("Please enter a problem location.")
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
       confirm_message = gettext("Rescore problem '<%= problem_id %>' for all students?")
       full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
       if window.confirm full_confirm_message
@@ -210,7 +210,7 @@ class StudentAdmin
           problem_to_reset: problem_to_reset
         success_message = gettext("Successfully started task to rescore problem '<%= problem_id %>' for all students. Click the 'Show Background Task History for Problem' button to see the status of the task.")
         full_success_message = _.template(success_message, {problem_id: problem_to_reset})
-        error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>'. Make sure that the problem identifier is complete and correct.")
+        error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>'. Check that the problem identifier is spelled correctly.")
         full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
@@ -226,10 +226,10 @@ class StudentAdmin
     # list task history for problem
     @$btn_task_history_all.click =>
       send_data =
-        problem_location_str: @$field_problem_select_all.val()
+        problem_urlname: @$field_problem_select_all.val()
 
-      if not send_data.problem_location_str
-        return @$request_response_error_all.text gettext("Please enter a problem location.")
+      if not send_data.problem_urlname
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
 
       $.ajax
         dataType: 'json'

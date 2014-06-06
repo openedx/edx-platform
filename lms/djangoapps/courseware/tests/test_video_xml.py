@@ -16,6 +16,7 @@ course, section, subsection, unit, etc.
 """
 
 from xmodule.video_module import VideoDescriptor
+from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, LogicTest, get_test_descriptor_system
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -34,6 +35,29 @@ SOURCE_XML = """
         <transcript language="uk" src="ukrainian_translation.srt" />
     </video>
 """
+
+
+class VideoFactory(object):
+    """A helper class to create video modules with various parameters
+    for testing.
+    """
+
+    # tag that uses youtube videos
+    sample_problem_xml_youtube = SOURCE_XML
+
+    @staticmethod
+    def create():
+        """Method return Video Xmodule instance."""
+        location = Location(["i4x", "edX", "video", "default",
+                             "SampleProblem1"])
+        field_data = {'data': VideoFactory.sample_problem_xml_youtube,
+                      'location': location}
+
+        system = get_test_descriptor_system()
+
+        descriptor = VideoDescriptor(system, DictFieldData(field_data), ScopeIds(None, None, None, None))
+        descriptor.xmodule_runtime = get_test_system()
+        return descriptor
 
 
 class VideoModuleLogicTest(LogicTest):

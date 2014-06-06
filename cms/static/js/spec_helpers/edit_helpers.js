@@ -100,7 +100,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
         verifyXBlockRequest = function (requests, expectedJson) {
             var request = requests[requests.length - 1],
                 actualJson = JSON.parse(request.requestBody);
-            expect(request.url).toEqual("/xblock/");
+            expect(request.url).toEqual("/xblock");
             expect(request.method).toEqual("POST");
             expect(actualJson).toEqual(expectedJson);
         };

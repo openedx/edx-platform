@@ -24,12 +24,11 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
     createItem: (parent, payload, callback=->) ->
       payload.parent_locator = parent
       $.postJSON(
-          @model.urlRoot + '/'
+          @model.urlRoot
           payload
           (data) =>
               @model.set(id: data.locator)
               @$el.data('locator', data.locator)
-              @$el.data('courseKey', data.courseKey)
               @render()
       ).success(callback)
 

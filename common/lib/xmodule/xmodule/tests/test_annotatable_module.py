@@ -8,7 +8,7 @@ from mock import Mock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.annotatable_module import AnnotatableModule
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 
 from . import get_test_system
 
@@ -35,7 +35,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             Mock(),
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
-            ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', None))
+            ScopeIds(None, None, None, None)
         )
 
     def test_annotation_data_attr(self):

@@ -9,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
@@ -23,7 +23,6 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from opaque_keys.edx.keys import CourseKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ def debug(*args, **kwargs):
         log.debug(*args, **kwargs)
 
 
-def has_access(user, action, obj, course_key=None):
+def has_access(user, obj, action, course_context=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
     switching based on various settings.
@@ -56,7 +55,7 @@ def has_access(user, action, obj, course_key=None):
     actions depend on the obj type, but include e.g. 'enroll' for courses.  See the
     type-specific functions below for the known actions for that type.
 
-    course_key: A course_key specifying which course run this access is for.
+    course_context: A course_id specifying which course run this access is for.
         Required when accessing anything other than a CourseDescriptor, 'global',
         or a location with category 'course'
 
@@ -70,26 +69,23 @@ def has_access(user, action, obj, course_key=None):
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
-        return _has_access_course_desc(user, action, obj)
+        return _has_access_course_desc(user, obj, action)
 
     if isinstance(obj, ErrorDescriptor):
-        return _has_access_error_desc(user, action, obj, course_key)
+        return _has_access_error_desc(user, obj, action, course_context)
 
     if isinstance(obj, XModule):
-        return _has_access_xmodule(user, action, obj, course_key)
+        return _has_access_xmodule(user, obj, action, course_context)
 
     # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XBlock):
-        return _has_access_descriptor(user, action, obj, course_key)
-
-    if isinstance(obj, CourseKey):
-        return _has_access_course_key(user, action, obj)
+        return _has_access_descriptor(user, obj, action, course_context)
 
     if isinstance(obj, Location):
-        return _has_access_location(user, action, obj, course_key)
+        return _has_access_location(user, obj, action, course_context)
 
     if isinstance(obj, basestring):
-        return _has_access_string(user, action, obj, course_key)
+        return _has_access_string(user, obj, action, course_context)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
@@ -98,7 +94,7 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
-def _has_access_course_desc(user, action, course):
+def _has_access_course_desc(user, course, action):
     """
     Check if user has access to a course descriptor.
 
@@ -118,19 +114,16 @@ def _has_access_course_desc(user, action, course):
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
         # delegate to generic descriptor check to check start dates
-        return _has_access_descriptor(user, 'load', course, course.id)
+        return _has_access_descriptor(user, course, 'load')
 
     def can_load_forum():
         """
         Can this user access the forums in this course?
         """
-        return (
-            can_load() and
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
+        return (can_load() and \
+            (CourseEnrollment.is_enrolled(user, course.id) or \
+                _has_staff_access_to_descriptor(user, course)
+            ))
 
     def can_enroll():
         """
@@ -165,16 +158,13 @@ def _has_access_course_desc(user, action, course):
             debug("Allow: in enrollment period")
             return True
 
-        # if user is in CourseEnrollmentAllowed with right course key then can also enroll
-        # (note that course.id actually points to a CourseKey)
-        # (the filter call uses course_id= since that's the legacy database schema)
-        # (sorry that it's confusing :( )
+        # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
         if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
             if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
                 return True
 
         # otherwise, need staff access
-        return _has_staff_access_to_descriptor(user, course, course.id)
+        return _has_staff_access_to_descriptor(user, course)
 
     def see_exists():
         """
@@ -194,7 +184,7 @@ def _has_access_course_desc(user, action, course):
             if course.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
-            return _has_staff_access_to_descriptor(user, course, course.id)
+            return _has_staff_access_to_descriptor(user, course)
 
         return can_enroll() or can_load()
 
@@ -203,14 +193,14 @@ def _has_access_course_desc(user, action, course):
         'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
-        'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
-    }
+        'staff': lambda: _has_staff_access_to_descriptor(user, course),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
+        }
 
     return _dispatch(checkers, action, user, course)
 
 
-def _has_access_error_desc(user, action, descriptor, course_key):
+def _has_access_error_desc(user, descriptor, action, course_context):
     """
     Only staff should see error descriptors.
 
@@ -219,17 +209,17 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     'staff' -- staff access to descriptor.
     """
     def check_for_staff():
-        return _has_staff_access_to_descriptor(user, descriptor, course_key)
+        return _has_staff_access_to_descriptor(user, descriptor, course_context)
 
     checkers = {
         'load': check_for_staff,
         'staff': check_for_staff
-    }
+        }
 
     return _dispatch(checkers, action, user, descriptor)
 
 
-def _has_access_descriptor(user, action, descriptor, course_key=None):
+def _has_access_descriptor(user, descriptor, action, course_context=None):
     """
     Check if user has access to this descriptor.
 
@@ -259,14 +249,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             effective_start = _adjust_start_date_for_beta_testers(
                 user,
                 descriptor,
-                course_key=course_key
+                course_context=course_context
             )
             if now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True
             # otherwise, need staff access
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
+            return _has_staff_access_to_descriptor(user, descriptor, course_context)
 
         # No start date, so can always load.
         debug("Allow: no start date")
@@ -281,7 +271,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     return _dispatch(checkers, action, user, descriptor)
 
 
-def _has_access_xmodule(user, action, xmodule, course_key):
+def _has_access_xmodule(user, xmodule, action, course_context):
     """
     Check if user has access to this xmodule.
 
@@ -289,10 +279,10 @@ def _has_access_xmodule(user, action, xmodule, course_key):
       - same as the valid actions for xmodule.descriptor
     """
     # Delegate to the descriptor
-    return has_access(user, action, xmodule.descriptor, course_key)
+    return has_access(user, xmodule.descriptor, action, course_context)
 
 
-def _has_access_location(user, action, location, course_key):
+def _has_access_location(user, location, action, course_context):
     """
     Check if user has access to this location.
 
@@ -302,31 +292,17 @@ def _has_access_location(user, action, location, course_key):
     NOTE: if you add other actions, make sure that
 
      has_access(user, location, action) == has_access(user, get_item(location), action)
+
+    And in general, prefer checking access on loaded items, rather than locations.
     """
     checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, location, course_key)
-    }
+        'staff': lambda: _has_staff_access_to_location(user, location, course_context)
+        }
 
     return _dispatch(checkers, action, user, location)
 
 
-def _has_access_course_key(user, action, course_key):
-    """
-    Check if user has access to the course with this course_key
-
-    Valid actions:
-    'staff' : True if the user has staff access to this location
-    'instructor' : True if the user has staff access to this location
-    """
-    checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, None, course_key),
-        'instructor': lambda: _has_instructor_access_to_location(user, None, course_key),
-    }
-
-    return _dispatch(checkers, action, user, course_key)
-
-
-def _has_access_string(user, action, perm, course_key):
+def _has_access_string(user, perm, action, course_context):
     """
     Check if user has certain special access, specified as string.  Valid strings:
 
@@ -363,7 +339,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.to_deprecated_string() if isinstance(obj, XBlock) else str(obj),
+              obj.location.url() if isinstance(obj, XBlock) else str(obj)[:60],
               action)
         return result
 
@@ -371,7 +347,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # pylint: disable=invalid-name
+def _adjust_start_date_for_beta_testers(user, descriptor, course_context=None):
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -398,7 +374,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # p
         # bail early if no beta testing is set up
         return descriptor.start
 
-    if CourseBetaTesterRole(course_key).has_user(user):
+    if CourseBetaTesterRole(descriptor.location, course_context=course_context).has_user(user):
         debug("Adjust start time: user in beta role for %s", descriptor)
         delta = timedelta(descriptor.days_early_for_beta)
         effective = descriptor.start - delta
@@ -407,25 +383,27 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # p
     return descriptor.start
 
 
-def _has_instructor_access_to_location(user, location, course_key=None):
-    if course_key is None:
-        course_key = location.course_key
-    return _has_access_to_course(user, 'instructor', course_key)
+def _has_instructor_access_to_location(user, location, course_context=None):
+    return _has_access_to_location(user, location, 'instructor', course_context)
 
 
-def _has_staff_access_to_location(user, location, course_key=None):
-    if course_key is None:
-        course_key = location.course_key
-    return _has_access_to_course(user, 'staff', course_key)
+def _has_staff_access_to_location(user, location, course_context=None):
+    return _has_access_to_location(user, location, 'staff', course_context)
 
 
-def _has_access_to_course(user, access_level, course_key):
+def _has_access_to_location(user, location, access_level, course_context):
     '''
     Returns True if the given user has access_level (= staff or
-    instructor) access to the course with the given course_key.
-    This ensures the user is authenticated and checks if global staff or has
-    staff / instructor access.
+    instructor) access to a location.  For now this is equivalent to
+    having staff / instructor access to the course location.course.
 
+    This means that user is in the staff_* group or instructor_* group, or is an overall admin.
+
+    TODO (vshnayder): this needs to be changed to allow per-course_id permissions, not per-course
+    (e.g. staff in 2012 is different from 2013, but maybe some people always have access)
+
+    course is a string: the course field of the location being accessed.
+    location = location
     access_level = string, either "staff" or "instructor"
     '''
     if user is None or (not user.is_authenticated()):
@@ -440,13 +418,13 @@ def _has_access_to_course(user, access_level, course_key):
         return True
 
     if access_level not in ('staff', 'instructor'):
-        log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
+        log.debug("Error in access._has_access_to_location access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return False
 
     staff_access = (
-        CourseStaffRole(course_key).has_user(user) or
-        OrgStaffRole(course_key.org).has_user(user)
+        CourseStaffRole(location, course_context).has_user(user) or
+        OrgStaffRole(location).has_user(user)
     )
 
     if staff_access and access_level == 'staff':
@@ -454,8 +432,8 @@ def _has_access_to_course(user, access_level, course_key):
         return True
 
     instructor_access = (
-        CourseInstructorRole(course_key).has_user(user) or
-        OrgInstructorRole(course_key.org).has_user(user)
+        CourseInstructorRole(location, course_context).has_user(user) or
+        OrgInstructorRole(location).has_user(user)
     )
 
     if instructor_access and access_level in ('staff', 'instructor'):
@@ -466,34 +444,42 @@ def _has_access_to_course(user, access_level, course_key):
     return False
 
 
-def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylint: disable=invalid-name
+def _has_staff_access_to_course_id(user, course_id):
+    """Helper method that takes a course_id instead of a course name"""
+    loc = CourseDescriptor.id_to_location(course_id)
+    return _has_staff_access_to_location(user, loc, course_id)
+
+
+def _has_instructor_access_to_descriptor(user, descriptor, course_context=None):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
     descriptor: something that has a location attribute
     """
-    return _has_instructor_access_to_location(user, descriptor.location, course_key)
+    return _has_instructor_access_to_location(user, descriptor.location, course_context)
 
 
-def _has_staff_access_to_descriptor(user, descriptor, course_key):
+def _has_staff_access_to_descriptor(user, descriptor, course_context=None):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
     descriptor: something that has a location attribute
     """
-    return _has_staff_access_to_location(user, descriptor.location, course_key)
+    return _has_staff_access_to_location(user, descriptor.location, course_context)
 
 
-def get_user_role(user, course_key):
+def get_user_role(user, course_id):
     """
     Return corresponding string if user has staff, instructor or student
     course role in LMS.
     """
+    from courseware.courses import get_course
+    course = get_course(course_id)
     if is_masquerading_as_student(user):
         return 'student'
-    elif has_access(user, 'instructor', course_key):
+    elif has_access(user, course, 'instructor'):
         return 'instructor'
-    elif has_access(user, 'staff', course_key):
+    elif has_access(user, course, 'staff'):
         return 'staff'
     else:
         return 'student'

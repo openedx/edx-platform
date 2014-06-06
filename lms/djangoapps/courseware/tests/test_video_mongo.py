@@ -12,8 +12,8 @@ from xblock.field_data import DictFieldData
 
 from xmodule.video_module import create_youtube_string
 from xmodule.tests import get_test_descriptor_system
+from xmodule.modulestore import Location
 from xmodule.video_module import VideoDescriptor
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -500,11 +500,10 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def setUp(self):
         system = get_test_descriptor_system()
-        course_key = SlashSeparatedCourseKey('org', 'course', 'run')
-        usage_key = course_key.make_usage_key('video', 'name')
+        location = Location('i4x://org/course/video/name')
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
-            scope_ids=ScopeIds(None, None, usage_key, usage_key),
+            scope_ids=ScopeIds(None, None, location, location),
             field_data=DictFieldData({}),
         )
         self.descriptor.runtime.handler_url = MagicMock()

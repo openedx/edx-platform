@@ -67,7 +67,7 @@ class AddUsersToCohortTestCase(ModuleStoreTestCase):
         expected_unknown = expected_unknown or []
         request = RequestFactory().post("dummy_url", {"users": users_string})
         request.user = self.staff_user
-        response = add_users_to_cohort(request, self.course.id.to_deprecated_string(), self.cohort1.id)
+        response = add_users_to_cohort(request, self.course.id, self.cohort1.id)
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.content)
         self.assertEqual(result.get("success"), True)

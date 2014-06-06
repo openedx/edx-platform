@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from courseware.courses import get_course_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -20,8 +20,8 @@ def has_instructor_access_for_class(user, course_id):
     Returns true if the `user` is an instructor for the course.
     """
 
-    course = get_course_with_access(user, 'staff', course_id, depth=None)
-    return has_access(user, 'staff', course)
+    course = get_course_with_access(user, course_id, 'staff', depth=None)
+    return has_access(user, course, 'staff')
 
 
 def all_sequential_open_distrib(request, course_id):

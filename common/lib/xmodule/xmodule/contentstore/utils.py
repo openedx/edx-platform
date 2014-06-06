@@ -1,3 +1,4 @@
+from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from .django import contentstore
 
@@ -12,14 +13,18 @@ def empty_asset_trashcan(course_locs):
         # first delete all of the thumbnails
         thumbs = store.get_all_content_thumbnails_for_course(course_loc)
         for thumb in thumbs:
-            print "Deleting {0}...".format(thumb)
-            store.delete(thumb['_id'])
+            thumb_loc = Location(thumb["_id"])
+            id = StaticContent.get_id_from_location(thumb_loc)
+            print "Deleting {0}...".format(id)
+            store.delete(id)
 
         # then delete all of the assets
         assets, __ = store.get_all_content_for_course(course_loc)
         for asset in assets:
-            print "Deleting {0}...".format(asset)
-            store.delete(asset['_id'])
+            asset_loc = Location(asset["_id"])
+            id = StaticContent.get_id_from_location(asset_loc)
+            print "Deleting {0}...".format(id)
+            store.delete(id)
 
 
 def restore_asset_from_trashcan(location):

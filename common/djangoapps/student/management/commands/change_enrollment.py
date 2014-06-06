@@ -1,10 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from optparse import make_option
 from student.models import CourseEnrollment, User
-
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -59,14 +55,8 @@ class Command(BaseCommand):
             raise CommandError("You must specify a course id for this command")
         if not options['from_mode'] or not options['to_mode']:
             raise CommandError('You must specify a "to" and "from" mode as parameters')
-
-        try:
-            course_key = CourseKey.from_string(options['course_id'])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_id'])
-
         filter_args = dict(
-            course_id=course_key,
+            course_id=options['course_id'],
             mode=options['from_mode']
         )
         if options['user']:

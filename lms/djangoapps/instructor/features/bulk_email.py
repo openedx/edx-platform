@@ -29,23 +29,23 @@ def make_populated_course(step):  # pylint: disable=unused-argument
         number='888',
         display_name='Bulk Email Test Course'
     )
-    world.bulk_email_course_key = course.id
+    world.bulk_email_course_id = 'edx/888/Bulk_Email_Test_Course'
 
     try:
         # See if we've defined the instructor & staff user yet
         world.bulk_email_instructor
     except AttributeError:
         # Make & register an instructor for the course
-        world.bulk_email_instructor = InstructorFactory(course_key=world.bulk_email_course_key)
-        world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_key)
+        world.bulk_email_instructor = InstructorFactory(course=course.location)
+        world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_id)
 
         # Make & register a staff member
-        world.bulk_email_staff = StaffFactory(course_key=course.id)
-        world.enroll_user(world.bulk_email_staff, world.bulk_email_course_key)
+        world.bulk_email_staff = StaffFactory(course=course.location)
+        world.enroll_user(world.bulk_email_staff, world.bulk_email_course_id)
 
     # Make & register a student
-    world.register_by_course_key(
-        course.id,
+    world.register_by_course_id(
+        'edx/888/Bulk_Email_Test_Course',
         username='student',
         password='test',
         is_staff=False

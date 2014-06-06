@@ -20,10 +20,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
 import contentstore.git_export_utils as git_export_utils
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys import InvalidKeyError
-from contentstore.git_export_utils import GitExportError
-from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -57,16 +53,8 @@ class Command(BaseCommand):
 
         # Rethrow GitExportError as CommandError for SystemExit
         try:
-            course_key = CourseKey.from_string(args[0])
-        except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            except InvalidKeyError:
-                raise CommandError(GitExportError.BAD_COURSE)
-
-        try:
             git_export_utils.export_to_git(
-                course_key,
+                args[0],
                 args[1],
                 options.get('user', ''),
                 options.get('rdir', None)

@@ -38,14 +38,14 @@ def get_running_instructor_tasks(course_id):
     return instructor_tasks.order_by('-id')
 
 
-def get_instructor_task_history(course_id, usage_key=None, student=None, task_type=None):
+def get_instructor_task_history(course_id, problem_url=None, student=None, task_type=None):
     """
     Returns a query of InstructorTask objects of historical tasks for a given course,
     that optionally match a particular problem, a student, and/or a task type.
     """
     instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
-    if usage_key is not None or student is not None:
-        _, task_key = encode_problem_and_student_input(usage_key, student)
+    if problem_url is not None or student is not None:
+        _, task_key = encode_problem_and_student_input(problem_url, student)
         instructor_tasks = instructor_tasks.filter(task_key=task_key)
     if task_type is not None:
         instructor_tasks = instructor_tasks.filter(task_type=task_type)
@@ -53,8 +53,7 @@ def get_instructor_task_history(course_id, usage_key=None, student=None, task_ty
     return instructor_tasks.order_by('-id')
 
 
-# Disabling invalid-name because this fn name is longer than 30 chars.
-def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: disable=invalid-name
+def submit_rescore_problem_for_student(request, course_id, problem_url, student):
     """
     Request a problem to be rescored as a background task.
 
@@ -75,15 +74,15 @@ def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: 
 
     """
     # check arguments:  let exceptions return up to the caller.
-    check_arguments_for_rescoring(usage_key)
+    check_arguments_for_rescoring(course_id, problem_url)
 
     task_type = 'rescore_problem'
     task_class = rescore_problem
-    task_input, task_key = encode_problem_and_student_input(usage_key, student)
-    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+    task_input, task_key = encode_problem_and_student_input(problem_url, student)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disable=invalid-name
+def submit_rescore_problem_for_all_students(request, course_id, problem_url):
     """
     Request a problem to be rescored as a background task.
 
@@ -104,22 +103,23 @@ def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disa
     separate transaction.
     """
     # check arguments:  let exceptions return up to the caller.
-    check_arguments_for_rescoring(usage_key)
+    check_arguments_for_rescoring(course_id, problem_url)
 
     # check to see if task is already running, and reserve it otherwise
     task_type = 'rescore_problem'
     task_class = rescore_problem
-    task_input, task_key = encode_problem_and_student_input(usage_key)
-    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+    task_input, task_key = encode_problem_and_student_input(problem_url)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylint: disable=invalid-name
+def submit_reset_problem_attempts_for_all_students(request, course_id, problem_url):
     """
     Request to have attempts reset for a problem as a background task.
 
     The problem's attempts will be reset for all students who have accessed the
     particular problem in a course.  Parameters are the `course_id` and
-    the `usage_key`, which must be a :class:`Location`.
+    the `problem_url`.  The url must specify the location of the problem,
+    using i4x-type notation.
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being reset.
@@ -131,24 +131,25 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     save here.  Any future database operations will take place in a
     separate transaction.
     """
-    # check arguments:  make sure that the usage_key is defined
+    # check arguments:  make sure that the problem_url is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
     # an exception will be raised.  Let it pass up to the caller.
-    modulestore().get_item(usage_key)
+    modulestore().get_instance(course_id, problem_url)
 
     task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts
-    task_input, task_key = encode_problem_and_student_input(usage_key)
-    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+    task_input, task_key = encode_problem_and_student_input(problem_url)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint: disable=invalid-name
+def submit_delete_problem_state_for_all_students(request, course_id, problem_url):
     """
     Request to have state deleted for a problem as a background task.
 
     The problem's state will be deleted for all students who have accessed the
     particular problem in a course.  Parameters are the `course_id` and
-    the `usage_key`, which must be a :class:`Location`.
+    the `problem_url`.  The url must specify the location of the problem,
+    using i4x-type notation.
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the particular problem's state is already being deleted.
@@ -160,23 +161,23 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
     save here.  Any future database operations will take place in a
     separate transaction.
     """
-    # check arguments:  make sure that the usage_key is defined
+    # check arguments:  make sure that the problem_url is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
     # an exception will be raised.  Let it pass up to the caller.
-    modulestore().get_item(usage_key)
+    modulestore().get_instance(course_id, problem_url)
 
     task_type = 'delete_problem_state'
     task_class = delete_problem_state
-    task_input, task_key = encode_problem_and_student_input(usage_key)
-    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+    task_input, task_key = encode_problem_and_student_input(problem_url)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id):
+def submit_bulk_course_email(request, course_id, email_id):
     """
     Request to have bulk email sent as a background task.
 
     The specified CourseEmail object will be sent be updated for all students who have enrolled
-    in a course.  Parameters are the `course_key` and the `email_id`, the id of the CourseEmail object.
+    in a course.  Parameters are the `course_id` and the `email_id`, the id of the CourseEmail object.
 
     AlreadyRunningError is raised if the same recipients are already being emailed with the same
     CourseEmail object.
@@ -205,10 +206,10 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_calculate_grades_csv(request, course_key):
+def submit_calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
@@ -217,4 +218,4 @@ def submit_calculate_grades_csv(request, course_key):
     task_input = {}
     task_key = ""
 
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)

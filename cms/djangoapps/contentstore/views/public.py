@@ -23,7 +23,7 @@ def signup(request):
     """
     csrf_token = csrf(request)['csrf_token']
     if request.user.is_authenticated():
-        return redirect('/course/')
+        return redirect('/course')
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to course to login to process their certificate if SSL is enabled
         # and registration is disabled.
@@ -48,7 +48,7 @@ def login_page(request):
         if next_url:
             return redirect(next_url)
         else:
-            return redirect('/course/')
+            return redirect('/course')
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
@@ -66,6 +66,6 @@ def login_page(request):
 def howitworks(request):
     "Proxy view"
     if request.user.is_authenticated():
-        return redirect('/course/')
+        return redirect('/course')
     else:
         return render_to_response('howitworks.html', {})

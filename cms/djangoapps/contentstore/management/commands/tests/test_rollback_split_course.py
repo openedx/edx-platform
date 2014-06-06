@@ -19,7 +19,6 @@ from xmodule.modulestore.split_migrator import SplitMigrator
 # pylint: disable=E1101
 
 
-@unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
 class TestArgParsing(unittest.TestCase):
     """
     Tests for parsing arguments for the `rollback_split_course` management command
@@ -38,7 +37,6 @@ class TestArgParsing(unittest.TestCase):
             self.command.handle("!?!")
 
 
-@unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
     """
@@ -56,8 +54,6 @@ class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, errstring):
             Command().handle(str(locator))
 
-
-@unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
     """
@@ -70,13 +66,12 @@ class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
         self.old_course = CourseFactory()
 
     def test_nonexistent_locator(self):
-        locator = loc_mapper().translate_location(self.old_course.location)
+        locator = loc_mapper().translate_location(self.old_course.id, self.old_course.location)
         errstring = "No course found with locator"
         with self.assertRaisesRegexp(CommandError, errstring):
             Command().handle(str(locator))
 
 
-@unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourse(ModuleStoreTestCase):
     """
@@ -98,17 +93,18 @@ class TestRollbackSplitCourse(ModuleStoreTestCase):
             loc_mapper=loc_mapper(),
         )
         migrator.migrate_mongo_course(self.old_course.location, self.user)
-        self.course = modulestore('split').get_course(self.old_course.id)
+        locator = loc_mapper().translate_location(self.old_course.id, self.old_course.location)
+        self.course = modulestore('split').get_course(locator)
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_happy_path(self, mock_stdout):
-        course_id = self.course.id
+        locator = self.course.location
         call_command(
             "rollback_split_course",
-            str(course_id),
+            str(locator),
         )
         with self.assertRaises(ItemNotFoundError):
-            modulestore('split').get_course(course_id)
+            modulestore('split').get_course(locator)
 
         self.assertIn("Course rolled back successfully", mock_stdout.getvalue())
 

@@ -17,14 +17,15 @@ class XmlImportData(object):
     Class to capture all of the data needed to actually run an XML import,
     so that the Factories have something to generate
     """
-    def __init__(self, xml_node, xml=None, course_id=None,
+    def __init__(self, xml_node, xml=None, org=None, course=None,
                  default_class=None, policy=None,
                  filesystem=None, parent=None,
                  xblock_mixins=(), xblock_select=None):
 
         self._xml_node = xml_node
         self._xml_string = xml
-        self.course_id = course_id
+        self.org = org
+        self.course = course
         self.default_class = default_class
         self.filesystem = filesystem
         self.xblock_mixins = xblock_mixins
@@ -46,8 +47,8 @@ class XmlImportData(object):
 
     def __repr__(self):
         return u"XmlImportData{!r}".format((
-            self._xml_node, self._xml_string, self.course_id,
-            self.default_class, self.policy,
+            self._xml_node, self._xml_string, self.org,
+            self.course, self.default_class, self.policy,
             self.filesystem, self.parent, self.xblock_mixins,
             self.xblock_select,
         ))
@@ -73,7 +74,6 @@ class XmlImportFactory(Factory):
     policy = {}
     inline_xml = True
     tag = 'unknown'
-    course_id = 'edX/xml_test_course/101'
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
@@ -136,6 +136,8 @@ class XmlImportFactory(Factory):
 class CourseFactory(XmlImportFactory):
     """Factory for <course> nodes"""
     tag = 'course'
+    org = 'edX'
+    course = 'xml_test_course'
     name = '101'
     static_asset_path = 'xml_test_course'
 

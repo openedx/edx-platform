@@ -1,8 +1,6 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
 
 from lettuce import world, steps
-from nose.tools import assert_in, assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_equals, assert_true
 
 from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import add_problem_to_course, answer_problem
@@ -48,16 +46,16 @@ class ConditionalSteps(object):
 
         metadata = {
             'xml_attributes': {
-                condition: cond_value
+                'sources': world.scenario_dict['CONDITION_SOURCE'].location.url()
             }
         }
+        metadata['xml_attributes'][condition] = cond_value
 
         world.scenario_dict['CONDITIONAL'] = world.ItemFactory(
             parent_location=world.scenario_dict['WRAPPER'].location,
             category='conditional',
             display_name="Test Conditional",
-            metadata=metadata,
-            sources_list=[world.scenario_dict['CONDITION_SOURCE'].location],
+            metadata=metadata
         )
 
         world.ItemFactory(
@@ -92,7 +90,6 @@ class ConditionalSteps(object):
             assert_true(world.css_visible('.hidden-contents'))
         else:
             assert_true(world.is_css_not_present('.hidden-contents'))
-            assert_true(world.css_contains_text('.conditional-message', 'must be attempted before this will become visible.'))  # sarina
 
     def answer_poll(self, step, answer):
         r' I answer the conditioned poll "([^"]*)"$'

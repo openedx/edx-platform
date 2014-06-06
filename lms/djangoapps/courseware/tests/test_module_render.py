@@ -19,11 +19,11 @@ from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
 from xmodule.lti_module import LTIDescriptor
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
@@ -47,9 +47,9 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests of courseware.module_render
     """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.location = self.course_key.make_usage_key('chapter', 'Overview')
-        self.toy_course = modulestore().get_course(self.course_key)
+        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        self.course_id = 'edX/toy/2012_Fall'
+        self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
         self.request_factory = RequestFactory()
@@ -60,7 +60,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.dispatch = 'score_update'
 
         # Construct a 'standard' xqueue_callback url
-        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_key.to_deprecated_string(),
+        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_id,
                                                                    userid=str(self.mock_user.id),
                                                                    mod_id=self.mock_module.id,
                                                                    dispatch=self.dispatch))
@@ -80,17 +80,17 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_request = MagicMock()
         mock_request.user = self.mock_user
 
-        course = get_course_with_access(self.mock_user, 'load', self.course_key)
+        course = get_course_with_access(self.mock_user, self.course_id, 'load')
 
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course_key, self.mock_user, course, depth=2)
+            self.course_id, self.mock_user, course, depth=2)
 
         module = render.get_module(
             self.mock_user,
             mock_request,
-            self.course_key.make_usage_key('html', 'toyjumpto'),
+            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
-            self.course_key
+            self.course_id
         )
 
         # get the rendered HTML output which should have the rewritten link
@@ -98,7 +98,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
-        self.assertIn('/courses/' + self.course_key.to_deprecated_string() + '/jump_to_id/vertical_test', html)
+        self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
 
     def test_xqueue_callback_success(self):
         """
@@ -116,7 +116,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             get_fake_module.return_value = self.mock_module
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
-            render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+            render.xqueue_callback(request, self.course_id, self.mock_user.id, self.mock_module.id, self.dispatch)
 
         # Verify that handle ajax is called with the correct data
         request.POST['queuekey'] = fake_key
@@ -133,12 +133,12 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
-                render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+                render.xqueue_callback(request, self.course_id, self.mock_user.id, self.mock_module.id, self.dispatch)
 
             # Test with missing xqueue_header
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, data)
-                render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+                render.xqueue_callback(request, self.course_id, self.mock_user.id, self.mock_module.id, self.dispatch)
 
     def test_get_score_bucket(self):
         self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
@@ -152,8 +152,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         dispatch_url = reverse(
             'xblock_handler',
             args=[
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.course_key.make_usage_key('videosequence', 'Toy_Videos').to_deprecated_string()),
+                'edX/toy/2012_Fall',
+                quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
                 'xmodule_handler',
                 'goto_position'
             ]
@@ -169,9 +169,9 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.location = self.course_key.make_usage_key('chapter', 'Overview')
-        self.toy_course = modulestore().get_course(self.course_key)
+        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        self.course_id = 'edX/toy/2012_Fall'
+        self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
         self.request_factory = RequestFactory()
@@ -182,14 +182,10 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.dispatch = 'score_update'
 
         # Construct a 'standard' xqueue_callback url
-        self.callback_url = reverse(
-            'xqueue_callback', kwargs={
-                'course_id': self.course_key.to_deprecated_string(),
-                'userid': str(self.mock_user.id),
-                'mod_id': self.mock_module.id,
-                'dispatch': self.dispatch
-            }
-        )
+        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_id,
+                                                                   userid=str(self.mock_user.id),
+                                                                   mod_id=self.mock_module.id,
+                                                                   dispatch=self.dispatch))
 
     def _mock_file(self, name='file', size=10):
         """Create a mock file object for testing uploads"""
@@ -208,7 +204,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
+                'dummy/course/id',
                 'invalid Location',
                 'dummy_handler'
                 'dummy_dispatch'
@@ -223,8 +219,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
+                'dummy/course/id',
+                quote_slashes(str(self.location)),
                 'dummy_handler'
             ).content,
             json.dumps({
@@ -243,8 +239,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
+                'dummy/course/id',
+                quote_slashes(str(self.location)),
                 'dummy_handler'
             ).content,
             json.dumps({
@@ -258,8 +254,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request.user = self.mock_user
         response = render.handle_xblock_callback(
             request,
-            self.course_key.to_deprecated_string(),
-            quote_slashes(self.location.to_deprecated_string()),
+            self.course_id,
+            quote_slashes(str(self.location)),
             'xmodule_handler',
             'goto_position',
         )
@@ -272,7 +268,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             render.handle_xblock_callback(
                 request,
                 'bad_course_id',
-                quote_slashes(self.location.to_deprecated_string()),
+                quote_slashes(str(self.location)),
                 'xmodule_handler',
                 'goto_position',
             )
@@ -283,8 +279,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.course_key.make_usage_key('chapter', 'bad_location').to_deprecated_string()),
+                self.course_id,
+                quote_slashes(str(Location('i4x', 'edX', 'toy', 'chapter', 'bad_location'))),
                 'xmodule_handler',
                 'goto_position',
             )
@@ -295,8 +291,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
+                self.course_id,
+                quote_slashes(str(self.location)),
                 'xmodule_handler',
                 'bad_dispatch',
             )
@@ -307,8 +303,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
                 request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
+                self.course_id,
+                quote_slashes(str(self.location)),
                 'bad_handler',
                 'bad_dispatch',
             )
@@ -320,13 +316,13 @@ class TestTOC(TestCase):
     def setUp(self):
 
         # Toy courses should be loaded
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.toy_course = modulestore().get_course(self.course_key)
+        self.course_name = 'edX/toy/2012_Fall'
+        self.toy_course = modulestore().get_course(self.course_name)
         self.portal_user = UserFactory()
 
     def test_toc_toy_from_chapter(self):
         chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_name, chapter)
         factory = RequestFactory()
         request = factory.get(chapter_url)
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -353,7 +349,7 @@ class TestTOC(TestCase):
 
     def test_toc_toy_from_section(self):
         chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_name, chapter)
         section = 'Welcome'
         factory = RequestFactory()
         request = factory.get(chapter_url)
@@ -513,7 +509,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
 
         self.assertIn(
             '/courses/{course_id}/bar/content'.format(
-                course_id=self.course.id.to_deprecated_string()
+                course_id=self.course.id
             ),
             result_fragment.content
         )
@@ -573,11 +569,11 @@ class ViewInStudioTest(ModuleStoreTestCase):
         Define the XML backed course to use.
         Toy courses are already loaded in XML and mixed modulestores.
         """
-        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        location = course_key.make_usage_key('chapter', 'Overview')
-        descriptor = modulestore().get_item(location)
+        course_id = 'edX/toy/2012_Fall'
+        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        descriptor = modulestore().get_instance(course_id, location)
 
-        self.module = self._get_module(course_key, descriptor, location)
+        self.module = self._get_module(course_id, descriptor, location)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -789,7 +785,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
     def _get_anonymous_id(self, course_id, xblock_class):
-        location = course_id.make_usage_key('dummy_category', 'dummy_name')
+        location = Location('dummy_org', 'dummy_course', 'dummy_category', 'dummy_name')
         descriptor = Mock(
             spec=xblock_class,
             _field_data=Mock(spec=FieldData),
@@ -824,7 +820,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
                 '5afe5d9bb03796557ee2614f5c9611fb',
-                self._get_anonymous_id(SlashSeparatedCourseKey.from_deprecated_string(course_id), descriptor_class)
+                self._get_anonymous_id(course_id, descriptor_class)
             )
 
     @data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
@@ -833,14 +829,14 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'e3b0b940318df9c14be59acb08e78af5',
-            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2012_Fall'), descriptor_class)
+            self._get_anonymous_id('MITx/6.00x/2012_Fall', descriptor_class)
         )
 
         self.assertEquals(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'f82b5416c9f54b5ce33989511bb5ef2e',
-            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2013_Spring'), descriptor_class)
+            self._get_anonymous_id('MITx/6.00x/2013_Spring', descriptor_class)
         )
 
 
@@ -886,8 +882,8 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
 
         render.handle_xblock_callback(
             self.request,
-            self.course.id.to_deprecated_string(),
-            quote_slashes(descriptor.location.to_deprecated_string()),
+            self.course.id,
+            quote_slashes(str(descriptor.location)),
             'xmodule_handler',
             'problem_check',
         )
@@ -926,10 +922,9 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         return render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
-            self.problem.location,
+            self.problem.id,
             field_data_cache,
-            self.course.id
-        )._xmodule
+            self.course.id)._xmodule
 
     def set_module_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
@@ -940,7 +935,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
     def test_xmodule_runtime_publish(self):
         """Tests the publish mechanism"""
         self.set_module_grade_using_publish(self.grade_dict)
-        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.location)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
         self.assertEqual(student_module.grade, self.grade_dict['value'])
         self.assertEqual(student_module.max_grade, self.grade_dict['max_value'])
 
@@ -948,7 +943,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         """Test deleting the grade using the publish mechanism"""
         module = self.set_module_grade_using_publish(self.grade_dict)
         module.system.publish(module, 'grade', self.delete_dict)
-        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.location)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
@@ -975,7 +970,7 @@ class TestRebindModule(TestSubmittingProblems):
         return render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
-            self.lti.location,
+            self.lti.id,
             field_data_cache,
             self.course.id)._xmodule
 

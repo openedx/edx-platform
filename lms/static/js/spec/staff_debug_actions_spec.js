@@ -1,7 +1,6 @@
 describe('StaffDebugActions', function() {
-    var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
-    var locationName = 'test_loc'
-    var fixture_id = 'sd_fu_' + locationName;
+    var loc = 'test_loc';
+    var fixture_id = 'sd_fu_' + loc;
     var fixture = $('<input>', { id: fixture_id, placeholder: "userman" });
 
     describe('get_url ', function() {
@@ -15,13 +14,13 @@ describe('StaffDebugActions', function() {
 
         it('gets the placeholder username if input field is empty', function() {
             $('body').append(fixture);
-            expect(StaffDebug.get_user(locationName)).toBe('userman');
+            expect(StaffDebug.get_user(loc)).toBe('userman');
             $('#' + fixture_id).remove();
         });
         it('gets a filled in name if there is one', function() {
             $('body').append(fixture);
             $('#' + fixture_id).val('notuserman');
-            expect(StaffDebug.get_user(locationName)).toBe('notuserman');
+            expect(StaffDebug.get_user(loc)).toBe('notuserman');
 
             $('#' + fixture_id).val('');
             $('#' + fixture_id).remove();
@@ -32,11 +31,11 @@ describe('StaffDebugActions', function() {
             $('body').append(fixture);
 
             spyOn($, 'ajax');
-            StaffDebug.reset(locationName, location);
+            StaffDebug.reset(loc);
 
             expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
             expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                'problem_to_reset': location,
+                'problem_to_reset': loc,
                 'unique_student_identifier': 'userman',
                 'delete_module': false
             });
@@ -51,11 +50,11 @@ describe('StaffDebugActions', function() {
             $('body').append(fixture);
 
             spyOn($, 'ajax');
-            StaffDebug.sdelete(locationName, location);
+            StaffDebug.sdelete(loc);
 
             expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
             expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                'problem_to_reset': location,
+                'problem_to_reset': loc,
                 'unique_student_identifier': 'userman',
                 'delete_module': true
             });
@@ -71,11 +70,11 @@ describe('StaffDebugActions', function() {
             $('body').append(fixture);
 
             spyOn($, 'ajax');
-            StaffDebug.rescore(locationName, location);
+            StaffDebug.rescore(loc);
 
             expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
             expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                'problem_to_reset': location,
+                'problem_to_reset': loc,
                 'unique_student_identifier': 'userman',
                 'delete_module': false
             });

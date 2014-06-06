@@ -47,6 +47,7 @@ from ratelimitbackend.exceptions import RateLimitException
 import student.views
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger("edx.external_auth")
@@ -588,8 +589,9 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    course = student.views.course_from_id(course_id)
-    if not course:
+    try:
+        course = course_from_id(course_id)
+    except ItemNotFoundError:
         # couldn't find the course, will just return vanilla signin page
         return redirect_with_get('signin_user', request.GET)
 
@@ -606,9 +608,9 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    course = student.views.course_from_id(course_id)
-
-    if not course:
+    try:
+        course = course_from_id(course_id)
+    except ItemNotFoundError:
         # couldn't find the course, will just return vanilla registration page
         return redirect_with_get('register_user', request.GET)
 
@@ -949,3 +951,9 @@ def provider_xrds(request):
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)
     return response
+
+
+def course_from_id(course_id):
+    """Return the CourseDescriptor corresponding to this course_id"""
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    return modulestore().get_instance(course_id, course_loc)

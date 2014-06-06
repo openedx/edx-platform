@@ -10,7 +10,6 @@ from xblock.fields import String
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mongo.draft import as_draft
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 
@@ -40,6 +39,7 @@ class XBlockImportTest(ModuleStoreTestCase):
     def test_import_public(self):
         self._assert_import(
             'pure_xblock_public',
+            'i4x://edX/pure_xblock_public/stubxblock/xblock_test',
             'set by xml'
         )
 
@@ -47,11 +47,12 @@ class XBlockImportTest(ModuleStoreTestCase):
     def test_import_draft(self):
         self._assert_import(
             'pure_xblock_draft',
+            'i4x://edX/pure_xblock_draft/stubxblock/xblock_test@draft',
             'set by xml',
             has_draft=True
         )
 
-    def _assert_import(self, course_dir, expected_field_val, has_draft=False):
+    def _assert_import(self, course_dir, expected_xblock_loc, expected_field_val, has_draft=False):
         """
         Import a course from XML, then verify that the XBlock was loaded
         with the correct field value.
@@ -66,21 +67,16 @@ class XBlockImportTest(ModuleStoreTestCase):
                 the expected field value set.
 
         """
-        _, courses = import_from_xml(
+        import_from_xml(
             self.store, 'common/test/data', [course_dir],
             draft_store=self.draft_store
         )
 
-        xblock_location = courses[0].id.make_usage_key('stubxblock', 'xblock_test')
-
-        if has_draft:
-            xblock_location = as_draft(xblock_location)
-
-        xblock = self.store.get_item(xblock_location)
+        xblock = self.store.get_item(expected_xblock_loc)
         self.assertTrue(isinstance(xblock, StubXBlock))
         self.assertEqual(xblock.test_field, expected_field_val)
 
         if has_draft:
-            draft_xblock = self.draft_store.get_item(xblock_location)
+            draft_xblock = self.draft_store.get_item(expected_xblock_loc)
             self.assertTrue(isinstance(draft_xblock, StubXBlock))
             self.assertEqual(draft_xblock.test_field, expected_field_val)

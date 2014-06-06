@@ -52,8 +52,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from collections import namedtuple
 
@@ -85,7 +84,6 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
-from xmodule.error_module import ErrorDescriptor
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -130,7 +128,8 @@ def index(request, extra_context={}, user=AnonymousUser()):
 
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""
-    return modulestore().get_course(course_id)
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    return modulestore().get_instance(course_id, course_loc)
 
 
 def embargo(_request):
@@ -242,8 +241,8 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        course = course_from_id(enrollment.course_id)
-        if course and not isinstance(course, ErrorDescriptor):
+        try:
+            course = course_from_id(enrollment.course_id)
 
             # if we are in a Microsite, then filter out anything that is not
             # attributed (by ORG) to that Microsite
@@ -255,10 +254,9 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
                 continue
 
             yield (course, enrollment)
-        else:
-            log.error("User {0} enrolled in {2} course {1}".format(
-                        user.username, enrollment.course_id, "broken" if course else "non-existent"
-                     ))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
 
 
 def _cert_info(user, course, cert_status):
@@ -452,13 +450,13 @@ def dashboard(request):
     # Global staff can see what courses errored on their dashboard
     staff_access = False
     errored_courses = {}
-    if has_access(user, 'staff', 'global'):
+    if has_access(user, 'global', 'staff'):
         # Show any courses that errored on load
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                          if has_access(request.user, 'load', course))
+                                          if has_access(request.user, course, 'load'))
 
     course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
@@ -591,10 +589,9 @@ def change_enrollment(request):
     user = request.user
 
     action = request.POST.get("enrollment_action")
-    if 'course_id' not in request.POST:
+    course_id = request.POST.get("course_id")
+    if course_id is None:
         return HttpResponseBadRequest(_("Course id not specified"))
-
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
 
     if not user.is_authenticated():
         return HttpResponseForbidden()
@@ -609,7 +606,7 @@ def change_enrollment(request):
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-        if not has_access(user, 'enroll', course):
+        if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
 
         # see if we have already filled up all allowed enrollments
@@ -623,7 +620,7 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()})
+                reverse("course_modes_choose", kwargs={'course_id': course_id})
             )
 
         current_mode = available_modes[0]
@@ -639,7 +636,7 @@ def change_enrollment(request):
         # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
         # whether things got added, etc
 
-        shoppingcart.views.add_course_to_cart(request, course_id.to_deprecated_string())
+        shoppingcart.views.add_course_to_cart(request, course_id)
         return HttpResponse(
             reverse("shoppingcart.views.show_cart")
         )
@@ -661,7 +658,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
-        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
+        return m_obj.group('course_id')
     return None
 
 
@@ -671,11 +668,11 @@ def _get_course_enrollment_domain(course_id):
     @param course_id:
     @return:
     """
-    course = course_from_id(course_id)
-    if course is None:
+    try:
+        course = course_from_id(course_id)
+        return course.enrollment_domain
+    except ItemNotFoundError:
         return None
-
-    return course.enrollment_domain
 
 
 @never_cache
@@ -1354,9 +1351,6 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
-    course_key = None
-    if course_id:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1392,12 +1386,12 @@ def auto_auth(request):
     reg.save()
 
     # Enroll the user in a course
-    if course_key is not None:
-        CourseEnrollment.enroll(user, course_key)
+    if course_id is not None:
+        CourseEnrollment.enroll(user, course_id)
 
     # Apply the roles
     for role_name in role_names:
-        role = Role.objects.get(name=role_name, course_id=course_key)
+        role = Role.objects.get(name=role_name, course_id=course_id)
         user.roles.add(role)
 
     # Log in as the user
@@ -1844,16 +1838,15 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
-        optout_object = Optout.objects.filter(user=user, course_id=course_key)
+        optout_object = Optout.objects.filter(user=user, course_id=course_id)
         if optout_object:
             optout_object.delete()
         log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
     else:
-        Optout.objects.get_or_create(user=user, course_id=course_key)
+        Optout.objects.get_or_create(user=user, course_id=course_id)
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 

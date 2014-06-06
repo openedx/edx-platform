@@ -1,15 +1,8 @@
-"""
-Management command to generate a list of grades for
-all students that are enrolled in a course.
-"""
 from courseware import grades, courses
 from certificates.models import GeneratedCertificate
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand, CommandError
 import os
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.contrib.auth.models import User
 from optparse import make_option
 import datetime
@@ -69,37 +62,24 @@ class Command(BaseCommand):
                 options['output']))
 
         STATUS_INTERVAL = 100
-
-        # parse out the course into a coursekey
-        if options['course']:
-            try:
-                course_key = CourseKey.from_string(options['course'])
-            # if it's not a new-style course key, parse it from an old-style
-            # course key
-            except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
-
-        print "Fetching enrolled students for {0}".format(course_key)
+        course_id = options['course']
+        print "Fetching enrolled students for {0}".format(course_id)
         enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_key
-        )
+            courseenrollment__course_id=course_id)
         factory = RequestMock()
         request = factory.get('/')
 
         total = enrolled_students.count()
         print "Total enrolled: {0}".format(total)
-        course = courses.get_course_by_id(course_key)
+        course = courses.get_course_by_id(course_id)
         total = enrolled_students.count()
         start = datetime.datetime.now()
         rows = []
         header = None
         print "Fetching certificate data"
-        cert_grades = {
-            cert.user.username: cert.grade
-            for cert in list(
-                GeneratedCertificate.objects.filter(course_id=course_key).prefetch_related('user')
-            )
-        }
+        cert_grades = {cert.user.username: cert.grade
+                       for cert in list(GeneratedCertificate.objects.filter(
+                       course_id=course_id).prefetch_related('user'))}
         print "Grading students"
         for count, student in enumerate(enrolled_students):
             count += 1

@@ -24,7 +24,7 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -101,14 +101,8 @@ class CapaFactory(object):
 
             attempts: also added to instance state.  Will be converted to an int.
         """
-        location = Location(
-            "edX",
-            "capa_test",
-            "2012_Fall",
-            "problem",
-            "SampleProblem{0}".format(cls.next_num()),
-            None
-        )
+        location = Location(["i4x", "edX", "capa_test", "problem",
+                             "SampleProblem{0}".format(cls.next_num())])
         if xml is None:
             xml = cls.sample_problem_xml
         field_data = {'data': xml}

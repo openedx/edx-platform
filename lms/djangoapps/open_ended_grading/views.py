@@ -1,9 +1,11 @@
 import logging
 
+from django.conf import settings
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
+from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
@@ -14,20 +16,19 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from edxmako.shortcuts import render_to_string
 from django.utils.translation import ugettext as _
 
-from open_ended_grading.utils import (
-    STAFF_ERROR_MESSAGE, StudentProblemList, generate_problem_url, create_controller_query_service
-)
+from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE,
+                                      StudentProblemList, generate_problem_url, create_controller_query_service)
 
 log = logging.getLogger(__name__)
 
-
-def _reverse_with_slash(url_name, course_key):
+def _reverse_with_slash(url_name, course_id):
     """
     Reverses the URL given the name and the course id, and then adds a trailing slash if
     it does not exist yet.
@@ -35,14 +36,13 @@ def _reverse_with_slash(url_name, course_key):
     @param course_id: The id of the course object (eg course.id).
     @returns: The reversed url with a trailing slash.
     """
-    ajax_url = _reverse_without_slash(url_name, course_key)
+    ajax_url = _reverse_without_slash(url_name, course_id)
     if not ajax_url.endswith('/'):
         ajax_url += '/'
     return ajax_url
 
 
-def _reverse_without_slash(url_name, course_key):
-    course_id = course_key.to_deprecated_string()
+def _reverse_without_slash(url_name, course_id):
     ajax_url = reverse(url_name, kwargs={'course_id': course_id})
     return ajax_url
 
@@ -66,10 +66,9 @@ def staff_grading(request, course_id):
     """
     Show the instructor grading interface.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
-    ajax_url = _reverse_with_slash('staff_grading', course_key)
+    ajax_url = _reverse_with_slash('staff_grading', course_id)
 
     return render_to_response('instructor/staff_grading.html', {
         'course': course,
@@ -91,15 +90,18 @@ def find_peer_grading_module(course):
     found_module = False
     problem_url = ""
 
+    # Get the course id and split it.
+    peer_grading_query = course.location.replace(category='peergrading', name=None)
     # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
-    items = modulestore().get_items(course.id, category='peergrading')
-    # See if any of the modules are centralized modules (ie display info from multiple problems)
+    items = modulestore().get_items(peer_grading_query, course_id=course.id)
+    #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     # Loop through all potential peer grading modules, and find the first one that has a path to it.
     for item in items:
+        item_location = item.location
         # Generate a url for the first module and redirect the user to it.
         try:
-            problem_url_parts = search.path_to_location(modulestore(), item.location)
+            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         except NoPathToItem:
             # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
             # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
@@ -117,9 +119,9 @@ def peer_grading(request, course_id):
     When a student clicks on the "peer grading" button in the open ended interface, link them to a peer grading
     xmodule in the course.
     '''
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
     #Get the current course
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_with_access(request.user, course_id, 'load')
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
@@ -142,17 +144,16 @@ def student_problem_list(request, course_id):
     @param course_id: The id of the course to get the problem list for.
     @return: Renders an HTML problem list table.
     """
-    assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
     # Load the course.  Don't catch any errors here, as we want them to be loud.
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_with_access(request.user, course_id, 'load')
 
     # The anonymous student id is needed for communication with ORA.
     student_id = unique_id_for_user(request.user)
     base_course_url = reverse('courses')
     error_text = ""
 
-    student_problem_list = StudentProblemList(course_key, student_id)
+    student_problem_list = StudentProblemList(course_id, student_id)
     # Get the problem list from ORA.
     success = student_problem_list.fetch_from_grading_service()
     # If we fetched the problem list properly, add in additional problem data.
@@ -164,11 +165,11 @@ def student_problem_list(request, course_id):
         valid_problems = []
         error_text = student_problem_list.error_text
 
-    ajax_url = _reverse_with_slash('open_ended_problems', course_key)
+    ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
     context = {
         'course': course,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': course_id,
         'ajax_url': ajax_url,
         'success': success,
         'problem_list': valid_problems,
@@ -184,18 +185,19 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key)
+    course = get_course_with_access(request.user, course_id, 'staff')
+    student_id = unique_id_for_user(request.user)
 
     # call problem list service
     success = False
     error_text = ""
     problem_list = []
+    base_course_url = reverse('courses')
 
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()
     try:
-        problem_list_dict = controller_qs.get_flagged_problem_list(course_key)
+        problem_list_dict = controller_qs.get_flagged_problem_list(course_id)
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
@@ -217,7 +219,7 @@ def flagged_problem_list(request, course_id):
         log.error("Could not parse problem list from external grading service response.")
         success = False
 
-    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_key)
+    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
     context = {
         'course': course,
         'course_id': course_id,
@@ -236,8 +238,7 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
     response = notifications['response']
@@ -249,7 +250,7 @@ def combined_notifications(request, course_id):
         if tag in response:
             url_name = notification_tuples[response_num][1]
             human_name = notification_tuples[response_num][2]
-            url = _reverse_without_slash(url_name, course_key)
+            url = _reverse_without_slash(url_name, course_id)
             has_img = response[tag]
 
             # check to make sure we have descriptions and alert messages
@@ -281,7 +282,7 @@ def combined_notifications(request, course_id):
             else:
                 notification_list.append(notification_item)
 
-    ajax_url = _reverse_with_slash('open_ended_notifications', course_key)
+    ajax_url = _reverse_with_slash('open_ended_notifications', course_id)
     combined_dict = {
         'error_text': "",
         'notification_list': notification_list,
@@ -299,7 +300,6 @@ def take_action_on_flags(request, course_id):
     Takes action on student flagged submissions.
     Currently, only support unflag and ban actions.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if request.method != 'POST':
         raise Http404
 
@@ -324,7 +324,7 @@ def take_action_on_flags(request, course_id):
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()
     try:
-        response = controller_qs.take_action_on_flags(course_key, student_id, submission_id, action_type)
+        response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(json.dumps(response), mimetype="application/json")
     except GradingServiceError:
         log.exception(

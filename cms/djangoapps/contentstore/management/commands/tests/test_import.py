@@ -14,7 +14,6 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -23,18 +22,18 @@ class TestImport(ModuleStoreTestCase):
     Unit tests for importing a course from command line
     """
 
-    BASE_COURSE_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2013_Spring')
-    DIFF_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2014_Spring')
-    TRUNCATED_KEY = SlashSeparatedCourseKey(u'edX', u'test_import', u'2014_Spring')
+    BASE_COURSE_ID = ['EDx', '0.00x', '2013_Spring', ]
+    DIFF_RUN = ['EDx', '0.00x', '2014_Spring', ]
+    TRUNCATED_COURSE = ['EDx', '0.00', '2014_Spring', ]
 
     def create_course_xml(self, content_dir, course_id):
         directory = tempfile.mkdtemp(dir=content_dir)
         os.makedirs(os.path.join(directory, "course"))
         with open(os.path.join(directory, "course.xml"), "w+") as f:
-            f.write('<course url_name="{0.run}" org="{0.org}" '
-                    'course="{0.course}"/>'.format(course_id))
+            f.write('<course url_name="{0[2]}" org="{0[0]}" '
+                    'course="{0[1]}"/>'.format(course_id))
 
-        with open(os.path.join(directory, "course", "{0.run}.xml".format(course_id)), "w+") as f:
+        with open(os.path.join(directory, "course", "{0[2]}.xml".format(course_id)), "w+") as f:
             f.write('<course></course>')
 
         return directory
@@ -48,22 +47,22 @@ class TestImport(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, self.content_dir)
 
         # Create good course xml
-        self.good_dir = self.create_course_xml(self.content_dir, self.BASE_COURSE_KEY)
+        self.good_dir = self.create_course_xml(self.content_dir, self.BASE_COURSE_ID)
 
         # Create run changed course xml
-        self.dupe_dir = self.create_course_xml(self.content_dir, self.DIFF_KEY)
+        self.dupe_dir = self.create_course_xml(self.content_dir, self.DIFF_RUN)
 
         # Create course XML where TRUNCATED_COURSE.org == BASE_COURSE_ID.org
         # and BASE_COURSE_ID.startswith(TRUNCATED_COURSE.course)
-        self.course_dir = self.create_course_xml(self.content_dir, self.TRUNCATED_KEY)
+        self.course_dir = self.create_course_xml(self.content_dir, self.TRUNCATED_COURSE)
 
     def test_forum_seed(self):
         """
         Tests that forum roles were created with import.
         """
-        self.assertFalse(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
+        self.assertFalse(are_permissions_roles_seeded('/'.join(self.BASE_COURSE_ID)))
         call_command('import', self.content_dir, self.good_dir)
-        self.assertTrue(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
+        self.assertTrue(are_permissions_roles_seeded('/'.join(self.BASE_COURSE_ID)))
 
     def test_duplicate_with_url(self):
         """
@@ -74,11 +73,11 @@ class TestImport(ModuleStoreTestCase):
         # Load up base course and verify it is available
         call_command('import', self.content_dir, self.good_dir)
         store = modulestore()
-        self.assertIsNotNone(store.get_course(self.BASE_COURSE_KEY))
+        self.assertIsNotNone(store.get_course('/'.join(self.BASE_COURSE_ID)))
 
         # Now load up duped course and verify it doesn't load
         call_command('import', self.content_dir, self.dupe_dir)
-        self.assertIsNone(store.get_course(self.DIFF_KEY))
+        self.assertIsNone(store.get_course('/'.join(self.DIFF_RUN)))
 
     def test_truncated_course_with_url(self):
         """
@@ -90,8 +89,8 @@ class TestImport(ModuleStoreTestCase):
         # Load up base course and verify it is available
         call_command('import', self.content_dir, self.good_dir)
         store = modulestore()
-        self.assertIsNotNone(store.get_course(self.BASE_COURSE_KEY))
+        self.assertIsNotNone(store.get_course('/'.join(self.BASE_COURSE_ID)))
 
         # Now load up the course with a similar course_id and verify it loads
         call_command('import', self.content_dir, self.course_dir)
-        self.assertIsNotNone(store.get_course(self.TRUNCATED_KEY))
+        self.assertIsNotNone(store.get_course('/'.join(self.TRUNCATED_COURSE)))

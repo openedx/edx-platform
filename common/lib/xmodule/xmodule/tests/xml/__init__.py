@@ -7,8 +7,8 @@ from unittest import TestCase
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.xml import create_block_from_xml, CourseLocationGenerator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from xmodule.modulestore.xml import create_block_from_xml, LocationReader, CourseLocationGenerator
+from xmodule.modulestore import Location
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
@@ -18,7 +18,8 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
     The simplest possible XMLParsingSystem
     """
     def __init__(self, xml_import_data):
-        self.course_id = SlashSeparatedCourseKey.from_deprecated_string(xml_import_data.course_id)
+        self.org = xml_import_data.org
+        self.course = xml_import_data.course
         self.default_class = xml_import_data.default_class
         self._descriptors = {}
 
@@ -36,6 +37,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             select=xml_import_data.xblock_select,
             render_template=lambda template, context: pprint.pformat((template, context)),
             field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
@@ -43,14 +45,14 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         descriptor = create_block_from_xml(
             xml,
             self,
-            CourseLocationGenerator(self.course_id),
+            CourseLocationGenerator(self.org, self.course),
         )
-        self._descriptors[descriptor.location.to_deprecated_string()] = descriptor
+        self._descriptors[descriptor.location.url()] = descriptor
         return descriptor
 
     def load_item(self, location):  # pylint: disable=method-hidden
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[location.to_deprecated_string()]
+        return self._descriptors[Location(location).url()]
 
 
 class XModuleXmlImportTest(TestCase):

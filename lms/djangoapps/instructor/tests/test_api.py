@@ -20,7 +20,6 @@ from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from django_comment_common.utils import seed_permissions_roles
 from django.core import mail
 from django.utils.timezone import utc
-from django.test import RequestFactory
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -30,7 +29,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
-from microsite_configuration import microsite
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
@@ -39,11 +37,10 @@ from courseware.models import StudentModule
 import instructor_task.api
 from instructor.access import allow_access
 import instructor.views.api
-from instructor.views.api import _split_input_list, common_exceptions_400
+from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from .test_tools import msk_from_problem_urlname, get_extended_due
+from .test_tools import get_extended_due
 
 
 @common_exceptions_400
@@ -114,15 +111,14 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-        self.problem_urlname = self.problem_location.to_deprecated_string()
+        self.problem_urlname = 'robot-some-problem-urlname'
         _module = StudentModule.objects.create(
             student=self.user,
             course_id=self.course.id,
-            module_state_key=self.problem_location,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
             state=json.dumps({'attempts': 10}),
         )
 
@@ -160,11 +156,13 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         status_code: expected HTTP status code response
         msg: message to display if assertion fails.
         """
-        url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
-        if endpoint in ['send_email']:
+        url = reverse(endpoint, kwargs={'course_id': self.course.id})
+        if endpoint in 'send_email':
             response = self.client.post(url, args)
         else:
             response = self.client.get(url, args)
+        print endpoint
+        print response
         self.assertEqual(
             response.status_code,
             status_code,
@@ -197,7 +195,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Ensure that a staff member can't access instructor endpoints.
         """
-        staff_member = StaffFactory(course_key=self.course.id)
+        staff_member = StaffFactory(course=self.course.location)
         CourseEnrollment.enroll(staff_member, self.course.id)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
@@ -226,7 +224,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Ensure that an instructor member can access all endpoints.
         """
-        inst = InstructorFactory(course_key=self.course.id)
+        inst = InstructorFactory(course=self.course.location)
         CourseEnrollment.enroll(inst, self.course.id)
         self.client.login(username=inst.username, password='test')
 
@@ -263,9 +261,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
     def setUp(self):
-        self.request = RequestFactory().request()
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
@@ -296,27 +293,21 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # (comment because pylint C0103)
         # self.maxDiff = None
 
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
     def test_missing_params(self):
         """ Test missing all query parameters. """
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
     def test_bad_action(self):
         """ Test with an invalid action. """
         action = 'robot-not-an-action'
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
     def test_invalid_email(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': 'percivaloctavius@', 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
@@ -336,7 +327,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(res_json, expected)
 
     def test_invalid_username(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': 'percivaloctavius', 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
@@ -356,7 +347,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(res_json, expected)
 
     def test_enroll_with_username(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
@@ -387,7 +378,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(res_json, expected)
 
     def test_enroll_without_email(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False})
         print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
@@ -427,7 +418,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @ddt.data('http', 'https')
     def test_enroll_with_email(self, protocol):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
@@ -485,7 +476,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @ddt.data('http', 'https')
     def test_enroll_with_email_not_registered(self, protocol):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
@@ -512,9 +503,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     @ddt.data('http', 'https')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_mktgsite(self, protocol):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
+
+        # Try with marketing site enabled
         response = self.client.get(url, params, **environ)
 
         self.assertEqual(response.status_code, 200)
@@ -531,11 +524,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @ddt.data('http', 'https')
     def test_enroll_with_email_not_registered_autoenroll(self, protocol):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -556,7 +549,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_unenroll_without_email(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': False})
         print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
@@ -595,7 +588,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_unenroll_with_email(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': True})
         print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
@@ -646,7 +639,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_unenroll_with_email_allowed_student(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
         print "type(self.allowed_email): {}".format(type(self.allowed_email))
         self.assertEqual(response.status_code, 200)
@@ -695,7 +688,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_enroll_with_email_not_registered_with_shib(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
@@ -718,12 +711,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     @patch('instructor.enrollment.uses_shib')
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
-        # Try with marketing site enabled and shib on
         mock_uses_shib.return_value = True
 
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         # Try with marketing site enabled
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
@@ -740,11 +731,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_enroll_with_email_not_registered_with_shib_autoenroll(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -772,15 +763,14 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.beta_tester = BetaTesterFactory(course_key=self.course.id)
+        self.beta_tester = BetaTesterFactory(course=self.course.location)
         CourseEnrollment.enroll(
             self.beta_tester,
             self.course.id
         )
-        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
 
         self.notenrolled_student = UserFactory(username='NotEnrolledStudent')
 
@@ -804,14 +794,14 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
     def test_bad_action(self):
         """ Test with an invalid action. """
         action = 'robot-not-an-action'
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
@@ -827,7 +817,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         Additionally asserts no email was sent.
         """
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
         # test the response data
         expected = {
             "action": "add",
@@ -847,38 +837,38 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 0)
 
     def test_add_notenrolled_email(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_email_autoenroll(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username_autoenroll(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email(self, protocol):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
-        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
         # test the response data
         expected = {
             "action": "add",
@@ -917,13 +907,14 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email_autoenroll(self, protocol):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.get(url, params, **environ)
+
         self.assertEqual(response.status_code, 200)
 
-        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
         # test the response data
         expected = {
             "action": "add",
@@ -960,11 +951,11 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             )
         )
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_add_notenrolled_email_mktgsite(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         # Try with marketing site enabled
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -980,7 +971,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_enroll_with_email_not_registered(self):
         # User doesn't exist
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'add', 'email_students': True})
         self.assertEqual(response.status_code, 200)
         # test the response data
@@ -1001,15 +992,11 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 0)
 
     def test_remove_without_email(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
-        # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
-        # the instance fetched from the email above which had its cache cleared
-        if hasattr(self.beta_tester, '_roles'):
-            del self.beta_tester._roles
-        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
 
         # test the response data
         expected = {
@@ -1029,15 +1016,11 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 0)
 
     def test_remove_with_email(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
-        # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
-        # the instance fetched from the email above which had its cache cleared
-        if hasattr(self.beta_tester, '_roles'):
-            del self.beta_tester._roles
-        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
 
         # test the response data
         expected = {
@@ -1086,22 +1069,24 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.other_instructor = InstructorFactory(course_key=self.course.id)
-        self.other_staff = StaffFactory(course_key=self.course.id)
+        self.other_instructor = UserFactory()
+        allow_access(self.course, self.other_instructor, 'instructor')
+        self.other_staff = UserFactory()
+        allow_access(self.course, self.other_staff, 'staff')
         self.other_user = UserFactory()
 
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
     def test_modify_access_bad_action(self):
         """ Test with an invalid action parameter. """
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'staff',
@@ -1111,7 +1096,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 
     def test_modify_access_bad_role(self):
         """ Test with an invalid action parameter. """
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'robot-not-a-roll',
@@ -1120,16 +1105,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         self.assertEqual(response.status_code, 400)
 
     def test_modify_access_allow(self):
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'unique_student_identifier': self.other_user.email,
+            'unique_student_identifier': self.other_instructor.email,
             'rolename': 'staff',
             'action': 'allow',
         })
         self.assertEqual(response.status_code, 200)
 
     def test_modify_access_allow_with_uname(self):
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
@@ -1138,7 +1123,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         self.assertEqual(response.status_code, 200)
 
     def test_modify_access_revoke(self):
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'staff',
@@ -1147,7 +1132,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         self.assertEqual(response.status_code, 200)
 
     def test_modify_access_revoke_with_username(self):
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_staff.username,
             'rolename': 'staff',
@@ -1156,7 +1141,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         self.assertEqual(response.status_code, 200)
 
     def test_modify_access_with_fake_user(self):
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': 'GandalfTheGrey',
             'rolename': 'staff',
@@ -1173,7 +1158,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     def test_modify_access_with_inactive_user(self):
         self.other_user.is_active = False
         self.other_user.save()  # pylint: disable=no-member
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_user.username,
             'rolename': 'beta',
@@ -1189,7 +1174,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 
     def test_modify_access_revoke_not_allowed(self):
         """ Test revoking access that a user does not have. """
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'instructor',
@@ -1201,7 +1186,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         """
         Test that an instructor cannot remove instructor privelages from themself.
         """
-        url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'unique_student_identifier': self.instructor.email,
             'rolename': 'instructor',
@@ -1220,28 +1205,30 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 
     def test_list_course_role_members_noparams(self):
         """ Test missing all query parameters. """
-        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
     def test_list_course_role_members_bad_rolename(self):
         """ Test with an invalid rolename parameter. """
-        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'rolename': 'robot-not-a-rolename',
         })
+        print response
         self.assertEqual(response.status_code, 400)
 
     def test_list_course_role_members_staff(self):
-        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'rolename': 'staff',
         })
+        print response
         self.assertEqual(response.status_code, 200)
 
         # check response content
         expected = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': self.course.id,
             'staff': [
                 {
                     'username': self.other_staff.username,
@@ -1255,15 +1242,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         self.assertEqual(res_json, expected)
 
     def test_list_course_role_members_beta(self):
-        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_course_role_members', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'rolename': 'beta',
         })
+        print response
         self.assertEqual(response.status_code, 200)
 
         # check response content
         expected = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': self.course.id,
             'beta': []
         }
         res_json = json.loads(response.content)
@@ -1301,7 +1289,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         Get unique_student_identifier, rolename and action and update forum role.
         """
 
-        url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id})
         response = self.client.get(
             url,
             {
@@ -1329,7 +1317,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -1341,7 +1329,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.
         """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_students_features', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {})
         res_json = json.loads(response.content)
         self.assertIn('students', res_json)
@@ -1359,7 +1347,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         """
         Test the CSV output for the anonymized user ids.
         """
-        url = reverse('get_anon_ids', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_anon_ids', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {})
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
@@ -1370,7 +1358,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertTrue(body.endswith('"7","41","42"\n'))
 
     def test_list_report_downloads(self):
-        url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_report_downloads', kwargs={'course_id': self.course.id})
         with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
             mock_links_for.return_value = [
                 ('mock_file_name_1', 'https://1.mock.url'),
@@ -1396,7 +1384,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res_json, expected_response)
 
     def test_calculate_grades_csv_success(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id})
 
         with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
             mock_cal_grades.return_value = True
@@ -1405,7 +1393,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertIn(success_status, response.content)
 
     def test_calculate_grades_csv_already_running(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id})
 
         with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
             mock_cal_grades.side_effect = AlreadyRunningError()
@@ -1418,7 +1406,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.
         """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_students_features', kwargs={'course_id': self.course.id})
         response = self.client.get(url + '/csv', {})
         self.assertEqual(response['Content-Type'], 'text/csv')
 
@@ -1427,13 +1415,13 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that get_distribution lists available features
         when supplied no feature parameter.
         """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_distribution', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(type(res_json['available_features']), list)
 
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_distribution', kwargs={'course_id': self.course.id})
         response = self.client.get(url + u'?feature=')
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
@@ -1444,7 +1432,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that get_distribution fails gracefully with
             an unavailable feature.
         """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_distribution', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'feature': 'robot-not-a-real-feature'})
         self.assertEqual(response.status_code, 400)
 
@@ -1453,10 +1441,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that get_distribution fails gracefully with
             an unavailable feature.
         """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_distribution', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'feature': 'gender'})
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
+        print res_json
         self.assertEqual(res_json['feature_results']['data']['m'], 6)
         self.assertEqual(res_json['feature_results']['choices_display_names']['m'], 'Male')
         self.assertEqual(res_json['feature_results']['data']['no_data'], 0)
@@ -1464,35 +1453,39 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
         url += "?unique_student_identifier={}".format(
             quote(self.students[0].email.encode("utf-8"))
         )
+        print url
         response = self.client.get(url)
+        print response
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertIn('progress_url', res_json)
 
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
         url += "?unique_student_identifier={}".format(
             quote(self.students[0].username.encode("utf-8"))
         )
+        print url
         response = self.client.get(url)
+        print response
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertIn('progress_url', res_json)
 
     def test_get_student_progress_url_noparams(self):
         """ Test that the endpoint 404's without the required query params. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
     def test_get_student_progress_url_nostudent(self):
         """ Test that the endpoint 400's when requesting an unknown email. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
@@ -1508,42 +1501,42 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
 
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-        self.problem_urlname = self.problem_location.to_deprecated_string()
-
+        self.problem_urlname = 'robot-some-problem-urlname'
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
-            module_state_key=self.problem_location,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
             state=json.dumps({'attempts': 10}),
         )
 
     def test_reset_student_attempts_deletall(self):
         """ Make sure no one can delete all students state on a problem. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
             'delete_module': True,
         })
+        print response.content
         self.assertEqual(response.status_code, 400)
 
     def test_reset_student_attempts_single(self):
         """ Test reset single student attempts. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         # make sure problem attempts have been reset.
         changed_module = StudentModule.objects.get(pk=self.module_to_reset.pk)
@@ -1556,82 +1549,89 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     @patch.object(instructor_task.api, 'submit_reset_problem_attempts_for_all_students')
     def test_reset_student_attempts_all(self, act):
         """ Test reset all student attempts. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
     def test_reset_student_attempts_missingmodule(self):
         """ Test reset for non-existant problem. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': 'robot-not-a-real-module',
             'unique_student_identifier': self.student.email,
         })
+        print response.content
         self.assertEqual(response.status_code, 400)
 
     def test_reset_student_attempts_delete(self):
         """ Test delete single student state. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
             'delete_module': True,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         # make sure the module has been deleted
         self.assertEqual(
             StudentModule.objects.filter(
                 student=self.module_to_reset.student,
                 course_id=self.module_to_reset.course_id,
-                # module_id=self.module_to_reset.module_id,
+                # module_state_key=self.module_to_reset.module_state_key,
             ).count(),
             0
         )
 
     def test_reset_student_attempts_nonsense(self):
         """ Test failure with both unique_student_identifier and all_students. """
-        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
             'all_students': True,
         })
+        print response.content
         self.assertEqual(response.status_code, 400)
 
     @patch.object(instructor_task.api, 'submit_rescore_problem_for_student')
     def test_rescore_problem_single(self, act):
         """ Test rescoring of a single student. """
-        url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
     @patch.object(instructor_task.api, 'submit_rescore_problem_for_student')
     def test_rescore_problem_single_from_uname(self, act):
         """ Test rescoring of a single student. """
-        url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.username,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
     @patch.object(instructor_task.api, 'submit_rescore_problem_for_all_students')
     def test_rescore_problem_all(self, act):
         """ Test rescoring for all students. """
-        url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
@@ -1646,7 +1646,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
@@ -1657,13 +1657,13 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
     def test_send_email_as_logged_in_instructor(self):
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, self.full_test_message)
         self.assertEqual(response.status_code, 200)
 
     def test_send_email_but_not_logged_in(self):
         self.client.logout()
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, self.full_test_message)
         self.assertEqual(response.status_code, 403)
 
@@ -1671,7 +1671,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.client.logout()
         student = UserFactory()
         self.client.login(username=student.username, password='test')
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, self.full_test_message)
         self.assertEqual(response.status_code, 403)
 
@@ -1681,7 +1681,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotEqual(response.status_code, 200)
 
     def test_send_email_no_sendto(self):
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {
             'subject': 'test subject',
             'message': 'test message',
@@ -1689,7 +1689,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_send_email_no_subject(self):
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {
             'send_to': 'staff',
             'message': 'test message',
@@ -1697,7 +1697,7 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_send_email_no_message(self):
-        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {
             'send_to': 'staff',
             'subject': 'test subject',
@@ -1768,22 +1768,20 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
 
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-        self.problem_urlname = self.problem_location.to_deprecated_string()
-
+        self.problem_urlname = 'robot-some-problem-urlname'
         self.module = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
-            module_state_key=self.problem_location,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
             state=json.dumps({'attempts': 10}),
         )
         mock_factory = MockCompletionInfo()
@@ -1800,7 +1798,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
@@ -1819,7 +1817,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_list_background_email_tasks(self, act):
         """Test list of background email tasks."""
         act.return_value = self.tasks
-        url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id})
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
@@ -1838,12 +1836,12 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {
-                'problem_location_str': self.problem_urlname,
+                'problem_urlname': self.problem_urlname,
             })
         self.assertEqual(response.status_code, 200)
 
@@ -1859,12 +1857,12 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {
-                'problem_location_str': self.problem_urlname,
+                'problem_urlname': self.problem_urlname,
                 'unique_student_identifier': self.student.email,
             })
         self.assertEqual(response.status_code, 200)
@@ -1901,7 +1899,7 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
     @patch.object(instructor.views.api.requests, 'get')
@@ -1909,17 +1907,18 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         """ Test legacy analytics proxy url generation. """
         act.return_value = self.FakeProxyResponse()
 
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'aname': 'ProblemGradeDistribution'
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
 
         # check request url
-        expected_url = "{url}get?aname={aname}&course_id={course_id!s}&apikey={api_key}".format(
+        expected_url = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
             url="http://robotanalyticsserver.netbot:900/",
             aname="ProblemGradeDistribution",
-            course_id=self.course.id.to_deprecated_string(),
+            course_id=self.course.id,
             api_key="robot_api_key",
         )
         act.assert_called_once_with(expected_url)
@@ -1931,10 +1930,11 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         """
         act.return_value = self.FakeProxyResponse()
 
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'aname': 'ProblemGradeDistribution'
         })
+        print response.content
         self.assertEqual(response.status_code, 200)
 
         # check response
@@ -1947,10 +1947,11 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         """ Test proxy when server reponds with failure. """
         act.return_value = self.FakeBadProxyResponse()
 
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'aname': 'ProblemGradeDistribution'
         })
+        print response.content
         self.assertEqual(response.status_code, 500)
 
     @patch.object(instructor.views.api.requests, 'get')
@@ -1958,8 +1959,9 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         """ Test proxy when missing the aname query parameter. """
         act.return_value = self.FakeProxyResponse()
 
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {})
+        print response.content
         self.assertEqual(response.status_code, 400)
         self.assertFalse(act.called)
 
@@ -1983,15 +1985,31 @@ class TestInstructorAPIHelpers(TestCase):
         self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
 
     def test_msk_from_problem_urlname(self):
-        course_id = SlashSeparatedCourseKey('MITx', '6.002x', '2013_Spring')
-        name = 'L2Node1'
-        output = 'i4x://MITx/6.002x/problem/L2Node1'
-        self.assertEqual(msk_from_problem_urlname(course_id, name).to_deprecated_string(), output)
+        course_id = 'RobotU/Robots101/3001_Spring'
+        capa_urlname = 'capa_urlname'
+        capa_urlname_xml = 'capa_urlname.xml'
+        xblock_urlname = 'notaproblem/someothername'
+        xblock_urlname_xml = 'notaproblem/someothername.xml'
+
+        capa_msk = 'i4x://RobotU/Robots101/problem/capa_urlname'
+        xblock_msk = 'i4x://RobotU/Robots101/notaproblem/someothername'
+
+        for urlname in [capa_urlname, capa_urlname_xml]:
+            self.assertEqual(
+                _msk_from_problem_urlname(course_id, urlname),
+                capa_msk
+            )
+
+        for urlname in [xblock_urlname, xblock_urlname_xml]:
+            self.assertEqual(
+                _msk_from_problem_urlname(course_id, urlname),
+                xblock_msk
+            )
 
     @raises(ValueError)
     def test_msk_from_problem_urlname_error(self):
         args = ('notagoodcourse', 'L2Node1')
-        msk_from_problem_urlname(*args)
+        _msk_from_problem_urlname(*args)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -2009,60 +2027,60 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
         week3 = ItemFactory.create(due=due)
-        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
-                           week3.location.to_deprecated_string()]
+        course.children = [week1.location.url(), week2.location.url(),
+                           week3.location.url()]
 
         homework = ItemFactory.create(
             parent_location=week1.location,
             due=due
         )
-        week1.children = [homework.location.to_deprecated_string()]
+        week1.children = [homework.location.url()]
 
         user1 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location).save()
+            module_state_key=week2.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location).save()
+            module_state_key=week3.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_state_key=week1.location.url()).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_state_key=homework.location.url()).save()
 
         self.course = course
         self.week1 = week1
@@ -2071,14 +2089,14 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.user1 = user1
         self.user2 = user2
 
-        self.instructor = InstructorFactory(course_key=course.id)
+        self.instructor = InstructorFactory(course=course.location)
         self.client.login(username=self.instructor.username, password='test')
 
     def test_change_due_date(self):
-        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'student': self.user1.username,
-            'url': self.week1.location.to_deprecated_string(),
+            'url': self.week1.location.url(),
             'due_datetime': '12/30/2013 00:00'
         })
         self.assertEqual(response.status_code, 200, response.content)
@@ -2087,10 +2105,10 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_reset_date(self):
         self.test_change_due_date()
-        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'student': self.user1.username,
-            'url': self.week1.location.to_deprecated_string(),
+            'url': self.week1.location.url(),
         })
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(None,
@@ -2099,8 +2117,8 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_show_unit_extensions(self):
         self.test_change_due_date()
         url = reverse('show_unit_extensions',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'url': self.week1.location.to_deprecated_string()})
+                      kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'url': self.week1.location.url()})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(json.loads(response.content), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
@@ -2113,7 +2131,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_show_student_extensions(self):
         self.test_change_due_date()
         url = reverse('show_student_extensions',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+                      kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'student': self.user1.username})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(json.loads(response.content), {

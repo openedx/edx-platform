@@ -8,13 +8,12 @@ from django.http import Http404
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-from xmodule.modulestore import XML_MODULESTORE_TYPE
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location, XML_MODULESTORE_TYPE, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from static_replace import replace_static_urls
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
@@ -43,69 +42,70 @@ def get_course(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
-    If the course does not exist, raises a ValueError.  This is appropriate
+    If course_id is not valid, raises a ValueError.  This is appropriate
     for internal use.
 
     depth: The number of levels of children for the modulestore to cache.
     None means infinite depth.  Default is to fetch no children.
     """
-    course = modulestore().get_course(course_id, depth=depth)
-    if course is None:
+    try:
+        course_loc = CourseDescriptor.id_to_location(course_id)
+        return modulestore().get_instance(course_id, course_loc, depth=depth)
+    except (KeyError, ItemNotFoundError):
         raise ValueError(u"Course not found: {0}".format(course_id))
-    return course
+    except InvalidLocationError:
+        raise ValueError(u"Invalid location: {0}".format(course_id))
 
 
-# TODO please rename this function to get_course_by_key at next opportunity!
-def get_course_by_id(course_key, depth=0):
+def get_course_by_id(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
-    If such a course does not exist, raises a 404.
+    If course_id is not valid, raises a 404.
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    course = modulestore().get_course(course_key, depth=depth)
-    if course:
-        return course
-    else:
+    try:
+        course_loc = CourseDescriptor.id_to_location(course_id)
+        return modulestore().get_instance(course_id, course_loc, depth=depth)
+    except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
+    except InvalidLocationError:
+        raise Http404("Invalid location")
 
 
-def get_course_with_access(user, action, course_key, depth=0):
+def get_course_with_access(user, course_id, action, depth=0):
     """
-    Given a course_key, look up the corresponding course descriptor,
+    Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
     on the course, and return the descriptor.
 
-    Raises a 404 if the course_key is invalid, or the user doesn't have access.
+    Raises a 404 if the course_id is invalid, or the user doesn't have access.
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    assert isinstance(course_key, CourseKey)
-    course = get_course_by_id(course_key, depth=depth)
-
-    if not has_access(user, action, course, course_key):
+    course = get_course_by_id(course_id, depth=depth)
+    if not has_access(user, course, action):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
-
     return course
 
 
-def get_opt_course_with_access(user, action, course_key):
+def get_opt_course_with_access(user, course_id, action):
     """
-    Same as get_course_with_access, except that if course_key is None,
+    Same as get_course_with_access, except that if course_id is None,
     return None without performing any access checks.
     """
-    if course_key is None:
+    if course_id is None:
         return None
-    return get_course_with_access(user, action, course_key)
+    return get_course_with_access(user, course_id, action)
 
 
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
+    if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
         # If we are a static course with the course_image attribute
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
@@ -116,8 +116,8 @@ def course_image_url(course):
         else:
             url += '/images/course_image.jpg'
     else:
-        loc = StaticContent.compute_location(course.id, course.course_image)
-        url = loc.to_deprecated_string()
+        loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
+        url = StaticContent.get_url_path_from_location(loc)
     return url
 
 
@@ -166,7 +166,7 @@ def get_course_about_section(course, section_key):
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
 
-    # TODO: Remove number, instructors from this list
+# TODO: Remove number, instructors from this list
     if section_key in ['short_description', 'description', 'key_dates', 'video',
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
@@ -207,7 +207,7 @@ def get_course_about_section(course, section_key):
 
         except ItemNotFoundError:
             log.warning(
-                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
+                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.url())
             )
             return None
     elif section_key == "title":
@@ -231,14 +231,14 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    usage_key = course.id.make_usage_key('course_info', section_key)
+    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
-        usage_key,
+        loc,
         field_data_cache,
         course.id,
         log_if_not_found=False,
@@ -288,12 +288,12 @@ def get_course_syllabus_section(course, section_key):
                 return replace_static_urls(
                     html_file.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
-                    course_id=course.id,
+                    course_id=course.location.course_id,
                     static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:
             log.exception(
-                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
+                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.url())
             )
             return "! Syllabus missing !"
 
@@ -321,7 +321,7 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, 'see_exists', c)]
+    courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
     courses = sorted(courses, key=lambda course: course.number)
 
@@ -341,14 +341,15 @@ def sort_by_announcement(courses):
     return courses
 
 
-def get_cms_course_link(course, page='course'):
+def get_cms_course_link(course):
     """
     Returns a link to course_index for editing the course in cms,
     assuming that the course is actually cms-backed.
     """
-    # This is fragile, but unfortunately the problem is that within the LMS we
-    # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, unicode(course.id))
+    locator = loc_mapper().translate_location(
+        course.location.course_id, course.location, False, True
+    )
+    return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')
 
 
 def get_cms_block_link(block, page):
@@ -356,20 +357,20 @@ def get_cms_block_link(block, page):
     Returns a link to block_index for editing the course in cms,
     assuming that the block is actually cms-backed.
     """
-    # This is fragile, but unfortunately the problem is that within the LMS we
-    # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
+    locator = loc_mapper().translate_location(
+        block.location.course_id, block.location, False, True
+    )
+    return "//" + settings.CMS_BASE + locator.url_reverse(page, '')
 
 
-def get_studio_url(course_key, page):
+def get_studio_url(course_id, page):
     """
     Get the Studio URL of the page that is passed in.
     """
-    assert(isinstance(course_key, CourseKey))
-    course = get_course_by_id(course_key)
+    course = get_course_by_id(course_id)
     is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course_key) == MONGO_MODULESTORE_TYPE
+    is_mongo_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
     studio_link = None
     if is_studio_course and is_mongo_course:
-        studio_link = get_cms_course_link(course, page)
+        studio_link = get_cms_block_link(course, page)
     return studio_link

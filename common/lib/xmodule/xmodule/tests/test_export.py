@@ -22,7 +22,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, Integer
 from xblock.test.tools import blocks_are_equivalent
 
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.xml_exporter import (
     EdxJSONEncoder, convert_between_versions, get_version
@@ -36,7 +36,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print("strip filename from {desc}".format(desc=descriptor.location.to_deprecated_string()))
+    print("strip filename from {desc}".format(desc=descriptor.location.url()))
     if descriptor._field_data.has(descriptor, 'filename'):
         descriptor._field_data.delete(descriptor, 'filename')
 
@@ -173,11 +173,11 @@ class TestEdxJsonEncoder(unittest.TestCase):
         self.null_utc_tz = NullTZ()
 
     def test_encode_location(self):
-        loc = Location('org', 'course', 'run', 'category', 'name', None)
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        loc = Location('i4x', 'org', 'course', 'category', 'name')
+        self.assertEqual(loc.url(), self.encoder.default(loc))
 
-        loc = Location('org', 'course', 'run', 'category', 'name', 'version')
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        loc = Location('i4x', 'org', 'course', 'category', 'name', 'version')
+        self.assertEqual(loc.url(), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):
         self.assertEqual(

@@ -1,5 +1,6 @@
 import json
 from textwrap import dedent
+from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_system
 
@@ -91,8 +92,11 @@ class DummyModulestore(object):
         courses = self.modulestore.get_courses()
         return courses[0]
 
-    def get_module_from_location(self, usage_key):
-        descriptor = self.modulestore.get_item(usage_key, depth=None)
+    def get_module_from_location(self, location, course):
+        course = self.get_course(course)
+        if not isinstance(location, Location):
+            location = Location(location)
+        descriptor = self.modulestore.get_instance(course.id, location, depth=None)
         descriptor.xmodule_runtime = self.get_module_system(descriptor)
         return descriptor
 

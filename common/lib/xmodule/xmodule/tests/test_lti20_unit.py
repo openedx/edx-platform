@@ -25,12 +25,13 @@ class LTI20RESTResultServiceTest(LogicTest):
     def test_sanitize_get_context(self):
         """Tests that the get_context function does basic sanitization"""
         # get_context, unfortunately, requires a lot of mocking machinery
-        mocked_course = Mock(name='mocked_course', lti_passports=['lti_id:test_client:test_secret'])
-        modulestore = Mock(name='modulestore')
-        modulestore.get_course.return_value = mocked_course
-        runtime = Mock(name='runtime', modulestore=modulestore)
+        mocked_course = Mock(lti_passports=['lti_id:test_client:test_secret'])
+        modulestore = Mock()
+        modulestore.get_item.return_value = mocked_course
+        runtime = Mock(modulestore=modulestore)
         self.xmodule.descriptor.runtime = runtime
         self.xmodule.lti_id = "lti_id"
+        self.xmodule.scope_ids.usage_id = "mocked"
 
         test_cases = (  # (before sanitize, after sanitize)
             (u"plaintext", u"plaintext"),

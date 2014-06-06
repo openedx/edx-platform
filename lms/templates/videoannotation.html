@@ -26,7 +26,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
 				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="${poster}">
 					<source src="${sourceUrl}" type='${typeSource}' />
 				</video>
-			</div>
+			</div> 
 			<div id="catchDIV">
 				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
 			</div>
@@ -49,9 +49,9 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
 		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
 	}
 	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-
+	
 	//Grab uri of the course
-    var parts = window.location.href.split("/"),
+    var parts = window.location.href.split("/"), 
     	uri = '';
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
 	//Change uri in cms
@@ -163,7 +163,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
             }
         },
     };
-
+	
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 
 	//remove old instances

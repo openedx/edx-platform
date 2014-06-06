@@ -1,4 +1,4 @@
-from opaque_keys.edx.locator import DefinitionLocator
+from xmodule.modulestore.locator import DefinitionLocator
 
 
 class DefinitionLazyLoader(object):
@@ -8,15 +8,14 @@ class DefinitionLazyLoader(object):
     object doesn't force access during init but waits until client wants the
     definition. Only works if the modulestore is a split mongo store.
     """
-    def __init__(self, modulestore, block_type, definition_id, field_converter):
+    def __init__(self, modulestore, definition_id):
         """
         Simple placeholder for yet-to-be-fetched data
         :param modulestore: the pymongo db connection with the definitions
         :param definition_locator: the id of the record in the above to fetch
         """
         self.modulestore = modulestore
-        self.definition_locator = DefinitionLocator(block_type, definition_id)
-        self.field_converter = field_converter
+        self.definition_locator = DefinitionLocator(definition_id)
 
     def fetch(self):
         """

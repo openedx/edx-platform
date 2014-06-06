@@ -7,8 +7,8 @@ import time
 from django.core.management.base import BaseCommand
 from optparse import make_option
 
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 from courseware.courses import get_course
@@ -37,8 +37,8 @@ class Command(BaseCommand):
         task_number = options['task_number']
 
         if len(args) == 2:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            usage_key = course_id.make_usage_key_from_deprecated_string(args[1])
+            course_id = args[0]
+            location = args[1]
         else:
             print self.help
             return
@@ -49,16 +49,16 @@ class Command(BaseCommand):
             print err
             return
 
-        descriptor = modulestore().get_item(usage_key, depth=0)
+        descriptor = modulestore().get_instance(course.id, location, depth=0)
         if descriptor is None:
-            print "Location {0} not found in course".format(usage_key)
+            print "Location {0} not found in course".format(location)
             return
 
         try:
             enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
             print "Total students enrolled in {0}: {1}".format(course_id, enrolled_students.count())
 
-            calculate_task_statistics(enrolled_students, course, usage_key, task_number)
+            calculate_task_statistics(enrolled_students, course, location, task_number)
 
         except KeyboardInterrupt:
             print "\nOperation Cancelled"
@@ -89,7 +89,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         student = student_module.student
         print "{0}:{1}".format(student.id, student.username)
 
-        module = get_module_for_student(student, location)
+        module = get_module_for_student(student, course, location)
         if module is None:
             print "  WARNING: No state found"
             students_with_no_state.append(student)
@@ -113,6 +113,8 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         elif task_state == OpenEndedChild.POST_ASSESSMENT or task_state == OpenEndedChild.DONE:
             students_with_graded_submissions.append(student)
 
+    location = Location(location)
+
     print "----------------------------------"
     print "Time: {0}".format(time.strftime("%Y %b %d %H:%M:%S +0000", time.gmtime()))
     print "Course: {0}".format(course.id)
@@ -130,7 +132,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         with open('{0}.{1}.csv'.format(filename, time_stamp), 'wb') as csv_file:
             writer = csv.writer(csv_file, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
             for student in students_with_ungraded_submissions:
-                writer.writerow(("ungraded", student.id, anonymous_id_for_user(student, None), student.username))
+                writer.writerow(("ungraded", student.id, anonymous_id_for_user(student, ''), student.username))
             for student in students_with_graded_submissions:
-                writer.writerow(("graded", student.id, anonymous_id_for_user(student, None), student.username))
+                writer.writerow(("graded", student.id, anonymous_id_for_user(student, ''), student.username))
     return stats

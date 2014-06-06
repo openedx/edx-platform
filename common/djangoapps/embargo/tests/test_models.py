@@ -1,14 +1,13 @@
 """Test of models for embargo middleware app"""
 from django.test import TestCase
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 
 class EmbargoModelsTest(TestCase):
     """Test each of the 3 models in embargo.models"""
     def test_course_embargo(self):
-        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        course_id = 'abc/123/doremi'
         # Test that course is not authorized by default
         self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
 
