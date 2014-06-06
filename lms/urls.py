@@ -282,6 +282,14 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/remove_coupon$',
+            'instructor.views.coupons.remove_coupon', name="remove_coupon"),
+        url(r'^courses/add_coupon$',
+            'instructor.views.coupons.add_coupon', name="add_coupon"),
+        url(r'^courses/update_coupon$',
+            'instructor.views.coupons.update_coupon', name="update_coupon"),
+        url(r'^courses/get_coupon_info$',
+            'instructor.views.coupons.get_coupon_info', name="get_coupon_info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
             include('instructor.views.api_urls')),
 
