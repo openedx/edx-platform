@@ -100,7 +100,7 @@ def get_purchase_params(cart):
 
     params['access_key'] = settings.CC_PROCESSOR['CyberSource'].get('ACCESS_KEY', '') 
     params['profile_id'] = settings.CC_PROCESSOR['CyberSource'].get('PROFILE_ID', '')
-    params['reference_number'] = '123456789'
+    params['reference_number'] = cart.id
     params['transaction_type'] = 'sale'
  
     params['locale'] = 'en'
@@ -108,8 +108,7 @@ def get_purchase_params(cart):
     params['signed_field_names'] = 'access_key,profile_id,amount,currency,transaction_type,reference_number,signed_date_time,locale,transaction_uuid,signed_field_names,unsigned_field_names,orderNumber' 
     params['unsigned_field_names'] = ''
     params['transaction_uuid'] = uuid.uuid4()
-    params['payment_method']='card'
-    params['merchant_secure_data1'] = cart.id
+    params['payment_method'] = 'card'
     params['override_custom_receipt_page'] = 'http://localhost:8000/shoppingcart/postpay_callback/'
 
     return params
@@ -132,7 +131,7 @@ def payment_accepted(params):
     """
     #make sure required keys are present and convert their values to the right type
     valid_params = {}
-    for key, key_type in [('req_merchant_secure_data1', int),
+    for key, key_type in [('req_reference_number', int),
                           ('req_currency', str),
                           ('decision', str)]:
         if key not in params:
@@ -147,7 +146,7 @@ def payment_accepted(params):
             )
 
     try:
-        order = Order.objects.get(id=valid_params['req_merchant_secure_data1'])
+        order = Order.objects.get(id=valid_params['req_reference_number'])
     except Order.DoesNotExist:
         raise CCProcessorDataException(_("The payment processor accepted an order whose number is not in our system."))
 
@@ -253,18 +252,6 @@ def get_processor_exception_html(exception):
                 </p>
                 """.format(msg=exception.message, email=payment_support_email)))
         return msg
-    elif isinstance(exception, CCProcessorSignatureException):
-        msg = dedent(_(
-                """
-                <p class="error_msg">
-                Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are
-                unable to validate that the message actually came from the payment processor.
-                The specific error message is: <span class="exception_msg">{msg}</span>.
-                We apologize that we cannot verify whether the charge went through and take further action on your order.
-                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.
-                </p>
-                """.format(msg=exception.message, email=payment_support_email)))
-        return msg
 
     # fallthrough case, which basically never happens
     return '<p class="error_msg">EXCEPTION!</p>'
@@ -289,7 +276,7 @@ CARDTYPE_MAP.update(
         '035': 'Laser',
         '036': 'Carte Bleue',
         '037': 'Carta Si',
-        '042': 'Maestro',
+        '042': 'Maestro Int.',
         '043': 'GE Money UK card'
     }
 )
