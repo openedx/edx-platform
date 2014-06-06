@@ -110,9 +110,10 @@ class SystemTestSuite(NoseTestSuite):
     @property
     def cmd(self):
         cmd = (
-            './manage.py {system} test {test_id} {test_opts} '
-            '--traceback --settings=test'.format(
+            './manage.py {system} test --verbosity={verbosity} '
+            '{test_id} {test_opts} --traceback --settings=test'.format(
                 system=self.root,
+                verbosity=self.verbosity,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
             )
@@ -158,11 +159,13 @@ class LibTestSuite(NoseTestSuite):
     def cmd(self):
         cmd = (
             "nosetests --id-file={test_ids} {test_id} {test_opts} "
-            "--with-xunit --xunit-file={xunit_report}".format(
+            "--with-xunit --xunit-file={xunit_report} "
+            "--verbosity={verbosity}".format(
                 test_ids=self.test_ids,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 xunit_report=self.xunit_report,
+                verbosity=self.verbosity,
             )
         )
 

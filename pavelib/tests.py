@@ -6,6 +6,7 @@ import sys
 from paver.easy import sh, task, cmdopts, needs
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
+from optparse import make_option
 
 try:
     from pygments.console import colorize
@@ -25,7 +26,10 @@ __test__ = False  # do not collect
     ("test_id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
-    ("fasttest", "a", "Run without collectstatic")
+    ("fasttest", "a", "Run without collectstatic"),
+    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
+    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
+    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
 ])
 def test_system(options):
     """
@@ -38,6 +42,7 @@ def test_system(options):
         'failed_only': getattr(options, 'failed', None),
         'fail_fast': getattr(options, 'fail_fast', None),
         'fasttest': getattr(options, 'fasttest', None),
+        'verbosity': getattr(options, 'verbosity', 1),
     }
 
     if test_id:
@@ -66,6 +71,9 @@ def test_system(options):
     ("test_id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
+    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
+    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
+    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
 ])
 def test_lib(options):
     """
@@ -77,6 +85,7 @@ def test_lib(options):
     opts = {
         'failed_only': getattr(options, 'failed', None),
         'fail_fast': getattr(options, 'fail_fast', None),
+        'verbosity': getattr(options, 'verbosity', 1),
     }
 
     if test_id:
@@ -98,6 +107,9 @@ def test_lib(options):
 @cmdopts([
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
+    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
+    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
+    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
 ])
 def test_python(options):
     """
@@ -106,6 +118,7 @@ def test_python(options):
     opts = {
         'failed_only': getattr(options, 'failed', None),
         'fail_fast': getattr(options, 'fail_fast', None),
+        'verbosity': getattr(options, 'verbosity', 1),
     }
 
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
@@ -130,13 +143,21 @@ def test_i18n():
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
-def test():
+@cmdopts([
+    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
+    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
+    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+])
+def test(options):
     """
     Run all tests
     """
+    opts = {
+        'verbosity': getattr(options, 'verbosity', 1)
+    }
     # Subsuites to be added to the main suite
-    python_suite = suites.PythonTestSuite('Python Tests')
-    i18n_suite = suites.I18nTestSuite('i18n')
+    python_suite = suites.PythonTestSuite('Python Tests', **opts)
+    i18n_suite = suites.I18nTestSuite('i18n', **opts)
     js_suite = suites.JsTestSuite('JS Tests', mode='run', with_coverage=True)
 
     # Main suite to be run
