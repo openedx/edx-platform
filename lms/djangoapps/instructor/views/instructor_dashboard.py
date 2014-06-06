@@ -245,6 +245,15 @@ def _section_analytics(course_key, access):
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
+    if settings.FEATURES.get('ENABLE_ANALYTICS_DATA', False):
+        from analyticsdataclient.client import RestClient
+        from analyticsdataclient.status import Status
+
+        auth_token = getattr(settings, 'ANALYTICS_DATA_TOKEN', '')
+        base_url = getattr(settings, 'ANALYTICS_DATA_URL', '')
+
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        section_data['analytics_data_status'] = Status(client)
     return section_data
 
 
