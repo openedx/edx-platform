@@ -217,6 +217,7 @@ class OrderItem(models.Model):
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    discount_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True, db_index=True)
@@ -303,6 +304,28 @@ class OrderItem(models.Model):
         """
         return ''
 
+
+class Coupons(models.Model):
+    """
+    This table contains coupon codes
+    A user can get a discount offer on course if provide coupon code
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    description = models.CharField(max_length=256, null=True, blank=True)
+    course_id = CourseKeyField(max_length=256)
+    percentage_discount = models.IntegerField(default=0)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    is_active = models.BooleanField(default=True)
+
+
+class CouponRedemption(models.Model):
+    """
+    This table contain coupon redemption info
+    """
+    order = models.ForeignKey(Order, db_index=True)
+    user = models.ForeignKey(User, db_index=True)
+    coupon = models.ForeignKey(Coupons, db_index=True)
 
 class PaidCourseRegistration(OrderItem):
     """
