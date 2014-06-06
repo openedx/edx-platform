@@ -770,10 +770,11 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
+# The "set" here is to work around the bug that load_classes returns duplicates for multiply-delcared classes.
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
     class_ for (name, class_) in XModuleDescriptor.load_classes()
     if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
-]
+)
 
 
 @ddt
