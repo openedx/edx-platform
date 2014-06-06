@@ -154,7 +154,8 @@ namespace :test do
 end
 
 desc "Build the html, xml, and diff coverage reports"
-task :coverage => :report_dirs do
+task :coverage, [:compare_branch] => :report_dirs do |t, args|
+    compare_branch = args[:compare_branch] || 'origin/master'
 
     # Generate coverage for Python sources
     TEST_TASK_DIRS.each do |dir|
@@ -181,8 +182,8 @@ task :coverage => :report_dirs do
         diff_html_path = report_dir_path('diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
-        sh("diff-cover #{xml_report_str} --html-report #{diff_html_path}")
-        sh("diff-cover #{xml_report_str}")
+        sh("diff-cover #{xml_report_str} --compare-branch=#{compare_branch} --html-report #{diff_html_path}")
+        sh("diff-cover #{xml_report_str} --compare-branch=#{compare_branch}")
         puts "\n"
     end
 end
