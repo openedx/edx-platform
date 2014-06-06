@@ -15,7 +15,7 @@ from verify_student.models import SoftwareSecurePhotoVerification
 import json
 import random
 import logging
-import lxml
+import lxml.html
 from lxml.etree import XMLSyntaxError, ParserError
 
 
