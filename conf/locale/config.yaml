@@ -108,6 +108,9 @@ segment:
     mako.po:
         mako-studio.po:
             - cms/*
+    underscore.po:
+        underscore-studio.po:
+            - cms/*
 
 # How should the generate step merge files?
 generate_merge:
@@ -121,3 +124,5 @@ generate_merge:
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - underscore.po
+        - underscore-studio.po
