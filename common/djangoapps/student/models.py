@@ -271,6 +271,15 @@ class UserProfile(models.Model):
         self.save()
 
 
+class UserSignupSource(models.Model):
+    """
+    This table contains information about users registering
+    via Micro-Sites
+    """
+    user_id = models.ForeignKey(User, db_index=True)
+    site = models.CharField(max_length=255, db_index=True)
+
+
 def unique_id_for_user(user, save=True):
     """
     Return a unique id for a user, suitable for inserting into
@@ -1034,6 +1043,9 @@ class CourseAccessRole(models.Model):
         Lexigraphic sort
         """
         return self._key < other._key
+
+    def __unicode__(self):
+        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
 
 
 #### Helper methods for use from python manage.py shell and other classes.

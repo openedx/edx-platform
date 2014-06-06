@@ -3,6 +3,7 @@
 <%! from django.conf import settings %>
 
 <%inherit file="../main.html" />
+
 <%block name="bodyclass">purchase-receipt</%block>
 
 <%block name="pagetitle">${_("Register for [Course Name] | Receipt (Order")} ${order.id})</%block>
@@ -37,16 +38,25 @@
           <tr>
             <th class="qty">${_("Qty")}</th>
             <th class="desc">${_("Description")}</th>
+            <th class="url">${_("URL")}</th>
             <th class="u-pr">${_("Unit Price")}</th>
             <th class="pri">${_("Price")}</th>
             <th class="curr">${_("Currency")}</th>
           </tr>
           % for item in order_items:
+
+            <% course_id = reverse('info', args=[item.course_id.to_deprecated_string()]) %>
+
             <tr class="order-item">
               % if item.status == "purchased":
                 <td>${item.qty}</td>
                 <td>${item.line_desc}</td>
-                <td>${"{0:0.2f}".format(item.unit_cost)}</td>
+                <td><a href="${course_id}" class="enter-course">${_('View Course')}</a></td>
+                <td>${"{0:0.2f}".format(item.unit_cost)}
+                    % if item.list_price != None:
+                        <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>
+                    % endif
+                    </td>
                 <td>${"{0:0.2f}".format(item.line_cost)}</td>
                 <td>${item.currency.upper()}</td></tr>
               % elif item.status == "refunded":

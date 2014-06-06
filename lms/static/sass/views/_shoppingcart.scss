@@ -12,14 +12,20 @@
   border: 1px solid $red;
 
 }
-
+.cart-errors{
+  background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
+  font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+  border-bottom: 1px solid #B72667;
+  margin-bottom: 20px;
+  display: none;
+}
 .cart-list {
   padding: 30px;
   margin-top: 40px;
   border-radius: 3px;
   border: 1px solid $border-color-1;
   background-color: $action-primary-fg;
-  
+
   > h2 {
     font-size: 1.5em;
     color: $base-font-color;
@@ -27,13 +33,42 @@
   
   .cart-table {
     width: 100%;
-    
+    tr:nth-child(even){
+        background-color: #f8f8f8;
+        border-bottom: 1px solid #f3f3f3;
+      }
+    tr.always-gray{
+      background: #eee !important;
+      border-top: 2px solid #FFFFFF;
+    }
+    tr.always-white{
+      background: #fff !important;
+      td{
+        padding: 30px 0px 10px;
+      }
+    }
+    tr{
+        td.cart-total{
+            padding: 10px 0;
+            span{
+                display: inline-block;
+                margin-right: 15px;
+                margin-left: 15px;
+                font-weight: bold;
+              }
+        }
+
+    }
     .cart-headings {
       height: 35px;
-      
+      border-bottom: 1px solid #BEBEBE;
+
+      th:nth-child(5),th:first-child{
+        text-align: center;
+        width: 120px;
+      }
       th {
         text-align: left;
-        padding-left: 5px;
         border-bottom: 1px solid $border-color-1;
         
         &.qty {
@@ -48,12 +83,35 @@
         &.cur {
           width: 100px;
         }
+        &.dsc{
+          width: 640px;
+          padding-right: 50px;
+        }
       }
     }
     
     .cart-items {
       td {
-        padding: 10px 25px;
+        padding: 10px 0px;
+        position: relative;
+        line-height: normal;
+        span.old-price{
+          left: -75px;
+          position: relative;
+          text-decoration: line-through;
+          color: red;
+          font-size: 12px;
+          top: -1px;
+        }
+      }
+      td:nth-child(5),td:first-child{
+        text-align: center;
+
+
+      }
+      td:nth-child(2){
+         line-height: 22px;
+        padding-right: 50px;
       }
     }
     
@@ -64,6 +122,7 @@
           font-weight: bold;
           padding: 10px 25px;
         }
+
       }
     }
   }
@@ -80,11 +139,10 @@
     .items-ordered {
       padding-top: 50px;
     }
-    
+
     tr {
-      
     }
-    
+
     th {
       text-align: left;
       padding: 25px 0 15px 0;
@@ -105,6 +163,9 @@
     tr.order-item {
       td {
         padding-bottom: 10px;
+        span.old-price{
+          text-decoration: line-through !important;
+        }
       }
     }
   }
