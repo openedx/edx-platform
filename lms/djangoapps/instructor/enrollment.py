@@ -14,9 +14,7 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
-# Submissions is a Django app that is currently installed
-# from the edx-ora2 repo, although it will likely move in the future.
-from submissions import api as sub_api
+from submissions import api as sub_api  # installed from the edx-submissions repository
 from student.models import anonymous_id_for_user
 
 from microsite_configuration import microsite
