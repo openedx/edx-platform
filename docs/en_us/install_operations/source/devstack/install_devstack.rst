@@ -87,7 +87,7 @@ next section.
 
 Before beginning the installation, ensure that you have your local computer's administrator's password.
 
-#. Ensure the NFSD client is running.
+#. Ensure the ``nfsd`` client is running.
 
 #. Create the ``devstack`` directory and navigate to it in the command prompt.
    
