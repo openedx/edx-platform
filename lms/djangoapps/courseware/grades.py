@@ -15,7 +15,6 @@ from dogapi import dog_stats_api
 from courseware import courses
 from courseware.model_data import FieldDataCache
 from student.models import anonymous_id_for_user
-from submissions import api as sub_api
 from xmodule import graders
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore
@@ -23,6 +22,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
+from submissions import api as sub_api  # installed from the edx-submissions repository
 from opaque_keys import InvalidKeyError
 
 log = logging.getLogger("edx.courseware")
