@@ -20,6 +20,39 @@ class Env(object):
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
 
+    # Test Ids Directory
+    TEST_DIR = REPO_ROOT / ".testids"
+
+    # Files used to run each of the js test suites
+    # TODO:  Store this as a dict. Order seems to matter for some
+    # reason. See issue TE-415.
+    JS_TEST_ID_FILES = [
+        REPO_ROOT / 'lms/static/js_test.yml',
+        REPO_ROOT / 'cms/static/js_test.yml',
+        REPO_ROOT / 'cms/static/js_test_squire.yml',
+        REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
+        REPO_ROOT / 'common/static/js_test.yml',
+    ]
+
+    JS_TEST_ID_KEYS = [
+        'lms',
+        'cms',
+        'cms-squire',
+        'xmodule',
+        'common',
+    ]
+
+    JS_REPORT_DIR = REPORT_DIR / 'javascript'
+
+    # Directories used for common/lib/ tests
+    LIB_TEST_DIRS = []
+    for item in (REPO_ROOT / "common/lib").listdir():
+        if (REPO_ROOT / 'common/lib' / item).isdir():
+            LIB_TEST_DIRS.append(path("common/lib") / item.basename())
+
+    # Directory for i18n test reports
+    I18N_REPORT_DIR = REPORT_DIR / 'i18n'
+
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)

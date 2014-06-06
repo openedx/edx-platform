@@ -93,7 +93,7 @@ because the `capa` package handles problem XML.
 
 You can run all of the unit-level tests using the command
 
-    rake test
+    paver test
 
 This includes python, javascript, and documentation tests. It does not, however,
 run any acceptance tests.
@@ -104,44 +104,54 @@ We use [nose](https://nose.readthedocs.org/en/latest/) through
 the [django-nose plugin](https://pypi.python.org/pypi/django-nose)
 to run the test suite.
 
-You can run all the python tests using `rake` commands.  For example,
+You can run all the python tests using `paver` commands.  For example,
 
-    rake test:python
+    paver test_python
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
 You can re-run all failed python tests by running: (see note at end of section)
 
-    rake test:python[--failed]
+    paver test_python --failed
 
-You can also run the tests without `collectstatic`, which tends to be faster:
+To test lms or cms python, use:
 
-    rake fasttest_lms
+    paver test_system -s lms
 
 or
 
-    rake fasttest_cms
+    paver test_system -s cms
 
-xmodule can be tested independently, with this:
+You can also run these tests without `collectstatic`, which is faster:
 
-    rake test_common/lib/xmodule
+    paver test_system -s lms --fasttest
 
-other module level tests include
+or
 
-* `rake test_common/lib/capa`
-* `rake test_common/lib/calc`
+    paver test_system -s cms --fasttest
 
 To run a single django test class:
 
-    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest]
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest
 
 To run a single django test:
 
-    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login]
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
+    
+To re-run all failing django tests from lms or cms, use the `--failed`,`-f` flag (see note at end of section)
 
-To re-run all failing django tests from lms or cms: (see note at end of section)
+    paver test_system -s lms --failed
+    paver test_system -s cms --failed
 
-    rake test_lms[--failed]
+There is also a `--fail_fast`, `-x` option that will stop nosetests after the first failure.
+
+common/lib tests are tested with the `test_lib` task, which also accepts the `--failed` and `--fail_fast` options. For example:
+
+    paver test_lib -l common/lib/calc
+
+or
+
+    paver test_lib -l common/lib/xmodule --failed
 
 To run a single nose test file:
 
@@ -174,7 +184,7 @@ To run tests for stub servers, for example for
 [YouTube stub server](https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py),
 you can do one of:
 
-    rake fasttest_cms[common/djangoapps/terrain/stubs/tests/test_youtube_stub.py]
+    paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
     python -m coverage run --rcfile=cms/.coveragerc `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 
@@ -183,28 +193,31 @@ Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you i
 
 Note: More on the `--failed` functionality
 * In order to use this, you must run the tests first. If you haven't already run the tests, or if no tests failed in the previous run, then using the `--failed` switch will result in **all** of the tests being run.  See more about this in the [nose documentation](http://nose.readthedocs.org/en/latest/plugins/testid.html#looping-over-failed-tests).
-* Note that `rake test:python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `rake test:python[--failed]` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `rake test_lms[--failed]` or `rake test_cms[--failed]` commands. 
+* Note that `paver test_python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `paver test_python --failed` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `paver test_system -s lms --failed` or `paver test_system -s cms --failed` commands. 
 
 
 ### Running Javascript Unit Tests
 
 We use Jasmine to run JavaScript unit tests.  To run all the JavaScript tests:
 
-    rake test:js
+    paver test_js
 
 To run a specific set of JavaScript tests and print the results to the console:
 
-    rake test:js:run[lms]
-    rake test:js:run[cms]
-    rake test:js:run[xmodule]
-    rake test:js:run[common]
+    paver test_js_run -s lms
+    paver test_js_run -s cms
+    paver test_js_run -s cms-squire
+    paver test_js_run -s xmodule
+    paver test_js_run -s common
 
 To run JavaScript tests in your default browser:
 
-    rake test:js:dev[lms]
-    rake test:js:dev[cms]
-    rake test:js:dev[xmodule]
-    rake test:js:dev[common]
+    paver test_js_dev -s lms
+    paver test_js_dev -s cms
+    paver test_js_dev -s cms-squire
+    paver test_js_dev -s xmodule
+    paver test_js_dev -s common
+
 
 These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
@@ -334,11 +347,11 @@ To view test coverage:
 
 1. Run the test suite:
 
-        rake test
+        paver test
 
 2. Generate reports:
 
-        rake coverage
+        paver coverage
 
 3. Reports are located in the `reports` folder.  The command
 generates HTML and XML (Cobertura format) reports.
