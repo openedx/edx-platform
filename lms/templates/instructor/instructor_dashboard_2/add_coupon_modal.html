@@ -1,0 +1,62 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
+<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Password Reset')}">
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="coupon-content">
+      <header>
+        <h2>${_("Add Coupon")}</h2>
+      </header>
+
+      <div class="instructions">
+        <p>
+          ${_("Please enter Coupon detail below")}</p>
+      </div>
+
+      <form id="add_coupon_form" action="${section_data['ajax_add_coupon']}" method="post" data-remote="true">
+        <div id="coupon_form_error" class="modal-form-error"></div>
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="is-hidden">${_("Required Information")}</legend>
+
+          <ol class="list-input">
+            <li class="field required text" id="add-coupon-modal-field-code">
+              <label for="coupon_code" class="required">${_("Code")}</label>
+              <input class="" id="coupon_code" type="text" name="code" maxlength="16" value="" placeholder="example: A123DS"
+                    aria-required="true"/>
+            </li>
+            <li class="field required text" id="add-coupon-modal-field-discount">
+              <label for="coupon_discount" class="required text">${_("Percentage Discount")}</label>
+              <input class="field required" id="coupon_discount" type="text" name="discount" value="" maxlength="5"
+                     aria-required="true"/>
+            </li>
+
+            <li class="field" id="add-coupon-modal-field-description">
+              <label for="coupon_description">${_("Description")}</label>
+              <textarea class="field" id="coupon_description" type="text" name="description" value=""
+                     aria-describedby="pwd_reset_email-tip" aria-required="true"> </textarea>
+            </li>
+
+            <li class="field" id="add-coupon-modal-field-course_id">
+              <label for="coupon_course_id">${_("Course ID")}</label>
+              <input class="field readonly" id="coupon_course_id" type="text" name="course_id" value="${section_data['course_id']}"
+                     readonly aria-required="true"/>
+            </li>
+
+          </ol>
+        </fieldset>
+
+        <div class="submit">
+          <input name="submit" type="submit" id="add_coupon_button" value="${_('Add Coupon')}"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
