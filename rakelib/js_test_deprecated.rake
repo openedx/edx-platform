@@ -14,7 +14,7 @@ def deprecated(deprecated, deprecated_by,  *args)
             new_cmd = "#{new_cmd} --suite=#{args.env}"
         end
 
-        puts("Task #{deprecated} has been deprecated. Use #{new_cmd} instead.".red)
+        puts("Task #{deprecated} has been deprecated. Using #{new_cmd} instead.".red)
         sh(new_cmd)
     end
 end

@@ -20,7 +20,9 @@ class NoseTestSuite(TestSuite):
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
         self.run_under_coverage = kwargs.get('with_coverage', True)
-        self.report_dir, self.test_id_dir, self.test_ids = self._required_dirs
+        self.report_dir = Env.REPORT_DIR / self.root
+        self.test_id_dir = Env.TEST_DIR / self.root
+        self.test_ids = self.test_id_dir / 'noseids'
 
     def __enter__(self):
         super(NoseTestSuite, self).__enter__()
@@ -83,18 +85,6 @@ class NoseTestSuite(TestSuite):
             opts += " --stop"
 
         return opts
-
-    @property
-    def _required_dirs(self):
-        """
-        Makes sure that the reports directory and the nodeids
-        directory are present.
-        """
-        report_dir = Env.REPORT_DIR / self.root
-        test_id_dir = Env.TEST_DIR / self.root
-        test_ids = test_id_dir / 'noseids'
-
-        return report_dir, test_id_dir, test_ids
 
 
 class SystemTestSuite(NoseTestSuite):

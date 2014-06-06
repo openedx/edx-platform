@@ -24,7 +24,9 @@ class JsTestSuite(TestSuite):
             self.test_id = ' '.join(Env.JS_TEST_ID_FILES)
 
         self.root = self.root + ' javascript'
-        self.report_dir, self.coverage_report, self.xunit_report = self._required_dirs
+        self.report_dir = Env.JS_REPORT_DIR
+        self.coverage_report = self.report_dir / 'coverage.xml'
+        self.xunit_report = self.report_dir / 'javascript_xunit.xml'
 
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
@@ -57,15 +59,3 @@ class JsTestSuite(TestSuite):
             )
 
         return cmd
-
-    @property
-    def _required_dirs(self):
-        """
-        Makes sure that the reports directory is present. Returns
-        paths of report directories and files.
-        """
-        report_dir = Env.JS_REPORT_DIR
-        coverage_report = report_dir / 'coverage.xml'
-        xunit_report = report_dir / 'javascript_xunit.xml'
-
-        return report_dir, coverage_report, xunit_report

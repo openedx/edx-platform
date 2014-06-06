@@ -1,8 +1,6 @@
 """
 TestSuite class and subclasses
 """
-__all__ = ["TestSuite", "PythonTestSuite", "NoseTestSuite", "SystemTestSuite", "LibTestSuite", "JsTestSuite", "I18nTestSuite"]
-
 from .suite import TestSuite
 from .nose_suite import NoseTestSuite, SystemTestSuite, LibTestSuite
 from .python_suite import PythonTestSuite

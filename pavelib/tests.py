@@ -99,11 +99,16 @@ def test_lib(options):
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
 ])
-def test_python():
+def test_python(options):
     """
     Run all python tests
     """
-    python_suite = suites.PythonTestSuite('Python Tests')
+    opts = {
+        'failed_only': getattr(options, 'failed', None),
+        'fail_fast': getattr(options, 'fail_fast', None),
+    }
+
+    python_suite = suites.PythonTestSuite('Python Tests', **opts)
     python_suite.run()
 
 
@@ -170,7 +175,7 @@ def coverage(options):
         if filepath.basename() == 'coverage.xml':
             xml_reports.append(filepath)
 
-    if len(xml_reports) < 1:
+    if not xml_reports:
         err_msg = colorize(
             'red',
             "No coverage info found.  Run `paver test` before running `paver coverage`."
