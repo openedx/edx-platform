@@ -39,7 +39,7 @@
   <div class="external-grader-message" aria-live="polite">
     ${msg|n}
   </div>
-  <div class="external-grader-message ungraded-matlab-result" aria-live="polite">
+  <div class="ungraded-matlab-result" aria-live="polite">
     ${queue_msg|n}
   </div>
 
@@ -58,7 +58,7 @@
           var alert_elem = $("<div>" + msg + "</div>");
           alert_elem.addClass('capa_alert').addClass('is-fading-in');
           $(parent_elt).find('.action').after(alert_elem);
-      }
+      };
 
       // hook up the plot button
       var plot = function(event) {
@@ -82,20 +82,25 @@
           // a chain of callbacks, each querying the server on success of the previous one
 
           var get_callback = function(response) {
-              var new_result_elem = $(response.html).find(".ungraded-matlab-result");
-              new_result_elem.addClass("is-fading-in");
+              var new_result_elem = $(response.html).find(".ungraded-matlab-result").html();
+              var external_grader_msg = $(response.html).find(".external-grader-message").html();
               result_elem = $(problem_elt).find(".ungraded-matlab-result");
-              result_elem.replaceWith(new_result_elem);
-              console.log(response.html);
-          }
+              result_elem.addClass("is-fading-in");
+              result_elem.html(new_result_elem);
+              external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
+              external_grader_msg_elem.addClass("is-fading-in");
+              external_grader_msg_elem.html(external_grader_msg);
+          };
 
           var plot_callback = function(response) {
               if(response.success) {
-                  $.postWithPrefix(url + "/problem_get", get_callback);
+                  setTimeout(function(){
+                    $.postWithPrefix(url + "/problem_get", get_callback)
+                  }, 2000);
               } else {
                   gentle_alert(problem_elt, response.message);
               }
-          }
+          };
 
           var save_callback = function(response) {
               if(response.success) {
@@ -106,11 +111,11 @@
               else {
                   gentle_alert(problem_elt, response.message);
               }
-          }
+          };
 
           // save the answer
           $.postWithPrefix(url + '/problem_save', answer, save_callback);
-      }
+      };
       $('#plot_${id}').click(plot);
     });
   </script>
