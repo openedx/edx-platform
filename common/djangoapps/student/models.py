@@ -269,6 +269,19 @@ class UserProfile(models.Model):
         self.save()
 
 
+class CourseRegistrationCode(models.Model):
+    """
+    This table contains registration codes
+    With registration code, a user can register for a course for free
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    course_id = CourseKeyField(max_length=256, db_index=True)
+    transaction_group_name = models.CharField(max_length=256, db_index=True, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_by_user')
+    created_at = models.DateTimeField(default=datetime.now(UTC))
+    redeemed_by = models.ForeignKey(User, null=True, related_name='redeemed_by_user')
+    redeemed_at = models.DateTimeField(default=datetime.now(UTC), null=True)
+
 def unique_id_for_user(user, save=True):
     """
     Return a unique id for a user, suitable for inserting into
