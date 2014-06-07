@@ -24,6 +24,8 @@ class CourseDetails(object):
         self.syllabus = None  # a pdf file asset
         self.short_description = ""
         self.overview = ""  # html to render as the overview
+        self.pre_enrollment_email = ""  # html to render as the pre-enrollment email
+        self.post_enrollment_email = ""  # html to render as the post-enrollment email
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
         self.course_image_name = ""
@@ -59,6 +61,18 @@ class CourseDetails(object):
         temploc = course_key.make_usage_key('about', 'overview')
         try:
             course_details.overview = modulestore().get_item(temploc).data
+        except ItemNotFoundError:
+            pass
+
+        temploc = course_key.make_usage_key('about', 'pre_enrollment_email')
+        try:
+            course.pre_enrollment_email = get_modulestore(temploc).get_item(temploc).data
+        except ItemNotFoundError:
+            pass
+
+        temploc = course_key.make_usage_key('about', 'post_enrollment_email')
+        try:
+            course.post_enrollment_email = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
@@ -155,7 +169,7 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        for about_type in ['syllabus', 'overview', 'effort', 'short_description']:
+        for about_type in ['syllabus', 'overview', 'effort', 'short_description', 'pre_enrollment_email', 'post_enrollment_email']:
             cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)
 
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])

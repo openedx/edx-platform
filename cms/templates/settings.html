@@ -205,7 +205,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <ol class="list-input">
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
-                  <label for="course-overview">${_("Course Short Description")}</label>
+                  <label for="course-short-description">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
@@ -224,6 +224,38 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <span class="tip tip-stacked">${overview_text()}</span>
                 </li>
                 % endif
+
+                <li class="field text" id="field-enable-enrollment-email">
+                  <input type="checkbox" id="enable-enrollment-email"/>
+                  <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
+                </li>
+
+                <li class="field text" id="field-pre-enrollment-email">
+                  <label for="pre-enrollment-email">${_("Email sent to students who enroll before the course starts")}</label>
+                  <textarea class="tinymce text-editor" id="pre-enrollment-email"></textarea>
+                  <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course before its start date")}</span>
+                  <ul class="list-actions">
+                    <li class="action-item">
+                      <a title="${_('Send me a copy of this via email')}"
+                          href="" class="action action-primary">
+                          ${_("Send me a test email")}</a>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="field text" id="field-post-enrollment-email">
+                  <label for="post-enrollment-email">${_("Email sent to students who enroll after the course starts")}</label>
+                  <textarea class="tinymce text-editor" id="post-enrollment-email"></textarea>
+                  <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course after its start date")}</span>
+                  <ul class="list-actions">
+                    <li class="action-item">
+                      <a title="${_('Send me a copy of this via email')}"
+                          href="" class="action action-primary">
+                          ${_("Send me a test email")}</a>
+                    </li>
+                  </ul>
+                </li>
+
 
                 <li class="field image" id="field-course-image">
                   <label>${_("Course Image")}</label>
