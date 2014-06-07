@@ -12,6 +12,9 @@ var DetailsView = ValidatingView.extend({
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
+        'click #enable-enrollment-email' : "toggleEnrollmentEmails",
+        'focus #pre-enrollment-email' : "codeMirrorize",
+        'focus #post-enrollment-email' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
@@ -51,6 +54,12 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
+        this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email']).val(this.model.get('pre_enrollment_email'));
+        this.codeMirrorize(null, $('#pre-enrollment-email')[0]);
+
+        this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email']).val(this.model.get('post_enrollment_email'));
+        this.codeMirrorize(null, $('#post-enrollment-email')[0]);
+
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
@@ -74,6 +83,8 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'pre_enrollment_email' : 'pre-enrollment-email',
+        'post_enrollment_email' : 'post-enrollment-email',
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
@@ -185,6 +196,18 @@ var DetailsView = ValidatingView.extend({
             this.$el.find('.remove-course-introduction-video').hide();
         }
     },
+
+    toggleEnrollmentEmails: function(event) {
+        var isChecked = this.$el.find("#enable-enrollment-email").is(':checked');
+        if(isChecked) {
+            this.$el.find('#field-pre-enrollment-email').show();
+            this.$el.find('#field-post-enrollment-email').show();
+        } else {
+            this.$el.find('#field-pre-enrollment-email').hide();
+            this.$el.find('#field-post-enrollment-email').hide();
+        }
+    },
+
     codeMirrors : {},
     codeMirrorize: function (e, forcedTarget) {
         var thisTarget;
