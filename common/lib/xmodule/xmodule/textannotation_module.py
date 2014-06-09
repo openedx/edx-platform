@@ -17,7 +17,9 @@ _ = lambda text: text
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
-    data = String(help=_("XML data for the annotation"), scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"),
+        scope=Scope.content,
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>

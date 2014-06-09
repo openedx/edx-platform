@@ -13,10 +13,15 @@ from xblock.fragment import Fragment
 
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class AnnotatableFields(object):
     """ Fields for `ImageModule` and `ImageDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"),
+        scope=Scope.content,
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -37,14 +42,14 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default='Image Annotation',
     )
     instructor_tags = String(
-        display_name="Tags for Assignments",
-        help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
+        display_name=_("Tags for Assignments"),
+        help=_("Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue"),
         scope=Scope.settings,
         default='professor:green,teachingAssistant:blue',
     )
