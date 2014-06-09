@@ -3,13 +3,10 @@ Run and manage servers for local development.
 """
 from __future__ import print_function
 import sys
-import argparse
 import traceback
 from invoke import task
 from invoke import run as sh
 from pygments.console import colorize
-from colorama import Fore, Back, Style
-from colorama import init as colorama_init
 
 from .utils.cmd import django_cmd
 from .utils.process import run_process, run_multi_processes
