@@ -103,7 +103,7 @@ def find_peer_grading_module(course):
         except NoPathToItem:
             # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
             # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
-            log.info(u"Invalid peer grading module location {0} in course {1}.  This module may need to be removed.".format(item_location, course.id))
+            log.info(u"Invalid peer grading module location %s in course %s.  This module may need to be removed.", item.location, course.id)
             continue
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
