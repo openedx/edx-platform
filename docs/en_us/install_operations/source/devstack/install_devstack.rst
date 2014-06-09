@@ -34,6 +34,7 @@ Devstack:
   For example, `nginx`_ and `gunicorn`_ are disabled in Devstack; Devstack uses
   Django's runserver instead.
 
+See the `Vagrant documentation`_ for more information.
 
 ********************
 Components
@@ -46,6 +47,7 @@ Devstack includes the following edX components:
 * Discussion Forums
 * Open Response Assessor (ORA)
   
+Devstack also includes a demo edX course.
 
 **************************
 Knowledge Prerequisites
@@ -85,7 +87,7 @@ next section.
 
 Before beginning the installation, ensure that you have your local computer's administrator's password.
 
-#. Ensure the NFSD client is running.
+#. Ensure the ``nfsd`` client is running.
 
 #. Create the ``devstack`` directory and navigate to it in the command prompt.
    
@@ -114,7 +116,7 @@ Before beginning the installation, ensure that you have your local computer's ad
 
    The first time you create the Devstack virtual machine, Vagrant downloads the
    base box, which is about 4GB. If you destroy and recreate the virtual
-   machine, Vagrant re-uses the box it downloaded.
+   machine, Vagrant re-uses the box it downloaded. See `Vagrant's documentation on boxes`_ for more information.
 
 #. When prompted, enter your local computer's administrator's password.
    
