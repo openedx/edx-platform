@@ -6,13 +6,19 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-
+from xmodule.annotator_mixin import get_instructions
+from xmodule.annotator_token import retrieve_token
+from xblock.fragment import Fragment
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"), 
+        scope=Scope.content, 
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -25,24 +31,60 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default='Text Annotation',
     )
-    tags = String(
-        display_name="Tags for Assignments",
-        help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
+    instructor_tags = String(
+        display_name=_("Tags for Assignments"),
+        help=_("Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue"),
         scope=Scope.settings,
         default='imagery:red,parallelism:blue',
     )
     source = String(
-        display_name="Source/Citation",
-        help="Optional for citing source of any material used. Automatic citation can be done using <a href=\"http://easybib.com\">EasyBib</a>",
+        display_name=_("Source/Citation"),
+        help=_("Optional for citing source of any material used. Automatic citation can be done using <a href=\"http://easybib.com\">EasyBib</a>"),
         scope=Scope.settings,
         default='None',
     )
-    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+    diacritics = String(
+        display_name=_("Diacritic Marks"),
+        help=_("Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"),
+        scope=Scope.settings,
+        default='',
+    )
+    annotation_storage_url = String(
+        help=_("Location of Annotation backend"),
+        scope=Scope.settings,
+        default="http://your_annotation_storage.com",
+        display_name=_("Url for Annotation Storage")
+    )
+    annotation_token_secret = String(
+        help=_("Secret string for annotation storage"),
+        scope=Scope.settings,
+        default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        display_name=_("Secret Token String for Annotation")
+    )
+    default_tab = String(
+        display_name=_("Default Annotations Tab"),
+        help=_("Select which tab will be the default in the annotations table: myNotes, Instructor, or Public."),
+        scope=Scope.settings,
+        default="myNotes",
+    )
+    # currently only supports one instructor, will build functionality for multiple later
+    instructor_email = String(
+        display_name=_("Email for 'Instructor' Annotations"),
+        help=_("Email of the user that will be attached to all annotations that will be found in 'Instructor' tab."),
+        scope=Scope.settings,
+        default="",
+    )
+    annotation_mode = String(
+        display_name=_("Mode for Annotation Tool"),
+        help=_("Type in number corresponding to following modes:  'instructor' or 'everyone'"),
+        scope=Scope.settings,
+        default="everyone",
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -59,37 +101,33 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        return etree.tostring(xmltree, encoding='unicode')
+        self.user_email = ""
+        if self.runtime.get_real_user is not None:
+            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
-            'tag': self.tags,
+            'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
-            'content_html': self._render_content(),
-            'annotation_storage': self.annotation_storage_url
+            'content_html': self.content,
+            'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-
-        return self.system.render_template('textannotation.html', context)
+        fragment = Fragment(self.system.render_template('textannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
@@ -101,6 +139,7 @@ class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(TextAnnotationDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            TextAnnotationDescriptor.annotation_storage_url
+            TextAnnotationDescriptor.annotation_storage_url,
+            TextAnnotationDescriptor.annotation_token_secret,
         ])
         return non_editable_fields

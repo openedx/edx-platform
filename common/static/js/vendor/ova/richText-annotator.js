@@ -31,11 +31,21 @@ Annotator.Plugin.RichText = (function(_super) {
 	RichText.prototype.options = {
 		tinymce:{
 			selector: "li.annotator-item textarea",
-			plugins: "media image insertdatetime link code",
+			skin: 'studio-tmce4',
+			formats: {
+          		code: {
+            	inline: 'code'
+          		}
+          	},
+          	codemirror: {
+          		path: "/static/js/vendor"
+        	},
+			plugins: "image link codemirror",
 			menubar: false,
 			toolbar_items_size: 'small',
 			extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-    		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+    		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image rubric | code ",
+    		resize: "both",
 		}
 	};
 
@@ -68,7 +78,6 @@ Annotator.Plugin.RichText = (function(_super) {
 		
 		annotator.subscribe("annotationEditorShown", function(){
 			$(annotator.editor.element).find('.mce-tinymce')[0].style.display='block';
-			$(annotator.editor.element).find('.mce-container').css('z-index',3000000000);
 			annotator.editor.checkOrientation();
 		});
 		annotator.subscribe("annotationEditorHidden", function(){
@@ -80,9 +89,6 @@ Annotator.Plugin.RichText = (function(_super) {
 			ed.on('change', function(e) {
 				//set the modification in the textarea of annotator
 				$(editor.element).find('textarea')[0].value = tinymce.activeEditor.getContent();
-			});
-			ed.on('Init', function(ed){
-				$('.mce-container').css('z-index','3090000000000000000');
 			});
 			//New button to add Rubrics of the url https://gteavirtual.org/rubric
 		    ed.addButton('rubric', {

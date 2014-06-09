@@ -7,13 +7,20 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.annotator_mixin import get_instructions, get_extension
+from xmodule.annotator_token import retrieve_token
+from xblock.fragment import Fragment
 
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 class AnnotatableFields(object):
     """ Fields for `VideoModule` and `VideoDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"), 
+        scope=Scope.content, 
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -23,14 +30,53 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Video Annotation',
+        default=_('Video Annotation'),
     )
-    sourceurl = String(help="The external source URL for the video.", display_name="Source URL", scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4")
-    poster_url = String(help="Poster Image URL", display_name="Poster URL", scope=Scope.settings, default="")
-    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+    sourceurl = String(
+        help=_("The external source URL for the video."),
+        display_name=_("Source URL"),
+        scope=Scope.settings, default="http://video-js.zencoder.com/oceans-clip.mp4"
+    )
+    poster_url = String(
+        help=_("Poster Image URL"),
+        display_name=_("Poster URL"),
+        scope=Scope.settings,
+        default=""
+    )
+    annotation_storage_url = String(
+        help=_("Location of Annotation backend"),
+        scope=Scope.settings,
+        default="http://your_annotation_storage.com",
+        display_name=_("Url for Annotation Storage")
+    )
+    annotation_token_secret = String(
+        help=_("Secret string for annotation storage"),
+        scope=Scope.settings,
+        default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        display_name=_("Secret Token String for Annotation")
+    )
+    default_tab = String(
+        display_name=_("Default Annotations Tab"),
+        help=_("Select which tab will be the default in the annotations table: myNotes, Instructor, or Public."),
+        scope=Scope.settings,
+        default="myNotes",
+    )
+    # currently only supports one instructor, will build functionality for multiple later
+    instructor_email = String(
+        display_name=_("Email for 'Instructor' Annotations"),
+        help=_("Email of the user that will be attached to all annotations that will be found in 'Instructor' tab."),
+        scope=Scope.settings,
+        default="",
+    )
+    annotation_mode = String(
+        display_name=_("Mode for Annotation Tool"),
+        help=_("Type in number corresponding to following modes:  'instructor' or 'everyone'"),
+        scope=Scope.settings,
+        default="everyone",
+    )
 
 
 class VideoAnnotationModule(AnnotatableFields, XModule):
@@ -55,96 +101,19 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _get_annotation_class_attr(self, element):
-        """ Returns a dict with the CSS class attribute to set on the annotation
-            and an XML key to delete from the element.
-         """
-
-        attr = {}
-        cls = ['annotatable-span', 'highlight']
-        highlight_key = 'highlight'
-        color = element.get(highlight_key)
-
-        if color is not None:
-            if color in self.highlight_colors:
-                cls.append('highlight-' + color)
-            attr['_delete'] = highlight_key
-        attr['value'] = ' '.join(cls)
-
-        return {'class': attr}
-
-    def _get_annotation_data_attr(self, element):
-        """ Returns a dict in which the keys are the HTML data attributes
-            to set on the annotation element. Each data attribute has a
-            corresponding 'value' and (optional) '_delete' key to specify
-            an XML attribute to delete.
-        """
-
-        data_attrs = {}
-        attrs_map = {
-            'body': 'data-comment-body',
-            'title': 'data-comment-title',
-            'problem': 'data-problem-id'
-        }
-
-        for xml_key in attrs_map.keys():
-            if xml_key in element.attrib:
-                value = element.get(xml_key, '')
-                html_key = attrs_map[xml_key]
-                data_attrs[html_key] = {'value': value, '_delete': xml_key}
-
-        return data_attrs
-
-    def _render_annotation(self, element):
-        """ Renders an annotation element for HTML output.  """
-        attr = {}
-        attr.update(self._get_annotation_class_attr(element))
-        attr.update(self._get_annotation_data_attr(element))
-
-        element.tag = 'span'
-
-        for key in attr.keys():
-            element.set(key, attr[key]['value'])
-            if '_delete' in attr[key] and attr[key]['_delete'] is not None:
-                delete_key = attr[key]['_delete']
-                del element.attrib[delete_key]
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        xmltree.tag = 'div'
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        for element in xmltree.findall('.//annotation'):
-            self._render_annotation(element)
-
-        return etree.tostring(xmltree, encoding='unicode')
+        self.user_email = ""
+        if self.runtime.get_real_user is not None:
+            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
-    def _get_extension(self, srcurl):
+    def _get_extension(self, src_url):
         ''' get the extension of a given url '''
-        if 'youtu' in srcurl:
-            return 'video/youtube'
-        else:
-            spliturl = srcurl.split(".")
-            extensionplus1 = spliturl[len(spliturl) - 1]
-            spliturl = extensionplus1.split("?")
-            extensionplus2 = spliturl[0]
-            spliturl = extensionplus2.split("#")
-            return 'video/' + spliturl[0]
+        return get_extension(src_url)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         extension = self._get_extension(self.sourceurl)
 
@@ -154,12 +123,17 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'sourceUrl': self.sourceurl,
             'typeSource': extension,
             'poster': self.poster_url,
-            'alert': self,
-            'content_html': self._render_content(),
-            'annotation_storage': self.annotation_storage_url
+            'content_html': self.content,
+            'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-
-        return self.system.render_template('videoannotation.html', context)
+        fragment = Fragment(self.system.render_template('videoannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
@@ -171,6 +145,7 @@ class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(VideoAnnotationDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            VideoAnnotationDescriptor.annotation_storage_url
+            VideoAnnotationDescriptor.annotation_storage_url,
+            VideoAnnotationDescriptor.annotation_token_secret,
         ])
         return non_editable_fields
