@@ -13,10 +13,14 @@ from xblock.fragment import Fragment
 
 import textwrap
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 class AnnotatableFields(object):
     """ Fields for `VideoModule` and `VideoDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"), 
+        scope=Scope.content, 
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
