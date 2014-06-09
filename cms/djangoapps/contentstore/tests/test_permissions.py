@@ -99,10 +99,8 @@ class TestCourseAccess(ModuleStoreTestCase):
             user_by_role[role] = []
             # Org-based roles are created via org name, rather than course_key
             if (role is OrgStaffRole) or (role is OrgInstructorRole):
-                # pylint: disable=protected-access
                 group = role(self.course_key.org)
             else:
-                # pylint: disable=protected-access
                 group = role(self.course_key)
             # NOTE: this loop breaks the roles.py abstraction by purposely assigning
             # users to one of each possible groupname in order to test that has_course_access
@@ -125,7 +123,8 @@ class TestCourseAccess(ModuleStoreTestCase):
                 auth.add_users(
                     self.user,
                     role(copy_course_key.org),
-                    *role(self.course_key.org).users_with_role())
+                    *role(self.course_key.org).users_with_role()
+                )
             else:
                 auth.add_users(
                     self.user,
