@@ -8,6 +8,8 @@ import logging
 import shutil
 from tempfile import mkdtemp
 from uuid import uuid4
+from datetime import datetime
+from pytz import UTC
 import unittest
 from xblock.core import XBlock
 
@@ -21,6 +23,7 @@ from opaque_keys.edx.locations import Location
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
+from xmodule.modulestore.mongo.draft import as_draft
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -470,6 +473,120 @@ class TestMongoModuleStore(unittest.TestCase):
             assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
             shutil.rmtree(root_dir)
+
+    def test_has_changes_direct_only(self):
+        """
+        Tests that has_changes() returns false when an xblock in a direct only category is checked
+        """
+        course_location = Location('edx', 'direct', '2012_Fall', 'course', 'test_course')
+        chapter_location = Location('edx', 'direct', '2012_Fall', 'chapter', 'test_chapter')
+        dummy_user = 123
+
+        # Create dummy direct only xblocks
+        self.draft_store.create_and_save_xmodule(course_location, user_id=dummy_user)
+        self.draft_store.create_and_save_xmodule(chapter_location, user_id=dummy_user)
+
+        # Check that neither xblock has changes
+        self.assertFalse(self.draft_store.has_changes(course_location))
+        self.assertFalse(self.draft_store.has_changes(chapter_location))
+
+    def test_has_changes(self):
+        """
+        Tests that has_changes() only returns true when changes are present
+        """
+        location = Location('edX', 'changes', '2012_Fall', 'vertical', 'test_vertical')
+        dummy_user = 123
+
+        # Create a dummy component to test against
+        self.draft_store.create_and_save_xmodule(location, user_id=dummy_user)
+
+        # Not yet published, so changes are present
+        self.assertTrue(self.draft_store.has_changes(location))
+
+        # Publish and verify that there are no unpublished changes
+        self.draft_store.publish(location, dummy_user)
+        self.assertFalse(self.draft_store.has_changes(location))
+
+        # Change the component, then check that there now are changes
+        component = self.draft_store.get_item(location)
+        component.display_name = 'Changed Display Name'
+        self.draft_store.update_item(component, dummy_user)
+        self.assertTrue(self.draft_store.has_changes(location))
+
+        # Publish and verify again
+        self.draft_store.publish(location, dummy_user)
+        self.assertFalse(self.draft_store.has_changes(location))
+
+    def test_update_edit_info(self):
+        """
+        Tests that edited_on and edited_by are set correctly during an update
+        """
+        location = Location('edX', 'editInfoTest', '2012_Fall', 'html', 'test_html')
+        dummy_user = 123
+
+        # Create a dummy component to test against
+        self.draft_store.create_and_save_xmodule(location, user_id=dummy_user)
+
+        # Store the current edit time and verify that dummy_user created the component
+        component = self.draft_store.get_item(location)
+        self.assertEqual(component.edited_by, dummy_user)
+        old_edited_on = component.edited_on
+
+        # Change the component
+        component.display_name = component.display_name + ' Changed'
+        self.draft_store.update_item(component, dummy_user)
+        updated_component = self.draft_store.get_item(location)
+
+        # Verify the ordering of edit times and that dummy_user made the edit
+        self.assertLess(old_edited_on, updated_component.edited_on)
+        self.assertEqual(updated_component.edited_by, dummy_user)
+
+    def test_update_published_info(self):
+        """
+        Tests that published_date and published_by are set correctly
+        """
+        location = Location('edX', 'publishInfo', '2012_Fall', 'html', 'test_html')
+        create_user = 123
+        publish_user = 456
+
+        # Create a dummy component to test against
+        self.draft_store.create_and_save_xmodule(location, user_id=create_user)
+
+        # Store the current time, then publish
+        old_time = datetime.now(UTC)
+        self.draft_store.publish(location, publish_user)
+        updated_component = self.draft_store.get_item(location)
+
+        # Verify the time order and that publish_user caused publication
+        self.assertLessEqual(old_time, updated_component.published_date)
+        self.assertEqual(updated_component.published_by, publish_user)
+
+    def test_migrate_published_info(self):
+        """
+        Tests that blocks that were storing published_date and published_by through CMSBlockMixin are loaded correctly
+        """
+
+        # Insert the test block directly into the module store
+        location = Location('edX', 'migration', '2012_Fall', 'html', 'test_html')
+        published_date = datetime(1970, 1, 1, tzinfo=UTC)
+        published_by = 123
+        self.store._update_single_item(
+            as_draft(location),
+            {
+                'definition.data': {},
+                'metadata': {
+                    # published_date was previously stored as a list of time components, not a datetime
+                    'published_date': list(published_date.timetuple()),
+                    'published_by': published_by,
+                },
+            },
+        )
+
+        # Retrieve the block and verify its fields
+        component = self.draft_store.get_item(location)
+        self.assertEqual(component.published_date, published_date)
+        self.assertEqual(component.published_by, published_by)
+
 
 
 class TestMongoKeyValueStore(object):

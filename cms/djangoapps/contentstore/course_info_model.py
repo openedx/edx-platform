@@ -239,6 +239,6 @@ def save_course_update_items(location, course_updates, course_update_items, user
     course_updates.data = _get_html(course_update_items)
 
     # update db record
-    modulestore('direct').update_item(course_updates, user)
+    modulestore('direct').update_item(course_updates, user.id)
 
     return course_updates

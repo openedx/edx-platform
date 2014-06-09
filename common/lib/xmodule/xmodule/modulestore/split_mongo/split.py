@@ -371,6 +371,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return self._get_block_from_structure(course_structure, usage_key.block_id) is not None
 
+    def has_changes(self, usage_key):
+        """
+        Checks if the given block has unpublished changes
+        :param usage_key: the block to check
+        :return: True if the draft and published versions differ
+        """
+        draft = self.get_item(usage_key.for_branch("draft"))
+        try:
+            published = self.get_item(usage_key.for_branch("published"))
+        except ItemNotFoundError:
+            return True
+
+        return draft.update_version != published.update_version
+
     def get_item(self, usage_key, depth=0):
         """
         depth (int): An argument that some module stores may use to prefetch

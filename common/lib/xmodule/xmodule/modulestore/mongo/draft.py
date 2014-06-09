@@ -157,7 +157,7 @@ class DraftModuleStore(MongoModuleStore):
 
         return wrap_draft(self._load_items(source_location.course_key, [original])[0])
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
@@ -175,7 +175,7 @@ class DraftModuleStore(MongoModuleStore):
                 raise
 
         xblock.location = draft_loc
-        super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+        super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found, isPublish)
         # don't allow locations to truly represent themselves as draft outside of this file
         xblock.location = as_published(xblock.location)
 
@@ -194,6 +194,30 @@ class DraftModuleStore(MongoModuleStore):
 
         return
 
+    def has_changes(self, location):
+        """
+        Check if the xblock has been changed since it was last published.
+        :param location: location to check
+        :return: True if the draft and published versions differ
+        """
+
+        # Direct only categories can never have changes because they can't have drafts
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return False
+
+        draft = self.get_item(location)
+
+        # If the draft was never published, then it clearly has unpublished changes
+        if not draft.published_date:
+            return True
+
+        # edited_on may be None if the draft was last edited before edit time tracking
+        # If the draft does not have an edit time, we play it safe and assume there are differences
+        if draft.edited_on:
+            return draft.edited_on > draft.published_date
+        else:
+            return True
+
     def publish(self, location, published_by_id):
         """
         Save a current draft to the underlying modulestore
@@ -209,8 +233,6 @@ class DraftModuleStore(MongoModuleStore):
 
         draft = self.get_item(location)
 
-        draft.published_date = datetime.now(UTC)
-        draft.published_by = published_by_id
         if draft.has_children:
             if original_published is not None:
                 # see if children were deleted. 2 reasons for children lists to differ:
@@ -221,7 +243,7 @@ class DraftModuleStore(MongoModuleStore):
                         rents = self.get_parent_locations(child)
                         if (len(rents) == 1 and rents[0] == location):  # the 1 is this original_published
                             self.delete_item(child, True)
-        super(DraftModuleStore, self).update_item(draft, '**replace_user**')
+        super(DraftModuleStore, self).update_item(draft, published_by_id, isPublish=True)
         self.delete_item(location)
 
     def unpublish(self, location):

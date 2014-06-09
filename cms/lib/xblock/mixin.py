@@ -19,11 +19,3 @@ class DateTuple(Field):
             return None
 
         return list(value.timetuple())
-
-
-class CmsBlockMixin(XBlockMixin):
-    """
-    Mixin with fields common to all blocks in Studio
-    """
-    published_date = DateTuple(help="Date when the module was published", scope=Scope.settings)
-    published_by = Integer(help="Id of the user who published this module", scope=Scope.settings)

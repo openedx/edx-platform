@@ -135,7 +135,7 @@ class CourseUpdateTest(CourseTestCase):
         update_content = u"Hello world!"
         update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
         course_updates.data = update_data
-        modulestore('direct').update_item(course_updates, self.user)
+        modulestore('direct').update_item(course_updates, self.user.id)
 
         # test getting all updates list
         course_update_url = self.create_update_url()

@@ -805,6 +805,32 @@ class SplitModuleItemTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(course.location.for_branch("published"))
 
+    def test_has_changes(self):
+        """
+        Tests that has_changes() only returns true when changes are present
+        """
+        draft_course = CourseLocator(org='testx', offering='GreekHero', branch='draft')
+        published_course = CourseLocator(org='testx', offering='GreekHero', branch='published')
+        head = draft_course.make_usage_key('course', 'head12345')
+        dummy_user = 'testUser'
+
+        # Not yet published, so changes are present
+        self.assertTrue(modulestore().has_changes(head))
+
+        # Publish and verify that there are no unpublished changes
+        modulestore().xblock_publish(dummy_user, draft_course, published_course, [head], None)
+        self.assertFalse(modulestore().has_changes(head))
+
+        # Change the course, then check that there now are changes
+        course = modulestore().get_item(head)
+        course.show_calculator = not course.show_calculator
+        modulestore().update_item(course, dummy_user)
+        self.assertTrue(modulestore().has_changes(head))
+
+        # Publish and verify again
+        modulestore().xblock_publish(dummy_user, draft_course, published_course, [head], None)
+        self.assertFalse(modulestore().has_changes(head))
+
     def test_get_non_root(self):
         # not a course obj
         locator = BlockUsageLocator(

@@ -33,7 +33,6 @@ from lms.envs.common import (
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
-from cms.lib.xblock.mixin import CmsBlockMixin
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -238,7 +237,7 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 # Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
