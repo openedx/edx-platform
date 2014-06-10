@@ -4,9 +4,7 @@ Views for the course_mode module
 
 import decimal
 from django.core.urlresolvers import reverse
-from django.http import (
-    HttpResponseBadRequest,  Http404
-)
+from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
@@ -18,9 +16,9 @@ from edxmako.shortcuts import render_to_response
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
-from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore
 
 
 class ChooseModeView(View):
@@ -54,7 +52,7 @@ class ChooseModeView(View):
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(course_key, None)
 
-        course = course_from_id(course_key)
+        course = modulestore().get_course(course_key)
         context = {
             "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
             "modes": modes,
@@ -78,9 +76,9 @@ class ChooseModeView(View):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
-        # This is a bit redundant with logic in student.views.change_enrollement,
+        # This is a bit redundant with logic in student.views.change_enrollment,
         # but I don't really have the time to refactor it more nicely and test.
-        course = course_from_id(course_key)
+        course = modulestore().get_course(course_key)
         if not has_access(user, 'enroll', course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)

@@ -35,7 +35,7 @@ from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
-from student.views import course_from_id, single_course_reverification_info
+from student.views import single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
@@ -746,7 +746,7 @@ def fetch_reverify_banner_info(request, course_key):
     if not user.id:
         return reverifications
     enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_key)
-    course = course_from_id(course_key)
+    course = modulestore().get_course(course_key)
     info = single_course_reverification_info(user, course, enrollment)
     if info:
         reverifications[info.status].append(info)

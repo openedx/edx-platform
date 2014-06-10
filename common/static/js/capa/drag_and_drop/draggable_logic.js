@@ -237,10 +237,10 @@ return {
     },
 
     'toggleTargets': function (isEnabled) {
-        var effect = (isEnabled ? 'move' : undefined);
-        this.state.baseImageEl.attr('aria-dropeffect', effect);
+        var effect = isEnabled ? 'move' : null;
 
-        $.each(this.state.targets, function (target) {
+        this.state.baseImageEl.attr('aria-dropeffect', effect);
+        $.each(this.state.targets, function (index, target) {
             target.targetEl.attr('aria-dropeffect', effect);
         });
     },

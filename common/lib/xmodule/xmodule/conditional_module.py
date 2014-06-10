@@ -197,7 +197,10 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         # substitution can be done.
         if not self.sources_list:
             if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
-                self.sources_list = ConditionalDescriptor.parse_sources(self.xml_attributes)
+                self.sources_list = [
+                    self.location.course_key.make_usage_key_from_deprecated_string(item)
+                    for item in ConditionalDescriptor.parse_sources(self.xml_attributes)
+                ]
 
     @staticmethod
     def parse_sources(xml_element):

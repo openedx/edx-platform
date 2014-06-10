@@ -66,7 +66,7 @@ class TestMongoModuleStore(unittest.TestCase):
             host=HOST,
             port=PORT,
             tz_aware=True,
-            document_class=bson.son.SON,
+            document_class=dict,
         )
         cls.connection.drop_database(DB)
 

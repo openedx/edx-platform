@@ -6,14 +6,15 @@ import random
 
 from chrono import Timer
 from mock import patch, Mock
+import ddt
 
 from django.test import RequestFactory
 
-from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups
+from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups, AccessListFallback
 from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, OrgInstructorRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -24,6 +25,7 @@ TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
 
 
+@ddt.ddt
 class TestCourseListing(ModuleStoreTestCase):
     """
     Unit tests for getting the list of courses for a logged in user
@@ -263,7 +265,7 @@ class TestCourseListing(ModuleStoreTestCase):
         course_db_record = modulestore()._find_one(course.location)
         course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki" })
         modulestore().collection.update(
-            {'_id': course_db_record['_id']},
+            {'_id': course.location.to_deprecated_son()},
             {'$set': {
                 'metadata.tabs': course_db_record['metadata']['tabs'],
             }},
@@ -271,3 +273,31 @@ class TestCourseListing(ModuleStoreTestCase):
 
         courses_list = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), 1, courses_list)
+
+    @ddt.data(OrgStaffRole('AwesomeOrg'), OrgInstructorRole('AwesomeOrg'))
+    def test_course_listing_org_permissions(self, role):
+        """
+        Create multiple courses within the same org.  Verify that someone with org-wide permissions can access
+        all of them.
+        """
+        org_course_one = SlashSeparatedCourseKey('AwesomeOrg', 'Course1', 'RunBabyRun')
+        CourseFactory.create(
+            org=org_course_one.org,
+            number=org_course_one.course,
+            run=org_course_one.run
+        )
+
+        org_course_two = SlashSeparatedCourseKey('AwesomeOrg', 'Course2', 'RunRunRun')
+        CourseFactory.create(
+            org=org_course_two.org,
+            number=org_course_two.course,
+            run=org_course_two.run
+        )
+
+        # Two types of org-wide roles have edit permissions: staff and instructor.  We test both
+        role.add_users(self.user)
+
+        with self.assertRaises(AccessListFallback):
+            _accessible_courses_list_from_groups(self.request)
+        courses_list = _accessible_courses_list(self.request)
+        self.assertEqual(len(courses_list), 2)

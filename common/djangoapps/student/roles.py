@@ -7,6 +7,28 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
 from student.models import CourseAccessRole
+from xmodule_django.models import CourseKeyField
+
+
+class RoleCache(object):
+    """
+    A cache of the CourseAccessRoles held by a particular user
+    """
+    def __init__(self, user):
+        self._roles = set(
+            CourseAccessRole.objects.filter(user=user).all()
+        )
+
+    def has_role(self, role, course_id, org):
+        """
+        Return whether this RoleCache contains a role with the specified role, course_id, and org
+        """
+        return any(
+            access_role.role == role and
+            access_role.course_id == course_id and
+            access_role.org == org
+            for access_role in self._roles
+        )
 
 
 class AccessRole(object):
@@ -93,12 +115,11 @@ class RoleBase(AccessRole):
 
         # pylint: disable=protected-access
         if not hasattr(user, '_roles'):
-            user._roles = set(
-                CourseAccessRole.objects.filter(user=user).all()
-            )
+            # Cache a list of tuples identifying the particular roles that a user has
+            # Stored as tuples, rather than django models, to make it cheaper to construct objects for comparison
+            user._roles = RoleCache(user)
 
-        role = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
-        return role in user._roles
+        return user._roles.has_role(self._role_name, self.course_key, self.org)
 
     def add_users(self, *users):
         """
@@ -129,6 +150,9 @@ class RoleBase(AccessRole):
         """
         Return a django QuerySet for all of the users with this role
         """
+        # Org roles don't query by CourseKey, so use CourseKeyField.Empty for that query
+        if self.course_key is None:
+            self.course_key = CourseKeyField.Empty
         entries = User.objects.filter(
             courseaccessrole__role=self._role_name,
             courseaccessrole__org=self.org,
@@ -228,12 +252,9 @@ class UserBasedRole(object):
 
         # pylint: disable=protected-access
         if not hasattr(self.user, '_roles'):
-            self.user._roles = list(
-                CourseAccessRole.objects.filter(user=self.user).all()
-            )
+            self.user._roles = RoleCache(self.user)
 
-        role = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
-        return role in self.user._roles
+        return self.user._roles.has_role(self.role, course_key, course_key.org)
 
     def add_course(self, *course_keys):
         """

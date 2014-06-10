@@ -337,7 +337,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 result.append(course_list[0])
         return result
 
-    def get_course(self, course_id, depth=None):
+    def get_course(self, course_id, depth=0):
         '''
         Gets the course descriptor for the course identified by the locator
         '''
