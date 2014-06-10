@@ -1,3 +1,5 @@
+$annotation-yellow: rgba(255,255,10,0.3);
+
 h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -929,7 +931,6 @@ div.problem {
   }
 
   .annotation-input {
-    $yellow: rgba(255,255,10,0.3);
     margin: 0 0 1em 0;
     border: 1px solid #ccc;
     border-radius: 1em;
@@ -957,8 +958,8 @@ div.problem {
 
     .block-highlight {
       padding: .5em;
-      border: 1px solid darken($yellow, 10%);
-      background-color: $yellow;
+      border: 1px solid darken($annotation-yellow, 10%);
+      background-color: $annotation-yellow;
       color:  #333;
       font-style: normal;
     }
@@ -982,7 +983,7 @@ div.problem {
           cursor: pointer;
 
           &.selected {
-            background-color: $yellow;
+            background-color: $annotation-yellow;
           }
         }
         .tag-status {
