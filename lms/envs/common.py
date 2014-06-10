@@ -37,8 +37,10 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
+PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
+PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -523,7 +525,7 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
@@ -536,6 +538,8 @@ SERVER_EMAIL = 'devops@example.com'
 TECH_SUPPORT_EMAIL = 'technical@example.com'
 CONTACT_EMAIL = 'info@example.com'
 BUGS_EMAIL = 'bugs@example.com'
+UNIVERSITY_EMAIL = 'university@example.com'
+PRESS_EMAIL = 'press@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -846,6 +850,7 @@ main_vendor_js = [
     'js/vendor/ova/reply-annotator.js',
     'js/vendor/ova/tags-annotator.js',
     'js/vendor/ova/flagging-annotator.js',
+    'js/vendor/ova/diacritic-annotator.js',
     'js/vendor/ova/jquery-Watch.js',
     'js/vendor/ova/openseadragon.js',
     'js/vendor/ova/OpenSeaDragonAnnotation.js',
@@ -868,14 +873,15 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
-            'css/vendor/ova/edx-annotator.css',
             'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
             'css/vendor/ova/video-js.min.css',
             'css/vendor/ova/rangeslider.css',
             'css/vendor/ova/share-annotator.css',
             'css/vendor/ova/richText-annotator.css',
             'css/vendor/ova/tags-annotator.css',
             'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
             'css/vendor/ova/ova.css',
             'js/vendor/ova/catch/css/main.css'
         ],
@@ -1098,7 +1104,6 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
-BULK_EMAIL_EMAILS_PER_QUERY = 1000
 
 # Initial delay used for retrying tasks.  Additional retries use
 # longer delays.  Value is in seconds.
@@ -1352,6 +1357,18 @@ INSTALLED_APPS += ('linkedin',)
 LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
+}
+
+
+############################ ORA 2 ############################################
+
+# By default, don't use a file prefix
+ORA2_FILE_PREFIX = None
+
+# AI algorithm configuration
+ORA2_AI_ALGORITHMS = {
+    'fake': 'openassessment.assessment.worker.algorithm.FakeAIAlgorithm',
+    'ease': 'openassessment.assessment.worker.algorithm.EaseAIAlgorithm'
 }
 
 

@@ -23,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
@@ -770,10 +770,11 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
+# The "set" here is to work around the bug that load_classes returns duplicates for multiply-delcared classes.
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
     class_ for (name, class_) in XModuleDescriptor.load_classes()
     if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
-]
+)
 
 
 @ddt

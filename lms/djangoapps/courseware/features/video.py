@@ -14,6 +14,7 @@ from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
+
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
 VIDEO_SOURCE_PORT = settings.VIDEO_SOURCE_PORT
@@ -54,6 +55,7 @@ VIDEO_MENUS = {
 }
 
 coursenum = 'test_course'
+
 
 @before.each_scenario
 def setUp(scenario):

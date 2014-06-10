@@ -15,7 +15,7 @@ def deprecated(deprecated, deprecated_by)
 end
 
 deprecated('install_prereqs','paver install_prereqs')
-deprecated('install_node_prereqs','paver install_prereqs')
-deprecated('install_ruby_prereqs','paver install_prereqs')
-deprecated('install_python_prereqs','paver install_prereqs')
+deprecated('install_node_prereqs','paver install_node_prereqs')
+deprecated('install_ruby_prereqs','paver install_ruby_prereqs')
+deprecated('install_python_prereqs','paver install_python_prereqs')
 

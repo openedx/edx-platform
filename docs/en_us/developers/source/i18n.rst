@@ -62,7 +62,8 @@ do:
 3. How are translator comments indicated?  These are comments in the file that
    will travel with the strings to the translators, giving them context to
    produce the best translation.  They have a "Translators:" marker. They must
-   appear on the line preceding the text they describe.
+   appear on the line preceding the text they describe. Multi-line comments
+   are supported for Python in case the translator comment needs to be wrapped.
 
 The code samples below show how to do each of these things for:
 
@@ -88,6 +89,10 @@ In most Python source code (read the Django docs for more details)::
     
     # Translators: This will help the translator
     message = _("Welcome!")
+    
+    # Translators: This is a very long comment that needs to wrap
+    # over multiple lines because it would be too long otherwise.
+    message = _("Hello world")
 
 Some edX code cannot use Django imports. To maintain portability, XBlocks,
 XModules, Inputtypes and Responsetypes forbid importing Django.  Each of these

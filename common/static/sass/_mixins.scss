@@ -54,19 +54,19 @@
 
 // extends - justify-content right for display:flex alignment in older browsers
 %ui-justify-right-flex {
-  -webkit-box-pack: end;
-  -moz-box-pack: end;
-  -ms-flex-pack: end;
-  -webkit-justify-content: end;
+  -webkit-box-pack: flex-end;
+  -moz-box-pack: flex-end;
+  -ms-flex-pack: flex-end;
+  -webkit-justify-content: flex-end;
   justify-content: flex-end;
 }
 
 // extends - justify-content left for display:flex alignment in older browsers
 %ui-justify-left-flex {
-  -webkit-box-pack: start;
-  -moz-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
+  -webkit-box-pack: flex-start;
+  -moz-box-pack: flex-start;
+  -ms-flex-pack: flex-start;
+  -webkit-justify-content: flex-start;
   justify-content: flex-start;
 }
 

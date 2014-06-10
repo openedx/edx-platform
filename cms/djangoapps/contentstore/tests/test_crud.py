@@ -6,7 +6,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, LocalId
+from opaque_keys.edx.locator import BlockUsageLocator, LocalId
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -68,7 +68,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = modulestore('split').get_course(test_course.id.version_agnostic())
-        self.assertIn(test_chapter.location.block_id, test_course.children)
+        self.assertIn(test_chapter.location, test_course.children)
 
         with self.assertRaises(DuplicateCourseError):
             persistent_factories.PersistentCourseFactory.create(

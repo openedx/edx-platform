@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from analytics.csvs import create_csv_response
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
@@ -558,7 +558,7 @@ def post_metrics_data_csv(request):
         header = [_("Section").encode('utf-8'), _("Subsection").encode('utf-8'), _("Opened by this number of students").encode('utf-8')]
         filename = sanitize_filename(_('subsections') + '_' + course_id)
     elif data_type == 'problem':
-        header = [_("Section").encode('utf-8'), _("Problem").encode('utf-8'), _("Name").encode('utf-8'), _("Count of Students").encode('utf-8'), _("% of Students").encode('utf-8'), _("Score").encode('utf-8')]
+        header = [_("Section").encode('utf-8'), _("Problem").encode('utf-8'), _("Name").encode('utf-8'), _("Count of Students").encode('utf-8'), _("Percent of Students").encode('utf-8'), _("Score").encode('utf-8')]
         filename = sanitize_filename(_('problems') + '_' + course_id)
 
     for index, section in enumerate(sections):

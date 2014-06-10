@@ -3,6 +3,7 @@ Fixture to create a course and course components (XBlocks).
 """
 
 import json
+import re
 import datetime
 import requests
 from textwrap import dedent
@@ -24,6 +25,9 @@ class StudioApiFixture(object):
     """
     Base class for fixtures that use the Studio restful API.
     """
+    def __init__(self):
+        # Info about the auto-auth user used to create the course.
+        self.user = {}
 
     @lazy
     def session(self):
@@ -37,6 +41,14 @@ class StudioApiFixture(object):
 
         # Return the session from the request
         if response.ok:
+            # auto_auth returns information about the newly created user
+            # capture this so it can be used by by the testcases.
+            user_pattern = re.compile('Logged in user {0} \({1}\) with password {2} and user_id {3}'.format(
+                '(?P<username>\S+)', '(?P<email>[^\)]+)', '(?P<password>\S+)', '(?P<user_id>\d+)'))
+            user_matches = re.match(user_pattern, response.text)
+            if user_matches:
+                self.user = user_matches.groupdict()
+
             return session
 
         else:
@@ -237,6 +249,8 @@ class CourseFixture(StudioApiFixture):
         self._configure_course()
         self._upload_assets()
         self._create_xblock_children(self._course_location, self._children)
+
+        return self
 
     @property
     def _course_key(self):

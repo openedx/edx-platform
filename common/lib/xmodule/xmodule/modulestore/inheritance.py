@@ -5,10 +5,21 @@ Support for inheritance of fields down an XBlock hierarchy.
 from datetime import datetime
 from pytz import UTC
 
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer
+from xmodule.partitions.partitions import UserPartition
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
+
+
+class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
+    def from_json(self, values):
+        return [UserPartition.from_json(v) for v in values]
+
+    def to_json(self, values):
+        return [user_partition.to_json()
+                for user_partition in values]
 
 
 class InheritanceMixin(XBlockMixin):
@@ -86,7 +97,22 @@ class InheritanceMixin(XBlockMixin):
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-
+    matlab_api_key = String(
+        display_name="Matlab API key",
+        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+             "This key is granted for exclusive use by this course for the specified duration. "
+             "Please do not share the API key with other courses and notify MathWorks immediately "
+             "if you believe the key is exposed or compromised. To obtain a key for your course, "
+             "or to report and issue, please contact moocsupport@mathworks.com",
+        scope=Scope.settings
+    )
+    # This is should be scoped to content, but since it's defined in the policy
+    # file, it is currently scoped to settings.
+    user_partitions = UserPartitionList(
+        help="The list of group configurations for partitioning students in content experiments.",
+        default=[],
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

@@ -31,21 +31,20 @@ configuration options. This wiki contains two pages with more information about 
 * `Developing on Devstack`_
 
 
-**********
-Fullstack
-**********
+*********************
+edX Production Stack
+*********************
 
 The edX Production Stack, known as **Fullstack**, is a Vagrant instance designed
-to set up all edX services on a single server in a production-like
-configuration.
-1
+for deploying all edX services on a single server.
+
 Fullstack is in the `edx configuration repository`_ on GitHub.
   
-Fullstack information is planned for future versions of this guide.
+This guide includes :ref:`Installing the edX Production Stack`.
 
-You can see the `edx configuration repository wiki`_ for information from edX
-and the Open edX community on Fullstack and other installation and configuration options.
-
+See the `edx configuration repository wiki`_ for information from edX and the
+Open edX community on Fullstack and other installation and configuration
+options.
 
 ==================
 Ubuntu 12.04 64 

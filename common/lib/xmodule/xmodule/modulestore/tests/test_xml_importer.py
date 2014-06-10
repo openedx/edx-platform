@@ -6,10 +6,10 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, ScopeIds
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import import_module
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
 from uuid import uuid4
 import unittest

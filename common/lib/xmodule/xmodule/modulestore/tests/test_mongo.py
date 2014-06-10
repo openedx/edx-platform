@@ -1,7 +1,6 @@
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
-    assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance
-from itertools import ifilter
+    assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
 # pylint: enable=E0611
 from path import path
 import pymongo
@@ -10,7 +9,6 @@ import shutil
 from tempfile import mkdtemp
 from uuid import uuid4
 import unittest
-import bson.son
 from xblock.core import XBlock
 
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
@@ -19,10 +17,11 @@ from xblock.exceptions import InvalidScopeError
 from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
@@ -157,6 +156,33 @@ class TestMongoModuleStore(unittest.TestCase):
             assert_in(course_key, course_ids)
             course = self.store.get_course(course_key)
             assert_not_none(course)
+            assert_true(self.store.has_course(course_key))
+            mix_cased = SlashSeparatedCourseKey(
+                course_key.org.upper(), course_key.course.upper(), course_key.run.lower()
+            )
+            assert_false(self.store.has_course(mix_cased))
+            assert_true(self.store.has_course(mix_cased, ignore_case=True))
+
+    def test_no_such_course(self):
+        """
+        Test get_course and has_course with ids which don't exist
+        """
+        for course_key in [
+
+            SlashSeparatedCourseKey(*fields)
+            for fields in [
+                ['edX', 'simple', 'no_such_course'], ['edX', 'no_such_course', '2012_Fall'],
+                ['NO_SUCH_COURSE', 'Test_iMport_courSe', '2012_Fall'],
+            ]
+        ]:
+            course = self.store.get_course(course_key)
+            assert_is_none(course)
+            assert_false(self.store.has_course(course_key))
+            mix_cased = SlashSeparatedCourseKey(
+                course_key.org.lower(), course_key.course.upper(), course_key.run.upper()
+            )
+            assert_false(self.store.has_course(mix_cased))
+            assert_false(self.store.has_course(mix_cased, ignore_case=True))
 
     def test_loads(self):
         assert_not_none(

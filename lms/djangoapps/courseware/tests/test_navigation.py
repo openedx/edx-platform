@@ -13,6 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.factories import GlobalStaffFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -35,6 +36,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                            display_name='Welcome')
         self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
                                            display_name='factory_section')
+        self.unit0 = ItemFactory.create(parent_location=self.section0.location,
+                                        display_name='New Unit')
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -42,6 +45,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             username = 'u{0}'.format(i)
             self.create_account(username, email, password)
             self.activate_user(email)
+
+        self.staff_user = GlobalStaffFactory()
 
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
     def test_inactive_session_timeout(self):
@@ -135,3 +140,55 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(resp, reverse('courseware_chapter',
                                            kwargs={'course_id': self.course.id.to_deprecated_string(),
                                                    'chapter': 'factory_chapter'}))
+
+    def test_incomplete_course(self):
+        email = self.staff_user.email
+        password = "test"
+        self.login(email, password)
+        self.enroll(self.test_course, True)
+
+        test_course_id = self.test_course.id.to_deprecated_string()
+
+        check_for_get_code(
+            self, 200,
+            reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+        )
+
+        section = ItemFactory.create(
+            parent_location=self.test_course.location,
+            display_name='New Section'
+        )
+        check_for_get_code(
+            self, 200,
+            reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+        )
+
+        subsection = ItemFactory.create(
+            parent_location=section.location,
+            display_name='New Subsection'
+        )
+        check_for_get_code(
+            self, 200,
+            reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+        )
+
+        ItemFactory.create(
+            parent_location=subsection.location,
+            display_name='New Unit'
+        )
+        check_for_get_code(
+            self, 302,
+            reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+        )

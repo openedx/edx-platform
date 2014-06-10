@@ -2,9 +2,6 @@
 <%namespace name='static' file='/static_content.html'/>
 ${static.css(group='style-vendor-tinymce-content', raw=True)}
 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
-<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
-
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -168,7 +165,6 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     };
 
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
 
 	//remove old instances
     if (Annotator._instances.length !== 0) {
@@ -179,18 +175,24 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
 
     ova.annotator.addPlugin('Tags');
+    var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+            '${instructor_email}':
+            '${user.email}';
 
     //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
+    var annotator = ova.annotator;
+    var catchOptions = {
             media:'video',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	        userId:'${user.email}',
+	        userId:userId,
             pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            flags:is_staff,
+            default_tab: "${default_tab}",
+            instructor_email: "${instructor_email}",
+            annotation_mode: "${annotation_mode}",
+        };
+        var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>

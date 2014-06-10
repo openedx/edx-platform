@@ -9,7 +9,7 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
                                    is_commentable_cohorted, get_cohort_by_name)
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 

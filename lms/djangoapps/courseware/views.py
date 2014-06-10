@@ -46,12 +46,13 @@ import shoppingcart
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
+CONTENT_DEPTH = 2
 
 def user_groups(user):
     """
@@ -113,17 +114,36 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     return render_to_string('courseware/accordion.html', context)
 
 
-def get_current_child(xmodule):
+def get_current_child(xmodule, min_depth=None):
     """
     Get the xmodule.position's display item of an xmodule that has a position and
-    children.  If xmodule has no position or is out of bounds, return the first child.
+    children.  If xmodule has no position or is out of bounds, return the first
+    child with children extending down to content_depth.
+
+    For example, if chapter_one has no position set, with two child sections,
+    section-A having no children and section-B having a discussion unit,
+    `get_current_child(chapter, min_depth=1)`  will return section-B.
+
     Returns None only if there are no children at all.
     """
+    def _get_default_child_module(child_modules):
+        """Returns the first child of xmodule, subject to min_depth."""
+        if not child_modules:
+            default_child = None
+        elif not min_depth > 0:
+            default_child = child_modules[0]
+        else:
+            content_children = [child for child in child_modules if
+                                child.has_children_at_depth(min_depth - 1)]
+            default_child = content_children[0] if content_children else None
+
+        return default_child
+
     if not hasattr(xmodule, 'position'):
         return None
 
     if xmodule.position is None:
-        pos = 0
+        return _get_default_child_module(xmodule.get_display_items())
     else:
         # position is 1-indexed.
         pos = xmodule.position - 1
@@ -132,14 +152,15 @@ def get_current_child(xmodule):
     if 0 <= pos < len(children):
         child = children[pos]
     elif len(children) > 0:
-        # Something is wrong.  Default to first child
-        child = children[0]
+        # module has a set position, but the position is out of range.
+        # return default child.
+        child = _get_default_child_module(children)
     else:
         child = None
     return child
 
 
-def redirect_to_course_position(course_module):
+def redirect_to_course_position(course_module, content_depth):
     """
     Return a redirect to the user's current place in the course.
 
@@ -153,7 +174,7 @@ def redirect_to_course_position(course_module):
 
     """
     urlargs = {'course_id': course_module.id.to_deprecated_string()}
-    chapter = get_current_child(course_module)
+    chapter = get_current_child(course_module, min_depth=content_depth)
     if chapter is None:
         # oops.  Something bad has happened.
         raise Http404("No chapter found when loading current position in course")
@@ -163,7 +184,7 @@ def redirect_to_course_position(course_module):
         return redirect(reverse('courseware_chapter', kwargs=urlargs))
 
     # Relying on default of returning first child
-    section = get_current_child(chapter)
+    section = get_current_child(chapter, min_depth=content_depth - 1)
     if section is None:
         raise Http404("No section found when loading current position in course")
 
@@ -266,9 +287,6 @@ def index(request, course_id, chapter=None, section=None,
 
         studio_url = get_studio_url(course_key, 'course')
 
-        if chapter is None:
-            return redirect_to_course_position(course_module)
-
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -282,6 +300,15 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
         }
+
+        has_content = course.has_children_at_depth(CONTENT_DEPTH)
+        if not has_content:
+            # Show empty courseware for a course with no units
+            return render_to_response('courseware/courseware.html', context)
+        elif chapter is None:
+            # passing CONTENT_DEPTH avoids returning 404 for a course with an
+            # empty first section and a second section with content
+            return redirect_to_course_position(course_module, CONTENT_DEPTH)
 
         # Only show the chat if it's enabled by the course and in the
         # settings.

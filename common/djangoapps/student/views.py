@@ -51,7 +51,7 @@ from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
@@ -789,7 +789,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "success": False,
             "value": _('Your password has expired due to password policy on this account. You must '
                        'reset your password before you can log in again. Please click the '
-                       'Forgot Password" link on this page to reset your password before logging in again.'),
+                       '"Forgot Password" link on this page to reset your password before logging in again.'),
         })  # TODO: this should be status code 403  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
@@ -1254,7 +1254,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             else:
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
-            log.warning('Unable to send activation email to user', exc_info=True)
+            log.error('Unable to send activation email to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
             # What is the correct status code to use here? I think it's 500, because
             # the problem is on the server's end -- but also, the account was created.
@@ -1578,7 +1578,7 @@ def reactivation_email_for_user(user):
     try:
         user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except Exception:  # pylint: disable=broad-except
-        log.warning('Unable to send reactivation email', exc_info=True)
+        log.error('Unable to send reactivation email from "{from_address}"'.format(from_address=settings.DEFAULT_FROM_EMAIL), exc_info=True)
         return JsonResponse({
             "success": False,
             "error": _('Unable to send reactivation email')
@@ -1652,8 +1652,14 @@ def change_email_request(request):
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )
-
-    send_mail(subject, message, from_address, [pec.new_email])
+    try:
+        send_mail(subject, message, from_address, [pec.new_email])
+    except Exception:  # pylint: disable=broad-except
+        log.error('Unable to send email activation link to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
+        return JsonResponse({
+            "success": False,
+            "error": _('Unable to send email activation link. Please try again later.')
+        })
 
     return JsonResponse({"success": True})
 

@@ -14,8 +14,8 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_video_storage.js'],
-function (VideoPlayer, VideoStorage) {
+['video/03_video_player.js', 'video/00_video_storage.js', 'video/00_i18n.js'],
+function (VideoPlayer, VideoStorage, i18n) {
     /**
      * @function
      *
@@ -39,7 +39,7 @@ function (VideoPlayer, VideoStorage) {
                     return false;
                 }
 
-                _initializeModules(state)
+                _initializeModules(state, i18n)
                     .done(function () {
                         // On iPad ready state occurs just after start playing.
                         // We hide controls before video starts playing.
@@ -70,7 +70,6 @@ function (VideoPlayer, VideoStorage) {
         isFlashMode: isFlashMode,
         isYoutubeType: isYoutubeType,
         parseSpeed: parseSpeed,
-        parseVideoSources: parseVideoSources,
         parseYoutubeStreams: parseYoutubeStreams,
         saveState: saveState,
         setPlayerMode: setPlayerMode,
@@ -280,32 +279,17 @@ function (VideoPlayer, VideoStorage) {
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
     function _prepareHTML5Video(state) {
-        state.parseVideoSources(
-            {
-                mp4: state.config.mp4Source,
-                webm: state.config.webmSource,
-                ogg: state.config.oggSource
-            }
-        );
-
         state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-
-        // We must have at least one non-YouTube video source available.
-        // Otherwise, return a negative.
-        if (
-            state.html5Sources.webm === null &&
-            state.html5Sources.mp4 === null &&
-            state.html5Sources.ogg === null
-        ) {
-
-            // TODO: use 1 class to work with.
-            state.el.find('.video-player div').addClass('hidden');
-            state.el.find('.video-player h3').removeClass('hidden');
+        // If none of the supported video formats can be played and there is no
+        // short-hand video links, than hide the spinner and show error message.
+        if (!state.config.sources.length) {
             _hideWaitPlaceholder(state);
-
-            console.log(
-                '[Video info]: Non-youtube video sources aren\'t available.'
-            );
+            state.el
+                .find('.video-player div')
+                    .addClass('hidden')
+                .end()
+                .find('.video-player h3')
+                    .removeClass('hidden');
 
             return false;
         }
@@ -341,11 +325,11 @@ function (VideoPlayer, VideoStorage) {
         state.captionHideTimeout = null;
     }
 
-    function _initializeModules(state) {
+    function _initializeModules(state, i18n) {
         var dfd = $.Deferred(),
             modulesList = $.map(state.modules, function(module) {
                 if ($.isFunction(module)) {
-                    return module(state);
+                    return module(state, i18n);
                 } else if ($.isPlainObject(module)) {
                     return module;
                 }
@@ -494,7 +478,6 @@ function (VideoPlayer, VideoStorage) {
             __dfd__: __dfd__,
             el: el,
             container: container,
-            currentVolume: 100,
             id: id,
             isFullScreen: false,
             isTouch: isTouch,
@@ -643,48 +626,6 @@ function (VideoPlayer, VideoStorage) {
         return _.isString(this.videos['1.0']);
     }
 
-    // function parseVideoSources(, mp4Source, webmSource, oggSource)
-    //
-    //     Take the HTML5 sources (URLs of videos), and make them available
-    //     explictly for each type of video format (mp4, webm, ogg).
-    function parseVideoSources(sources) {
-        var _this = this,
-            v = document.createElement('video'),
-            sourceCodecs = {
-                mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-                webm: 'video/webm; codecs="vp8, vorbis"',
-                ogg: 'video/ogg; codecs="theora"'
-            };
-
-        this.html5Sources = {
-            mp4: null,
-            webm: null,
-            ogg: null
-        };
-
-        $.each(sources, function (name, source) {
-            if (source && source.length) {
-                if (
-                    Boolean(
-                        v.canPlayType &&
-                        v.canPlayType(sourceCodecs[name]).replace(/no/, '')
-                    )
-                ) {
-                    _this.html5Sources[name] = source;
-                }
-            }
-        });
-
-        // None of the supported video formats can be played. Hide the spinner.
-        if (!(_.compact(_.values(this.html5Sources)))) {
-            _hideWaitPlaceholder(state);
-            console.log(
-                '[Video info]: This browser cannot play .mp4, .ogg, or .webm ' +
-                'files'
-            );
-        }
-    }
-
     // function fetchMetadata()
     //
     //     When dealing with YouTube videos, we must fetch meta data that has
@@ -764,7 +705,10 @@ function (VideoPlayer, VideoStorage) {
         }
         successHandler = ($.isFunction(callback)) ? callback : null;
         xhr = $.ajax({
-            url: document.location.protocol + '//'  + this.config.ytTestUrl + url + '?v=2&alt=jsonc',
+            url: [
+                document.location.protocol, '//', this.config.ytTestUrl, url,
+                '?v=2&alt=jsonc'
+            ].join(''),
             dataType: 'jsonp',
             timeout: this.config.ytTestTimeout,
             success: successHandler

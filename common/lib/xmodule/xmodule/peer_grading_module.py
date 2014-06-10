@@ -78,7 +78,7 @@ class PeerGradingFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default="Peer Grading Interface"
+        default=_("Peer Grading Interface")
     )
     data = String(
         help=_("Html contents to display for this module"),

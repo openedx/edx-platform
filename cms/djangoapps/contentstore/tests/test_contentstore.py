@@ -33,8 +33,8 @@ from xmodule.modulestore import mongo
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.store_utilities import clone_course, delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -140,7 +140,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.check_components_on_page(
             ADVANCED_COMPONENT_TYPES,
             ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation', 'Image Annotation',
-             'Open Response Assessment', 'Peer Grading Interface', 'openassessment'],
+             'Open Response Assessment', 'Peer Grading Interface', 'openassessment', 'split_test'],
         )
 
     def test_advanced_components_require_two_clicks(self):

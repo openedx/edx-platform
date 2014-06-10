@@ -18,7 +18,7 @@ from courseware.courses import (
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 CMS_BASE_TEST = 'testcms'

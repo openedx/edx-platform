@@ -25,9 +25,10 @@ from contentstore.utils import get_lms_link_for_item, compute_publish_state, Pub
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 
 from .access import has_course_access
+from django.utils.translation import ugettext as _
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -57,8 +58,15 @@ else:
         'word_cloud',
         'graphical_slider_tool',
         'lti',
-        'concept',
+        # XBlocks from pmitros repos are prototypes. They should not be used
+        # except for edX Learning Sciences experiments on edge.edx.org without
+        # further work to make them robust, maintainable, finalize data formats,
+        # etc. 
+        'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
+        'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
+        'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         'openassessment',  # edx-ora2
+        'split_test'
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -283,19 +291,27 @@ def _get_component_templates(course):
             "is_common": is_common
         }
 
+    component_display_names = {
+        'discussion': _("Discussion"),
+        'html': _("HTML"),
+        'problem': _("Problem"),
+        'video': _("Video")
+    }
+    advanced_component_display_names = {}
+
     component_templates = []
     # The component_templates array is in the order of "advanced" (if present), followed
     # by the components in the order listed in COMPONENT_TYPES.
     for category in COMPONENT_TYPES:
         templates_for_category = []
         component_class = _load_mixed_class(category)
-        # add the default template
+        # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
         if hasattr(component_class, 'display_name'):
-            display_name = component_class.display_name.default or 'Blank'
+            display_name = _(component_class.display_name.default) if component_class.display_name.default else _('Blank')
         else:
-            display_name = 'Blank'
+            display_name = _('Blank')
         templates_for_category.append(create_template_dict(display_name, category))
 
         # add boilerplates
@@ -305,20 +321,24 @@ def _get_component_templates(course):
                 if not filter_templates or filter_templates(template, course):
                     templates_for_category.append(
                         create_template_dict(
-                            template['metadata'].get('display_name'),
+                            _(template['metadata'].get('display_name')),
                             category,
                             template.get('template_id'),
                             template['metadata'].get('markdown') is not None
                         )
                     )
-        component_templates.append({"type": category, "templates": templates_for_category})
+        component_templates.append({
+            "type": category,
+            "templates": templates_for_category,
+            "display_name": component_display_names[category]
+            })
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
     course_advanced_keys = course.advanced_modules
-    advanced_component_templates = {"type": "advanced", "templates": []}
+    advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
@@ -327,9 +347,13 @@ def _get_component_templates(course):
                 try:
                     component_class = _load_mixed_class(category)
 
+                    if component_class.display_name.default:
+                        template_display_name = _(component_class.display_name.default)
+                    else:
+                        template_display_name = advanced_component_display_names.get(category, category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
-                            component_class.display_name.default or category,
+                            template_display_name,
                             category
                         )
                     )

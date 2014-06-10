@@ -2,13 +2,9 @@
 metadata:
     display_name: Multiple Choice
     markdown: |
-       A multiple choice problem presents radio buttons for student input. Students can only select a single 
-       option presented. Multiple Choice questions have been the subject of many areas of research due to the early 
-       invention and adoption of bubble sheets.
+       A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
        
-       One of the main elements that goes into a good multiple choice question is the existence of good distractors. 
-       That is, each of the alternate responses presented to the student should be the result of a plausible mistake 
-       that a student might make.
+       One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
     
        >>What Apple device competed with the portable CD player?<<
             ( ) The iPad
@@ -17,8 +13,7 @@ metadata:
             ( ) The vegetable peeler
             
        [explanation]
-       The release of the iPod allowed consumers to carry their entire music library with them in a 
-       format that did not rely on fragile and energy-intensive spinning disks.
+       The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
        [explanation]
 data: |
    <problem>

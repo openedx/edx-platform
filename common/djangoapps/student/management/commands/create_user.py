@@ -6,8 +6,8 @@ from django.core.management.base import BaseCommand
 from django.utils import translation
 
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, Registration, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand

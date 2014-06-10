@@ -60,7 +60,7 @@ class UnitPageTestCase(StudioPageTestCase):
         ItemFactory.create(parent_location=child_container.location,
                            category='html', display_name='grandchild')
         self.validate_preview_html(child_container, 'student_view',
-                                   can_reorder=True, can_edit=False, can_add=False)
+                                   can_reorder=True, can_edit=True, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
@@ -74,4 +74,4 @@ class UnitPageTestCase(StudioPageTestCase):
         modulestore('draft').convert_to_draft(self.vertical.location)
         draft_child_container = modulestore('draft').get_item(child_container.location)
         self.validate_preview_html(draft_child_container, 'student_view',
-                                   can_reorder=True, can_edit=False, can_add=False)
+                                   can_reorder=True, can_edit=True, can_add=False)

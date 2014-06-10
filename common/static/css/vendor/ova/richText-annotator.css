@@ -16,6 +16,14 @@
 	font-style: italic;
 }
 
+.mce-floatpanel {
+	z-index: 700000000!important;
+}
+
+.annotator-wrapper .mce-container {
+	z-index: 3000000000!important; /*To fix full-screen problems*/
+}
+
 .mce-container-body {
 	min-width: 400px;
 }
@@ -23,10 +31,6 @@
 .iframe[id="annotator-field"] {
 	width: inherit;
 	min-width: 400px;
-}
-
-.mce-floatpanel {
-	z-index: 700000000!important;
 }
 
 div.mce-tinymce.mce-container.mce-panel {

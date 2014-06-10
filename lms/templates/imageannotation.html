@@ -9,72 +9,69 @@
 </style>
 
 <div class="annotatable-wrapper">
-	<div class="annotatable-header">
-		% if display_name is not UNDEFINED and display_name is not None:
-			<div class="annotatable-title">${display_name}</div>
-		% endif
-	</div>
-	% if instructions_html is not UNDEFINED and instructions_html is not None:
-	<div class="annotatable-section shaded">
-		<div class="annotatable-section-title">
-		    ${_('Instructions')}
-		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
-		</div>
-		<div class="annotatable-section-body annotatable-instructions">
-		    ${instructions_html}
-		</div>
-	</div>
-	% endif
-	<div class="annotatable-section">
-		<div class="annotatable-content">
-		    <div id="imageHolder" class="openseadragon1"> 
+    <div class="annotatable-header">
+        % if display_name is not UNDEFINED and display_name is not None:
+            <div class="annotatable-title">${display_name}</div>
+        % endif
+    </div>
+    % if instructions_html is not UNDEFINED and instructions_html is not None:
+    <div class="annotatable-section shaded">
+        <div class="annotatable-section-title">
+            ${_('Instructions')}
+            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
+        </div>
+        <div class="annotatable-section-body annotatable-instructions">
+            ${instructions_html}
+        </div>
+    </div>
+    % endif
+    <div class="annotatable-section">
+        <div class="annotatable-content">
+            <div id="imageHolder" class="openseadragon1"> 
                 <%namespace name='static' file='/static_content.html'/>
                 ${static.css(group='style-vendor-tinymce-content', raw=True)}
                 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
-                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}" />
-                <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" />
             </div> 
-			<div id="catchDIV">
-                ## Translators: Notes below refer to annotations. They wil later be put under a "Notes" section.
-				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
-			</div>
-		</div>
-	</div>
+            <div id="catchDIV">
+                <div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 
-	function onClickHideInstructions(){
-		//Reset function if there is more than one event handler
-		$(this).off();
-		$(this).on('click',onClickHideInstructions);
-		var hide = $(this).html()=='Collapse Instructions'?true:false,
-			cls, txt,slideMethod;
-		txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
-		cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
-		slideMethod = (hide ? 'slideUp' : 'slideDown');
-		$(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
-		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
-	}
-	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-	
-	//Grab uri of the course
-	var parts = window.location.href.split("/"), 
-		uri = '',
-	courseid;
-	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
-	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
-	//Change uri in cms
-	var lms_location = $('.sidebar .preview-button').attr('href');
-	if (typeof lms_location!='undefined'){
-		courseid = parts[4].split(".").join("/");
-		uri = window.location.protocol;
-		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
-	}
-	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+    function onClickHideInstructions(){
+        //Reset function if there is more than one event handler
+        $(this).off();
+        $(this).on('click',onClickHideInstructions);
+        var hide = $(this).html()=='Collapse Instructions'?true:false,
+            cls, txt,slideMethod;
+        txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
+        cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
+        slideMethod = (hide ? 'slideUp' : 'slideDown');
+        $(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
+        $(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
+    }
+    $('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
+    
+    //Grab uri of the course
+    var parts = window.location.href.split("/"), 
+        uri = '',
+    courseid;
+    for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+    courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
+    //Change uri in cms
+    var lms_location = $('.sidebar .preview-button').attr('href');
+    if (typeof lms_location!='undefined'){
+        courseid = parts[4].split(".").join("/");
+        uri = window.location.protocol;
+        for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
+    }
+    var unit_id = $('#sequence-list').find('.active').attr("data-element");
         uri += unit_id;
-	var pagination = 100,
-	 is_staff = !('${user.is_staff}'=='False'),
+    var pagination = 100,
+     is_staff = ('${user.email}'=='${instructor_email}'),
         options = {
         optionsAnnotator: {
             permissions:{
@@ -105,7 +102,7 @@
                     if (annotation.permissions) {
                       tokens = annotation.permissions[action] || [];
                       if (is_staff){
-                      	return true;
+                          return true;
                       }
                       if (tokens.length === 0) {
                         return true;
@@ -155,7 +152,7 @@
                     offset:0,
                     uri:uri,
                     media:'image',
-		            userid:'${user.email}',
+                    userid:'${user.email}',
                 }
             },
             highlightTags:{
@@ -174,37 +171,52 @@
         },
         optionsOpenSeadragon:{
             id:                 "imageHolder",
+            annotation_mode: "${annotation_mode}",
+            flags: is_staff,
             prefixUrl:           "${settings.STATIC_URL}" + "js/vendor/ova/images/",
             ${openseadragonjson}
         },
         optionsOSDA:{},
 
     };
-    tinymce.baseURL = "${settings.STATIC_URL}" + "js/vendor/tinymce/js/tinymce";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	
+    
     if (typeof Annotator != 'undefined'){
-    	    //remove old instances
-	    if (Annotator._instances.length !== 0) {
-	      $('#imageHolder').annotator("destroy");
-	    }
-	    delete osda;
-	    //Load the plugin Image/Text Annotation
-	    var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
-	    
-	    //Catch
-	    var annotator = osda.annotator,
-		catchOptions = {
-		    media:'image',
-		    externalLink:false,
-		    imageUrlRoot:imgURLRoot,
-		    showMediaSelector: false,
-		    showPublicPrivate: true,
-		    userId:'${user.email}',
-		    pagination:pagination,//Number of Annotations per load in the pagination,
-		    flags:is_staff
-		},
-		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            //remove old instances
+        if (Annotator._instances.length !== 0) {
+          $('#imageHolder').annotator("destroy");
+        }
+        delete osda;
+        //Load the plugin Image/Text Annotation
+        var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
+        
+        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+            '${instructor_email}':
+            '${user.email}';
 
+        //Catch
+        var annotator = osda.annotator;
+        var catchOptions = {
+            media:'image',
+            externalLink:false,
+            imageUrlRoot:imgURLRoot,
+            showMediaSelector: false,
+            showPublicPrivate: true,
+            userId:userId,
+            pagination:pagination,//Number of Annotations per load in the pagination,
+            flags:is_staff,
+            default_tab: "${default_tab}",
+            instructor_email: "${instructor_email}",
+            annotation_mode: "${annotation_mode}",
+        };
+
+        // if annotations are opened to everyone (2) or if they want to create no annotations (1 with no instructor)
+        // then the table at the bottom of the source should be displayed
+        if ("${annotation_mode}" == "everyone" || ("${annotation_mode}" == "instructor" && "${instructor_email}" != ""))
+            var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+
+        // if it is in instructor mode only (1), the annotator should be destroyed for all except the instructor
+        if ("${annotation_mode}" == "instructor" && "${instructor_email}" == "" && !is_staff)
+            osda.annotator.destroy();
     }
 </script>

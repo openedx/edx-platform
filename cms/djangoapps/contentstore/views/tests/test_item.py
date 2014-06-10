@@ -22,8 +22,9 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locations import Location
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locations import Location
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class ItemTest(CourseTestCase):
@@ -62,10 +63,6 @@ class ItemTest(CourseTestCase):
             data['boilerplate'] = boilerplate
         return self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
 
-
-class GetItem(ItemTest):
-    """Tests for '/xblock' GET url."""
-
     def _create_vertical(self, parent_usage_key=None):
         """
         Creates a vertical, returning its UsageKey.
@@ -73,6 +70,10 @@ class GetItem(ItemTest):
         resp = self.create_xblock(category='vertical', parent_usage_key=parent_usage_key)
         self.assertEqual(resp.status_code, 200)
         return self.response_usage_key(resp)
+
+
+class GetItem(ItemTest):
+    """Tests for '/xblock' GET url."""
 
     def _get_container_preview(self, usage_key):
         """
@@ -645,7 +646,6 @@ class TestEditItem(ItemTest):
         self.assertIsNotNone(draft_2)
         self.assertEqual(draft_1, draft_2)
 
-
     def test_make_private_with_multiple_requests(self):
         """
         Make private requests gets proper response even if xmodule is already made private.
@@ -684,7 +684,6 @@ class TestEditItem(ItemTest):
         draft_2 = self.get_item_from_modulestore(self.problem_usage_key, True)
         self.assertIsNotNone(draft_2)
         self.assertEqual(draft_1, draft_2)
-
 
     def test_published_and_draft_contents_with_update(self):
         """ Create a draft and publish it then modify the draft and check that published content is not modified """
@@ -769,6 +768,133 @@ class TestEditItem(ItemTest):
         html = self.get_item_from_modulestore(html_usage_key, True)
         self.assertEqual(compute_publish_state(unit), PublishState.draft)
         self.assertEqual(compute_publish_state(html), PublishState.draft)
+
+
+class TestEditSplitModule(ItemTest):
+    """
+    Tests around editing instances of the split_test module.
+    """
+    def setUp(self):
+        super(TestEditSplitModule, self).setUp()
+        self.course.user_partitions = [
+            UserPartition(
+                0, 'first_partition', 'First Partition',
+                [Group("0", 'alpha'), Group("1", 'beta')]
+            ),
+            UserPartition(
+                1, 'second_partition', 'Second Partition',
+                [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]
+            )
+        ]
+        self.store.update_item(self.course, self.user.id)
+        root_usage_key = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
+        self.split_test_usage_key = self.response_usage_key(resp)
+        self.split_test_update_url = reverse_usage_url("xblock_handler", self.split_test_usage_key)
+
+    def _update_partition_id(self, partition_id):
+        """
+        Helper method that sets the user_partition_id to the supplied value.
+
+        The updated split_test instance is returned.
+        """
+        self.client.ajax_post(
+            self.split_test_update_url,
+            # Even though user_partition_id is Scope.content, it will get saved by the Studio editor as
+            # metadata. The code in item.py will update the field correctly, even though it is not the
+            # expected scope.
+            data={'metadata': {'user_partition_id': str(partition_id)}}
+        )
+
+        # Verify the partition_id was saved.
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, True)
+        self.assertEqual(partition_id, split_test.user_partition_id)
+        return split_test
+
+    def test_split_create_groups(self):
+        """
+        Test that verticals are created for the experiment groups when
+        a spit test module is edited.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, True)
+        # Initially, no user_partition_id is set, and the split_test has no children.
+        self.assertEqual(-1, split_test.user_partition_id)
+        self.assertEqual(0, len(split_test.children))
+
+        # Set the user_partition_id to 0.
+        split_test = self._update_partition_id(0)
+
+        # Verify that child verticals have been set to match the groups
+        self.assertEqual(2, len(split_test.children))
+        vertical_0 = self.get_item_from_modulestore(split_test.children[0], True)
+        vertical_1 = self.get_item_from_modulestore(split_test.children[1], True)
+        self.assertEqual("vertical", vertical_0.category)
+        self.assertEqual("vertical", vertical_1.category)
+        self.assertEqual("alpha", vertical_0.display_name)
+        self.assertEqual("beta", vertical_1.display_name)
+
+        # Verify that the group_id_to child mapping is correct.
+        self.assertEqual(2, len(split_test.group_id_to_child))
+        split_test.group_id_to_child['0'] = vertical_0.location
+        split_test.group_id_to_child['1'] = vertical_1.location
+
+    def test_split_change_user_partition_id(self):
+        """
+        Test what happens when the user_partition_id is changed to a different experiment.
+
+        This is not currently supported by the Studio UI.
+        """
+        # Set to first experiment.
+        split_test = self._update_partition_id(0)
+        self.assertEqual(2, len(split_test.children))
+        initial_vertical_0_location = split_test.children[0]
+        initial_vertical_1_location = split_test.children[1]
+
+        # Set to second experiment
+        split_test = self._update_partition_id(1)
+        # We don't currently remove existing children.
+        self.assertEqual(5, len(split_test.children))
+        vertical_0 = self.get_item_from_modulestore(split_test.children[2], True)
+        vertical_1 = self.get_item_from_modulestore(split_test.children[3], True)
+        vertical_2 = self.get_item_from_modulestore(split_test.children[4], True)
+
+        # Verify that the group_id_to child mapping is correct.
+        self.assertEqual(3, len(split_test.group_id_to_child))
+        split_test.group_id_to_child['0'] = vertical_0.location
+        split_test.group_id_to_child['1'] = vertical_1.location
+        split_test.group_id_to_child['2'] = vertical_2.location
+        self.assertNotEqual(initial_vertical_0_location, vertical_0.location)
+        self.assertNotEqual(initial_vertical_1_location, vertical_1.location)
+
+    def test_split_same_user_partition_id(self):
+        """
+        Test that nothing happens when the user_partition_id is set to the same value twice.
+        """
+        # Set to first experiment.
+        split_test = self._update_partition_id(0)
+        self.assertEqual(2, len(split_test.children))
+        initial_group_id_to_child = split_test.group_id_to_child
+
+        # Set again to first experiment.
+        split_test = self._update_partition_id(0)
+        self.assertEqual(2, len(split_test.children))
+        self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
+
+    def test_split_non_existent_user_partition_id(self):
+        """
+        Test that nothing happens when the user_partition_id is set to a value that doesn't exist.
+
+        The user_partition_id will be updated, but children and group_id_to_child map will not change.
+        """
+        # Set to first experiment.
+        split_test = self._update_partition_id(0)
+        self.assertEqual(2, len(split_test.children))
+        initial_group_id_to_child = split_test.group_id_to_child
+
+        # Set to an experiment that doesn't exist.
+        split_test = self._update_partition_id(-50)
+        self.assertEqual(2, len(split_test.children))
+        self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
 
 
 @ddt.ddt

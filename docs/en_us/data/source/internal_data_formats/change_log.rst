@@ -18,7 +18,7 @@ Change Log
      - Added descriptions of five video- and problem-related events to the
        :ref:`Tracking Logs` chapter.
    * - 
-     _ Added the new ``edx.forum.searched`` event to the
+     - Added the new ``edx.forum.searched`` event to the
        :ref:`Tracking Logs` chapter.
    * - 05/06/14
      - Added enrollment event types to the :ref:`Tracking Logs` chapter. 

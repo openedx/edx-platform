@@ -34,7 +34,7 @@ from verify_student.models import (
 from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 

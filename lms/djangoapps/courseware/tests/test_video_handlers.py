@@ -11,7 +11,6 @@ from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import editable_modulestore
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -22,7 +21,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
-from xmodule.modulestore.locations import AssetLocation
+from opaque_keys.edx.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0

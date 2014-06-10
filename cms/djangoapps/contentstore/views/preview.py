@@ -13,7 +13,7 @@ from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -180,12 +180,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
         }
-        # For child xblocks with their own page, render a link to the page
-        if xblock_has_own_studio_page(xblock) and not is_root:
-            template = 'studio_container_wrapper.html'
-        else:
-            template = 'studio_xblock_wrapper.html'
-        html = render_to_string(template, template_context)
+        html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag
 

@@ -41,7 +41,7 @@ LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
 MAX_VALID_BROWSER_ATTEMPTS = 20
-GLOBAL_SCRIPT_TIMEOUT = 20
+GLOBAL_SCRIPT_TIMEOUT = 60
 
 
 def get_saucelabs_username_and_key():

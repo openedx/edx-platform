@@ -54,10 +54,10 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
         self.assertIsNone(actual)
 
-    def test_get_html(self):
+    def test_student_view(self):
         """
         Tests the function that passes in all the information in the context that will be used in templates/textannotation.html
         """
-        context = self.mod.get_html()
+        context = self.mod.student_view({}).content
         for key in ['display_name', 'tag', 'source', 'instructions_html', 'content_html', 'annotation_storage', 'token']:
             self.assertIn(key, context)

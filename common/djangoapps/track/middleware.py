@@ -1,3 +1,5 @@
+import hmac
+import hashlib
 import json
 import re
 import logging
@@ -111,11 +113,25 @@ class TrackMiddleware(object):
         )
 
     def get_session_key(self, request):
-        """Gets the Django session key from the request or an empty string if it isn't found"""
+        """ Gets and encrypts the Django session key from the request or an empty string if it isn't found."""
         try:
-            return request.session.session_key
+            return self.encrypt_session_key(request.session.session_key)
         except AttributeError:
             return ''
+
+    def encrypt_session_key(self, session_key):
+        """Encrypts a Django session key to another 32-character hex value."""
+        if not session_key:
+            return ''
+
+        # Follow the model of django.utils.crypto.salted_hmac() and
+        # django.contrib.sessions.backends.base._hash() but use MD5
+        # instead of SHA1 so that the result has the same length (32)
+        # as the original session_key.
+        key_salt = "common.djangoapps.track" + self.__class__.__name__
+        key = hashlib.md5(key_salt + settings.SECRET_KEY).digest()
+        encrypted_session_key = hmac.new(key, msg=session_key, digestmod=hashlib.md5).hexdigest()
+        return encrypted_session_key
 
     def get_user_primary_key(self, request):
         """Gets the primary key of the logged in Django user"""

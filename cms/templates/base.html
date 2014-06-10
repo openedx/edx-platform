@@ -1,4 +1,4 @@
-## -*- coding: utf-8 -*-
+﻿## -*- coding: utf-8 -*-
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
@@ -39,6 +39,12 @@
 
     <script type="text/javascript">
     window.baseUrl = "${settings.STATIC_URL}";
+    // Internet Explorer does not have built-in property 'window.location.origin',
+    // we need to create one here as some vendor code such as TinyMCE uses this.
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol + "//" + window.location.hostname
+                               + (window.location.port ? ':' + window.location.port : '');
+    }
     var require = {
         baseUrl: baseUrl,
         waitSeconds: 60,
@@ -290,6 +296,4 @@
     <%block name="jsextra"></%block>
     <div class="modal-cover"></div>
   </body>
-
-  <%include file="widgets/qualaroo.html" />
 </html>

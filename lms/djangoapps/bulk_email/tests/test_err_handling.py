@@ -19,7 +19,7 @@ from django.db import DatabaseError
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL

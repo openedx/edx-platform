@@ -21,7 +21,7 @@ from django_comment_client.utils import (merge_dict, extract, strip_none, add_co
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -85,7 +85,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'sort_order', 'text',
                                                   'commentable_ids', 'flagged'])))
 
-    threads, page, num_pages = cc.Thread.search(query_params)
+    threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
     #now add the group name if the thread has a group id
     for thread in threads:
@@ -103,6 +103,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
+    query_params['corrected_text'] = corrected_text
 
     return threads, query_params
 
@@ -198,6 +199,7 @@ def forum_form_discussion(request, course_id):
             'annotated_content_info': annotated_content_info,
             'num_pages': query_params['num_pages'],
             'page': query_params['page'],
+            'corrected_text': query_params['corrected_text'],
         })
     else:
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):

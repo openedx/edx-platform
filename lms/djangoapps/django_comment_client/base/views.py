@@ -24,8 +24,8 @@ from django_comment_client.utils import JsonResponse, JsonError, extract, add_co
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from courseware.access import has_access
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 

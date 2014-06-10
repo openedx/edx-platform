@@ -1,7 +1,7 @@
 import unittest
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.content import ContentStore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
 
 class Content:

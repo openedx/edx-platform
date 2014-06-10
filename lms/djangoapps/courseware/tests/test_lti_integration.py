@@ -12,7 +12,6 @@ from django.conf import settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore import Location
 
 from courseware.tests import BaseTestXmodule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE

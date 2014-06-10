@@ -7,7 +7,7 @@ from mock import Mock, patch
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
