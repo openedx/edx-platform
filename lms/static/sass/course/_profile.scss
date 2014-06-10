@@ -40,7 +40,7 @@
 
         div#location_sub, div#language_sub {
           font-weight: bold;
-          @include inline-block();
+          display: inline-block;
 
           form {
             width: 100%;
@@ -235,17 +235,17 @@
 
               h3 {
                 font-size: em(14);
-                @include inline-block;
+                display: inline-block;
               }
 
               ol {
                 list-style: none;
                 margin: 0;
                 padding: 0;
-                @include inline-block;
+                display: inline-block;
 
                 li {
-                  @include inline-block;
+                  display: inline-block;
                   font-size: em(14);
                   font-weight: normal;
                   padding-right: 1em;

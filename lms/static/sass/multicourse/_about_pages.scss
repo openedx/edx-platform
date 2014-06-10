@@ -17,7 +17,7 @@
       color: $lighter-base-font-color;
       font-family: $serif;
       font-style: italic;
-      @include inline-block;
+      display: inline-block;
       letter-spacing: 1px;
       margin: 0px 15px;
       padding: 20px 10px;
@@ -53,7 +53,7 @@
         width: flex-grid(3);
 
         > img {
-          @include inline-block;
+          display: inline-block;
           margin-top: 26px;
           max-height: 60px;
         }

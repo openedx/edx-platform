@@ -277,7 +277,7 @@
     .close-modal {
       border-radius: 2px;
       cursor: pointer;
-      @include inline-block;
+      display: inline-block;
       padding: 10px;
       position: absolute;
       right: 2px;

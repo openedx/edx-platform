@@ -51,7 +51,7 @@
 
       > hgroup {
         @include box-sizing(border-box);
-        @include inline-block;
+        display: inline-block;
         left: 0px;
         opacity: 1.0;
         padding: 20px 30px;
@@ -222,7 +222,7 @@
       text-align: center;
 
       li.partner {
-        @include inline-block;
+        display: inline-block;
         padding: 0px 30px;
         position: relative;
         vertical-align: middle;

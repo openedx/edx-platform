@@ -331,7 +331,7 @@ nav.sequence-bottom {
 
   ul {
     @include clearfix();
-    @include inline-block();
+    display: inline-block;
 
     li {
       float: left;

@@ -156,7 +156,7 @@ div.problem {
 
     &.unanswered {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 14px;
         height: 14px;
         background: url('../images/unanswered-icon.png') center center no-repeat;
@@ -165,7 +165,7 @@ div.problem {
 
     &.correct, &.ui-icon-check {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 25px;
         height: 20px;
         background: url('../images/correct-icon.png') center center no-repeat;
@@ -178,7 +178,7 @@ div.problem {
 
     &.processing {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 20px;
         height: 20px;
         background: url('../images/spinner.gif') center center no-repeat;
@@ -191,7 +191,7 @@ div.problem {
 
     &.incorrect, &.incomplete, &.ui-icon-close {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 20px;
         height: 20px;
         background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -209,7 +209,7 @@ div.problem {
     }
 
     p.answer {
-      @include inline-block();
+      display: inline-block;
       margin-bottom: 0;
       margin-left: $baseline/2;
 
@@ -244,7 +244,7 @@ div.problem {
         margin-bottom: 0;
 
         &.math {
-          @include inline-block;
+          display: inline-block;
           padding: 6px;
           min-width: 30px;
           border: 1px solid #e3e3e3;
@@ -256,7 +256,7 @@ div.problem {
 
     span {
       &.unanswered, &.ui-icon-bullet {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 4px;
         width: 14px;
@@ -265,7 +265,7 @@ div.problem {
       }
 
       &.processing, &.ui-icon-processing {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 6px;
         width: 25px;
@@ -274,7 +274,7 @@ div.problem {
       }
 
       &.correct, &.ui-icon-check {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 3px;
         width: 25px;
@@ -283,7 +283,7 @@ div.problem {
       }
 
       &.partially-correct {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 6px;
         width: 25px;
@@ -292,7 +292,7 @@ div.problem {
       }
 
       &.incorrect, &.incomplete, &.ui-icon-close {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 3px;
         width: 20px;
@@ -623,7 +623,7 @@ div.problem {
       // border-radius: 3px;
       // padding: 8px 12px;
       // margin-top: 10px;
-      @include inline-block;
+      display: inline-block;
       margin: 8px 0 0 $baseline/2;
       color: #777;
       font-style: italic;
