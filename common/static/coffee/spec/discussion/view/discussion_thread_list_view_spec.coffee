@@ -4,34 +4,41 @@ describe "DiscussionThreadListView", ->
         DiscussionSpecHelper.setUpGlobals()
         setFixtures """
         <script type="text/template" id="thread-list-item-template">
-          <a href="<%- id %>" data-id="<%- id %>">
-            <span class="title"><%- title %></span>
-            <span class="comments-count">
-                <%
-            var fmt;
-            var data = {
-                'span_sr_open': '<span class="sr">',
-                'span_close': '</span>',
-                'unread_comments_count': unread_comments_count,
-                'comments_count': comments_count
-                };
-            if (unread_comments_count > 0) {
-                fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
-            } else {
-                fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
-            }
-            print(interpolate(fmt, data, true));
-            %>
-            </span>
-
-            <span class="votes-count">+<%=
-                interpolate(
-                    '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
-                    {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
-                    true
-                    )
-            %></span>
-          </a>
+          <li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
+            <a href="#" class="forum-nav-thread-link">
+              <div class="forum-nav-thread-wrapper-1">
+                <span class="forum-nav-thread-title"><%- title %></span>
+              </div><div class="forum-nav-thread-wrapper-2">
+                <% if (endorsed) { %>
+                  <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">Endorsed response</span></span>
+                <% } %>
+                <span class="forum-nav-thread-votes-count">+<%=
+                    interpolate(
+                        '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
+                        {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
+                        true
+                        )
+                %></span>
+                <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
+                    <%
+                var fmt;
+                var data = {
+                    'span_sr_open': '<span class="sr">',
+                    'span_close': '</span>',
+                    'unread_comments_count': unread_comments_count,
+                    'comments_count': comments_count
+                    };
+                if (unread_comments_count > 0) {
+                    fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
+                } else {
+                    fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
+                }
+                print(interpolate(fmt, data, true));
+                %>
+                </span>
+              </div>
+            </a>
+          </li>
         </script>
         <script type="text/template" id="thread-list-template">
             <div class="browse-search">
@@ -53,9 +60,7 @@ describe "DiscussionThreadListView", ->
               </ul>
             </div>
             <div class="search-alerts"></div>
-            <div class="post-list-wrapper">
-                <ul class="post-list"></ul>
-            </div>
+            <ul class="forum-nav-thread-list"></ul>
         </script>
         <script aria-hidden="true" type="text/template" id="search-alert-template">
             <div class="search-alert" id="search-alert-<%- cid %>">
@@ -71,9 +76,27 @@ describe "DiscussionThreadListView", ->
         <div class="sidebar"></div>
         """
         @threads = [
-          {id: "1", title: "Thread1", body: "dummy body", votes: {up_count: '20'}, unread_comments_count:0, comments_count:1, created_at: '2013-04-03T20:08:39Z',},
-          {id: "2", title: "Thread2", body: "dummy body", votes: {up_count: '42'}, unread_comments_count:0, comments_count:2, created_at: '2013-04-03T20:07:39Z',},
-          {id: "3", title: "Thread3", body: "dummy body", votes: {up_count: '12'}, unread_comments_count:0, comments_count:3, created_at: '2013-04-03T20:06:39Z',},
+          makeThreadWithProps({
+            id: "1",
+            title: "Thread1",
+            votes: {up_count: '20'},
+            comments_count: 1,
+            created_at: '2013-04-03T20:08:39Z',
+          }),
+          makeThreadWithProps({
+            id: "2",
+            title: "Thread2",
+            votes: {up_count: '42'},
+            comments_count: 2,
+            created_at: '2013-04-03T20:07:39Z',
+          }),
+          makeThreadWithProps({
+            id: "3",
+            title: "Thread3",
+            votes: {up_count: '12'},
+            comments_count: 3,
+            created_at: '2013-04-03T20:06:39Z',
+          }),
         ]
 
         spyOn($, "ajax")
@@ -82,6 +105,21 @@ describe "DiscussionThreadListView", ->
         @view = new DiscussionThreadListView({collection: @discussion, el: $(".sidebar")})
         @view.render()
 
+    makeThreadWithProps = (props) ->
+      # Minimal set of properties necessary for rendering
+      thread = {
+        id: "dummy_id",
+        pinned: false,
+        endorsed: false,
+        votes: {up_count: '0'},
+        unread_comments_count: 0,
+        comments_count: 0,
+      }
+      $.extend(thread, props)
+
+    renderSingleThreadWithProps = (props) ->
+      makeView(new Discussion([new Thread(makeThreadWithProps(props))])).render()
+
     makeView = (discussion) ->
       return new DiscussionThreadListView(
           el: $(".sidebar"),
@@ -89,10 +127,10 @@ describe "DiscussionThreadListView", ->
       )
 
     checkThreadsOrdering =  (view, sort_order, type) ->
-      expect(view.$el.find(".post-list .list-item").children().length).toEqual(3)
-      expect(view.$el.find(".post-list .list-item:nth-child(1) .title").text()).toEqual(sort_order[0])
-      expect(view.$el.find(".post-list .list-item:nth-child(2) .title").text()).toEqual(sort_order[1])
-      expect(view.$el.find(".post-list .list-item:nth-child(3) .title").text()).toEqual(sort_order[2])
+      expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)
+      expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text()).toEqual(sort_order[0])
+      expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text()).toEqual(sort_order[1])
+      expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text()).toEqual(sort_order[2])
       expect(view.$el.find(".sort-bar a.active").text()).toEqual(type)
 
     describe "thread rendering should be correct", ->
@@ -269,3 +307,12 @@ describe "DiscussionThreadListView", ->
             @view.searchForUser("dummy")
             expect($.ajax).toHaveBeenCalled()
             expect(@view.addSearchAlert).not.toHaveBeenCalled()
+
+    describe "endorsed renders correctly", ->
+      it "when absent", ->
+        renderSingleThreadWithProps({})
+        expect($(".forum-nav-thread-endorsed").length).toEqual(0)
+
+      it "when present", ->
+        renderSingleThreadWithProps({endorsed: true})
+        expect($(".forum-nav-thread-endorsed").length).toEqual(1)

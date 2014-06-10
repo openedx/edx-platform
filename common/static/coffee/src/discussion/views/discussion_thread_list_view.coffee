@@ -9,8 +9,8 @@ if Backbone?
       "click .sort-bar a": "sortThreads"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
-      "click .post-list .list-item a": "threadSelected"
-      "click .post-list .more-pages a": "loadMorePages"
+      "click .forum-nav-thread-link": "threadSelected"
+      "click .forum-nav-load-more-link": "loadMorePages"
       "change .cohort-options": "chooseCohort"
       'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
 
@@ -68,8 +68,8 @@ if Backbone?
       @clearSearchAlerts()
       thread_id = thread.get('id')
       content = @renderThread(thread)
-      current_el = @$("a[data-id=#{thread_id}]")
-      active = current_el.hasClass("active")
+      current_el = @$(".forum-nav-thread[data-id=#{thread_id}]")
+      active = current_el.has(".forum-nav-thread-link.is-active").length != 0
       current_el.replaceWith(content)
       if active
         @setActiveThread(thread_id)
@@ -111,8 +111,7 @@ if Backbone?
       sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
       sidebar.css 'height', sidebarHeight
 
-      postListWrapper = @$('.post-list-wrapper')
-      postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
+      @$('.forum-nav-thread-list').css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
@@ -138,30 +137,32 @@ if Backbone?
       @
 
     renderThreads: =>
-      @$(".post-list").html("")
+      @$(".forum-nav-thread-list").html("")
       rendered = $("<div></div>")
       for thread in @displayedCollection.models
         content = @renderThread(thread)
         rendered.append content
-        content.wrap("<li class='list-item' data-id='\"#{thread.get('id')}\"' />")
 
-      @$(".post-list").html(rendered.html())
+      @$(".forum-nav-thread-list").html(rendered.html())
       @renderMorePages()
       @updateSidebar()
       @trigger "threads:rendered"
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
-        @$(".post-list").append("<li class='more-pages'><a href='#'>" + gettext("Load more") + "</a></li>")
+        @$(".forum-nav-thread-list").append("<li class='forum-nav-load-more'><a href='#' class='forum-nav-load-more-link'>" + gettext("Load more") + "</a></li>")
 
-    loadMorePages: (event) ->
+    getLoadingContent: (srText) ->
+      return '<div class="forum-nav-loading" tabindex="0"><span class="icon-spinner icon-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
+
+    loadMorePages: (event) =>
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation" tabindex=0><span class="sr" role="alert">' + gettext('Loading more threads') + '</span></div>')
-      @$(".more-pages").addClass("loading")
-      loadingDiv = @$(".more-pages .loading-animation")
-      DiscussionUtil.makeFocusTrap(loadingDiv)
-      loadingDiv.focus()
+      loadMoreElem = @$(".forum-nav-load-more")
+      loadMoreElem.html(@getLoadingContent(gettext("Loading more threads")))
+      loadingElem = loadMoreElem.find(".forum-nav-loading")
+      DiscussionUtil.makeFocusTrap(loadingElem)
+      loadingElem.focus()
       options = {}
       switch @mode
         when 'search'
@@ -184,12 +185,12 @@ if Backbone?
       if lastThread
         # Pagination; focus the first thread after what was previously the last thread
         @once("threads:rendered", ->
-          $(".post-list li:has(a[data-id='#{lastThread}']) + li a").focus()
+          $(".forum-nav-thread[data-id='#{lastThread}'] + .forum-nav-thread .forum-nav-thread-link").focus()
         )
       else
         # Totally refreshing the list (e.g. from clicking a sort button); focus the first thread
         @once("threads:rendered", ->
-          $(".post-list a").first()?.focus()
+          $(".forum-nav-thread-link").first()?.focus()
         )
 
       error = =>
@@ -200,15 +201,9 @@ if Backbone?
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
-      if thread.get('subscribed')
-        content.addClass("followed")
-      if thread.get('endorsed')
-        content.addClass("resolved")
-      if thread.get('read')
-        content.addClass("read")
       unreadCount = thread.get('unread_comments_count')
       if unreadCount > 0
-        content.find('.comments-count').addClass("unread").attr(
+        content.find('.forum-nav-thread-comments-count').attr(
           "data-tooltip",
           interpolate(
             ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', unreadCount),
@@ -216,25 +211,14 @@ if Backbone?
             true
           )
         )
-      @highlight(content)
-
-
-    highlight: (el) ->
-      el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-
-    renderThreadListItem: (thread) =>
-      view = new ThreadListItemView(model: thread)
-      view.on "thread:selected", @threadSelected
-      view.on "thread:removed", @threadRemoved
-      view.render()
-      @$(".post-list").append(view.el)
+      content
 
     threadSelected: (e) =>
       # Use .attr('data-id') rather than .data('id') because .data does type
       # coercion. Usually, this is fine, but when Mongo gives an object id with
       # no letters, it casts it to a Number.
 
-      thread_id = $(e.target).closest("a").attr("data-id")
+      thread_id = $(e.target).closest(".forum-nav-thread").attr("data-id")
       @setActiveThread(thread_id)
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
@@ -243,8 +227,8 @@ if Backbone?
       @trigger("thread:removed", thread_id)
 
     setActiveThread: (thread_id) ->
-      @$(".post-list a[data-id!='#{thread_id}']").removeClass("active")
-      @$(".post-list a[data-id='#{thread_id}']").addClass("active")
+      @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
+      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
 
     showSearch: ->
       @$(".browse").removeClass('is-dropped')
@@ -257,7 +241,7 @@ if Backbone?
     goHome: ->
       @template = _.template($("#discussion-home").html())
       $(".discussion-column").html(@template)
-      $(".post-list a").removeClass("active")
+      $(".forum-nav-thread-list a").removeClass("is-active")
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
@@ -448,7 +432,7 @@ if Backbone?
         dataType: 'json'
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">' + gettext('Loading thread list') + '</span></div></li>')
+          @$(".forum-nav-thread-list").html("<li class='forum-nav-load-more'>" + @getLoadingContent(gettext("Loading thread list")) + "</li>")
         loadedCallback: =>
           if callback
             callback.apply @, [value]
