@@ -8,6 +8,24 @@ describe "DiscussionThreadListView", ->
             <a href="#" class="forum-nav-thread-link">
               <div class="forum-nav-thread-wrapper-1">
                 <span class="forum-nav-thread-title"><%- title %></span>
+                <%
+                var labels = "";
+                if (pinned) {
+                    labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
+                }
+                if (typeof(subscribed) != "undefined" && subscribed) {
+                    labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>Following</li> ';
+                }
+                if (staff_authored) {
+                    labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>By: Staff</li> ';
+                }
+                if (community_ta_authored) {
+                    labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
+                }
+                if (labels != "") {
+                    print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
+                }
+                %>
               </div><div class="forum-nav-thread-wrapper-2">
                 <% if (endorsed) { %>
                   <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">Endorsed response</span></span>
@@ -135,7 +153,7 @@ describe "DiscussionThreadListView", ->
 
     describe "thread rendering should be correct", ->
         checkRender = (threads, type, sort_order) ->
-            discussion = new Discussion(threads, {pages: 1, sort: type})
+            discussion = new Discussion(_.map(threads, (thread) -> new Thread(thread)), {pages: 1, sort: type})
             view = makeView(discussion)
             view.render()
             checkThreadsOrdering(view, sort_order, type)
@@ -151,7 +169,7 @@ describe "DiscussionThreadListView", ->
 
     describe "Sort click should be correct", ->
       changeSorting = (threads, selected_type, new_type, sort_order) ->
-        discussion = new Discussion(threads, {pages: 1, sort: selected_type})
+        discussion = new Discussion(_.map(threads, (thread) -> new Thread(thread)), {pages: 1, sort: selected_type})
         view = makeView(discussion)
         view.render()
         expect(view.$el.find(".sort-bar a.active").text()).toEqual(selected_type)
@@ -316,3 +334,38 @@ describe "DiscussionThreadListView", ->
       it "when present", ->
         renderSingleThreadWithProps({endorsed: true})
         expect($(".forum-nav-thread-endorsed").length).toEqual(1)
+
+    describe "post labels render correctly", ->
+      beforeEach ->
+        @moderatorId = "42"
+        @administratorId = "43"
+        @communityTaId = "44"
+        DiscussionUtil.loadRoles({
+          "Moderator": [parseInt(@moderatorId)],
+          "Administrator": [parseInt(@administratorId)],
+          "Community TA": [parseInt(@communityTaId)],
+        })
+
+      it "for pinned", ->
+        renderSingleThreadWithProps({pinned: true})
+        expect($(".forum-nav-thread-label-pinned").length).toEqual(1)
+
+      it "for following", ->
+        renderSingleThreadWithProps({subscribed: true})
+        expect($(".forum-nav-thread-label-following").length).toEqual(1)
+
+      it "for moderator", ->
+        renderSingleThreadWithProps({user_id: @moderatorId})
+        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+
+      it "for administrator", ->
+        renderSingleThreadWithProps({user_id: @administratorId})
+        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+
+      it "for community TA", ->
+        renderSingleThreadWithProps({user_id: @communityTaId})
+        expect($(".forum-nav-thread-label-community-ta").length).toEqual(1)
+
+      it "when none should be present", ->
+        renderSingleThreadWithProps({})
+        expect($(".forum-nav-thread-labels").length).toEqual(0)

@@ -19,6 +19,11 @@
   }
 }
 
+li[class*=forum-nav-thread-label-] {
+  margin-top: ($baseline/4) !important;
+  padding: 1px 6px !important;
+}
+
 .forum-nav-load-more {
   border-bottom: 1px solid $gray-l3 !important;
   background-color: $gray-l5 !important;
@@ -33,4 +38,19 @@
 
 .forum-nav-load-more-link, .forum-nav-loading {
   padding: $baseline 0 !important;
+}
+
+// The following rules would be unnecessary but for broadly scoped rules defined
+// elsewhere in our CSS.
+
+li[class*=forum-nav-thread-label-] {
+  // Override global span rules
+  span {
+    color: inherit;
+  }
+
+  // Override clearfix stuff in .sidebar ul li rules
+  &:before, &:after {
+    display: none !important;
+  }
 }
