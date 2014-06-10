@@ -49,7 +49,11 @@
 
 // applications
 @import 'discussion/discussion';
-@import 'discussion/discussion-developer';
+@import "discussion/utilities/variables";
+@import "discussion/elements/navigation";
+@import 'discussion/utilities/developer';
+@import 'discussion/utilities/shame';
+
 @import 'news';
 
 // temp - shame and developer
