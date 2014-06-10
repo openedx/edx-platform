@@ -1160,6 +1160,7 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
+BULK_EMAIL_EMAILS_PER_QUERY = 1000
 
 # Initial delay used for retrying tasks.  Additional retries use
 # longer delays.  Value is in seconds.

@@ -20,8 +20,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
 from instructor_task.subtasks import update_subtask_status
-from student.roles import CourseStaffRole
-from student.models import CourseEnrollment
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -178,22 +176,6 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-    def test_no_duplicate_emails_staff_instructor(self):
-        """
-        Test that no duplicate emails are sent to a course instructor that is
-        also course staff
-        """
-        CourseStaffRole(self.course.id).add_users(self.instructor)
-        self.test_send_to_all()
-
-    def test_no_duplicate_emails_enrolled_staff(self):
-        """
-        Test that no duplicate emials are sent to a course instructor that is
-        also enrolled in the course
-        """
-        CourseEnrollment.enroll(self.instructor, self.course.id)
-        self.test_send_to_all()
-
     def test_unicode_subject_send_to_all(self):
         """
         Make sure email (with Unicode characters) send to all goes there.
@@ -278,7 +260,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
+    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
     @patch('bulk_email.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
