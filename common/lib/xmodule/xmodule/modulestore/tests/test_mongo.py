@@ -9,7 +9,6 @@ import shutil
 from tempfile import mkdtemp
 from uuid import uuid4
 import unittest
-import bson.son
 from xblock.core import XBlock
 
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict

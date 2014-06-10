@@ -23,10 +23,14 @@ ensureIndex({'schema': 1})
 fs.files:
 =========
 
+Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
+which can be `uploadDate`, `display_name`, 
+# again, uploadDate may also be a freq sort.
 ```
-ensureIndex({'displayname': 1})
-ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1, '_id.name': 1})
+ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1})
 ```
+
+Remove index on `displayname`
 
 modulestore:
 ============
@@ -47,6 +51,17 @@ Because we often scan for all category='course' regardless of the value of the o
 ensureIndex({'_id.category': 1})
 ```
 
+Because lms calls get_parent_locations frequently (for path generation):
+```
+ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, 'definition.children': 1})
+```
+
+Remove these indices if they exist as I can find no use for them:
+```
+ { "_id.course": 1, "_id.org": 1, "_id.revision": 1, "definition.children": 1 }
+ { "definition.children": 1 }
+```
+
 NOTE, that index will only aid queries which provide the keys in exactly that form and order. The query can
 omit later fields of the query but not earlier. Thus ```modulestore.find({'_id.org': 'myu'})``` will not use
 the index as it omits the tag. As soon as mongo comes across an index field omitted from the query, it stops
@@ -56,14 +71,17 @@ for matches to the category.
 
 To find out if any records have the wrong id structure, run
 ```
-db.modulestore.find({$where: function() { 
-    var keys = Object.keys(this['_id']); 
-    var ref = ['tag', 'org', 'course', 'category', 'name', 'revision']; 
-    for (var i=0; i < ref.length; i++) { 
-        if (keys[i] != ref[i]) return true; 
-    } 
-    return false; }}, 
-    {_id: 1})
+db.fs.files.find({uploadDate: {$gt: startDate, $lt: endDate},
+       $where: function() {
+           var keys = ['category', 'name', 'course', 'tag', 'org', 'revision'];
+           for (var key in this._id) {
+               if (key != keys.shift()) {
+                   return true;
+               }
+           }
+           return false;
+       }},
+       {_id: 1})
 ```
 
 modulestore.active_versions
