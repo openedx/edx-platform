@@ -345,6 +345,10 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
                         return JsonResponse({"error": "Invalid data"}, 400)
                     field.write_to(existing_item, value)
 
+        # call when we need to do something only if fieds values were changed by user.
+        if callable(getattr(existing_item, "editor_saved_on_user_change", None)):
+            existing_item.editor_saved_on_user_change(request.user, old_metadata, old_content)
+
     if callable(getattr(existing_item, "editor_saved", None)):
         existing_item.editor_saved(request.user, old_metadata, old_content)
 

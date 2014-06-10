@@ -229,7 +229,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         if not download_track['explicitly_set'] and self.track:
             self.download_track = True
 
-    def editor_saved(self, user, old_metadata, old_content):
+    def editor_saved_on_user_change(self, user, old_metadata, old_content):
         """
         Used to update video subtitles.
         """
