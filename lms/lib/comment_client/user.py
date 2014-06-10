@@ -117,6 +117,7 @@ class User(models.Model):
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
+        retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
             retrieve_params['course_id'] = self.course_id.to_deprecated_string()
         try:
