@@ -72,7 +72,6 @@ from student.models import (
     unique_id_for_user,
     anonymous_id_for_user
 )
-from student.views import course_from_id
 import track.views
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -352,7 +351,7 @@ def instructor_dashboard(request, course_id):
                 msg += message
 
     elif "Show Background Task History" in action:
-        problem_location = strip_if_string(request.POST.get('problem_for_all_students', ''))
+        problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
             problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
         except InvalidKeyError:
@@ -1620,7 +1619,7 @@ def _do_unenroll_students(course_key, students, email_students=False):
         settings.SITE_NAME
     )
     if email_students:
-        course = course_from_id(course_key)
+        course = modulestore().get_course(course_key)
         #Composition of email
         d = {'site_name': stripped_site_name,
              'course': course}

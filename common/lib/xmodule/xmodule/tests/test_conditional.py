@@ -253,3 +253,45 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
+
+    def test_conditional_module_with_empty_sources_list(self):
+        """
+        If a ConditionalDescriptor is initialized with an empty sources_list, we assert that the sources_list is set
+        via generating UsageKeys from the values in xml_attributes['sources']
+        """
+        dummy_system = Mock()
+        dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
+        dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
+        dummy_field_data = DictFieldData({
+            'data': '<conditional/>',
+            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll'},
+            'children': None,
+        })
+        conditional = ConditionalDescriptor(
+            dummy_system,
+            dummy_field_data,
+            dummy_scope_ids,
+        )
+        self.assertEqual(
+            conditional.sources_list[0],
+            conditional.location.course_key.make_usage_key_from_deprecated_string(conditional.xml_attributes['sources'])
+        )
+
+    def test_conditional_module_parse_sources(self):
+        dummy_system = Mock()
+        dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
+        dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
+        dummy_field_data = DictFieldData({
+            'data': '<conditional/>',
+            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},
+            'children': None,
+        })
+        conditional = ConditionalDescriptor(
+            dummy_system,
+            dummy_field_data,
+            dummy_scope_ids,
+        )
+        self.assertEqual(
+            conditional.parse_sources(conditional.xml_attributes),
+            ['i4x://HarvardX/ER22x/poll_question/T15_poll', 'i4x://HarvardX/ER22x/poll_question/T16_poll']
+        )

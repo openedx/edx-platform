@@ -1,14 +1,16 @@
 """
 Tests of student.roles
 """
-
+import ddt
 from django.test import TestCase
 
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory
 
-from student.roles import GlobalStaff, CourseRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole, \
-    CourseInstructorRole
+from student.roles import (
+    GlobalStaff, CourseRole, CourseStaffRole, CourseInstructorRole,
+    OrgStaffRole, OrgInstructorRole, RoleCache, CourseBetaTesterRole
+)
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
@@ -152,3 +154,40 @@ class RolesTestCase(TestCase):
         role.add_users(self.student)
         role.remove_users(self.student)
         self.assertFalse(role.has_user(self.student))
+
+
+@ddt.ddt
+class RoleCacheTestCase(TestCase):
+
+    IN_KEY = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    NOT_IN_KEY = SlashSeparatedCourseKey('edX', 'toy', '2013_Fall')
+
+    ROLES = (
+        (CourseStaffRole(IN_KEY), ('staff', IN_KEY, 'edX')),
+        (CourseInstructorRole(IN_KEY), ('instructor', IN_KEY, 'edX')),
+        (OrgStaffRole(IN_KEY.org), ('staff', None, 'edX')),
+        (OrgInstructorRole(IN_KEY.org), ('instructor', None, 'edX')),
+        (CourseBetaTesterRole(IN_KEY), ('beta_testers', IN_KEY, 'edX')),
+    )
+
+    def setUp(self):
+        self.user = UserFactory()
+
+    @ddt.data(*ROLES)
+    @ddt.unpack
+    def test_only_in_role(self, role, target):
+        role.add_users(self.user)
+        cache = RoleCache(self.user)
+        self.assertTrue(cache.has_role(*target))
+
+        for other_role, other_target in self.ROLES:
+            if other_role == role:
+                continue
+
+            self.assertFalse(cache.has_role(*other_target))
+
+    @ddt.data(*ROLES)
+    @ddt.unpack
+    def test_empty_cache(self, role, target):
+        cache = RoleCache(self.user)
+        self.assertFalse(cache.has_role(*target))

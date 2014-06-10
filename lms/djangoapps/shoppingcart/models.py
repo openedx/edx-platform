@@ -21,12 +21,9 @@ from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
 
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
-from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
@@ -332,7 +329,7 @@ class PaidCourseRegistration(OrderItem):
         Returns the order item
         """
         # First a bunch of sanity checks
-        course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
+        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
                                                 # throw errors if it doesn't
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
@@ -528,7 +525,7 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        course_name = course_from_id(course_id).display_name
+        course_name = modulestore().get_course(course_id).display_name
         item.line_desc = _("Certificate of Achievement, {mode_name} for course {course}").format(mode_name=mode_info.name,
                                                                                                  course=course_name)
         item.currency = currency
@@ -544,7 +541,7 @@ class CertificateItem(OrderItem):
         try:
             verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
             verification_attempt.submit()
-        except Exception as e:
+        except Exception:
             log.exception(
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
@@ -560,7 +557,7 @@ class CertificateItem(OrderItem):
 
     @property
     def single_item_receipt_context(self):
-        course = course_from_id(self.course_id)
+        course = modulestore().get_course(self.course_id)
         return {
             "course_id": self.course_id,
             "course_name": course.display_name_with_default,

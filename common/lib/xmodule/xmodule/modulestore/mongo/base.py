@@ -184,7 +184,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if isinstance(data, basestring):
                     data = {'data': data}
                 mixed_class = self.mixologist.mix(class_)
-                data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
+                if data is not None:
+                    data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
                 metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
                     data,
@@ -294,8 +295,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     host=host,
                     port=port,
                     tz_aware=tz_aware,
-                    # deserialize dicts as SONs
-                    document_class=SON,
+                    document_class=dict,
                     **kwargs
                 ),
                 db
@@ -350,7 +350,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
 
-        # it's ok to keep these as urls b/c the overall cache is indexed by course_key and this
+        # it's ok to keep these as deprecated strings b/c the overall cache is indexed by course_key and this
         # is a dictionary relative to that course
         results_by_url = {}
         root = None
@@ -411,7 +411,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
-                tree = self.metadata_inheritance_cache_subsystem.get(course_id, {})
+                tree = self.metadata_inheritance_cache_subsystem.get(unicode(course_id), {})
             else:
                 logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
 
@@ -421,7 +421,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
             # now write out computed tree to caching subsystem (e.g. memcached), if available
             if self.metadata_inheritance_cache_subsystem is not None:
-                self.metadata_inheritance_cache_subsystem.set(course_id, tree)
+                self.metadata_inheritance_cache_subsystem.set(unicode(course_id), tree)
 
         # now populate a request_cache, if available. NOTE, we are outside of the
         # scope of the above if: statement so that after a memcache hit, it'll get
@@ -590,7 +590,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(location)
         return item
 
-    def get_course(self, course_key, depth=None):
+    def get_course(self, course_key, depth=0):
         """
         Get the course with the given courseid (org/course/run)
         """

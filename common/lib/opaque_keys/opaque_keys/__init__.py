@@ -187,12 +187,17 @@ class OpaqueKey(object):
         return self.NAMESPACE_SEPARATOR.join([self.CANONICAL_NAMESPACE, self._to_string()])  # pylint: disable=no-member
 
     def __copy__(self):
-        return self.replace()
+        """
+        Because it's immutable, return itself
+        """
+        return self
 
     def __deepcopy__(self, memo):
-        return self.replace(**{
-            key: deepcopy(getattr(self, key), memo) for key in self.KEY_FIELDS  # pylint: disable=no-member
-        })
+        """
+        Because it's immutable, return itself
+        """
+        memo[id(self)] = self
+        return self
 
     def __setstate__(self, state_dict):
         # used by pickle to set fields on an unpickled object

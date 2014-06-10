@@ -1,4 +1,6 @@
-from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
+""" Helper methods for determining user access permissions in Studio """
+
+from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole, OrgStaffRole, OrgInstructorRole
 from student import auth
 
 
@@ -13,6 +15,10 @@ def has_course_access(user, course_key, role=CourseStaffRole):
     queries here as INSTRUCTOR has all the rights that STAFF do
     """
     if GlobalStaff().has_user(user):
+        return True
+    if OrgInstructorRole(org=course_key.org).has_user(user):
+        return True
+    if OrgStaffRole(org=course_key.org).has_user(user):
         return True
     return auth.has_access(user, role(course_key))
 

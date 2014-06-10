@@ -99,7 +99,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             host=self.HOST,
             port=self.PORT,
             tz_aware=True,
-            document_class=bson.son.SON,
         )
         self.connection.drop_database(self.DB)
         self.addCleanup(self.connection.drop_database, self.DB)
