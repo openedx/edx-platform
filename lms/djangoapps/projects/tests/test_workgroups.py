@@ -252,6 +252,29 @@ class WorkgroupsApiTests(TestCase):
         self.assertEqual(response.data[0]['id'], pr_id)
         self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
 
+    def test_workgroups_workgroup_reviews_get(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        workgroup_id = response.data['id']
+        wr_data = {
+            'workgroup': workgroup_id,
+            'reviewer': self.test_user.username,
+            'question': 'Test question?',
+            'answer': 'Test answer!'
+        }
+        response = self.do_post('/api/workgroup_reviews/', wr_data)
+        self.assertEqual(response.status_code, 201)
+        wr_id = response.data['id']
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
+        workgroup_reviews_uri = '{}workgroup_reviews/'.format(test_uri)
+        response = self.do_get(workgroup_reviews_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], wr_id)
+        self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
 
     def test_submissions_list_post_invalid_relationships(self):
         data = {
@@ -271,7 +294,6 @@ class WorkgroupsApiTests(TestCase):
         data = {"id": 123456}
         response = self.do_post(groups_uri, data)
         self.assertEqual(response.status_code, 400)
-
 
     def test_workgroups_detail_get_undefined(self):
         test_uri = '/api/workgroups/123456789/'
