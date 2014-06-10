@@ -12,7 +12,6 @@ from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -629,13 +628,13 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
       - location -- the module location. Used to look up the XModule instance
       - course_id -- defines the course context for this request.
 
-    Raises PermissionDenied if the user is not logged in. Raises Http404 if
+    Return 401 error if the user is not logged in. Raises Http404 if
     the location and course_id do not identify a valid module, the module is
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
     if not request.user.is_authenticated():
-        raise PermissionDenied
+        return HttpResponse('Unauthorized', status=401)
 
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
