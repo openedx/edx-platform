@@ -27,8 +27,6 @@ PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
-from edxmako import add_lookup, lookup_template
-add_lookup('main', 'templates', package='discussion_app')
 
 @newrelic.agent.function_trace()
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
