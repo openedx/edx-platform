@@ -127,19 +127,6 @@ def test_python(options):
 
 @task
 @needs(
-    'pavelib.prereqs.install_python_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-def test_i18n():
-    """
-    Run all i18n tests
-    """
-    i18n_suite = suites.I18nTestSuite('i18n')
-    i18n_suite.run()
-
-
-@task
-@needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
@@ -157,11 +144,10 @@ def test(options):
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
-    i18n_suite = suites.I18nTestSuite('i18n', **opts)
     js_suite = suites.JsTestSuite('JS Tests', mode='run', with_coverage=True)
 
     # Main suite to be run
-    all_unittests_suite = suites.TestSuite('All Tests', subsuites=[i18n_suite, js_suite, python_suite])
+    all_unittests_suite = suites.TestSuite('All Tests', subsuites=[js_suite, python_suite])
     all_unittests_suite.run()
 
 
