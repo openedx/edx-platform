@@ -25,7 +25,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bourbon (~> 4.0.1)
+  bourbon (~> 4.0.2)
   colorize (~> 0.5.8)
   dalli (~> 2.6.4)
   launchy (~> 2.1.2)
