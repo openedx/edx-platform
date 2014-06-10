@@ -1,0 +1,27 @@
+tddium:
+  :hooks:
+    :pre_setup: "pip install -r requirements/edx/paver.txt && paver install_prereqs"
+  :cache:
+    :key_paths:
+      - requirements/edx/
+      - package.json
+      - Gemfile
+  #:mongodb:
+  #  :version: "2.4.7"
+  #:mysql:
+  #  :version: "5.5"
+  #:memcached:
+  #  :version: "1.4.7"
+  #:chrome:
+  :python:
+    :python_version: "2.7"
+  :tests:
+    - paver test_lib
+    #- paver test_lms
+    #- paver test_cms
+    #- paver test_lib
+    #- paver test_js
+    #- rake test:acceptance:lms["-v 3 --tag shard_${SHARD}"]
+    #- rake test:acceptance:cms["-v 3 --tag shard_${SHARD}"]
+    #- rake test:bok_choy --lms
+    #- rake test:bok_choy --studio
