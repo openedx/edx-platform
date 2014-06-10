@@ -159,7 +159,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ]
         )
         response = self.client.post(dispatch_url, {'position': 2})
-        self.assertEquals(403, response.status_code)
+        self.assertEquals(401, response.status_code)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
