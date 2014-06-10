@@ -1,0 +1,112 @@
+// -----------
+// Thread list
+// -----------
+.forum-nav-thread-list {
+  overflow-y: scroll;
+}
+
+.forum-nav-thread {
+  border-bottom: 1px solid $gray-l3;
+}
+
+.forum-nav-thread-link {
+  @include clearfix();
+}
+
+%forum-nav-thread-wrapper {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.forum-nav-thread-wrapper-1 {
+  @extend %forum-nav-thread-wrapper;
+  width: 70%;
+}
+
+.forum-nav-thread-wrapper-2 {
+  @extend %forum-nav-thread-wrapper;
+  width: 30%;
+  text-align: right;
+}
+
+.forum-nav-thread-title {
+  @extend %t-title7;
+  display: block;
+}
+
+%forum-nav-thread-wrapper-2-content {
+  @include font-size(11);
+  display: inline-block;
+  margin-right: ($baseline/4);
+  text-align: center;
+  color: $black;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.forum-nav-thread-endorsed {
+  @extend %forum-nav-thread-wrapper-2-content;
+  color: $green-d1;
+}
+
+.forum-nav-thread-votes-count {
+  @extend %forum-nav-thread-wrapper-2-content;
+}
+
+.forum-nav-thread-comments-count {
+  @extend %forum-nav-thread-wrapper-2-content;
+  @extend %t-weight4;
+  position: relative;
+  margin-left: ($baseline/4);
+  margin-bottom: ($baseline/4); // Because tail is position: absolute
+  border-radius: 2px;
+  padding: ($baseline/10) ($baseline/5);
+  min-width: 2em; // Fit most comment counts but allow expansion if necessary
+  background-color: $gray-l3;
+
+  // Speech bubble tail
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: (-$baseline/4);
+    right: ($baseline/4);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 ($baseline/4) ($baseline/4) 0;
+    border-color: transparent $gray-l3 transparent transparent;
+  }
+
+  &.is-unread {
+    background-color: $white;
+
+    &:after {
+      border-right-color: $white
+    }
+  }
+}
+
+.forum-nav-thread.is-unread .forum-nav-thread-comments-count {
+  background-color: $blue;
+  color: $white;
+
+  &:after {
+    border-right-color: $blue;
+  }
+}
+
+%forum-nav-load-more-content {
+  text-align: center;
+}
+
+.forum-nav-load-more-link {
+  @extend %forum-nav-load-more-content;
+  color: $link-color;
+}
+
+.forum-nav-loading {
+  @extend %forum-nav-load-more-content;
+}

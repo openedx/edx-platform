@@ -1,0 +1,36 @@
+// The sidebar class does a lot of things that we don't want in the thread list;
+// the following rules contain styling that is necessary and would otherwise
+// reside in elements/_navigation.scss if the sidebar styling did not make the
+// !important directive necessary.
+
+.forum-nav-thread {
+  background-color: $gray-l5 !important;
+
+  &.is-unread {
+    background-color: $white !important;
+  }
+}
+
+.forum-nav-thread-link {
+  padding: ($baseline/4) ($baseline/2) !important;
+
+  &.is-active, &:hover, &:focus {
+    background-color: $forum-color-active-thread !important;
+  }
+}
+
+.forum-nav-load-more {
+  border-bottom: 1px solid $gray-l3 !important;
+  background-color: $gray-l5 !important;
+}
+
+.forum-nav-load-more-link {
+  &:hover, &:focus {
+    color: $link-color !important;
+    background-color: $forum-color-active-thread !important;
+  }
+}
+
+.forum-nav-load-more-link, .forum-nav-loading {
+  padding: $baseline 0 !important;
+}
