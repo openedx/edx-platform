@@ -76,6 +76,57 @@ $pink-u1: desaturate($pink,15%);
 $pink-u2: desaturate($pink,30%);
 $pink-u3: desaturate($pink,45%);
 
+$gray: rgb(127,127,127);
+$gray-l1: tint($gray,20%);
+$gray-l2: tint($gray,40%);
+$gray-l3: tint($gray,60%);
+$gray-l4: tint($gray,80%);
+$gray-l5: tint($gray,90%);
+$gray-l6: tint($gray,95%);
+$gray-l7: tint($gray,99%);
+$gray-d1: shade($gray,20%);
+$gray-d2: shade($gray,40%);
+$gray-d3: shade($gray,60%);
+$gray-d4: shade($gray,80%);
+
+$blue: rgb(0, 159, 230);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d3: shade($blue,60%);
+$blue-d4: shade($blue,80%);
+$blue-s1: saturate($blue,15%);
+$blue-s2: saturate($blue,30%);
+$blue-s3: saturate($blue,45%);
+$blue-u1: desaturate($blue,15%);
+$blue-u2: desaturate($blue,30%);
+$blue-u3: desaturate($blue,45%);
+$blue-t0: rgba($blue, 0.125);
+$blue-t1: rgba($blue, 0.25);
+$blue-t2: rgba($blue, 0.50);
+$blue-t3: rgba($blue, 0.75);
+
+$pink: rgb(183, 37, 103);
+$pink-l1: tint($pink,20%);
+$pink-l2: tint($pink,40%);
+$pink-l3: tint($pink,60%);
+$pink-l4: tint($pink,80%);
+$pink-l5: tint($pink,90%);
+$pink-d1: shade($pink,20%);
+$pink-d2: shade($pink,40%);
+$pink-d3: shade($pink,60%);
+$pink-d4: shade($pink,80%);
+$pink-s1: saturate($pink,15%);
+$pink-s2: saturate($pink,30%);
+$pink-s3: saturate($pink,45%);
+$pink-u1: desaturate($pink,15%);
+$pink-u2: desaturate($pink,30%);
+$pink-u3: desaturate($pink,45%);
+
 $red: rgb(178, 6, 16);
 $red-l1: tint($red,20%);
 $red-l2: tint($red,40%);
@@ -110,6 +161,23 @@ $green-u1: desaturate($green,15%);
 $green-u2: desaturate($green,30%);
 $green-u3: desaturate($green,45%);
 
+$orange: rgb(237, 189, 60);
+$orange-l1: tint($orange,20%);
+$orange-l2: tint($orange,40%);
+$orange-l3: tint($orange,60%);
+$orange-l4: tint($orange,80%);
+$orange-l5: tint($orange,90%);
+$orange-d1: shade($orange,20%);
+$orange-d2: shade($orange,40%);
+$orange-d3: shade($orange,60%);
+$orange-d4: shade($orange,80%);
+$orange-s1: saturate($orange,15%);
+$orange-s2: saturate($orange,30%);
+$orange-s3: saturate($orange,45%);
+$orange-u1: desaturate($orange,15%);
+$orange-u2: desaturate($orange,30%);
+$orange-u3: desaturate($orange,45%);
+
 // TODO: both blue and yellow variables differ from CMS rgb value, need to confirm change to CMS variable is ok in current platform uses before switching.
 $blue: rgb(29,157,217);
 $yellow: rgb(255, 252, 221);
@@ -121,7 +189,7 @@ $light-gray: rgb(221, 221, 221);
 $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
-$outer-border-color: rgb(170, 170, 170);
+$outer-border-color: $gray-l3;
 $light-gray: #ddd;
 
 // used by descriptor css
@@ -320,8 +388,7 @@ $dashboard-course-cover-border: $light-gray;
 
 // MISC: course assets
 $content-wrapper-bg: $white;
-$course-bg-color: #d6d6d6;
-$course-bg-image: url(../images/bg-texture.png);
+$course-bg-color: $gray-l6;
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);

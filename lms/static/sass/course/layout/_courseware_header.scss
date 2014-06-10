@@ -1,10 +1,12 @@
 nav.course-material {
   @include clearfix;
   @include box-sizing(border-box);
-  border-bottom: none;
   margin: 0px auto 0px;
+  border-bottom: none;
   padding: 0px;
   width: 100%;
+  background-color: $blue;
+  box-shadow: 0 0 2px $shadow inset;
 
   .inner-wrapper {
     margin: 0 auto;
@@ -15,18 +17,16 @@ nav.course-material {
   ol.course-tabs {
     @include border-top-radius(4px);
     @include clearfix;
-    padding: 28px 0 10px 0;
-    margin-left: 10px;
+    padding: 0 9px 0 10px;
 
     li {
       float: left;
       list-style: none;
-      margin-right: 6px;
 
       &.prominent {
         margin-right: 16px;
+        //border-radius: 3px;
         background: rgba(255, 255, 255, .5);
-        border-radius: 3px; 
       }
 
       &.prominent + li {
@@ -35,15 +35,12 @@ nav.course-material {
       }
 
       a {
-        border-radius: 3px;
-        color: #555;
         display: block;
+        padding: $baseline ($baseline*.75);
+        color: $white;
         text-align: center;
-        padding: 10px 13px 12px;
-        font-size: 14px;
-        font-weight: bold;
         text-decoration: none;
-        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+        font-size: 14px;
 
         &:hover, &:focus {
           color: #333;
@@ -51,12 +48,7 @@ nav.course-material {
         }
 
         &.active {
-          // background: rgba(0, 0, 0, .2);
-          @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
-          background-color: transparent;
-          box-shadow: 0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset;
-          color: #fff;
-          text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+          background-color: $blue-u3;
         }
       }
     }
