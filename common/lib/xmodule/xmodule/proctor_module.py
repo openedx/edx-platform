@@ -32,14 +32,13 @@ class ProctorPanel(object):
     '''
 
 
-    def __init__(self, user_id, procset_name):
+    def __init__(self, user, procset_name):
         self.ProctorPanelInterface = getattr(settings, 'PROCTOR_PANEL_INTERFACE', {})
         self.ProctorPanelServer = self.ProctorPanelInterface.get('url', "")
-        self.user_id = user_id
         self.procset_name = procset_name
         self.ses = requests.session()
-        from django.contrib.auth.models import User
-        self.user = User.objects.get(pk=user_id)
+        self.user = user
+        self.user_id = user.id
 
     def is_released(self):
         #url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
@@ -106,8 +105,8 @@ class ProctorModule(ProctorFields, XModule):
     def __init__(self, *args, **kwargs):
         super(ProctorModule, self).__init__(*args, **kwargs)
         # check proctor panel to see if this should be released
-        user_id = self.system.seed
-        self.pp = ProctorPanel(user_id, self.procset_name)
+        user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+        self.pp = ProctorPanel(user, self.procset_name)
 
         self.child_descriptor = self.descriptor.get_children()[0]
         log.debug("children of proctor module (should be only 1): %s", self.get_children())
