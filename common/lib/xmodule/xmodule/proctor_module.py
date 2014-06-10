@@ -6,7 +6,6 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from django.conf import settings
-from django.contrib.auth.models import User
 
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
@@ -32,14 +31,14 @@ class ProctorPanel(object):
 
     '''
 
-    ProctorPanelInterface = getattr(settings, 'PROCTOR_PANEL_INTERFACE', {})
-    ProctorPanelServer = ProctorPanelInterface.get('url', "")
 
     def __init__(self, user_id, procset_name):
-
+        self.ProctorPanelInterface = getattr(settings, 'PROCTOR_PANEL_INTERFACE', {})
+        self.ProctorPanelServer = self.ProctorPanelInterface.get('url', "")
         self.user_id = user_id
         self.procset_name = procset_name
         self.ses = requests.session()
+        from django.contrib.auth.models import User
         self.user = User.objects.get(pk=user_id)
 
     def is_released(self):
