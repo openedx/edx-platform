@@ -13,6 +13,7 @@ from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupProfile
+from projects.models import Project
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -51,6 +52,11 @@ class WorkgroupsApiTests(TestCase):
             name=self.test_group_name,
             group_id=self.test_group.id,
             group_type="series"
+        )
+
+        self.test_project = Project.objects.create(
+            course_id=self.test_course_id,
+            content_id=self.test_course_content_id
         )
 
         self.test_user_email = str(uuid.uuid4())
@@ -95,6 +101,7 @@ class WorkgroupsApiTests(TestCase):
     def test_workgroups_list_post(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -106,14 +113,20 @@ class WorkgroupsApiTests(TestCase):
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
+        self.assertEqual(response.data['name'], self.test_workgroup_name)
+        self.assertEqual(response.data['project'], self.test_project.id)
         self.assertIsNotNone(response.data['users'])
         self.assertIsNotNone(response.data['groups'])
+        self.assertIsNotNone(response.data['submissions'])
+        self.assertIsNotNone(response.data['workgroup_reviews'])
+        self.assertIsNotNone(response.data['peer_reviews'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
     def test_workgroups_detail_get(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -123,14 +136,20 @@ class WorkgroupsApiTests(TestCase):
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
+        self.assertEqual(response.data['name'], self.test_workgroup_name)
+        self.assertEqual(response.data['project'], self.test_project.id)
         self.assertIsNotNone(response.data['users'])
         self.assertIsNotNone(response.data['groups'])
+        self.assertIsNotNone(response.data['submissions'])
+        self.assertIsNotNone(response.data['workgroup_reviews'])
+        self.assertIsNotNone(response.data['peer_reviews'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
     def test_workgroups_groups_post(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -142,6 +161,7 @@ class WorkgroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['groups'][0]['id'], self.test_group.id)
+        self.assertEqual(response.data['groups'][0]['name'], self.test_group.name)
 
         test_groupnoprofile_name = str(uuid.uuid4())
         test_groupnoprofile = Group.objects.create(
@@ -155,11 +175,30 @@ class WorkgroupsApiTests(TestCase):
         self.assertEqual(response.data['groups'][1]['id'], test_groupnoprofile.id)
         self.assertEqual(response.data['groups'][1]['name'], test_groupnoprofile_name)
 
+    def test_workgroups_groups_get(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        groups_uri = '{}groups/'.format(test_uri)
+        data = {"id": self.test_group.id}
+        response = self.do_post(groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], self.test_group.id)
+        self.assertEqual(response.data[0]['name'], self.test_group.name)
+
     def test_workgroups_users_post(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
+        print response.data
         self.assertEqual(response.status_code, 201)
         test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
@@ -170,9 +209,54 @@ class WorkgroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users'][0]['id'], self.test_user.id)
 
+    def test_workgroups_users_get(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(users_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], self.test_user.id)
+        self.assertEqual(response.data[0]['username'], self.test_user.username)
+        self.assertEqual(response.data[0]['email'], self.test_user.email)
+
+    def test_workgroups_peer_reviews_get(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        workgroup_id = response.data['id']
+        pr_data = {
+            'workgroup': workgroup_id,
+            'user': self.test_user.id,
+            'reviewer': self.test_user.username,
+            'question': 'Test question?',
+            'answer': 'Test answer!'
+        }
+        response = self.do_post('/api/peer_reviews/', pr_data)
+        self.assertEqual(response.status_code, 201)
+        pr_id = response.data['id']
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
+        peer_reviews_uri = '{}peer_reviews/'.format(test_uri)
+        response = self.do_get(peer_reviews_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], pr_id)
+        self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
+
+
     def test_submissions_list_post_invalid_relationships(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -188,6 +272,7 @@ class WorkgroupsApiTests(TestCase):
         response = self.do_post(groups_uri, data)
         self.assertEqual(response.status_code, 400)
 
+
     def test_workgroups_detail_get_undefined(self):
         test_uri = '/api/workgroups/123456789/'
         response = self.do_get(test_uri)
@@ -196,6 +281,7 @@ class WorkgroupsApiTests(TestCase):
     def test_workgroups_detail_delete(self):
         data = {
             'name': self.test_workgroup_name,
+            'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
         self.assertEqual(response.status_code, 201)

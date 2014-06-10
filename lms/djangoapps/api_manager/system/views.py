@@ -51,6 +51,7 @@ class ApiDetail(SecureAPIView):
         response_data['resources'] = []
         response_data['resources'].append({'uri': base_uri + 'courses'})
         response_data['resources'].append({'uri': base_uri + 'groups'})
+        response_data['resources'].append({'uri': base_uri + 'projects'})
         response_data['resources'].append({'uri': base_uri + 'sessions'})
         response_data['resources'].append({'uri': base_uri + 'system'})
         response_data['resources'].append({'uri': base_uri + 'users'})

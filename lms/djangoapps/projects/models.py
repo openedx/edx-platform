@@ -2,18 +2,9 @@
 
 from django.contrib.auth.models import Group, User
 from django.db import models
+
 from model_utils.models import TimeStampedModel
-
-
-class Workgroup(TimeStampedModel):
-    """
-    Model representing the Workgroup concept.  Workgroups are an
-    intersection of Users and CourseContent, although they can also be
-    related to other Groups.
-    """
-    name = models.CharField(max_length=255, null=True, blank=True)
-    users = models.ManyToManyField(User, related_name="workgroups")
-    groups = models.ManyToManyField(Group, related_name="workgroups")
+from student.models import AnonymousUserId
 
 
 class Project(TimeStampedModel):
@@ -23,47 +14,71 @@ class Project(TimeStampedModel):
     """
     course_id = models.CharField(max_length=255)
     content_id = models.CharField(max_length=255)
-    workgroups = models.ManyToManyField(Workgroup, related_name="projects")
 
     class Meta:
         """ Meta class for defining additional model characteristics """
         unique_together = ("course_id", "content_id")
 
 
-class Submission(TimeStampedModel):
+class Workgroup(TimeStampedModel):
+    """
+    Model representing the Workgroup concept.  Workgroups are an
+    intersection of Users and CourseContent, although they can also be
+    related to other Groups.
+    """
+    name = models.CharField(max_length=255, null=True, blank=True)
+    project = models.ForeignKey(Project, related_name="workgroups")
+    users = models.ManyToManyField(User, related_name="workgroups", blank=True, null=True)
+    groups = models.ManyToManyField(Group, related_name="workgroups", blank=True, null=True)
+
+
+class WorkgroupReview(TimeStampedModel):
+    """
+    Model representing the Workgroup Review concept.  A Workgroup Review is
+    a single question/answer combination for a particular Workgroup in the
+    context of a specific Project, as defined in the Group Project XBlock
+    schema.  There can be more than one Project Review entry for a given Project.
+    """
+    workgroup = models.ForeignKey(Workgroup, related_name="workgroup_reviews")
+    reviewer = models.CharField(max_length=255)  # AnonymousUserId
+    question = models.CharField(max_length=255)
+    answer = models.CharField(max_length=255)
+
+
+class WorkgroupSubmission(TimeStampedModel):
     """
     Model representing the Submission concept.  A Submission is a project artifact
     created by the Users in a Workgroup.  The document fields are defined by the
     'Group Project' XBlock and data for a specific instance is persisted here
     """
-    user = models.ForeignKey(User)
     workgroup = models.ForeignKey(Workgroup, related_name="submissions")
-    project = models.ForeignKey(Project, related_name="projects")
+    user = models.ForeignKey(User, related_name="submissions")
     document_id = models.CharField(max_length=255)
     document_url = models.CharField(max_length=255)
     document_mime_type = models.CharField(max_length=255)
 
 
-class SubmissionReview(TimeStampedModel):
+class WorkgroupSubmissionReview(TimeStampedModel):
     """
     Model representing the Submission Review concept.  A Submission Review is
     essentially a single question/answer combination for a particular Submission,
     defined in the Group Project XBlock schema.  There can be more than one
-    Submission Review for a given Submission.
+    Submission Review entry for a given Submission.
     """
-    submission = models.ForeignKey(Submission, related_name="submission_reviews")
-    reviewer = models.ForeignKey(User, related_name="submission_reviews")
+    submission = models.ForeignKey(WorkgroupSubmission, related_name="reviews")
+    reviewer = models.CharField(max_length=255)  # AnonymousUserId
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
 
 
-class PeerReview(TimeStampedModel):
+class WorkgroupPeerReview(TimeStampedModel):
     """
     Model representing the Peer Review concept.  A Peer Review is a record of a
     specific question/answer defined in the Group Project XBlock schema.  There
-    can be more than one Peer Review for a given User.
+    can be more than one Peer Review entry for a given User.
     """
-    user = models.ForeignKey(User, related_name="peer_reviewees")
-    reviewer = models.ForeignKey(User, related_name="peer_reviewers")
+    workgroup = models.ForeignKey(Workgroup, related_name="peer_reviews")
+    user = models.ForeignKey(User, related_name="workgroup_peer_reviewees")
+    reviewer = models.CharField(max_length=255)  # AnonymousUserId
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
