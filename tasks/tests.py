@@ -3,10 +3,10 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs
-from pavelib.utils.test import suites
-from pavelib.utils.envs import Env
-from optparse import make_option
+from invoke import task
+from invoke import run as sh
+from tasks.utils.test import suites
+from tasks.utils.envs import Env
 
 try:
     from pygments.console import colorize
@@ -16,33 +16,38 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-@cmdopts([
-    ("system=", "s", "System to act on"),
-    ("test_id=", "t", "Test id"),
-    ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
-    ("fasttest", "a", "Run without collectstatic"),
-    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
-def test_system(options):
+# @cmdopts([
+#     ("system=", "s", "System to act on"),
+#     ("test_id=", "t", "Test id"),
+#     ("failed", "f", "Run only failed tests"),
+#     ("fail_fast", "x", "Run only failed tests"),
+#     ("fasttest", "a", "Run without collectstatic"),
+#     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
+#     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
+#     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+# ])
+
+@task('prereqs.install',
+    help={
+        "system": "System to act on",
+        "test_id": "Test id",
+        "failed": "Run only failed tests",
+        "fail_fast": "Run only failed tests",
+        "fasttest": "Run without collectstatic",
+        "verbosity": "Turn logging up or down",
+})
+def test_system(
+        system=None, test_id=None, failed=None, fail_fast=None,
+        fasttest=None, verbosity=1
+    ):
     """
     Run tests on our djangoapps for lms and cms
     """
-    system = getattr(options, 'system', None)
-    test_id = getattr(options, 'test_id', None)
-
     opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'fasttest': getattr(options, 'fasttest', None),
-        'verbosity': getattr(options, 'verbosity', 1),
+        'failed_only': failed,
+        'fail_fast': fail_fast,
+        'fasttest': fasttest,
+        'verbosity': verbosity,
     }
 
     if test_id:
@@ -61,31 +66,27 @@ def test_system(options):
     test_suite.run()
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-@cmdopts([
-    ("lib=", "l", "lib to test"),
-    ("test_id=", "t", "Test id"),
-    ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
-    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
-def test_lib(options):
+@task('prereqs.install',
+    help={
+        "lib": "lib to test",
+        "test_id": "Test id",
+        "failed": "Run only failed tests",
+        "fail_fast": "Run only failed tests",
+        "verbosity": "Turn logging up or down",
+})
+def test_lib(
+        lib=None, test_id=None, failed=None, fail_fast=None,
+        verbosity=1,
+    ):
     """
     Run tests for common/lib/
     """
-    lib = getattr(options, 'lib', None)
-    test_id = getattr(options, 'test_id', lib)
+    test_id = test_id or lib
 
     opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'verbosity': getattr(options, 'verbosity', 1),
+        'failed_only': failed,
+        'fail_fast': fail_fast,
+        'verbosity': verbosity,
     }
 
     if test_id:
@@ -99,37 +100,27 @@ def test_lib(options):
     test_suite.run()
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-@cmdopts([
-    ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
-    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
-def test_python(options):
+@task('prereqs.install',
+    help={
+        "failed": "Run only failed tests",
+        "fail_fast": "Run only failed tests",
+        "verbosity": "Turn logging up or down",
+})
+def test_python(failed=None, fail_fast=None, verbosity=1):
     """
     Run all python tests
     """
     opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'verbosity': getattr(options, 'verbosity', 1),
+        'failed_only': failed,
+        'fail_fast': fail_fast,
+        'verbosity': verbosity,
     }
 
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
     python_suite.run()
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_python_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
+@task('prereqs.install.python')
 def test_i18n():
     """
     Run all i18n tests
@@ -138,22 +129,16 @@ def test_i18n():
     i18n_suite.run()
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-@cmdopts([
-    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-    make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
-def test(options):
+@task('prereqs.install',
+    help={
+        "verbosity": "Turn logging up or down"
+})
+def test(verbosity=1):
     """
     Run all tests
     """
     opts = {
-        'verbosity': getattr(options, 'verbosity', 1)
+        'verbosity': verbosity,
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
@@ -165,17 +150,14 @@ def test(options):
     all_unittests_suite.run()
 
 
-@task
-@needs('pavelib.prereqs.install_prereqs')
-@cmdopts([
-    ("compare_branch", "b", "Branch to compare against, defaults to origin/master"),
-])
-def coverage(options):
+@task('prereqs.install',
+    help={
+        "compare_branch": "Branch to compare against"
+})
+def coverage(compare_branch="origin/master"):
     """
     Build the html, xml, and diff coverage reports
     """
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
-
     for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
         report_dir = Env.REPORT_DIR / directory
 
