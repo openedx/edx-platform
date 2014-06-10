@@ -209,6 +209,36 @@
     <a href="#" class="forum-nav-thread-link">
       <div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
+        <%
+        js_block = u"""
+        var labels = "";
+        if (pinned) {{
+            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+        }}
+        if (typeof(subscribed) != "undefined" && subscribed) {{
+            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+        }}
+        if (staff_authored) {{
+            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+        }}
+        if (community_ta_authored) {{
+            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+        }}
+        if (labels != "") {{
+            print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
+        }}
+        """.format(
+            ## Translators: This is a label for a forum thread that has been pinned
+            pinned_text=escapejs(_("Pinned")),
+            ## Translators: This is a label for a forum thread that the user is subscribed to
+            following_text=escapejs(_("Following")),
+            ## Translators: This is a label for a forum thread that was authored by a member of the course staff
+            staff_text=escapejs(_("By: Staff")),
+            ## Translators: This is a label for a forum thread that was authored by a community TA
+            community_ta_text=escapejs(_("By: Community TA"))
+        )
+         %>
+        ${"<%"}${js_block}${"%>"}
       </div><div class="forum-nav-thread-wrapper-2">
         ${"<% if (endorsed) { %>"}
           ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
