@@ -2,7 +2,6 @@
 Change Log
 ############
 
-
 ***********
 June, 2014
 ***********
@@ -18,36 +17,6 @@ June, 2014
        section.
    * - 06/03/14   
      - Added :ref:`gradebook` to the :ref:`Grades` section.
-
-***********
-June, 2014
-***********
-
-.. list-table::
-   :widths: 10 70
-   :header-rows: 1
-
-   * - Date
-     - Change
-   * - 06/03/14   
-     - Added :ref:`gradebook` to the :ref:`Grades` section.
-
-***********
-June, 2014
-***********
-
-.. list-table::
-   :widths: 10 70
-   :header-rows: 1
-
-   * - Date
-     - Change
-   * - 06/06/14   
-     - Added a description of email task workflow states to the :ref:`Launch`
-       section.
-   * - 06/03/14   
-     - Added :ref:`gradebook` to the :ref:`Grades` section.
-       
 
 ***********
 May, 2014
