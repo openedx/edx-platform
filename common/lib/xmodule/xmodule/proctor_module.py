@@ -13,6 +13,7 @@ from xblock.fragment import Fragment
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 class ProctorPanel(object):
     '''
     Interface to proctor panel system, which determines if a given proctored item
@@ -26,7 +27,6 @@ class ProctorPanel(object):
             'username' : 'lms',
             'password' : 'abcd',
         }
-
     '''
     def __init__(self, user, proc_url, proc_user, proc_pass, procset_name):
         self.proc_url = proc_url
@@ -37,55 +37,57 @@ class ProctorPanel(object):
         self.user = user
 
     def is_released(self):
-        #url = '{2}/cmd/status/{0}/{1}'.format(self.user.id, self.procset_name, self.proc_url)
         url = '{1}/cmd/status/{0}'.format(self.user.id, self.proc_url)
         log.info('ProctorPanel url={0}'.format(url))
-        #ret = self.ses.post(url, data={'userid' : self.user.id, 'urlname': self.procset_name}, verify=False)
-        auth = (self.proc_user, self.proc_pass)
-        ret = self.ses.get(url, verify=False, auth=auth, params={'problem': self.procset_name})
+        ret = self.ses.get(url, verify=False,
+                           auth=(self.proc_user, self.proc_pass),
+                           params={'problem': self.procset_name})
         try:
             retdat = ret.json()
         except Exception:
-            log.error('bad return from proctor panel: ret.content={0}'.format(ret.content))
+            log.error('bad return from proctor panel: '
+                      'ret.content={0}'.format(ret.content))
             retdat = {}
-
         log.info('ProctorPanel retdat={0}'.format(retdat))
         enabled = retdat.get('enabled', False)
         return enabled
 
 
 class ProctorFields(object):
-    #display_name = String(
-    #    display_name="Display Name",
-    #    help="This name appears in the grades progress page",
-    #    scope=Scope.settings,
-    #    default="Proctored Module"
-    #)
-    procset_name = String(help="Name of this proctored set", scope=Scope.settings)
-    staff_release = Boolean(help="True if staff forced release independent of proctor panel",
-                       default=False, scope=Scope.user_state)
-    proctor_url = String(help="URL of proctor server", scope=Scope.settings)
+    # display_name = String(
+    #     display_name="Display Name",
+    #     help="This name appears in the grades progress page",
+    #     scope=Scope.settings,
+    #     default="Proctored Module"
+    # )
+    procset_name = String(help="Name of this proctored set",
+                          scope=Scope.settings)
+    staff_release = Boolean(help="True if staff forced release independent "
+                            "of proctor panel", default=False,
+                            scope=Scope.user_state)
+    proctor_url = String(help="proctor server URL", scope=Scope.settings)
     proctor_user = String(help="proctor server username", scope=Scope.settings)
-    proctor_password = String(help="proctor server password", scope=Scope.settings)
+    proctor_password = String(help="proctor server password",
+                              scope=Scope.settings)
 
 
 class ProctorModule(ProctorFields, XModule):
     """
     Releases modules for viewing depending on proctor panel.
 
-    The proctor panel is a separate application which knows the mapping between user_id's and usernames,
-    and whether a given problem should be released for access by that student or not.
+    The proctor panel is a separate application which knows the mapping between
+    user_id's and usernames, and whether a given problem should be released for
+    access by that student or not.
 
-    The idea is that a course staff member is proctoring an exam provided in the edX system.
-    After the staff member verifies a student's identity, the staff member releases the exam
-    to the student, via the proctor panel.  Once the student is done, or the elapsed time
-    runs out, exam access closes.
+    The idea is that a course staff member is proctoring an exam provided in
+    the edX system.  After the staff member verifies a student's identity, the
+    staff member releases the exam to the student, via the proctor panel.  Once
+    the student is done, or the elapsed time runs out, exam access closes.
 
-     Example:
-     <proctor procset_name="Proctored Exam 1">
-     <sequential url_name="exam1" />
-     </proctor>
-
+    Example:
+    <proctor procset_name="Proctored Exam 1">
+    <sequential url_name="exam1" />
+    </proctor>
     """
 
     js = {
@@ -107,24 +109,25 @@ class ProctorModule(ProctorFields, XModule):
         user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
         self.pp = ProctorPanel(user, self.proctor_url, self.proctor_user,
                                self.proctor_password, self.procset_name)
-
         self.child_descriptor = self.descriptor.get_children()[0]
-        log.debug("children of proctor module (should be only 1): %s", self.get_children())
+        log.debug("proctor module children (should only be 1): %s",
+                  self.get_children())
         self.child = self.get_children()[0]
-
         log.info('Proctor module child={0}'.format(self.child))
         log.info('Proctor module child display_name={0}'.format(self.child.display_name))
         # TODO: This attr is read-only now - need to figure out if/why this is
         # needed and find a fix if necessary (disabling doesnt appear to break
         # anything)
-        #self.display_name = self.child.display_name
-
+        # self.display_name = self.child.display_name
 
     def is_released(self):
+        released = None
         if self.staff_release:
-            return True
-        return self.pp.is_released()
-
+            released = True
+        else:
+            released = self.pp.is_released()
+        log.info("is_released: %s" % released)
+        return released
 
     def get_child_descriptors(self):
         """
@@ -132,40 +135,35 @@ class ProctorModule(ProctorFields, XModule):
         """
         return [self.child_descriptor]
 
-
     def not_released_html(self):
         return Fragment(self.runtime.render_template('proctor_release.html', {
-                'element_id': self.location.html_id(),
-                'id': self.id,
-                'name': self.display_name or self.procset_name,
-                'pp': self.pp,
-                'location': self.location,
-                'ajax_url': self.runtime.ajax_url,
-                'is_staff': self.runtime.user_is_staff,
+            'element_id': self.location.html_id(),
+            'id': self.id,
+            'name': self.display_name or self.procset_name,
+            'pp': self.pp,
+            'location': self.location,
+            'ajax_url': self.runtime.ajax_url,
+            'is_staff': self.runtime.user_is_staff,
         }))
 
-
     def student_view(self, context):
-        if not self.is_released():	# check for release each time we do get_html()
-            log.info('is_released False')
+        if not self.is_released():  # check each time we do get_html()
             return self.not_released_html()
-            # return "<div>%s not yet released</div>" % self.display_name
-
-        log.info('is_released True')
-
         # for sequential module, just return HTML (no ajax container)
-        if self.child.category in ['sequential', 'videosequence', 'problemset', 'randomize']:
+        categories = ['sequential', 'videosequence', 'problemset', 'randomize']
+        if self.child.category in categories:
             html = self.child.render('student_view', context)
             if self.staff_release:
-                dishtml = self.runtime.render_template('proctor_disable.html', {
+                dishtml = self.runtime.render_template(
+                    'proctor_disable.html', {
                         'element_id': self.location.html_id(),
                         'is_staff': self.runtime.user_is_staff,
                         'ajax_url': self.runtime.ajax_url,
-                        })
+                    })
                 html.content = dishtml + html.content
             return html
-
-        # return ajax container, so that we can dynamically check for is_released changing
+        # return ajax container, so that we can dynamically check for
+        # is_released changing
         return Fragment(self.runtime.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
@@ -173,28 +171,19 @@ class ProctorModule(ProctorFields, XModule):
             'depends': '',
         }))
 
-
-
     def handle_ajax(self, _dispatch, _data):
-        if self.runtime.user_is_staff and _dispatch=='release':
+        if self.runtime.user_is_staff and _dispatch == 'release':
             self.staff_release = True
-            # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Release successful</body></html>'
             return json.dumps({'html': 'staff_release successful'})
-        if self.runtime.user_is_staff and _dispatch=='disable':
+        if self.runtime.user_is_staff and _dispatch == 'disable':
             self.staff_release = False
             return json.dumps({'html': 'staff_disable successful'})
-            # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Disable successful</body></html>'
 
-        if not self.is_released():	# check for release each time we do get_html()
-            log.info('is_released False')
-            # html = "<div>%s not yet released</div>" % self.display_name
+        if not self.is_released():  # check each time we do get_html()
             html = self.not_released_html()
             return json.dumps({'html': [html], 'message': bool(True)})
         html = [child.get_html() for child in self.get_display_items()]
-
-        log.info('is_released True')
         return json.dumps({'html': html})
-
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
@@ -205,7 +194,6 @@ class ProctorDescriptor(ProctorFields, SequenceDescriptor):
     module_class = ProctorModule
 
     filename_extension = "xml"
-
 
     def definition_to_xml(self, resource_fs):
 
