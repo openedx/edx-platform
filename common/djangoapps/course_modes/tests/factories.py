@@ -1,5 +1,6 @@
 from course_modes.models import CourseMode
 from factory.django import DjangoModelFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting
@@ -7,9 +8,10 @@ from factory.django import DjangoModelFactory
 class CourseModeFactory(DjangoModelFactory):
     FACTORY_FOR = CourseMode
 
-    course_id = u'MITx/999/Robot_Super_Course'
+    course_id = SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course')
     mode_slug = 'audit'
     mode_display_name = 'audit course'
     min_price = 0
     currency = 'usd'
     expiration_datetime = None
+    suggested_prices = ''
