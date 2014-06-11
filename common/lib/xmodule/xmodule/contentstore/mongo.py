@@ -67,8 +67,8 @@ class MongoContentStore(ContentStore):
     def delete(self, location_or_id):
         if isinstance(location_or_id, AssetLocation):
             location_or_id = self.asset_db_key(location_or_id)
-        if self.fs.exists({"_id": location_or_id}):
-            self.fs.delete(location_or_id)
+        # Deletes of non-existent files are considered successful
+        self.fs.delete(location_or_id)
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = self.asset_db_key(location)
@@ -104,10 +104,8 @@ class MongoContentStore(ContentStore):
 
     def get_stream(self, location):
         content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one({'_id': content_id}, fields={'_id': 1})
-
         try:
-            handle = self.fs.get(fs_pointer['_id'])
+            handle = self.fs.get(content_id)
         except NoFile:
             raise NotFoundError()
 
@@ -239,11 +237,10 @@ class MongoContentStore(ContentStore):
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key = self.asset_db_key(location)
-        # FIXME remove fetch and use a form of update which fails if doesn't exist
-        item = self.fs_files.find_one({'_id': asset_db_key})
-        if item is None:
+        # catch upsert error and raise NotFoundError if asset doesn't exist
+        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        if not result.get('updatedExisting', True):
             raise NotFoundError(asset_db_key)
-        self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict})
 
     def get_attrs(self, location):
         """
