@@ -830,6 +830,7 @@ courseware_js = (
         'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
+    ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
