@@ -44,7 +44,7 @@ class ProctorPanel(object):
         auth = (self.proc_user, self.proc_pass)
         ret = self.ses.get(url, verify=False, auth=auth, params={'problem': self.procset_name})
         try:
-            retdat = json.loads(ret.content)
+            retdat = ret.json()
         except Exception:
             log.error('bad return from proctor panel: ret.content={0}'.format(ret.content))
             retdat = {}
