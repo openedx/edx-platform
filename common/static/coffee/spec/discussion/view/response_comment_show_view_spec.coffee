@@ -1,5 +1,6 @@
 describe 'ResponseCommentShowView', ->
     beforeEach ->
+        DiscussionSpecHelper.setUpGlobals()
         # set up the container for the response to go in
         setFixtures """
         <ol class="responses"></ol>
