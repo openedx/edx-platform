@@ -2,31 +2,33 @@
 metadata:
     display_name: (Grade Me!)  Button
 data: |
-      <p>By clicking the button below, you assert that you have completed the course in its entirety.</p>
-      
-      <!-- <form action=/request_certificate method=POST>
-        <input type=hidden name=student_id value=103 />
-        <input type=hidden name=course_id value="OpenEdX/200/Stanford_Sandbox" />
-        <input type=submit name="hoo" />
-      </form> -->
-      
-      <input type=button value="Yes, I Agree." id="User_Verify_Button" style="margin-bottom: 20px;" />
+      <p id="verify_button_by_clicking_msg">By clicking the button below, you assert that you have completed the course in its entirety.</p>
+
+      <p><input type=button value="Yes, I Agree." id="User_Verify_Button" style="margin-bottom: 20px;" /></p>
       <p class="verify-button-success-text" style="font-weight: bold; color: #008200;"></p>
       
       <script type="text/javascript">
         var success_message = "Your grading and certification request has been received, <br />if you have passed, your certificate should be available in the next 20 minutes.";
-        document.getElementById('User_Verify_Button').addEventListener("click",
-        function(event) {
-          (function(event) {
-            var linkcontents = $('a.user-link').contents();
-            $.ajax({
-              type:     'POST',
-              url:      '/request_certificate',
-              data:     {'course_id': $$course_id},
-              success:  function(data) {
-                $('.verify-button-success-text').html(success_message);
-              }
+        var failure_message = "We're sorry; users who haven't created accounts and registered for the course may not receive Statements of Accomplishment.";
+
+        // for actual value of username, use scraped_username.split(':')[1].trim(); to get actual value
+        var scraped_username = $('li.primary a.user-link').text();
+        if (scraped_username) {
+            document.getElementById('User_Verify_Button').addEventListener("click",
+            function(event) {
+              (function(event) {
+                $.ajax({
+                  type:     'POST',
+                  url:      '/request_certificate',
+                  data:     {'course_id': $$course_id},
+                  success:  function(data) {
+                    $('.verify-button-success-text').html(success_message);
+                  }
+                });
+              }).call(document.getElementById('User_Verify_Button'), event);
             });
-          }).call(document.getElementById('User_Verify_Button'), event);
-        });
+        } else {
+            $('#verify_button_by_clicking_msg').html(failure_message);
+            $('#User_Verify_Button').remove();
+        };
       </script>
