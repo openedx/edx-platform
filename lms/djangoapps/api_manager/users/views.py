@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from django.db.models import Q
 
-from api_manager.permissions import SecureAPIView
+from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile
 from .serializers import UserSerializer
 
@@ -114,7 +114,7 @@ def _save_content_position(request, user, course_id, course_descriptor, position
     return saved_content.id
 
 
-class UsersList(SecureAPIView):
+class UsersList(SecureListAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
