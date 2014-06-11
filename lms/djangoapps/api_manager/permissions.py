@@ -5,7 +5,7 @@ from django.conf import settings
 
 from api_manager.utils import get_client_ip_address, address_exists_in_network
 from rest_framework import permissions, generics, filters, pagination, serializers
-
+from rest_framework.views import APIView
 
 log = logging.getLogger(__name__)
 
@@ -102,7 +102,11 @@ class CustomPaginationSerializer(pagination.PaginationSerializer):
     num_pages = serializers.Field(source='paginator.num_pages')
 
 
-class SecureAPIView(generics.ListAPIView):
+class SecureAPIView(APIView):
+    permission_classes = (ApiKeyHeaderPermission, )
+
+
+class SecureListAPIView(generics.ListAPIView):
     """
         Inherited from ListAPIView
     """
