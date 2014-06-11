@@ -8,7 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_mixin import get_instructions
 from xmodule.annotator_token import retrieve_token
-
+from xblock.fragment import Fragment
 import textwrap
 
 # Make '_' a no-op so we can scrape strings
@@ -17,7 +17,9 @@ _ = lambda text: text
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
-    data = String(help=_("XML data for the annotation"), scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"),
+        scope=Scope.content,
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -47,8 +49,43 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='None',
     )
-    annotation_storage_url = String(help=_("Location of Annotation backend"), scope=Scope.settings, default="http://your_annotation_storage.com", display_name=_("Url for Annotation Storage"))
-    annotation_token_secret = String(help=_("Secret string for annotation storage"), scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name=_("Secret Token String for Annotation"))
+    diacritics = String(
+        display_name=_("Diacritic Marks"),
+        help=_("Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"),
+        scope=Scope.settings,
+        default='',
+    )
+    annotation_storage_url = String(
+        help=_("Location of Annotation backend"),
+        scope=Scope.settings,
+        default="http://your_annotation_storage.com",
+        display_name=_("Url for Annotation Storage")
+    )
+    annotation_token_secret = String(
+        help=_("Secret string for annotation storage"),
+        scope=Scope.settings,
+        default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        display_name=_("Secret Token String for Annotation")
+    )
+    default_tab = String(
+        display_name=_("Default Annotations Tab"),
+        help=_("Select which tab will be the default in the annotations table: myNotes, Instructor, or Public."),
+        scope=Scope.settings,
+        default="myNotes",
+    )
+    # currently only supports one instructor, will build functionality for multiple later
+    instructor_email = String(
+        display_name=_("Email for 'Instructor' Annotations"),
+        help=_("Email of the user that will be attached to all annotations that will be found in 'Instructor' tab."),
+        scope=Scope.settings,
+        default="",
+    )
+    annotation_mode = String(
+        display_name=_("Mode for Annotation Tool"),
+        help=_("Type in number corresponding to following modes:  'instructor' or 'everyone'"),
+        scope=Scope.settings,
+        default="everyone",
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -73,7 +110,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
         return get_instructions(xmltree)
 
-    def get_html(self):
+    def student_view(self, context):
         """ Renders parameters to template. """
         context = {
             'course_key': self.runtime.course_id,
@@ -82,10 +119,17 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'source': self.source,
             'instructions_html': self.instructions,
             'content_html': self.content,
-            'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user_email, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-        return self.system.render_template('textannotation.html', context)
+        fragment = Fragment(self.system.render_template('textannotation.html', context))
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        return fragment
 
 
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
