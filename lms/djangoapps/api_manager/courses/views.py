@@ -8,11 +8,15 @@ from StringIO import StringIO
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.response import Response
 
-from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
+    CourseModuleCompletion
 from api_manager.users.serializers import UserSerializer
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
@@ -21,7 +25,8 @@ from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
-from api_manager.permissions import SecureAPIView
+from api_manager.permissions import SecureAPIView, SecureListAPIView
+from .serializers import CourseModuleCompletionSerializer
 
 
 log = logging.getLogger(__name__)
@@ -1055,3 +1060,96 @@ class CourseContentUsersList(SecureAPIView):
 
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)  # pylint: disable=E1101
+
+
+class CourseModuleCompletionList(SecureListAPIView):
+    """
+    ### The CourseModuleCompletionList allows clients to view user's course module completion entities
+    to monitor a user's progression throughout the duration of a course,
+    - URI: ```/api/courses/{course_id}/completions```
+    - GET: Returns a JSON representation of the course, content and user and timestamps
+    - GET Example:
+        {
+            "count":"1",
+            "num_pages": "1",
+            "previous": null
+            "next": null
+            "results": [
+                {
+                    "id": 2,
+                    "user_id": "3",
+                    "course_id": "32fgdf",
+                    "content_id": "324dfgd",
+                    "created": "2014-06-10T13:14:49.878Z",
+                    "modified": "2014-06-10T13:14:49.914Z"
+                }
+            ]
+        }
+
+    Filters can also be applied
+    ```/api/courses/{course_id}/completions/?user_id={user_id}```
+    ```/api/courses/{course_id}/completions/?content_id={content_id}```
+    ```/api/courses/{course_id}/completions/?user_id={user_id}&content_id={content_id}```
+    ### Use Cases/Notes:
+    * Use GET operation to retrieve list of course completions by user
+    * Use GET operation to verify user has completed specific course module
+    """
+    serializer_class = CourseModuleCompletionSerializer
+
+    def get_queryset(self):
+        """
+        GET /api/courses/{course_id}/completions/
+        """
+        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        course_id = self.kwargs['course_id']
+        queryset = CourseModuleCompletion.objects.filter(course_id=course_id)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        if user_ids:
+            if ',' in user_ids:
+                user_ids = user_ids.split(",")[:upper_bound]
+            queryset = queryset.filter(user__in=user_ids)
+
+        if content_id:
+            queryset = queryset.filter(content_id=content_id)
+
+        if not queryset.exists() and (user_ids or content_id):
+            raise Http404
+        return queryset
+
+
+class CourseModuleCompletionDetail(SecureAPIView):
+    """
+    ### The CourseModuleCompletionDetail view allows clients to interact with a
+    specific Course-Content completion entity
+    - URI: ```/api/courses/{course_id}/completions/{content_id}/{user_id}```
+    - POST: Creates a Course-Module completion entity
+    - DELETE: Removes an existing Course-Module completion entity from the system
+    ### Use Cases/Notes:
+    * Use this operation to save or remove Course-Module completion entity
+    """
+
+    def post(self, request, course_id, content_id, user_id):
+        """
+        POST /api/courses/{course_id}/completions/{content_id}/{user_id}
+        """
+        completion, created = CourseModuleCompletion.objects.get_or_create(user_id=user_id,
+                                                                           course_id=course_id,
+                                                                           content_id=content_id)
+        serializer = CourseModuleCompletionSerializer(completion)
+        if created:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # pylint: disable=E1101
+        else:
+            return Response({'message': _('Resource already exists')}, status=status.HTTP_409_CONFLICT)
+
+    def delete(self, request, course_id, content_id, user_id):
+        """
+        DELETE /api/courses/{course_id}/completions/{content_id}/{user_id}
+        """
+        try:
+            completion = CourseModuleCompletion.objects.get(user_id=user_id, course_id=course_id, content_id=content_id)
+            completion.delete()
+        except ObjectDoesNotExist:
+            raise Http404
+        response_data = {'uri': _generate_base_uri(request)}
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
