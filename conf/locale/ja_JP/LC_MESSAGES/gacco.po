@@ -166,6 +166,26 @@ msgstr ""
 "退会手続きが完了しました。<br />\n"
 "何か不明な点がございましたら、<a href=\"mailto:%(support_email)s?subject=退会手続き\">%(support_email)s</a> へご連絡ください。"
 
+#: lms/templates/help_modal.html
+msgid "Do you have any questions?"
+msgstr "他にご質問がありますか？"
+
+#: lms/templates/help_modal.html
+msgid "See {link_start}FAQ{link_end}."
+msgstr "まずは、gacco<a href=\"https://support.gacco.org/\" target=\"_blank\">サポートサイト</a>をご覧ください。こちらに一般的なご質問に対しての情報が掲載されています。"
+
+#: lms/templates/help_modal.html
+msgid "If you have further questions, please send questions below."
+msgstr "お手数をお掛けしますが、サポートサイトにて記載のない内容については、改めてお問合せください。なお、返信には１〜３営業日（土日祝日等を除く）を頂いております。また、一般的な端末の操作方法等については、私どもにてご案内できかねますことご承知おきただけますと幸いです。"
+
+#: lms/templates/help_modal.html
+msgid "Please provide a subject."
+msgstr "概要を入力してください"
+
+#: lms/templates/help_modal.html
+msgid "Please provide details."
+msgstr "詳細を入力してください"
+
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Survey"
 msgstr "アンケート"
