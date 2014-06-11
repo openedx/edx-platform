@@ -212,6 +212,7 @@ define([
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
+    "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
 
     "js/spec/utils/drag_and_drop_spec",
