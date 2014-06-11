@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
+from django.http import Http404
 from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
@@ -15,6 +16,7 @@ from django.db.models import Q
 
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile
+from api_manager.organizations.serializers import OrganizationSerializer
 from .serializers import UserSerializer
 
 from courseware import module_render
@@ -876,3 +878,23 @@ class UsersPreferences(SecureAPIView):
                 status_code = status.HTTP_201_CREATED
 
         return Response({}, status_code)
+
+
+class UserOraganizationsList(SecureListAPIView):
+    """
+    ### The UserOrganizationsList view allows clients to retrieve a list of organizations a user
+    belongs to
+    - URI: ```/api/users/{user_id}/organizations/```
+    - GET: Provides paginated list of organizations for a user
+    """
+
+    serializer_class = OrganizationSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        return user.organizations.all()
