@@ -302,7 +302,7 @@ section.foldit {
    }
 }
 
-section.unauth-tos {
+.unauth-tos {
   position: relative;
   margin: 30px auto 0 auto;
   background-color: $black;
@@ -312,7 +312,7 @@ section.unauth-tos {
   font-weight: bold;
   text-align: center;
 }
-section.unauth-tos a {
+.unauth-tos a {
   padding: 5px;
   background-color: $white;
   border-radius: 5px;
