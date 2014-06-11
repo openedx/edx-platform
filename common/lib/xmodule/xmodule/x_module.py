@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import yaml
+import xml.sax.saxutils as saxutils
 
 from functools import partial
 from lxml import etree
@@ -1233,24 +1234,65 @@ class DiscussionService(object):
     def __init__(self, runtime):
         self.runtime = runtime
 
-    def get_template_context(self, discussion_id):
+    def get_course_template_context(self):
         """
-        Returns the context to render the discussion page templates.
+        Returns the context to render the course-level discussion templates.
 
-        Not currently used. Not finish.
         """
 
+        import json
+        from django.http import HttpRequest
         import lms.lib.comment_client as cc
-        from course_groups.cohorts import get_cohort_id
+        from courseware.access import has_access
+        from courseware.courses import get_course_with_access
+        from django_comment_client.forum.views import get_threads
+        from django_comment_client.permissions import cached_has_permission
+        import django_comment_client.utils as utils
+        from course_groups.cohorts import (
+            is_course_cohorted,
+            get_cohort_id,
+            get_cohorted_commentables,
+            get_course_cohorts
+        )
 
-        user = self.runtime.user
-        profiled_user = cc.User(id=user.id, course_id=course_id)
+        escapedict = {'"': '&quot;'}
+
+        request = HttpRequest()
+        user  = self.runtime.user
+        request.user = user
+        user_info = cc.User.from_django_user(self.runtime.user).to_dict()
+        course_id = self.runtime.course_id
+        course = get_course_with_access(self.runtime.user, course_id, 'load_forum')
         user_cohort_id = get_cohort_id(user, course_id)
 
+        unsafethreads, query_params = get_threads(request, course_id)
+        threads = [utils.safe_content(thread) for thread in unsafethreads]
+
+        flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or \
+                         has_access(user, course, 'staff')
+
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
+        category_map = utils.get_discussion_category_map(course)
+
+        cohorts = get_course_cohorts(course_id)
+        cohorted_commentables = get_cohorted_commentables(course_id)
+
         context = {
-            'django_user': user,
-            'profiled_user': profiled_user.to_dict(),
-            'user_cohort': user_cohort_id
+            'course': course,
+            'course_id': course.id,
+            'staff_access': has_access(user, course, 'staff'),
+            'threads': saxutils.escape(json.dumps(threads), escapedict),
+            'thread_pages': query_params['num_pages'],
+            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'flag_moderator': flag_moderator,
+            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
+            'category_map': category_map,
+            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
+            'is_moderator': cached_has_permission(user, "see_all_cohorts", course_id),
+            'cohorts': cohorts,
+            'user_cohort': user_cohort_id,
+            'cohorted_commentables': cohorted_commentables,
+            'is_course_cohorted': is_course_cohorted(course_id)
         }
 
         return context
@@ -1265,22 +1307,12 @@ class DiscussionService(object):
         from courseware.access import has_access
         from django_comment_client.permissions import cached_has_permission
         from django_comment_client.utils import get_discussion_category_map
-        from course_groups.cohorts import (
-            is_course_cohorted,
-            get_cohort_id,
-            is_commentable_cohorted,
-            get_cohorted_commentables,
-            get_course_cohorts
-        )
 
         course_id = self.runtime.course_id
         user = self.runtime.user
 
         course = get_course_with_access(user, course_id, 'load_forum')
         category_map = get_discussion_category_map(course)
-
-        cohorts = get_course_cohorts(course_id)
-        cohorted_commentables = get_cohorted_commentables(course_id)
 
         is_moderator = cached_has_permission(user, "see_all_cohorts", course_id)
         flag_moderator =  cached_has_permission(user, 'openclose_thread', course_id) or \
@@ -1289,11 +1321,8 @@ class DiscussionService(object):
         context = {
             'course': course,
             'category_map': category_map,
-            'cohorts': cohorts,
-            'cohorted_commentables': cohorted_commentables,
             'is_moderator': is_moderator,
             'flag_moderator': flag_moderator,
-            'is_course_cohorted': is_course_cohorted(course_id),
             'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
             'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
             'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),

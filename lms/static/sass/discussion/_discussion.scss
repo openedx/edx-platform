@@ -123,7 +123,7 @@
 }
 
 // main styling
-body.discussion {
+body.discussion, section.discussion {
 
   // new post creation
   .new-post-form-errors {
@@ -602,6 +602,12 @@ body.discussion {
   background: transparent;
   box-shadow: none;
   line-height: 1.4;
+
+  .sidebar ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+  }
 
   .sr {
     @extend %text-sr;

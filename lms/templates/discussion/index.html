@@ -1,8 +1,3 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! import django_comment_client.helpers as helpers %>
-<%! from django.template.defaultfilters import escapejs %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -21,27 +16,4 @@
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<article class="new-post-article"></article>
-
-<%include file="/discussion/_new_post.html" />
-
-<section class="discussion container" id="discussion-container"
-         data-roles="${roles}"
-         data-course-id="${course_id}"
-         data-user-info="${user_info}"
-         data-threads="${threads}"
-         data-thread-pages="${thread_pages}"
-         data-content-info="${annotated_content_info}"
-         data-sort-preference="${sort_preference}"
-         data-flag-moderator="${flag_moderator}"
-         data-user-cohort-id="${user_cohort}"
-         data-course-settings="${course_settings}">
-    <div class="discussion-body">
-        <div class="forum-nav"></div>
-        <div class="discussion-column">
-        </div>
-    </div>
-</section>
-
-<%include file="/discussion/_underscore_templates.html" />
-<%include file="/discussion/_thread_list_template.html" />
+<%include file="/discussion/_discussion_course.html" />
