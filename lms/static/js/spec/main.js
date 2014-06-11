@@ -69,6 +69,7 @@
             'history': 'js/vendor/history',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/inline_analytics': 'js/inline_analytics',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -315,6 +316,10 @@
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext']
+            },
+            'js/inline_analytics': {
+            	exports: 'js/inline_analytics',
+            	deps: ['gettext']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -722,6 +727,7 @@
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
+        'lms/include/js/spec/inline_analytics_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',

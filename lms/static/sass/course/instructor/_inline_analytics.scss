@@ -8,10 +8,17 @@
 
 .grid-wrapper {
     position: relative;
-    width: 100%;
     float: left;
-    margin:0 25px 50px 25px;
     clear: both;
+    margin: 0 25px 50px 25px;
+    
+    &.radio .graph {
+        height: 150px;
+    }
+    
+    &.checkbox .graph {
+        height: 250px;
+    }
 }
 
 .grid-block {
@@ -30,58 +37,64 @@
         margin-left: 50px;
         border-left: 2px solid #444;
         border-bottom: 2px solid #444;
+        
+        .y-label {
+            position: absolute;
+            width: 45px;
+            top: -8px;
+            left: 0;
+            text-align: right;
+        }
+        
+        .column {
+            position: relative;
+            height: 100%;
+            width: 45px;
+            margin: 0 15px;
+            float: left;
+            
+            .block {
+                position: absolute;
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+    
+    .legend {
+        float: left;
+        clear: both;
+        height: 28px;
+        width: 300px;
+        margin-left: 50px;
+        
+        .label {
+            float: left;
+            width: 75px;
+            padding: 5px 0;
+            text-align: center;
+        }
     }
 }
 
-.grid-wrapper.radio .graph {
-    height: 150px;
-}
-
-.grid-wrapper.checkbox .graph {
-    height: 250px;
-}
-
-.grid-block .graph .y-label {
-    position: absolute;
-    width: 45px;
-    top: -8px;
-    left: 0;
-    text-align: right;
-}
-
-.grid-block .graph .column {
-    position: relative;
-    height: 100%;
-    width: 45px;
-    margin: 0 15px;
-    float: left;
-}
-
-.grid-block .graph .column .block {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-}
-
-.grid-block .legend {
-    float: left;
-    clear: both;
-    height: 28px;
-    width: 300px;
-    margin-left: 50px;
-}
-
-.grid-block .legend .label {
-    float: left;
-    width: 75px;
+.answer-box {
     padding: 5px 0;
+    background-color: #efefef;
     text-align: center;
 }
 
-.answer_box {
-    padding:5px 0px;
-    background-color:#efefef;
-    text-align: center;
+.instructor-analytics-action {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.checkbox-first-attempt {
+    background-color:#dedede;
+}
+
+.checkbox-last-attempt {
+    background-color:#c2c2c2;
 }
 
 .inline-analytics-incorrect {
@@ -90,15 +103,6 @@
 
 .inline-analytics-correct {
     background-color:#96ec9c;
-}
-
-.correct_answer {
-    color:#96ec9c;
-    background-color: #444;
-}
-
-.correct_answer .dot {
-    background-color:#efefef;
 }
 
 .dot {
@@ -123,14 +127,13 @@
     top: 25px;
     right: 0;
     float: right;
-    z-index: 10;
 }
 
 .header {
     width:65px;
 }
 
-.not_displayed {
+.not-displayed {
     width:400px;
 }
 

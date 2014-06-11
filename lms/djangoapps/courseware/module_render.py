@@ -54,7 +54,6 @@ from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    add_inline_analytics,
     request_token as xblock_request_token,
 )
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -79,6 +78,7 @@ from util.keyword_substitution import substitute_keywords_with_data
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
+from openedx.core.lib.inline_analytics_utils import add_inline_analytics
 
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
@@ -675,7 +675,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
 
     # Add button for in-line analytics answer distribution
-    if getattr(settings, 'ANALYTICS_ANSWER_DIST_URL'):
+    if getattr(settings, 'ANALYTICS_DATA_URL'):
         if has_access(user, 'staff', descriptor, course_id):
             block_wrappers.append(partial(add_inline_analytics, user))
 
