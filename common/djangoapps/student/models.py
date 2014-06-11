@@ -23,6 +23,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from cities.models import City
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
@@ -203,7 +204,7 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range(this_year, this_year - 120, -1)
+    VALID_YEARS = range((this_year-settings.DELTA_YEAR), this_year - settings.MAX_YEAR_ALLOWED, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -241,6 +242,9 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
+    #EVEX fields
+    cedula = models.CharField(max_length=32, blank=True, null=True)
+    city = models.ForeignKey(City, default=None, blank=True, null=True)
 
     def get_meta(self):
         js_str = self.meta
@@ -618,7 +622,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
@@ -746,7 +750,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
@@ -774,7 +778,7 @@ class CourseEnrollment(models.Model):
 
         `email` Email address of the User to add to enroll in the course.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
@@ -808,7 +812,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
@@ -826,7 +830,7 @@ class CourseEnrollment(models.Model):
 
         `email` Email address of the User to unenroll from the course.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             user = User.objects.get(email=email)
@@ -845,7 +849,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
