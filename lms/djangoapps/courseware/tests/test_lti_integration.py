@@ -12,6 +12,7 @@ from django.conf import settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.x_module import STUDENT_VIEW
 
 from courseware.tests import BaseTestXmodule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -108,7 +109,7 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        generated_content = self.item_descriptor.render('student_view').content
+        generated_content = self.item_descriptor.render(STUDENT_VIEW).content
         expected_content = self.runtime.render_template('lti.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
 

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment
+from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -175,7 +176,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view in ['student_view', 'author_view']:
+    if context.get('container_view', None) and view in PREVIEW_VIEWS:
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
@@ -198,7 +199,7 @@ def get_preview_fragment(request, descriptor, context):
     """
     module = _load_preview_module(request, descriptor)
 
-    preview_view = 'author_view' if _has_author_view(module) else 'student_view'
+    preview_view = AUTHOR_VIEW if _has_author_view(module) else STUDENT_VIEW
 
     try:
         fragment = module.render(preview_view, context)

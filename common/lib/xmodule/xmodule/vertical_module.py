@@ -1,5 +1,5 @@
 from xblock.fragment import Fragment
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
@@ -26,7 +26,7 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
         child_context['child_of_vertical'] = True
 
         for child in self.get_display_items():
-            rendered_child = child.render('student_view', child_context)
+            rendered_child = child.render(STUDENT_VIEW, child_context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({

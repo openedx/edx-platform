@@ -22,6 +22,7 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
@@ -712,12 +713,12 @@ class TestEditItem(ItemTest):
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
-        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": "student_view"})
+        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDENT_VIEW})
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
-        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": "studio_view"})
+        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDIO_VIEW})
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 

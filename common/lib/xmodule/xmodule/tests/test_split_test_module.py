@@ -9,6 +9,7 @@ from fs.memoryfs import MemoryFS
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, ValidationMessageType
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
@@ -113,7 +114,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
 
         self.assertIn(
             child_content,
-            self.module_system.render(self.split_test_module, 'student_view').content
+            self.module_system.render(self.split_test_module, STUDENT_VIEW).content
         )
 
     @ddt.data(('0',), ('1',))
@@ -176,7 +177,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
 
         # The split_test module should render both its groups when it is the root
         context = create_studio_context(self.split_test_module)
-        html = self.module_system.render(self.split_test_module, 'author_view', context).content
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertIn('HTML FOR GROUP 0', html)
         self.assertIn('HTML FOR GROUP 1', html)
         # Note that the mock xblock system doesn't render the template but the parameters instead
@@ -184,7 +185,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
 
         # When rendering as a child, it shouldn't render either of its groups
         context = create_studio_context(self.course_sequence)
-        html = self.module_system.render(self.split_test_module, 'author_view', context).content
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertNotIn('HTML FOR GROUP 0', html)
         self.assertNotIn('HTML FOR GROUP 1', html)
 
@@ -194,7 +195,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
             UserPartition(0, 'first_partition', 'First Partition',
                           [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'gamma')])
         ]
-        html = self.module_system.render(self.split_test_module, 'author_view', context).content
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertIn('HTML FOR GROUP 0', html)
         self.assertIn('HTML FOR GROUP 1', html)
         # Note that the mock xblock system doesn't render the template but the parameters instead

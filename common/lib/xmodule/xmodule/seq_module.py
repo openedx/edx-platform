@@ -11,7 +11,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import XModule
+from .x_module import XModule, STUDENT_VIEW
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class SequenceModule(SequenceFields, XModule):
 
         for child in self.get_display_items():
             progress = child.get_progress()
-            rendered_child = child.render('student_view', context)
+            rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
             titles = child.get_content_titles()

@@ -5,6 +5,7 @@ Unit tests for the unit page.
 from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.x_module import STUDENT_VIEW
 
 
 class UnitPageTestCase(StudioPageTestCase):
@@ -38,7 +39,7 @@ class UnitPageTestCase(StudioPageTestCase):
         """
         Verify that a public xblock's preview returns the expected HTML.
         """
-        self.validate_preview_html(self.video, 'student_view',
+        self.validate_preview_html(self.video, STUDENT_VIEW,
                                    can_edit=True, can_reorder=True, can_add=False)
 
     def test_draft_component_preview_html(self):
@@ -47,7 +48,7 @@ class UnitPageTestCase(StudioPageTestCase):
         """
         modulestore('draft').convert_to_draft(self.vertical.location)
         draft_video = modulestore('draft').convert_to_draft(self.video.location)
-        self.validate_preview_html(draft_video, 'student_view',
+        self.validate_preview_html(draft_video, STUDENT_VIEW,
                                    can_edit=True, can_reorder=True, can_add=False)
 
     def test_public_child_container_preview_html(self):
@@ -59,7 +60,7 @@ class UnitPageTestCase(StudioPageTestCase):
                                              category='split_test', display_name='Split Test')
         ItemFactory.create(parent_location=child_container.location,
                            category='html', display_name='grandchild')
-        self.validate_preview_html(child_container, 'student_view',
+        self.validate_preview_html(child_container, STUDENT_VIEW,
                                    can_reorder=True, can_edit=True, can_add=False)
 
     def test_draft_child_container_preview_html(self):
@@ -73,5 +74,5 @@ class UnitPageTestCase(StudioPageTestCase):
                            category='html', display_name='grandchild')
         modulestore('draft').convert_to_draft(self.vertical.location)
         draft_child_container = modulestore('draft').get_item(child_container.location)
-        self.validate_preview_html(draft_child_container, 'student_view',
+        self.validate_preview_html(draft_child_container, STUDENT_VIEW,
                                    can_reorder=True, can_edit=True, can_add=False)

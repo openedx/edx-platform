@@ -1,7 +1,7 @@
 """
 Mixin to support editing in Studio.
 """
-from xmodule.x_module import module_attr
+from xmodule.x_module import module_attr, STUDENT_VIEW, AUTHOR_VIEW
 
 
 class StudioEditableModule(object):
@@ -43,7 +43,7 @@ class StudioEditableModule(object):
         """
         Helper method for getting preview view name (student_view or author_view) for a given module.
         """
-        return 'author_view' if hasattr(block, 'author_view') else 'student_view'
+        return AUTHOR_VIEW if hasattr(block, AUTHOR_VIEW) else STUDENT_VIEW
 
 
 class StudioEditableDescriptor(object):
@@ -53,5 +53,5 @@ class StudioEditableDescriptor(object):
     This class is only intended to be used with an XModule Descriptor. This class assumes that the associated
     XModule will have an "author_view" method for returning an editable preview view of the module.
     """
-    author_view = module_attr("author_view")
+    author_view = module_attr(AUTHOR_VIEW)
     has_author_view = True

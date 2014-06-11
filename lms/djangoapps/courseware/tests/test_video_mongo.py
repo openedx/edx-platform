@@ -13,6 +13,7 @@ from xblock.field_data import DictFieldData
 from xmodule.video_module import create_youtube_string
 from xmodule.tests import get_test_descriptor_system
 from xmodule.video_module import VideoDescriptor
+from xmodule.x_module import STUDENT_VIEW
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from . import BaseTestXmodule
@@ -25,7 +26,7 @@ class TestVideoYouTube(TestVideo):
 
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
-        context = self.item_descriptor.render('student_view').content
+        context = self.item_descriptor.render(STUDENT_VIEW).content
         sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
@@ -89,7 +90,7 @@ class TestVideoNonYouTube(TestVideo):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
-        context = self.item_descriptor.render('student_view').content
+        context = self.item_descriptor.render(STUDENT_VIEW).content
         sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
@@ -231,7 +232,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor, 'transcript', 'download'
             ).rstrip('/?')
 
-            context = self.item_descriptor.render('student_view').content
+            context = self.item_descriptor.render(STUDENT_VIEW).content
 
             expected_context.update({
                 'transcript_download_format': None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt',
@@ -344,7 +345,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 sources=data['sources']
             )
             self.initialize_module(data=DATA)
-            context = self.item_descriptor.render('student_view').content
+            context = self.item_descriptor.render(STUDENT_VIEW).content
 
             expected_context = dict(initial_context)
             expected_context.update({

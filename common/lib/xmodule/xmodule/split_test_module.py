@@ -6,12 +6,11 @@ import logging
 import json
 from webob import Response
 from uuid import uuid4
-from pkg_resources import resource_string
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
-from xmodule.x_module import XModule, module_attr
+from xmodule.x_module import XModule, module_attr, STUDENT_VIEW
 from xmodule.modulestore.inheritance import UserPartitionList
 
 from lxml import etree
@@ -235,7 +234,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             child_location = self.group_id_to_child[group_id]
             child_descriptor = self.get_child_descriptor_by_location(child_location)
             child = self.system.get_module(child_descriptor)
-            rendered_child = child.render('student_view', context)
+            rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
@@ -312,7 +311,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         if self.system.user_is_staff:
             return self._staff_view(context)
         else:
-            child_fragment = self.child.render('student_view', context)
+            child_fragment = self.child.render(STUDENT_VIEW, context)
             fragment = Fragment(self.system.render_template('split_test_student_view.html', {
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,

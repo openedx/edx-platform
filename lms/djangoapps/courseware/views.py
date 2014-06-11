@@ -42,6 +42,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
+from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from opaque_keys import InvalidKeyError
 
@@ -377,7 +378,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render('student_view')
+            context['fragment'] = section_module.render(STUDENT_VIEW)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -865,7 +866,7 @@ def get_static_tab_contents(request, course, tab):
     html = ''
     if tab_module is not None:
         try:
-            html = tab_module.render('student_view').content
+            html = tab_module.render(STUDENT_VIEW).content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
