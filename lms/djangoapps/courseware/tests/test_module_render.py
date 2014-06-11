@@ -1062,3 +1062,119 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         module.system.rebind_noauth_module_to_user(module, self.anon_user)
         self.assertFalse(psycho_handler.called)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(ANALYTICS_ANSWER_DIST_URL=True)
+@patch('courseware.module_render.has_access', Mock(return_value=True))
+class TestInlineAnalytics(ModuleStoreTestCase):
+    """Tests to verify that Inline Analytics fragment is generated correctly"""
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+
+        self.problem_xml = OptionResponseXMLFactory().build_xml(
+            question_text='The correct answer is Correct',
+            num_inputs=2,
+            weight=2,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct',
+        )
+        self.descriptor = ItemFactory.create(
+            category='problem',
+            data=self.problem_xml,
+            display_name='Option Response Problem',
+            rerandomize='never',
+        )
+
+        self.location = self.descriptor.location
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+
+    def test_inline_analytics_enabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertIn('Staff Analytics Info', result_fragment.content)
+
+    @override_settings(ANALYTICS_ANSWER_DIST_URL=False)
+    def test_inline_analytics_disabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertNotIn('Staff Analytics Info', result_fragment.content)
+
+    @override_settings(INLINE_ANALYTICS_SUPPORTED_TYPES={'ChoiceResponse': 'checkbox'})
+    def test_unsupported_response_type(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertIn('Staff Analytics Info', result_fragment.content)
+        self.assertIn('The analytics cannot be displayed for this type of question.', result_fragment.content)
+
+    def test_rerandomization_set(self):
+        descriptor = ItemFactory.create(
+            category='problem',
+            data=self.problem_xml,
+            display_name='Option Response Problem2',
+            rerandomize='always',
+        )
+
+        location = descriptor.location
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            descriptor
+        )
+
+        module = render.get_module(
+            self.user,
+            self.request,
+            location,
+            field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertIn('Staff Analytics Info', result_fragment.content)
+        self.assertIn('The analytics cannot be displayed for this question as it uses randomization.', result_fragment.content)
+
+    def test_no_problems(self):
+
+        descriptor = ItemFactory.create(
+            category='html',
+            display_name='HTML Component',
+        )
+
+        location = descriptor.location
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            descriptor
+        )
+
+        module = render.get_module(
+            self.user,
+            self.request,
+            location,
+            field_data_cache,
+        )
+        result_fragment = module.render(STUDENT_VIEW)
+        self.assertNotIn('Staff Analytics Info', result_fragment.content)
