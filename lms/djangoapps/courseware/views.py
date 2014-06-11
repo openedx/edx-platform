@@ -4,7 +4,11 @@ Courseware views functions
 
 import logging
 import urllib
+import urllib2
 import json
+from util.json_request import JsonResponse
+from datetime import datetime
+from pytz import timezone
 
 from datetime import datetime
 from collections import defaultdict
@@ -19,7 +23,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
@@ -54,6 +58,7 @@ from opaque_keys import InvalidKeyError
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
+from util.date_utils import get_time_display
 
 from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
@@ -312,6 +317,8 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
+        analytics_url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -324,6 +331,7 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
             'masquerade': masq,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
+            'analytics_url': analytics_url,
         }
 
         now = datetime.now(UTC())
@@ -799,6 +807,7 @@ def mktg_course_about(request, course_id):
         if force_english:
             translation.deactivate()
 
+
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually
@@ -1048,3 +1057,100 @@ def get_course_lti_endpoints(request, course_id):
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
+
+
+@require_GET
+def get_analytics_answer_dist(request):
+    """
+    Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.
+
+    Arguments:
+        request (django request object):  the HTTP request object that triggered this view function
+
+    Returns:
+        (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
+    """
+
+    # Construct api request
+    module_id = request.GET['module_id']
+    url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
+    if url:
+        url = url.format(module_id=module_id)
+
+    if not request.user.is_staff or not url:
+        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+
+    api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')
+    token = 'Token %s' % api_secret
+
+    analytics_req = urllib2.Request(url)
+    analytics_req.add_header('Authorization', token)
+
+    try:
+        response = urllib2.urlopen(analytics_req)
+        data = json.loads(response.read())
+
+    except urllib2.HTTPError, error:
+        log.warning('Analytics API error: ' + str(error))
+        if error.code == 404:
+            return HttpResponseNotFound(_('The analytics data could not be retrieved, please try again later.'))
+        else:
+            return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+
+    return process_analytics_answer_dist(data)
+
+
+def process_analytics_answer_dist(data):
+    """
+    Aggregates the analytics answer dist data. From the data, gets the date/time the data was last updated and reformats to the client TZ.
+
+    Arguments:
+        data: response from the analytics api
+
+    Returns:
+        A json payload of:
+          - data by part: an array of dicts of {value_id, correct, count} for each part_id
+          - count by part: an array of dicts of {totalAttemptCount, totalCorrectCount, TotalIncorrectCount} for each part_id
+          - last updated: string
+     """
+
+    # Each element in count_by_part is a dict of totalAttemptCount, totalCorrectCount, totalIncorrectCount
+    count_by_part = {}
+
+    # Each element in data_by_part is an array of dicts of {value_id, correct, count}
+    data_by_part = {}
+
+    for item in data:
+        part_id = item['part_id']
+
+        # Add count to appropriate aggregates
+        count_dict = count_by_part.get(part_id, {})
+        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount', 0) + item['count']
+        if item['correct']:
+            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount', 0) + item['count']
+        else:
+            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount', 0) + item['count']
+
+        count_by_part[part_id] = count_dict
+
+        # Add this item's data to the data for this part_id
+        part_dict = {}
+        part_dict['value_id'] = item['value_id']
+        part_dict['correct'] = item['correct']
+        part_dict['count'] = item['count']
+
+        data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
+
+    # Determine the last updated date, convert to client TZ and format
+    created_date = data[0]['created']
+    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H:%M:%S')
+    obj_date = timezone('UTC').localize(obj_date)
+    formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+
+    response_payload = {
+        'data_by_part': data_by_part,
+        'count_by_part': count_by_part,
+        'last_update_date': formatted_date_string,
+    }
+
+    return JsonResponse(response_payload)

@@ -45,7 +45,8 @@ from xmodule_modifiers import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    request_token
+    request_token,
+    add_inline_analytics,
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -71,6 +72,7 @@ XQUEUE_INTERFACE = XQueueInterface(
 # TODO: course_id and course_key are used interchangeably in this file, which is wrong.
 # Some brave person should make the variable names consistently someday, but the code's
 # coupled enough that it's kind of tricky--you've been warned!
+
 
 class LmsModuleRenderError(Exception):
     """
@@ -480,6 +482,12 @@ def get_module_system_for_user(user, field_data_cache,
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
+
+    # Add button for in-line analytics answer distribution
+    if getattr(settings, 'ANALYTICS_ANSWER_DIST_URL'):
+        if has_access(user, 'staff', descriptor, course_id):
+            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            block_wrappers.append(partial(add_inline_analytics, user, has_instructor_access))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
