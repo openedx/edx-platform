@@ -529,12 +529,12 @@ SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
-ALLOWED_HOSTS = [
-    'beta.cms.iaen.edu.ec',
-    'beta.evex.iaen.edu.ec',
-    'upex.iaen.edu.ec',
-    'cms.iaen.edu.ec'
-    ]
+#ALLOWED_HOSTS = [
+#    'beta.cms.iaen.edu.ec',
+#    'beta.evex.iaen.edu.ec',
+#    'upex.iaen.edu.ec',
+#    'cms.iaen.edu.ec'
+#    ]
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -562,8 +562,8 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (

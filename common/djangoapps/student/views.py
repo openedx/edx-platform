@@ -1877,3 +1877,19 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    Verificar informacion academica de estudiante
+    """
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
+    return HttpResponse(json.dumps(data))

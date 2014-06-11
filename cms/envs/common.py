@@ -285,7 +285,7 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-
+LANGUAGE_CODE = 'es-419'
 LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True
@@ -619,3 +619,6 @@ for app_name in OPTIONAL_APPS:
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70
