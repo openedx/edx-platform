@@ -1018,7 +1018,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param wiki_slug: the course wiki root slug
         :return: list of course locations
         """
-        courses = self.collection.find({'definition.data.wiki_slug': wiki_slug})
+        courses = self.collection.find({'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug})
         # the course's run == its name. It's the only xblock for which that's necessarily true.
         return [Location._from_deprecated_son(course['_id'], course['_id']['name']) for course in courses]
 
