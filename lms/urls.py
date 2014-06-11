@@ -445,6 +445,10 @@ if settings.COURSEWARE_ENABLED:
             include('edxnotes.urls'), name="edxnotes_endpoints"),
 
         url(r'^api/branding/v1/', include('branding.api_urls')),
+
+        # Analytics api endpoints for in-line analytics
+        url(r'^get_analytics_answer_dist/',
+            'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
     )
 
     if settings.FEATURES["ENABLE_TEAMS"]:

@@ -69,6 +69,9 @@ ${page_title_breadcrumbs(course_name())}
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:
   	<%include file="xqa_interface.html"/>
+	% if analytics_url:
+		<script type="text/javascript" src="${static.url('js/inline_analytics.js')}"></script> 
+	% endif
   % endif
 
   <script type="text/javascript">

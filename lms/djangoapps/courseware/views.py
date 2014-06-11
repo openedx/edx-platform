@@ -6,7 +6,8 @@ import logging
 import urllib
 import json
 import cgi
-
+from util.json_request import JsonResponse
+from pytz import timezone
 from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext as _
@@ -20,7 +21,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
 from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
@@ -70,6 +71,9 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from instructor.enrollment import uses_shib
+from util.date_utils import get_time_display
+from analyticsclient.client import Client
+from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
 
 from util.db import commit_on_success_with_read_committed
 
@@ -415,6 +419,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
+        analytics_url = getattr(settings, 'ANALYTICS_DATA_URL')
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -426,6 +432,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
+            'analytics_url': analytics_url,
         }
 
         now = datetime.now(UTC())
@@ -1403,3 +1410,180 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+def get_analytics_answer_dist(request):
+    """
+    Calls the the analytics answer distribution api client. Retrieves answer distribution data for the in-line
+    analytics display.
+
+    Arguments:
+        request (django request object):  the HTTP request object that triggered this view function
+
+    Returns:
+        (django response object):  JSON response:
+            500 if error occurred,
+            404 if api client returns no data,
+            otherwise 200 with JSON body.
+    """
+
+    all_data = json.loads(request.POST['data'])
+    module_id = all_data['module_id']
+    question_types_by_part = all_data['question_types_by_part']
+    num_options_by_part = all_data['num_options_by_part']
+    course_key = SlashSeparatedCourseKey.from_string(all_data['course_id'])
+
+    # Construct an error message
+    if getattr(settings, 'ZENDESK_URL'):
+        link_start = "<a href=\"" + getattr(settings, 'ZENDESK_URL') + "/hc/en-us/requests/new\">"
+        link_text = _('here')
+        link_end = "</a>"
+        error_message = _("A problem has occurred retrieving the data, to report the problem click {link_start}{link_text}{link_end}").format(
+            link_start=link_start,
+            link_text=link_text,
+            link_end=link_end,
+        )
+    else:
+        error_message = _('A problem has occurred retrieving the data.')
+
+    # Check user is enrolled as a staff member of this course
+    try:
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+    except Http404:
+        return HttpResponseServerError(error_message)
+
+    having_access = has_access(request.user, 'staff', course)
+    url = getattr(settings, 'ANALYTICS_DATA_URL')
+    auth_token = getattr(settings, 'ANALYTICS_DATA_TOKEN')
+
+    if not having_access or not url:
+        return HttpResponseServerError(error_message)
+
+    client = Client(base_url=url, auth_token=auth_token)
+    module = client.modules(course.id, module_id)
+
+    try:
+        data = module.answer_distribution()
+    except NotFoundError:
+        return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
+    except InvalidRequestError:
+        return HttpResponseServerError(error_message)
+    except TimeoutError:
+        return HttpResponseServerError(error_message)
+
+    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+
+
+def process_analytics_answer_dist(data, question_types_by_part, num_options_by_part):
+    """
+    Aggregates the analytics answer dist data.
+    From the data, gets the date/time the data was last updated and reformats to the client TZ.
+
+    Arguments:
+        data: response from the analytics api
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
+
+    Returns:
+        A json payload of:
+          - data by part: an array of dicts of {value_id, correct, count} for each part_id
+          - count by part: an array of dicts of {totalAttemptCount, totalCorrectCount, TotalIncorrectCount} for each part_id
+          - last updated: string
+     """
+
+    # Each element in count_by_part is a dict of totalAttemptCount, totalCorrectCount, totalIncorrectCount
+    count_by_part = {}
+
+    # Each element in data_by_part is an array of dicts of {value_id, correct, count}
+    data_by_part = {}
+
+    # For errors discovered during analytics data processing use message_by_part
+    message_by_part = {}
+
+    # Count rows returned for each part for integrity check
+    num_rows_by_part = {}
+
+    for item in data:
+        part_id = item['part_id']
+
+        num_rows_by_part[part_id] = num_rows_by_part.get(part_id, 0) + 1
+
+        # If we detect an issue with the data, set error message and continue
+        if _issue_with_data(item,
+                            part_id,
+                            message_by_part,
+                            question_types_by_part,
+                            num_options_by_part,
+                            num_rows_by_part):
+            continue
+
+        # Add count to appropriate aggregates
+        count_dict = count_by_part.get(part_id, {
+            'totalAttemptCount': 0,
+            'totalCorrectCount': 0,
+            'totalIncorrectCount': 0,
+        })
+        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount') + item['count']
+        if item['correct']:
+            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount') + item['count']
+        else:
+            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount') + item['count']
+
+        count_by_part[part_id] = count_dict
+
+        # Add this item's data to the data for this part_id
+        part_dict = {}
+        part_dict['value_id'] = item['value_id']
+        part_dict['correct'] = item['correct']
+        part_dict['count'] = item['count']
+
+        data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
+
+    # Determine the last updated date, convert to client TZ and format
+    created_date = data[0]['created']
+    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H%M%S')
+    obj_date = timezone('UTC').localize(obj_date)
+    formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+
+    response_payload = {
+        'data_by_part': data_by_part,
+        'count_by_part': count_by_part,
+        'message_by_part': message_by_part,
+        'last_update_date': formatted_date_string,
+    }
+    return JsonResponse(response_payload)
+
+
+def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
+    """
+    A function where issues with the data returned by the analytics API are detected
+    and an appropriate message formulated.
+
+    Arguments:
+        item: current row returned by the analytics API
+        part_id: the part_id of the current row
+        message_by_part: dictionary for storing error messages for parts
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
+        num_rows_by_part: dict of count of rows returned by API
+
+    Returns:
+        True: if an error was detected
+        False: if no error was detected
+    """
+    # Check variant (randomization) and if set, generate an error message
+    if item['variant']:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as randomization was set at one time."
+        return True
+
+    # Check number of rows returned for radio question is consistent with definition
+    if question_types_by_part[part_id] == 'radio' and num_rows_by_part[part_id] > num_options_by_part[part_id]:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    # Check number of rows returned for checkbox question is consistent with definition
+    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2, num_options_by_part[part_id]):
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    return False
