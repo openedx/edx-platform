@@ -40,7 +40,7 @@
 @import 'course/base/extends';
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'course/courseware/courseware';
-@import 'course/courseware/instructor';
+@import 'course/instructor/inline_analytics';
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
 

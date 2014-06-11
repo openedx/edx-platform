@@ -64,7 +64,6 @@ from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     wrap_xblock,
     request_token,
-    add_inline_analytics,
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -75,6 +74,7 @@ from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from util.module_utils import yield_dynamic_descriptor_descendents
 from verify_student.services import ReverificationService
+from openedx.core.lib.inline_analytics_utils import add_inline_analytics
 
 from .field_overrides import OverrideFieldData
 
@@ -579,7 +579,7 @@ def get_module_system_for_user(user, field_data_cache,
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
 
     # Add button for in-line analytics answer distribution
-    if getattr(settings, 'ANALYTICS_ANSWER_DIST_URL'):
+    if getattr(settings, 'ANALYTICS_DATA_URL'):
         if has_access(user, 'staff', descriptor, course_id):
             block_wrappers.append(partial(add_inline_analytics, user))
 

@@ -7,14 +7,16 @@ import textwrap
 
 from django.test.utils import override_settings
 
-from courseware.inline_analytics_utils import get_responses_data
 from xmodule.tests.test_capa_module import CapaFactory
+
+from openedx.core.lib.inline_analytics_utils import get_responses_data
 
 
 class ResponseTest(unittest.TestCase):
     """ unittest class """
 
     def setUp(self):
+        super(ResponseTest, self).setUp()
         self.module = CapaFactory.create()
 
     def test_capa_module(self):
@@ -37,7 +39,8 @@ class ResponseTest(unittest.TestCase):
 
         module = CapaFactory.create(rerandomize='always')
         response = get_responses_data(module)
-        self.assertEquals(response[0].message, 'The analytics cannot be displayed for this question as it uses randomization.')
+        self.assertEquals(response[0].message,
+                          'The analytics cannot be displayed for this question as it uses randomization.')
 
     @override_settings(INLINE_ANALYTICS_SUPPORTED_TYPES={'DummyType': 'dummy'})
     def test_other_type(self):
@@ -79,7 +82,8 @@ class ResponseTest(unittest.TestCase):
         self.assertEquals(response[0].message, None)
         self.assertEquals(response[1].message, None)
         self.assertEquals(response[0].choice_name_list, '[]')
-        self.assertEquals(response[1].choice_name_list, '[&quot;choice_0&quot;, &quot;choice_1&quot;, &quot;choice_2&quot;]')
+        self.assertEquals(response[1].choice_name_list,
+                          '[&quot;choice_0&quot;, &quot;choice_1&quot;, &quot;choice_2&quot;]')
 
     def test_multi_responses_name_mask(self):
 
@@ -115,4 +119,5 @@ class ResponseTest(unittest.TestCase):
         self.assertEquals(response[0].message, None)
         self.assertEquals(response[1].message, None)
         self.assertEquals(response[0].choice_name_list, '[]')
-        self.assertEquals(response[1].choice_name_list, '[&quot;choice_Tom&quot;, &quot;choice_Dick&quot;, &quot;choice_Harry&quot;]')
+        self.assertEquals(response[1].choice_name_list,
+                          '[&quot;choice_Tom&quot;, &quot;choice_Dick&quot;, &quot;choice_Harry&quot;]')
