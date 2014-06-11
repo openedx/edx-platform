@@ -52,9 +52,7 @@ import analytics.distributions
 import analytics.csvs
 import csv
 
-# Submissions is a Django app that is currently installed
-# from the edx-ora2 repo, although it will likely move in the future.
-from submissions import api as sub_api
+from submissions import api as sub_api # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
 
