@@ -1,7 +1,7 @@
 describe "DiscussionThreadListView", ->
 
     beforeEach ->
-
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures """
         <script type="text/template" id="thread-list-item-template">
           <a href="<%- id %>" data-id="<%- id %>">
@@ -75,8 +75,6 @@ describe "DiscussionThreadListView", ->
           {id: "2", title: "Thread2", body: "dummy body", votes: {up_count: '42'}, unread_comments_count:0, comments_count:2, created_at: '2013-04-03T20:07:39Z',},
           {id: "3", title: "Thread3", body: "dummy body", votes: {up_count: '12'}, unread_comments_count:0, comments_count:3, created_at: '2013-04-03T20:06:39Z',},
         ]
-        window.$$course_id = "TestOrg/TestCourse/TestRun"
-        window.user = new DiscussionUser({id: "567", upvoted_ids: []})
 
         spyOn($, "ajax")
 
