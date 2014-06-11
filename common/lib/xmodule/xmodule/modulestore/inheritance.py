@@ -86,7 +86,18 @@ class InheritanceMixin(XBlockMixin):
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-
+    proctor_url = String(
+        help="URL of proctor server",
+        scope=Scope.settings
+    )
+    proctor_user = String(
+        help="proctor server username",
+        scope=Scope.settings
+    )
+    proctor_password = String(
+        help="proctor server password",
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

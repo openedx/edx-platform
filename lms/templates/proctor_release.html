@@ -39,7 +39,7 @@ procrel = (function(){
 
     var mkurl = function(cmd) {
         ps = encodeURIComponent("${pp.procset_name}");
-        return "${pp.ProctorPanelServer}/cmd/" + cmd + "/${pp.user_id}/" + ps;
+        return "${pp.proc_url}/cmd/" + cmd + "/${pp.user.id}/" + ps;
     }
 
     var statel = $('#proctor_stat_${element_id}');
@@ -57,8 +57,8 @@ procrel = (function(){
 		 xhrFields: {
 		      withCredentials: true
 		 },
-		 username: "${pp.ProctorPanelInterface.get('username')}",
-		 password: "${pp.ProctorPanelInterface.get('password')}",
+		 username: "${pp.proc_user}",
+		 password: "${pp.proc_pass}",
                  success: gfun,
 		 dataType: "json",
                  error: function(xhr, status, error) {

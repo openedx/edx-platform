@@ -5,8 +5,6 @@ import requests
 from lxml import etree
 from pkg_resources import resource_string
 
-from django.conf import settings
-
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 
@@ -30,22 +28,20 @@ class ProctorPanel(object):
         }
 
     '''
-
-
-    def __init__(self, user, procset_name):
-        self.ProctorPanelInterface = getattr(settings, 'PROCTOR_PANEL_INTERFACE', {})
-        self.ProctorPanelServer = self.ProctorPanelInterface.get('url', "")
+    def __init__(self, user, proc_url, proc_user, proc_pass, procset_name):
+        self.proc_url = proc_url
+        self.proc_user = proc_user
+        self.proc_pass = proc_pass
         self.procset_name = procset_name
         self.ses = requests.session()
         self.user = user
-        self.user_id = user.id
 
     def is_released(self):
-        #url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
-        url = '{1}/cmd/status/{0}'.format(self.user_id, self.ProctorPanelServer)
+        #url = '{2}/cmd/status/{0}/{1}'.format(self.user.id, self.procset_name, self.proc_url)
+        url = '{1}/cmd/status/{0}'.format(self.user.id, self.proc_url)
         log.info('ProctorPanel url={0}'.format(url))
-        #ret = self.ses.post(url, data={'userid' : self.user_id, 'urlname': self.procset_name}, verify=False)
-        auth = (self.ProctorPanelInterface.get('username'), self.ProctorPanelInterface.get('password'))
+        #ret = self.ses.post(url, data={'userid' : self.user.id, 'urlname': self.procset_name}, verify=False)
+        auth = (self.proc_user, self.proc_pass)
         ret = self.ses.get(url, verify=False, auth=auth, params={'problem': self.procset_name})
         try:
             retdat = json.loads(ret.content)
@@ -68,6 +64,9 @@ class ProctorFields(object):
     procset_name = String(help="Name of this proctored set", scope=Scope.settings)
     staff_release = Boolean(help="True if staff forced release independent of proctor panel",
                        default=False, scope=Scope.user_state)
+    proctor_url = String(help="URL of proctor server", scope=Scope.settings)
+    proctor_user = String(help="proctor server username", scope=Scope.settings)
+    proctor_password = String(help="proctor server password", scope=Scope.settings)
 
 
 class ProctorModule(ProctorFields, XModule):
@@ -106,7 +105,8 @@ class ProctorModule(ProctorFields, XModule):
         super(ProctorModule, self).__init__(*args, **kwargs)
         # check proctor panel to see if this should be released
         user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
-        self.pp = ProctorPanel(user, self.procset_name)
+        self.pp = ProctorPanel(user, self.proctor_url, self.proctor_user,
+                               self.proctor_password, self.procset_name)
 
         self.child_descriptor = self.descriptor.get_children()[0]
         log.debug("children of proctor module (should be only 1): %s", self.get_children())
