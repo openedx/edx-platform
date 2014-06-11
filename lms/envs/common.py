@@ -1371,6 +1371,14 @@ ORA2_AI_ALGORITHMS = {
     'ease': 'openassessment.assessment.worker.algorithm.EaseAIAlgorithm'
 }
 
+ORA2_ASSESSMENTS = {
+    'peer': 'openassessment.assessment.api.peer',
+    'self': 'openassessment.assessment.api.self',
+    'training': 'openassessment.assessment.api.student_training',
+}
+
+ORA2_ASSESSMENT_SCORE_PRIORITY = ['peer', 'self']
+
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5

@@ -587,6 +587,17 @@ MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 
+############################ ORA 2 ############################################
+
+ORA2_ASSESSMENTS = {
+    'peer': 'openassessment.assessment.api.peer',
+    'self': 'openassessment.assessment.api.self',
+    'training': 'openassessment.assessment.api.student_training',
+}
+
+ORA2_ASSESSMENT_SCORE_PRIORITY = ['peer', 'self']
+
+
 ### Apps only installed in some instances
 
 OPTIONAL_APPS = (
