@@ -1,3 +1,4 @@
+from dogapi import dog_stats_api
 import json
 import logging
 
@@ -6,12 +7,11 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.http import HttpResponse
-import json
-from dogapi import dog_stats_api
-from capa.xqueue_interface import XQUEUE_METRIC_NAME
 
+from capa.xqueue_interface import XQUEUE_METRIC_NAME
 from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
 from certificates.queue import XQueueCertInterface
+from student.models import UserProfile
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -32,27 +32,39 @@ def request_certificate(request):
     at the end of a course run, so that we can be sure users get graded and
     then if and only if they pass, do they get a certificate issued.
     """
-    if request.method == "POST":
-        if request.user.is_authenticated():
-            xq         = XQueueCertInterface()
-            username   = request.user.username
-            student    = User.objects.get(username=username)
-            course_id  = request.POST.get('course_id')
-            course     = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
-            title = 'None'
-            if use_cme:
-                titlelist = CmeUserProfile.objects.filter(user=student).values('professional_designation')
-                if len(titlelist):
-                    print "DEBUG: {}".format(repr(titlelist))
-                    title = titlelist[0]['professional_designation']
+    # Memoize user information; return error if it's invalid
+    user = None
+    username = ''
+    try:
+        user = request.user
+        username = user.username
+    except AttributeError:
+        return HttpResponse(json.dumps({'add_status': 'error', 'error': 'ERRORBADREQUEST'}), mimetype='application/json')
 
-            status = certificate_status_for_student(student, course_id)['status']
-            if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_id))
-                # TODO: make xq.add_cert into async celery job w/o return so grading pushes off to util boxen
-                status = xq.add_cert(student, course_id, course=course, title=title)
-            return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
-        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
+    # It is an error to hit this endpoint with anything but a POST
+    if request.method != "POST":
+        return HttpResponse(json.dumps({'add_status': 'error', 'error': 'ERRORNOPOST'}), mimetype='application/json')
+
+    # It is an error to hit this endpoint as an anonymous/nonregistered user
+    if not (user.is_authenticated() and UserProfile.has_registered(user)):
+        return HttpResponse(json.dumps({'add_status': 'error', 'error': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
+
+    xq = XQueueCertInterface()
+    student = User.objects.get(username=username)
+    course_id = request.POST.get('course_id')
+    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+    title = 'None'
+    if use_cme:
+        titlelist = CmeUserProfile.objects.filter(user=student).values('professional_designation')
+        if len(titlelist):
+            title = titlelist[0]['professional_designation']
+
+    status = certificate_status_for_student(student, course_id)['status']
+    if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
+        logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_id))
+        # TODO: make xq.add_cert into async celery job w/o return so grading pushes off to util boxen
+        status = xq.add_cert(student, course_id, course=course, title=title)
+    return HttpResponse(json.dumps({'add_status': status, 'error': ''}), mimetype='application/json')
 
 
 @csrf_exempt
