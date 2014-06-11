@@ -65,7 +65,7 @@ class VerifyView(View):
                 reverse('verify_student_verified',
                         kwargs={'course_id': course_id.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
             )
-        elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+        elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
             return redirect(reverse('dashboard'))
         else:
             # If they haven't completed a verification attempt, we have to
@@ -119,7 +119,7 @@ class VerifiedView(View):
         """
         upgrade = request.GET.get('upgrade', False)
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
 
@@ -284,7 +284,7 @@ def show_requirements(request, course_id):
     Show the requirements necessary for the verification flow.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+    if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
         return redirect(reverse('dashboard'))
 
     upgrade = request.GET.get('upgrade', False)
