@@ -123,7 +123,7 @@
 }
 
 // main styling
-body.discussion, section.discussion {
+body.discussion, .discussion-course {
 
   // new post creation
   .new-post-form-errors {
@@ -148,7 +148,7 @@ body.discussion, section.discussion {
     }
   }
 
-  .course-tabs .right {
+  .course-tabs .right, .discussion-course-new.right {
     float: right;
 
     .new-post-btn {
@@ -480,7 +480,7 @@ body.discussion, section.discussion {
 
 
   .wmd-panel {
-    min-width: 500px;
+    min-width: 425px;
     width: 100%;
   }
 

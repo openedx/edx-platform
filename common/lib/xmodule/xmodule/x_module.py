@@ -1292,7 +1292,11 @@ class DiscussionService(object):
             'cohorts': cohorts,
             'user_cohort': user_cohort_id,
             'cohorted_commentables': cohorted_commentables,
-            'is_course_cohorted': is_course_cohorted(course_id)
+            'is_course_cohorted': is_course_cohorted(course_id),
+            'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
+            'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
+            'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),
+            'has_permission_to_openclose_thread': cached_has_permission(user, "openclose_thread", course_id)
         }
 
         return context
