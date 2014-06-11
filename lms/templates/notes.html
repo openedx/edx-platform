@@ -1,6 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js', raw=True)}"></script>
+ <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', raw=True)}" ></script>
 <%inherit file="main.html" />
 <%!
     from django.core.urlresolvers import reverse
@@ -102,7 +106,7 @@
                             if (annotation.permissions) {
                               tokens = annotation.permissions[action] || [];
                               if (is_staff){
-                              	return true;
+                                  return true;
                               }
                               if (tokens.length === 0) {
                                 return true;
@@ -128,7 +132,7 @@
                           },
                     },
                     auth: {
-                        tokenUrl: location.protocol+'//'+location.host+"/token?course_id=${course.id.to_deprecated_string()}"
+                        token: "${token}"
                     },
                     store: {
                         // The endpoint of the store on your server.
@@ -158,37 +162,34 @@
                 optionsRichText: {
                     tinymce:{
                         selector: "li.annotator-item textarea",
-                        plugins: "media image insertdatetime link code",
+                        plugins: "media image codemirror",
                         menubar: false,
                         toolbar_items_size: 'small',
                         extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+                        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
                     }
-                    return true;
-                  },
-            },
-            auth: {
-                token: "${token}"
-            },
-            store: {
-                // The endpoint of the store on your server.
-                prefix: "${storage}",
-
-                annotationData: {},
-
-                urls: {
-                    // These are the default URLs.
-                    create:  '/create',
-                    read:    '/read/:id',
-                    update:  '/update/:id',
-                    destroy: '/delete/:id',
-                    search:  '/search'
                 },
+                auth: {
+                    token: "${token}"
+                },
+                store: {
+                    // The endpoint of the store on your server.
+                    prefix: "${storage}",
+
+                    annotationData: {},
+
+                    urls: {
+                        // These are the default URLs.
+                        create:  '/create',
+                        read:    '/read/:id',
+                        update:  '/update/:id',
+                        destroy: '/delete/:id',
+                        search:  '/search'
+                    },
+                }
             };
 
-        tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
         var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-
         //remove old instances
         if (Annotator._instances.length !== 0) {
             $('#notesHolder').annotator("destroy");
@@ -207,7 +208,8 @@
                 showMediaSelector: true,
                 showPublicPrivate: true,
                 pagination:pagination,//Number of Annotations per load in the pagination,
-                flags:is_staff
+                flags:is_staff,
+                default_tab: "${default_tab}",
             },
             Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
         </script>

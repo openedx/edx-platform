@@ -7872,14 +7872,14 @@ $.extend( $.IIIF1_1TileSource.prototype, $.TileSource.prototype, {
             uri;
 
         if ( level_width < this.tile_width && level_height < this.tile_height ){
-            iiif_size = level_width + "," + level_height;
+            iiif_size = level_width + ",";
             iiif_region = 'full';
         } else {
             iiif_tile_x = x * iiif_tile_size_width;
             iiif_tile_y = y * iiif_tile_size_height;
             iiif_tile_w = Math.min( iiif_tile_size_width, this.width - iiif_tile_x );
             iiif_tile_h = Math.min( iiif_tile_size_height, this.height - iiif_tile_y );
-            iiif_size = Math.ceil(iiif_tile_w * scale) + "," +  Math.ceil(iiif_tile_h * scale);
+            iiif_size = Math.ceil(iiif_tile_w * scale) + ",";
             iiif_region = [ iiif_tile_x, iiif_tile_y, iiif_tile_w, iiif_tile_h ].join(',');
         }
         uri = [ this['@id'], iiif_region, iiif_size, IIIF_ROTATION, IIIF_QUALITY ].join('/');
