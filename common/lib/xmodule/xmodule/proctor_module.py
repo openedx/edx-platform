@@ -134,14 +134,14 @@ class ProctorModule(ProctorFields, XModule):
 
 
     def not_released_html(self):
-        return Fragment(self.system.render_template('proctor_release.html', {
+        return Fragment(self.runtime.render_template('proctor_release.html', {
                 'element_id': self.location.html_id(),
                 'id': self.id,
                 'name': self.display_name or self.procset_name,
                 'pp': self.pp,
                 'location': self.location,
-                'ajax_url': self.system.ajax_url,
-                'is_staff': self.system.user_is_staff,
+                'ajax_url': self.runtime.ajax_url,
+                'is_staff': self.runtime.user_is_staff,
         }))
 
 
@@ -157,30 +157,30 @@ class ProctorModule(ProctorFields, XModule):
         if self.child.category in ['sequential', 'videosequence', 'problemset', 'randomize']:
             html = self.child.render('student_view', context)
             if self.staff_release:
-                dishtml = self.system.render_template('proctor_disable.html', {
+                dishtml = self.runtime.render_template('proctor_disable.html', {
                         'element_id': self.location.html_id(),
-                        'is_staff': self.system.user_is_staff,
-                        'ajax_url': self.system.ajax_url,
+                        'is_staff': self.runtime.user_is_staff,
+                        'ajax_url': self.runtime.ajax_url,
                         })
                 html.content = dishtml + html.content
             return html
 
         # return ajax container, so that we can dynamically check for is_released changing
-        return Fragment(self.system.render_template('conditional_ajax.html', {
+        return Fragment(self.runtime.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
-            'ajax_url': self.system.ajax_url,
+            'ajax_url': self.runtime.ajax_url,
             'depends': '',
         }))
 
 
 
     def handle_ajax(self, _dispatch, _data):
-        if self.system.user_is_staff and _dispatch=='release':
+        if self.runtime.user_is_staff and _dispatch=='release':
             self.staff_release = True
             # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Release successful</body></html>'
             return json.dumps({'html': 'staff_release successful'})
-        if self.system.user_is_staff and _dispatch=='disable':
+        if self.runtime.user_is_staff and _dispatch=='disable':
             self.staff_release = False
             return json.dumps({'html': 'staff_disable successful'})
             # return '<html><head><META HTTP-EQUIV="refresh" CONTENT="15"></head><body>Disable successful</body></html>'
