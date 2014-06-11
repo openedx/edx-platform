@@ -1132,3 +1132,100 @@ class CoursesApiTests(TestCase):
         response = self.do_get('{}?enrolled={}&type={}'.format(test_uri_users, 'true', 'project'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+
+    def test_coursemodulecompletions_detail_delete(self):
+
+        data = {
+            'email': 'test@example.com',
+            'username': 'test_user',
+            'password': 'test_pass',
+            'first_name': 'John',
+            'last_name': 'Doe'
+        }
+        response = self.do_post(self.base_users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        created_user_id = response.data['id']
+        detail_uri = '{}/{}/completions/{}/{}'.format(self.base_courses_uri, self.course.id, self.course_content.id,
+                                                      created_user_id)
+        response = self.do_post(detail_uri, {})
+        self.assertEqual(response.status_code, 201)
+        coursemodulecomp_id = response.data['id']
+        self.assertGreater(coursemodulecomp_id, 0)
+        self.assertEqual(response.data['user_id'], created_user_id)
+        self.assertEqual(response.data['course_id'], self.course.id)
+        self.assertEqual(response.data['content_id'], self.course_content.id)
+        self.assertIsNotNone(response.data['created'])
+        self.assertIsNotNone(response.data['modified'])
+
+        # test to create course completion with same attributes
+        response = self.do_post(detail_uri, {})
+        self.assertEqual(response.status_code, 409)
+
+        # test for delete
+        response = self.do_delete(detail_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get('{}/{}/completions?user_id={}&content_id={}'.format(self.base_courses_uri,
+                                                                                   self.course.id,
+                                                                                   created_user_id,
+                                                                                   self.course_content.id))
+        self.assertEqual(response.status_code, 404)
+
+        #test deletion of non existing course module completion
+        non_existing_uri = '{}/{}/completions/{}/{}'.format(self.base_courses_uri, self.course.id,
+                                                            self.course_content.id, '3323432')
+        response = self.do_delete(non_existing_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_coursemodulecompletions_filters(self):
+        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
+        for i in xrange(1, 3):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+
+        for i in xrange(1, 26):
+            content_id = self.course_content.id + str(i)
+            response = self.do_post('{}{}/{}'.format(completion_uri, content_id, created_user_id), {})
+            self.assertEqual(response.status_code, 201)
+
+        #filter course module completion by user
+        user_filter_uri = '{}?user_id={}&page_size=10&page=3'.format(completion_uri, created_user_id)
+        response = self.do_get(user_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 25)
+        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(response.data['num_pages'], 3)
+
+        #filter course module completion by multiple user ids
+        user_filter_uri = '{}?user_id={}'.format(completion_uri, str(created_user_id) + ',3,4')
+        response = self.do_get(user_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 25)
+        self.assertEqual(len(response.data['results']), 20)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        #filter course module completion by user who has not completed any course module
+        user_filter_uri = '{}?user_id={}'.format(completion_uri, 1)
+        response = self.do_get(user_filter_uri)
+        self.assertEqual(response.status_code, 404)
+
+        #filter course module completion by course_id
+        course_filter_uri = '{}?course_id={}&page_size=10'.format(completion_uri, self.course.id)
+        response = self.do_get(course_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 25)
+        self.assertEqual(len(response.data['results']), 10)
+
+        #filter course module completion by content_id
+        content_filter_uri = '{}?content_id={}'.format(completion_uri, self.course_content.id + str(1))
+        response = self.do_get(content_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(len(response.data['results']), 1)
