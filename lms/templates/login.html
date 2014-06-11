@@ -51,7 +51,7 @@
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
           var u=decodeURI(window.location.search);
-          next=u.split("next=")[1];
+          next=decodeURIComponent(u.split("next=")[1]);
           if (next && !isExternal(next)) {
             location.href=next;
           }  else if(json.redirect_url){
