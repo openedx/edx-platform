@@ -14,7 +14,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url
 
-from contentstore.views.component import component_handler
+from contentstore.views.component import component_handler, get_component_templates
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
@@ -947,3 +947,69 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code, status_code)
+
+
+class TestComponentTemplates(CourseTestCase):
+    """
+    Unit tests for the generation of the component templates for a course.
+    """
+
+    def setUp(self):
+        super(TestComponentTemplates, self).setUp()
+        self.templates = get_component_templates(self.course)
+
+    def get_templates_of_type(self, template_type):
+        """
+        Returns the templates for the specified type, or None if none is found.
+        """
+        template_dict = next((template for template in self.templates if template.get('type') == template_type), None)
+        return template_dict.get('templates') if template_dict else None
+
+    def get_template(self, templates, display_name):
+        """
+        Returns the template which has the specified display name.
+        """
+        return next((template for template in templates if template.get('display_name') == display_name), None)
+
+    def test_basic_components(self):
+        """
+        Test the handling of the basic component templates.
+        """
+        self.assertIsNotNone(self.get_templates_of_type('discussion'))
+        self.assertIsNotNone(self.get_templates_of_type('html'))
+        self.assertIsNotNone(self.get_templates_of_type('problem'))
+        self.assertIsNotNone(self.get_templates_of_type('video'))
+        self.assertIsNone(self.get_templates_of_type('advanced'))
+
+    def test_advanced_components(self):
+        """
+        Test the handling of advanced component templates.
+        """
+        self.course.advanced_modules.append('word_cloud')
+        self.templates = get_component_templates(self.course)
+        advanced_templates = self.get_templates_of_type('advanced')
+        self.assertEqual(len(advanced_templates), 1)
+        world_cloud_template = advanced_templates[0]
+        self.assertEqual(world_cloud_template.get('category'), 'word_cloud')
+        self.assertEqual(world_cloud_template.get('display_name'), u'Word cloud')
+        self.assertIsNone(world_cloud_template.get('boilerplate_name', None))
+
+        # Verify that non-advanced components are not added twice
+        self.course.advanced_modules.append('video')
+        self.course.advanced_modules.append('openassessment')
+        self.templates = get_component_templates(self.course)
+        advanced_templates = self.get_templates_of_type('advanced')
+        self.assertEqual(len(advanced_templates), 1)
+        only_template = advanced_templates[0]
+        self.assertNotEqual(only_template.get('category'), 'video')
+        self.assertNotEqual(only_template.get('category'), 'openassessment')
+
+    def test_advanced_problems(self):
+        """
+        Test the handling of advanced problem templates.
+        """
+        problem_templates = self.get_templates_of_type('problem')
+        ora_template = self.get_template(problem_templates, u'Peer Assessment')
+        self.assertIsNotNone(ora_template)
+        self.assertEqual(ora_template.get('category'), 'openassessment')
+        self.assertIsNone(ora_template.get('boilerplate_name', None))
