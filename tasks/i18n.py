@@ -16,9 +16,9 @@ from invoke import run as sh
 from pygments.console import colorize
 from .utils.cmd import cmd
 from .utils.envs import Env
-from .tests import test_i18n
+from .test import test_i18n
 
-I18N_REPORT_DIR = Env.REPORT_DIR/'i18n'
+I18N_REPORT_DIR = Env.REPORT_DIR / 'i18n'
 I18N_XUNIT_REPORT = I18N_REPORT_DIR.joinpath('nosetests.xml')
 
 

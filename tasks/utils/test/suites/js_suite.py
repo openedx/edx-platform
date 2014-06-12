@@ -9,6 +9,15 @@ from tasks.utils.envs import Env
 __test__ = False  # do not collect
 
 
+JS_TEST_IDS = {
+    'lms': Env.REPO_ROOT / 'lms/static/js_test.yml',
+    'cms': Env.REPO_ROOT / 'cms/static/js_test.yml',
+    'cms-squire': Env.REPO_ROOT / 'cms/static/js_test_squire.yml',
+    'xmodule': Env.REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
+    'common': Env.REPO_ROOT / 'common/static/js_test.yml',
+}
+
+
 class JsTestSuite(TestSuite):
     """
     A class for running JavaScript tests.
@@ -19,12 +28,12 @@ class JsTestSuite(TestSuite):
         self.mode = kwargs.get('mode', 'run')
 
         try:
-            self.test_id = (Env.JS_TEST_ID_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
-        except ValueError:
-            self.test_id = ' '.join(Env.JS_TEST_ID_FILES)
+            self.test_id = JS_TEST_IDS[self.root]
+        except (KeyError, ValueError):
+            self.test_id = " ".join(JS_TEST_IDS.values())
 
         self.root = self.root + ' javascript'
-        self.report_dir = Env.JS_REPORT_DIR
+        self.report_dir = Env.REPORT_DIR / 'javascript'
         self.coverage_report = self.report_dir / 'coverage.xml'
         self.xunit_report = self.report_dir / 'javascript_xunit.xml'
 

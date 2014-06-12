@@ -3,10 +3,14 @@ Unit test tasks
 """
 import os
 import sys
-from invoke import task
+from invoke import task, Collection
 from invoke import run as sh
 from tasks.utils.test import suites
 from tasks.utils.envs import Env
+from .js import ns as ns_js
+
+ns = Collection()
+ns.add_collection(ns_js)
 
 try:
     from pygments.console import colorize
@@ -53,6 +57,8 @@ def test_system(
     test_suite = suites.PythonTestSuite('python tests', subsuites=system_tests, **opts)
     test_suite.run()
 
+ns.add_task(test_system, 'system')
+
 
 @task('prereqs.install', help={
     "lib": "lib to test",
@@ -86,6 +92,7 @@ def test_lib(
     test_suite = suites.PythonTestSuite('python tests', subsuites=lib_tests, **opts)
     test_suite.run()
 
+ns.add_task(test_lib, 'lib')
 
 @task('prereqs.install', help={
     "failed": "Run only failed tests",
@@ -105,6 +112,7 @@ def test_python(failed=None, fail_fast=None, verbosity=1):
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
     python_suite.run()
 
+ns.add_task(test_python, 'python')
 
 @task('prereqs.install.python')
 def test_i18n():
@@ -114,11 +122,13 @@ def test_i18n():
     i18n_suite = suites.I18nTestSuite('i18n')
     i18n_suite.run()
 
+ns.add_task(test_i18n, 'i18n')
+
 
 @task('prereqs.install', help={
     "verbosity": "Turn logging up or down"
 })
-def test(verbosity=1):
+def test_all(verbosity=1):
     """
     Run all tests
     """
@@ -134,6 +144,7 @@ def test(verbosity=1):
     all_unittests_suite = suites.TestSuite('All Tests', subsuites=[i18n_suite, js_suite, python_suite])
     all_unittests_suite.run()
 
+ns.add_task(test_all, 'all', default=True)
 
 @task('prereqs.install', help={
     "compare_branch": "Branch to compare against"
@@ -194,3 +205,5 @@ def coverage(compare_branch="origin/master"):
         )
 
         print("\n")
+
+ns.add_task(coverage, 'coverage')
