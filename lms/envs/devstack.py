@@ -32,6 +32,17 @@ FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio cou
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 
 
+########################## ANALYTICS TESTING ########################
+
+ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
+ANALYTICS_API_KEY = ""
+
+# TODO Change this once the Analytics API is integrated into devstack
+ANALYTICS_DATA_URL = "http://192.168.33.1:8080"
+ANALYTICS_DATA_TOKEN = "1a8c76def278f9174f952c05ea32415e616251e9"
+FEATURES['ANALYTICS_ENROLLMENT_COUNT'] = True
+
+
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ('debug_toolbar',)
