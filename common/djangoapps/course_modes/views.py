@@ -36,16 +36,14 @@ class ChooseModeView(View):
 
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
+        # Inactive users always need to re-register
         # verified users do not need to register or upgrade
-        if enrollment_mode == 'verified':
-            return redirect(reverse('dashboard'))
-
         # registered users who are not trying to upgrade do not need to re-register
-        if enrollment_mode is not None and upgrade is False:
+        if is_active and (upgrade is False or enrollment_mode == 'verified'):
             return redirect(reverse('dashboard'))
 
         modes = CourseMode.modes_for_course_dict(course_key)
@@ -64,7 +62,11 @@ class ChooseModeView(View):
             "upgrade": upgrade,
         }
         if "verified" in modes:
-            context["suggested_prices"] = [decimal.Decimal(x) for x in modes["verified"].suggested_prices.split(",")]
+            context["suggested_prices"] = [
+                decimal.Decimal(x.strip())
+                for x in modes["verified"].suggested_prices.split(",")
+                if x.strip()
+            ]
             context["currency"] = modes["verified"].currency.upper()
             context["min_price"] = modes["verified"].min_price
 

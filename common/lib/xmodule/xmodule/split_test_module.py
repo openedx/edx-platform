@@ -290,7 +290,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Record in the tracking logs which child was rendered
         """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('xblock.split_test.child_render', {'child-id': self.child.scope_ids.usage_id})
+        self.system.track_function('xblock.split_test.child_render', {'child-id': self.child.scope_ids.usage_id.to_deprecated_string()})
         return Response()
 
     def get_icon_class(self):
