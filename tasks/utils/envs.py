@@ -24,6 +24,12 @@ class Env(object):
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
+    # Directories used for common/lib/ tests
+    LIB_TEST_DIRS = []
+    for item in (REPO_ROOT / "common/lib").listdir():
+        if (REPO_ROOT / 'common/lib' / item).isdir():
+            LIB_TEST_DIRS.append(path("common/lib") / item.basename())
+
     @lazy
     def env_tokens(self):
         """

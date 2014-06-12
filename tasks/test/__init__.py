@@ -176,7 +176,7 @@ def coverage(compare_branch="origin/master"):
     if not xml_reports:
         err_msg = colorize(
             'red',
-            "No coverage info found.  Run `paver test` before running `paver coverage`.\n"
+            "No coverage info found.  Run `inv test` before running `inv test.coverage`.\n"
         )
         sys.stderr.write(err_msg)
     else:
