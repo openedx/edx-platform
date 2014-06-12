@@ -11,6 +11,10 @@ import traceback
 from path import path
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
@@ -217,8 +221,8 @@ def update(system=None, watch=False, settings="dev", debug=False, skip_collect=T
 
     if not skip_collect:
         collect_assets(system, settings)
-        print(Fore.WHITE + "Done collecting assets...")
+        print(colorize('white', "Done collecting assets..."))
 
     if watch:
-        print(Fore.WHITE + "Starting to watch assets")
-        run('invoke assets.watch --background {}'.format(not debug))
+        print(colorize('white', "Starting to watch assets"))
+        sh('invoke assets.watch --background {}'.format(not debug))

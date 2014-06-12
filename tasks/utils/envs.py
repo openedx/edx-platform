@@ -20,6 +20,8 @@ class Env(object):
     # Root dir for reports
     REPORT_DIR = REPO_ROOT / "reports"
 
+    TEST_DIR = REPO_ROOT / ".testids"
+
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
