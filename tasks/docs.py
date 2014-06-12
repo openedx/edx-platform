@@ -11,6 +11,7 @@ DOC_PATHS = {
     "default": "docs/en_us"
 }
 
+
 def valid_doc_types():
     """
     Return a comma-separated string of valid doc types.
@@ -43,10 +44,11 @@ def doc_path(doc_type, allow_default=True):
         sys.exit(2)
     return path
 
-@task('prereqs.install',
-      help={"type": "Type of docs to compile",
-            "verbose": "Display verbose output"
-      })
+
+@task('prereqs.install', default=True, help={
+    "type": "Type of docs to compile",
+    "verbose": "Display verbose output"
+})
 def build(type='default', verbose=False):
     """
     Invoke sphinx 'make build' to generate docs.
