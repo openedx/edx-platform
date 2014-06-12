@@ -288,6 +288,7 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 LANGUAGES = lms.envs.common.LANGUAGES
+LANGUAGE_DICT = lms.envs.common.LANGUAGE_DICT
 USE_I18N = True
 USE_L10N = True
 
