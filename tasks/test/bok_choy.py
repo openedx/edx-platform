@@ -133,17 +133,12 @@ def check_memcache():
         raise RuntimeError('Memcache is not running locally')
 
 
-@task('bok_choy.check_mongo',
-      'bok_choy.check_memcache',
-      'bok_choy.check_mysql'
-)
+@task(check_mongo, check_memcache, check_mysql)
 def check_services():
     pass
 
 
-@task('bok_choy.check_mysql',
-      'prereqs.install'
-)
+@task(check_mysql, 'prereqs.install')
 def bok_choy_setup():
     sh(Env.REPO_ROOT / 'scripts/reset-test-db.sh')
     sh("invoke assets.update --settings=bok_choy")
@@ -151,8 +146,7 @@ def bok_choy_setup():
 ns.add_task(bok_choy_setup, 'setup')
 
 
-@task('bok_choy.check_services',
-      'clean.reports')
+@task(check_services, 'clean.reports')
 def test_bok_choy_fast(spec=None):
     clear_mongo()
     BOK_CHOY_CACHE.flush()
