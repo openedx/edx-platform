@@ -371,7 +371,7 @@ def _progress_summary(student, request, course):
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
                     course_id = course.id
                     (correct, total) = get_score(
-                        course_id, student, module_descriptor, module_creator, scores_cache=submissions_scores
+                        course_id, student, module_descriptor, module_creator, scores_cache=submissions_scores, field_data_cache=field_data_cache
                     )
                     if correct is None and total is None:
                         continue
@@ -403,7 +403,7 @@ def _progress_summary(student, request, course):
     return chapters
 
 
-def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=None):
+def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=None, field_data_cache=None):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -444,11 +444,18 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         return (None, None)
 
     try:
-        student_module = StudentModule.objects.get(
-            student=user,
-            course_id=course_id,
-            module_state_key=problem_descriptor.location
-        )
+        student_module = None
+        if field_data_cache:
+            student_module = field_data_cache.find_student_module(
+                problem_descriptor.location
+            )
+
+        if not student_module:
+            student_module = StudentModule.objects.get(
+                student=user,
+                course_id=course_id,
+                module_state_key=problem_descriptor.location
+            )
     except StudentModule.DoesNotExist:
         student_module = None
 

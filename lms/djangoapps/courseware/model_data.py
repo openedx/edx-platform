@@ -60,6 +60,7 @@ class FieldDataCache(object):
         self.cache = {}
         self.descriptors = descriptors
         self.select_for_update = select_for_update
+        self.locations_to_student_modules = {}
 
         assert isinstance(course_id, SlashSeparatedCourseKey)
         self.course_id = course_id
@@ -68,7 +69,13 @@ class FieldDataCache(object):
         if user.is_authenticated():
             for scope, fields in self._fields_to_cache().items():
                 for field_object in self._retrieve_fields(scope, fields):
-                    self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
+                    cache_key = self._cache_key_from_field_object(scope, field_object)
+                    self.cache[cache_key] = field_object
+
+                    # Side load our location cache as well
+                    if scope == Scope.user_state:
+                        location = cache_key[1]
+                        self.locations_to_student_modules[location] = field_object
 
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
@@ -224,6 +231,9 @@ class FieldDataCache(object):
             assert key.user_id == self.user.id
 
         return self.cache.get(self._cache_key_from_kvs_key(key))
+
+    def find_student_module(self, location):
+        return self.locations_to_student_modules.get(location)
 
     def find_or_create(self, key):
         '''
