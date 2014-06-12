@@ -34,6 +34,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
         $(".account-settings-language").toggleClass("is-editing");
     });
 
+    $(".account-settings-language .action-cancel").click(function(event, xhr) {
+        event.preventDefault();
+        $(".account-settings-language").toggleClass("is-editing");
+    });
+
     $(".account-settings-language .action-submit").click(function(event, xhr) {
         event.preventDefault();
         $.post('/lang_pref/setlang/',
