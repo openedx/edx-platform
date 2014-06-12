@@ -6,16 +6,18 @@ import sys
 import traceback
 from invoke import task
 from invoke import run as sh
-from pygments.console import colorize
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
 
 from .utils.cmd import django_cmd
 from .utils.process import run_process, run_multi_processes
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
-DEFAULT_SETTINGS = 'dev'
-DEFAULT_CELERY_SETTINGS = 'dev_with_worker'
 
-def run_server(system, settings=None, port=None, skip_assets=False):
+
+def run_server(system, settings="dev", port=0, skip_assets=False):
     """
     Start the server for the specified `system` (lms or cms).
     `settings` is the Django settings module to use; if not provided, use the default.
@@ -29,50 +31,45 @@ def run_server(system, settings=None, port=None, skip_assets=False):
 
     if not skip_assets:
         # Local dev settings use staticfiles to serve assets, so we can skip the collecstatic step
-        args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
         sh('invoke assets.update --system={system} --settings={settings}'.format(system=system, settings=settings), echo=True)
 
-    if port is None:
+    if not port:
         port = DEFAULT_PORT[system]
-
-    if settings is None:
-        settings = DEFAULT_SETTINGS
 
     run_process(django_cmd(
         system, settings, 'runserver', '--traceback',
         '--pythonpath=.', '0.0.0.0:{}'.format(port)))
 
-@task('prereqs.install',
-      help={
-          "settings": "Django settings",
-          "port": "Port",
-          "fast": "Skip updating assets"}
-)
-def lms(settings=DEFAULT_SETTINGS, port=None, fast=False):
+
+@task('prereqs.install', help={
+    "settings": "Django settings",
+    "port": "Port",
+    "fast": "Skip updating assets",
+})
+def lms(settings="dev", port=8000, fast=False):
     """
     Run the LMS server.
     """
     run_server('lms', settings=settings, port=port, skip_assets=fast)
 
-@task('prereqs.install',
-      help={
-          "settings": "Django settings",
-          "port": "Port",
-          "fast": "Skip updating assets"}
-)
-def cms(settings=None, port=None, fast=False):
+
+@task('prereqs.install', help={
+    "settings": "Django settings",
+    "port": "Port",
+    "fast": "Skip updating assets",
+})
+def cms(settings="dev", port=8001, fast=False):
     """
     Run the cms server.
     """
     run_server('cms', settings=settings, port=port, skip_assets=fast)
 
-@task('prereqs.install',
-      help={
-          "system": "lms or cms",
-          "fast": "Skip updating assets",
-      }
-)
-def devstack(system=None, fast=False):
+
+@task('prereqs.install', positional=("system"), help={
+    "system": "lms or cms",
+    "fast": "Skip updating assets",
+})
+def devstack(system, fast=False):
     """
     Start the devstack LMS or CMS server
     """
@@ -82,19 +79,22 @@ def devstack(system=None, fast=False):
     run_server(system, settings='devstack', skip_assets=fast)
 
 
-@task('prereqs.install', help={"settings": "Django settings"})
-def celery(settings=DEFAULT_CELERY_SETTINGS):
+@task('prereqs.install', help={
+    "settings": "Django settings"
+})
+def celery(settings="dev_with_worker"):
     """
     Runs Celery workers.
     """
     run_process(django_cmd('lms', settings, 'celery', 'worker', '--loglevel=INFO', '--pythonpath=.'))
 
-@task('prereqs.install',
-      help={"settings":        "Django settings",
-            "worker_settings": "Celery worker Django settings",
-            "fast":            "Skip updating assets"}
-)
-def run(settings=DEFAULT_SETTINGS, worker_settings='dev_with_worker', fast=False):
+
+@task('prereqs.install', default=True, help={
+    "settings":        "Django settings",
+    "worker_settings": "Celery worker Django settings",
+    "fast":            "Skip updating assets",
+})
+def run(settings="dev", worker_settings='dev_with_worker', fast=False):
     """
     Runs Celery workers, CMS and LMS.
     """
@@ -111,15 +111,15 @@ def run(settings=DEFAULT_SETTINGS, worker_settings='dev_with_worker', fast=False
     ])
 
 
-@task('prereqs.install',
-      help={"settings": "Django settings",
-            "verbose": "Display verbose output"
+@task('prereqs.install', help={
+    "settings": "Django settings",
+    "verbose": "Display verbose output"
 })
 def update_db(settings='dev', verbose=False):
     """
     Runs syncdb and then migrate.
     """
-    hide=None
+    hide = None
     if not verbose:
         hide = 'both'
 
@@ -127,10 +127,11 @@ def update_db(settings='dev', verbose=False):
     sh(django_cmd('lms', settings, 'migrate', '--traceback', '--pythonpath=.'), hide=hide, echo=True)
     print(colorize("lightgreen", "DB sucessufully updated"))
 
-@task('prereqs.install',
-      help={'system': "lms or cms",
-            'settings': "Django settings"}
-)
+
+@task('prereqs.install', help={
+    'system': "lms or cms",
+    'settings': "Django settings",
+})
 def check_settings(system=None, settings=None):
     """
     Checks settings files.
