@@ -158,7 +158,7 @@
           this.reload_matlab_result = function(get_callback) {
             return PendingMatlabResult.prototype.reload_matlab_result.apply(_this, arguments);
           };
-          MATLAB_RESULT_POLL_INTERVAL = 5000;
+          MATLAB_RESULT_POLL_INTERVAL = 1000;
           this.reload_matlab_result(get_callback);
           this.task_poller = new IntervalManager(MATLAB_RESULT_POLL_INTERVAL, function() {
             return _this.reload_matlab_result(get_callback);
