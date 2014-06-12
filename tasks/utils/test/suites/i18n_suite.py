@@ -13,7 +13,7 @@ class I18nTestSuite(TestSuite):
     """
     def __init__(self, *args, **kwargs):
         super(I18nTestSuite, self).__init__(*args, **kwargs)
-        self.report_dir = Env.I18N_REPORT_DIR
+        self.report_dir = Env.REPO_ROOT / "i18n"
         self.xunit_report = self.report_dir / 'nosetests.xml'
 
     def __enter__(self):

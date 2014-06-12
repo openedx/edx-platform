@@ -16,20 +16,17 @@ from invoke import run as sh
 from pygments.console import colorize
 from .utils.cmd import cmd
 from .utils.envs import Env
+from .tests import test_i18n
 
 I18N_REPORT_DIR = Env.REPORT_ROOT.joinpath('i18n')
 I18N_XUNIT_REPORT = I18N_REPORT_DIR.joinpath('nosetests.xml')
 
+
 @task
-def mk_i18n_report_dir():
-    I18N_REPORT_DIR.makedirs_p()
-
-
-@task('i18n.mk_i18n_report_dir')
 def clean_reports_dir():
     """Clean coverage files, to ensure that we don't use stale data to generate reports."""
-    print(colorize("lightgray", "Cleaning report directory "))
-    sh("find {!s} -type f -delete".format(I18N_REPORT_DIR))
+    I18N_REPORT_DIR.rmtree_p()
+    I18N_REPORT_DIR.makedirs_p()
 
 
 @task('i18n.validate_gettext', 'assets.update')
@@ -75,11 +72,13 @@ def dummy():
 def validate_gettext(**kwargs):
     """Make sure GNU gettext utilities are available"""
     if find_executable('xgettext') is None:
-        print(colorize("darkred",
-                       "Cannot locate GNU gettext utilities, which are required by "
-                       "django for internationalization.\n See https://docs.djangoproject"
-                       ".com/en/dev/topics/i18n/translation/#message-files)\n"
-                       "Try downloading them from http://www.gnu.org/software/gettext/"))
+        err = (
+            "Cannot locate GNU gettext utilities, which are required by Django "
+            "for internationalization.\n See "
+            "https://docs.djangoproject.com/en/dev/topics/i18n/translation/#message-files\n"
+            "Try downloading them from http://www.gnu.org/software/gettext/"
+        )
+        print(colorize("darkred", err))
         sys.exit(1)
 
 @task
@@ -124,19 +123,7 @@ def robot_push():
     """Extract new strings, and push to transifex"""
     pass
 
-@task('i18n.extract')
+@task
 def test():
-    sh(cmd('invoke', 'prereqs.install'))
-    sh(cmd('invoke', 'i18n.mk_i18n_report_dir'))
-    sh(cmd('invoke', 'i18n.clean_reports_dir'))
-    pythonpath_prefix = "PYTHONPATH={}/i18n:$PYTHONPATH".format(Env.REPO_ROOT)
-    return
-    test_run(
-        "i18n",
-        cmd(
-            pythonpath_prefix,
-            "nosetests",
-            Env.REPO_ROOT + "/i18n/tests", "--with-xunit",
-            "--xunit-file=" + I18N_XUNIT_REPORT
-        )
-    )
+    # proxy to `test.i18n`
+    test_i18n()
