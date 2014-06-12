@@ -5,7 +5,6 @@ ns = Collection()
 
 
 from . import assets
-from . import bok_choy
 from . import clean
 from . import db
 from . import docs
