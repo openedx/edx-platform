@@ -28,6 +28,23 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
     $('#request-coursecreator-submit').click(function(e){
       $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
     });
+
+    $(".account-settings-language .action-edit").click(function(event, xhr) {
+        event.preventDefault();
+        $(".account-settings-language").toggleClass("is-editing");
+    });
+
+    $(".account-settings-language .action-submit").click(function(event, xhr) {
+        event.preventDefault();
+        $.post('/lang_pref/setlang/',
+            {"language": $('.settings-language-value').val()})
+        .done(
+            function(data){
+                // Refresh the page
+                location.reload();
+            }
+        );
+    });
 });
 </script>
 </%block>
@@ -293,11 +310,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </ul>
           </div>
 
-          <form action="" method="post" class="settings-language-form ui-toggle-edit-form" id="settings-form">
+          <div class="settings-language-form ui-toggle-edit-form">
             <ol class="list-input">
-              <li class="field text settings-language-select" id="settings-language-select">
+              <li class="field text settings-language-select">
                 <label class="label sr" for="settings-language-value">${_("Please choose your preferred language")}</label>
-                <select class="input select" id="settings-language-value">
+                <select class="input select settings-language-value">
 		  % for abbrv in language_options:
 		    % for language in settings.LANGUAGES:
                       % if abbrv == language[0]:
@@ -321,7 +338,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <button type="reset" class="action action-cancel">Cancel</button>
               </li>
             </ul>
-          </form>
+          </div>
         </div>
       </div>
 
