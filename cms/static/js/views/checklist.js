@@ -76,7 +76,7 @@ define(["js/views/baseview", "underscore", "jquery"], function(BaseView, _, $) {
                         var updatedTemplate = self.renderTemplate(model, checklist_index);
                         self.$el.find('#course-checklist'+checklist_index).first().replaceWith(updatedTemplate);
 
-                        analytics.track('Toggled a Checklist Task', {
+                        analytics.track('Checklist: Edit', {
                             'course': course_location_analytics,
                             'task': model.attributes.items[task_index].short_description,
                             'state': model.attributes.items[task_index].is_checked

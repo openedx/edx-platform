@@ -91,7 +91,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             });
             this.closeEditor(false);
 
-            analytics.track('Saved Course Update', {
+            analytics.track('Update: Edit', {
                 'course': course_location_analytics,
                 'date': this.dateEntry(event).val()
             });
@@ -139,9 +139,8 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                     primary: {
                         text: gettext('OK'),
                         click: function () {
-                            analytics.track('Deleted Course Update', {
-                                'course': course_location_analytics,
-                                'date': self.dateEntry(event).val()
+                            analytics.track('Update: Delete', {
+                                'course': course_location_analytics
                             });
                             self.modelDom(event).remove();
                             var deleting = new NotificationView.Mini({

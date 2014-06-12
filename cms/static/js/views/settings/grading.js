@@ -83,6 +83,12 @@ var GradingView = ValidatingView.extend({
     },
     addAssignmentType : function(e) {
         e.preventDefault();
+
+        analytics.track('Grading: New Assignment Type', {
+            'course': course_location_analytics,
+            'types_count': this.model.get('graders').length + 1
+        });
+
         this.model.get('graders').push({});
     },
     fieldToSelectorMap : {
@@ -100,6 +106,15 @@ var GradingView = ValidatingView.extend({
     setGracePeriod : function(event) {
         this.clearValidationErrors();
         var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
+
+        if (newVal != null) {
+            analytics.track('Grading: Edit Grace Period', {
+                'course': course_location_analytics,
+                'hours': newVal.hours,
+                'minutes': newVal.minutes
+            });
+        }
+
         this.model.set('grace_period', newVal, {validate: true});
     },
     updateModel : function(event) {
@@ -251,6 +266,12 @@ var GradingView = ValidatingView.extend({
             // TODO shouldn't we disable the button
             return;
         }
+
+        analytics.track('Grading: New Range', {
+            'course': course_location_analytics,
+            'ranges': gradeLength + 2       // Add one for the fencepost problem and one for adding a grade range
+        });
+
         var failBarWidth = this.descendingCutoffs[gradeLength - 1]['cutoff'];
         // going to split the grade above the insertion point in half leaving fail in same place
         var nextGradeTop = (gradeLength > 1 ? this.descendingCutoffs[gradeLength - 2]['cutoff'] : 100);
@@ -285,6 +306,12 @@ var GradingView = ValidatingView.extend({
 
     removeGrade: function(e) {
         e.preventDefault();
+
+        analytics.track('Grading: Delete Range', {
+            'course': course_location_analytics,
+            'ranges': this.descendingCutoffs.length // Adding one for fencepost problem balances with removing one range
+        });
+
         var domElement = $(e.currentTarget).closest('li');
         var index = domElement.index();
         // copy the boundary up to the next higher grade then remove

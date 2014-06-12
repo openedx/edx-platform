@@ -80,6 +80,12 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
                       {success: function () { saving.hide(); }}
                   );
 
+              analytics.track('Subsection: Edit Grade Type', {
+                  'course': course_location_analytics,
+                  'subsection_id': this.assignmentGrade.id,
+                  'type': this.assignmentGrade.attributes.graderType
+              });
+
               this.render();
         }
     });

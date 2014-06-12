@@ -34,6 +34,11 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       checkbox_element = event.target
       tab_element = $(checkbox_element).parents(".course-tab")[0]
 
+      analytics.track "Page: Visibility",
+        course: course_location_analytics
+        tab_id: $(tab_element).data('tab-id')
+        is_hidden: $(checkbox_element).is(':checked')
+
       saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
       saving.show()
 
@@ -61,7 +66,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
           )
       )
 
-      analytics.track "Reordered Pages",
+      analytics.track "Page: Reorder",
         course: course_location_analytics
 
       saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
@@ -96,7 +101,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         {category: 'static_tab'}
       )
 
-      analytics.track "Added Page",
+      analytics.track "Page: Add",
         course: course_location_analytics
 
     deleteTab: (event) =>
@@ -110,9 +115,9 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
               view.hide()
               $component = $(event.currentTarget).parents('.component')
 
-              analytics.track "Deleted Page",
+              analytics.track "Page: Delete",
                 course: course_location_analytics
-                id: $component.data('locator')
+                tab_id: $component.data('locator')
               deleting = new NotificationView.Mini
                 title: gettext('Deleting&hellip;')
               deleting.show()

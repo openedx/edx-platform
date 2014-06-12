@@ -25,7 +25,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
 
-            analytics.track('Created a Course', {
+            analytics.track('Course: New', {
                 'org': org,
                 'number': number,
                 'display_name': display_name,

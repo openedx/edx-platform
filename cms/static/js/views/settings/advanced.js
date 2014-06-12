@@ -106,7 +106,7 @@ var AdvancedView = ValidatingView.extend({
                 var title = gettext("Your policy changes have been saved.");
                 var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
                 self.showSavedBar(title, message);
-                analytics.track('Saved Advanced Settings', {
+                analytics.track('Advanced Settings: Edit', {
                     'course': course_location_analytics
                 });
             },

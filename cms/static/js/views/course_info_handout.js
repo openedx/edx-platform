@@ -68,7 +68,7 @@ define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js
                 this.$form.hide();
                 this.closeEditor();
 
-                analytics.track('Saved Course Handouts', {
+                analytics.track('Handouts: Edit', {
                     'course': course_location_analytics
                 });
             }else{

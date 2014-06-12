@@ -68,9 +68,9 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
             var locator = $(modalSelector).attr('data-locator');
 
-            analytics.track('Edited Section Release Date', {
+            analytics.track('Section: Edit Release Date', {
                 'course': course_location_analytics,
-                'id': locator,
+                'section_id': locator,
                 'start': datetime
             });
 
@@ -137,7 +137,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             var category = $saveButton.data('category');
             var display_name = $(this).find('.new-section-name').val();
 
-            analytics.track('Created a Section', {
+            analytics.track('Section: New', {
                 'course': course_location_analytics,
                 'display_name': display_name
             });
@@ -186,7 +186,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             var category = $(this).find('.new-subsection-name-save').data('category');
             var display_name = $(this).find('.new-subsection-name-input').val();
 
-            analytics.track('Created a Subsection', {
+            analytics.track('Subsection: New', {
                 'course': course_location_analytics,
                 'display_name': display_name
             });

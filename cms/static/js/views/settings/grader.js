@@ -61,6 +61,13 @@ var GraderView = ValidatingView.extend({
     },
     deleteModel : function(e) {
         e.preventDefault();
+
+        analytics.track('Grading: Delete Assignment Type', {
+            'course': course_location_analytics,
+            'types_count': this.collection.length - 1,
+            'name': this.model.attributes.type
+        });
+
         this.collection.remove(this.model);
     }
 });

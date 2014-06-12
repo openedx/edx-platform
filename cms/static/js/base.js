@@ -227,7 +227,7 @@ function createNewUnit(e) {
     var parent = $(this).data('parent');
     var category = $(this).data('category');
 
-    analytics.track('Created a Unit', {
+    analytics.track('Unit: New', {
         'course': course_location_analytics,
         'parent_locator': parent
     });
@@ -272,9 +272,9 @@ function _deleteItem($el, type) {
 
                     var locator = $el.data('locator');
 
-                    analytics.track('Deleted an Item', {
+                    analytics.track(type + ': Delete', {
                         'course': course_location_analytics,
-                        'id': locator
+                        'item_id': locator
                     });
 
                     var deleting = new NotificationView.Mini({

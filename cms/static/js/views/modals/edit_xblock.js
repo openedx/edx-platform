@@ -148,6 +148,13 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             save: function(event) {
                 event.preventDefault();
+
+                analytics.track("XBlock: Edit", {
+                    'course': course_location_analytics,
+                    'category': this.xblockInfo.attributes.category,
+                    'xblock_id': this.xblockInfo.id
+                });
+
                 this.editorView.save({
                     success: _.bind(this.onSave, this)
                 });

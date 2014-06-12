@@ -24,10 +24,10 @@ define(["js/views/baseview", "underscore", "js/views/feedback_prompt", "js/views
             var that = this;
             this.model.save("name", name, {
                 success: function() {
-                    analytics.track('Edited Section Name', {
+                    analytics.track('Section: Edit Name', {
                         'course': course_location_analytics,
                         'display_name': that.model.get('name'),
-                        'id': that.model.get('id')
+                        'section_id': that.model.get('id')
                     });
                     that.switchToShowView();
                 }
