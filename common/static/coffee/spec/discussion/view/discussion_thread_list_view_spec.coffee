@@ -1,7 +1,7 @@
 describe "DiscussionThreadListView", ->
 
     beforeEach ->
-
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures """
         <script type="text/template" id="thread-list-template">
             <div class="browse-search">
@@ -33,8 +33,6 @@ describe "DiscussionThreadListView", ->
         </script>
         <div class="sidebar"></div>
         """
-        window.$$course_id = "TestOrg/TestCourse/TestRun"
-        window.user = new DiscussionUser({id: "567", upvoted_ids: []})
 
         spyOn($, "ajax")
 
