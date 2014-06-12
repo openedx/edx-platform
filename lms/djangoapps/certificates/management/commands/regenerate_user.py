@@ -5,6 +5,11 @@ from optparse import make_option
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.course_module import CourseDescriptor
+
 from certificates.queue import XQueueCertInterface
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -48,9 +53,17 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        if options['course']:
+            # try to parse out the course from the serialized form
+            try:
+                course_id = CourseKey.from_string(options['course'])
+            except InvalidKeyError:
+                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
+                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+        else:
+            raise CommandError("You must specify a course")
 
         user = options['username']
-        course_id = options['course']
         if not (course_id and user):
             raise CommandError('both course id and student username are required')
 
@@ -69,8 +82,8 @@ class Command(BaseCommand):
             xq = XQueueCertInterface()
             if options['insecure']:
                 xq.use_https = False
-            ret = xq.regen_cert(student, course_id, course=course, 
-                                forced_grade=options['grade_value'], 
+            ret = xq.regen_cert(student, course_id, course=course,
+                                forced_grade=options['grade_value'],
                                 template_file=options['template_file'])
             print '{0} - {1}'.format(student, ret)
         else:
