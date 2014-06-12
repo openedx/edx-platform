@@ -9,6 +9,7 @@ import mimetypes
 from xblock.core import XBlock
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 
 
@@ -31,3 +32,44 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
 
     mimetype, _ = mimetypes.guess_type(uri)
     return HttpResponse(content, mimetype=mimetype)
+
+
+def get_course_xblock_type_info(course_module):
+    """
+    Returns information about xblock types used within the course.
+    """
+    json = {}
+    xblock_types_json = []
+    xblocks_dict = get_course_xblocks_dict(course_module)
+    for name, xblock_class in XBlock.load_classes():
+        display_name = name
+        xblocks = xblocks_dict.get(name, [])
+        studio_url = reverse('contentstore.views.dashboard_handler', kwargs={
+            'course_key_string': course_module.id,
+            'xblock_type_name': name,
+        })
+        xblock_type_json = {
+            'id': name,
+            'display_name': display_name,
+            'locators': list(unicode(xblock.scope_ids.usage_id) for xblock in xblocks),
+            'studio_url': studio_url
+        }
+        xblock_types_json.append(xblock_type_json)
+    xblock_types_json.sort(key=lambda item: item['display_name'])
+    json['xblock_types'] = xblock_types_json
+    return json
+
+
+def get_course_xblocks_dict(xblock):
+    xblocks_dict = {}
+    _populate_course_xblocks_dict(xblocks_dict, xblock)
+    return xblocks_dict
+
+
+def _populate_course_xblocks_dict(xblocks_dict, xblock):
+    category = xblock.category
+    if category not in xblocks_dict:
+        xblocks_dict[category] = []
+    xblocks_dict[category].append(xblock)
+    for child in xblock.get_children():
+        _populate_course_xblocks_dict(xblocks_dict, child)

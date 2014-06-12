@@ -69,6 +69,20 @@ def get_parent_xblock(xblock):
     return modulestore().get_item(parent_locations[0])
 
 
+def get_ancestor_xblocks(xblock, root_category='sequential'):
+    """
+    Returns all the ancestors of the specified xblock, up to and including the parent of the specified
+    root category.
+    """
+    ancestor_xblocks = []
+    parent = get_parent_xblock(xblock)
+    while parent and parent.category != root_category:
+        ancestor_xblocks.append(parent)
+        parent = get_parent_xblock(parent)
+    ancestor_xblocks.reverse()
+    return ancestor_xblocks
+
+
 def is_unit(xblock):
     """
     Returns true if the specified xblock is a vertical that is treated as a unit.

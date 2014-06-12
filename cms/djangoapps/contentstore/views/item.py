@@ -181,6 +181,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
         unit_views = ['student_view']
+        dashboard_views = ['dashboard_view']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -198,8 +199,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # change not authored by requestor but by xblocks.
             store.update_item(xblock, None)
-        elif view_name in (unit_views + container_views):
+        elif view_name in (unit_views + container_views + dashboard_views):
             is_container_view = (view_name in container_views)
+            is_dashboard_view = (view_name in dashboard_views)
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
@@ -215,6 +217,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             context = {
                 'runtime_type': 'studio',
                 'container_view': is_container_view,
+                'dashboard_view': is_dashboard_view,
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items
@@ -224,7 +227,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # For old-style pages (such as unit and static pages), wrap the preview with
             # the component div. Note that the container view recursively adds headers
             # into the preview fragment, so we don't want to add another header here.
-            if not is_container_view:
+            if not is_container_view and not is_dashboard_view:
                 # For non-leaf xblocks, show the special rendering which links to the new container page.
                 if xblock_has_own_studio_page(xblock):
                     template = 'container_xblock_component.html'

@@ -7,7 +7,8 @@
 // ====================
 
 // UI: container page view
-.view-container {
+.view-container,
+.view-dashboard {
 
   .mast {
     border-bottom: none;
@@ -133,7 +134,8 @@
 }
 
 // UI: xblock rendering
-body.view-container .content-primary {
+body.view-container .content-primary,
+body.view-dashboard .content-primary {
 
   // dragging bits
   .ui-sortable-helper {

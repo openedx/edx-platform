@@ -22,13 +22,34 @@ collapsible_class = "is-collapsible" if xblock.has_children else ""
 
 <header class="xblock-header">
     <div class="xblock-header-primary">
+        % if xblock_context['dashboard_view']:
+        <div class="header-breadcrumb">
+            <% first_ancestor = True %>
+            <small class="navigation navigation-parents subtitle">
+                % for ancestor in ancestor_xblocks:
+                    <%
+                    ancestor_url = xblock_studio_url(ancestor)
+                    %>
+                    % if not first_ancestor:
+                        <span class="ancestor-separator">/</span>
+                    % else:
+                        <% first_ancestor = False %>
+                    % endif
+                    % if ancestor_url:
+                        <a href="${ancestor_url}"
+                           class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                    % else:
+                        <span>${ancestor.display_name_with_default | h}</span>
+                    % endif
+                % endfor
+            </small>
+        </div>
+        % endif
         <div class="header-details">
-            % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
                 <i class="icon-caret-down ui-toggle-expansion"></i>
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
-            % endif
             <span>${xblock.display_name_with_default | h}</span>
         </div>
         <div class="header-actions">
