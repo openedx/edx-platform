@@ -944,6 +944,11 @@ project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - s
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
+    'main_vendor': {
+        'source_filenames': main_vendor_js,
+        'output_filename': 'js/lms-main_vendor.js',
+        'test_order': 0,
+    },
     'application': {
 
         # Application will contain all paths not in courseware_only_js
@@ -964,16 +969,6 @@ PIPELINE_JS = {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
         'test_order': 2,
-    },
-    'main_vendor': {
-        'source_filenames': main_vendor_js,
-        'output_filename': 'js/lms-main_vendor.js',
-        'test_order': 0,
-    },
-    'module-descriptor-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
-        'output_filename': 'js/lms-module-descriptors.js',
-        'test_order': 8,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
@@ -999,6 +994,11 @@ PIPELINE_JS = {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
         'test_order': 7
+    },
+    'module-descriptor-js': {
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
+        'output_filename': 'js/lms-module-descriptors.js',
+        'test_order': 8,
     },
     'instructor_dash': {
         'source_filenames': instructor_dash_js,
@@ -1053,7 +1053,7 @@ PIPELINE_COMPILE_INPLACE = True
 
 PIPELINE_COMPILERS = (
     'pipeline.compilers.sass.SASSCompiler',
-#    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
 )
 
 # TODO will need to update settings in aws.py as well
@@ -1073,7 +1073,10 @@ PIPELINE_SASS_ARGUMENTS = "--style compressed --sourcemap --cache-location {cach
         update_paths=" ".join([ PROJECT_ROOT / 'static',  EDX_PIPELINE_THEME_PATH]),
 )
 
-PIPELINE_COFFEE_SCRIPT_ARGUMENTS = ""
+PIPELINE_COFFEE_SCRIPT_BINARY = "node_modules/.bin/coffee"
+
+PIPELINE_COFFEE_SCRIPT_ARGUMENTS = "--compile"
+
 ################################# CELERY ######################################
 
 # Message configuration

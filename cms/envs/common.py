@@ -361,12 +361,17 @@ PIPELINE_JS = {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/discussion/*.js')
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/discussion/*.coffee') +
+            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/*.coffee') +
+            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
         ),
         'output_filename': 'js/cms-modules.js',
         'test_order': 1
     },
 }
+
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
+PIPELINE_COMPILE_INPLACE = True
 
 PIPELINE_COMPILERS = (
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
@@ -390,6 +395,10 @@ PIPELINE_SASS_ARGUMENTS = "--style compressed --sourcemap --cache-location {cach
         update_paths=" ".join([ PROJECT_ROOT / 'static',  EDX_PIPELINE_THEME_PATH]),
 )
 
+
+PIPELINE_COFFEE_SCRIPT_BINARY = "node_modules/.bin/coffee"
+
+PIPELINE_COFFEE_SCRIPT_ARGUMENTS = "--compile"
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
