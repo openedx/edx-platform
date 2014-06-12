@@ -15,7 +15,7 @@ urlpatterns = patterns(
     url(r'^(?P<user_id>[0-9]+)/groups/*$', users_views.UsersGroupsList.as_view(), name='users-groups-list'),
     url(r'^(?P<user_id>[0-9]+)/groups/(?P<group_id>[0-9]+)$', users_views.UsersGroupsDetail.as_view(), name='users-groups-detail'),
     url(r'^(?P<user_id>[0-9]+)/preferences$', users_views.UsersPreferences.as_view(), name='users-preferences-list'),
-    url(r'^(?P<user_id>[0-9]+)/organizations/$', users_views.UserOraganizationsList.as_view(), name='users-organizations-list'),
+    url(r'^(?P<user_id>[0-9]+)/organizations/$', users_views.UsersOrganizationsList.as_view(), name='users-organizations-list'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
