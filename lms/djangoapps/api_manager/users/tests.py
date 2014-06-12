@@ -925,3 +925,24 @@ class UsersApiTests(TestCase):
             response.data['level_of_education'], data["level_of_education"])
         self.assertEqual(
             str(response.data['year_of_birth']), data["year_of_birth"])
+
+    def test_user_organizations_list(self):
+        user_id = self._create_test_user()
+        for i in xrange(1, 7):
+            data = {
+                'name': 'Org ' + str(i),
+                'display_name': 'Org display name' + str(i),
+                'users': [user_id]
+            }
+            response = self.do_post('/api/organizations/', data)
+            self.assertEqual(response.status_code, 201)
+
+        test_uri = '/api/users/{}/organizations/'.format(user_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 6)
+        self.assertEqual(len(response.data['results']), 6)
+        self.assertEqual(response.data['num_pages'], 1)
+
+        # test with invalid user
+        response = self.do_get('/api/users/4356340/organizations/')
+        self.assertEqual(response.status_code, 404)
