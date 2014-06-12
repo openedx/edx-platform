@@ -73,9 +73,9 @@ procrel = (function(){
         do_pp_get('status', function(data){
 	    console.log(data);
 	    if (data.enabled) {
-                if (timeout != null) {
-                    console.log("Disabling timer");
-                    clearTimeout(timeout);
+                if (interval != null) {
+                    console.log("clearing interval for check_access");
+                    clearInterval(interval);
                 }
 	        alert ("Access Granted!");
 		location.reload();
@@ -85,14 +85,15 @@ procrel = (function(){
 
     var check_count = 0;
 
-    var timeout = null;
+    var interval = null;
 
     var periodic_check = function() {
-        check_count = check_count + 1;
-	if (check_count < 100){			// >
-            timeout = setTimeout(periodic_check, 2000);
-	}
-	check_access();
+        if (interval == null) {
+            console.log("setting interval for check_access");
+            interval = setInterval(check_access, 2000);
+        } else {
+            console.log("interval already set for check_access");
+        }
     }
 
     var make_request = function(){
