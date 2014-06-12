@@ -195,7 +195,6 @@ body.view-dashboard .content-primary {
       }
 
       .xblock-header-primary {
-        @include ui-flexbox();
         margin-bottom: 0;
         border-bottom: none;
         background: none;
@@ -227,7 +226,6 @@ body.view-dashboard .content-primary {
       }
 
       .xblock-header-primary {
-        display: flex;
         margin-bottom: 0;
         border-bottom: 1px solid $gray-l4;
         background-color: $gray-l6;

@@ -532,6 +532,55 @@ p, ul, ol, dl {
 
 // ====================
 
+// UI - breadcrumb pattern
+
+.wrapper-breadcrumbs {
+  @extend %t-title7;
+  position: relative;
+  display: block;
+  margin-bottom: ($baseline/4);
+  color: $gray-l2;
+  font-weight: 400;
+
+  .breadcrumb {
+    @extend %cont-truncated;
+    display: inline-block;
+    vertical-align: bottom; // correct for extra padding in FF
+    max-width: 250px;
+    color: $gray-l2;
+
+    &.link:hover {
+      color: $blue;
+    }
+
+    &.breadcrumb-current {
+      @extend %ui-disabled;
+      max-width: 250px;
+
+      &:before {
+        color: $gray-l2;
+      }
+    }
+  }
+
+  .breadcrumb:before {
+    content: " / ";
+    margin: ($baseline/4);
+    color: $gray-l2;
+
+    &:hover {
+      color: $gray-l2;
+    }
+  }
+
+  .breadcrumb:first-child:before {
+    content: "";
+    margin: 0;
+  }
+}
+
+// ====================
+
 // misc
 hr.divide {
   @extend %cont-text-sr;
