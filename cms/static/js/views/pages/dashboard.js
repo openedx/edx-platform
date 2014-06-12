@@ -15,13 +15,17 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
             },
 
             render: function() {
-                var xblockType = this.model.get(this.options.xblockTypeName);
+                var xblockType = this.model.get(this.options.xblockTypeName),
+                    loadingElement = this.$('.ui-loading');
+                loadingElement.removeClass('is-hidden');
                 if (xblockType) {
                     this.$('.dashboard-section-features').hide();
                     this.renderXBlockType(xblockType);
                 } else {
                     this.$('.dashboard-section-components').hide();
+                    this.renderXBlockTypeList();
                 }
+                loadingElement.addClass('is-hidden');
                 return this;
             },
 
@@ -43,6 +47,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                     event.preventDefault();
                     self.deleteComponent(self.findXBlockElement(event.target));
                 });
+            },
+
+            renderXBlockTypeList: function() {
+                var parentElement = this.$('.dashboard-section-features'),
+                    i, xblockType,
+                    listElement = $('<ul></ul>').appendTo(parentElement);
+                for (i=0; i < this.model.length; i++) {
+                    xblockType = this.model.at(i);
+                    listElement.append(interpolate('<li><a href="%(studio_url)s">%(display_name)s</a></li>', {
+                        studio_url: xblockType.get('studio_url'),
+                        display_name: xblockType.get('display_name')
+                    },
+                    true));
+                }
             },
 
             renderXBlockType: function(xblockType) {

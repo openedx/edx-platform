@@ -50,19 +50,15 @@ from django.utils.translation import ugettext as _
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="content-primary" role="main">
-            <ul class="dashboard-nav">
+            <ul class="dashboard-nav is-hidden">
                 <li class="nav-item"><a href="" data-section="features" class="active-section">Features</a></li>
                 <li class="nav-item"><a href="" data-section="components">Components</a></li>
             </ul>
-            <section class="dashboard-section dashboard-section-features">
-                <h3>Features</h3>
-                <ul>
-                    % for xblock_type in xblock_type_info['xblock_types']:
-                    <li><a href="${xblock_type['studio_url']}">${xblock_type['display_name']}</a></li>
-                    % endfor
-                </ul>
-            </section>
+            <section class="dashboard-section dashboard-section-features"></section>
             <section class="dashboard-section dashboard-section-components"></section>
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+            </div>
         </article>
 
         <aside class="content-supplementary" role="complimentary">
