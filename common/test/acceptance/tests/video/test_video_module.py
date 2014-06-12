@@ -267,7 +267,6 @@ class YouTubeVideoTest(VideoBaseTest):
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text())
 
-    @skip("Failing Intermittently in master. BLD-1115")
     def test_cc_button_transcripts_and_sub_fields_empty(self):
         """
         Scenario: CC button works correctly if transcripts and sub fields are empty,
@@ -276,8 +275,9 @@ class YouTubeVideoTest(VideoBaseTest):
         And I have uploaded a .srt.sjson file to assets
         Then I see the correct english text in the captions
         """
-        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
-        self.navigate_to_video()
+        self._install_course_fixture()
+        self.course_fixture._upload_assets(['subs_OEoXaMPEzfM.srt.sjson'])
+        self._navigate_to_courseware_video_and_render()
         self.video.show_captions()
 
         # Verify that we see "Hi, welcome to Edx." text in the captions
