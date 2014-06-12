@@ -82,7 +82,12 @@ var AssetView = BaseView.extend({
     asset.save({'locked': !asset.get('locked')}, {
       wait: true, // This means we won't re-render until we get back the success state.
       success: function() {
-          saving.hide();
+        saving.hide();
+        analytics.track('File: Lock', {
+            'course': course_location_analytics,
+            'asset_id': asset.get('url'),
+            'locked': asset.get('locked')
+        });
       }
     });
     }

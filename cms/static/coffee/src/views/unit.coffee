@@ -31,7 +31,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 collection: @options.templates
                 el: @$('.add-xblock-component')
                 createComponent: (template) =>
-                    return @createComponent(template, "Creating new component").done(
+                    return @createComponent(template, "Component: New").done(
                         (editor) ->
                             listPanel = @$newComponentItem.prev()
                             listPanel.append(editor.$el)
@@ -45,9 +45,9 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @$('.components').sortable(
                 handle: '.drag-handle'
                 update: (event, ui) =>
-                    analytics.track "Reordered Components",
+                    analytics.track "Component: Reorder",
                         course: course_location_analytics
-                        id: unit_location_analytics
+                        unit_id: unit_location_analytics
 
                     payload = children : @components()
                     saving = new NotificationView.Mini
@@ -86,7 +86,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 analytics.track analytics_message,
                     course: course_location_analytics
                     unit_id: unit_location_analytics
-                    type: editor.$el.data('locator')
+                    component_id: editor.$el.data('locator')
 
             editor.createItem(
                 @$el.data('locator'),
@@ -104,7 +104,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @runOperationShowingMessage(gettext('Duplicating&hellip;'), ->
                 operation = self.createComponent(
                     {duplicate_source_locator: source_locator},
-                    "Duplicating " + source_locator);
+                    "Component: Duplicate");
                 operation.done(
                     (editor) ->
                         originalOffset = @getScrollOffset($component)
@@ -140,10 +140,10 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                         type: 'DELETE',
                         url: self.model.urlRoot + "/" + $component.data('locator')
                     }).success(=>
-                        analytics.track "Deleted a Component",
+                        analytics.track "Component: Delete",
                             course: course_location_analytics
                             unit_id: unit_location_analytics
-                            id: $component.data('locator')
+                            component_id: $component.data('locator')
 
                         $component.remove()
                         # b/c we don't vigilantly keep children up to date
@@ -162,7 +162,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 url: @model.url() + "?" + $.param({recurse: true})
             }).success(=>
 
-                analytics.track "Deleted Draft",
+                analytics.track "Component: Delete Draft",
                     course: course_location_analytics
                     unit_id: unit_location_analytics
 
@@ -176,7 +176,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 $.postJSON(self.model.url(), {
                         publish: 'create_draft'
                     }, =>
-                    analytics.track "Created Draft",
+                    analytics.track "Component: Draft",
                         course: course_location_analytics
                         unit_id: unit_location_analytics
 
@@ -193,7 +193,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 $.postJSON(self.model.url(), {
                         publish: 'make_public'
                     }, =>
-                    analytics.track "Published Draft",
+                    analytics.track "Component: Published",
                         course: course_location_analytics
                         unit_id: unit_location_analytics
 
@@ -214,7 +214,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             $.postJSON(@model.url(), {
                     publish: action
                 }, =>
-                analytics.track "Set Unit Visibility",
+                analytics.track "Component: Visibility",
                     course: course_location_analytics
                     unit_id: unit_location_analytics
                     visibility: visibility
@@ -249,7 +249,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @model.save(metadata: metadata)
             # Update name shown in the right-hand side location summary.
             $('.unit-location .editing .unit-name').html(metadata.display_name)
-            analytics.track "Edited Unit Name",
+            analytics.track "Component: Edit Name",
                 course: course_location_analytics
                 unit_id: unit_location_analytics
                 display_name: metadata.display_name

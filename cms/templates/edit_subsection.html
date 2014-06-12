@@ -87,7 +87,7 @@
     <div class="row unit-actions">
       <a href="${preview_link}" target="_blank" class="preview-button">${_("Preview Drafts")}</a>
       %if can_view_live:
-      <a href="${lms_link}" target="_blank" class="preview-button">${_("View Live")}</a>
+      <a href="${lms_link}" target="_blank" class="preview-button analytics-course-click-event" data-analytics-event-name="View Live">${_("View Live")}</a>
       %endif
     </div>
       </div>

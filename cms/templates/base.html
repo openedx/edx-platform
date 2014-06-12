@@ -252,6 +252,20 @@
       <%static:include path="js/system-feedback.underscore" />
     </script>
 
+    <script type="text/javascript">
+        // event handler for all click events that are to be tracked through analytics
+        require(["jquery"], function($) {
+            $('.analytics-course-click-event').click(
+                function() {
+                    var analyticsEventName = $(this).data('analytics-event-name');
+                    analytics.track(analyticsEventName, {
+                        'course': course_location_analytics,
+                        'link': $(this).attr('href')
+                    });
+                }
+            );
+        });
+    </script>
 
     % if context_course:
       <script type="text/javascript">

@@ -17,8 +17,10 @@
 	</form>
 	<div class="post-preview">
 		<div class="post-actions">
-			<a href="#" class="edit-button" name="<%- updateModel.cid %>"><span class="edit-icon"></span>Edit</a>
-			<a href="#" class="delete-button" name="<%- updateModel.cid %>"><span class="delete-icon"></span>Delete</a>
+			<a href="#" class="edit-button analytics-course-click-event" name="<%- updateModel.cid %>" data-analytics-event-name="Update: Edit">
+                <span class="edit-icon"></span>Edit</a>
+			<a href="#" class="delete-button analytics-course-click-event" name="<%- updateModel.cid %>" data-analytics-event-name="Update: Delete">
+                <span class="delete-icon"></span>Delete</a>
 		</div>
 		<h2>
 			<span class="calendar-icon"></span><span class="date-display"><%=

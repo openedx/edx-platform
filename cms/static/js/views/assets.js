@@ -82,9 +82,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             handleDestroy: function(model) {
                 this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
-                analytics.track('Deleted Asset', {
+                analytics.track('File: Delete', {
                     'course': course_location_analytics,
-                    'id': model.get('url')
+                    'asset_id': model.get('url')
                 });
             },
 
@@ -94,9 +94,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.setInitialSortColumn('js-asset-date-col');
                 this.setPage(0);
 
-                analytics.track('Uploaded a File', {
+                analytics.track('File: Upload', {
                     'course': course_location_analytics,
-                    'asset_url': model.get('url')
+                    'asset_id': model.get('url')
                 });
             },
 

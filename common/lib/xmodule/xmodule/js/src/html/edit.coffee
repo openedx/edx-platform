@@ -118,12 +118,14 @@ class @HTMLEditingDescriptor
     # The input argument is a dict with the text content.
     content = rewriteStaticLinks(source.content, @base_asset_url, '/static/')
     source.content = content
+    @capture_analytics("HTML Editor: HTML")
 
   saveCodeEditor: (source) =>
     # Called when the CodeMirror Editor is saved to convert links back to the full form.
     # The input argument is a dict with the text content.
     content = rewriteStaticLinks(source.content, '/static/', @base_asset_url)
     source.content = content
+    @capture_analytics("HTML Editor: HTML Save")
 
   initInstanceCallback: (visualEditor) =>
     visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
@@ -131,6 +133,7 @@ class @HTMLEditingDescriptor
     # haven't dirtied the Editor. Store the raw content so we can compare it later.
     @starting_content = visualEditor.getContent({format:"raw", no_events: 1})
     visualEditor.focus()
+    @capture_analytics("HTML Editor")
 
   getVisualEditor: () ->
     ###
@@ -152,3 +155,9 @@ class @HTMLEditingDescriptor
       text = @advanced_editor.getValue()
 
     data: text
+
+  capture_analytics: (event_name) =>
+      analytics.track event_name,
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+        editor: @editor_choice

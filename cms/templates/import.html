@@ -185,13 +185,27 @@ $('#fileupload').fileupload({
         file = data.files[0];
         if (file.name.match(/tar\.gz$/)) {
             submitBtn.click(function(e){
+                analytics.track('XML Import: Begin', {
+                    'course': course_location_analytics,
+                    'file': file.name
+                });
                 e.preventDefault();
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
                     CourseImport.stopGetStatus = true;
                     window.onbeforeunload = null;
-                    if (xhr.status != 200) {
+                    if (xhr.status == 200) {
+                        analytics.track('XML Import: Complete', {
+                            'course': course_location_analytics,
+                            'file': file.name
+                        });
+                    }
+                    else {
                         if (!result.responseText) {
+                            analytics.track('XML Import: Time Out', {
+                                'course': course_location_analytics,
+                                'file': file.name
+                            });
                             alert(gettext("Your browser has timed out, but the server is still processing your import. Please wait 5 minutes and verify that the new content has appeared."));
                             return;
                         }
@@ -202,6 +216,10 @@ $('#fileupload').fileupload({
                             CourseImport.stageError(stage, defaults[stage] + errMsg);
                         }
                         else {
+                            analytics.track('XML Import: Fail', {
+                                'course': course_location_analytics,
+                                'file': file.name
+                            });
                             alert("${_("Your import has failed.")}\n\n" + errMsg);
                         }
                         chooseBtn.html("${_("Choose new file")}").show();

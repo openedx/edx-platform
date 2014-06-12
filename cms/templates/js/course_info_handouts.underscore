@@ -1,4 +1,4 @@
-<a href="#" class="edit-button"><span class="edit-icon"></span>Edit</a>
+<a href="#" class="edit-button analytics-course-click-event" data-analytics-event-name="Handouts: Edit"><span class="edit-icon"></span>Edit</a>
 
 <h2 class="title">Course Handouts</h2>
 <%if (model.get('data') != null) { %>

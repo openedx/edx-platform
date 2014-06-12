@@ -17,6 +17,10 @@ var hasUnit = ${json.dumps(bool(unit))},
     courseHomeUrl = "${course_home_url or ""}",
     errMsg = ${json.dumps(raw_err_msg or "")};
 
+    analytics.track("XML Export: Fail", {
+        'course': course_location_analytics
+    });
+
 require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gettext, PromptView) {
   var dialog;
   if(hasUnit) {
@@ -103,7 +107,7 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
 
         <ul class="list-actions">
           <li class="item-action">
-            <a class="action action-export action-primary" href="${export_url}">
+            <a class="action action-export action-primary analytics-course-click-event" data-analytics-event-name="XML Export" href="${export_url}">
               <i class="icon-download"></i>
               <span class="copy">${_("Export Course Content")}</span>
             </a>
