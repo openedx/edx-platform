@@ -51,15 +51,34 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
 
             renderXBlockTypeList: function() {
                 var parentElement = this.$('.dashboard-section-features'),
-                    i, xblockType,
-                    listElement = $('<ul></ul>').appendTo(parentElement);
+                    i, xblockType, usedXBlocksTable, unusedXBlocksListElement;
+
+                parentElement.append('<h3>Features used in this course</h3>')
+                usedXBlocksTable = $('<table></table>').appendTo(parentElement);
+                usedXBlocksTable.append('<tr><th>Name</th><th>Count</th></tr>');
                 for (i=0; i < this.model.length; i++) {
                     xblockType = this.model.at(i);
-                    listElement.append(interpolate('<li><a href="%(studio_url)s">%(display_name)s</a></li>', {
-                        studio_url: xblockType.get('studio_url'),
-                        display_name: xblockType.get('display_name')
-                    },
-                    true));
+                    if (xblockType.get('locators').length > 0) {
+                        usedXBlocksTable.append(interpolate('<tr><td><a href="%(studio_url)s">%(display_name)s</a></td><td>%(count)s</td></tr>', {
+                                studio_url: xblockType.get('studio_url'),
+                                display_name: xblockType.get('display_name'),
+                                count: xblockType.get('locators').length
+                            },
+                            true));
+                    }
+                }
+
+                parentElement.append('<h3>Unused features</h3>')
+                unusedXBlocksListElement = $('<ul></ul>').appendTo(parentElement);
+                for (i=0; i < this.model.length; i++) {
+                    xblockType = this.model.at(i);
+                    if (xblockType.get('locators').length === 0) {
+                        unusedXBlocksListElement.append(interpolate('<li><a href="%(studio_url)s">%(display_name)s</a></li>', {
+                                studio_url: xblockType.get('studio_url'),
+                                display_name: xblockType.get('display_name')
+                            },
+                            true));
+                    }
                 }
             },
 

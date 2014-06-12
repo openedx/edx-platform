@@ -79,7 +79,8 @@ def get_xblock_type_display_name(xblock_type_name):
     Returns the display name for the specified xblock type name.
     """
     component_class = XBlock.load_class(xblock_type_name, select=settings.XBLOCK_SELECT_FUNCTION)
-    if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)
-    else:
-        return xblock_type_name
+    if hasattr(component_class, 'display_name'):
+        display_name = component_class.display_name.default
+        if display_name and not display_name == 'Empty':
+            return _(display_name)
+    return xblock_type_name
