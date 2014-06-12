@@ -628,6 +628,7 @@ LANGUAGES = (
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
+    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
 )
 

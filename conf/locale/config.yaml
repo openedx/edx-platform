@@ -65,6 +65,7 @@ locales:
     - ur  # Urdu
     - vi  # Vietnamese
     - zh_CN  # Chinese (China)
+    - zh_HK  # Chinese (Hong Kong)
     - zh_TW  # Chinese (Taiwan)
 
 
