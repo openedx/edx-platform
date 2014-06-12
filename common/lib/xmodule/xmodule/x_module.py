@@ -777,8 +777,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
         Note that after this method is called, the modulestore update_item method will
         be called on this xmodule. Therefore, any modifications to the xmodule that are
-        performed in editor_saved will automatically be persisted (implementors of this method
-        should not call update_item themselves).
+        performed in editor_saved will automatically be persisted (calling update_item
+        from implementors of this method is not necessary).
 
         Args:
             user: the user who requested the save (as obtained from the request)
