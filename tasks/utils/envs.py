@@ -18,7 +18,7 @@ class Env(object):
     REPO_ROOT = path(__file__).abspath().parent.parent.parent
 
     # Root dir for reports
-    REPORT_ROOT = REPO_ROOT / "reports"
+    REPORT_DIR = REPO_ROOT / "reports"
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
