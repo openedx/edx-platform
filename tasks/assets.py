@@ -225,4 +225,7 @@ def update(system=None, watch=False, settings="dev", debug=False, skip_collect=T
 
     if watch:
         print(colorize('white', "Starting to watch assets"))
-        sh('invoke assets.watch --background {}'.format(not debug))
+        cmd = "invoke assets.watch"
+        if not debug:
+            cmd += " --background"
+        sh(cmd)
