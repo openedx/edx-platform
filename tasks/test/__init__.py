@@ -8,9 +8,11 @@ from invoke import run as sh
 from tasks.utils.test import suites
 from tasks.utils.envs import Env
 from .js import ns as ns_js
+from .bok_choy import ns as ns_bok_choy
 
 ns = Collection()
 ns.add_collection(ns_js)
+ns.add_collection(ns_bok_choy)
 
 try:
     from pygments.console import colorize

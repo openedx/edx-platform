@@ -1,17 +1,18 @@
 import os
 import memcache
 import subprocess
-from invoke import task
+from invoke import task, Collection
 from invoke.exceptions import Failure
 try:
     from pygments.console import colorize
 except ImportError:
     colorize = lambda color, text: text
 
-from .utils import chdir, singleton_process, wait_for_server
-from .utils.cmd import django_cmd
-from .utils.envs import Env
+from ..utils import chdir, singleton_process, wait_for_server
+from ..utils.cmd import django_cmd
+from ..utils.envs import Env
 
+ns = Collection('bok_choy')
 
 # Mongo databases that will be dropped before/after the tests run
 BOK_CHOY_MONGO_DATABASE = 'test'
@@ -35,7 +36,7 @@ BOK_CHOY_REPORT_DIR.mkdir_p()
 
 
 # Directory that videos are served from
-VIDEO_SOURCE_DIR = File.join(REPO_ROOT, "test_root", "data", "video")
+VIDEO_SOURCE_DIR = Env.REPO_ROOT/'test_root/data/video'
 
 BOK_CHOY_SERVERS = {
     'lms': {
@@ -136,14 +137,15 @@ def check_services():
 @task('bok_choy.check_mysql',
       'prereqs.install'
 )
-def setup():
+def bok_choy_setup():
     sh(Env.REPO_ROOT/'scripts/reset-test-db.sh')
     sh("invoke assets.update --settings=bok_choy")
 
+ns.add_task(bok_choy_setup, 'setup')
 
 @task('bok_choy.check_services',
       'clean.reports')
-def fast(spec=None):
+def test_bok_choy_fast(spec=None):
     clear_mongo()
     BOK_CHOY_CACHE.flush()
     sh(django_cmd('lms', 'bok_choy', 'loaddata', 'common/test/db_fixtures/*.json'))
@@ -162,6 +164,8 @@ def fast(spec=None):
     finally:
         print(colorize('green', 'Cleaning up databases...'))
 
+ns.add_task(test_bok_choy_fast, 'fast', default=True)
+
 @task
 def coverage():
     print(colorize('green', 'Combining coverage reports'))
@@ -171,6 +175,9 @@ def coverage():
     sh("coverage html --rcfile={}".format(BOK_CHOY_COVERAGE_RC))
     sh("coverage xml --rcfile={}".format(BOK_CHOY_COVERAGE_RC))
     sh("coverage report --rcfile={}".format(BOK_CHOY_COVERAGE_RC))
+
+ns.add_task(coverage, 'coverage')
+
 
 def is_mongo_running():
     '''
@@ -215,7 +222,7 @@ def run_bok_choy(test_spec):
 
     cmd = [
         "SCREENSHOT_DIR='{}'".format(BOK_CHOY_LOG_DIR), "nosetests", test_spec,
-        "--with-xunit", "--with-flaky", "--xunit-file={}".format{BOK_CHOY_XUNIT_REPORT}, "--verbosity=2"
+        "--with-xunit", "--with-flaky", "--xunit-file={}".format(BOK_CHOY_XUNIT_REPORT), "--verbosity=2"
     ]
 
     if BOK_CHOY_NUM_PARALLEL > 1:

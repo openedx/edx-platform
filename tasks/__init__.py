@@ -3,18 +3,23 @@ from invoke import Collection
 
 ns = Collection()
 
-from . import prereqs
-from . import assets
-from . import i18n
-from . import servers
-from . import docs
-from . import test
-from . import db
 
-ns.add_collection(prereqs)
-ns.add_collection(i18n)
-ns.add_collection(servers)
+from . import assets
+from . import bok_choy
+from . import clean
+from . import db
+from . import docs
+from . import i18n
+from . import prereqs
+from . import servers
+from . import test
+
+
 ns.add_collection(assets)
-ns.add_collection(docs)
-ns.add_collection(test)
+ns.add_collection(clean)
 ns.add_collection(db)
+ns.add_collection(docs)
+ns.add_collection(i18n)
+ns.add_collection(prereqs)
+ns.add_collection(servers)
+ns.add_collection(test)
