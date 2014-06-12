@@ -193,7 +193,7 @@ def watch(background=False, **kwargs):
 
 
 
-@task('prereqs.install', help={
+@task('prereqs.install', default=True, help={
     "system":       "lms or cms",
     "settings":     "Django settings module",
     "debug":        "Disable Sass compression",
