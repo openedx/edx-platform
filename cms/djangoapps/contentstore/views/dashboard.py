@@ -9,11 +9,12 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 from .access import has_course_access
-from .xblock import get_course_xblock_type_info
+from .xblock import get_course_xblock_type_info, get_xblock_type_display_name
 
 __all__ = ['dashboard_handler']
 
@@ -46,6 +47,9 @@ def dashboard_handler(request, course_key_string, xblock_type_name=None):
                 content_type="text/plain"
             )
         else:
+            dashboard_url = reverse('contentstore.views.dashboard_handler', kwargs={
+                'course_key_string': course_module.id
+            })
             xblock_type_info = get_course_xblock_type_info(course_module)
             return render_to_response(
                 'dashboard.html',
@@ -53,6 +57,9 @@ def dashboard_handler(request, course_key_string, xblock_type_name=None):
                     'context_course': course_module,
                     'xblock_type_info': xblock_type_info,
                     'xblock_type_name': xblock_type_name,
+                    'xblock_type_display_name':
+                        get_xblock_type_display_name(xblock_type_name) if xblock_type_name else None,
+                    'dashboard_url': dashboard_url,
                 })
     elif json_request:
         return HttpResponseBadRequest(

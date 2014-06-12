@@ -11,6 +11,7 @@ from xblock.core import XBlock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
+from django.utils.translation import ugettext as _
 
 
 log = logging.getLogger(__name__)
@@ -40,9 +41,10 @@ def get_course_xblock_type_info(course_module):
     """
     json = {}
     xblock_types_json = []
-    xblocks_dict = get_course_xblocks_dict(course_module)
+    xblocks_dict = {}
+    _populate_course_xblocks_dict(xblocks_dict, course_module)
     for name, xblock_class in XBlock.load_classes():
-        display_name = name
+        display_name = get_xblock_type_display_name(name)
         xblocks = xblocks_dict.get(name, [])
         studio_url = reverse('contentstore.views.dashboard_handler', kwargs={
             'course_key_string': course_module.id,
@@ -52,7 +54,7 @@ def get_course_xblock_type_info(course_module):
             'id': name,
             'display_name': display_name,
             'locators': list(unicode(xblock.scope_ids.usage_id) for xblock in xblocks),
-            'studio_url': studio_url
+            'studio_url': studio_url,
         }
         xblock_types_json.append(xblock_type_json)
     xblock_types_json.sort(key=lambda item: item['display_name'])
@@ -60,16 +62,24 @@ def get_course_xblock_type_info(course_module):
     return json
 
 
-def get_course_xblocks_dict(xblock):
-    xblocks_dict = {}
-    _populate_course_xblocks_dict(xblocks_dict, xblock)
-    return xblocks_dict
-
-
 def _populate_course_xblocks_dict(xblocks_dict, xblock):
+    """
+    Populates a dict with information about the xblock and all of its children.
+    """
     category = xblock.category
     if category not in xblocks_dict:
         xblocks_dict[category] = []
     xblocks_dict[category].append(xblock)
     for child in xblock.get_children():
         _populate_course_xblocks_dict(xblocks_dict, child)
+
+
+def get_xblock_type_display_name(xblock_type_name):
+    """
+    Returns the display name for the specified xblock type name.
+    """
+    component_class = XBlock.load_class(xblock_type_name, select=settings.XBLOCK_SELECT_FUNCTION)
+    if hasattr(component_class, 'display_name') and component_class.display_name.default:
+        return _(component_class.display_name.default)
+    else:
+        return xblock_type_name

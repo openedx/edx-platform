@@ -42,7 +42,14 @@ from django.utils.translation import ugettext as _
     <header class="mast has-actions has-subtitle">
         <h1 class="page-header">
             <small class="subtitle">${_("Tools")}</small>
-            <span class="sr">&gt; </span>${_("Dashboard")}
+            <span class="sr">&gt; </span>
+            % if xblock_type_name:
+                <a href="${dashboard_url}">${_("Dashboard")}</a>
+                <span class="ancestor-separator">/</span>
+                ${xblock_type_display_name}
+            % else:
+                ${_("Dashboard")}
+            % endif
         </h1>
     </header>
 </div>
