@@ -68,6 +68,9 @@
                 <td><del>${item.currency.upper()}</del></td></tr>
               % endif
           % endfor
+          % for p in paid:
+            <a href="${p.course_id}" class="enter-course">${_('View Course')}</a>
+          % endfor
           <tr>
             <td colspan="3"></td>
             <th>${_("Total Amount")}</th>
