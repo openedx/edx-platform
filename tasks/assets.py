@@ -139,9 +139,10 @@ def compile_sass(debug=False):
     theme_paths = theme_sass_paths()
     sh(cmd(
         'sass', '' if debug else '--style compressed',
+        "--sourcemap",
         "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
         "--load-path", " ".join(SASS_LOAD_PATHS + theme_paths),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + theme_paths)
+        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + theme_paths),
     ))
 
 
