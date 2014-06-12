@@ -298,6 +298,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
     </article>
     <aside class="content-supplementary" role="complimentary">
+      %if len(language_options) > 1:
       <div class="bit bit-account-settings">
         <h2 class="title-super">Your Account</h2>
 
@@ -347,6 +348,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           </form>
         </div>
       </div>
+      %endif
 
       <div class="bit">
         <h3 class="title title-3">${_('New to edX Studio?')}</h3>
