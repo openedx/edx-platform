@@ -25,7 +25,7 @@ fs.files:
 
 Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
 which can be `uploadDate`, `display_name`, 
-# again, uploadDate may also be a freq sort.
+
 ```
 ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1})
 ```
