@@ -86,8 +86,10 @@ def prereq_cache(cache_name, paths, install_func):
         # then this step won't get executed.
         PREREQS_MD5_DIR.makedirs_p()
 
-        with open(cache_file_path, "w") as cache_file:
-            cache_file.write(new_hash)
+        # recalculate hash
+        new_hash = compute_fingerprint(paths)
+        # write to cache file
+        cache_file_path.write_text(new_hash)
 
     else:
         print('{cache} unchanged, skipping...'.format(cache=cache_name))
