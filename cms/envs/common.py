@@ -207,10 +207,14 @@ MIDDLEWARE_CLASSES = (
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
 
-    'embargo.middleware.EmbargoMiddleware',
+    # Allows us to set user preferences
+    # should be after DarkLangMiddleware
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
+
+    'embargo.middleware.EmbargoMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # needs to run after locale middleware (or anything that modifies the request context)

@@ -40,8 +40,8 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             {"language": $('.settings-language-value').val()})
         .done(
             function(data){
-                // Refresh the page
-                location.reload();
+                // submit form as normal
+                $('.settings-language-form').submit();
             }
         );
     });
@@ -310,11 +310,12 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </ul>
           </div>
 
-          <div class="settings-language-form ui-toggle-edit-form">
+	  <form action="/i18n/setlang/" method="post" class="settings-language-form ui-toggle-edit-form">
+	  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
             <ol class="list-input">
               <li class="field text settings-language-select">
                 <label class="label sr" for="settings-language-value">${_("Please choose your preferred language")}</label>
-                <select class="input select settings-language-value">
+                <select class="input select settings-language-value" name="language">
 		  % for abbrv in language_options:
 		    % for language in settings.LANGUAGES:
                       % if abbrv == language[0]:
@@ -338,7 +339,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <button type="reset" class="action action-cancel">Cancel</button>
               </li>
             </ul>
-          </div>
+          </form>
         </div>
       </div>
 

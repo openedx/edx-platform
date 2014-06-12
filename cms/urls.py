@@ -41,6 +41,7 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^user_api/', include('user_api.urls')),
     url(r'^lang_pref/', include('lang_pref.urls')),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 )
 
 # User creation and updating views

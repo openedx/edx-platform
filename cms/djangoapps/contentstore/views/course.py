@@ -7,6 +7,7 @@ import string  # pylint: disable=W0402
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
+from django.core.context_processors import csrf
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
@@ -264,6 +265,8 @@ def course_listing(request):
         # if the user doesn't have a preference, use the site language
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
+    csrf_token = csrf(request)['csrf_token']
+
     return render_to_response('index.html', {
         'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
@@ -273,6 +276,7 @@ def course_listing(request):
         'language_options': language_options,
         'current_language': current_language,
         'current_language_code': cur_lang_code,
+        'csrf_token': csrf_token,
     })
 
 
