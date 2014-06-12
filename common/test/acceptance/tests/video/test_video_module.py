@@ -681,7 +681,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('play')
         self.video.click_player_button('pause')
 
-        self.assertGreaterEqual(int(self.video.position().split(':')[1]), 5)
+        self.assertGreaterEqual(self.video.seconds(), 5)
 
     @skip("Intermittently fails 03 June 2014")
     def test_video_position_stored_correctly_with_seek(self):
@@ -701,16 +701,17 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.video.click_player_button('play')
-        self.video.click_player_button('pause')
 
         self.video.seek('0:10')
 
-        self.video.click_player_button('play')
         self.video.click_player_button('pause')
 
         self.video.reload_page()
 
-        self.assertGreaterEqual(int(self.video.position().split(':')[1]), 10)
+        self.video.click_player_button('play')
+        self.video.click_player_button('pause')
+
+        self.assertGreaterEqual(self.video.seconds(), 10)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
