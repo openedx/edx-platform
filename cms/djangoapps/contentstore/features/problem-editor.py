@@ -5,7 +5,7 @@ import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
-from advanced_settings import change_value
+from advanced_settings import change_value, ADVANCED_MODULES_KEY
 from course_import import import_file
 
 DISPLAY_NAME = "Display Name"
@@ -29,7 +29,7 @@ def i_created_unit_with_advanced_module(step, advanced_module):
 
     url = world.browser.url
     step.given("I select the Advanced Settings")
-    change_value(step, 'advanced_modules', '["{}"]'.format(advanced_module))
+    change_value(step, ADVANCED_MODULES_KEY, '["{}"]'.format(advanced_module))
     world.visit(url)
     world.wait_for_xmodule()
 
@@ -232,7 +232,7 @@ def cancel_does_not_save_changes(step):
 def enable_latex_compiler(step):
     url = world.browser.url
     step.given("I select the Advanced Settings")
-    change_value(step, 'use_latex_compiler', 'true')
+    change_value(step, 'Enable LaTeX Compiler', 'true')
     world.visit(url)
     world.wait_for_xmodule()
 
