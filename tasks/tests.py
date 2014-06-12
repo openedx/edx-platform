@@ -16,25 +16,13 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-# @cmdopts([
-#     ("system=", "s", "System to act on"),
-#     ("test_id=", "t", "Test id"),
-#     ("failed", "f", "Run only failed tests"),
-#     ("fail_fast", "x", "Run only failed tests"),
-#     ("fasttest", "a", "Run without collectstatic"),
-#     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-#     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-#     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-# ])
-
-@task('prereqs.install',
-    help={
-        "system": "System to act on",
-        "test_id": "Test id",
-        "failed": "Run only failed tests",
-        "fail_fast": "Run only failed tests",
-        "fasttest": "Run without collectstatic",
-        "verbosity": "Turn logging up or down",
+@task('prereqs.install', help={
+    "system": "System to act on",
+    "test_id": "Test id",
+    "failed": "Run only failed tests",
+    "fail_fast": "Run only failed tests",
+    "fasttest": "Run without collectstatic",
+    "verbosity": "Turn logging up or down",
 })
 def test_system(
         system=None, test_id=None, failed=None, fail_fast=None,
@@ -66,13 +54,12 @@ def test_system(
     test_suite.run()
 
 
-@task('prereqs.install',
-    help={
-        "lib": "lib to test",
-        "test_id": "Test id",
-        "failed": "Run only failed tests",
-        "fail_fast": "Run only failed tests",
-        "verbosity": "Turn logging up or down",
+@task('prereqs.install', help={
+    "lib": "lib to test",
+    "test_id": "Test id",
+    "failed": "Run only failed tests",
+    "fail_fast": "Run only failed tests",
+    "verbosity": "Turn logging up or down",
 })
 def test_lib(
         lib=None, test_id=None, failed=None, fail_fast=None,
@@ -100,11 +87,10 @@ def test_lib(
     test_suite.run()
 
 
-@task('prereqs.install',
-    help={
-        "failed": "Run only failed tests",
-        "fail_fast": "Run only failed tests",
-        "verbosity": "Turn logging up or down",
+@task('prereqs.install', help={
+    "failed": "Run only failed tests",
+    "fail_fast": "Run only failed tests",
+    "verbosity": "Turn logging up or down",
 })
 def test_python(failed=None, fail_fast=None, verbosity=1):
     """
@@ -129,9 +115,8 @@ def test_i18n():
     i18n_suite.run()
 
 
-@task('prereqs.install',
-    help={
-        "verbosity": "Turn logging up or down"
+@task('prereqs.install', help={
+    "verbosity": "Turn logging up or down"
 })
 def test(verbosity=1):
     """
@@ -150,9 +135,8 @@ def test(verbosity=1):
     all_unittests_suite.run()
 
 
-@task('prereqs.install',
-    help={
-        "compare_branch": "Branch to compare against"
+@task('prereqs.install', help={
+    "compare_branch": "Branch to compare against"
 })
 def coverage(compare_branch="origin/master"):
     """
