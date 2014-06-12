@@ -4,7 +4,7 @@ Run and manage servers for local development.
 from __future__ import print_function
 import sys
 import traceback
-from invoke import task
+from invoke import task, Collection
 from invoke import run as sh
 try:
     from pygments.console import colorize
@@ -112,23 +112,6 @@ def run(settings="dev", worker_settings='dev_with_worker', fast=False):
 
 
 @task('prereqs.install', help={
-    "settings": "Django settings",
-    "verbose": "Display verbose output"
-})
-def update_db(settings='dev', verbose=False):
-    """
-    Runs syncdb and then migrate.
-    """
-    hide = None
-    if not verbose:
-        hide = 'both'
-
-    sh(django_cmd('lms', settings, 'syncdb', '--traceback', '--pythonpath=.'), hide=hide, echo=True)
-    sh(django_cmd('lms', settings, 'migrate', '--traceback', '--pythonpath=.'), hide=hide, echo=True)
-    print(colorize("lightgreen", "DB sucessufully updated"))
-
-
-@task('prereqs.install', help={
     'system': "lms or cms",
     'settings': "Django settings",
 })
@@ -148,7 +131,7 @@ def check_settings(system=None, settings=None):
         import_cmd = "echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
         sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd), hide='both')
-        print(colorize("lightgreen", "{system} settings for {settings} are ok.".format(system=system, settings=settings)))
+        print(colorize("green", "{system} settings for {settings} are ok.".format(system=system, settings=settings)))
     except Exception as exc:
         traceback.print_exc()
         print(colorize("darkred", "Failed to import settings", file=sys.stderr))
