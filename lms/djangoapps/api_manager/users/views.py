@@ -880,7 +880,7 @@ class UsersPreferences(SecureAPIView):
         return Response({}, status_code)
 
 
-class UserOraganizationsList(SecureListAPIView):
+class UsersOrganizationsList(SecureListAPIView):
     """
     ### The UserOrganizationsList view allows clients to retrieve a list of organizations a user
     belongs to
