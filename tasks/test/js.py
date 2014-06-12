@@ -42,16 +42,6 @@ def test_js(suite=None, mode="run", coverage=False):
 
 ns.add_task(test_js, 'run', default=True)
 
-# @task(help={
-#     'suite': "Test suite to run",
-#     'coverage': "Run test under coverage",
-# })
-# def test_js_run(suite=None, coverage=False):
-#     """
-#     Run the JavaScript tests and print results to the console
-#     """
-#     test_js(suite=suite, coverage=coverage, mode="run")
-
 
 @task(help={
     'suite': "Test suite to run",
