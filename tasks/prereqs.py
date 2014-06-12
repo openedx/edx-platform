@@ -8,6 +8,7 @@ from distutils import sysconfig
 from invoke import Collection
 from invoke import task
 from invoke import run as sh
+from path import path
 
 from .utils.envs import Env
 
@@ -15,18 +16,19 @@ ns = Collection()
 
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
+PREREQS_MD5_DIR = path(PREREQS_MD5_DIR)
 NPM_REGISTRY = "http://registry.npmjs.org/"
 PYTHON_REQ_FILES = [
-    'requirements/edx/pre.txt',
-    'requirements/edx/github.txt',
-    'requirements/edx/local.txt',
-    'requirements/edx/base.txt',
-    'requirements/edx/post.txt',
+    path('requirements/edx/pre.txt'),
+    path('requirements/edx/github.txt'),
+    path('requirements/edx/local.txt'),
+    path('requirements/edx/base.txt'),
+    path('requirements/edx/post.txt'),
 ]
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
-PRIVATE_REQS = 'requirements/private.txt'
+PRIVATE_REQS = path('requirements/private.txt')
 if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
@@ -39,20 +41,19 @@ def compute_fingerprint(path_list):
 
     hasher = hashlib.sha1()
 
-    for path in path_list:
+    for p in path_list:
+        p = path(p)
 
         # For directories, create a hash based on the modification times
         # of first-level subdirectories
-        if os.path.isdir(path):
-            for dirname in sorted(os.listdir(path)):
-                p = os.path.join(path, dirname)
-                if os.path.isdir(p):
-                    hasher.update(str(os.stat(p).st_mtime))
+        if p.isdir():
+            for dir in sorted(p.dirs()):
+                mtime = dir.stat().st_mtime
+                hasher.update(str(mtime))
 
         # For files, hash the contents of the file
-        if os.path.isfile(path):
-            with open(path, "rb") as file_handle:
-                hasher.update(file_handle.read())
+        if p.isfile():
+            hasher.update(p.text())
 
     return hasher.hexdigest()
 
@@ -67,9 +68,9 @@ def prereq_cache(cache_name, paths, install_func):
     """
     # Retrieve the old hash
     cache_filename = cache_name.replace(" ", "_")
-    cache_file_path = os.path.join(PREREQS_MD5_DIR, "{}.sha1".format(cache_filename))
+    cache_file_path = PREREQS_MD5_DIR / (cache_filename + ".sha1")
     old_hash = None
-    if os.path.isfile(cache_file_path):
+    if cache_file_path.isfile():
         with open(cache_file_path) as cache_file:
             old_hash = cache_file.read()
 
@@ -83,11 +84,7 @@ def prereq_cache(cache_name, paths, install_func):
         # Update the cache with the new hash
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
-        try:
-            os.makedirs(PREREQS_MD5_DIR)
-        except OSError:
-            if not os.path.isdir(PREREQS_MD5_DIR):
-                raise
+        PREREQS_MD5_DIR.makedirs_p()
 
         with open(cache_file_path, "w") as cache_file:
             cache_file.write(new_hash)
@@ -95,6 +92,23 @@ def prereq_cache(cache_name, paths, install_func):
     else:
         print('{cache} unchanged, skipping...'.format(cache=cache_name))
 
+
+@task
+def show_cache_hashes():
+    caches = ("Ruby prereqs", "Node prereqs", "Python prereqs")
+    for cache in caches:
+        cache_filename = cache.replace(" ", "_")
+        cache_file_path = PREREQS_MD5_DIR / (cache_filename + ".sha1")
+        if cache_file_path.isfile():
+            with open(cache_file_path) as cache_file:
+                prereq_hash = cache_file.read()
+            print("{cache}: {hash}".format(cache=cache, hash=prereq_hash))
+
+
+@task
+def flush_cache_hashes():
+    for f in PREREQS_MD5_DIR.files():
+        f.remove()
 
 @task
 def install_ruby_prereqs():
@@ -123,7 +137,7 @@ def install_python_prereqs():
         sh("pip install --exists-action w -r {req_file}".format(req_file=req_file), hide='stdout')
 
 
-@task
+@task(default=True)
 def install(**kwargs):
     """
     Installs Ruby, Node and Python prerequisites
@@ -142,3 +156,10 @@ install_ns.add_task(install_node_prereqs, 'node')
 install_ns.add_task(install_python_prereqs, 'python')
 install_ns.add_task(install, 'all', default=True)
 ns.add_collection(install_ns)
+
+cache_ns = Collection('cache')
+cache_ns.add_task(show_cache_hashes, "show", default=True)
+cache_ns.add_task(flush_cache_hashes, "flush")
+ns.add_collection(cache_ns)
+
+ns.default = "install.all"
