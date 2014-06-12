@@ -1,0 +1,281 @@
+// studio - utilities - extends
+// ====================
+
+// transitions
+%trans-size {
+  @include transition(width $tmg-f1 ease-in-out, height $tmg-f1 ease-in-out);
+}
+
+%trans-color {
+  @include transition(color $tmg-f1 ease-in-out);
+}
+
+// UI - used for page/view-level wrappers (for centering/grids)
+%ui-wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+// --------------------
+
+// controls & states
+%fake-link {
+  cursor: pointer;
+}
+
+%state-disabled {
+  pointer-events: none;
+  outline: none;
+}
+
+%state-enabled {
+  pointer-events: auto;
+  outline: invert none medium;
+}
+
+// --------------------
+
+// UI - window
+%ui-window {
+  @include clearfix();
+  border-radius: 3px;
+  box-shadow: 0 1px 1px $shadow-l1;
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+}
+
+// --------------------
+
+// UI - well
+%ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow;
+  padding: ($baseline*0.75) $baseline;
+}
+
+// --------------------
+
+// UI - visual link
+%ui-fake-link {
+  cursor: pointer;
+}
+
+// UI - functional disable
+%ui-disabled {
+  pointer-events: none;
+  outline: none;
+}
+
+// --------------------
+
+// UI - depth levels
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
+
+// --------------------
+
+// UI - utility - nth-type style clearing
+%wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// UI - utility - nth-type style clearing
+%wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+// --------------------
+
+// UI - buttons
+%ui-btn {
+  @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out 0s, border-color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s);
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover, &:active {
+
+  }
+
+  &.disabled, &[disabled], &.is-disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// pill button
+%ui-btn-pill {
+  border-radius: ($baseline/5);
+}
+
+%ui-btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+// primary button
+%ui-btn-primary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+  padding:($baseline/2) $baseline;
+  border-width: 1px;
+  border-style: solid;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover, &:active {
+    box-shadow: 0 2px 1px $shadow-l1;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 1px 1px 2px $shadow-d1;
+
+    &:hover, &:active {
+      box-shadow: inset 1px 1px 1px $shadow-d1;
+    }
+  }
+}
+
+// secondary button
+%ui-btn-secondary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+  border-width: 1px;
+  border-style: solid;
+  padding:($baseline/2) $baseline;
+  background: transparent;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover, &:active {
+
+  }
+
+  &.current, &.active {
+
+  }
+}
+
+%ui-btn-flat-outline {
+  @extend %t-action4;
+  @include transition(all .15s);
+  font-weight: 600;
+  text-align: center;
+  border-radius: ($baseline/4);
+  border: 1px solid $blue-l2;
+  padding: 1px ($baseline/2) 2px ($baseline/2);
+  background-color: $white;
+  color: $blue-l2;
+
+  &:hover {
+    border: 1px solid $blue;
+    background-color: $blue;
+    color: $white;
+  }
+
+  &.is-disabled,
+  &[disabled="disabled"]{
+   border: 1px solid $gray-l2;
+   background-color: $gray-l4;
+   color: $gray-l2;
+   pointer-events: none;
+  }
+}
+
+// button with no button shell until hover for understated actions
+%ui-btn-non {
+  @include transition(all .15s);
+  border: none;
+  border-radius: ($baseline/4);
+  background: none;
+  padding: 3px ($baseline/2);
+  vertical-align: middle;
+  color: $gray-l1;
+
+  &:hover {
+    background-color: $gray-l1;
+    color: $white;
+  }
+
+  span {
+    @extend %cont-text-sr;
+  }
+}
+
+// --------------------
+
+// content - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%cont-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// content - image-replacement hidden text
+%cont-text-hide {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// content - hidden elems - screenreaders
+%cont-text-sr {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+// content - wrapping
+%cont-text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+// content - text overflow by ellipsis
+%cont-truncated {
+  @include box-sizing(border-box);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// --------------------
+
+// cosmetics - circle
+%deco-circle {
+  border-radius: 99999em;
+}

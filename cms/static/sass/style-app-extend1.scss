@@ -1,35 +1,34 @@
-// studio - css architecture
+// studio - style compile - extend 1
 // ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
+// common libraries
+// --------------------
+@import 'common/utilities/bourbon/bourbon';                     // lib - http://bourbon.io (ref from /common/)
 
-// VENDOR + REBASE *referenced/used vendor presentation and reset*
-// ====================
-@import 'reset';
+// utilities and assets
+// --------------------
+// utilities
+@import 'utilities/variables';                                  // settings/values/placeholders
+@import 'utilities/reset';                                      // global resets
+@import 'utilities/mixins';                                     // mixins and functions
+@import 'utilities/mixins-inherited';                           // mixins and functions (inherited)
+@import 'utilities/extends';                                    // re-usable extends, placeholders, archetypes
 
-// BASE  *default edX offerings*
-// ====================
-// base - utilities
-@import 'variables';
-@import 'mixins';
-@import 'mixins-inherited';
+// assets
+@import 'assets/fonts';                                         // imported/used fonts
+@import 'assets/graphics';                                      // sprites, basic img/figure/svg styling
+@import 'assets/anims';                                         // animations
 
-// base - assets
-@import 'assets/fonts';
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
-@import 'assets/anims'; // animations
-
-// base - starter
-@import 'base';
-
-// base - elements
+// general, elements, and views
+// --------------------
+// elements
+@import 'elements/base';
 @import 'elements/typography';
-@import 'elements/icons'; // references to icons used
-@import 'elements/controls'; // buttons, link styles, sliders, etc.
-@import 'elements/xblocks'; //  studio rendering chrome for xblocks
+@import 'elements/icons';                                       // references to icons used
+@import 'elements/controls';                                    // buttons, link styles, sliders, etc.
+@import 'elements/xblocks';                                     //  studio rendering chrome for xblocks
 
-// base - specific views
+// specific views/areas of app
 @import 'views/account';
 @import 'views/assets';
 @import 'views/updates';
@@ -48,11 +47,9 @@
 @import 'views/textbooks';
 @import 'views/export-git';
 
-// base - contexts
-@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+// contextual
+@import 'contexts/ie';                                           // ie-specific styling
 
-// temp - inherited
-@import 'assets/content-types';
-
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
+// misc.ƒ
+@import 'utilities/developer';                                   // developer-created scss (temporary)
+@import 'utilities/shame';                                       // bad-form/orphaned scss (temporary)
