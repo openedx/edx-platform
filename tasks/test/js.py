@@ -5,6 +5,7 @@ from __future__ import print_function
 import sys
 from invoke import task, Collection
 from tasks.utils.test.suites import JsTestSuite
+from tasks.utils.test.suites.js_suite import JS_TEST_IDS
 from tasks.utils.envs import Env
 
 __test__ = False  # do not collect
@@ -12,7 +13,7 @@ __test__ = False  # do not collect
 ns = Collection('js')
 
 
-@task('prereqs.install', help={
+@task('prereqs.install', positional=["suite"], help={
     'suite': "Test suite to run",
     'mode': "dev or run",
     'coverage': "Run test under coverage",
@@ -28,10 +29,10 @@ def test_js(suite=None, mode="run", coverage=False):
     if mode == 'run':
         suite = suite or "all"
 
-    if (suite != 'all') and (suite not in Env.JS_TEST_ID_KEYS):
+    if suite != 'all' and suite not in JS_TEST_IDS:
         sys.stderr.write(
             "Unknown test suite. Please choose from ({suites})\n".format(
-                suites=", ".join(Env.JS_TEST_ID_KEYS)
+                suites=", ".join(JS_TEST_IDS.keys())
             )
         )
         return
