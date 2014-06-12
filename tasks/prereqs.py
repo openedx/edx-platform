@@ -97,6 +97,9 @@ def prereq_cache(cache_name, paths, install_func):
 
 @task
 def show_cache_hashes():
+    """
+    Show SHA1 hashes for prereq caches
+    """
     caches = ("Ruby prereqs", "Node prereqs", "Python prereqs")
     for cache in caches:
         cache_filename = cache.replace(" ", "_")
@@ -109,6 +112,9 @@ def show_cache_hashes():
 
 @task
 def flush_cache_hashes():
+    """
+    Flush prereq caches
+    """
     for f in PREREQS_MD5_DIR.files():
         f.remove()
 

@@ -105,6 +105,9 @@ ns_validate.add_task(validate_transifex_config, 'transifex')
 
 @task
 def validate_all():
+    """
+    Validate everything related to i18n
+    """
     validate_gettext()
     validate_transifex_config()
 
@@ -153,6 +156,7 @@ def test():
     # proxy to `test.i18n`
     test_i18n()
 
+test.__doc__ = test_i18n.__doc__
 ns.add_task(test)
 
 ns.add_collection(ns_validate)
