@@ -2,7 +2,6 @@
 Asset compilation and collection.
 """
 from __future__ import print_function
-import argparse
 from invoke import task
 from invoke import run as sh
 from watchdog.observers import Observer
@@ -35,6 +34,7 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
             dirnames.add(path(filename).abspath().dirname())
         for dirname in dirnames:
             observer.schedule(self, dirname)
+
     def on_modified(self, event):
         print('\tCHANGED:', event.src_path)
         try:
@@ -193,15 +193,13 @@ def watch(background=False, **kwargs):
 
 
 
-@task('prereqs.install',
-      help={
-          "system":       "lms or cms",
-          "settings":     "Django settings module",
-          "debug":        "Disable Sass compression",
-          "skip-collect": "Skip collection of static assets",
-          "watch":        "Watch files for changes",
-        }
-)
+@task('prereqs.install', help={
+    "system":       "lms or cms",
+    "settings":     "Django settings module",
+    "debug":        "Disable Sass compression",
+    "skip-collect": "Skip collection of static assets",
+    "watch":        "Watch files for changes",
+})
 def update(system=None, watch=False, settings="dev", debug=False, skip_collect=True, **kwargs):
     """
     Compile CoffeeScript and Sass, then collect static assets.
