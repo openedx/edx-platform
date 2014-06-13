@@ -924,9 +924,10 @@ class MatlabInput(CodeInput):
             dict - 'success' - whether or not we successfully queued this submission
                  - 'message' - message to be rendered in case of error
         """
+        _ = self.capa_system.i18n.ugettext
         # only send data if xqueue exists
         if self.capa_system.xqueue is None:
-            return {'success': False, 'message': 'Cannot connect to the queue'}
+            return {'success': False, 'message': _('Cannot connect to the queue')}
 
         # pull relevant info out of get
         response = data['submission']
