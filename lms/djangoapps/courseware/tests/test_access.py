@@ -98,37 +98,50 @@ class AccessTestCase(TestCase):
         user = Mock()
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-        course = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
+        course = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='', invitation_only=False)
 
-        # User can enroll if it is between the start and end dates
-        self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
-
-        # User can enroll if authenticated and specifically allowed for that course
+        # Non-staff can enroll if authenticated and specifically allowed for that course
         # even outside the open enrollment period
-        user = Mock(email='test@edx.org', is_staff=False)
+        user = Mock(email='test1@edx.org', is_staff=False)
         user.is_authenticated.return_value = True
-
         course = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
             id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain=''
         )
-
         CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
-
         self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
         # Staff can always enroll even outside the open enrollment period
-        user = Mock(email='test@edx.org', is_staff=True)
+        user = Mock(email='test2@edx.org', is_staff=True)
         user.is_authenticated.return_value = True
+        self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
+        # Non-staff cannot enroll if it is between the start and end dates and invitation only
+        # and not specifically allowed
         course = Mock(
-            enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=SlashSeparatedCourseKey('edX', 'test', 'Whenever'), enrollment_domain='',
+            enrollment_start=yesterday, enrollment_end=tomorrow,
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            invitation_only=True
+        )
+        user = UserFactory.create(email='test3@edx.org')
+        self.assertFalse(access._has_access_course_desc(user, 'enroll', course))
+
+        # Non-staff can enroll if it is between the start and end dates and not invitation only
+        course = Mock(
+            enrollment_start=yesterday, enrollment_end=tomorrow,
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            invitation_only=False
         )
         self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
-        # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
+        course = Mock(
+            enrollment_start=tomorrow, enrollment_end=tomorrow,
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            invitation_only=False
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'enroll', course))
+
 
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""

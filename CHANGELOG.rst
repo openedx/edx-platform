@@ -5,6 +5,12 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: New advanced setting "invitation_only" for courses. This setting overrides the enrollment start/end dates
+  if set. LMS-2670
+
+LMS: Register button on About page was active even when greyed out. Now made inactive when appropriate and
+displays appropriate context sensitive message to student. LMS-2717
+
 Blades: Add context-aware video index. BLD-933
 
 Blades: Fix bug with incorrect link format and redirection. BLD-1049
