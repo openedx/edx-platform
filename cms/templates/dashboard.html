@@ -52,6 +52,20 @@ from django.utils.translation import ugettext as _
                 ${_("Dashboard")}
             % endif
         </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                % if has_admin_view:
+                <li class="action-item action-edit nav-item">
+                    <a href="#" class="button edit-button action-button">
+                        <i class="icon-pencil"></i>
+                        <span class="action-button-text">${_("Edit")}</span>
+                    </a>
+                </li>
+                % endif
+            </ul>
+        </nav>
     </header>
 </div>
 

@@ -8,6 +8,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
         var DashboardPage = BaseView.extend({
             // takes XBlockTypes as a model
 
+            events: {
+                "click .mast .edit-button": "editCourseSettings"
+            },
+
+
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
             },
@@ -209,6 +214,32 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                     success: function() {
                         self.onXBlockRefresh(temporaryView);
                         temporaryView.unbind();  // Remove the temporary view
+                    }
+                });
+            },
+
+            editCourseSettings: function(event) {
+                var self = this,
+                    xblockType = this.model.get(this.options.xblockTypeName),
+                    EditXBlockTypeModel,
+                    modal;
+                EditXBlockTypeModel = EditXBlockModal.extend({
+                    findXBlockInfo: function() {
+                        return new XBlockInfo({
+                            category: 'xblock_type'
+                        });
+                    },
+
+                    displayXBlock: function() {
+                        var editor = this.$('.xblock-editor'),
+                            placeholderElement = $('<div></div>').appendTo(editor);
+                        self.refreshXBlockTypeView(placeholderElement, xblockType, 'admin_view');
+                    }
+                });
+                modal = new EditXBlockTypeModel({ });
+                modal.edit(null, this.model, {
+                    refresh: function() {
+                        // TODO: do something on refresh!
                     }
                 });
             }
