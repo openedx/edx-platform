@@ -1155,23 +1155,24 @@ class ChemicalEquationInput(InputTypeBase):
         }
         """
 
+        _ = self.capa_system.i18n.ugettext
         result = {'preview': '',
                   'error': ''}
         try:
             formula = data['formula']
         except KeyError:
-            result['error'] = "No formula specified."
+            result['error'] = _("No formula specified.")
             return result
 
         try:
             result['preview'] = chemcalc.render_to_html(formula)
         except pyparsing.ParseException as err:
-            result['error'] = u"Couldn't parse formula: {0}".format(err.msg)
+            result['error'] = _("Couldn't parse formula: {error_msg}").format(error_msg=err.msg)
         except Exception:
             # this is unexpected, so log
             log.warning(
                 "Error while previewing chemical formula", exc_info=True)
-            result['error'] = "Error while rendering preview"
+            result['error'] = _("Error while rendering preview")
 
         return result
 
