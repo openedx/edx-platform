@@ -6,29 +6,33 @@ import itertools
 from lxml import etree
 from StringIO import StringIO
 
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+from django.db.models import Avg, Sum
 from django.http import Http404
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.response import Response
 
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
+from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
 from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import generate_base_uri
-from .serializers import CourseModuleCompletionSerializer
 
+from .serializers import CourseModuleCompletionSerializer
+from .serializers import GradeSerializer
 
 log = logging.getLogger(__name__)
 
@@ -1099,8 +1103,7 @@ class CourseModuleCompletionList(SecureListAPIView):
         queryset = CourseModuleCompletion.objects.filter(course_id=course_id)
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
         if user_ids:
-            if ',' in user_ids:
-                user_ids = user_ids.split(",")[:upper_bound]
+            user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
         if content_id:
@@ -1127,3 +1130,70 @@ class CourseModuleCompletionList(SecureListAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)  # pylint: disable=E1101
         else:
             return Response({'message': _('Resource already exists')}, status=status.HTTP_409_CONFLICT)
+
+
+class CoursesGradesList(SecureListAPIView):
+    """
+    ### The CoursesGradesList view allows clients to retrieve a list of grades for the specified Course
+    - URI: ```/api/courses/{course_id}/grades/```
+    - GET: Returns a JSON representation (array) of the set of grade objects
+    ### Use Cases/Notes:
+    * Example: Display a graph of all of the grades awarded for a given course
+    """
+
+    def get(self, request, course_id):
+        """
+        GET /api/courses/{course_id}/grades?user_ids=1,2&content_ids=i4x://1/2/3,i4x://a/b/c
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        queryset = StudentModule.objects.filter(
+            course_id__exact=course_id,
+            grade__isnull=False,
+            max_grade__isnull=False,
+            max_grade__gt=0
+        )
+
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
+        if user_ids:
+            user_ids = map(int, user_ids.split(','))[:upper_bound]
+            queryset = queryset.filter(student__in=user_ids)
+
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        if content_id:
+            queryset = queryset.filter(module_state_key=content_id)
+
+        queryset_grade_avg = queryset.aggregate(Avg('grade'))
+        queryset_grade_sum = queryset.aggregate(Sum('grade'))
+        queryset_maxgrade_sum = queryset.aggregate(Sum('max_grade'))
+
+        course_queryset = StudentModule.objects.filter(
+            course_id__exact=course_id,
+            grade__isnull=False,
+            max_grade__isnull=False,
+            max_grade__gt=0
+        )
+        course_queryset_grade_avg = course_queryset.aggregate(Avg('grade'))
+        course_queryset_grade_sum = course_queryset.aggregate(Sum('grade'))
+        course_queryset_maxgrade_sum = course_queryset.aggregate(Sum('max_grade'))
+
+        response_data = {}
+        base_uri = generate_base_uri(request)
+        response_data['uri'] = base_uri
+        response_data['average_grade'] = queryset_grade_avg['grade__avg']
+        response_data['points_scored'] = queryset_grade_sum['grade__sum']
+        response_data['points_possible'] = queryset_maxgrade_sum['max_grade__sum']
+        response_data['course_average_grade'] = course_queryset_grade_avg['grade__avg']
+        response_data['course_points_scored'] = course_queryset_grade_sum['grade__sum']
+        response_data['course_points_possible'] = course_queryset_maxgrade_sum['max_grade__sum']
+
+        response_data['grades'] = []
+        for row in queryset:
+            serializer = GradeSerializer(row)
+            response_data['grades'].append(serializer.data)
+        return Response(response_data, status=status.HTTP_200_OK)
