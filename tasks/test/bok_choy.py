@@ -104,10 +104,12 @@ def start_servers():
         )
         subprocess.Popen(cmd, shell=True)
 
-    for service, info in BOK_CHOY_STUBS:
+    for service, info in BOK_CHOY_STUBS.items():
         with chdir(BOK_CHOY_STUB_DIR):
-            singleton_process(['python', '-m', 'stubs.start', service, info['port'], info['config'] ],
-                              logfile=info['log'])
+            singleton_process([
+                'python', '-m', 'stubs.start',
+                service, info['port'], info.get('config', "")
+            ], logfile=info['log'])
 
 
 def wait_for_test_servers():
