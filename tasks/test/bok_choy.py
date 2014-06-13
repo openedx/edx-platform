@@ -27,13 +27,13 @@ BOK_CHOY_TEST_TIMEOUT = float(os.environ.get('TEST_TIMEOUT', 300))
 BOK_CHOY_DIR = Env.REPO_ROOT / 'common/test/acceptance'
 BOK_CHOY_TEST_DIR = BOK_CHOY_DIR / 'tests'
 BOK_CHOY_LOG_DIR = Env.REPO_ROOT / 'test_root/log'
-BOK_CHOY_LOG_DIR.mkdir_p()
+BOK_CHOY_LOG_DIR.makedirs_p()
 
 # Reports
 BOK_CHOY_REPORT_DIR = Env.REPORT_DIR / 'bok_choy'
 BOK_CHOY_XUNIT_REPORT = BOK_CHOY_REPORT_DIR / 'xunit.xml'
 BOK_CHOY_COVERAGE_RC = BOK_CHOY_DIR / '.coveragerc'
-BOK_CHOY_REPORT_DIR.mkdir_p()
+BOK_CHOY_REPORT_DIR.makedirs_p()
 
 
 # Directory that videos are served from
@@ -149,7 +149,7 @@ ns.add_task(bok_choy_setup, 'setup')
 @task(check_services, 'clean.reports')
 def test_bok_choy_fast(spec=None):
     clear_mongo()
-    BOK_CHOY_CACHE.flush()
+    BOK_CHOY_CACHE.flush_all()
     sh(django_cmd('lms', 'bok_choy', 'loaddata', 'common/test/db_fixtures/*.json'))
 
     # Ensure the test servers are available
