@@ -276,7 +276,8 @@ class YouTubeVideoTest(VideoBaseTest):
         Then I see the correct english text in the captions
         """
         self._install_course_fixture()
-        self.course_fixture._upload_assets(['subs_OEoXaMPEzfM.srt.sjson'])
+        self.course_fixture.add_asset(['subs_OEoXaMPEzfM.srt.sjson'])
+        self.course_fixture._upload_assets()
         self._navigate_to_courseware_video_and_render()
         self.video.show_captions()
 
