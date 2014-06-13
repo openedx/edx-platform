@@ -1,0 +1,96 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "dashboard" %></%def>
+<%!
+import json
+
+from contentstore.views.helpers import EDITING_TEMPLATES
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Dashboard")}</%block>
+<%block name="bodyclass">is-signedin course view-dashboard</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in EDITING_TEMPLATES:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+    require(["domReady!", "jquery", "js/views/pages/dashboard", "js/collections/xblock_type",
+            "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+            function(doc, $, DashboardPage, XBlockTypes) {
+                var xblockTypes = new XBlockTypes(${json.dumps(xblock_type_info) | n}, {parse: true});
+
+                view = new DashboardPage({
+                    el: $('#content'),
+                    model: xblockTypes,
+                    xblockTypeName: '${xblock_type_name}'
+                });
+                view.render();
+            });
+</script>
+</%block>
+
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+            <small class="subtitle">${_("Tools")}</small>
+            <span class="sr">&gt; </span>
+            % if xblock_type_name:
+                <a href="${dashboard_url}">${_("Dashboard")}</a>
+                <span class="ancestor-separator">/</span>
+                ${xblock_type_display_name}
+            % else:
+                ${_("Dashboard")}
+            % endif
+        </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                % if has_admin_view:
+                <li class="action-item action-edit nav-item">
+                    <a href="#" class="button edit-button action-button">
+                        <i class="icon-pencil"></i>
+                        <span class="action-button-text">${_("Edit")}</span>
+                    </a>
+                </li>
+                % endif
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main">
+            <ul class="dashboard-nav is-hidden">
+                <li class="nav-item"><a href="" data-section="features" class="active-section">Features</a></li>
+                <li class="nav-item"><a href="" data-section="components">Components</a></li>
+            </ul>
+            <section class="dashboard-section dashboard-section-features"></section>
+            <section class="dashboard-section dashboard-section-components"></section>
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+            </div>
+        </article>
+
+        <aside class="content-supplementary" role="complimentary">
+            <div class="bit">
+                <h3 class="title title-3">${_("What is the dashboard?")}</h3>
+                <p>
+                    ${_("The Studio course dashboard is a single place to understand the status of your course.")}
+                </p>
+            </div>
+        </aside>
+    </section>
+</div>
+</%block>

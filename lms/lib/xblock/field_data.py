@@ -3,7 +3,7 @@
 """
 
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
-from xblock.fields import Scope
+from xblock.fields import Scope, UserScope, BlockScope
 
 
 class LmsFieldData(SplitFieldData):
@@ -24,6 +24,7 @@ class LmsFieldData(SplitFieldData):
         self._student_data = student_data
 
         super(LmsFieldData, self).__init__({
+            Scope(UserScope.NONE, BlockScope.TYPE, u"block_type"): authored_data,
             Scope.content: authored_data,
             Scope.settings: authored_data,
             Scope.parent: authored_data,

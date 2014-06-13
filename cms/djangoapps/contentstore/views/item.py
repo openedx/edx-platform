@@ -39,7 +39,7 @@ from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
-__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
+__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_type_view_handler']
 
 log = logging.getLogger(__name__)
 
@@ -175,12 +175,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
-    if 'application/json' in accept_header:
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in accept_header:
         store = get_modulestore(usage_key)
         xblock = store.get_item(usage_key)
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
         unit_views = ['student_view']
+        dashboard_views = ['dashboard_view', 'dashboard_collapsed_view']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -198,8 +200,10 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # change not authored by requestor but by xblocks.
             store.update_item(xblock, None)
-        elif view_name in (unit_views + container_views):
+        elif view_name in (unit_views + container_views + dashboard_views):
             is_container_view = (view_name in container_views)
+            is_dashboard_view = (view_name in dashboard_views)
+            is_collapsed = view_name == 'dashboard_collapsed_view'
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
@@ -215,6 +219,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
             context = {
                 'runtime_type': 'studio',
                 'container_view': is_container_view,
+                'dashboard_view': is_dashboard_view,
+                'collapsed': is_collapsed,
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items
@@ -224,7 +230,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # For old-style pages (such as unit and static pages), wrap the preview with
             # the component div. Note that the container view recursively adds headers
             # into the preview fragment, so we don't want to add another header here.
-            if not is_container_view:
+            if not is_container_view and not is_dashboard_view:
                 # For non-leaf xblocks, show the special rendering which links to the new container page.
                 if xblock_has_own_studio_page(xblock):
                     template = 'container_xblock_component.html'
@@ -251,6 +257,99 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
     else:
         return HttpResponse(status=406)
+
+
+# pylint: disable=unused-argument
+@require_http_methods(("GET"))
+@login_required
+@expect_json
+def xblock_type_view_handler(request, course_key_string, xblock_type_name, view_name):
+    """
+    The restful handler for requests for rendered xblock views.
+
+    Returns a json object containing two keys:
+        html: The rendered html of the view
+        resources: A list of tuples where the first element is the resource hash, and
+            the second is the resource description
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
+        raise PermissionDenied()
+
+    accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
+
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in accept_header:
+        store = get_modulestore(course_key_string)
+        course_module = store.get_course(course_key, depth=None)
+        xblock = _get_prototype_xblock(course_module, xblock_type_name)
+
+        # wrap the generated fragment in the xmodule_editor div so that the javascript
+        # can bind to it correctly
+        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
+
+        if view_name == 'admin_view':
+            try:
+                fragment = xblock.render(view_name)
+            # catch exceptions indiscriminately, since after this point they escape the
+            # dungeon and surface as uneditable, unsaveable, and undeletable
+            # component-goblins.
+            except Exception as exc:                          # pylint: disable=w0703
+                log.debug("unable to render studio_view for %r", xblock, exc_info=True)
+                fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+        elif view_name == 'author_dashboard_view':
+            # Determine the items to be shown as reorderable. Note that the view
+            # 'reorderable_container_child_preview' is only rendered for xblocks that
+            # are being shown in a reorderable container, so the xblock is automatically
+            # added to the list.
+            reorderable_items = set()
+            if view_name == 'reorderable_container_child_preview':
+                reorderable_items.add(xblock.location)
+
+            # Only show the new style HTML for the container view, i.e. for non-verticals
+            # Note: this special case logic can be removed once the unit page is replaced
+            # with the new container view.
+            context = {
+                'runtime_type': 'studio',
+                'container_view': False,
+                'dashboard_view': True,
+                'collapsed': False,
+                'read_only': False,
+                'root_xblock': xblock if (view_name == 'container_preview') else None,
+                'reorderable_items': reorderable_items
+            }
+
+            fragment = get_preview_fragment(request, xblock, context, view_name=view_name)
+        else:
+            raise Http404
+
+        hashed_resources = OrderedDict()
+        for resource in fragment.resources:
+            hashed_resources[hash_resource(resource)] = resource
+
+        return JsonResponse({
+            'html': fragment.content,
+            'resources': hashed_resources.items()
+        })
+
+    else:
+        return HttpResponse(status=406)
+
+
+def _get_prototype_xblock(course_module, xblock_type):
+    """
+    Returns a prototype xblock to render course views from.
+    """
+    # TODO: find a way to really do this, rather than just finding an instance...
+    def find_xblock(xblock):
+        if xblock.category == xblock_type:
+            return xblock
+        for xblock in xblock.get_children():
+            result = find_xblock(xblock)
+            if result:
+                return result
+        return False
+    return find_xblock(course_module)
 
 
 def _is_xblock_read_only(xblock):

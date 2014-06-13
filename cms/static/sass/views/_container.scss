@@ -7,7 +7,8 @@
 // ====================
 
 // UI: container page view
-.view-container {
+.view-container,
+.view-dashboard {
 
   .mast {
     border-bottom: none;
@@ -133,7 +134,8 @@
 }
 
 // UI: xblock rendering
-body.view-container .content-primary {
+body.view-container .content-primary,
+body.view-dashboard .content-primary {
 
   // dragging bits
   .ui-sortable-helper {
@@ -193,7 +195,6 @@ body.view-container .content-primary {
       }
 
       .xblock-header-primary {
-        @include ui-flexbox();
         margin-bottom: 0;
         border-bottom: none;
         background: none;
@@ -225,7 +226,6 @@ body.view-container .content-primary {
       }
 
       .xblock-header-primary {
-        display: flex;
         margin-bottom: 0;
         border-bottom: 1px solid $gray-l4;
         background-color: $gray-l6;

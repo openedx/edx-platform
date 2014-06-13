@@ -27,7 +27,7 @@ from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .helpers import render_from_lms, xblock_has_own_studio_page
+from .helpers import render_from_lms, get_ancestor_xblocks
 
 from contentstore.views.access import get_user_role
 
@@ -169,7 +169,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view == 'student_view':
+    view_showing_headers = context.get('container_view', None) or context.get('dashboard_view', None)
+    if view_showing_headers and view == 'student_view':
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
@@ -179,13 +180,14 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
+            'ancestor_xblocks': get_ancestor_xblocks(xblock, root_category='course'),
         }
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag
 
 
-def get_preview_fragment(request, descriptor, context):
+def get_preview_fragment(request, descriptor, context, view_name='student_view'):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
@@ -193,7 +195,7 @@ def get_preview_fragment(request, descriptor, context):
     module = _load_preview_module(request, descriptor)
 
     try:
-        fragment = module.render("student_view", context)
+        fragment = module.render(view_name, context)
     except Exception as exc:                          # pylint: disable=W0703
         log.warning("Unable to render student_view for %r", module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))

@@ -22,7 +22,7 @@ from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
-from contentstore.views.helpers import get_parent_xblock
+from contentstore.views.helpers import get_parent_xblock, get_ancestor_xblocks
 
 from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
@@ -165,7 +165,7 @@ def unit_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
+        component_templates = get_component_templates(course)
 
         xblocks = item.get_children()
 
@@ -245,14 +245,8 @@ def container_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
-        ancestor_xblocks = []
-        parent = get_parent_xblock(xblock)
-        while parent and parent.category != 'sequential':
-            ancestor_xblocks.append(parent)
-            parent = get_parent_xblock(parent)
-        ancestor_xblocks.reverse()
-
+        component_templates = get_component_templates(course)
+        ancestor_xblocks = get_ancestor_xblocks(xblock)
         unit = ancestor_xblocks[0] if ancestor_xblocks else None
         unit_publish_state = compute_publish_state(unit) if unit else None
 
@@ -269,7 +263,7 @@ def container_handler(request, usage_key_string):
         return HttpResponseBadRequest("Only supports html requests")
 
 
-def _get_component_templates(course):
+def get_component_templates(course):
     """
     Returns the applicable component templates that can be used by the specified course.
     """

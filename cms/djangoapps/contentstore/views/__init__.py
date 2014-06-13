@@ -8,6 +8,7 @@ from .assets import *
 from .checklist import *
 from .component import *
 from .course import *
+from .dashboard import *
 from .error import *
 from .helpers import *
 from .item import *

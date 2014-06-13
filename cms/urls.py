@@ -77,6 +77,7 @@ urlpatterns += patterns(
     url(r'^unit/(?P<usage_key_string>[^/]+)$', 'unit_handler'),
     url(r'^container/(?P<usage_key_string>[^/]+)$', 'container_handler'),
     url(r'^checklists/(?P<course_key_string>[^/]+)/(?P<checklist_index>\d+)?$', 'checklists_handler'),
+    url(r'^dashboard/(?P<course_key_string>[^/]+)/(?P<xblock_type_name>.+)?$', 'dashboard_handler'),
     url(r'^orphan/(?P<course_key_string>[^/]+)$', 'orphan_handler'),
     url(r'^assets/(?P<course_key_string>[^/]+)/(?P<asset_key_string>.+)?$', 'assets_handler'),
     url(r'^import/(?P<course_key_string>[^/]+)$', 'import_handler'),
@@ -84,6 +85,10 @@ urlpatterns += patterns(
     url(r'^export/(?P<course_key_string>[^/]+)$', 'export_handler'),
     url(r'^xblock/(?P<usage_key_string>[^/]+)/(?P<view_name>[^/]+)$', 'xblock_view_handler'),
     url(r'^xblock/(?P<usage_key_string>[^/]+)?$', 'xblock_handler'),
+    url(
+        r'^xblock_type/(?P<course_key_string>[^/]+)/(?P<xblock_type_name>[^/]+)/(?P<view_name>[^/]+)$',
+        'xblock_type_view_handler'
+    ),
     url(r'^tabs/(?P<course_key_string>[^/]+)$', 'tabs_handler'),
     url(r'^settings/details/(?P<course_key_string>[^/]+)$', 'settings_handler'),
     url(r'^settings/grading/(?P<course_key_string>[^/]+)(/)?(?P<grader_index>\d+)?$', 'grading_handler'),

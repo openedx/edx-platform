@@ -7,7 +7,10 @@ from contentstore.views.helpers import xblock_studio_url
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
-collapsible_class = "is-collapsible" if xblock.has_children else ""
+is_collapsed = xblock_context['collapsed']
+collapse_action_class = "expand" if is_collapsed else "collapse"
+collapsible_class = "collapsed" if is_collapsed else ""
+hidden_class = "is-hidden" if is_collapsed else ""
 %>
 
 % if not is_root:
@@ -17,51 +20,71 @@ collapsible_class = "is-collapsible" if xblock.has_children else ""
     <div class="studio-xblock-wrapper" data-locator="${xblock.location}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}" data-course-key="${xblock.location.course_key}">
+    <section class="wrapper-xblock ${section_class} is-collapsible ${collapsible_class}" data-course-key="${xblock.location.course_key}">
 % endif
 
 <header class="xblock-header">
     <div class="xblock-header-primary">
+        % if xblock_context['dashboard_view']:
+        <div class="header-breadcrumb wrapper-breadcrumbs">
+            <p>
+            <% first_ancestor = True %>
+                % for ancestor in ancestor_xblocks:
+                    <%
+                    ancestor_url = xblock_studio_url(ancestor)
+                    %>
+                    % if ancestor_url:
+                        <a href="${ancestor_url}"
+                           class="breadcrumb link">${ancestor.display_name_with_default | h}</a>
+                    % else:
+                        <span class="breadcrumb">${ancestor.display_name_with_default | h}</span>
+                    % endif
+                % endfor
+            </p>
+        </div>
+        % endif
         <div class="header-details">
-            % if show_inline:
-            <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
+            <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse ${collapse_action_class}">
                 <i class="icon-caret-down ui-toggle-expansion"></i>
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
-            % endif
             <span>${xblock.display_name_with_default | h}</span>
         </div>
+        % if not is_root:
         <div class="header-actions">
             <ul class="actions-list">
-                % if not xblock_context['read_only'] and not is_root:
-                    % if not show_inline:
-                        <li class="action-item action-edit">
-                            <a href="#" class="edit-button action-button">
-                                <i class="icon-pencil"></i>
-                                <span class="action-button-text">${_("Edit")}</span>
-                            </a>
-                        </li>
-                        <li class="action-item action-duplicate">
-                            <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                            <i class="icon-copy"></i>
-                            <span class="sr">${_("Duplicate")}</span>
-                            </a>
-                        </li>
-                        <li class="action-item action-delete">
-                            <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                            <i class="icon-trash"></i>
-                            <span class="sr">${_("Delete")}</span>
-                            </a>
-                        </li>
-                    % endif
-                    % if is_reorderable:
-                        <li class="action-item action-drag">
-                            <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
-                        </li>
-                    % endif
+                % if not xblock_context['read_only']:
+                    <li class="action-item action-edit">
+                        <a href="#" class="edit-button action-button">
+                            <i class="icon-pencil"></i>
+                            <span class="action-button-text">${_("Edit")}</span>
+                        </a>
+                    </li>
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                        <i class="icon-copy"></i>
+                        <span class="sr">${_("Duplicate")}</span>
+                        </a>
+                    </li>
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                        <i class="icon-trash"></i>
+                        <span class="sr">${_("Delete")}</span>
+                        </a>
+                    </li>
+                % else:
+                    <li class="action-item action-delete">
+                        <span><i class="icon-lock"></i></span>
+                    </li>
+                % endif
+                % if is_reorderable:
+                    <li class="action-item action-drag">
+                        <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                    </li>
                 % endif
             </ul>
         </div>
+        % endif
     </div>
     % if xblock_url and not is_root:
     <div class="xblock-header-secondary">
@@ -79,11 +102,11 @@ collapsible_class = "is-collapsible" if xblock.has_children else ""
     % endif
  </header>
 % if is_root or not xblock_url:
-    <article class="xblock-render">
+    <article class="xblock-render ${hidden_class}">
     ${content}
     </article>
 % else:
-    <div class="xblock-message-area">
+    <div class="xblock-message-area ${hidden_class}">
     ${content}
     </div>
 % endif
