@@ -40,6 +40,11 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'url', 'name')
 
 
+class GradeSerializer(serializers.Serializer):
+    """ Serializer for model interactions """
+    grade = serializers.Field()
+
+
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     workgroups = serializers.PrimaryKeyRelatedField(many=True, required=False)
