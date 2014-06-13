@@ -10,11 +10,11 @@ from django.conf import settings
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 
-from xmodule.video_module import create_youtube_string
-from xmodule.tests import get_test_descriptor_system
-from xmodule.video_module import VideoDescriptor
+from xmodule.video_module import create_youtube_string, VideoDescriptor
 from xmodule.x_module import STUDENT_VIEW
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.tests import get_test_descriptor_system
+from xmodule.tests.test_video import VideoDescriptorTestBase
+
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -494,20 +494,12 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
-class VideoDescriptorTest(unittest.TestCase):
+class VideoDescriptorTest(VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.
     """
-
     def setUp(self):
-        system = get_test_descriptor_system()
-        course_key = SlashSeparatedCourseKey('org', 'course', 'run')
-        usage_key = course_key.make_usage_key('video', 'name')
-        self.descriptor = system.construct_xblock_from_class(
-            VideoDescriptor,
-            scope_ids=ScopeIds(None, None, usage_key, usage_key),
-            field_data=DictFieldData({}),
-        )
+        super(VideoDescriptorTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
 
     def test_get_context(self):
