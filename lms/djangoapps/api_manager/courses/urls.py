@@ -18,6 +18,7 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)/users/*$', courses_views.CourseContentUsersList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/(?P<content_id>[a-zA-Z0-9/_:]+)$', courses_views.CourseContentDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/content/*$', courses_views.CourseContentList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/grades/*$', courses_views.CoursesGradesList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/(?P<group_id>[0-9]+)$', courses_views.CoursesGroupsDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/groups/*$', courses_views.CoursesGroupsList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/overview/*$', courses_views.CoursesOverview.as_view()),
