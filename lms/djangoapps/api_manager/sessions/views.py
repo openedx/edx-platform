@@ -98,7 +98,7 @@ class SessionsList(SecureAPIView):
                     # add to audit log
                     AUDIT_LOG.info(u"API::User logged in successfully with user-id - {0}".format(user.id))
                 else:
-                    response_status = status.HTTP_401_UNAUTHORIZED
+                    response_status = status.HTTP_403_FORBIDDEN
             else:
                 limiter.tick_bad_request_counter(request)
                 # tick the failed login counters if the user exists in the database
