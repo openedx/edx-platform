@@ -41,6 +41,7 @@ from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
 
 from .access import has_course_access
+from course_modes.models import CourseMode
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
@@ -53,6 +54,8 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.roles import CourseRole, UserBasedRole
 
+import shoppingcart
+
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
@@ -61,7 +64,7 @@ from student import auth
 
 from microsite_configuration import microsite
 
-__all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
+__all__ = ['course_info_handler', 'course_handler', 'coupon_handler', 'course_info_update_handler',
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
@@ -125,6 +128,12 @@ def course_handler(request, course_key_string=None):
     else:
         return HttpResponseNotFound()
 
+# pylint: disable=unused-argument
+@login_required
+def coupon_handler(request, course_key_string=None):
+    #shoppingcart.models.Coupons.objects.all()
+    #coupons = Coupons.objects.filter(course_id=course_key_string)
+    return render_to_response('coupons.html')
 
 @login_required
 def _course_json(request, course_key):
@@ -249,17 +258,26 @@ def course_index(request, course_key):
     org, course, name: Attributes of the Location for the item to edit
     """
     course_module = _get_course_module(course_key, request.user, depth=3)
+
+    #check mode for the course corresponding to mode_slug
+    #if mode is defined then show the E-commerce Tab in the Instructor Dashboard
+    has_course_mode = CourseMode.mode_for_course(course_key, 'honor')
+    course_mode_price = False
+    if has_course_mode:
+        if has_course_mode.min_price > 0:
+            course_mode_price = True
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
 
-
     return render_to_response('overview.html', {
+        'url': reverse_course_url('course_handler', course_module.id),
         'context_course': course_module,
         'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(
             CourseGradingModel.fetch(course_key).graders
         ),
+        'course_mode_price': course_mode_price,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'new_unit_category': 'vertical',

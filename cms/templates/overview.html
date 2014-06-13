@@ -131,6 +131,11 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
           <li class="nav-item">
             <a href="#" class="toggle-button toggle-button-sections"><i class="icon-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></a>
           </li>
+          %if course_mode_price:
+            <li class="nav-item">
+                <a href="${url}/coupons" class="button new-button new-ecommerce-button"> ${_("E-Commerce")}</a>
+            </li>
+          %endif
           <li class="nav-item">
             <a href="#" class="button new-button new-courseware-section-button"><i class="icon-plus"></i> ${_("New Section")}</a>
           </li>
