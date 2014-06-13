@@ -10,6 +10,7 @@ section_class = "level-nesting" if show_inline else "level-element"
 is_collapsed = xblock_context['collapsed']
 collapse_action_class = "expand" if is_collapsed else "collapse"
 collapsible_class = "collapsed" if is_collapsed else ""
+hidden_class = "is-hidden" if is_collapsed else ""
 %>
 
 % if not is_root:
@@ -101,11 +102,11 @@ collapsible_class = "collapsed" if is_collapsed else ""
     % endif
  </header>
 % if is_root or not xblock_url:
-    <article class="xblock-render">
+    <article class="xblock-render ${hidden_class}">
     ${content}
     </article>
 % else:
-    <div class="xblock-message-area">
+    <div class="xblock-message-area ${hidden_class}">
     ${content}
     </div>
 % endif
