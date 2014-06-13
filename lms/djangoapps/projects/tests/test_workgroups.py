@@ -9,11 +9,13 @@ import uuid
 
 from django.contrib.auth.models import Group, User
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupProfile
 from projects.models import Project
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -29,20 +31,36 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class WorkgroupsApiTests(TestCase):
+class WorkgroupsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
     def setUp(self):
+        super(WorkgroupsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_workgroups_uri = '/api/workgroups/'
-        self.test_course_id = 'edx/demo/course'
         self.test_bogus_course_id = 'foo/bar/baz'
-        self.test_course_content_id = "i4x://blah"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
         self.test_group_id = '1'
         self.test_bogus_group_id = "2131241123"
         self.test_workgroup_name = str(uuid.uuid4())
+
+        self.test_course = CourseFactory.create(
+            start="2014-06-16T14:30:00Z",
+            end="2015-01-16T14:30:00Z"
+        )
+        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+
+        self.test_group_project = ItemFactory.create(
+            category="group_project",
+            parent_location=self.test_course.location,
+            data=self.test_data,
+            due="2014-05-16T14:30:00Z",
+            display_name="Group Project"
+        )
+
+        self.test_course_id = self.test_course.id
+        self.test_course_content_id = self.test_group_project.id
 
         self.test_group_name = str(uuid.uuid4())
         self.test_group = Group.objects.create(
@@ -64,6 +82,13 @@ class WorkgroupsApiTests(TestCase):
         self.test_user = User.objects.create(
             email=self.test_user_email,
             username=self.test_user_username
+        )
+
+        self.test_user_email2 = str(uuid.uuid4())
+        self.test_user_username2 = str(uuid.uuid4())
+        self.test_user2 = User.objects.create(
+            email=self.test_user_email2,
+            username=self.test_user_username2
         )
 
         self.client = SecureClient()
@@ -299,6 +324,97 @@ class WorkgroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], submission_id)
         self.assertEqual(response.data[0]['user'], self.test_user.id)
+
+    def test_workgroups_grades_post(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        workgroup_id = response.data['id']
+        users_uri = '{}{}/users/'.format(self.test_workgroups_uri, workgroup_id)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        data = {"id": self.test_user2.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        grade_data = {
+            'course_id': self.test_course_id,
+            'content_id': self.test_course_content_id,
+            'grade': 0.85,
+            'max_grade': 0.75,
+        }
+        grades_uri = '{}{}/grades/'.format(self.test_workgroups_uri, workgroup_id)
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 201)
+
+        # Confirm the grades for the users
+        course_grades_uri = '/api/courses/{}/grades'.format(self.test_course_id)
+        response = self.do_get(course_grades_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data['grades']), 0)
+
+    def test_workgroups_grades_post_invalid_requests(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        workgroup_id = response.data['id']
+
+        users_uri = '{}{}/users/'.format(self.test_workgroups_uri, workgroup_id)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        data = {"id": self.test_user2.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        grades_uri = '{}{}/grades/'.format(self.test_workgroups_uri, workgroup_id)
+        grade_data = {
+            'content_id': self.test_course_content_id,
+            'grade': 0.85,
+            'max_grade': 0.75,
+        }
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 400)
+
+        grade_data = {
+            'course_id': self.test_bogus_course_id,
+            'content_id': self.test_course_content_id,
+            'grade': 0.85,
+            'max_grade': 0.75,
+        }
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 400)
+
+        grade_data = {
+            'course_id': self.test_course_id,
+            'grade': 0.85,
+            'max_grade': 0.75,
+        }
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 400)
+
+        grade_data = {
+            'course_id': self.test_course_id,
+            'content_id': self.test_course_content_id,
+            'max_grade': 0.75,
+        }
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 400)
+
+        grade_data = {
+            'course_id': self.test_course_id,
+            'content_id': self.test_course_content_id,
+            'grade': 0.85,
+        }
+        response = self.do_post(grades_uri, grade_data)
+        self.assertEqual(response.status_code, 400)
 
     def test_submissions_list_post_invalid_relationships(self):
         data = {
