@@ -10,6 +10,20 @@ from contentstore.utils import reverse_usage_url
 <%block name="bodyclass">is-signedin course view-outline</%block>
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
+<%block name="jsextra">
+<script type="text/javascript">
+require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
+  $('a.remove_coupon').click(function(event) {
+      event.preventDefault();
+      var post_url = "/remove_coupon";
+      $.post(post_url, {id:$(this).data('item-id')})
+        .always(function(data){
+        location.reload(true);
+      });
+    });
+});
+</script>
+</%block>
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
@@ -18,7 +32,7 @@ from contentstore.utils import reverse_usage_url
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-coupon-button"><i class="icon-plus icon-inline"></i>
+          <a href="add_coupon" class="button new-button new-coupon-button"><i class="icon-plus icon-inline"></i>
             ${_("Add Coupon")}</a>
         </li>
       </ul>
@@ -27,9 +41,33 @@ from contentstore.utils import reverse_usage_url
 </div>
 <div class="wrapper-content wrapper">
 <section class="content">
-<section>
+  %if coupons_list:
+  <table>
+    <thead>
+      <tr class="coupons-headings">
+        <th class="qty">${_("Code")}</th>
+        <th class="dsc">${_("Description")}</th>
+        <th class="u-pr">${_("Course_id")}</th>
+        <th class="prc">${_("Percentage Discount")}</th>
+        <th class="cur">${_("Is Active")}</th>
+        <th class="cur">${_("Actions")}</th>
+      </tr>
+    </thead>
 
-</section>
+    <tbody>
+      %for coupon in coupons_list:
+      <tr class="cart-items">
+        <td>${coupon.code}</td>
+        <td>${coupon.description}</td>
+        <td>${coupon.course_id}</td>
+        <td>${coupon.percentage_discount}</td>
+        <td>${coupon.is_active}</td>
+        <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a></td>
+      </tr>
+      %endfor
+    </tbody>
+  </table>
+  %endif
 </section>
 </div>
 </%block>

@@ -4,15 +4,16 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
+import logging
 
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
@@ -54,7 +55,9 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.roles import CourseRole, UserBasedRole
 
-import shoppingcart
+from shoppingcart.models import Coupons
+
+from contentstore.forms import CouponsForm
 
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
@@ -65,11 +68,12 @@ from student import auth
 from microsite_configuration import microsite
 
 __all__ = ['course_info_handler', 'course_handler', 'coupon_handler', 'course_info_update_handler',
-           'settings_handler',
+           'settings_handler', 'remove_coupon', 'add_coupon_handler',
            'grading_handler',
            'advanced_settings_handler',
            'textbooks_list_handler', 'textbooks_detail_handler']
 
+log = logging.getLogger("CMS Course Views")
 
 def _get_course_module(course_key, user, depth=0):
     """
@@ -130,10 +134,41 @@ def course_handler(request, course_key_string=None):
 
 # pylint: disable=unused-argument
 @login_required
+def add_coupon_handler(request, course_key_string=None):
+    if request.method == 'POST':
+        form = CouponsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('coupons') #
+        else:
+            resp = render_to_response('add_coupon.html', {'form': form, })
+            return resp
+    else:
+        form = CouponsForm()
+        return render_to_response('add_coupon.html', {
+            'form': form,
+        })
+
+# pylint: disable=unused-argument
+@login_required
 def coupon_handler(request, course_key_string=None):
-    #shoppingcart.models.Coupons.objects.all()
-    #coupons = Coupons.objects.filter(course_id=course_key_string)
-    return render_to_response('coupons.html')
+    coupons = Coupons.objects.filter(course_id=CourseKey.from_string(course_key_string))
+    return render_to_response('coupons.html', {'coupons_list': coupons})
+
+
+# pylint: disable=unused-argument
+@require_POST
+@login_required
+def remove_coupon(request):
+    coupon_id = request.REQUEST.get('id', '-1')
+    try:
+        coupon = Coupons.objects.get(id=coupon_id)
+        if coupon.created_by == request.user and coupon.is_active:
+            coupon.is_active = False
+            coupon.save()
+    except coupon.DoesNotExist:
+        log.exception('Cannot remove cart Coupon id={0}. DoesNotExist or coupon is already purchased'.format(coupon_id))
+    return HttpResponse('OK')
 
 @login_required
 def _course_json(request, course_key):
