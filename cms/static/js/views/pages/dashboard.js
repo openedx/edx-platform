@@ -85,10 +85,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
             renderXBlockType: function(xblockType) {
                 var locators = xblockType.get('locators'),
                     parentElement = this.$('.dashboard-section-components'),
-                    locator, i, placeholderElement;
+                    locator, i, placeholderElement,
+                    hasDashboardView = xblockType.get('views').indexOf('author_dashboard_view') >= 0;
                 placeholderElement = $('<div></div>').appendTo(parentElement);
-                this.refreshXBlockTypeView(placeholderElement, xblockType, 'author_dashboard_view');
-                placeholderElement = parentElement.append('<hr></hr><h3>Course Components</h3>');
+                if (hasDashboardView) {
+                    this.refreshXBlockTypeView(placeholderElement, xblockType, 'author_dashboard_view');
+                    placeholderElement = parentElement.append('<hr></hr><h3>Course Components</h3>');
+                }
                 for (i=0; i < locators.length; i++) {
                     locator = locators[i];
                     placeholderElement = $('<div data-locator="' + locator + '"></div>').appendTo(parentElement);

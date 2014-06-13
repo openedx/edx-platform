@@ -55,13 +55,28 @@ def get_course_xblock_type_info(course_module):
             'id': name,
             'display_name': display_name,
             'locators': list(unicode(xblock.scope_ids.usage_id) for xblock in xblocks),
+            'views': _get_xblock_type_views(xblocks[0]) if len(xblocks) > 0 else [],
             'studio_url': studio_url,
-            'publish_status': _compute_aggregate_publish_status(xblocks)
+            'publish_status': _compute_aggregate_publish_status(xblocks),
         }
         xblock_types_json.append(xblock_type_json)
     xblock_types_json.sort(key=lambda item: item['display_name'].lower())
     json['xblock_types'] = xblock_types_json
     return json
+
+
+def _get_xblock_type_views(xblock):
+    """
+    Returns the views for the specified xblock.
+    """
+    views = []
+    for view_name in ['student_view', 'studio_view', 'author_view', 'author_dashboard_view', 'admin_view']:
+        try:
+            if getattr(xblock, view_name, None):
+                views.append(view_name)
+        except Exception:  # pylint: disable-msg=broad-except
+            pass
+    return views
 
 
 def _get_course_xblock_types(course_module):

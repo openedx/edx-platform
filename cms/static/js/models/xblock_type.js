@@ -8,6 +8,7 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "display_name": null,
             "publish_status": "Unknown",
             "locators": [],
+            "views": [],
             "studio_url": null
         },
 
