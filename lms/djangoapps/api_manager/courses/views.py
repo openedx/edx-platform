@@ -1090,6 +1090,12 @@ class CourseModuleCompletionList(SecureListAPIView):
     ```/api/courses/{course_id}/completions/?user_id={user_id}```
     ```/api/courses/{course_id}/completions/?content_id={content_id}```
     ```/api/courses/{course_id}/completions/?user_id={user_id}&content_id={content_id}```
+    - POST: Creates a Course-Module completion entity
+    - POST Example:
+        {
+            "content_id":"i4x://the/content/location",
+            "user_id":4
+        }
     ### Use Cases/Notes:
     * Use GET operation to retrieve list of course completions by user
     * Use GET operation to verify user has completed specific course module
@@ -1113,26 +1119,19 @@ class CourseModuleCompletionList(SecureListAPIView):
         if content_id:
             queryset = queryset.filter(content_id=content_id)
 
-        if not queryset.exists() and (user_ids or content_id):
-            raise Http404
         return queryset
 
-
-class CourseModuleCompletionDetail(SecureAPIView):
-    """
-    ### The CourseModuleCompletionDetail view allows clients to interact with a
-    specific Course-Content completion entity
-    - URI: ```/api/courses/{course_id}/completions/{content_id}/{user_id}```
-    - POST: Creates a Course-Module completion entity
-    - DELETE: Removes an existing Course-Module completion entity from the system
-    ### Use Cases/Notes:
-    * Use this operation to save or remove Course-Module completion entity
-    """
-
-    def post(self, request, course_id, content_id, user_id):
+    def post(self, request, course_id):
         """
-        POST /api/courses/{course_id}/completions/{content_id}/{user_id}
+        POST /api/courses/{course_id}/completions/
         """
+        content_id = request.DATA.get('content_id', None)
+        user_id = request.DATA.get('user_id', None)
+        if not content_id:
+            return Response({'message': _('content_id is missing')}, status.HTTP_400_BAD_REQUEST)
+        if not user_id:
+            return Response({'message': _('user_id is missing')}, status.HTTP_400_BAD_REQUEST)
+
         completion, created = CourseModuleCompletion.objects.get_or_create(user_id=user_id,
                                                                            course_id=course_id,
                                                                            content_id=content_id)
@@ -1141,15 +1140,3 @@ class CourseModuleCompletionDetail(SecureAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)  # pylint: disable=E1101
         else:
             return Response({'message': _('Resource already exists')}, status=status.HTTP_409_CONFLICT)
-
-    def delete(self, request, course_id, content_id, user_id):
-        """
-        DELETE /api/courses/{course_id}/completions/{content_id}/{user_id}
-        """
-        try:
-            completion = CourseModuleCompletion.objects.get(user_id=user_id, course_id=course_id, content_id=content_id)
-            completion.delete()
-        except ObjectDoesNotExist:
-            raise Http404
-        response_data = {'uri': _generate_base_uri(request)}
-        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
