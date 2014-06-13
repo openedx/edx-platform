@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import url, patterns, include
+from django.conf.urls import url, patterns, include
 
 urlpatterns = patterns('',  # nopep8
     url(r'forum/?', include('django_comment_client.forum.urls')),

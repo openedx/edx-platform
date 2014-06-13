@@ -5,7 +5,7 @@ Middleware to serve assets.
 import logging
 
 from django.http import (
-    HttpResponse, HttpResponseNotModified, HttpResponseForbidden
+    StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse
 )
 from student.models import CourseEnrollment
 
@@ -121,7 +121,7 @@ class StaticContentServer(object):
 
                         if 0 <= first <= last < content.length:
                             # If the byte range is satisfiable
-                            response = HttpResponse(content.stream_data_in_range(first, last))
+                            response = StreamingHttpResponse(content.stream_data_in_range(first, last))
                             response['Content-Range'] = 'bytes {first}-{last}/{length}'.format(
                                 first=first, last=last, length=content.length
                             )
@@ -135,7 +135,7 @@ class StaticContentServer(object):
 
             # If Range header is absent or syntactically invalid return a full content response.
             if response is None:
-                response = HttpResponse(content.stream_data())
+                response = StreamingHttpResponse(content.stream_data())
                 response['Content-Length'] = content.length
 
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed

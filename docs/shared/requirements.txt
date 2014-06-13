@@ -56,7 +56,7 @@ PyYAML==3.10
 requests==2.3.0
 Shapely==1.2.16
 sorl-thumbnail==11.12
-South==0.7.6
+South==1.0.1
 sympy==0.7.1
 xmltodict==0.4.1
 
