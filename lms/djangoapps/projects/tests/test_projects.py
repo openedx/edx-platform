@@ -35,6 +35,7 @@ class ProjectsApiTests(TestCase):
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
         self.test_projects_uri = '/api/projects/'
+        self.test_organizations_uri = '/api/organizations/'
         self.test_project_name = str(uuid.uuid4())
 
         self.test_course_id = 'edx/demo/course'
@@ -93,11 +94,19 @@ class ProjectsApiTests(TestCase):
         return response
 
     def test_projects_list_post(self):
+        data = {
+            'name': 'Test Organization'
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_org_id = response.data['id']
+
         test_course_content_id = "i4x://blahblah1234"
         data = {
             'name': self.test_project_name,
             'course_id': self.test_course_id,
-            'content_id': test_course_content_id
+            'content_id': test_course_content_id,
+            'organization': test_org_id
         }
         response = self.do_post(self.test_projects_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -108,7 +117,7 @@ class ProjectsApiTests(TestCase):
             str(response.data['id'])
         )
         self.assertEqual(response.data['url'], confirm_uri)
-        self.assertGreater(response.data['id'], 0)
+        self.assertEqual(response.data['organization'], test_org_id)
         self.assertEqual(response.data['course_id'], self.test_course_id)
         self.assertEqual(response.data['content_id'], test_course_content_id)
         self.assertIsNotNone(response.data['workgroups'])
