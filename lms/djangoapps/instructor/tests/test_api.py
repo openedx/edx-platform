@@ -1985,6 +1985,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res['total_codes'], 5)
 
     def test_get_students_features(self):
+
         """
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.

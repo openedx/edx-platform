@@ -26,6 +26,11 @@ def run():
     """
     django_utils_translation.patch()
 
+    # Enabling third party auth modifies settings, so do it before
+    # we load all of the modules in autostartup
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+        enable_third_party_auth()
+
     autostartup()
 
     add_mimetypes()
@@ -35,9 +40,6 @@ def run():
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
-
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
 
     # Initialize Segment.io analytics module. Flushes first time a message is received and
     # every 50 messages thereafter, or if 10 seconds have passed since last flush

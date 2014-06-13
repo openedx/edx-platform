@@ -4,13 +4,13 @@ Tests for student activation and login
 import json
 import unittest
 
-from django.test import TestCase
-from django.test.client import Client
-from django.test.utils import override_settings
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
+from django.test import TestCase
+from django.test.client import Client
 from external_auth.models import ExternalAuthMap
 import httpretty
 from mock import patch
@@ -227,6 +227,9 @@ class LoginTest(TestCase):
         response = client1.post(self.url, creds)
         self._assert_response(response, success=True)
 
+        # Django > 1.4 caches related models.  Reload the user object to
+        # refresh the user profile.
+        self.user = User.objects.get(username=self.user.username)
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 
         # second login should log out the first

@@ -300,7 +300,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:
-            hashed_resources[hash_resource(resource)] = resource
+            # Use a dictionary representation of the FragmentResource namedtuple
+            # so that it is json-encoded as a dict, rather than as a list.
+            hashed_resources[hash_resource(resource)] = resource._asdict()
 
         return JsonResponse({
             'html': fragment.content,

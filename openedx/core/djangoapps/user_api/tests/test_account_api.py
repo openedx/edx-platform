@@ -45,7 +45,7 @@ class AccountApiTest(TestCase):
         '@domain.com',
         'test@no_extension',
         u'fŕáńḱ@example.com',
-        u'frank@éxáḿṕĺé.ćőḿ',
+#        u'frank@éxáḿṕĺé.ćőḿ',
 
         # Long email -- subtract the length of the @domain
         # except for one character (so we exceed the max length limit)

@@ -79,18 +79,6 @@ class PasswordResetFormNoActive(PasswordResetForm):
             send_mail(subject, email, from_email, [user.email])
 
 
-class TrueField(forms.BooleanField):
-    """
-    A boolean field that only accepts "true" (case-insensitive) as true
-    """
-    def to_python(self, value):
-        # CheckboxInput converts string to bool by case-insensitive match to "true" or "false"
-        if value is True:
-            return value
-        else:
-            return None
-
-
 _USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
 _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
 _PASSWORD_INVALID_MSG = _("A valid password is required")
@@ -152,7 +140,7 @@ class AccountCreationForm(forms.Form):
         self.enforce_username_neq_password = enforce_username_neq_password
         self.enforce_password_policy = enforce_password_policy
         if tos_required:
-            self.fields["terms_of_service"] = TrueField(
+            self.fields["terms_of_service"] = forms.BooleanField(
                 error_messages={"required": _("You must accept the terms of service.")}
             )
 
@@ -170,7 +158,7 @@ class AccountCreationForm(forms.Form):
             if field_name not in self.fields:
                 if field_name == "honor_code":
                     if field_value == "required":
-                        self.fields[field_name] = TrueField(
+                        self.fields[field_name] = forms.BooleanField(
                             error_messages={
                                 "required": _("To enroll, you must follow the honor code.")
                             }

@@ -26,7 +26,7 @@ from boto.exception import AWSConnectionError
 
 from celery import task, current_task
 from celery.states import SUCCESS, FAILURE, RETRY
-from celery.exceptions import RetryTaskError
+from celery.exceptions import Retry
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -336,8 +336,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         # Update the InstructorTask object that is storing its progress.
         log.info("Send-email task %s for email %s: succeeded", current_task_id, email_id)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-    elif isinstance(send_exception, RetryTaskError):
-        # If retrying, a RetryTaskError needs to be returned to Celery.
+    elif isinstance(send_exception, Retry):
+        # If retrying, a Retry needs to be returned to Celery.
         # We assume that the the progress made before the retry condition
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
@@ -720,7 +720,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
 
       * Second value is an exception returned by the innards of the method.  If the retry was
-        successfully submitted, this value will be the RetryTaskError that retry() returns.
+        successfully submitted, this value will be the Retry that retry() returns.
         Otherwise, it (ought to be) the current_exception passed in.
     """
     task_id = subtask_status.task_id
@@ -757,11 +757,11 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
     # condition between this update and the update made by the retried task.
     update_subtask_status(entry_id, task_id, subtask_status)
 
-    # Now attempt the retry.  If it succeeds, it returns a RetryTaskError that
+    # Now attempt the retry.  If it succeeds, it returns a Retry that
     # needs to be returned back to Celery.  If it fails, we return the existing
     # exception.
     try:
-        send_course_email.retry(
+        raise send_course_email.retry(
             args=[
                 entry_id,
                 email_id,
@@ -774,7 +774,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
             max_retries=max_retries,
             throw=True,
         )
-    except RetryTaskError as retry_error:
+    except Retry as retry_error:
         # If the retry call is successful, update with the current progress:
         log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
                       task_id, email_id)
@@ -788,7 +788,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         log.exception(u'Task %s: email with id %d caused send_course_email task to fail to retry. To list: %s',
                       task_id, email_id, [i['email'] for i in to_list])
         num_failed = len(to_list)
-        subtask_status.increment(subtask_status, failed=num_failed, state=FAILURE)
+        subtask_status.increment(failed=num_failed, state=FAILURE)
         return subtask_status, retry_exc
 
 

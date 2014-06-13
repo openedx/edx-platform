@@ -232,6 +232,8 @@ PASSWORD_COMPLEXITY = {}
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+    INSTALLED_APPS += ('social.apps.django_app.default',)
 
 THIRD_PARTY_AUTH = {
     "Google": {
@@ -297,6 +299,7 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
+CELERY_CACHE_BACKEND = 'memory'
 
 ######################### MARKETING SITE ###############################
 
