@@ -1133,7 +1133,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    def test_coursemodulecompletions_detail_delete(self):
+    def test_coursemodulecompletions_post(self):
 
         data = {
             'email': 'test@example.com',
@@ -1145,9 +1145,9 @@ class CoursesApiTests(TestCase):
         response = self.do_post(self.base_users_uri, data)
         self.assertEqual(response.status_code, 201)
         created_user_id = response.data['id']
-        detail_uri = '{}/{}/completions/{}/{}'.format(self.base_courses_uri, self.course.id, self.course_content.id,
-                                                      created_user_id)
-        response = self.do_post(detail_uri, {})
+        completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
+        completions_data = {'content_id': self.course_content.id, 'user_id': created_user_id}
+        response = self.do_post(completions_uri, completions_data)
         self.assertEqual(response.status_code, 201)
         coursemodulecomp_id = response.data['id']
         self.assertGreater(coursemodulecomp_id, 0)
@@ -1158,23 +1158,18 @@ class CoursesApiTests(TestCase):
         self.assertIsNotNone(response.data['modified'])
 
         # test to create course completion with same attributes
-        response = self.do_post(detail_uri, {})
+        response = self.do_post(completions_uri, completions_data)
         self.assertEqual(response.status_code, 409)
 
-        # test for delete
-        response = self.do_delete(detail_uri)
-        self.assertEqual(response.status_code, 204)
-        response = self.do_get('{}/{}/completions?user_id={}&content_id={}'.format(self.base_courses_uri,
-                                                                                   self.course.id,
-                                                                                   created_user_id,
-                                                                                   self.course_content.id))
-        self.assertEqual(response.status_code, 404)
+        # test to create course completion with empty user_id
+        completions_data['user_id'] = None
+        response = self.do_post(completions_uri, completions_data)
+        self.assertEqual(response.status_code, 400)
 
-        #test deletion of non existing course module completion
-        non_existing_uri = '{}/{}/completions/{}/{}'.format(self.base_courses_uri, self.course.id,
-                                                            self.course_content.id, '3323432')
-        response = self.do_delete(non_existing_uri)
-        self.assertEqual(response.status_code, 404)
+        # test to create course completion with empty content_id
+        completions_data['content_id'] = None
+        response = self.do_post(completions_uri, completions_data)
+        self.assertEqual(response.status_code, 400)
 
     def test_coursemodulecompletions_filters(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
@@ -1192,7 +1187,8 @@ class CoursesApiTests(TestCase):
 
         for i in xrange(1, 26):
             content_id = self.course_content.id + str(i)
-            response = self.do_post('{}{}/{}'.format(completion_uri, content_id, created_user_id), {})
+            completions_data = {'content_id': content_id, 'user_id': created_user_id}
+            response = self.do_post(completion_uri, completions_data)
             self.assertEqual(response.status_code, 201)
 
         #filter course module completion by user
@@ -1214,7 +1210,8 @@ class CoursesApiTests(TestCase):
         #filter course module completion by user who has not completed any course module
         user_filter_uri = '{}?user_id={}'.format(completion_uri, 1)
         response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 0)
 
         #filter course module completion by course_id
         course_filter_uri = '{}?course_id={}&page_size=10'.format(completion_uri, self.course.id)
