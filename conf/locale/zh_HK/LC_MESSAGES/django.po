@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Chinese (Hong Kong) (http://www.transifex.com/projects/p/edx-platform/language/zh_HK/).
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -11,7 +11,7 @@
 # 
 # Translators:
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Chinese (Hong Kong) (http://www.transifex.com/projects/p/edx-platform/language/zh_HK/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -38,7 +38,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-09 14:23-0400\n"
+"POT-Creation-Date: 2014-06-12 12:24-0400\n"
 "PO-Revision-Date: 2014-06-11 12:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (Hong Kong) (http://www.transifex.com/projects/p/edx-platform/language/zh_HK/)\n"
@@ -833,7 +833,7 @@ msgstr ""
 msgid "ChoiceGroup: unexpected tag {tag_name}"
 msgstr ""
 
-#: common/lib/capa/capa/inputtypes.py
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
 msgid "Answer received."
 msgstr ""
 
@@ -862,6 +862,15 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1036,6 +1045,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"

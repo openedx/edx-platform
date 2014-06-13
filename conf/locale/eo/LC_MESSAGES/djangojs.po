@@ -1,5 +1,24 @@
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2014.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2014.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2014.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
 # 
@@ -7,13 +26,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-27 07:56-0400\n"
-"PO-Revision-Date: 2014-05-27 11:57:03.040250\n"
+"POT-Creation-Date: 2014-06-13 09:23-0400\n"
+"PO-Revision-Date: 2014-06-13 13:24:28.607488\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -31,12 +51,25 @@ msgstr "ÖK Ⱡ'#"
 #: cms/static/js/views/modals/base_modal.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
+#: cms/templates/js/checklist.underscore
 msgid "This link will open in a new browser window/tab"
 msgstr "Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/show-textbook.underscore
+msgid "Delete"
+msgstr "Délété Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -226,9 +259,60 @@ msgstr ""
 "SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢ση#"
 
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Volume"
+msgstr "Völümé Ⱡ'σяєм ιρѕ#"
+
+#. Translators: Volume level equals 0%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Muted"
+msgstr "Mütéd Ⱡ'σяєм ι#"
+
+#. Translators: Volume level in range ]0,20]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very low"
+msgstr "Vérý löw #"
+
+#. Translators: Volume level in range ]20,40]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Low"
+msgstr "Löw Ⱡ'σя#"
+
+#. Translators: Volume level in range ]40,60]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Average"
+msgstr "Àvérägé #"
+
+#. Translators: Volume level in range ]60,80]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Loud"
+msgstr "Löüd Ⱡ'σяєм#"
+
+#. Translators: Volume level in range ]80,99]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very loud"
+msgstr "Vérý löüd #"
+
+#. Translators: Volume level equals 100%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Maximum"
+msgstr "Mäxïmüm #"
+
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid "This browser cannot play .mp4, .ogg, or "
-msgstr "Thïs ßröwsér çännöt pläý .mp4, .ögg, ör  Ⱡ'σяєм ιρѕυ#"
+msgid ""
+"VideoPlayer: Element corresponding to the given selector does not found."
+msgstr ""
+"VïdéöPläýér: Élémént çörréspöndïng tö thé gïvén séléçtör döés nöt föünd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or .webm files."
+msgstr "Thïs ßröwsér çännöt pläý .mp4, .ögg, ör .wéßm fïlés. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "Try using a different browser, such as Google Chrome."
+msgstr ""
+"Trý üsïng ä dïfférént ßröwsér, süçh äs Gööglé Çhrömé. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
@@ -284,45 +368,6 @@ msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s séçönd Ⱡ#"
 msgstr[1] "%(value)s séçönds Ⱡ#"
-
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Volume"
-msgstr "Völümé Ⱡ'σяєм ιρѕ#"
-
-#. Translators: Volume level equals 0%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Muted"
-msgstr "Mütéd Ⱡ'σяєм ι#"
-
-#. Translators: Volume level in range (0,20]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very low"
-msgstr "Vérý löw #"
-
-#. Translators: Volume level in range (20,40]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Low"
-msgstr "Löw Ⱡ'σя#"
-
-#. Translators: Volume level in range (40,60]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Average"
-msgstr "Àvérägé #"
-
-#. Translators: Volume level in range (60,80]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Loud"
-msgstr "Löüd Ⱡ'σяєм#"
-
-#. Translators: Volume level in range (80,100)%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very loud"
-msgstr "Vérý löüd #"
-
-#. Translators: Volume level equals 100%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Maximum"
-msgstr "Mäxïmüm #"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -401,6 +446,7 @@ msgstr "… #"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ι#"
 
@@ -452,6 +498,14 @@ msgstr[1] "%(unread_count)s néw çömménts Ⱡ'σ#"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Löädïng thréäd lïst Ⱡ'σя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid ""
+"No results found for %(original_query)s. Showing results for "
+"%(suggested_query)s."
+msgstr ""
+"Nö résülts föünd för %(original_query)s. Shöwïng résülts för "
+"%(suggested_query)s. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
@@ -660,6 +714,108 @@ msgid_plural "%d years"
 msgstr[0] "%d ýéär #"
 msgstr[1] "%d ýéärs #"
 
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "User"
+msgstr "Ûsér Ⱡ'σяєм#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Annotation"
+msgstr "Ànnötätïön Ⱡ#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Start"
+msgstr "Stärt Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "End"
+msgstr "Énd Ⱡ'σя#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "#Replies"
+msgstr "#Réplïés #"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Date posted"
+msgstr "Däté pöstéd Ⱡ#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "More"
+msgstr "Möré Ⱡ'σяєм#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "My Notes"
+msgstr "Mý Nötés #"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Instructor"
+msgstr "Ìnstrüçtör Ⱡ#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Public"
+msgstr "Püßlïç Ⱡ'σяєм ιρѕ#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Search"
+msgstr "Séärçh Ⱡ'σяєм ιρѕ#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Users"
+msgstr "Ûsérs Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Tags"
+msgstr "Tägs Ⱡ'σяєм#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Annotation Text"
+msgstr "Ànnötätïön Téxt Ⱡ'#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+#: cms/templates/js/mock/mock-xmodule-editor.underscore
+#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Clear"
+msgstr "Çléär Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Text"
+msgstr "Téxt Ⱡ'σяєм#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Video"
+msgstr "Vïdéö Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Image"
+msgstr "Ìmägé Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Reply"
+msgstr "Réplý Ⱡ'σяєм ι#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/mock/mock-container-page.underscore
+msgid "Edit"
+msgstr "Édït Ⱡ'σяєм#"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Tags:"
+msgstr "Tägs: Ⱡ'σяєм ι#"
+
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
 msgstr "Àväïläßlé %s Ⱡ#"
@@ -696,6 +852,7 @@ msgid "Choose"
 msgstr "Çhöösé Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
+#: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Remove"
 msgstr "Rémövé Ⱡ'σяєм ιρѕ#"
 
@@ -835,6 +992,7 @@ msgid "Close Calculator"
 msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 
 #: lms/static/coffee/src/customwmd.js
+#: cms/templates/js/asset-library.underscore
 msgid "Preview"
 msgstr "Prévïéw #"
 
@@ -1566,16 +1724,15 @@ msgid "Saving&hellip;"
 msgstr "Sävïng&hellip; #"
 
 #: cms/static/coffee/src/views/tabs.js
-msgid "Delete Component Confirmation"
-msgstr "Délété Çömpönént Çönfïrmätïön Ⱡ'σяєм #"
+msgid "Delete Page Confirmation"
+msgstr "Délété Pägé Çönfïrmätïön Ⱡ'σяє#"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
-"Are you sure you want to delete this component? This action cannot be "
-"undone."
+"Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
-"Àré ýöü süré ýöü wänt tö délété thïs çömpönént? Thïs äçtïön çännöt ßé "
-"ündöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+"Àré ýöü süré ýöü wänt tö délété thïs pägé? Thïs äçtïön çännöt ßé ündöné. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
@@ -1735,19 +1892,15 @@ msgstr ""
 "\n"
 "Àlsö äný çöntént thät lïnks/référs tö thïs ïtém wïll nö löngér wörk (é.g. ßrökén ïmägés änd/ör lïnks) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
 
-#: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
-msgid "Delete"
-msgstr "Délété Ⱡ'σяєм ιρѕ#"
-
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
 msgstr "Ýöür fïlé häs ßéén délétéd. Ⱡ'σяєм#"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм#"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 msgid "Date Added"
 msgstr "Däté Àddéd Ⱡ#"
 
@@ -1756,10 +1909,12 @@ msgid "Uploading…"
 msgstr "Ûplöädïng… Ⱡ#"
 
 #: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
 msgstr "Çhöösé Fïlé Ⱡ#"
 
 #: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Ûplöäd Néw Fïlé Ⱡ'#"
 
@@ -1880,6 +2035,8 @@ msgid "Deleting"
 msgstr "Délétïng #"
 
 #: cms/static/js/views/uploads.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
 msgstr "Ûplöäd Ⱡ'σяєм ιρѕ#"
 
@@ -1929,6 +2086,8 @@ msgid "Adding&hellip;"
 msgstr "Àddïng&hellip; #"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/section-name-edit.underscore
 msgid "Save"
 msgstr "Sävé Ⱡ'σяєм#"
 
@@ -1982,3 +2141,449 @@ msgstr ""
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
 msgstr "Ûplöäd tränslätïön Ⱡ'σ#"
+
+#: common/templates/js/image-modal.underscore
+msgid "Fullscreen"
+msgstr "Füllsçréén Ⱡ#"
+
+#: common/templates/js/image-modal.underscore
+msgid "Large"
+msgstr "Lärgé Ⱡ'σяєм ι#"
+
+#: common/templates/js/image-modal.underscore
+msgid "Zoom In"
+msgstr "Zööm Ìn #"
+
+#: common/templates/js/image-modal.underscore
+msgid "Zoom Out"
+msgstr "Zööm Öüt #"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Common Problem Types"
+msgstr "Çömmön Prößlém Týpés Ⱡ'σя#"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Advanced"
+msgstr "Àdvänçéd #"
+
+#: cms/templates/js/add-xblock-component.underscore
+msgid "Add New Component"
+msgstr "Àdd Néw Çömpönént Ⱡ'σ#"
+
+#: cms/templates/js/asset-library.underscore
+msgid "List of uploaded files and assets in this course"
+msgstr "Lïst öf üplöädéd fïlés änd ässéts ïn thïs çöürsé Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Embed URL"
+msgstr "Émßéd ÛRL #"
+
+#: cms/templates/js/asset-library.underscore
+msgid "External URL"
+msgstr "Éxtérnäl ÛRL Ⱡ#"
+
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/basic-modal.underscore
+msgid "Actions"
+msgstr "Àçtïöns #"
+
+#: cms/templates/js/asset-library.underscore
+msgid "You haven't added any assets to this course yet."
+msgstr "Ýöü hävén't äddéd äný ässéts tö thïs çöürsé ýét. Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Upload your first asset"
+msgstr "Ûplöäd ýöür fïrst ässét Ⱡ'σяє#"
+
+#: cms/templates/js/asset-upload-modal.underscore
+msgid "close"
+msgstr "çlösé Ⱡ'σяєм ι#"
+
+#: cms/templates/js/asset.underscore
+msgid "Open/download this file"
+msgstr "Öpén/döwnlöäd thïs fïlé Ⱡ'σяє#"
+
+#: cms/templates/js/asset.underscore
+msgid "Delete this asset"
+msgstr "Délété thïs ässét Ⱡ'σ#"
+
+#: cms/templates/js/asset.underscore
+msgid "Lock this asset"
+msgstr "Löçk thïs ässét Ⱡ'#"
+
+#: cms/templates/js/asset.underscore
+msgid "Lock/unlock file"
+msgstr "Löçk/ünlöçk fïlé Ⱡ'σ#"
+
+#: cms/templates/js/checklist.underscore
+msgid "{number}% of checklists completed"
+msgstr "{number}% öf çhéçklïsts çömplétéd Ⱡ'σяєм #"
+
+#: cms/templates/js/checklist.underscore
+msgid "Tasks Completed:"
+msgstr "Täsks Çömplétéd: Ⱡ'σ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Assignment Type Name"
+msgstr "Àssïgnmént Týpé Nämé Ⱡ'σя#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "e.g. Homework, Midterm Exams"
+msgstr "é.g. Höméwörk, Mïdtérm Éxäms Ⱡ'σяєм #"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Abbreviation"
+msgstr "Àßßrévïätïön Ⱡ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "e.g. HW, Midterm"
+msgstr "é.g. HW, Mïdtérm Ⱡ'σ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Weight of Total Grade"
+msgstr "Wéïght öf Tötäl Grädé Ⱡ'σя#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "as a percent, e.g. 40"
+msgstr "äs ä pérçént, é.g. 40 Ⱡ'σя#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Total Number"
+msgstr "Tötäl Nümßér Ⱡ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "total exercises assigned"
+msgstr "tötäl éxérçïsés ässïgnéd Ⱡ'σяє#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Number of Droppable"
+msgstr "Nümßér öf Dröppäßlé Ⱡ'σя#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "total exercises that won't be graded"
+msgstr "tötäl éxérçïsés thät wön't ßé grädéd Ⱡ'σяєм ιρ#"
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid "You have no handouts defined"
+msgstr "Ýöü hävé nö händöüts défïnéd Ⱡ'σяєм #"
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid ""
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
+msgstr ""
+"Théré ïs ïnvälïd çödé ïn ýöür çöntént. Pléäsé çhéçk tö mäké süré ït ïs välïd"
+" HTML. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Name"
+msgstr "Çhäptér Nämé Ⱡ#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter %s"
+msgstr "Çhäptér %s Ⱡ#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "provide the title/name of the chapter that will be used in navigating"
+msgstr ""
+"prövïdé thé tïtlé/nämé öf thé çhäptér thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Asset"
+msgstr "Çhäptér Àssét Ⱡ'#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH%d.pdf"
+msgstr "päth/tö/ïntrödüçtïönTöÇöökïéBäkïng-ÇH%d.pdf Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "upload a PDF file or provide the path to a Studio asset file"
+msgstr ""
+"üplöäd ä PDF fïlé ör prövïdé thé päth tö ä Stüdïö ässét fïlé Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Upload PDF"
+msgstr "Ûplöäd PDF Ⱡ#"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "delete chapter"
+msgstr "délété çhäptér Ⱡ'#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "error.message"
+msgstr "érrör.méssägé Ⱡ'#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook information"
+msgstr "Téxtßöök ïnförmätïön Ⱡ'σя#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook Name"
+msgstr "Téxtßöök Nämé Ⱡ'#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Introduction to Cookie Baking"
+msgstr "Ìntrödüçtïön tö Çöökïé Bäkïng Ⱡ'σяєм #"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid ""
+"provide the title/name of the text book as you would like your students to "
+"see it"
+msgstr ""
+"prövïdé thé tïtlé/nämé öf thé téxt ßöök äs ýöü wöüld lïké ýöür stüdénts tö "
+"séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Chapter(s) information"
+msgstr "Çhäptér(s) ïnförmätïön Ⱡ'σяє#"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Add a Chapter"
+msgstr "Àdd ä Çhäptér Ⱡ'#"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Add"
+msgstr "Àdd Ⱡ'σя#"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+#: cms/templates/js/mock/mock-xmodule-editor.underscore
+#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Clear Value"
+msgstr "Çléär Välüé Ⱡ#"
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Replace"
+msgstr "Répläçé #"
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Download"
+msgstr "Döwnlöäd #"
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "You haven't added any textbooks to this course yet."
+msgstr "Ýöü hävén't äddéd äný téxtßööks tö thïs çöürsé ýét. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "Add your first textbook"
+msgstr "Àdd ýöür fïrst téxtßöök Ⱡ'σяє#"
+
+#: cms/templates/js/paging-footer.underscore
+#: cms/templates/js/paging-header.underscore
+msgid "Previous"
+msgstr "Prévïöüs #"
+
+#: cms/templates/js/paging-footer.underscore
+msgid "Page number"
+msgstr "Pägé nümßér Ⱡ#"
+
+#: cms/templates/js/paging-footer.underscore
+#: cms/templates/js/paging-header.underscore
+msgid "Next"
+msgstr "Néxt Ⱡ'σяєм#"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Vïéw Lïvé #"
+
+#: cms/templates/js/upload-dialog.underscore
+msgid "File upload succeeded"
+msgstr "Fïlé üplöäd süççéédéd Ⱡ'σя#"
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Add URLs for additional versions"
+msgstr "Àdd ÛRLs för äddïtïönäl vérsïöns Ⱡ'σяєм ι#"
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid ""
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
+"another version. These URLs cannot be YouTube URLs. The first listed video "
+"that\\'s compatible with the student\\'s computer will play."
+msgstr ""
+"Tö ßé süré äll stüdénts çän äççéss thé vïdéö, wé réçömménd prövïdïng ßöth än"
+" .mp4 änd ä .wéßm vérsïön öf ýöür vïdéö. Çlïçk ßélöw tö ädd ä ÛRL för "
+"änöthér vérsïön. Thésé ÛRLs çännöt ßé ÝöüTüßé ÛRLs. Thé fïrst lïstéd vïdéö "
+"thät\\'s çömpätïßlé wïth thé stüdént\\'s çömpütér wïll pläý. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υη#"
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Default Timed Transcript"
+msgstr "Défäült Tïméd Tränsçrïpt Ⱡ'σяє#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Timed Transcript Conflict"
+msgstr "Tïméd Tränsçrïpt Çönflïçt Ⱡ'σяєм#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid ""
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
+msgstr ""
+"Thé tïméd tränsçrïpt för thé fïrst vïdéö fïlé döés nöt äppéär tö ßé thé sämé"
+" äs thé tïméd tränsçrïpt för thé séçönd vïdéö fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid "Which timed transcript would you like to use?"
+msgstr "Whïçh tïméd tränsçrïpt wöüld ýöü lïké tö üsé? Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Error."
+msgstr "Érrör. Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid "Timed Transcript from"
+msgstr "Tïméd Tränsçrïpt fröm Ⱡ'σя#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid "Timed Transcript Found"
+msgstr "Tïméd Tränsçrïpt Föünd Ⱡ'σяє#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript. "
+"If you want to replace this transcript, upload a new .srt transcript file."
+msgstr ""
+"ÉdX häs ä tïméd tränsçrïpt för thïs vïdéö. Ìf ýöü wänt tö édït thïs "
+"tränsçrïpt, ýöü çän döwnlöäd, édït, änd ré-üplöäd thé éxïstïng tränsçrïpt. "
+"Ìf ýöü wänt tö répläçé thïs tränsçrïpt, üplöäd ä néw .srt tränsçrïpt fïlé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Upload New Transcript"
+msgstr "Ûplöäd Néw Tränsçrïpt Ⱡ'σя#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Upload New .srt Transcript"
+msgstr "Ûplöäd Néw .srt Tränsçrïpt Ⱡ'σяєм#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Download Transcript for Editing"
+msgstr "Döwnlöäd Tränsçrïpt för Édïtïng Ⱡ'σяєм ι#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "No EdX Timed Transcript"
+msgstr "Nö ÉdX Tïméd Tränsçrïpt Ⱡ'σяє#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid ""
+"EdX doesn\\'t have a timed transcript for this video in Studio, but we found"
+" a transcript on YouTube. You can import the YouTube transcript or upload "
+"your own .srt transcript file."
+msgstr ""
+"ÉdX döésn\\'t hävé ä tïméd tränsçrïpt för thïs vïdéö ïn Stüdïö, ßüt wé föünd"
+" ä tränsçrïpt ön ÝöüTüßé. Ýöü çän ïmpört thé ÝöüTüßé tränsçrïpt ör üplöäd "
+"ýöür öwn .srt tränsçrïpt fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Import YouTube Transcript"
+msgstr "Ìmpört ÝöüTüßé Tränsçrïpt Ⱡ'σяєм#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid "No Timed Transcript"
+msgstr "Nö Tïméd Tränsçrïpt Ⱡ'σя#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid ""
+"EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
+"file."
+msgstr ""
+"ÉdX döésn\\'t hävé ä tïméd tränsçrïpt för thïs vïdéö. Pléäsé üplöäd än .srt "
+"fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid ""
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
+msgstr ""
+"Thé tïméd tränsçrïpt för thïs vïdéö ön édX ïs öüt öf däté, ßüt ÝöüTüßé häs ä"
+" çürrént tïméd tränsçrïpt för thïs vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Do you want to replace the edX transcript with the YouTube transcript?"
+msgstr ""
+"Dö ýöü wänt tö répläçé thé édX tränsçrïpt wïth thé ÝöüTüßé tränsçrïpt? "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Yes, replace the edX transcript with the YouTube transcript"
+msgstr ""
+"Ýés, répläçé thé édX tränsçrïpt wïth thé ÝöüTüßé tränsçrïpt Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Timed Transcript Uploaded Successfully"
+msgstr "Tïméd Tränsçrïpt Ûplöädéd Süççéssfüllý Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to replace this "
+"transcript, upload a new .srt transcript file. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript."
+msgstr ""
+"ÉdX häs ä tïméd tränsçrïpt för thïs vïdéö. Ìf ýöü wänt tö répläçé thïs "
+"tränsçrïpt, üplöäd ä néw .srt tränsçrïpt fïlé. Ìf ýöü wänt tö édït thïs "
+"tränsçrïpt, ýöü çän döwnlöäd, édït, änd ré-üplöäd thé éxïstïng tränsçrïpt. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Confirm Timed Transcript"
+msgstr "Çönfïrm Tïméd Tränsçrïpt Ⱡ'σяє#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid ""
+"You changed a video URL, but did not change the timed transcript file. Do "
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
+msgstr ""
+"Ýöü çhängéd ä vïdéö ÛRL, ßüt dïd nöt çhängé thé tïméd tränsçrïpt fïlé. Dö "
+"ýöü wänt tö üsé thé çürrént tïméd tränsçrïpt ör üplöäd ä néw .srt tränsçrïpt"
+" fïlé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Use Current Transcript"
+msgstr "Ûsé Çürrént Tränsçrïpt Ⱡ'σяє#"
