@@ -1238,14 +1238,14 @@ class FormulaEquationInput(InputTypeBase):
            'request_start' : <time sent with request>
         }
         """
-
+        _ = self.capa_system.i18n.ugettext
         result = {'preview': '',
                   'error': ''}
 
         try:
             formula = get['formula']
         except KeyError:
-            result['error'] = "No formula specified."
+            result['error'] = _("No formula specified.")
             return result
 
         result['request_start'] = int(get.get('request_start', 0))
@@ -1256,14 +1256,14 @@ class FormulaEquationInput(InputTypeBase):
             # or something, and this is where we would need to pass those in.
             result['preview'] = latex_preview(formula)
         except pyparsing.ParseException as err:
-            result['error'] = "Sorry, couldn't parse formula"
+            result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
         except Exception:
             # this is unexpected, so log
             log.warning(
                 "Error while previewing formula", exc_info=True
             )
-            result['error'] = "Error while rendering preview"
+            result['error'] = _("Error while rendering preview")
 
         return result
 
