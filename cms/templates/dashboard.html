@@ -3,6 +3,7 @@
 <%!
 import json
 
+from contentstore.views.helpers import EDITING_TEMPLATES
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 %>
@@ -12,7 +13,7 @@ from django.utils.translation import ugettext as _
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["checklist"]:
+% for template_name in EDITING_TEMPLATES:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

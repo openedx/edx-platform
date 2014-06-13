@@ -8,8 +8,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
         var DashboardPage = BaseView.extend({
             // takes XBlockTypes as a model
 
-            view: 'dashboard_view',
-
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
             },
@@ -31,6 +29,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
 
             onXBlockRefresh: function(xblockView) {
                 this.addButtonActions(xblockView.$el);
+                this.$('.article').hide();
             },
 
             addButtonActions: function(element) {
@@ -53,22 +52,23 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 var parentElement = this.$('.dashboard-section-features'),
                     i, xblockType, usedXBlocksTable, unusedXBlocksListElement;
 
-                parentElement.append('<h3>Features used in this course</h3>')
-                usedXBlocksTable = $('<table></table>').appendTo(parentElement);
-                usedXBlocksTable.append('<tr><th>Name</th><th>Count</th></tr>');
+                parentElement.append('<h3>Features used in this course</h3>');
+                usedXBlocksTable = $('<table class="feature-table"></table>').appendTo(parentElement);
+                usedXBlocksTable.append('<thead><tr><th>Name</th><th>Count</th><th>Publish Status</th></tr></thead>');
                 for (i=0; i < this.model.length; i++) {
                     xblockType = this.model.at(i);
                     if (xblockType.get('locators').length > 0) {
-                        usedXBlocksTable.append(interpolate('<tr><td><a href="%(studio_url)s">%(display_name)s</a></td><td>%(count)s</td></tr>', {
+                        usedXBlocksTable.append(interpolate('<tr><td><a href="%(studio_url)s">%(display_name)s</a></td><td>%(count)s</td><td>%(publish_status)s</td></tr>', {
                                 studio_url: xblockType.get('studio_url'),
                                 display_name: xblockType.get('display_name'),
-                                count: xblockType.get('locators').length
+                                count: xblockType.get('locators').length,
+                                publish_status: xblockType.get('publish_status')
                             },
                             true));
                     }
                 }
 
-                parentElement.append('<h3>Unused features</h3>')
+                parentElement.append('<h3>Unused features</h3>');
                 unusedXBlocksListElement = $('<ul></ul>').appendTo(parentElement);
                 for (i=0; i < this.model.length; i++) {
                     xblockType = this.model.at(i);
@@ -89,8 +89,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 for (i=0; i < locators.length; i++) {
                     locator = locators[i];
                     placeholderElement = $('<div data-locator="' + locator + '"></div>').appendTo(parentElement);
-                    this.refreshChildXBlock(placeholderElement);
+                    this.refreshChildXBlock(placeholderElement, true);
                 }
+            },
+
+            findXBlockElement: function(target) {
+                return $(target).closest('.studio-xblock-wrapper');
             },
 
             editComponent: function(xblockElement) {
@@ -103,13 +107,34 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 });
             },
 
+            deleteComponent: function(xblockElement) {
+                var self = this;
+                this.confirmThenRunOperation(gettext('Delete this component?'),
+                    gettext('Deleting this component is permanent and cannot be undone.'),
+                    gettext('Yes, delete this component'),
+                    function() {
+                        self.runOperationShowingMessage(gettext('Deleting&hellip;'),
+                            function() {
+                                var urlRoot = self.model.models[0].urlRoot;
+                                return $.ajax({
+                                    type: 'DELETE',
+                                    url: urlRoot + "/" +
+                                        xblockElement.data('locator') + "?" +
+                                        $.param({recurse: true, all_versions: false})
+                                }).success(function() {
+                                    xblockElement.remove();
+                                });
+                            });
+                    });
+            },
+
             /**
              * Refresh an xblock element inline on the page, using the specified xblockInfo.
              * Note that the element is removed and replaced with the newly rendered xblock.
              * @param xblockElement The xblock element to be refreshed.
              * @returns {promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement) {
+            refreshChildXBlock: function(xblockElement, collapsed) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -130,7 +155,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 });
                 temporaryView = new TemporaryXBlockView({
                     model: xblockInfo,
-                    view: 'dashboard_view',
+                    view: collapsed ? 'dashboard_collapsed_view' : 'dashboard_view',
                     el: xblockElement
                 });
                 return temporaryView.render({

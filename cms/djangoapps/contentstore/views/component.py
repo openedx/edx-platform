@@ -165,7 +165,7 @@ def unit_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
+        component_templates = get_component_templates(course)
 
         xblocks = item.get_children()
 
@@ -245,7 +245,7 @@ def container_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
+        component_templates = get_component_templates(course)
         ancestor_xblocks = get_ancestor_xblocks(xblock)
         unit = ancestor_xblocks[0] if ancestor_xblocks else None
         unit_publish_state = compute_publish_state(unit) if unit else None
@@ -263,7 +263,7 @@ def container_handler(request, usage_key_string):
         return HttpResponseBadRequest("Only supports html requests")
 
 
-def _get_component_templates(course):
+def get_component_templates(course):
     """
     Returns the applicable component templates that can be used by the specified course.
     """

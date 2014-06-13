@@ -181,7 +181,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
         unit_views = ['student_view']
-        dashboard_views = ['dashboard_view']
+        dashboard_views = ['dashboard_view', 'dashboard_collapsed_view']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -202,6 +202,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         elif view_name in (unit_views + container_views + dashboard_views):
             is_container_view = (view_name in container_views)
             is_dashboard_view = (view_name in dashboard_views)
+            is_collapsed = view_name == 'dashboard_collapsed_view'
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
@@ -218,6 +219,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 'runtime_type': 'studio',
                 'container_view': is_container_view,
                 'dashboard_view': is_dashboard_view,
+                'collapsed': is_collapsed,
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items

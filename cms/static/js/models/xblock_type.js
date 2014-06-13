@@ -6,6 +6,7 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
         defaults: {
             "id": null,
             "display_name": null,
+            "publish_status": "Unknown",
             "locators": [],
             "studio_url": null
         },
