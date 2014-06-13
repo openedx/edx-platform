@@ -11,10 +11,19 @@ from ..pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
-    DiscussionUserProfilePage
+    DiscussionUserProfilePage,
+    DiscussionTabHomePage
 )
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.discussion import SingleThreadViewFixture, UserProfileViewFixture, Thread, Response, Comment
+from ..fixtures.discussion import (
+    SingleThreadViewFixture,
+    UserProfileViewFixture,
+    SearchResultFixture,
+    Thread,
+    Response,
+    Comment,
+    SearchResult
+)
 
 
 class DiscussionResponsePaginationTestMixin(object):
@@ -405,3 +414,47 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
     def test_151_threads(self):
         self.check_pages(151)
+
+class DiscussionSearchAlertTest(UniqueCourseTest):
+    """
+    Tests for spawning and dismissing alerts related to user search actions and their results.
+    """
+
+    def setUp(self):
+        super(DiscussionSearchAlertTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+
+    def setup_corrected_text(self, text):
+        SearchResultFixture(SearchResult(corrected_text=text)).push()
+
+    def check_search_alert_messages(self, expected):
+        actual = self.page.get_search_alert_messages()
+        self.assertTrue(all(map(lambda msg, sub: msg.find(sub) >= 0, actual, expected)))
+
+    def test_no_rewrite(self):
+        self.setup_corrected_text(None)
+        self.page.perform_search()
+        self.check_search_alert_messages([])
+
+    def test_rewrite_dismiss(self):
+        self.setup_corrected_text("foo")
+        self.page.perform_search()
+        self.check_search_alert_messages(["foo"])
+        self.page.dismiss_alert_message("foo")
+        self.check_search_alert_messages([])
+
+    def test_new_search(self):
+        self.setup_corrected_text("foo")
+        self.page.perform_search()
+        self.check_search_alert_messages(["foo"])
+
+        self.setup_corrected_text("bar")
+        self.page.perform_search()
+        self.check_search_alert_messages(["bar"])
+
+        self.setup_corrected_text(None)
+        self.page.perform_search()
+        self.check_search_alert_messages([])

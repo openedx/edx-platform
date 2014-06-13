@@ -20,7 +20,7 @@ from mock import Mock
 from . import LogicTest
 from lxml import etree
 from opaque_keys.edx.locations import Location
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_ext
+from xmodule.video_module import VideoDescriptor, create_youtube_string
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -106,18 +106,6 @@ class VideoModuleTest(LogicTest):
              '1.25': '',
              '1.50': ''}
         )
-
-    def test_get_ext(self):
-        """Test get the file's extension in a url without query string."""
-        filename_str = 'http://www.example.com/path/video.mp4'
-        output = get_ext(filename_str)
-        self.assertEqual(output, 'mp4')
-
-    def test_get_ext_with_query_string(self):
-        """Test get the file's extension in a url with query string."""
-        filename_str = 'http://www.example.com/path/video.mp4?param1=1&p2=2'
-        output = get_ext(filename_str)
-        self.assertEqual(output, 'mp4')
 
 
 class VideoDescriptorTest(unittest.TestCase):

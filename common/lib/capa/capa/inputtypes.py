@@ -50,6 +50,7 @@ import pyparsing
 import html5lib
 import bleach
 
+from .util import sanitize_html
 from .registry import TagRegistry
 from chem import chemcalc
 from calc.preview import latex_preview
@@ -821,19 +822,7 @@ class MatlabInput(CodeInput):
         # this is only set if we don't have a graded response
         # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
-            attributes = bleach.ALLOWED_ATTRIBUTES.copy()
-            # Yuck! but bleach does not offer the option of passing in allowed_protocols,
-            # and matlab uses data urls for images
-            if u'data' not in bleach.BleachSanitizer.allowed_protocols:
-                bleach.BleachSanitizer.allowed_protocols.append(u'data')
-            attributes.update({'*': ['class', 'style', 'id'],
-                    'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
-                    'img': ['src', 'width', 'height', 'class']})
-            self.queue_msg = bleach.clean(self.input_state['queue_msg'],
-                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
-                    styles=['white-space'],
-                    attributes=attributes
-                    )
+            self.queue_msg = sanitize_html(self.input_state['queue_msg'])
 
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
@@ -905,6 +894,7 @@ class MatlabInput(CodeInput):
             'button_enabled': self.button_enabled(),
             'matlab_editor_js': '{static_url}js/vendor/CodeMirror/octave.js'.format(
                 static_url=self.capa_system.STATIC_URL),
+            'msg': sanitize_html(self.msg)  # sanitize msg before rendering into template
         }
         return extra_context
 

@@ -142,7 +142,7 @@ function (HTML5Video, Resizer) {
         if (state.videoType === 'html5') {
             state.videoPlayer.player = new HTML5Video.Player(state.el, {
                 playerVars:   state.videoPlayer.playerVars,
-                videoSources: state.html5Sources,
+                videoSources: state.config.sources,
                 events: {
                     onReady:       state.videoPlayer.onReady,
                     onStateChange: state.videoPlayer.onStateChange

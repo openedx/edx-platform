@@ -7,8 +7,8 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
     editorMode: 'editor-mode'
 
     events:
-      "click .component-actions .edit-button": 'clickEditButton'
-      "click .component-actions .delete-button": 'onDelete'
+      "click .edit-button": 'clickEditButton'
+      "click .delete-button": 'onDelete'
 
     initialize: ->
       @onDelete = @options.onDelete
@@ -38,6 +38,7 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
         $.ajax(
           url: "#{decodeURIComponent(@model.url())}/#{viewName}"
           type: 'GET'
+          cache: false
           headers:
             Accept: 'application/json'
           success: (fragment) =>

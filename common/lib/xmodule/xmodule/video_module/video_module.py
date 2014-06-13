@@ -35,14 +35,7 @@ from .video_utils import create_youtube_string
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
-from urlparse import urlparse
-
-
-def get_ext(filename):
-    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
-    path = urlparse(filename).path
-    return path.rpartition('.')[-1]
-
+from xmodule.video_module import manage_video_subtitles_save
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
@@ -97,15 +90,15 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
 
     def get_html(self):
         track_url = None
+        download_video_link = None
         transcript_download_format = self.transcript_download_format
-
-        sources = {get_ext(src): src for src in self.html5_sources}
+        sources = filter(None, self.html5_sources)
 
         if self.download_video:
             if self.source:
-                sources['main'] = self.source
+                download_video_link = self.source
             elif self.html5_sources:
-                sources['main'] = self.html5_sources[0]
+                download_video_link = self.html5_sources[0]
 
         if self.download_track:
             if self.track:
@@ -149,7 +142,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'handout': self.handout,
             'id': self.location.html_id(),
             'show_captions': json.dumps(self.show_captions),
-            'sources': sources,
+            'download_video_link': download_video_link,
+            'sources': json.dumps(sources),
             'speed': json.dumps(self.speed),
             'general_speed': self.global_speed,
             'saved_video_position': self.saved_video_position.total_seconds(),
@@ -230,6 +224,17 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         download_track = editable_fields['download_track']
         if not download_track['explicitly_set'] and self.track:
             self.download_track = True
+
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Used to update video subtitles.
+        """
+        manage_video_subtitles_save(
+            self,
+            user,
+            old_metadata if old_metadata else None,
+            generate_translation=True
+        )
 
     def save_with_metadata(self, user):
         """

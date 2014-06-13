@@ -109,6 +109,56 @@ class CoursePagesTest(UniqueCourseTest):
             page.visit()
 
 
+class CourseSectionTest(UniqueCourseTest):
+    """
+    Tests that verify the sections name editable only inside headers in Studio Course Outline that you can get to
+    when logged in and have a course.
+    """
+
+    COURSE_ID_SEPARATOR = "."
+
+    def setUp(self):
+        """
+        Install a course with no content using a fixture.
+        """
+        super(CourseSectionTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True).visit()
+        self.course_outline_page = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section')
+        ).install()
+
+        self.course_outline_page.visit()
+
+    def test_section_name_editable_in_course_outline(self):
+        """
+        Check that section name is editable on course outline page.
+        """
+        section_name = self.course_outline_page.get_section_name()[0]
+        self.assertEqual(section_name, "Test Section")
+        self.course_outline_page.change_section_name("Test Section New")
+        section_name = self.course_outline_page.get_section_name(page_refresh=True)[0]
+        self.assertEqual(section_name, "Test Section New")
+
+    def test_section_name_not_editable_inside_modal(self):
+        """
+        Check that section name is not editable inside "Section Release Date" modal on course outline page.
+        """
+        parent_css='div.modal-window'
+        self.course_outline_page.click_release_date()
+        section_name = self.course_outline_page.get_section_name(parent_css)[0]
+        self.assertEqual(section_name, '"Test Section"')
+        self.course_outline_page.click_section_name(parent_css)
+        section_name_edit_form = self.course_outline_page.section_name_edit_form_present(parent_css)
+        self.assertFalse(section_name_edit_form)
+
 class DiscussionPreviewTest(UniqueCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio

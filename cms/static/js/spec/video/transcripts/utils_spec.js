@@ -26,7 +26,7 @@ describe('Transcripts.Utils', function () {
         } (videoId)),
         html5FileName = 'file_name',
         html5LinksList =  (function (videoName) {
-            var videoTypes = ['mp4', 'webm'],
+            var videoTypes = ['mp4', 'webm', 'm4v', 'ogv'],
                 links = [
                     'http://somelink.com/%s.%s?param=1&param=2#hash',
                     'http://somelink.com/%s.%s#hash',
@@ -34,6 +34,7 @@ describe('Transcripts.Utils', function () {
                     'http://somelink.com/%s.%s',
                     'ftp://somelink.com/%s.%s',
                     'https://somelink.com/%s.%s',
+                    'https://somelink.com/sub/sub/%s.%s',
                     'http://cdn.somecdn.net/v/%s.%s',
                     'somelink.com/%s.%s',
                      '%s.%s'
@@ -48,7 +49,25 @@ describe('Transcripts.Utils', function () {
 
             return data;
 
-        } (html5FileName));
+        } (html5FileName)),
+        otherLinkId = 'other_link_id',
+        otherLinksList =  (function (linkId) {
+            var links = [
+                    'http://goo.gl/%s?param=1&param=2#hash',
+                    'http://goo.gl/%s?param=1&param=2',
+                    'http://goo.gl/%s#hash',
+                    'http://goo.gl/%s',
+                    'http://goo.gl/%s',
+                    'ftp://goo.gl/%s',
+                    'https://goo.gl/%s',
+                     '%s'
+                ];
+
+            return $.map(links, function (link) {
+                return _str.sprintf(link, linkId);
+            });
+
+        } (otherLinkId));
 
     describe('Method: getField', function (){
         var collection,
@@ -107,7 +126,6 @@ describe('Transcripts.Utils', function () {
         });
 
         describe('Wrong arguments ', function () {
-
             beforeEach(function(){
                 spyOn(console, 'log');
             });
@@ -124,18 +142,9 @@ describe('Transcripts.Utils', function () {
                 expect(result).toBeUndefined();
             });
 
-            it('videoId is wrong', function () {
-                var videoId = 'wrong_id',
-                    link = 'http://youtu.be/' + videoId,
-                    result = Utils.parseYoutubeLink(link);
-
-                expect(result).toBeUndefined();
-            });
-
             var wrongUrls = [
-                'http://youtu.bee/' + videoId,
                 'http://youtu.be/',
-                'example.com',
+                '/static/example',
                 'http://google.com/somevideo.mp4'
             ];
 
@@ -163,10 +172,20 @@ describe('Transcripts.Utils', function () {
                     });
                 });
             });
+
+            $.each(otherLinksList, function (index, link) {
+                it(link, function () {
+                    var result = Utils.parseHTML5Link(link);
+
+                    expect(result).toEqual({
+                        video: otherLinkId,
+                        type: 'other'
+                    });
+                });
+            });
         });
 
         describe('Wrong arguments ', function () {
-
             beforeEach(function(){
                 spyOn(console, 'log');
             });
@@ -184,15 +203,11 @@ describe('Transcripts.Utils', function () {
             });
 
             var html5WrongUrls = [
-                'http://youtu.bee/' + videoId,
                 'http://youtu.be/',
-                'example.com',
-                'http://google.com/somevideo.mp1',
-                'http://google.com/somevideomp4',
-                'http://google.com/somevideo_mp4',
-                'http://google.com/somevideo:mp4',
-                'http://google.com/somevideo',
-                'http://google.com/somevideo.webm_'
+                'http://example.com/.mp4',
+                'http://example.com/video_name.',
+                'http://example.com/',
+                'http://example.com'
             ];
 
             $.each(html5WrongUrls, function (index, link) {
@@ -248,6 +263,13 @@ describe('Transcripts.Utils', function () {
         });
 
         describe('Wrong arguments ', function () {
+            it('youtube videoId is wrong', function () {
+                var videoId = 'wrong_id',
+                    link = 'http://youtu.be/' + videoId,
+                    result = Utils.parseLink(link);
+
+                expect(result).toEqual({ mode : 'incorrect' });
+            });
 
             it('no arguments', function () {
                 var result = Utils.parseLink();

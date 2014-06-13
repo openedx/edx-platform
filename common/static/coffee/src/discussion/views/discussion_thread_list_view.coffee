@@ -36,7 +36,36 @@ if Backbone?
       @current_search = ""
       @mode = 'all'
 
+      @searchAlertCollection = new Backbone.Collection([], {model: Backbone.Model})
+
+      @searchAlertCollection.on "add", (searchAlert) =>
+        content = _.template(
+          $("#search-alert-template").html(),
+          {'message': searchAlert.attributes.message, 'cid': searchAlert.cid}
+          )
+        @$(".search-alerts").append(content)
+        @$("#search-alert-" + searchAlert.cid + " a.dismiss").bind "click", searchAlert, (event) =>
+          @removeSearchAlert(event.data.cid)
+
+      @searchAlertCollection.on "remove", (searchAlert) =>
+        @$("#search-alert-" + searchAlert.cid).remove()
+
+      @searchAlertCollection.on "reset", =>
+        @$(".search-alerts").empty()
+
+    addSearchAlert: (message) =>
+      m = new Backbone.Model({"message": message})
+      @searchAlertCollection.add(m)
+      m
+
+    removeSearchAlert: (searchAlert) =>
+      @searchAlertCollection.remove(searchAlert)
+
+    clearSearchAlerts: =>
+      @searchAlertCollection.reset()
+
     reloadDisplayedCollection: (thread) =>
+      @clearSearchAlerts()
       thread_id = thread.get('id')
       content = @renderThread(thread)
       current_el = @$("a[data-id=#{thread_id}]")
@@ -405,6 +434,7 @@ if Backbone?
         @searchFor(text)
 
     searchFor: (text, callback, value) ->
+      @clearSearchAlerts()
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
@@ -429,6 +459,8 @@ if Backbone?
             Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages
+            if !_.isNull response.corrected_text
+              @addSearchAlert('Showing results for "' + response.corrected_text + '"');
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway

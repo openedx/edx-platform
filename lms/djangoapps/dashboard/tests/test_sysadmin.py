@@ -164,13 +164,13 @@ class TestSysadmin(SysadminBaseTestCase):
                                     {'action': 'create_user',
                                      'student_fullname': 'blah',
                                      'student_password': 'foozor', })
-        self.assertIn(_('Must provide username'), response.content.decode('utf-8'))
+        self.assertIn('Must provide username', response.content.decode('utf-8'))
         # no full name
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'create_user',
                                      'student_uname': 'test_cuser+sysadmin@edx.org',
                                      'student_password': 'foozor', })
-        self.assertIn(_('Must provide full name'), response.content.decode('utf-8'))
+        self.assertIn('Must provide full name', response.content.decode('utf-8'))
 
         # Test create valid user
         self.client.post(reverse('sysadmin'),
@@ -195,20 +195,20 @@ class TestSysadmin(SysadminBaseTestCase):
         # Try no username
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user', })
-        self.assertIn(_('Must provide username'), response.content.decode('utf-8'))
+        self.assertIn('Must provide username', response.content.decode('utf-8'))
 
         # Try bad usernames
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user',
                                      'student_uname': 'flabbergast@example.com',
                                      'student_fullname': 'enigma jones', })
-        self.assertIn(_('Cannot find user with email address'), response.content.decode('utf-8'))
+        self.assertIn('Cannot find user with email address', response.content.decode('utf-8'))
 
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user',
                                      'student_uname': 'flabbergast',
                                      'student_fullname': 'enigma jones', })
-        self.assertIn(_('Cannot find user with username'), response.content.decode('utf-8'))
+        self.assertIn('Cannot find user with username', response.content.decode('utf-8'))
 
         self.client.post(reverse('sysadmin'),
                          {'action': 'del_user',
@@ -271,9 +271,9 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'repair_eamap', })
 
-        self.assertIn('{0} test0'.format(_('Failed in authenticating')),
+        self.assertIn('{0} test0'.format('Failed in authenticating'),
                       response.content)
-        self.assertIn(_('fixed password'), response.content.decode('utf-8'))
+        self.assertIn('fixed password', response.content.decode('utf-8'))
 
         self.assertTrue(self.client.login(username='test0',
                                           password=eamap.internal_password))
@@ -282,7 +282,7 @@ class TestSysadmin(SysadminBaseTestCase):
         self._setstaff_login()
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'repair_eamap', })
-        self.assertIn(_('All ok!'), response.content.decode('utf-8'))
+        self.assertIn('All ok!', response.content.decode('utf-8'))
 
     def test_xml_course_add_delete(self):
         """add and delete course from xml module store"""
@@ -299,7 +299,7 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self.client.post(reverse('sysadmin_courses'), {
             'repo_location': 'http://example.com/not_real.git',
             'action': 'add_course', })
-        self.assertIn(_('Unable to clone or pull repository'),
+        self.assertIn('Unable to clone or pull repository',
                       response.content.decode('utf-8'))
         # Create git loaded course
         response = self._add_edx4edx()
@@ -333,7 +333,7 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self.client.post(reverse('sysadmin_courses'),
                                     {'course_id': 'foobar/foo/blah',
                                      'action': 'del_course', })
-        self.assertIn(_('Error - cannot get course with ID'),
+        self.assertIn('Error - cannot get course with ID',
                       response.content.decode('utf-8'))
 
     @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=False)
@@ -375,8 +375,8 @@ class TestSysadmin(SysadminBaseTestCase):
                                     {'action': 'get_staff_csv', })
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
-        columns = [_('course_id'), _('role'), _('username'),
-                   _('email'), _('full_name'), ]
+        columns = ['course_id', 'role', 'username',
+                   'email', 'full_name', ]
         self.assertIn(','.join('"' + c + '"' for c in columns),
                       response.content)
 
