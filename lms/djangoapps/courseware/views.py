@@ -354,6 +354,13 @@ def index(request, course_id, chapter=None, section=None,
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_key, user, section_descriptor, depth=None)
 
+            # Verify that position a string is in fact an int
+            if position is not None:
+                try:
+                    int(position)
+                except ValueError:
+                    raise Http404("Position {} is not an integer!".format(position))
+
             section_module = get_module_for_descriptor(
                 request.user,
                 request,
