@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Chinese (Hong Kong) (http://www.transifex.com/projects/p/edx-platform/language/zh_HK/).
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-11 11:15-0400\n"
+"POT-Creation-Date: 2014-06-12 12:23-0400\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Hong Kong) (http://www.transifex.com/projects/p/edx-platform/language/zh_HK/)\n"
@@ -456,6 +456,12 @@ msgstr[0] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid ""
+"No results found for %(original_query)s. Showing results for "
+"%(suggested_query)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
