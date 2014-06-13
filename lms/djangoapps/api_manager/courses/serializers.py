@@ -13,3 +13,8 @@ class CourseModuleCompletionSerializer(serializers.ModelSerializer):
         model = CourseModuleCompletion
         fields = ('id', 'user_id', 'course_id', 'content_id', 'created', 'modified')
         read_only = ('id', 'created')
+
+
+class GradeSerializer(serializers.Serializer):
+    """ Serializer for model interactions """
+    grade = serializers.Field()
