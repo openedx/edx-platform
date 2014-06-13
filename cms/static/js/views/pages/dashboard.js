@@ -86,6 +86,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 var locators = xblockType.get('locators'),
                     parentElement = this.$('.dashboard-section-components'),
                     locator, i, placeholderElement;
+                placeholderElement = $('<div></div>').appendTo(parentElement);
+                this.refreshXBlockTypeView(placeholderElement, xblockType, 'author_dashboard_view');
+                placeholderElement = parentElement.append('<hr></hr><h3>Course Components</h3>');
                 for (i=0; i < locators.length; i++) {
                     locator = locators[i];
                     placeholderElement = $('<div data-locator="' + locator + '"></div>').appendTo(parentElement);
@@ -134,7 +137,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
              * @param xblockElement The xblock element to be refreshed.
              * @returns {promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement, collapsed) {
+            refreshChildXBlock: function(xblockElement, collapsed, viewName) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -142,6 +145,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 xblockInfo = new XBlockInfo({
                     id: xblockElement.data('locator')
                 });
+                if (!viewName) {
+                    viewName = collapsed ? 'dashboard_collapsed_view' : 'dashboard_view';
+                }
                 // There is only one Backbone view created on the container page, which is
                 // for the container xblock itself. Any child xblocks rendered inside the
                 // container do not get a Backbone view. Thus, create a temporary view
@@ -155,7 +161,45 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/xbloc
                 });
                 temporaryView = new TemporaryXBlockView({
                     model: xblockInfo,
-                    view: collapsed ? 'dashboard_collapsed_view' : 'dashboard_view',
+                    view: viewName,
+                    el: xblockElement
+                });
+                return temporaryView.render({
+                    success: function() {
+                        self.onXBlockRefresh(temporaryView);
+                        temporaryView.unbind();  // Remove the temporary view
+                    }
+                });
+            },
+
+            /**
+             * Refresh an xblock element inline on the page, using the specified xblockInfo.
+             * Note that the element is removed and replaced with the newly rendered xblock.
+             * @param xblockElement The xblock element to be refreshed.
+             * @returns {promise} A promise representing the complete operation.
+             */
+            refreshXBlockTypeView: function(xblockElement, xblockType, viewName) {
+                var self = this,
+                    TemporaryXBlockTypeView,
+                    temporaryView;
+                TemporaryXBlockTypeView = XBlockView.extend({
+                    updateHtml: function(element, html) {
+                        // Replace the element with the new HTML content, rather than adding
+                        // it as child elements.
+                        this.$el = $(html).replaceAll(element);
+                    },
+
+                    getXBlockURL: function() {
+                        var studio_url = xblockType.get('studio_url'),
+                            course_key_index = studio_url.indexOf('/slashes:'),
+                            course_key_string = studio_url.substring(course_key_index),
+                            xblockUrl = '/xblock_type' + course_key_string;
+                        return decodeURIComponent(xblockUrl) + "/" + viewName;
+                    }
+                });
+                temporaryView = new TemporaryXBlockTypeView({
+                    model: xblockType,
+                    view: viewName,
                     el: xblockElement
                 });
                 return temporaryView.render({

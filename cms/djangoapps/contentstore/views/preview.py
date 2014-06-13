@@ -187,7 +187,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     return frag
 
 
-def get_preview_fragment(request, descriptor, context):
+def get_preview_fragment(request, descriptor, context, view_name='student_view'):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
@@ -195,7 +195,7 @@ def get_preview_fragment(request, descriptor, context):
     module = _load_preview_module(request, descriptor)
 
     try:
-        fragment = module.render("student_view", context)
+        fragment = module.render(view_name, context)
     except Exception as exc:                          # pylint: disable=W0703
         log.warning("Unable to render student_view for %r", module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))

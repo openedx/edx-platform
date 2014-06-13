@@ -12,10 +12,9 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             render: function(options) {
                 var self = this,
                     view = this.view,
-                    xblockInfo = this.model,
-                    xblockUrl = xblockInfo.url();
+                    xblockUrl = this.getXBlockURL(view);
                 return $.ajax({
-                    url: decodeURIComponent(xblockUrl) + "/" + view,
+                    url: xblockUrl,
                     type: 'GET',
                     cache: false,
                     headers: { Accept: 'application/json' },
@@ -23,6 +22,15 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                         self.handleXBlockFragment(fragment, options);
                     }
                 });
+            },
+
+            /**
+             * Returns the URL to be used to communicate with XBlock.
+             * @returns {*}
+             */
+            getXBlockURL: function(view) {
+                var xblockUrl = this.model.url();
+                return decodeURIComponent(xblockUrl) + "/" + view;
             },
 
             handleXBlockFragment: function(fragment, options) {
