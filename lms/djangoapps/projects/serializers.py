@@ -49,7 +49,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         model = Project
         fields = (
             'id', 'url', 'created', 'modified', 'course_id', 'content_id',
-            'workgroups'
+            'organization', 'workgroups'
         )
 
 
@@ -124,4 +124,15 @@ class WorkgroupSerializer(serializers.HyperlinkedModelSerializer):
             'id', 'url', 'created', 'modified', 'name', 'project',
             'groups', 'users', 'submissions',
             'workgroup_reviews', 'peer_reviews'
+        )
+
+
+class BasicWorkgroupSerializer(serializers.HyperlinkedModelSerializer):
+    """ Basic Workgroup Serializer to keep only basic fields """
+
+    class Meta:
+        """ Meta class for defining additional serializer characteristics """
+        model = Workgroup
+        fields = (
+            'id', 'url', 'created', 'modified', 'name', 'project',
         )
