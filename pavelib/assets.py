@@ -190,7 +190,7 @@ def watch_assets(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_asset_prereqs')
 @consume_args
 def update_assets(args):
     """
