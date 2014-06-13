@@ -97,6 +97,28 @@ class VideoPage(PageObject):
         video_selector = '{0}'.format(CSS_CLASS_NAMES['video_container'])
         self._wait_for_element(video_selector, 'Video is initialized')
 
+    def _wait_for_element_visibility(self, element_selector, promise_desc):
+        """
+        Wait for an element to be visible.
+
+        Arguments:
+            element_selector (str): css selector of the element.
+            promise_desc (str): Description of the Promise, used in log messages.
+
+        """
+
+        def _is_element_visible():
+            """
+            Check if a web-element is visible.
+
+            Returns:
+                bool: Tells element visibility status.
+
+            """
+            return self.q(css=element_selector).visible
+
+        EmptyPromise(_is_element_visible, promise_desc, timeout=200).fulfill()
+
     @wait_for_js
     def wait_for_video_player_render(self):
         """
@@ -106,6 +128,10 @@ class VideoPage(PageObject):
         self.wait_for_video_class()
         self._wait_for_element(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self._wait_for_element(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
+
+        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
+        for button in video_player_buttons:
+            self._wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
         def _is_finished_loading():
             """
@@ -381,9 +407,9 @@ class VideoPage(PageObject):
         button_selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS[button])
         self.q(css=button_selector).first.click()
 
-        if button == 'play':
-            # wait for video buffering
-            self._wait_for_video_play(video_display_name)
+        button_states = {'play': 'playing', 'pause': 'pause'}
+        if button in button_states:
+            self.wait_for_state(button_states[button], video_display_name)
 
         self.wait_for_ajax()
 
@@ -691,6 +717,9 @@ class VideoPage(PageObject):
         current_seek_position = self.q(css=selector).text[0]
         return current_seek_position.split('/')[0].strip()
 
+    def seconds(self, video_display_name=None):
+        return int(self.position(video_display_name).split(':')[1])
+
     def state(self, video_display_name=None):
         """
         Extract the current state (play, pause etc) of video.
@@ -772,6 +801,16 @@ class VideoPage(PageObject):
         js_code = "$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
             seek_selector=seek_selector, seek_time=seek_time)
         self.browser.execute_script(js_code)
+
+        # after seek, player goes into `is-buffered` state. we need to get
+        # out of this state before doing any further operation/action.
+        def _is_buffering_completed():
+            """
+            Check if buffering completed
+            """
+            return self.state(video_display_name) != 'buffering'
+
+        self._wait_for(_is_buffering_completed, 'Buffering completed after Seek.')
 
     def reload_page(self):
         """
