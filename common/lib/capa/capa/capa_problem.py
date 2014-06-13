@@ -133,6 +133,7 @@ class LoncapaProblem(object):
             seed (int): random number generator seed.
 
         """
+        # import pudb; pu.db
 
         ## Initialize class variables from state
         self.do_reset()

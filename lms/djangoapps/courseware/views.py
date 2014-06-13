@@ -685,6 +685,10 @@ def progress(request, course_id, student_id=None):
     with grades.manual_transaction():
         return _progress(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), student_id)
 
+EXCLUDED_LOCATION_CATEGORIES = {'video', 'html', 'discussion'}
+def location_filter(location):
+    return location.category not in EXCLUDED_LOCATION_CATEGORIES
+
 
 def _progress(request, course_key, student_id):
     """
@@ -713,9 +717,21 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, request, course)
+    with grades.manual_transaction():
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, student, course, depth=None, location_filter=location_filter
+        )
+
+    courseware_summary = grades.progress_summary(student, request, course, field_data_cache=field_data_cache)
     studio_url = get_studio_url(course_key, 'settings/grading')
-    grade_summary = grades.grade(student, request, course)
+    grade_summary = grades.grade(student, request, course, field_data_cache=field_data_cache)
+
+    # import pprint
+    # print "------------------------"
+    # print pprint.pprint(courseware_summary)
+    # print "------------------------"
+    # print pprint.pprint(grade_summary)
+    # print "------------------------"
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)

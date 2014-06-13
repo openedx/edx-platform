@@ -284,7 +284,7 @@ class XModuleMixin(XBlockMixin):
         else:
             return [self.display_name_with_default]
 
-    def get_children(self):
+    def get_children(self, location_filter=lambda location: True):
         """Returns a list of XBlock instances for the children of
         this module"""
 
@@ -294,6 +294,9 @@ class XModuleMixin(XBlockMixin):
         if getattr(self, '_child_instances', None) is None:
             self._child_instances = []  # pylint: disable=attribute-defined-outside-init
             for child_loc in self.children:
+                # Skip if it doesn't satisfy the filter function
+                if not location_filter(child_loc):
+                    continue
                 try:
                     child = self.runtime.get_block(child_loc)
                     child.runtime.export_fs = self.runtime.export_fs
@@ -481,6 +484,9 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
             for those fields.
         """
         # Set the descriptor first so that we can proxy to it
+
+        # import pudb; pu.db
+
         self.descriptor = descriptor
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None

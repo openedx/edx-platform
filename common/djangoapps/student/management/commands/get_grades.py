@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         total = enrolled_students.count()
         print "Total enrolled: {0}".format(total)
-        course = courses.get_course_by_id(course_key)
+        course = courses.get_course_by_id(course_key, depth=None)
         total = enrolled_students.count()
         start = datetime.datetime.now()
         rows = []

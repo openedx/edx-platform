@@ -77,9 +77,20 @@ class FieldDataCache(object):
                         location = cache_key[1]
                         self.locations_to_student_modules[location] = field_object
 
+    def possibly_graded_locations(self):
+        NEVER_HAS_GRADE = {
+            'course', 'chapter', 'section', 'sequence', 'vertical',
+            'discussions', 'html', 'video',
+        }
+        return {
+            loc for loc in self.locations_to_student_modules
+            if loc.category not in NEVER_HAS_GRADE
+        }
+
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
+                                         location_filter=lambda location: True,
                                          select_for_update=False):
         """
         course_id: the course in the context of which we want StudentModules.
@@ -110,7 +121,7 @@ class FieldDataCache(object):
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
+                for child in descriptor.get_children(location_filter=location_filter) + descriptor.get_required_module_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors
