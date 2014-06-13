@@ -17,6 +17,7 @@ from django.db.models import Q
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile
 from api_manager.organizations.serializers import OrganizationSerializer
+from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer
 
 from courseware import module_render
@@ -898,3 +899,30 @@ class UsersOrganizationsList(SecureListAPIView):
             raise Http404
 
         return user.organizations.all()
+
+
+class UsersWorkgroupsList(SecureListAPIView):
+    """
+    ### The UsersWorkgroupsList view allows clients to retrieve a list of workgroups a user
+    belongs to
+    - URI: ```/api/users/{user_id}/workgroups/```
+    - GET: Provides paginated list of workgroups for a user
+    To filter the user's workgroup set by course
+    GET ```/api/users/{user_id}/workgroups/?course={course_id}```
+    """
+
+    serializer_class = BasicWorkgroupSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        course_id = self.request.QUERY_PARAMS.get('course_id', None)
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        queryset = user.workgroups.all()
+
+        if course_id:
+            queryset = queryset.filter(project__course_id=course_id)
+        return queryset

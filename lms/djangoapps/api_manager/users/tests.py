@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
+from projects.models import Project
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -33,6 +34,7 @@ class SecureClient(Client):
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
+@override_settings(API_PAGE_SIZE=10)
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class UsersApiTests(TestCase):
 
@@ -46,6 +48,25 @@ class UsersApiTests(TestCase):
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
         self.test_city = str(uuid.uuid4())
+
+        self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+        self.course = CourseFactory.create()
+        self.course_content = ItemFactory.create(
+            category="videosequence",
+            parent_location=self.course.location,
+            data=self.test_course_data,
+            due="2016-05-16T14:30:00Z",
+            display_name="View_Sequence"
+        )
+        self.test_project = Project.objects.create(
+            course_id=self.course.id,
+            content_id=self.course_content.id
+        )
+
+        self.second_test_project = Project.objects.create(
+            course_id=self.course.id + 'b2',
+            content_id=self.course_content.id + 'b2'
+        )
 
         self.client = SecureClient()
         cache.clear()
@@ -89,7 +110,6 @@ class UsersApiTests(TestCase):
         user_id = response.data['id']
         return user_id
 
-    @override_settings(API_PAGE_SIZE=10)
     def test_user_list_get(self):
         test_uri = '/api/users'
 
@@ -946,3 +966,47 @@ class UsersApiTests(TestCase):
         # test with invalid user
         response = self.do_get('/api/users/4356340/organizations/')
         self.assertEqual(response.status_code, 404)
+
+    def test_user_workgroups_list(self):
+        test_workgroups_uri = '/api/workgroups/'
+        user_id = self._create_test_user()
+        for i in xrange(1, 12):
+            project_id = self.test_project.id
+            if i > 7:  # set to other project
+                project_id = self.second_test_project.id
+            data = {
+                'name': 'Workgroup ' + str(i),
+                'project': project_id
+            }
+            response = self.do_post(test_workgroups_uri, data)
+            self.assertEqual(response.status_code, 201)
+            test_uri = '{}{}/'.format(test_workgroups_uri, str(response.data['id']))
+            users_uri = '{}users/'.format(test_uri)
+            data = {"id": user_id}
+            response = self.do_post(users_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        test_uri = '/api/users/{}/workgroups/?page_size=10'.format(user_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 11)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # test with course_id filter
+        response = self.do_get('/api/users/{}/workgroups/?course_id={}'.format(user_id, self.course.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(len(response.data['results']), 7)
+        self.assertIsNotNone(response.data['results'][0]['name'])
+        self.assertIsNotNone(response.data['results'][0]['project'])
+
+        # test with invalid user
+        response = self.do_get('/api/users/4356340/workgroups/')
+        self.assertEqual(response.status_code, 404)
+
+        # test with valid user but has no workgroup
+        another_user_id = self._create_test_user()
+        response = self.do_get('/api/users/{}/workgroups/'.format(another_user_id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual(len(response.data['results']), 0)
