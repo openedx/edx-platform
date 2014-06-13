@@ -1030,7 +1030,9 @@ if os.path.isdir(DATA_DIR):
                 os.system("coffee -c %s" % (js_dir / filename))
 
 
-PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_CSS_COMPRESSOR = "pipeline.compressors.cssmin.CSSMinCompressor"
+PIPELINE_CSS_CSSMIN_BINARY = "node_modules/.bin/cssmin"
+
 PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
