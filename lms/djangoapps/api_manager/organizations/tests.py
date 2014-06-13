@@ -33,6 +33,7 @@ class OrganizationsApiTests(TestCase):
         self.test_server_prefix = 'https://testserver'
         self.test_organizations_uri = '/api/organizations/'
         self.test_users_uri = '/api/users'
+        self.base_groups_uri = '/api/groups'
         self.test_organization_name = str(uuid.uuid4())
         self.test_organization_display_name = 'Test Org'
         self.test_organization_contact_name = 'John Org'
@@ -167,3 +168,24 @@ class OrganizationsApiTests(TestCase):
         }
         response = self.do_post(self.test_organizations_uri, data)
         self.assertEqual(response.status_code, 400)
+
+    def test_organizations_list_post_with_groups(self):
+        groups = []
+        for i in xrange(1, 6):
+            data = {
+                'name': '{} {}'.format('Test Group', i),
+                'type': 'series',
+                'data': {'display_name': 'My first series'}
+            }
+            response = self.do_post(self.base_groups_uri, data)
+            self.assertEqual(response.status_code, 201)
+            groups.append(response.data['id'])
+
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'groups': groups
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.data['groups']), len(groups))
