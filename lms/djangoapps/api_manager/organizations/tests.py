@@ -7,6 +7,7 @@ Run these tests @ Devstack:
 import json
 import uuid
 
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
@@ -39,6 +40,13 @@ class OrganizationsApiTests(TestCase):
         self.test_organization_contact_name = 'John Org'
         self.test_organization_contact_email = 'john@test.org'
         self.test_organization_contact_phone = '+1 332 232 24234'
+
+        self.test_user_email = str(uuid.uuid4())
+        self.test_user_username = str(uuid.uuid4())
+        self.test_user = User.objects.create(
+            email=self.test_user_email,
+            username=self.test_user_username
+        )
 
         self.client = SecureClient()
         cache.clear()
@@ -189,3 +197,59 @@ class OrganizationsApiTests(TestCase):
         response = self.do_post(self.test_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['groups']), len(groups))
+
+    def test_organizations_users_post(self):
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users'][0], self.test_user.id)
+
+    def test_organizations_users_post_invalid_user(self):
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": 123456}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_organizations_users_get(self):
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(users_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], self.test_user.id)
+        self.assertEqual(response.data[0]['username'], self.test_user.username)
+        self.assertEqual(response.data[0]['email'], self.test_user.email)
