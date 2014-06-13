@@ -1,8 +1,18 @@
 """ Django REST Framework Serializers """
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
 from api_manager.models import Organization
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    """ Serializer for model interactions """
+
+    class Meta:
+        """ Meta class for defining additional serializer characteristics """
+        model = User
+        fields = ('id', 'url', 'username', 'email')
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
