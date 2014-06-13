@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import url, patterns
+from django.conf.urls import url, patterns
 
 urlpatterns = patterns('django_comment_client.base.views',  # nopep8
     url(r'upload$', 'upload', name='upload'),

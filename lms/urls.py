@@ -122,9 +122,9 @@ urlpatterns += (
 
 # Favicon
 favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
-urlpatterns += ((
+urlpatterns += (url(
     r'^favicon\.ico$',
-    'django.views.generic.simple.redirect_to',
+    'django.views.generic.base.RedirectView',
     {'url': settings.STATIC_URL + favicon_path}
 ),)
 

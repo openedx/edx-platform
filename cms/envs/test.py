@@ -224,3 +224,6 @@ FEATURES['USE_MICROSITES'] = True
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+
+# Dummy secret key for dev/test
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

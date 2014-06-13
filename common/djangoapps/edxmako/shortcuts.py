@@ -121,6 +121,13 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
         context_dictionary.update(d)
     if context:
         context_dictionary.update(context)
+
+    # "Fix" CSRF token by evaluating the lazy object
+    KEY_CSRF_TOKEN = 'csrf_token'
+    csrf_token = context_dictionary.get(KEY_CSRF_TOKEN, None)
+    if csrf_token:
+        context_dictionary[KEY_CSRF_TOKEN] = unicode(csrf_token)
+
     # fetch and render template
     template = lookup_template(namespace, template_name)
     return template.render_unicode(**context_dictionary)

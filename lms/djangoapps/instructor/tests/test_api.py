@@ -1888,8 +1888,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.client.get(url, {})
         res_json = json.loads(response.content)
         self.assertIn('students', res_json)
-        for res, i in zip(res_json['students'], xrange(3)):
-            self.validate_purchased_transaction_response(res, carts[i], instructors[i], 'None')
+        for (res, cart, instructor) in zip(res_json['students'], carts, instructors):
+            self.validate_purchased_transaction_response(res, cart, instructor, 'None')
 
     def validate_purchased_transaction_response(self, res, cart, user, code):
         """
