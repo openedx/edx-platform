@@ -51,6 +51,7 @@ def dashboard_handler(request, course_key_string, xblock_type_name=None):
                 'course_key_string': course_module.id
             })
             xblock_type_info = get_course_xblock_type_info(course_module)
+            has_admin_view = xblock_type_name
             return render_to_response(
                 'dashboard.html',
                 {
@@ -60,7 +61,7 @@ def dashboard_handler(request, course_key_string, xblock_type_name=None):
                     'xblock_type_display_name':
                         get_xblock_type_display_name(xblock_type_name) if xblock_type_name else None,
                     'dashboard_url': dashboard_url,
-                    'has_admin_view': True,
+                    'has_admin_view': has_admin_view,
                 })
     elif json_request:
         return HttpResponseBadRequest(
