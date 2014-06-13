@@ -3,6 +3,7 @@
 <%! from django.conf import settings %>
 
 <%inherit file="../main.html" />
+
 <%block name="bodyclass">purchase-receipt</%block>
 
 <%block name="pagetitle">${_("Register for [Course Name] | Receipt (Order")} ${order.id})</%block>
@@ -68,8 +69,8 @@
                 <td><del>${item.currency.upper()}</del></td></tr>
               % endif
           % endfor
-          % for p in paid:
-            <a href="${p.course_id}" class="enter-course">${_('View Course')}</a>
+          % for course_id in paid_course_ids:
+            <a href="${course_id}" class="enter-course">${_('View Course')}</a>
           % endfor
           <tr>
             <td colspan="3"></td>
