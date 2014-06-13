@@ -115,7 +115,7 @@ def start_servers():
 def wait_for_test_servers():
     '''Wait until we get a successful response from the servers or time out'''
 
-    for service, info in BOK_CHOY_SERVERS + BOK_CHOY_STUBS:
+    for service, info in BOK_CHOY_SERVERS.items() + BOK_CHOY_STUBS.items():
         ready = wait_for_server("http://0.0.0.0", info['port'])
         if not ready:
             raise RuntimeError('Could not contact {service} test server'.format(service=service))
