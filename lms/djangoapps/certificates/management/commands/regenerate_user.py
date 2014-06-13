@@ -1,18 +1,14 @@
 """Django management command to force certificate regeneration for one user"""
 
 from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.course_module import CourseDescriptor
-
-from certificates.queue import XQueueCertInterface
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
+from certificates.queue import XQueueCertInterface
 
 
 class Command(BaseCommand):
