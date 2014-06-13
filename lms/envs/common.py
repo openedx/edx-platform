@@ -953,7 +953,7 @@ PIPELINE_CSS = {
 
 
 common_js = (
-    rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
     rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')
 )
 common_js = set(common_js) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
