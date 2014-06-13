@@ -156,7 +156,7 @@ def show_receipt(request, ordernum):
     404 if order is not yet purchased or request.user != order.user
     """
 
-    paid =[]
+    paid_course_ids =[]
     try:
         order = Order.objects.get(id=ordernum)
     except Order.DoesNotExist:
@@ -167,7 +167,8 @@ def show_receipt(request, ordernum):
 
     order_items = OrderItem.objects.filter(order=order).select_subclasses()
     for item in order_items:
-        paid.append(PaidCourseRegistration.objects.get(id=item.id))
+        paid_course = PaidCourseRegistration.objects.get(id=item.id)
+        paid_course_ids.append(reverse('info', args=[paid_course.course_id.to_deprecated_string()]))
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
@@ -178,7 +179,7 @@ def show_receipt(request, ordernum):
         'order_items': order_items,
         'any_refunds': any_refunds,
         'instructions': instructions,
-        'paid': paid,
+        'paid_course_ids': paid_course_ids,
     }
 
     if order_items.count() == 1:
