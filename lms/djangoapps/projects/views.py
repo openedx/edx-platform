@@ -10,6 +10,13 @@ from rest_framework.decorators import action, link
 from rest_framework import status
 from rest_framework.response import Response
 
+from xblock.fields import Scope
+from xblock.runtime import KeyValueStore
+
+from courseware.courses import get_course
+from courseware.model_data import FieldDataCache
+from xmodule.modulestore import Location
+
 from .models import Project, Workgroup, WorkgroupSubmission
 from .models import WorkgroupReview, WorkgroupSubmissionReview, WorkgroupPeerReview
 from .serializers import UserSerializer, GroupSerializer
@@ -129,6 +136,51 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
                 serializer = WorkgroupSubmissionSerializer(submission)
                 response_data.append(serializer.data)
         return Response(response_data, status=status.HTTP_200_OK)
+
+    @action()
+    def grades(self, request, pk):
+        """
+        Submit a grade for a Workgroup.  The grade will be applied to all members of the workgroup
+        """
+        # Ensure we received all of the necessary information
+        course_id = request.DATA.get('course_id')
+        if course_id is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            course_descriptor = None
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        content_id = request.DATA.get('content_id')
+        if content_id is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        grade = request.DATA.get('grade')
+        if grade is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        max_grade = request.DATA.get('max_grade')
+        if max_grade is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        if grade > max_grade:
+            max_grade = grade
+
+        users = User.objects.filter(workgroups=pk)
+        for user in users:
+            key = KeyValueStore.Key(
+                scope=Scope.user_state,
+                user_id=user.id,
+                block_scope_id=Location(content_id),
+                field_name='grade'
+            )
+            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
+            student_module = field_data_cache.find_or_create(key)
+            student_module.grade = grade
+            student_module.max_grade = max_grade
+            student_module.save()
+        return Response({}, status=status.HTTP_201_CREATED)
 
 
 class ProjectsViewSet(viewsets.ModelViewSet):
