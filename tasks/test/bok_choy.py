@@ -94,11 +94,15 @@ def start_servers():
     '''Start the servers we will run tests on'''
 
     for service, info in BOK_CHOY_SERVERS.items():
-        address = "0.0.0.0:{}".format(innfo['port'])
-        cmd = "coverage run --rcfile={rcfile} -m manage {service} --settings bok_choy runserver {address} --traceback --noreload".format(rcfile=BOK_CHOY_COVERAGE_RC,
-                                                                                                                                          service=service,
-                                                                                                                                          address=address)
-        subprocess.Popen(cmd, shell=True, )
+        address = "0.0.0.0:{}".format(info['port'])
+        cmd = (
+            "coverage run --rcfile={rcfile} -m manage {service} "
+            "--settings bok_choy runserver {address} --traceback "
+            "--noreload".format(
+                rcfile=BOK_CHOY_COVERAGE_RC, service=service, address=address,
+            )
+        )
+        subprocess.Popen(cmd, shell=True)
 
     for service, info in BOK_CHOY_STUBS:
         with chdir(BOK_CHOY_STUB_DIR):
