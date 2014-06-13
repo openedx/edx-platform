@@ -115,6 +115,8 @@ def flush_cache_hashes():
     """
     Flush prereq caches
     """
+    if not PREREQS_MD5_DIR.exists():
+        return
     for f in PREREQS_MD5_DIR.files():
         f.remove()
 
