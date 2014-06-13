@@ -29,6 +29,11 @@ from opaque_keys import InvalidKeyError
 log = logging.getLogger("edx.courseware")
 
 
+EXCLUDED_LOCATION_CATEGORIES = {'video', 'html', 'discussion'}
+def location_filter(location):
+    return location.category not in EXCLUDED_LOCATION_CATEGORIES
+
+
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
     This returns all of the descendants of a descriptor. If the descriptor
@@ -225,7 +230,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache):
     if field_data_cache is None:
         with manual_transaction():
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course.id, student, course, depth=None,# descriptor_filter=has_or_might_have_score
+                course.id, student, course, depth=None, location_filter=location_filter
             )
 
     possibly_graded_locations = field_data_cache.possibly_graded_locations()
@@ -363,6 +368,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
+
 @transaction.commit_manually
 def progress_summary(student, request, course, field_data_cache=None):
     """
@@ -400,7 +406,7 @@ def _progress_summary(student, request, course, field_data_cache):
     if field_data_cache is None:
         with manual_transaction():
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course.id, student, course, depth=None, # descriptor_filter=has_or_might_have_score
+                course.id, student, course, depth=None, location_filter=location_filter
             )
 
     possibly_graded_locations = field_data_cache.possibly_graded_locations()

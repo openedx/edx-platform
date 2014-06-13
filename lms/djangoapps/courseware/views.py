@@ -685,11 +685,6 @@ def progress(request, course_id, student_id=None):
     with grades.manual_transaction():
         return _progress(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), student_id)
 
-EXCLUDED_LOCATION_CATEGORIES = {'video', 'html', 'discussion'}
-def location_filter(location):
-    return location.category not in EXCLUDED_LOCATION_CATEGORIES
-
-
 def _progress(request, course_key, student_id):
     """
     Unwrapped version of "progress".
@@ -719,7 +714,7 @@ def _progress(request, course_key, student_id):
 
     with grades.manual_transaction():
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, student, course, depth=None, location_filter=location_filter
+            course.id, student, course, depth=None, location_filter=grades.location_filter
         )
 
     courseware_summary = grades.progress_summary(student, request, course, field_data_cache=field_data_cache)
