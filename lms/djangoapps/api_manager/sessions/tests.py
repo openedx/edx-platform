@@ -105,7 +105,7 @@ class SessionsApiTests(TestCase):
         user.save()
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_session_list_post_invalid_notfound(self):
         data = {'username': 'user_12321452334', 'password': self.test_password}
