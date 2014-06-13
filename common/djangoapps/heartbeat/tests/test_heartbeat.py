@@ -24,6 +24,7 @@ class HeartbeatTestCase(TestCase):
         return super(HeartbeatTestCase, self).setUp()
 
     def test_success(self, mock_modulestore):  # pylint: disable=unused-argument
+        mock_modulestore.return_value.heartbeat.return_value = {'default': True}
         response = self.client.get(self.heartbeat_url)
         self.assertEqual(response.status_code, 200)
 

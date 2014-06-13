@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import IntegrityError
-from django.http import HttpResponse, Http404
+from django.http import StreamingHttpResponse, Http404
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils import timezone
@@ -107,7 +107,8 @@ class SysadminDashboardView(TemplateView):
                 writer.writerow(row)
             csv_data = read_and_flush()
             yield csv_data
-        response = HttpResponse(csv_data(), mimetype='text/csv')
+
+        response = StreamingHttpResponse(csv_data(), mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(
             filename)
         return response

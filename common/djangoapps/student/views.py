@@ -1852,7 +1852,7 @@ def auto_auth(request):
             username, email, password, user.id  # pylint: disable=no-member
         )
         response = HttpResponse(success_msg)
-    response.set_cookie('csrftoken', csrf(request)['csrf_token'])
+    response.set_cookie('csrftoken', unicode(csrf(request)['csrf_token']))
     return response
 
 

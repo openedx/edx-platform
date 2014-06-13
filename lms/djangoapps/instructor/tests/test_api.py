@@ -2394,6 +2394,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             self.assertIn('already in progress', res_json['status'])
 
     def test_get_students_features(self):
+
         """
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.

@@ -1,4 +1,8 @@
-from django.conf.urls.defaults import url, patterns
+"""
+Urls for the comment client forum views.
+"""
+
+from django.conf.urls import url, patterns
 
 urlpatterns = patterns(
     'django_comment_client.forum.views',
