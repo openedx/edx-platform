@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Move Peer Assessment into advanced problems menu.
+
 Blades: Add context-aware video index. BLD-933
 
 Blades: Fix bug with incorrect link format and redirection. BLD-1049
