@@ -5,6 +5,7 @@ import sys
 from paver.easy import task, cmdopts, needs
 from pavelib.utils.test.suites import JsTestSuite
 from pavelib.utils.envs import Env
+from .utils.deprecated import deprecated
 
 __test__ = False  # do not collect
 
@@ -19,6 +20,7 @@ __test__ = False  # do not collect
     ("mode=", "m", "dev or run"),
     ("coverage", "c", "Run test under coverage"),
 ])
+@deprecated('invoke js_test.test_js')
 def test_js(options):
     """
     Run the JavaScript tests
@@ -52,6 +54,7 @@ def test_js(options):
     ("suite=", "s", "Test suite to run"),
     ("coverage", "c", "Run test under coverage"),
 ])
+@deprecated('invoke js_test.test_js_run')
 def test_js_run(options):
     """
     Run the JavaScript tests and print results to the console
@@ -64,6 +67,7 @@ def test_js_run(options):
 @cmdopts([
     ("suite=", "s", "Test suite to run"),
 ])
+@deprecated('invoke js_test.test_js_dev')
 def test_js_dev(options):
     """
     Run the JavaScript tests in your default browsers

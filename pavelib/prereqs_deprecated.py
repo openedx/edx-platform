@@ -7,7 +7,7 @@ import hashlib
 from distutils import sysconfig
 from paver.easy import *
 from .utils.envs import Env
-
+from .utils.deprecated import deprecated
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
@@ -117,6 +117,7 @@ def python_prereqs_installation():
 
 
 @task
+@deprecated('invoke prereqs.install.ruby')
 def install_ruby_prereqs():
     """
     Installs Ruby prereqs
@@ -125,6 +126,7 @@ def install_ruby_prereqs():
 
 
 @task
+@deprecated('invoke prereqs.install.node')
 def install_node_prereqs():
     """
     Installs Node prerequisites
@@ -133,6 +135,7 @@ def install_node_prereqs():
 
 
 @task
+@deprecated('invoke prereqs.install.python')
 def install_python_prereqs():
     """
     Installs Python prerequisites
@@ -141,6 +144,7 @@ def install_python_prereqs():
 
 
 @task
+@deprecated('invoke prereqs.install')
 def install_prereqs():
     """
     Installs Ruby, Node and Python prerequisites
