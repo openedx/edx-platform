@@ -198,7 +198,6 @@ class WorkgroupsApiTests(TestCase):
             'project': self.test_project.id
         }
         response = self.do_post(self.test_workgroups_uri, data)
-        print response.data
         self.assertEqual(response.status_code, 201)
         test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
@@ -275,6 +274,31 @@ class WorkgroupsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], wr_id)
         self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
+
+    def test_workgroups_submissions_get(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        workgroup_id = response.data['id']
+        data = {
+            'workgroup': workgroup_id,
+            'user': self.test_user.id,
+            'document_id': 'filename.pdf',
+            'document_url': 'https://s3.amazonaws.com/bucketname/filename.pdf',
+            'document_mime_type': 'application/pdf'
+        }
+        response = self.do_post('/api/submissions/', data)
+        self.assertEqual(response.status_code, 201)
+        submission_id = response.data['id']
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
+        submissions_uri = '{}submissions/'.format(test_uri)
+        response = self.do_get(submissions_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], submission_id)
+        self.assertEqual(response.data[0]['user'], self.test_user.id)
 
     def test_submissions_list_post_invalid_relationships(self):
         data = {
