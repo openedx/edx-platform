@@ -99,7 +99,7 @@ class ProjectsApiTests(TestCase):
         }
         response = self.do_post(self.test_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_org_id = response.data['id']
+        test_org_id = response.data['url']
 
         test_course_content_id = "i4x://blahblah1234"
         data = {
