@@ -5,6 +5,10 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 admin.autodiscover()
 
+COURSE_KEY_PATTERN = r'(?P<course_key_string>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
+USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
+ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
+
 urlpatterns = patterns('',  # nopep8
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
@@ -66,30 +70,29 @@ urlpatterns += patterns(
     url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
-    url(r'^course_team/{}/(?P<email>.+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_team_handler'),
-    url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_info_handler'),
+    url(r'^course_team/{}/(?P<email>.+)?$'.format(COURSE_KEY_PATTERN), 'course_team_handler'),
+    url(r'^course_info/{}$'.format(COURSE_KEY_PATTERN), 'course_info_handler'),
     url(
-        r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
+        r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(COURSE_KEY_PATTERN),
         'course_info_update_handler'
     ),
-    url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
-    url(r'^subsection/{}$'.format(settings.USAGE_KEY_PATTERN), 'subsection_handler'),
-    url(r'^unit/{}$'.format(settings.USAGE_KEY_PATTERN), 'unit_handler'),
-    url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), 'container_handler'),
-    url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'checklists_handler'),
-    url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), 'orphan_handler'),
-    url(r'^assets/{}/{}?$'.format(settings.COURSE_KEY_PATTERN, settings.ASSET_KEY_PATTERN), 'assets_handler'),
-    url(r'^import/{}$'.format(settings.COURSE_KEY_PATTERN), 'import_handler'),
-    url(r'^import_status/{}/(?P<filename>.+)$'.format(settings.COURSE_KEY_PATTERN), 'import_status_handler'),
-    url(r'^export/{}$'.format(settings.COURSE_KEY_PATTERN), 'export_handler'),
-    url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(settings.USAGE_KEY_PATTERN), 'xblock_view_handler'),
-    url(r'^xblock/{}?$'.format(settings.USAGE_KEY_PATTERN), 'xblock_handler'),
-    url(r'^tabs/{}$'.format(settings.COURSE_KEY_PATTERN), 'tabs_handler'),
-    url(r'^settings/details/{}$'.format(settings.COURSE_KEY_PATTERN), 'settings_handler'),
-    url(r'^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'grading_handler'),
-    url(r'^settings/advanced/{}$'.format(settings.COURSE_KEY_PATTERN), 'advanced_settings_handler'),
-    url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_list_handler'),
-    url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
+    url(r'^course/{}?$'.format(COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
+    url(r'^subsection/{}$'.format(USAGE_KEY_PATTERN), 'subsection_handler'),
+    url(r'^container/{}$'.format(USAGE_KEY_PATTERN), 'container_handler'),
+    url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(COURSE_KEY_PATTERN), 'checklists_handler'),
+    url(r'^orphan/{}$'.format(COURSE_KEY_PATTERN), 'orphan_handler'),
+    url(r'^assets/{}/{}?$'.format(COURSE_KEY_PATTERN, ASSET_KEY_PATTERN), 'assets_handler'),
+    url(r'^import/{}$'.format(COURSE_KEY_PATTERN), 'import_handler'),
+    url(r'^import_status/{}/(?P<filename>.+)$'.format(COURSE_KEY_PATTERN), 'import_status_handler'),
+    url(r'^export/{}$'.format(COURSE_KEY_PATTERN), 'export_handler'),
+    url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(USAGE_KEY_PATTERN), 'xblock_view_handler'),
+    url(r'^xblock/{}?$'.format(USAGE_KEY_PATTERN), 'xblock_handler'),
+    url(r'^tabs/{}$'.format(COURSE_KEY_PATTERN), 'tabs_handler'),
+    url(r'^settings/details/{}$'.format(COURSE_KEY_PATTERN), 'settings_handler'),
+    url(r'^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(COURSE_KEY_PATTERN), 'grading_handler'),
+    url(r'^settings/advanced/{}$'.format(COURSE_KEY_PATTERN), 'advanced_settings_handler'),
+    url(r'^textbooks/{}$'.format(COURSE_KEY_PATTERN), 'textbooks_list_handler'),
+    url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
 )
 
 if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
@@ -109,7 +112,7 @@ urlpatterns += patterns('',
 
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-    urlpatterns += (url(r'^export_git/{}$'.format(settings.COURSE_KEY_PATTERN),
+    urlpatterns += (url(r'^export_git/{}$'.format(COURSE_KEY_PATTERN),
                         'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):

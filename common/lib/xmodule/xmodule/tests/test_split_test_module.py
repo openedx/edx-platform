@@ -170,7 +170,6 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
             Context for rendering the studio "author_view".
             """
             return {
-                'container_view': True,
                 'reorderable_items': set(),
                 'root_xblock': root_xblock,
             }

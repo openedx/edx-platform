@@ -6,7 +6,7 @@
 # pylint: disable=W0613
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in  # pylint: disable=E0611
+from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
 
 DISPLAY_NAME = "Display Name"
 
@@ -48,7 +48,7 @@ def add_a_multi_step_component(step, is_advanced, category):
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
-    selector = 'li.component div.xblock-student_view'
+    selector = 'li.studio-xblock-wrapper div.xblock-student_view'
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):
@@ -79,7 +79,7 @@ def see_a_problem_component(step, category):
     assert_true(world.is_css_present(component_css),
                 'No problem was added to the unit.')
 
-    problem_css = 'li.component div.xblock-student_view'
+    problem_css = 'li.studio-xblock-wrapper div.xblock-student_view'
     actual_text = world.css_text(problem_css)
     assert_in(category.upper(), actual_text)
 
@@ -93,7 +93,7 @@ def add_component_category(step, component, category):
 
 @step(u'I delete all components$')
 def delete_all_components(step):
-    count = len(world.css_find('ol.components li.component'))
+    count = len(world.css_find('ol.reorderable-container li.studio-xblock-wrapper'))
     step.given('I delete "' + str(count) + '" component')
 
 
@@ -124,7 +124,7 @@ def delete_components(step, number):
 
 @step(u'I see no components')
 def see_no_components(steps):
-    assert world.is_css_not_present('li.component')
+    assert world.is_css_not_present('li.studio-xblock-wrapper')
 
 
 @step(u'I delete a component')
@@ -162,8 +162,9 @@ def see_component_in_position(step, display_name, index):
 
 @step(u'I see the display name is "([^"]*)"')
 def check_component_display_name(step, display_name):
-    label = world.css_text(".component-header")
-    assert display_name == label
+    # The display name for the unit uses the same structure, must differentiate by level-element.
+    label = world.css_html("section.level-element>header>div>div>span.xblock-display-name")
+    assert_equal(display_name, label)
 
 
 @step(u'I change the display name to "([^"]*)"')
