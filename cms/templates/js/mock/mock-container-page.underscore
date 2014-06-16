@@ -2,13 +2,14 @@
 
     <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
         <header class="mast has-actions has-navigation">
-            <h1 class="page-header">
+            <div class="page-header">
                 <small class="navigation navigation-parents subtitle">
-                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
-                    <a href="#" class="navigation-link navigation-current">Test Container</a>
+                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
                 </small>
-                <span class="page-header-title">Test Container</span>
-            </h1>
+                <div class="wrapper-xblock-field is-editable" data-field="display_name">
+                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
+                </div>
+            </div>
 
             <nav class="nav-actions">
                 <h3 class="sr">Page Actions</h3>
@@ -31,9 +32,6 @@
                 <article class="content-primary window">
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
-                    <div class="no-container-content is-hidden">
-                        <p>This page has no content yet.</p>
-                    </div>
                     <div class="ui-loading is-hidden">
                         <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
                     </div>

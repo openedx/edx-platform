@@ -85,7 +85,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     });
                     // Give the mock xblock a save method...
                     editor.xblock.save = window.MockDescriptor.save;
-                    editor.save();
+                    editor.model.save(editor.getXModuleData());
                     request = requests[requests.length - 1];
                     response = JSON.parse(request.requestBody);
                     expect(response.metadata.display_name).toBe(testDisplayName);

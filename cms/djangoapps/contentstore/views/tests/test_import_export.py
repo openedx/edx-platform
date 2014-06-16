@@ -17,7 +17,6 @@ from django.conf import settings
 from contentstore.utils import reverse_course_url
 
 from xmodule.contentstore.django import _CONTENTSTORE
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import ItemFactory
 
 from contentstore.tests.utils import CourseTestCase
@@ -296,7 +295,7 @@ class ExportTestCase(CourseTestCase):
         """
         fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
         self.store.publish(fake_xblock.location, self.user.id)
-        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
+        self._verify_export_failure(u'/container/location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):
         """
@@ -308,7 +307,7 @@ class ExportTestCase(CourseTestCase):
             category='aawefawef'
         )
 
-        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+vertical+foo')
+        self._verify_export_failure(u'/container/location:MITx+999+Robot_Super_Course+vertical+foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """
