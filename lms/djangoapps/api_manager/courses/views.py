@@ -26,26 +26,11 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 from api_manager.permissions import SecureAPIView, SecureListAPIView
+from api_manager.utils import generate_base_uri
 from .serializers import CourseModuleCompletionSerializer
 
 
 log = logging.getLogger(__name__)
-
-
-def _generate_base_uri(request):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        request.get_full_path()
-    )
-    return resource_uri
-
 
 def _get_content_children(content, content_type=None):
     """
@@ -334,7 +319,7 @@ class CourseContentDetail(SecureAPIView):
         """
         store = modulestore()
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         content_type = request.QUERY_PARAMS.get('type', None)
         response_data['uri'] = base_uri
         if course_id != content_id:
@@ -366,10 +351,11 @@ class CourseContentDetail(SecureAPIView):
                 course_id,
                 children
             )
+            base_uri_without_qs = generate_base_uri(request, True)
             response_data['resources'] = []
-            resource_uri = '{}/users'.format(base_uri)
+            resource_uri = '{}/users'.format(base_uri_without_qs)
             response_data['resources'].append({'uri': resource_uri})
-            resource_uri = '{}/groups'.format(base_uri)
+            resource_uri = '{}/groups'.format(base_uri_without_qs)
             response_data['resources'].append({'uri': resource_uri})
             status_code = status.HTTP_200_OK
         else:
@@ -450,20 +436,21 @@ class CoursesDetail(SecureAPIView):
                 course_descriptor.id,
                 course_descriptor
             )
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
+        base_uri_without_qs = generate_base_uri(request, True)
         response_data['resources'] = []
-        resource_uri = '{}/content/'.format(base_uri)
+        resource_uri = '{}/content/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/groups/'.format(base_uri)
+        resource_uri = '{}/groups/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/overview/'.format(base_uri)
+        resource_uri = '{}/overview/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/updates/'.format(base_uri)
+        resource_uri = '{}/updates/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/static_tabs/'.format(base_uri)
+        resource_uri = '{}/static_tabs/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/users/'.format(base_uri)
+        resource_uri = '{}/users/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -492,7 +479,7 @@ class CoursesGroupsList(SecureAPIView):
         """
         response_data = {}
         group_id = request.DATA['group_id']
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -569,7 +556,7 @@ class CoursesGroupsDetail(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         response_data['course_id'] = course_id
         response_data['group_id'] = group_id
@@ -585,7 +572,7 @@ class CoursesGroupsDetail(SecureAPIView):
         except ObjectDoesNotExist:
             pass
         response_data = {}
-        response_data['uri'] = _generate_base_uri(request)
+        response_data['uri'] = generate_base_uri(request)
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -795,7 +782,7 @@ class CoursesUsersList(SecureAPIView):
         GET /api/courses/{course_id/users}
         """
         response_data = OrderedDict()
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         try:
             existing_course = get_course(course_id)
@@ -840,7 +827,7 @@ class CoursesUsersDetail(SecureAPIView):
         """
         GET /api/courses/{course_id}/users/{user_id}
         """
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data = {
             'course_id': course_id,
             'user_id': user_id,
@@ -887,7 +874,7 @@ class CoursesUsersDetail(SecureAPIView):
         if user:
             CourseEnrollment.unenroll(user, course_id)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
@@ -932,7 +919,7 @@ class CourseContentGroupsList(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, existing_profile.group_id)
         response_data['course_id'] = course_descriptor.id
         response_data['content_id'] = existing_content.id

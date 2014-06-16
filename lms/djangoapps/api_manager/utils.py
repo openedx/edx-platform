@@ -34,3 +34,13 @@ def str2bool(value):
     convert string to bool
     """
     return value.lower() in ("true",)
+
+
+def generate_base_uri(request, strip_qs=False):
+    """
+    Build absolute uri
+    """
+    if strip_qs:
+        return request.build_absolute_uri(request.path)  # Don't need querystring that why giving location parameter
+    else:
+        return request.build_absolute_uri()
