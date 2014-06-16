@@ -295,7 +295,7 @@ def edit_my_name(step):
     world.css_click(btn_css)
 
 
-@step(u'I give a reason why I cannot pay$')
+@step(u'I select the honor code option$')
 def give_a_reason_why_i_cannot_pay(step):
     register()
 
@@ -304,9 +304,6 @@ def give_a_reason_why_i_cannot_pay(step):
 
     cb_css = 'input#honor-code'
     world.css_click(cb_css)
-
-    text_css = 'li.field-explain textarea'
-    world.css_find(text_css).type('I cannot afford it.')
 
     btn_css = 'input[value="Select Certificate"]'
     world.css_click(btn_css)
