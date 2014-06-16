@@ -22,7 +22,7 @@ from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
-from contentstore.views.helpers import get_parent_xblock
+from contentstore.views.helpers import get_parent_xblock, is_unit
 
 from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
@@ -259,7 +259,12 @@ def container_handler(request, usage_key_string):
             parent = get_parent_xblock(parent)
         ancestor_xblocks.reverse()
 
-        unit = ancestor_xblocks[0] if ancestor_xblocks else None
+        if is_unit(xblock):
+            unit = xblock
+        else:
+            unit = ancestor_xblocks[0] if ancestor_xblocks else None
+        subsection = get_parent_xblock(unit) if unit else None
+        section = get_parent_xblock(subsection) if subsection else None
         unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
@@ -267,7 +272,10 @@ def container_handler(request, usage_key_string):
             'xblock': xblock,
             'unit_publish_state': unit_publish_state,
             'xblock_locator': usage_key,
-            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
+            'unit': unit,
+            'subsection': subsection,
+            'section': section,
+            'new_unit_category': 'vertical',
             'ancestor_xblocks': ancestor_xblocks,
             'component_templates': json.dumps(component_templates),
         })
