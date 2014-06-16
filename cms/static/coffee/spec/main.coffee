@@ -225,7 +225,6 @@ define([
     "js/spec/views/group_configuration_spec",
 
     "js/spec/views/container_spec",
-    "js/spec/views/unit_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",
 

@@ -55,7 +55,7 @@ def i_click_on_error_dialog(step):
     # we don't know the actual ID of the vertical. So just check that we did go to a
     # vertical page in the course (there should only be one).
     vertical_usage_key = course_key.make_usage_key("vertical", None)
-    vertical_url = reverse_usage_url('unit_handler', vertical_usage_key)
+    vertical_url = reverse_usage_url('container_handler', vertical_usage_key)
     # Remove the trailing "/None" from the URL - we don't know the course ID, so we just want to
     # check that we visited a vertical URL.
     if vertical_url.endswith("/None"):
