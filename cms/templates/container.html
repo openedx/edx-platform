@@ -24,14 +24,14 @@ from django.utils.translation import ugettext as _
 <%block name="jsextra">
 <%
 main_xblock_info = {
-    'id': str(xblock_locator),
-    'display_name': xblock.display_name_with_default,
-    'category': xblock.category,
+'id': str(xblock_locator),
+'display_name': xblock.display_name_with_default,
+'category': xblock.category,
 };
 %>
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+                "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
             function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates) {
                 var view, mainXBlockInfo;
 
@@ -58,13 +58,13 @@ main_xblock_info = {
         <h1 class="page-header">
             <small class="navigation navigation-parents subtitle">
                 % for ancestor in ancestor_xblocks:
-                    <%
-                    ancestor_url = xblock_studio_url(ancestor)
-                    %>
-                    % if ancestor_url:
-                    <a href="${ancestor_url}"
-                       class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
-                    % endif
+                <%
+                ancestor_url = xblock_studio_url(ancestor)
+                %>
+                % if ancestor_url:
+                <a href="${ancestor_url}"
+                   class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                % endif
                 % endfor
                 <a href="#" class="navigation-link navigation-current">${xblock.display_name_with_default | h}</a>
             </small>
@@ -100,34 +100,34 @@ main_xblock_info = {
             </article>
             <aside class="content-supplementary" role="complimentary">
                 % if unit:
-                  % if unit_publish_state == PublishState.public:
-                    <div class="bit-publishing published">
-                      <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Published")}</h3>
-                      <p class="copy">
-                          <%
-                          unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
-                              unit_address=xblock_studio_url(unit),
-                              unit_display_name=unit.display_name_with_default,
-                          )
-                          %>
-                          ${_('To make changes to the content of this page, you need to edit unit {unit_link} as a draft.'
-                                  ).format(unit_link=unit_link)}
-                      </p>
-                    </div>
-                  % else:
-                    <div class="bit-publishing draft">
-                        <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft")}</h3>
-                        <p class="copy">
-                            <%
-                            unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
-                                unit_address=xblock_studio_url(unit),
-                                unit_display_name=unit.display_name_with_default,
-                            )
-                            %>
-                            ${_('You can edit the content of this page, and your changes will be published with unit {unit_link}.').format(unit_link=unit_link)}
-                        </p>
-                    </div>
-                  % endif
+                % if unit_publish_state == PublishState.public:
+                <div class="bit-publishing published">
+                    <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Published")}</h3>
+                    <p class="copy">
+                        <%
+                        unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
+                        unit_address=xblock_studio_url(unit),
+                        unit_display_name=unit.display_name_with_default,
+                        )
+                        %>
+                        ${_('To make changes to the content of this page, you need to edit unit {unit_link} as a draft.'
+                        ).format(unit_link=unit_link)}
+                    </p>
+                </div>
+                % else:
+                <div class="bit-publishing draft">
+                    <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft")}</h3>
+                    <p class="copy">
+                        <%
+                        unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
+                        unit_address=xblock_studio_url(unit),
+                        unit_display_name=unit.display_name_with_default,
+                        )
+                        %>
+                        ${_('You can edit the content of this page, and your changes will be published with unit {unit_link}.').format(unit_link=unit_link)}
+                    </p>
+                </div>
+                % endif
                 % endif
                 <div class="bit">
                     <h3 class="title-3">${_("What can I do on this page?")}</h3>
@@ -135,6 +135,36 @@ main_xblock_info = {
                         <li class="item-detail">${_("You can view and edit course components that contain other components on this page. In the case of experiment blocks, this allows you to confirm that you have properly configured your experiment groups and make changes to existing content.")}</li>
                     </ul>
                 </div>
+                % if unit.location == xblock.location:
+                    <div class="window unit-location">
+                        <h4 class="header">${_("Unit Location")}</h4>
+                        <div class="window-contents">
+                            <div class="row wrapper-unit-id">
+                                <p class="unit-id">
+                                    <label for="unit-location-id-input">${_("Unit Identifier:")}</label>
+                                    <input type="text" class="url value" id="unit-location-id-input" value="${unit.location.name}" readonly />
+                                </p>
+                            </div>
+                            <div class="unit-tree-location">
+                                <ol>
+                                    <li class="section">
+                                        <a href="${xblock_studio_url(section)}" class="section-item section-name">
+                                            <span class="section-name">${section.display_name_with_default}</span>
+                                        </a>
+                                        <ol>
+                                            <li class="subsection">
+                                                <div class="section-item">
+                                                    <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                                                </div>
+                                                ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                                            </li>
+                                        </ol>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                % endif
             </aside>
         </section>
     </div>
