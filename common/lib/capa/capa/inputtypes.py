@@ -230,8 +230,8 @@ class InputTypeBase(object):
             self.setup()
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
-            msg = "Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=str(err))
+            msg = u"Error in xml '{x}': {err} ".format(
+                x=etree.tostring(xml), err=err.message)
             raise Exception, msg, sys.exc_info()[2]
 
     @classmethod
@@ -1744,7 +1744,7 @@ class ChoiceTextGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag != 'choice':
-                msg = "[capa.inputtypes.extract_choices] {0}".format(
+                msg = u"[capa.inputtypes.extract_choices] {0}".format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
                     _("Expected a {expected_tag} tag; got {given_tag} instead").format(
                         expected_tag=u"<choice>",
