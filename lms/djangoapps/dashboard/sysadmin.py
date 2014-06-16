@@ -493,8 +493,11 @@ class Courses(SysadminDashboardView):
             data.append([course.display_name, course.id.to_deprecated_string()]
                         + self.git_info_for_course(gdir))
 
-        return dict(header=[_('Course Name'), _('Directory/ID'),
-                            _('Git Commit'), _('Last Change'),
+        return dict(header=[_('Course Name'),
+                            _('Directory/ID'),
+                            # Translators: "Git Commit" is a computer command; see http://gitref.org/basic/#commit
+                            _('Git Commit'),
+                            _('Last Change'),
                             _('Last Editor')],
                     title=_('Information about all courses'),
                     data=data)
