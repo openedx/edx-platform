@@ -241,7 +241,7 @@ function createNewUnit(e) {
 
     function(data) {
         // redirect to the edit page
-        window.location = "/unit/" + data['locator'];
+        window.location = "/container/" + data['locator'];
     });
 }
 

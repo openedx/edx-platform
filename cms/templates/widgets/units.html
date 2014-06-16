@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from contentstore.utils import compute_publish_state, reverse_usage_url %>
+<%! from contentstore.utils import compute_publish_state %>
+<%! from contentstore.views.helpers import xblock_studio_url %>
 
 <!--
 This def will enumerate through a passed in subsection and list all of the units
@@ -24,7 +25,7 @@ This def will enumerate through a passed in subsection and list all of the units
         selected_class = ''
     %>
     <div class="section-item ${selected_class}">
-      <a href="${reverse_usage_url('unit_handler', unit.location)}" class="${unit_state}-item">
+      <a href="${xblock_studio_url(unit)}" class="${unit_state}-item">
         <span class="unit-name">${unit.display_name_with_default}</span>
       </a>
       % if actions:

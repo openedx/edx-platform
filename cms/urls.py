@@ -78,7 +78,6 @@ urlpatterns += patterns(
     ),
     url(r'^course/{}?$'.format(COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^subsection/{}$'.format(USAGE_KEY_PATTERN), 'subsection_handler'),
-    url(r'^unit/{}$'.format(USAGE_KEY_PATTERN), 'unit_handler'),
     url(r'^container/{}$'.format(USAGE_KEY_PATTERN), 'container_handler'),
     url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(COURSE_KEY_PATTERN), 'checklists_handler'),
     url(r'^orphan/{}$'.format(COURSE_KEY_PATTERN), 'orphan_handler'),
