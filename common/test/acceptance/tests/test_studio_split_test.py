@@ -64,7 +64,7 @@ class SplitTest(ContainerBase):
 
     def verify_add_missing_groups_button_not_present(self, container):
         """
-        Checks that the "add missing gorups" button/link is not present.
+        Checks that the "add missing groups" button/link is not present.
         """
         def missing_groups_button_not_present():
             button_present = container.missing_groups_button_present()
@@ -78,9 +78,9 @@ class SplitTest(ContainerBase):
 
         Returns the container page.
         """
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
@@ -93,16 +93,16 @@ class SplitTest(ContainerBase):
             }
         )
         self.course_fix._add_advanced_settings()
-        return self.go_to_container_page()
+        return self.go_to_nested_container_page()
 
     def test_create_and_select_group_configuration(self):
         """
         Tests creating a split test instance on the unit page, and then
         assigning the group configuration.
         """
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
@@ -110,14 +110,14 @@ class SplitTest(ContainerBase):
 
         # Switch to the other group configuration. Must navigate again to the container page so
         # that there is only a single "editor" on the page.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration 0,1,2')
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
 
         # Reload the page to make sure the groups were persisted.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
 
     @skip("This fails periodically where it fails to trigger the add missing groups action.Dis")
@@ -135,7 +135,7 @@ class SplitTest(ContainerBase):
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
         # Reload the page to make sure the groups were persisted.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
     def test_delete_inactive_group(self):
