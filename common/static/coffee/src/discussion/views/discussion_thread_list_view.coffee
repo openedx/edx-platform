@@ -445,6 +445,7 @@ if Backbone?
         data: { text: text }
         url: url
         type: "GET"
+        dataType: 'json'
         $loading: $
         loadingCallback: =>
           @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">' + gettext('Loading thread list') + '</span></div></li>')
@@ -465,10 +466,36 @@ if Backbone?
                 true
               )
               @addSearchAlert(message)
+            else if response.discussion_data.length == 0
+              @addSearchAlert(gettext('No threads matched your query.'))
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway
             @displayedCollection.reset(@collection.models) # Don't think this is necessary
+            @searchForUser(text) if text
+
+
+    searchForUser: (text) ->
+      DiscussionUtil.safeAjax
+        data: { username: text }
+        url: DiscussionUtil.urlFor("users")
+        type: "GET"
+        dataType: 'json'
+        error: =>
+          return
+        success: (response) =>
+          if response.users.length > 0
+            message = interpolate(
+              _.escape(gettext('Show posts by %(username)s.')),
+              {"username":
+                _.template('<a class="link-jump" href="<%= url %>"><%- username %></a>', {
+                  url: DiscussionUtil.urlFor("user_profile", response.users[0].id),
+                  username: response.users[0].username
+                })
+              },
+              true
+            )
+            @addSearchAlert(message)
 
     clearSearch: (callback, value) ->
       @$(".post-search-field").val("")
