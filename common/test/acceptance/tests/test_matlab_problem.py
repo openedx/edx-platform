@@ -108,8 +108,8 @@ class MatlabProblemTest(UniqueCourseTest):
             matlab_problem_page.get_grader_msg(".external-grader-message")[0]
         )
 
-        # Wait 1 seconds for next problem_get request.
-        time.sleep(1)
+        # Wait 5 seconds for xqueue stub server grader response sent back to lms.
+        time.sleep(5)
 
         self.assertEqual(u'', matlab_problem_page.get_grader_msg(".external-grader-message")[0])
         self.assertEqual(
