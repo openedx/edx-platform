@@ -30,6 +30,7 @@ email message when we have updated the edX Course Staff Release Notes.
    :maxdepth: 1
 
    read_me
+   06-17-2014
    06-10-2014
    05-20-2014
    05-15-2014
