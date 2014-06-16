@@ -350,7 +350,7 @@ def export_handler(request, course_key_string):
                 'raw_err_msg': str(exc),
                 'failed_module': failed_item,
                 'unit': unit,
-                'edit_unit_url': reverse_usage_url("unit_handler", parent.location) if parent else "",
+                'edit_unit_url': reverse_usage_url("container_handler", parent.location) if parent else "",
                 'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })

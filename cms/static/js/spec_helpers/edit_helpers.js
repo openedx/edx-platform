@@ -83,8 +83,8 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
             // Add templates needed by the settings editor
             modal_helpers.installTemplate('metadata-editor');
-            modal_helpers.installTemplate('metadata-number-entry');
-            modal_helpers.installTemplate('metadata-string-entry');
+            modal_helpers.installTemplate('metadata-number-entry', false, 'metadata-number-entry');
+            modal_helpers.installTemplate('metadata-string-entry', false, 'metadata-string-entry');
         };
 
         showEditModal = function(requests, xblockElement, model, mockHtml, options) {

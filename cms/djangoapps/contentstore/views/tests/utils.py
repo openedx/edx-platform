@@ -41,19 +41,16 @@ class StudioPageTestCase(CourseTestCase):
         resp_content = json.loads(resp.content)
         return resp_content['html']
 
-    def validate_preview_html(self, xblock, view_name, can_edit=True, can_reorder=True, can_add=True):
+    def validate_preview_html(self, xblock, view_name, can_add=True):
         """
         Verify that the specified xblock's preview has the expected HTML elements.
         """
         html = self.get_preview_html(xblock, view_name)
-        self.validate_html_for_add_buttons(html, can_add=can_add)
+        self.validate_html_for_add_buttons(html, can_add)
 
-        # Verify that there are no drag handles for public blocks
+        # Verify drag handles always appear.
         drag_handle_html = '<span data-tooltip="Drag to reorder" class="drag-handle action"></span>'
-        if can_reorder:
-            self.assertIn(drag_handle_html, html)
-        else:
-            self.assertNotIn(drag_handle_html, html)
+        self.assertIn(drag_handle_html, html)
 
         # Verify that there are no action buttons for public blocks
         expected_button_html = [
@@ -62,10 +59,7 @@ class StudioPageTestCase(CourseTestCase):
             '<a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">'
         ]
         for button_html in expected_button_html:
-            if can_edit:
-                self.assertIn(button_html, html)
-            else:
-                self.assertNotIn(button_html, html)
+            self.assertIn(button_html, html)
 
     def validate_html_for_add_buttons(self, html, can_add=True):
         """

@@ -127,7 +127,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(course.id, category='vertical',)
-        resp = self.client.get_html(get_url('unit_handler', descriptor[0].location))
+        resp = self.client.get_html(get_url('container_handler', descriptor[0].location))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
 
@@ -153,7 +153,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # just pick one vertical
         usage_key = course_items[0].id.make_usage_key('vertical', None)
 
-        resp = self.client.get_html(get_url('unit_handler', usage_key))
+        resp = self.client.get_html(get_url('container_handler', usage_key))
         self.assertEqual(resp.status_code, 400)
         _test_no_locations(self, resp, status_code=400)
 
@@ -1185,7 +1185,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # Assert is here to make sure that the course being tested actually has verticals (units) to check.
         self.assertGreater(len(items), 0)
         for descriptor in items:
-            resp = self.client.get_html(get_url('unit_handler', descriptor.location))
+            resp = self.client.get_html(get_url('container_handler', descriptor.location))
             self.assertEqual(resp.status_code, 200)
             _test_no_locations(self, resp)
 
@@ -1585,7 +1585,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')
-        resp = self.client.get_html(get_url('unit_handler', unit_key))
+        resp = self.client.get_html(get_url('container_handler', unit_key))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
 

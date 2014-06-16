@@ -1,4 +1,4 @@
-<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="VerticalDescriptor" data-block-type="wrapper" tabindex="0">
+<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="VerticalDescriptor" tabindex="0">
     <section class="sequence-edit">
         <script id="metadata-editor-tpl" type="text/template">
             <ul class="list-input settings-list">

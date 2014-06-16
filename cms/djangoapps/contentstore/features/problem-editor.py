@@ -305,15 +305,13 @@ def i_can_edit_problem(_step):
 
 @step(u'I edit first blank advanced problem for annotation response$')
 def i_edit_blank_problem_for_annotation_response(_step):
-    edit_css = """$('.component-header:contains("Blank Advanced Problem")').parent().find('a.edit-button').click()"""
+    world.edit_component(1)
     text = """
         <problem>
             <annotationresponse>
                 <annotationinput><text>Text of annotation</text></annotationinput>
             </annotationresponse>
         </problem>"""
-    world.browser.execute_script(edit_css)
-    world.wait_for_ajax_complete()
     type_in_codemirror(0, text)
     world.save_component()
 

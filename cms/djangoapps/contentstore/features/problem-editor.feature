@@ -81,38 +81,6 @@ Feature: CMS.Problem Editor
     When I edit and select Settings
     Then Edit High Level Source is visible
 
-  # This is a very specific scenario that was failing with some of the
-  # DB rearchitecture changes. It had to do with children IDs being stored
-  # with @draft at the end. To reproduce, must update children while in draft mode.
-  Scenario: Problems can be deleted after being public
-    Given I have created a Blank Common Problem
-    And I have created another Blank Common Problem
-    When I publish the unit
-    And I click on "edit a draft"
-    And I delete "1" component
-    And I click on "replace with draft"
-    And I click on "edit a draft"
-    And I delete "1" component
-    Then I see no components
-
-  # This is a very specific scenario for a bug where editing a component in draft
-  # impacted the published version.
-  Scenario: Changes to draft problem do not impact published version
-    Given I have created a Blank Common Problem
-    When I publish the unit
-    And I click on "edit a draft"
-    And I change the display name to "draft"
-    And I click on "delete draft"
-    Then the problem display name is "Blank Common Problem"
-
-  Scenario: Problems can be made private after being made public
-    Given I have created a Blank Common Problem
-    When I publish the unit
-    And I click on "edit a draft"
-    And I click on "delete draft"
-    And I unpublish the unit
-    Then I can edit the problem
-
   Scenario: Cheat sheet visible on toggle
     Given I have created a Blank Common Problem
     And I can edit the problem
