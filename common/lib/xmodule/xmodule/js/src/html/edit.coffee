@@ -63,7 +63,7 @@ class @HTMLEditingDescriptor
         
         # Necessary to avoid stripping of style tags.
         valid_children : "+body[style]",
-        valid_elements: "h1,h2,h3,h4,p[id|style],div[id|style],span[id|style],img[src|style|alt|width|height],br,hr,a[*],strong/b,cite,mark,address,i/em,code,ul,ol,li,blockquote"
+        valid_elements: "h1,h2,h3,h4,p[id|style|class],div[id|style|class],span[id|style],section[id|style|class],img[src|style|alt|width|height],br,hr,a[*],strong/b,cite,mark,address,i/em,code,ul,ol,li,blockquote"
         extended_valid_elements: "link,math,maction,maligngroup,malingmark,menclose,merror,mfenced,mfrac,mglyph,mi,mlabeldtr,mlongdiv,mmultiscripts,mn,mo,mover,mpadded,mphantom,mroot,mrow,ms,mscarries,mscarry,msgroup,mstack,msline,mspace,msqrt,msrow,mstyle,msub,msup,msubsup,mtable,mtd,mtext,mtr,munder,munderover"        
         invalid_elements: "script,style",
         setup: @setupTinyMCE,
