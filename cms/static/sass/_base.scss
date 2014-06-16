@@ -331,11 +331,13 @@ p, ul, ol, dl {
         bottom: -($baseline*1.5);
       }
 
-      .navigation-link {
+      // breadcrumb navigation
+      .navigation-item {
         @extend %cont-truncated;
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
+        color: $gray;
 
         &.navigation-current {
           @extend %ui-disabled;
@@ -348,7 +350,12 @@ p, ul, ol, dl {
         }
       }
 
-      .navigation-link:before {
+
+      .navigation-link:hover {
+        color: $blue;
+      }
+
+      .navigation-item:before {
         content: " / ";
         margin: ($baseline/4);
         color: $gray;
@@ -358,7 +365,7 @@ p, ul, ol, dl {
         }
       }
 
-      .navigation .navigation-link:first-child:before {
+      .navigation .navigation-item:first-child:before {
         content: "";
         margin: 0;
       }

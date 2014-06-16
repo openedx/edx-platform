@@ -396,27 +396,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 def log_out(_step):
     world.visit('logout')
 
-
-@step(u'I click on "edit a draft"$')
-def i_edit_a_draft(_step):
-    world.css_click("a.create-draft")
-
-
-@step(u'I click on "replace with draft"$')
-def i_replace_w_draft(_step):
-    world.css_click("a.publish-draft")
-
-
-@step(u'I click on "delete draft"$')
-def i_delete_draft(_step):
-    world.css_click("a.delete-draft")
-
-
-@step(u'I publish the unit$')
-def publish_unit(_step):
-    world.select_option('visibility-select', 'public')
-
-
-@step(u'I unpublish the unit$')
-def unpublish_unit(_step):
-    world.select_option('visibility-select', 'private')
