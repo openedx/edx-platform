@@ -92,9 +92,9 @@
               external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
               external_grader_msg_elem.addClass("is-fading-in");
               external_grader_msg_elem.html(external_grader_msg);
-              if (!external_grader_msg.trim()){
+              if (!external_grader_msg.trim()) {
                   matlab_result_task.task_poller.stop();
-              }else{
+              } else {
                   result_elem.html('');
               }
           };
@@ -124,6 +124,7 @@
       };
       $('#plot_${id}').click(plot);
 
+      // Copied from lms/static/coffee/src/instructor_dashboard/util.js
       IntervalManager = (function() {
 
         function IntervalManager(ms, fn) {

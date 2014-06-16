@@ -34,7 +34,7 @@ class MatlabProblemTest(UniqueCourseTest):
         )
 
         problem_data = dedent("""
-            <problem source_file="/Users/evheubel/Desktop/MIT/2.003TA/FA2013/203r/203r.tex" weight="0.0" markdown="null">
+            <problem markdown="null">
                   <text>
                     <p>
                         Write MATLAB code to create the following row vector and store it in a variable named <code>V</code>.
@@ -108,9 +108,8 @@ class MatlabProblemTest(UniqueCourseTest):
             matlab_problem_page.get_grader_msg(".external-grader-message")[0]
         )
 
-        # Wait 5 seconds for next problem_get request.
-        # from nose.tools import set_trace; set_trace()
-        time.sleep(5)
+        # Wait 1 seconds for next problem_get request.
+        time.sleep(1)
 
         self.assertEqual(u'', matlab_problem_page.get_grader_msg(".external-grader-message")[0])
         self.assertEqual(
