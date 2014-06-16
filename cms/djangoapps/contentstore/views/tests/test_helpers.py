@@ -20,18 +20,19 @@ class HelpersTestCase(CourseTestCase):
         # Verify chapter URL
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter',
                                      display_name="Week 1")
-        self.assertIsNone(xblock_studio_url(chapter))
+        self.assertEqual(xblock_studio_url(chapter),
+                         u'/course/slashes:MITx+999+Robot_Super_Course')
 
         # Verify lesson URL
         sequential = ItemFactory.create(parent_location=chapter.location, category='sequential',
                                         display_name="Lesson 1")
         self.assertIsNone(xblock_studio_url(sequential))
 
-        # Verify vertical URL
+        # Verify unit URL
         vertical = ItemFactory.create(parent_location=sequential.location, category='vertical',
                                       display_name='Unit')
         self.assertEqual(xblock_studio_url(vertical),
-                         u'/unit/location:MITx+999+Robot_Super_Course+vertical+Unit')
+                         u'/container/location:MITx+999+Robot_Super_Course+vertical+Unit')
 
         # Verify child vertical URL
         child_vertical = ItemFactory.create(parent_location=vertical.location, category='vertical',

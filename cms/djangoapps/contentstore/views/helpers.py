@@ -11,7 +11,7 @@ __all__ = ['edge', 'event', 'landing']
 EDITING_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem"
+    "add-xblock-component-menu-problem", "xblock-string-field-editor",
 ]
 
 # points to the temporary course landing page with log in and sign up
@@ -88,8 +88,8 @@ def xblock_has_own_studio_page(xblock):
     are a few exceptions:
       1. Courses
       2. Verticals that are either:
-        - themselves treated as units (in which case they are shown on a unit page)
-        - a direct child of a unit (in which case they are shown on a container page)
+        - themselves treated as units
+        - a direct child of a unit
       3. XBlocks with children, except for:
         - sequentials (aka subsections)
         - chapters (aka sections)
@@ -101,7 +101,7 @@ def xblock_has_own_studio_page(xblock):
     elif category == 'vertical':
         parent_xblock = get_parent_xblock(xblock)
         return is_unit(parent_xblock) if parent_xblock else False
-    elif category in ('sequential', 'chapter'):
+    elif category == 'sequential':
         return False
 
     # All other xblocks with children have their own page
@@ -115,12 +115,7 @@ def xblock_studio_url(xblock):
     if not xblock_has_own_studio_page(xblock):
         return None
     category = xblock.category
-    parent_xblock = get_parent_xblock(xblock)
-    parent_category = parent_xblock.category if parent_xblock else None
-    if category == 'course':
+    if category in ('course', 'chapter'):
         return reverse_course_url('course_handler', xblock.location.course_key)
-    elif category == 'vertical' and parent_category == 'sequential':
-        # only show the unit page for verticals directly beneath a subsection
-        return reverse_usage_url('unit_handler', xblock.location)
     else:
         return reverse_usage_url('container_handler', xblock.location)

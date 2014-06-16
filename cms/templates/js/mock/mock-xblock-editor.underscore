@@ -1,5 +1,5 @@
 <div class="xblock xblock-studio_view" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
-     data-init="MockXBlock" data-runtime-class="StudioRuntime" data-block-type="mock" tabindex="0">
+     data-init="MockXBlock" data-runtime-class="StudioRuntime" tabindex="0">
 
     <div class="mock-xblock">
         <h3>Mock XBlock Editor</h3>
