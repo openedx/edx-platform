@@ -16,28 +16,9 @@ from api_manager.models import GroupRelationship, CourseGroupRelationship, Group
 from xmodule.modulestore.django import modulestore
 from api_manager.permissions import SecureAPIView
 from xmodule.modulestore import Location, InvalidLocationError
-from api_manager.utils import str2bool
+from api_manager.utils import str2bool, generate_base_uri
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
-
-
-def _generate_base_uri(request, include_query_string=True):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    if include_query_string:
-        path_to_use = request.get_full_path()
-    else:
-        path_to_use = request.path_info
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        path_to_use
-    )
-    return resource_uri
 
 
 class GroupsList(SecureAPIView):
@@ -84,7 +65,6 @@ class GroupsList(SecureAPIView):
         if group_type is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         response_data = {}
-        base_uri = _generate_base_uri(request)
         # Group name must be unique, but we need to support dupes
         group = Group.objects.create(name=str(uuid.uuid4()))
         original_group_name = request.DATA.get('name', None)
@@ -106,12 +86,9 @@ class GroupsList(SecureAPIView):
             data=json.dumps(data)
         )
 
-        response_data = {
-            'id': group.id,
-            'name': profile.name,
-        }
-        base_uri = _generate_base_uri(request)
-        response_data['uri'] = '{}/{}'.format(_generate_base_uri(request, False), group.id)
+        response_data['id'] = group.id
+        response_data['name'] = profile.name
+        response_data['uri'] = '{}/{}'.format(generate_base_uri(request, True), group.id)
         response_status = status.HTTP_201_CREATED
         return Response(response_data, status=response_status)
 
@@ -135,7 +112,7 @@ class GroupsList(SecureAPIView):
             item_data['type'] = profile.group_type
             if profile.data:
                 item_data['data'] = json.loads(profile.data)
-            item_data['uri'] = '{}/{}'.format(_generate_base_uri(request, False), profile.group_id)
+            item_data['uri'] = '{}/{}'.format(generate_base_uri(request, True), profile.group_id)
             response_data.append(item_data)
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -173,7 +150,6 @@ class GroupsDetail(SecureAPIView):
         POST /api/groups/{group_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
         try:
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
@@ -189,7 +165,7 @@ class GroupsDetail(SecureAPIView):
         response_data['id'] = existing_group.id
         response_data['name'] = profile.name
         response_data['type'] = profile.group_type
-        response_data['uri'] = _generate_base_uri(request)
+        response_data['uri'] = generate_base_uri(request)
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, group_id):
@@ -197,7 +173,7 @@ class GroupsDetail(SecureAPIView):
         GET /api/groups/{group_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
@@ -252,7 +228,7 @@ class GroupsUsersList(SecureAPIView):
         """
         POST /api/groups/{group_id}/users/
         """
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
@@ -323,7 +299,7 @@ class GroupsUsersDetail(SecureAPIView):
         GET /api/groups/{group_id}/users/{user_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_group = Group.objects.get(id=group_id)
             existing_relationship = existing_group.user_set.get(id=user_id)
@@ -391,7 +367,7 @@ class GroupsGroupsList(SecureAPIView):
         response_data = {}
         to_group_id = request.DATA['group_id']
         relationship_type = request.DATA['relationship_type']
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, to_group_id)
         response_data['group_id'] = str(to_group_id)
         response_data['relationship_type'] = relationship_type
@@ -426,7 +402,7 @@ class GroupsGroupsList(SecureAPIView):
             from_group_relationship = None
         response_data = []
         if from_group_relationship:
-            base_uri = _generate_base_uri(request)
+            base_uri = generate_base_uri(request)
             group_type = request.QUERY_PARAMS.get('type', None)
             child_groups = GroupRelationship.objects.filter(parent_group_id=group_id)
             linked_groups = from_group_relationship.get_linked_group_relationships()
@@ -473,7 +449,7 @@ class GroupsGroupsDetail(SecureAPIView):
         GET /api/groups/{group_id}/groups/{related_group_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         response_data['from_group_id'] = group_id
         response_data['to_group_id'] = related_group_id
@@ -549,7 +525,7 @@ class GroupsCoursesList(SecureAPIView):
         store = modulestore()
         course_id = request.DATA['course_id']
 
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
 
         existing_course = store.get_course(course_id)
@@ -613,7 +589,7 @@ class GroupsCoursesDetail(SecureAPIView):
         GET /api/groups/{group_id}/courses/{course_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         try:
             existing_group = Group.objects.get(id=group_id)

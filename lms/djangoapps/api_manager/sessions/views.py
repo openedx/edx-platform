@@ -16,29 +16,13 @@ from rest_framework.response import Response
 
 
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-
+from api_manager.utils import generate_base_uri
 
 from api_manager.users.serializers import UserSerializer
 from student.models import (
     LoginFailures, PasswordHistory
 )
 AUDIT_LOG = logging.getLogger("audit")
-
-
-def _generate_base_uri(request):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        request.get_full_path()
-    )
-    return resource_uri
-
 
 class SessionsList(SecureAPIView):
     """ Inherit with SecureAPIView """
@@ -55,7 +39,7 @@ class SessionsList(SecureAPIView):
             response_data['message'] = _('Rate limit exceeded in api login.')
             return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_user = User.objects.get(username=request.DATA['username'])
         except ObjectDoesNotExist:
@@ -121,7 +105,7 @@ class SessionsDetail(SecureAPIView):
         GET retrieves an existing system session
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)
         try:
@@ -145,7 +129,6 @@ class SessionsDetail(SecureAPIView):
         DELETE flushes an existing system session from the system
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)
         user_id = session[SESSION_KEY]
