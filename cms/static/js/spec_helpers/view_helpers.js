@@ -6,9 +6,11 @@ define(["jquery", "js/views/feedback_notification", "js/spec_helpers/create_sino
         var installTemplate, installTemplates, installViewTemplates, createNotificationSpy,
             verifyNotificationShowing, verifyNotificationHidden;
 
-        installTemplate = function(templateName, isFirst) {
-            var template = readFixtures(templateName + '.underscore'),
+        installTemplate = function(templateName, isFirst, templateId) {
+            var template = readFixtures(templateName + '.underscore');
+            if (!templateId) {
                 templateId = templateName + '-tpl';
+            }
 
             if (isFirst) {
                 setFixtures($("<script>", { id: templateId, type: "text/template" }).text(template));

@@ -147,10 +147,19 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             save: function(event) {
+                var self = this,
+                    editorView = this.editorView,
+                    xblockInfo = this.xblockInfo,
+                    data = editorView.getXModuleData();
                 event.preventDefault();
-                this.editorView.save({
-                    success: _.bind(this.onSave, this)
-                });
+                if (data) {
+                    this.runOperationShowingMessage(gettext('Saving&hellip;'),
+                        function() {
+                            return xblockInfo.save(data);
+                        }).done(function() {
+                            self.onSave();
+                        });
+                }
             },
 
             onSave: function() {
@@ -177,7 +186,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
                     displayName = xblockWrapperElement.find('.xblock-header .header-details .xblock-display-name').text().trim();
-                    // If not found, try looking for the old unit page style rendering
+                    // If not found, try looking for the old unit page style rendering.
+                    // Only used now by static pages.
                     if (!displayName) {
                         displayName = this.xblockElement.find('.component-header').text().trim();
                     }

@@ -3,8 +3,10 @@
  * This page allows the user to understand and manipulate the xblock and its children.
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/container",
-        "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo) {
+        "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info",
+        "js/views/xblock_string_field_editor"],
+    function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo,
+                XBlockStringFieldEditor) {
         var XBlockContainerPage = BaseView.extend({
             // takes XBlockInfo as a model
 
@@ -12,6 +14,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
 
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
+                this.nameEditor = new XBlockStringFieldEditor({
+                    el: this.$('.wrapper-xblock-field'),
+                    model: this.model
+                });
+                this.nameEditor.render();
                 this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
@@ -36,12 +43,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
 
                 // Render the xblock
                 xblockView.render({
-                    success: function(xblock) {
+                    success: function() {
                         xblockView.xblock.runtime.notify("page-shown", self);
                         xblockView.$el.removeClass('is-hidden');
                         self.renderAddXBlockComponents();
                         self.onXBlockRefresh(xblockView);
-                        self.refreshTitle();
+                        self.refreshDisplayName();
                         loadingElement.addClass('is-hidden');
                         self.delegateEvents();
                     }
@@ -56,10 +63,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 return this.xblockView.model.urlRoot;
             },
 
-            refreshTitle: function() {
-                var title = this.$('.xblock-header .header-details .xblock-display-name').first().text().trim();
-                this.$('.page-header-title').text(title);
-                this.$('.page-header .subtitle a').last().text(title);
+            refreshDisplayName: function() {
+                var displayName = this.$('.xblock-header .header-details .xblock-display-name').first().text().trim();
+                this.model.set('display_name', displayName);
             },
 
             onXBlockRefresh: function(xblockView) {
