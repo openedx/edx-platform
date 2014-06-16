@@ -82,7 +82,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             },
 
             updateChildren: function (targetParent, successCallback) {
-                var children, childLocators;
+                var children, childLocators, xblockInfo=this.model;
 
                 // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.
@@ -110,6 +110,8 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         if (successCallback) {
                             successCallback();
                         }
+                        // Update publish and last modified information from the server.
+                        xblockInfo.fetch();
                     }
                 });
             },
