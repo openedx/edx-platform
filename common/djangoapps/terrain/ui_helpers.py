@@ -37,11 +37,6 @@ REQUIREJS_WAIT = {
         "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
-    # Individual Unit (editing)
-    re.compile('^Individual Unit \|'): [
-        "js/base", "coffee/src/views/unit",
-        "coffee/src/views/module_edit"],
-
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile('^Course Outline \|'): [
