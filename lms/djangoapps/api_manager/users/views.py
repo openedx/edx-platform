@@ -17,6 +17,7 @@ from django.db.models import Q
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile
 from api_manager.organizations.serializers import OrganizationSerializer
+from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer
 
@@ -38,21 +39,6 @@ from courseware.courses import get_course
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
-
-
-def _generate_base_uri(request):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        request.get_full_path()
-    )
-    return resource_uri
 
 
 def _serialize_user_profile(response_data, user_profile):
@@ -193,7 +179,7 @@ class UsersList(SecureListAPIView):
         POST /api/users/
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         email = request.DATA['email']
         username = request.DATA['username']
         password = request.DATA['password']
@@ -335,7 +321,7 @@ class UsersDetail(SecureAPIView):
         GET /api/users/{user_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
@@ -360,8 +346,7 @@ class UsersDetail(SecureAPIView):
         POST /api/users/{user_id}
         """
         response_data = {}
-        base_uri = _generate_base_uri(request)
-        response_data['uri'] = _generate_base_uri(request)
+        response_data['uri'] = generate_base_uri(request)
         first_name = request.DATA.get('first_name')  # Used in multiple spots below
         last_name = request.DATA.get('last_name')  # Used in multiple spots below
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
@@ -523,7 +508,7 @@ class UsersGroupsList(SecureAPIView):
         """
         response_data = {}
         group_id = request.DATA['group_id']
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, str(group_id))
         try:
             existing_user = User.objects.get(id=user_id)
@@ -552,7 +537,7 @@ class UsersGroupsList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         group_type = request.QUERY_PARAMS.get('type', None)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         groups = existing_user.groups.all()
         if group_type:
@@ -590,7 +575,7 @@ class UsersGroupsDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = existing_user.id
         response_data['group_id'] = existing_relationship.id
-        response_data['uri'] = _generate_base_uri(request)
+        response_data['uri'] = generate_base_uri(request)
         return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, group_id):
@@ -633,7 +618,7 @@ class UsersCoursesList(SecureAPIView):
             course_descriptor = store.get_course(course_id)
         except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         course_enrollment = CourseEnrollment.enroll(user, course_id)
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
         response_data['id'] = course_id
@@ -646,7 +631,7 @@ class UsersCoursesList(SecureAPIView):
         GET /api/users/{user_id}/courses/
         """
         store = modulestore()
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
@@ -702,7 +687,7 @@ class UsersCoursesDetail(SecureAPIView):
         POST /api/users/{user_id}/courses/{course_id}
         """
         store = modulestore()
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data = {}
         response_data['uri'] = base_uri
         try:
@@ -728,7 +713,7 @@ class UsersCoursesDetail(SecureAPIView):
         """
         store = modulestore()
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
             course_descriptor = store.get_course(course_id)
