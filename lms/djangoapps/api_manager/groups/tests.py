@@ -357,15 +357,13 @@ class GroupsApiTests(ModuleStoreTestCase):
         is_active = True
 
         for num in range(0, 5):
-            local_username = self.test_username + str(randint(11, 99))
-            local_email = str(randint(11,99)) + self.test_email
 
             if num == 3:
                 is_active = False
 
             data = {
-                'email': local_email,
-                'username': local_username,
+                'email': '{}{}'.format(num, self.test_email),
+                'username': '{}{}'.format(num, self.test_username),
                 'password': self.test_password,
                 'first_name': self.test_first_name,
                 'last_name': self.test_last_name,

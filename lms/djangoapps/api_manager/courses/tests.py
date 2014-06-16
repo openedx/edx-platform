@@ -211,6 +211,9 @@ class CoursesApiTests(TestCase):
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertGreater(len(response.data['content']), 0)
+        for resource in response.data['resources']:
+            response = self.do_get(resource['uri'])
+            self.assertEqual(response.status_code, 200)
 
     def test_courses_detail_get_notfound(self):
         test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id
