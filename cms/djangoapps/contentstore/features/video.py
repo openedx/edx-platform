@@ -166,7 +166,7 @@ def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
     world.wait_for_visible('.hide-subtitles')
     if captions_state == 'closed':
-        if not world.is_css_present(SELECTOR):
+        if world.is_css_not_present(SELECTOR):
             world.css_find('.hide-subtitles').click()
     else:
         if world.is_css_present(SELECTOR):
