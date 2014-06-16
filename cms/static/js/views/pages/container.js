@@ -28,8 +28,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 // Hide both blocks until we know which one to show
                 xblockView.$el.addClass('is-hidden');
 
-                // Add actions to any top level buttons, e.g. "Edit" of the container itself
-                self.addButtonActions(this.$el);
+                if (!options || !options.refresh) {
+                    // Add actions to any top level buttons, e.g. "Edit" of the container itself.
+                    // Do not add the actions on "refresh" though, as the handlers are already registered.
+                    self.addButtonActions(this.$el);
+                }
 
                 // Render the xblock
                 xblockView.render({
@@ -192,7 +195,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                     parentElement = xblockElement.parent(),
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
-                    this.render({ });
+                    this.render({refresh: true});
                 } else if (parentElement.hasClass('reorderable-container')) {
                     this.refreshChildXBlock(xblockElement);
                 } else {

@@ -35,15 +35,17 @@ XMODULE_METRIC_NAME = 'edxapp.xmodule'
 # xblock view names
 
 # This is the view that will be rendered to display the XBlock in the LMS.
+# It will also be used to render the block in "preview" mode in Studio, unless
+# the XBlock also implements author_view.
 STUDENT_VIEW = 'student_view'
 
-# An optional view of the xblock similar to student_view, but with possible inline
+# An optional view of the XBlock similar to student_view, but with possible inline
 # editing capabilities. This view differs from studio_view in that it should be as similar to student_view
-# as possible. When previewing xblocks within Studio, Studio will prefer author_view to student_view.
+# as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
 AUTHOR_VIEW = 'author_view'
 
 # The view used to render an editor in Studio. The editor rendering can be completely different
-# from the LMS student_view, and it is only shown with the author selects "Edit".
+# from the LMS student_view, and it is only shown when the author selects "Edit".
 STUDIO_VIEW = 'studio_view'
 
 # Views that present a "preview" view of an xblock (as opposed to an editing view).

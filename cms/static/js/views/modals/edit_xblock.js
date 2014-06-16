@@ -168,10 +168,6 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 if (this.runtime) {
                     this.runtime.notify('modal-hidden');
                 }
-
-                // Completely clear the contents of the modal
-                this.undelegateEvents();
-                this.$el.html("");
             },
 
             findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {

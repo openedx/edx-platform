@@ -55,11 +55,13 @@ class ValidationMessage(object):
     """
     Represents a single validation message for an xblock.
     """
-    def __init__(self, xblock, message_text, message_type):
+    def __init__(self, xblock, message_text, message_type, action_class=None, action_label=None):
         assert isinstance(message_text, unicode)
         self.xblock = xblock
         self.message_text = message_text
         self.message_type = message_type
+        self.action_class = action_class
+        self.action_label = action_label
 
     def __unicode__(self):
         return self.message_text
@@ -76,12 +78,15 @@ class SplitTestFields(object):
     no_partition_selected = {'display_name': _("Not Selected"), 'value': -1}
 
     @staticmethod
-    def build_partition_values(all_user_partitions):
+    def build_partition_values(all_user_partitions, selected_user_partition):
         """
         This helper method builds up the user_partition values that will
         be passed to the Studio editor
         """
-        SplitTestFields.user_partition_values = [SplitTestFields.no_partition_selected]
+        SplitTestFields.user_partition_values = []
+        # Add "No selection" value if there is not a valid selected user partition.
+        if not selected_user_partition:
+            SplitTestFields.user_partition_values.append(SplitTestFields.no_partition_selected)
         for user_partition in all_user_partitions:
             SplitTestFields.user_partition_values.append({"display_name": user_partition.name, "value": user_partition.id})
         return SplitTestFields.user_partition_values
@@ -121,7 +126,6 @@ class SplitTestFields(object):
         help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
     )
-
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
@@ -258,15 +262,12 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
+        is_configured = not self.user_partition_id == SplitTestFields.no_partition_selected['value']
         is_root = root_xblock and root_xblock.location == self.location
         active_groups_preview = None
         inactive_groups_preview = None
-        # We don't show the "add missing groups" button on the unit page-- only when showing the container page.
-        is_missing_groups = False
         if is_root:
-            user_partition = self.descriptor.get_selected_partition()
             [active_children, inactive_children] = self.descriptor.active_and_inactive_children()
-            is_missing_groups = user_partition and len(active_children) < len(user_partition.groups)
             active_groups_preview = self.studio_render_children(
                 fragment, active_children, context
             )
@@ -277,9 +278,9 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         fragment.add_content(self.system.render_template('split_test_author_view.html', {
             'split_test': self,
             'is_root': is_root,
+            'is_configured': is_configured,
             'active_groups_preview': active_groups_preview,
             'inactive_groups_preview': inactive_groups_preview,
-            'is_missing_groups': is_missing_groups
         }))
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_author_view.js'))
         fragment.initialize_js('SplitTestAuthorView')
@@ -430,7 +431,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
     @property
     def editable_metadata_fields(self):
         # Update the list of partitions based on the currently available user_partitions.
-        SplitTestFields.build_partition_values(self.user_partitions)
+        SplitTestFields.build_partition_values(self.user_partitions, self.get_selected_partition())
 
         editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
 
@@ -508,15 +509,17 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         if self.user_partition_id < 0:
             messages.append(ValidationMessage(
                 self,
-                _(u"You must select a group configuration for this content experiment."),
-                ValidationMessageType.warning
+                _(u"The experiment is not associated with a group configuration."),
+                ValidationMessageType.warning,
+                'edit-button',
+                _(u"Select a Group Configuration")
             ))
         else:
             user_partition = self.get_selected_partition()
             if not user_partition:
                 messages.append(ValidationMessage(
                     self,
-                    _(u"This content experiment will not be shown to students because it refers to a group configuration that has been deleted. You can delete this experiment or reinstate the group configuration to repair it."), \
+                    _(u"The experiment uses a deleted group configuration. Select a valid group configuration or delete this experiment."),
                     ValidationMessageType.error
                 ))
             else:
@@ -524,13 +527,15 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                 if len(active_children) < len(user_partition.groups):
                     messages.append(ValidationMessage(
                         self,
-                        _(u"This content experiment is missing groups that are defined in the current configuration. You can press the 'Create Missing Groups' button to create them."),
-                        ValidationMessageType.error
+                        _(u"The experiment does not contain all of the groups in the configuration."),
+                        ValidationMessageType.error,
+                        'add-missing-groups-button',
+                        _(u"Add Missing Groups")
                     ))
                 if len(inactive_children) > 0:
                     messages.append(ValidationMessage(
                         self,
-                        _(u"This content experiment has children that are not associated with the selected group configuration. You can move content into an active group or delete it if it is unneeded."),
+                        _(u"The experiment has an inactive group. Move content into active groups, then delete the inactive group."),
                         ValidationMessageType.warning
                     ))
         return messages
@@ -543,16 +548,17 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         Called from Studio view.
         """
         user_partition = self.get_selected_partition()
+
+        changed = False
         for group in user_partition.groups:
             str_group_id = unicode(group.id)
-            changed = False
             if str_group_id not in self.group_id_to_child:
                 self._create_vertical_for_group(group)
                 changed = True
 
-            if changed:
-                # request does not have a user attribute, so pass None for user.
-                self.system.modulestore.update_item(self, None)
+        if changed:
+            # request does not have a user attribute, so pass None for user.
+            self.system.modulestore.update_item(self, None)
         return Response()
 
     def _create_vertical_for_group(self, group):

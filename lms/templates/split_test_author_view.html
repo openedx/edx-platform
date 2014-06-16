@@ -7,82 +7,72 @@ user_partition = split_test.descriptor.get_selected_partition()
 messages = split_test.descriptor.validation_messages()
 %>
 
-% if is_root and not user_partition:
+% if is_root and not is_configured:
     <div class="no-container-content">
 % else:
     <div class="wrapper-xblock-message">
 % endif
 
-% if not user_partition:
-    <div class="xblock-message error">
+% if user_partition:
+    <div class="xblock-message information">
         <p>
-            <i class="icon-exclamation-sign"></i>
-            ${_("You must select a group configuration for this content experiment.")}
-            <a href="#" class="button edit-button action-button">
-                <i class="icon-pencil"></i> <span class="action-button-text">${_("Select a Group Configuration")}</span>
-            </a>
+            <span class="message-text">
+            ${_("This content experiment uses group configuration '{experiment_name}'.").format(experiment_name=user_partition.name)}
+            </span>
         </p>
     </div>
-% else:
-    % if is_root or len(messages) == 0:
-        <div class="xblock-message information">
-            <p>
-                <span class="message-text">
-                ${_("This content experiment uses group configuration '{experiment_name}'.").format(experiment_name=user_partition.name)}
-                </span>
-            </p>
-        </div>
+% endif
+% if len(messages) > 0:
+    <%
+    def get_validation_icon(validation_type):
+        if validation_type == 'error':
+            return 'icon-exclamation-sign'
+        elif validation_type == 'warning':
+            return 'icon-warning-sign'
+        return None
+
+    error_messages = (message for message in messages if message.message_type==ValidationMessageType.error)
+    has_errors = next(error_messages, False)
+    aggregate_validation_class = 'has-errors' if has_errors else 'has-warnings'
+    aggregate_validation_type = 'error' if has_errors else 'warning'
+    %>
+    <div class="xblock-message validation ${aggregate_validation_class}">
+    % if is_configured:
+        <p class="${aggregate_validation_type}"><i class="${get_validation_icon(aggregate_validation_type)}"></i>
+        ${_("This content experiment has issues that affect content visibility.")}
+        </p>
     % endif
-    % if is_root:
-        <ul>
+    % if is_root or not is_configured:
+        <ul class="xblock-message-list">
         % for message in messages:
             <%
             message_type = message.message_type
             message_type_display_name = ValidationMessageType.display_name(message_type) if message_type else None
             %>
-                <li class="xblock-message ${message_type}">
-                    % if message_type == 'warning':
-                        <i class="icon-warning-sign"></i>
-                    % elif message_type == 'error':
-                        <i  class="icon-exclamation-sign"></i>
+                <li class="xblock-message-item ${message_type}">
+                    % if not is_configured:
+                        <i class="${get_validation_icon(message_type)}"></i>
                     % endif
                     <span class="message-text">
                         % if message_type_display_name:
                             <span class="sr">${message_type_display_name}:</span>
                         % endif
                         ${unicode(message)}
+
+                    % if message.action_class:
+                        <a href="#" class="button action-button ${message.action_class}">
+                            <span class="action-button-text">${message.action_label}</span>
+                        </a>
+                    % endif
                     </span>
                 </li>
         % endfor
         </ul>
-    % elif len(messages) > 0:
-        <%
-        error_messages = (message for message in messages if message.message_type==ValidationMessageType.error)
-        %>
-        % if next(error_messages, False):
-            <div class="xblock-message error">
-                <i  class="icon-exclamation-sign"></i>
-                ${_("This content experiment has errors that should be resolved.")}
-            </div>
-        % else:
-            <div class="xblock-message error">
-                <i  class="icon-warning-sign"></i>
-                ${_("This content experiment has warnings that might need to be investigated.")}
-            </div>
-        % endif
     % endif
-    % if is_missing_groups:
-        <a href="#" class="button add-missing-groups-button action-button">
-            <span class="action-button-text">${_("Create Missing Groups")}</span>
-        </a>
-    % endif
+    </div>
 % endif
 
-% if is_root and not user_partition:
-    </div>
-% else:
-    </div>
-% endif
+</div>
 
 % if is_root:
     <div class="wrapper-groups is-active">
