@@ -32,19 +32,18 @@ main_xblock_info = {
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates) {
-                var view, mainXBlockInfo;
-
+            function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
                 var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
+                var mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
 
-                mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
-
-                view = new ContainerPage({
-                    el: $('#content'),
-                    model: mainXBlockInfo,
-                    templates: templates
+                xmoduleLoader.done(function () {
+                    var view = new ContainerPage({
+                        el: $('#content'),
+                        model: mainXBlockInfo,
+                        templates: templates
+                    });
+                    view.render();
                 });
-                view.render();
             });
 </script>
 
