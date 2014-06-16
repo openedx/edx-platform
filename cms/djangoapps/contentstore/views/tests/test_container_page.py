@@ -3,9 +3,7 @@ Unit tests for the container page.
 """
 
 import re
-from contentstore.utils import compute_publish_state
 from contentstore.views.tests.utils import StudioPageTestCase
-from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 
@@ -35,10 +33,13 @@ class ContainerPageTestCase(StudioPageTestCase):
                 'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                r'<a href="/unit/{}"\s*'
-                r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="#" class="navigation-link navigation-current">Split Test</a>'
-            ).format(re.escape(unicode(self.vertical.location)))
+                r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
+                r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
+                r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>'
+            ).format(
+                course=re.escape(unicode(self.course.id)),
+                unit=re.escape(unicode(self.vertical.location)),
+            ),
         )
 
     def test_container_on_container_html(self):
@@ -57,15 +58,15 @@ class ContainerPageTestCase(StudioPageTestCase):
                     'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    r'<a href="/unit/{unit}"\s*'
-                    r'class="navigation-link navigation-parent">Unit</a>\s*'
-                    r'<a href="/container/{split_test}"\s*'
-                    r'class="navigation-link navigation-parent">Split Test</a>\s*'
-                    r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
+                    r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
+                    r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
+                    r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>\s*'
+                    r'<a href="/container/{split_test}" class="navigation-item navigation-link navigation-parent">\s*Split Test\s*</a>'
                 ).format(
+                    course=re.escape(unicode(self.course.id)),
                     unit=re.escape(unicode(self.vertical.location)),
                     split_test=re.escape(unicode(self.child_container.location))
-                )
+                ),
             )
 
         # Test the draft version of the container
@@ -82,18 +83,8 @@ class ContainerPageTestCase(StudioPageTestCase):
         and the breadcrumbs trail is correct.
         """
         html = self.get_page_html(xblock)
-        publish_state = compute_publish_state(xblock)
         self.assertIn(expected_section_tag, html)
-        # Verify the navigation link at the top of the page is correct.
         self.assertRegexpMatches(html, expected_breadcrumbs)
-
-        # Verify the link that allows users to change publish status.
-        if publish_state == PublishState.public:
-            expected_message = 'you need to edit unit <a href="/unit/{}">Unit</a> as a draft.'
-        else:
-            expected_message = 'your changes will be published with unit <a href="/unit/{}">Unit</a>.'
-        expected_unit_link = expected_message.format(self.vertical.location)
-        self.assertIn(expected_unit_link, html)
 
     def test_public_container_preview_html(self):
         """
@@ -102,23 +93,17 @@ class ContainerPageTestCase(StudioPageTestCase):
         published_unit = self.store.publish(self.vertical.location, self.user.id)
         published_child_container = self.store.get_item(self.child_container.location)
         published_child_vertical = self.store.get_item(self.child_vertical.location)
-        self.validate_preview_html(published_unit, self.container_view,
-                                   can_edit=False, can_reorder=False, can_add=False)
-        self.validate_preview_html(published_child_container, self.container_view,
-                                   can_edit=False, can_reorder=False, can_add=False)
-        self.validate_preview_html(published_child_vertical, self.reorderable_child_view,
-                                   can_edit=False, can_reorder=False, can_add=False)
+        self.validate_preview_html(published_unit, self.container_view)
+        self.validate_preview_html(published_child_container, self.container_view)
+        self.validate_preview_html(published_child_vertical, self.reorderable_child_view)
 
     def test_draft_container_preview_html(self):
         """
         Verify that a draft xblock's container preview returns the expected HTML.
         """
-        self.validate_preview_html(self.vertical, self.container_view,
-                                   can_edit=True, can_reorder=True, can_add=True)
-        self.validate_preview_html(self.child_container, self.container_view,
-                                   can_edit=True, can_reorder=True, can_add=True)
-        self.validate_preview_html(self.child_vertical, self.reorderable_child_view,
-                                   can_edit=True, can_reorder=True, can_add=True)
+        self.validate_preview_html(self.vertical, self.container_view)
+        self.validate_preview_html(self.child_container, self.container_view)
+        self.validate_preview_html(self.child_vertical, self.reorderable_child_view)
 
     def test_public_child_container_preview_html(self):
         """
@@ -126,25 +111,11 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
-        self.validate_preview_html(published_empty_child_container, self.reorderable_child_view,
-                                   can_reorder=False, can_edit=False, can_add=False)
+        self.validate_preview_html(published_empty_child_container, self.reorderable_child_view, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
-        self.validate_preview_html(empty_child_container, self.reorderable_child_view,
-                                   can_reorder=True, can_edit=True, can_add=False)
-
-    def _create_item(self, parent_location, category, display_name, **kwargs):
-        """
-        creates an item in the module store, without publishing it.
-        """
-        return ItemFactory.create(
-            parent_location=parent_location,
-            category=category,
-            display_name=display_name,
-            publish_item=False,
-            **kwargs
-        )
+        self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)

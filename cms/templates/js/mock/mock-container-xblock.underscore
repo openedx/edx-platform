@@ -10,7 +10,7 @@
     </div>
 </header>
 <article class="xblock-render">
-    <div class="xblock" data-block-type="vertical" data-locator="locator-container"
+    <div class="xblock" data-locator="locator-container"
          data-init="MockXBlock" data-runtime-class="StudioRuntime" data-runtime-version="1">
         <ol class="reorderable-container">
             <li class="studio-xblock-wrapper is-draggable" data-locator="locator-group-A">
@@ -35,7 +35,7 @@
                     </header>
 
                     <article class="xblock-render">
-                        <div class="xblock" data-block-type="vertical">
+                        <div class="xblock">
                             <ol class="reorderable-container">
                                 <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-A1">
                                     <section class="wrapper-xblock level-element"
@@ -144,7 +144,7 @@
                     </header>
 
                     <article class="xblock-render">
-                        <div class="xblock" data-block-type="vertical">
+                        <div class="xblock">
                             <ol class="reorderable-container">
                                 <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-B1">
                                     <section class="wrapper-xblock level-element"

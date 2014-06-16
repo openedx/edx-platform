@@ -13,18 +13,19 @@
     border-bottom: none;
     padding-bottom: 0;
 
-    .page-header {
+    .page-header-title {
       @extend %t-title;
       @include font-size(28);
       @include line-height(32);
+      font-weight: 600;
+    }
 
-      .subtitle .navigation-link {
-        color: $gray;
-
-        &:hover {
-          color: $blue;
-        }
-      }
+    .page-header-title-edit {
+      @extend %t-title4;
+      background: none repeat scroll 0 0 $white;
+      border: 0;
+      box-shadow: 0 0 2px 2px $shadow inset;
+      font-weight: 600;
     }
   }
 
@@ -127,6 +128,158 @@
       .copy {
         @extend %t-copy-sub1;
         padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
+      }
+    }
+
+    // location widget
+    .unit-location {
+      border-top: 5px solid $gray-l1;
+      background-color: $white;
+
+      .header {
+        @extend %t-title6;
+        padding: ($baseline/2) ($baseline*.75);
+        background-color: $gray-l4;
+        font-weight: 600;
+      }
+
+      .content-bit {
+        margin: ($baseline*.75);
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: ($baseline/2);
+
+        &:last-child {
+          border-bottom: 0;
+        }
+
+        .title {
+         @extend %t-title7;
+         margin-bottom: ($baseline/2);
+         font-weight: 600;
+         color: $gray-d1;
+        }
+
+        .tip {
+          @extend %t-copy-sub2;
+          display: inline-block;
+          margin: ($baseline/4) 0;
+          color: $gray-l2;
+        }
+      }
+
+      .wrapper-unit-id {
+
+        .unit-id-value {
+          @extend %t-copy-sub1;
+          display: inline-block;
+          margin: ($baseline/4) 0;
+        }
+      }
+
+      .wrapper-unit-tree-location {
+
+        .draggable-drop-indicator {
+          display: none;
+        }
+
+        .section-name {
+          @extend %t-title8;
+
+          &:hover {
+            background: $blue-l5;
+            color: $blue;
+          }
+        }
+
+        .subsection,
+        .courseware-unit {
+          margin: ($baseline/4) 0 0 ($baseline*.75);
+        }
+
+        .courseware-unit .section-item {
+          background-color: transparent;
+        }
+
+        .section-item {
+          @include transition(background $tmg-avg ease-in-out 0);
+          @include box-sizing(border-box);
+          @extend %t-copy-sub2;
+          width: 100%;
+          display: inline-block;
+          vertical-align: top;
+          overflow: hidden;
+          padding: 6px 8px 8px 16px;
+          background: $gray-l5;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          color: $gray;
+
+          &:hover {
+            background: $blue-l5;
+            color: $blue;
+          }
+
+          &.editing {
+            background-color: $orange-l3;
+          }
+
+          .public-item {
+            color: $black;
+          }
+
+          .private-item {
+            color: $gray-l1;
+          }
+
+          .draft-item {
+            color: $yellow-d1;
+          }
+
+          .public-item:hover,
+          .private-item:hover,
+          .draft-item:hover {
+            color: $blue;
+          }
+
+          .draft-item:after,
+          .public-item:after,
+          .private-item:after {
+            @include font-size(9);
+            margin-left: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+          .draft-item:after {
+            content: "- draft";
+          }
+
+          .private-item:after {
+            content: "- private";
+          }
+        }
+
+        .subsection > .section-item:hover {
+          background-color: $gray-l5;
+          color: inherit;
+        }
+
+        .new-unit-item {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action4;
+          width: 90%;
+          margin: 0 0 ($baseline/2) ($baseline/4);
+          border: 1px solid transparent;
+          padding: ($baseline/4) ($baseline/2);
+          font-weight: normal;
+          color: $gray-l2;
+          text-align: left;
+
+          &:hover {
+            box-shadow: none;
+            background-image: none;
+          }
+        }
       }
     }
   }

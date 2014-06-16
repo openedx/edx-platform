@@ -21,35 +21,18 @@ class UnitPageTestCase(StudioPageTestCase):
                                         category="video", display_name="My Video")
         self.store = modulestore()
 
-    def test_public_unit_page_html(self):
-        """
-        Verify that an xblock returns the expected HTML for a public unit page.
-        """
-
-        html = self.get_page_html(self.vertical)
-        self.validate_html_for_add_buttons(html)
-
-    def test_draft_unit_page_html(self):
-        """
-        Verify that an xblock returns the expected HTML for a draft unit page.
-        """
-        html = self.get_page_html(self.vertical)
-        self.validate_html_for_add_buttons(html)
-
     def test_public_component_preview_html(self):
         """
         Verify that a public xblock's preview returns the expected HTML.
         """
         published_video = self.store.publish(self.video.location, self.user.id)
-        self.validate_preview_html(self.video, STUDENT_VIEW,
-                                   can_edit=True, can_reorder=True, can_add=False)
+        self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
 
     def test_draft_component_preview_html(self):
         """
         Verify that a draft xblock's preview returns the expected HTML.
         """
-        self.validate_preview_html(self.video, STUDENT_VIEW,
-                                   can_edit=True, can_reorder=True, can_add=False)
+        self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
 
     def test_public_child_container_preview_html(self):
         """
@@ -61,8 +44,7 @@ class UnitPageTestCase(StudioPageTestCase):
         ItemFactory.create(parent_location=child_container.location,
                            category='html', display_name='grandchild')
         published_child_container = self.store.publish(child_container.location, self.user.id)
-        self.validate_preview_html(published_child_container, STUDENT_VIEW,
-                                   can_reorder=True, can_edit=True, can_add=False)
+        self.validate_preview_html(published_child_container, STUDENT_VIEW, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
@@ -74,5 +56,4 @@ class UnitPageTestCase(StudioPageTestCase):
         ItemFactory.create(parent_location=child_container.location,
                            category='html', display_name='grandchild')
         draft_child_container = self.store.get_item(child_container.location)
-        self.validate_preview_html(draft_child_container, STUDENT_VIEW,
-                                   can_reorder=True, can_edit=True, can_add=False)
+        self.validate_preview_html(draft_child_container, STUDENT_VIEW, can_add=False)

@@ -191,8 +191,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     """
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
-    # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view in PREVIEW_VIEWS:
+    # Only add the Studio wrapper when on the container page. The "Pages" page will remain as is for now.
+    if not context.get('is_pages_view', None) and view in PREVIEW_VIEWS:
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
