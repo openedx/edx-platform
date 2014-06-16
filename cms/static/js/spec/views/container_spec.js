@@ -1,7 +1,7 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers",
+define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
     "js/views/container", "js/models/xblock_info", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, view_helpers, ContainerView, XBlockInfo) {
+    function ($, create_sinon, edit_helpers, ContainerView, XBlockInfo) {
 
         describe("Container View", function () {
 
@@ -34,9 +34,10 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                 };
 
                 beforeEach(function () {
-                    view_helpers.installViewTemplates();
+                    edit_helpers.installMockXBlock();
+                    edit_helpers.installViewTemplates();
                     appendSetFixtures('<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="' + rootLocator + '"></div>');
-                    notificationSpy = view_helpers.createNotificationSpy();
+                    notificationSpy = edit_helpers.createNotificationSpy();
                     model = new XBlockInfo({
                         id: rootLocator,
                         display_name: 'Test AB Test',
@@ -51,6 +52,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
                 });
 
                 afterEach(function () {
+                    edit_helpers.uninstallMockXBlock();
                     containerView.remove();
                 });
 
@@ -186,11 +188,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 200);
-                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 1, 200);
-                        view_helpers.verifyNotificationHidden(notificationSpy);
+                        edit_helpers.verifyNotificationHidden(notificationSpy);
                     });
 
                     it('does not hide saving message if failure', function () {
@@ -198,9 +200,9 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 500);
-                        view_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
 
                         // Since the first reorder call failed, the removal will not be called.
                         verifyNumReorderCalls(requests, 1);

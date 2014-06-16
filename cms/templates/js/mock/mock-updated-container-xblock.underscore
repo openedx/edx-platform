@@ -10,7 +10,7 @@
     </div>
 </header>
 <article class="xblock-render">
-    <div class="xblock" data-block-type="vertical" data-locator="locator-container"
+    <div class="xblock" data-locator="locator-container"
          data-init="MockXBlock" data-runtime-class="StudioRuntime" data-runtime-version="1">
         <ol class="reorderable-container">
         </ol>

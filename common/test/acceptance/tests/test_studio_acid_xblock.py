@@ -72,7 +72,7 @@ class XBlockAcidBase(WebAppTest):
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
-        acid_block = AcidView(self.browser, unit.components[0].preview_selector)
+        acid_block = AcidView(self.browser, unit.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
     def test_acid_block_editor(self):
@@ -84,9 +84,7 @@ class XBlockAcidBase(WebAppTest):
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
-        unit.edit_draft()
-
-        acid_block = AcidView(self.browser, unit.components[0].edit().editor_selector)
+        acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('content'))
@@ -139,14 +137,10 @@ class XBlockAcidParentBase(XBlockAcidBase):
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
-        container = unit.components[0].go_to_container()
+        container = unit.xblocks[0].go_to_container()
 
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
-
-    @skip('This will fail until the container page supports editing')
-    def test_acid_block_editor(self):
-        super(XBlockAcidParentBase, self).test_acid_block_editor()
 
 
 class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
@@ -208,7 +202,6 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
         ).install()
 
         self.user = course_fix.user
-
 
     @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):
