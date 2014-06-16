@@ -34,17 +34,16 @@ class ContainerBase(StudioCourseTest):
             self.course_info['run']
         )
 
-    def go_to_container_page(self, make_draft=False):
+    def go_to_nested_container_page(self):
         """
-        Go to the test container page.
-
-        If make_draft is true, the unit page (accessed on way to container page) will be put into draft mode.
+        Go to the nested container page.
         """
-        unit = self.go_to_unit_page(make_draft)
-        container = unit.components[0].go_to_container()
+        unit = self.go_to_unit_page()
+        # The 0th entry is the unit page itself.
+        container = unit.xblocks[1].go_to_container()
         return container
 
-    def go_to_unit_page(self, make_draft=False):
+    def go_to_unit_page(self):
         """
         Go to the test unit page.
 
@@ -52,10 +51,7 @@ class ContainerBase(StudioCourseTest):
         """
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
-        if make_draft:
-            unit.edit_draft()
-        return unit
+        return subsection.toggle_expand().unit('Test Unit').go_to()
 
     def verify_ordering(self, container, expected_orderings):
         """
@@ -83,13 +79,13 @@ class ContainerBase(StudioCourseTest):
         """
         Perform the supplied action and then verify the resulting ordering.
         """
-        container = self.go_to_container_page(make_draft=True)
+        container = self.go_to_nested_container_page()
         action(container)
 
         self.verify_ordering(container, expected_ordering)
 
         # Reload the page to see that the change was persisted.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         self.verify_ordering(container, expected_ordering)
 
 
@@ -101,9 +97,9 @@ class NestedVerticalTest(ContainerBase):
         Sets up a course structure with nested verticals.
         """
         self.container_title = ""
-        self.group_a = "Expand or Collapse\nGroup A"
-        self.group_b = "Expand or Collapse\nGroup B"
-        self.group_empty = "Expand or Collapse\nGroup Empty"
+        self.group_a = "Group A"
+        self.group_b = "Group B"
+        self.group_empty = "Group Empty"
         self.group_a_item_1 = "Group A Item 1"
         self.group_a_item_2 = "Group A Item 2"
         self.group_b_item_1 = "Group B Item 1"
@@ -360,13 +356,13 @@ class EditContainerTest(NestedVerticalTest):
         """
         Test the "edit" button on a container appearing on the unit page.
         """
-        unit = self.go_to_unit_page(make_draft=True)
-        component = unit.components[0]
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
         self.modify_display_name_and_verify(component)
 
     def test_edit_container_on_container_page(self):
         """
         Test the "edit" button on a container appearing on the container page.
         """
-        container = self.go_to_container_page(make_draft=True)
+        container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)

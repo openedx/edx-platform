@@ -293,7 +293,7 @@ class ExportTestCase(CourseTestCase):
         """
         fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
         self.store.publish(fake_xblock.location, self.user.id)
-        self._verify_export_failure(u'/unit/i4x://MITx/999/course/Robot_Super_Course')
+        self._verify_export_failure(u'/container/i4x://MITx/999/course/Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):
         """
@@ -305,7 +305,7 @@ class ExportTestCase(CourseTestCase):
             category='aawefawef'
         )
 
-        self._verify_export_failure(u'/unit/i4x://MITx/999/vertical/foo')
+        self._verify_export_failure(u'/container/i4x://MITx/999/vertical/foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """

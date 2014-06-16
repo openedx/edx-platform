@@ -9,9 +9,11 @@ define(['jquery', 'js/views/feedback_notification', 'js/views/feedback_prompt'],
             verifyNotificationHidden, createPromptSpy, confirmPrompt, verifyPromptShowing,
             verifyPromptHidden;
 
-        installTemplate = function(templateName, isFirst) {
-            var template = readFixtures(templateName + '.underscore'),
+        installTemplate = function(templateName, isFirst, templateId) {
+            var template = readFixtures(templateName + '.underscore');
+            if (!templateId) {
                 templateId = templateName + '-tpl';
+            }
 
             if (isFirst) {
                 setFixtures($('<script>', { id: templateId, type: 'text/template' }).text(template));

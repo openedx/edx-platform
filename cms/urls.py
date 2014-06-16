@@ -75,7 +75,6 @@ urlpatterns += patterns(
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_notifications_handler'),
     url(r'^subsection/{}$'.format(settings.USAGE_KEY_PATTERN), 'subsection_handler'),
-    url(r'^unit/{}$'.format(settings.USAGE_KEY_PATTERN), 'unit_handler'),
     url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), 'container_handler'),
     url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'checklists_handler'),
     url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), 'orphan_handler'),

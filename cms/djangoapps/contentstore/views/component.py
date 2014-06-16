@@ -11,7 +11,6 @@ from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
-from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import PublishState
 
@@ -23,7 +22,7 @@ from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item, compute_publish_state
-from contentstore.views.helpers import get_parent_xblock
+from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 
 from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
@@ -34,14 +33,13 @@ from django.utils.translation import ugettext as _
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
            'subsection_handler',
-           'unit_handler',
            'container_handler',
            'component_handler'
            ]
 
 log = logging.getLogger(__name__)
 
-# NOTE: unit_handler assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
+# NOTE: it is assumed that this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 # Constants for determining if these components should be enabled for this course
@@ -135,84 +133,6 @@ def _load_mixed_class(category):
     return mixologist.mix(component_class)
 
 
-@require_GET
-@login_required
-def unit_handler(request, usage_key_string):
-    """
-    The restful handler for unit-specific requests.
-
-    GET
-        html: return html page for editing a unit
-        json: not currently supported
-    """
-    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        usage_key = UsageKey.from_string(usage_key_string)
-        try:
-            course, item, lms_link = _get_item_in_course(request, usage_key)
-        except ItemNotFoundError:
-            return HttpResponseBadRequest()
-
-        component_templates = get_component_templates(course)
-
-        xblocks = item.get_children()
-
-        # TODO (cpennington): If we share units between courses,
-        # this will need to change to check permissions correctly so as
-        # to pick the correct parent subsection
-        containing_subsection = get_parent_xblock(item)
-        containing_section = get_parent_xblock(containing_subsection)
-
-        # cdodge hack. We're having trouble previewing drafts via jump_to redirect
-        # so let's generate the link url here
-
-        # need to figure out where this item is in the list of children as the
-        # preview will need this
-        index = 1
-        for child in containing_subsection.get_children():
-            if child.location == item.location:
-                break
-            index = index + 1
-
-        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
-
-        preview_lms_link = (
-            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
-        ).format(
-            preview_lms_base=preview_lms_base,
-            lms_base=settings.LMS_BASE,
-            org=course.location.org,
-            course=course.location.course,
-            course_name=course.location.name,
-            section=containing_section.location.name,
-            subsection=containing_subsection.location.name,
-            index=index
-        )
-
-        return render_to_response('unit.html', {
-            'context_course': course,
-            'unit': item,
-            'unit_usage_key': item.location,
-            'child_usage_keys': [block.scope_ids.usage_id for block in xblocks],
-            'component_templates': json.dumps(component_templates),
-            'draft_preview_link': preview_lms_link,
-            'published_preview_link': lms_link,
-            'subsection': containing_subsection,
-            'release_date': (
-                get_default_time_display(containing_subsection.start)
-                if containing_subsection.start is not None else None
-            ),
-            'section': containing_section,
-            'new_unit_category': 'vertical',
-            'unit_state': compute_publish_state(item),
-            'published_date': (
-                get_default_time_display(item.published_date)
-                if item.published_date is not None else None
-            ),
-        })
-    else:
-        return HttpResponseBadRequest("Only supports html requests")
-
-
 # pylint: disable=unused-argument
 @require_GET
 @login_required
@@ -235,25 +155,37 @@ def container_handler(request, usage_key_string):
         component_templates = get_component_templates(course)
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
-        while parent and parent.category != 'sequential':
+
+        is_unit_page = is_unit(xblock)
+        unit = xblock if is_unit_page else None
+
+        while parent and parent.category != 'course':
+            if unit is None and is_unit(parent):
+                unit = parent
             ancestor_xblocks.append(parent)
             parent = get_parent_xblock(parent)
         ancestor_xblocks.reverse()
 
-        unit = ancestor_xblocks[0] if ancestor_xblocks else None
-        unit_publish_state = compute_publish_state(unit) if unit else None
+        subsection = get_parent_xblock(unit) if unit else None
+        section = get_parent_xblock(subsection) if subsection else None
+        # TODO: correct with publishing story.
+        unit_publish_state = 'draft'
 
         return render_to_response('container.html', {
             'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
             'unit_publish_state': unit_publish_state,
             'xblock_locator': xblock.location,
-            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
+            'unit': unit,
+            'is_unit_page': is_unit_page,
+            'subsection': subsection,
+            'section': section,
+            'new_unit_category': 'vertical',
             'ancestor_xblocks': ancestor_xblocks,
             'component_templates': json.dumps(component_templates),
         })
     else:
-        return HttpResponseBadRequest("Only supports html requests")
+        return HttpResponseBadRequest("Only supports HTML requests")
 
 
 def get_component_templates(course):
@@ -285,16 +217,6 @@ def get_component_templates(course):
         'video': _("Video")
     }
 
-    def get_component_display_name(component, default_display_name=None):
-        """
-        Returns the display name for the specified component.
-        """
-        component_class = _load_mixed_class(component)
-        if hasattr(component_class, 'display_name') and component_class.display_name.default:
-            return _(component_class.display_name.default)
-        else:
-            return default_display_name
-
     component_templates = []
     categories = set()
     # The component_templates array is in the order of "advanced" (if present), followed
@@ -305,7 +227,7 @@ def get_component_templates(course):
         # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
-        display_name = get_component_display_name(category, _('Blank'))
+        display_name = xblock_type_display_name(category, _('Blank'))
         templates_for_category.append(create_template_dict(display_name, category))
         categories.add(category)
 
@@ -328,7 +250,7 @@ def get_component_templates(course):
             for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
-                component_display_name = get_component_display_name(component)
+                component_display_name = xblock_type_display_name(component)
                 templates_for_category.append(create_template_dict(component_display_name, component, boilerplate_name))
                 categories.add(component)
 
@@ -350,7 +272,7 @@ def get_component_templates(course):
             if category in ADVANCED_COMPONENT_TYPES and not category in categories:
                 # boilerplates not supported for advanced components
                 try:
-                    component_display_name = get_component_display_name(category, default_display_name=category)
+                    component_display_name = xblock_type_display_name(category, default_display_name=category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
                             component_display_name,

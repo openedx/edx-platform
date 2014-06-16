@@ -1,12 +1,20 @@
 <%inherit file="base.html" />
+<%def name="online_help_token()">
+<%
+if is_unit_page:
+    return "unit"
+else:
+    return "container"
+%>
+</%def>
 <%!
 import json
 
 from xmodule.modulestore import PublishState
-from contentstore.views.helpers import xblock_studio_url, EDITING_TEMPLATES
+from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name, EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 %>
-<%block name="title">${_("Container")}</%block>
+<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock)}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -53,28 +61,32 @@ main_xblock_info = {
 <%block name="content">
 
 
-<div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
+<div class="wrapper-mast wrapper">
     <header class="mast has-actions has-navigation has-subtitle">
-        <h1 class="page-header">
+        <div class="page-header">
             <small class="navigation navigation-parents subtitle">
                 % for ancestor in ancestor_xblocks:
                     <%
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                    <a href="${ancestor_url}"
-                       class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">
+                            ${ancestor.display_name_with_default | h}
+                        </a>
+                    % else:
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
                     % endif
                 % endfor
-                <a href="#" class="navigation-link navigation-current">${xblock.display_name_with_default | h}</a>
             </small>
-            <span class="page-header-title">${xblock.display_name_with_default | h}</span>
-        </h1>
+            <div class="wrapper-xblock-field" data-field="display_name">
+                <h1 class="page-header-title is-editable xblock-field-value">${xblock.display_name_with_default | h}</h1>
+            </div>
+        </div>
 
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
-                % if not unit_publish_state == 'public':
+                % if not is_unit_page and not unit_publish_state == 'public':
                 <li class="action-item action-edit nav-item">
                     <a href="#" class="button edit-button action-button">
                         <i class="icon-pencil"></i>
@@ -99,42 +111,44 @@ main_xblock_info = {
                 </div>
             </article>
             <aside class="content-supplementary" role="complimentary">
-                % if unit:
-                  % if unit_publish_state == PublishState.public:
-                    <div class="bit-publishing published">
-                      <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Published")}</h3>
-                      <p class="copy">
-                          <%
-                          unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
-                              unit_address=xblock_studio_url(unit),
-                              unit_display_name=unit.display_name_with_default,
-                          )
-                          %>
-                          ${_('To make changes to the content of this page, you need to edit unit {unit_link} as a draft.'
-                                  ).format(unit_link=unit_link)}
-                      </p>
+                % if not is_unit_page:
+                    <div class="bit">
+                        <h3 class="title-3">${_("What can I do on this page?")}</h3>
+                        <ul class="list-details">
+                            <li class="item-detail">${_("You can view and edit course components that contain other components on this page. In the case of experiment blocks, this allows you to confirm that you have properly configured your experiment groups and make changes to existing content.")}</li>
+                        </ul>
                     </div>
-                  % else:
-                    <div class="bit-publishing draft">
-                        <h3 class="title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft")}</h3>
-                        <p class="copy">
-                            <%
-                            unit_link=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
-                                unit_address=xblock_studio_url(unit),
-                                unit_display_name=unit.display_name_with_default,
-                            )
-                            %>
-                            ${_('You can edit the content of this page, and your changes will be published with unit {unit_link}.').format(unit_link=unit_link)}
-                        </p>
-                    </div>
-                  % endif
                 % endif
-                <div class="bit">
-                    <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                    <ul class="list-details">
-                        <li class="item-detail">${_("You can view and edit course components that contain other components on this page. In the case of experiment blocks, this allows you to confirm that you have properly configured your experiment groups and make changes to existing content.")}</li>
-                    </ul>
-                </div>
+                % if is_unit_page:
+                    <div class="unit-location">
+                        <h4 class="header">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id content-bit">
+                            <h5 class="title">Unit Location ID</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
+                            </p>
+                        </div>
+                        <div class="wrapper-unit-tree-location content-bit">
+                            <h5 class="title">Unit Tree Location</h5>
+                            <ol>
+                                <li class="section">
+                                    <a href="${xblock_studio_url(section)}" class="section-item section-name">
+                                        <span class="section-name">${section.display_name_with_default}</span>
+                                    </a>
+                                    <ol>
+                                        <li class="subsection">
+                                            <div class="section-item">
+                                                <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                                            </div>
+                                            ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                % endif
             </aside>
         </section>
     </div>
