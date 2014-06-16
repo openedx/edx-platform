@@ -5,30 +5,14 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from api_manager.permissions import SecureAPIView
-
-from api_manager.permissions import ApiKeyHeaderPermission
-
-
-def _generate_base_uri(request):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        request.get_full_path()
-    )
-    return resource_uri
+from api_manager.utils import generate_base_uri
 
 
 class SystemDetail(SecureAPIView):
     """Manages system-level information about the Open edX API"""
 
     def get(self, request):
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX System API"
         response_data['description'] = "System interface for managing groups, users, and sessions."
@@ -41,7 +25,7 @@ class ApiDetail(SecureAPIView):
     """Manages top-level information about the Open edX API"""
 
     def get(self, request):
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX API"
         response_data['description'] = "Machine interface for interactions with Open edX."
