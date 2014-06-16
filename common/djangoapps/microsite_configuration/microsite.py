@@ -118,6 +118,19 @@ def _set_current_microsite(microsite_config_key, subdomain, domain):
     config = settings.MICROSITE_CONFIGURATION[microsite_config_key].copy()
     config['subdomain'] = subdomain
     config['site_domain'] = domain
+    if 'theme_name' in config and config['theme_name'] != "":
+        settings.THEME_NAME = config['theme_name']
+        # Calculate the location of the theme's files
+        theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
+        # Include the theme's templates in the template search paths
+        settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')
+        # Namespace the theme's static files to 'themes/<theme_name>' to
+        # amespace the theme's static files to 'themes/<theme_name>' to
+        # avoid collisions with default edX static files
+        settings.STATICFILES_DIRS.append(
+            (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
+        )
+    
     CURRENT_REQUEST_CONFIGURATION.data = config
 
 
