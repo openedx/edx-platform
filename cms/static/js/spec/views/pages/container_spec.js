@@ -1,22 +1,34 @@
 define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
-    "js/views/feedback_prompt", "js/views/pages/container", "js/models/xblock_info"],
+    "js/views/feedback_prompt", "js/views/pages/container", "js/models/xblock_info", "jquery.simulate"],
     function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
 
         describe("ContainerPage", function() {
             var lastRequest, renderContainerPage, expectComponents, respondWithHtml,
-                model, containerPage, requests,
+                model, containerPage, requests, initialDisplayName,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore'),
                 mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
             beforeEach(function () {
+                var newDisplayName = 'New Display Name';
+
                 edit_helpers.installEditTemplates();
+                edit_helpers.installTemplate('xblock-string-field-editor');
                 appendSetFixtures(mockContainerPage);
+
+                edit_helpers.installMockXBlock({
+                    data: "<p>Some HTML</p>",
+                    metadata: {
+                        display_name: newDisplayName
+                    }
+                });
+
+                initialDisplayName = 'Test Container';
 
                 model = new XBlockInfo({
                     id: 'locator-container',
-                    display_name: 'Test Container',
+                    display_name: initialDisplayName,
                     category: 'vertical'
                 });
                 containerPage = new ContainerPage({
@@ -24,6 +36,10 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     templates: edit_helpers.mockComponentTemplates,
                     el: $('#content')
                 });
+            });
+
+            afterEach(function() {
+                edit_helpers.uninstallMockXBlock();
             });
 
             lastRequest = function() { return requests[requests.length - 1]; };
@@ -55,9 +71,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             describe("Initial display", function() {
                 it('can render itself', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
-                    expect(containerPage.$('.wrapper-xblock')).not.toHaveClass('is-hidden');
-                    expect(containerPage.$('.no-container-content')).toHaveClass('is-hidden');
+                    expect(containerPage.$('.xblock-header').length).toBe(9);
+                    expect(containerPage.$('.wrapper-xblock .level-nesting')).not.toHaveClass('is-hidden');
                 });
 
                 it('shows a loading indicator', function() {
@@ -70,25 +85,27 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             });
 
             describe("Editing the container", function() {
-                var newDisplayName = 'New Display Name';
+                var updatedDisplayName = 'Updated Test Container',
+                    inlineEditDisplayName, displayNameElement, displayNameInput;
 
-                beforeEach(function () {
-                    edit_helpers.installMockXBlock({
-                        data: "<p>Some HTML</p>",
-                        metadata: {
-                            display_name: newDisplayName
-                        }
-                    });
+                beforeEach(function() {
+                    displayNameElement = containerPage.$('.page-header-title');
                 });
 
                 afterEach(function() {
-                    edit_helpers.uninstallMockXBlock();
                     edit_helpers.cancelModalIfShowing();
                 });
 
+                inlineEditDisplayName = function(newTitle) {
+                    displayNameElement.click();
+                    expect(displayNameElement).toHaveClass('is-hidden');
+                    displayNameInput = containerPage.$('.xblock-string-field-editor .xblock-field-input');
+                    expect(displayNameInput).not.toHaveClass('is-hidden');
+                    displayNameInput.val(newTitle);
+                };
+
                 it('can edit itself', function() {
-                    var editButtons,
-                        updatedTitle = 'Updated Test Container';
+                    var editButtons;
                     renderContainerPage(mockContainerXBlockHtml, this);
 
                     // Click the root edit button
@@ -118,26 +135,49 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         resources: []
                     });
 
-                    // Expect the title and breadcrumb to be updated
-                    expect(containerPage.$('.page-header-title').text().trim()).toBe(updatedTitle);
-                    expect(containerPage.$('.page-header .subtitle a').last().text().trim()).toBe(updatedTitle);
+                    // Expect the title to have been updated
+                    expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
+                });
+
+                it('can inline edit the display name', function() {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    inlineEditDisplayName(updatedDisplayName);
+                    displayNameInput.change();
+                    create_sinon.respondWithJson(requests, { });
+                    expect(displayNameInput).toHaveClass('is-hidden');
+                    expect(displayNameElement).not.toHaveClass('is-hidden');
+                    expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
+                    expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
+                });
+
+                it('does not change the title when a display name update fails', function() {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    inlineEditDisplayName(updatedDisplayName);
+                    displayNameInput.change();
+                    create_sinon.respondWithError(requests);
+                    expect(displayNameElement).toHaveClass('is-hidden');
+                    expect(displayNameInput).not.toHaveClass('is-hidden');
+                    expect(displayNameInput.val().trim()).toBe(updatedDisplayName);
+                    expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
+                });
+
+                it('can cancel an inline edit', function() {
+                    var numRequests;
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    inlineEditDisplayName(updatedDisplayName);
+                    numRequests = requests.length;
+                    displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
+                    displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
+                    expect(requests.length).toBe(numRequests);
+                    expect(displayNameInput).toHaveClass('is-hidden');
+                    expect(displayNameElement).not.toHaveClass('is-hidden');
+                    expect(displayNameElement.text().trim()).toBe(initialDisplayName);
+                    expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 });
             });
 
             describe("Editing an xblock", function() {
-                var newDisplayName = 'New Display Name';
-
-                beforeEach(function () {
-                    edit_helpers.installMockXBlock({
-                        data: "<p>Some HTML</p>",
-                        metadata: {
-                            display_name: newDisplayName
-                        }
-                    });
-                });
-
                 afterEach(function() {
-                    edit_helpers.uninstallMockXBlock();
                     edit_helpers.cancelModalIfShowing();
                 });
 
@@ -190,6 +230,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     });
 
                     modal = $('.edit-xblock-modal');
+                    expect(modal.length).toBe(1);
                     // Click on the settings tab
                     modal.find('.settings-button').click();
                     // Change the display name's text
@@ -426,7 +467,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 describe('createNewComponent ', function () {
-                    var clickNewComponent, verifyComponents;
+                    var clickNewComponent;
 
                     clickNewComponent = function (index) {
                         containerPage.$(".new-component .new-component-type a.single-template")[index].click();

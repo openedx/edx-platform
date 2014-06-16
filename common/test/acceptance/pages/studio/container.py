@@ -15,7 +15,7 @@ class ContainerPage(PageObject):
     """
     Container page in Studio
     """
-    NAME_SELECTOR = 'a.navigation-current'
+    NAME_SELECTOR = '.page-header-title'
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -126,16 +126,8 @@ class ContainerPage(PageObject):
     def edit(self):
         """
         Clicks the "edit" button for the first component on the page.
-
-        Same as the implementation in unit.py, unit and component pages will be merging.
         """
-        self.q(css='.edit-button').first.click()
-        EmptyPromise(
-            lambda: self.q(css='.xblock-studio_view').present,
-            'Wait for the Studio editor to be present'
-        ).fulfill()
-
-        return self
+        return _click_edit(self)
 
     def add_missing_groups(self):
         """
@@ -164,7 +156,7 @@ class XBlockWrapper(PageObject):
     """
     url = None
     BODY_SELECTOR = '.studio-xblock-wrapper'
-    NAME_SELECTOR = '.header-details'
+    NAME_SELECTOR = '.xblock-display-name'
 
     def __init__(self, browser, locator):
         super(XBlockWrapper, self).__init__(browser)
@@ -210,3 +202,33 @@ class XBlockWrapper(PageObject):
     @property
     def preview_selector(self):
         return self._bounded_selector('.xblock-student_view,.xblock-author_view')
+
+    def go_to_container(self):
+        """
+        Open the container page linked to by this xblock, and return
+        an initialized :class:`.ContainerPage` for that xblock.
+        """
+        return ContainerPage(self.browser, self.locator).visit()
+
+    def edit(self):
+        """
+        Clicks the "edit" button for this xblock.
+        """
+        return _click_edit(self, self._bounded_selector)
+
+    @property
+    def editor_selector(self):
+        return '.xblock-studio_view'
+
+
+def _click_edit(page_object, bounded_selector=lambda(x): x):
+    """
+    Click on the first edit button found and wait for the Studio editor to be present.
+    """
+    page_object.q(css=bounded_selector('.edit-button')).first.click()
+    EmptyPromise(
+        lambda: page_object.q(css='.xblock-studio_view').present,
+        'Wait for the Studio editor to be present'
+    ).fulfill()
+
+    return page_object
