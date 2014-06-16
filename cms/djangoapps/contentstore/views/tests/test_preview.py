@@ -38,7 +38,11 @@ class GetPreviewHtmlTestCase(TestCase):
         request.session = {}
 
         # Call get_preview_fragment directly.
-        html = get_preview_fragment(request, html, {}).content
+        context = {
+            'reorderable_items': set(),
+            'read_only': True
+        }
+        html = get_preview_fragment(request, html, context).content
 
         # Verify student view html is returned, and the usage ID is as expected.
         self.assertRegexpMatches(

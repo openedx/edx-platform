@@ -13,7 +13,7 @@
     </div>
 </header>
 <article class="xblock-render">
-    <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_131a499ddaa3474194c1aa2eced34455" data-type="None" data-block-type="vertical">
+    <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_131a499ddaa3474194c1aa2eced34455" data-type="None">
         <ol class="reorderable-container">
         </ol>
     </div>

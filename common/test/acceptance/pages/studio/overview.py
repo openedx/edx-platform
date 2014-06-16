@@ -5,7 +5,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
-from .unit import UnitPage
+from .container import ContainerPage
 
 
 class CourseOutlineContainer(object):
@@ -84,10 +84,10 @@ class CourseOutlineUnit(CourseOutlineChild):
 
     def go_to(self):
         """
-        Open the unit page linked to by this unit link, and return
-        an initialized :class:`.UnitPage` for that unit.
+        Open the container page linked to by this unit link, and return
+        an initialized :class:`.ContainerPage` for that unit.
         """
-        return UnitPage(self.browser, self.locator).visit()
+        return ContainerPage(self.browser, self.locator).visit()
 
     def is_browser_on_page(self):
         return self.q(css=self.BODY_SELECTOR).present
