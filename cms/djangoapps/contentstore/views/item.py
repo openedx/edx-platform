@@ -23,16 +23,14 @@ import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
 
 from util.json_request import expect_json, JsonResponse
 
 from .access import has_course_access
-from .helpers import xblock_has_own_studio_page
-from contentstore.utils import compute_publish_state
+from contentstore.views.helpers import is_unit
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -190,7 +188,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock = store.get_item(usage_key)
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
-        unit_views = PREVIEW_VIEWS
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -206,9 +203,10 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
+            # change not authored by requestor but by xblocks.
             store.update_item(xblock, request.user.id)
-        elif view_name in (unit_views + container_views):
-            is_container_view = (view_name in container_views)
+        elif view_name in (PREVIEW_VIEWS + container_views):
+            is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
@@ -218,27 +216,21 @@ def xblock_view_handler(request, usage_key_string, view_name):
             if view_name == 'reorderable_container_child_preview':
                 reorderable_items.add(xblock.location)
 
-            # Only show the new style HTML for the container view, i.e. for non-verticals
-            # Note: this special case logic can be removed once the unit page is replaced
-            # with the new container view.
+            # Set up the context to be passed to each XBlock's render method.
             context = {
-                'container_view': is_container_view,
+                'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
+                'is_unit_page': is_unit(xblock),
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items
             }
 
             fragment = get_preview_fragment(request, xblock, context)
-            # For old-style pages (such as unit and static pages), wrap the preview with
-            # the component div. Note that the container view recursively adds headers
-            # into the preview fragment, so we don't want to add another header here.
-            if not is_container_view:
-                # For non-leaf xblocks, show the special rendering which links to the new container page.
-                if xblock_has_own_studio_page(xblock):
-                    template = 'container_xblock_component.html'
-                else:
-                    template = 'component.html'
-                fragment.content = render_to_string(template, {
+
+            # Note that the container view recursively adds headers into the preview fragment,
+            # so only the "Pages" view requires that this extra wrapper be included.
+            if is_pages_view:
+                fragment.content = render_to_string('component.html', {
                     'xblock_context': context,
                     'xblock': xblock,
                     'locator': usage_key,
@@ -266,10 +258,12 @@ def _is_xblock_read_only(xblock):
     Returns true if the specified xblock is read-only, meaning that it cannot be edited.
     """
     # We allow direct editing of xblocks in DIRECT_ONLY_CATEGORIES (for example, static pages).
-    if xblock.category in DIRECT_ONLY_CATEGORIES:
-        return False
-    component_publish_state = compute_publish_state(xblock)
-    return component_publish_state == PublishState.public
+    # if xblock.category in DIRECT_ONLY_CATEGORIES:
+    #     return False
+    # component_publish_state = compute_publish_state(xblock)
+    # return component_publish_state == PublishState.public
+    # TODO: correct with publishing story.
+    return False
 
 
 def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout=None,
@@ -467,8 +461,6 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
 
     dest_module = store.create_and_save_xmodule(
         dest_usage_key,
-
-
         user.id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
