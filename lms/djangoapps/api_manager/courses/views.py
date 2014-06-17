@@ -173,6 +173,13 @@ def _parse_overview_html(html):
             section_data = OrderedDict()
             section_data['class'] = section_class
 
+            section_data['attributes'] = {}
+            for attribute_key in section.keys():
+                # don't return the class attribute as we are already using the class attribute
+                # as a key name to the result set, so we don't want to end up duplicating it
+                if attribute_key != 'class':
+                    section_data['attributes'][attribute_key] = section.get(attribute_key)
+
             articles = section.findall('article')
             if articles:
                 section_data['articles'] = []
@@ -259,7 +266,7 @@ def _parse_updates_html(html):
 
 class CourseContentList(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CourseContentList gets a collection of content for a given
         course. You can use the **uri** value in
@@ -289,7 +296,7 @@ class CourseContentList(SecureAPIView):
 
     **Response Values**
 
-        * category: The type of content. 
+        * category: The type of content.
 
         * due: The due date.
 
@@ -328,7 +335,7 @@ class CourseContentList(SecureAPIView):
 
 class CourseContentDetail(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CourseContentDetail returns a JSON collection for a specified
         CourseContent entity. If the specified CourseContent is the Course, the
@@ -422,7 +429,7 @@ class CourseContentDetail(SecureAPIView):
 
 class CoursesList(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesList returns a collection of courses in the edX Platform. You can
         use the uri value in the response to get details of the course.
@@ -464,7 +471,7 @@ class CoursesList(SecureAPIView):
 
 class CoursesDetail(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesDetail returns details for a course. You can use the uri values
         in the resources collection in the response to get more course
@@ -506,7 +513,7 @@ class CoursesDetail(SecureAPIView):
         * id: The unique identifier for the course.
 
         * resources: A collection of URIs to use to get more information about
-          the course.  
+          the course.
     """
 
     def get(self, request, course_id):
@@ -556,7 +563,7 @@ class CoursesDetail(SecureAPIView):
 
 class CoursesGroupsList(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesGroupsList returns a collection of course group relationship
         entities(?) for a specified course entity.
@@ -697,7 +704,7 @@ class CoursesGroupsDetail(SecureAPIView):
 
 class CoursesOverview(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesOverview returns an HTML representation of the overview for the
         specified course. CoursesOverview has an optional parse parameter that
@@ -742,7 +749,7 @@ class CoursesOverview(SecureAPIView):
 
 class CoursesUpdates(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesUpdates returns an HTML representation of the overview for the
         specified course. CoursesUpdates has an optional parse parameter that
@@ -785,7 +792,7 @@ class CoursesUpdates(SecureAPIView):
 
 class CoursesStaticTabsList(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesStaticTabsList returns a collection of custom pages in the
         course. CoursesStaticTabsList has an optional detail parameter that when
@@ -837,10 +844,10 @@ class CoursesStaticTabsList(SecureAPIView):
 
 class CoursesStaticTabsDetail(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesStaticTabsDetail returns a collection of custom pages in the
-        course, including the page content. 
+        course, including the page content.
 
     **Example Requests**
 
@@ -881,7 +888,7 @@ class CoursesStaticTabsDetail(SecureAPIView):
 
 class CoursesUsersList(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesUsersList returns a collection of users enrolled or pre-enrolled
         in the course.
@@ -979,7 +986,7 @@ class CoursesUsersList(SecureAPIView):
 
 class CoursesUsersDetail(SecureAPIView):
     """
-    **Use Case** 
+    **Use Case**
 
         CoursesUsersDetail returns a details about a specified user of a course.
 
