@@ -249,8 +249,9 @@ class CapaMixin(CapaFields):
                 # e.g. in the CMS
                 msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
                 msg += u'<p><pre>{tb}</pre></p>'.format(
-                    # just the traceback
-                    tb=cgi.escape(''.join(['Traceback (most recent call last):\n'] +
+                    # just the traceback, no message - it is already present above
+                    tb=cgi.escape(
+                        u''.join(['Traceback (most recent call last):\n'] +
                         traceback.format_tb(sys.exc_info()[2]))))
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
