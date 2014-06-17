@@ -68,7 +68,8 @@ class WorkgroupSubmissionSerializer(serializers.HyperlinkedModelSerializer):
         """ Meta class for defining additional serializer characteristics """
         model = WorkgroupSubmission
         fields = (
-            'id', 'url', 'created', 'modified', 'document_id', 'document_url', 'document_mime_type',
+            'id', 'url', 'created', 'modified', 'document_id', 'document_url',
+            'document_mime_type', 'document_filename',
             'user', 'workgroup', 'reviews'
         )
 
