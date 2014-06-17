@@ -50,7 +50,7 @@
                     <div class="form-group-label choose-cohort">
                         ## Translators: This labels the selector for which group of students can view a post
                         ${_("Make visible to:")}
-                        <select class="group-filter-select new-post-group" name = "group_id">
+                        <select class="new-post-group" name = "group_id">
                             <option value="">${_("All Groups")}</option>
                             %for c in cohorts:
                                 <option value="${c.id}"

@@ -1,3 +1,16 @@
+// --------------------------------
+// navigation - sort and filter bar
+// --------------------------------
+
+// Override global span rules
+.forum-nav-sort-label {
+  color: inherit;
+}
+
+// --------------------------------
+// navigation - thread list
+// --------------------------------
+
 // The sidebar class does a lot of things that we don't want in the thread list;
 // the following rules contain styling that is necessary and would otherwise
 // reside in elements/_navigation.scss if the sidebar styling did not make the

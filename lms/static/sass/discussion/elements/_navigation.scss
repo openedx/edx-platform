@@ -1,3 +1,34 @@
+// -------------------
+// Sort and filter bar
+// -------------------
+.forum-nav-refine-bar {
+  @include clearfix();
+  @include font-size(11);
+  border-bottom: 1px solid $gray-l3;
+  background-color: $gray-l5;
+  padding: ($baseline/4) ($baseline/2);
+  color: $black;
+}
+
+%forum-nav-select {
+  border: none;
+  max-width: 100%;
+  background-color: transparent;
+  font: inherit;
+}
+
+.forum-nav-filter-cohort-control {
+  @extend %forum-nav-select;
+}
+
+.forum-nav-sort {
+  float: right;
+}
+
+.forum-nav-sort-control {
+  @extend %forum-nav-select;
+}
+
 // -----------
 // Thread list
 // -----------
