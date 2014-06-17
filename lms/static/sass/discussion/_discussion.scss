@@ -595,7 +595,7 @@ body.discussion, .discussion-course {
   }
 }
 
-.container .discussion-body, .discussion-module {
+.container .discussion-body, .discussion-module, .discussion-course {
   @include clearfix;
   display: block;
   border: none;
