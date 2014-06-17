@@ -1,4 +1,3 @@
-@shard_1
 Feature: LMS.Debug staff info links
     As a course staff in an edX course
     In order to test my understanding of the material

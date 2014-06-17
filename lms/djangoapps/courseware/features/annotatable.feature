@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Annotatable Component
   As a student, I want to view an Annotatable component in the LMS
 

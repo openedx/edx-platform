@@ -106,7 +106,7 @@ END
         ;;
 
     "lms-acceptance")
-        rake test:acceptance:lms["-v 3 --tag shard_${SHARD}"]
+        rake test:acceptance:lms["-v 3"]
         ;;
 
     "cms-acceptance")

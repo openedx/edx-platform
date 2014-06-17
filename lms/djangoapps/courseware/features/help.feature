@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.The help module should work
   In order to get help
   As a student

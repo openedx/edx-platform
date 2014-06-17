@@ -1,4 +1,3 @@
-@shard_1
 Feature: LMS.Login in as a registered user
   As a registered user
   In order to access my content

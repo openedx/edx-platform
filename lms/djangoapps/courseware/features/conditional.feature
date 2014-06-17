@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Conditional Module
   As a student, I want to view a Conditional component in the LMS
 

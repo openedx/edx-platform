@@ -1,4 +1,3 @@
-@shard_1
 Feature: LMS.All the high level tabs should work
   In order to preview the courseware
   As a student

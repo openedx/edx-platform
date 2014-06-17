@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.World Cloud component
   As a student, I want to view Word Cloud component in LMS.
 
