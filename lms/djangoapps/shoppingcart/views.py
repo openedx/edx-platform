@@ -167,8 +167,7 @@ def show_receipt(request, ordernum):
 
     order_items = OrderItem.objects.filter(order=order).select_subclasses()
     for item in order_items:
-        paid_course = PaidCourseRegistration.objects.get(id=item.id)
-        paid_course_ids.append(reverse('info', args=[paid_course.course_id.to_deprecated_string()]))
+        paid_course_ids.append(reverse('info', args=[item.course_id.to_deprecated_string()]))
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
