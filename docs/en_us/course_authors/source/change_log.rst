@@ -12,6 +12,9 @@ June, 2014
 
    * - Date
      - Change
+   * - 06/18/14    
+     - In the :ref:`View and download student data` section, updated the
+       example report to include the new User ID column.
    * - 06/17/14   
      - Added :ref:`TOC Transcripts` section to :ref:`Working with Video Components`.
    * - 06/06/14   
