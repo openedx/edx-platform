@@ -338,12 +338,24 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
+
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
                     return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
+
+            ## Allow chromeless operation
+            if section_descriptor.chrome:
+                chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
+                if 'accordion' not in chrome:
+                    del context['accordion']
+                if 'tabs' not in chrome:
+                    context['disable_tabs'] = True
+
+            if section_descriptor.default_tab:
+                context['default_tab'] = section_descriptor.default_tab
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load

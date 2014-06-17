@@ -147,7 +147,15 @@ class MongoContentStore(ContentStore):
 
         for asset in assets:
             asset_location = AssetLocation._from_deprecated_son(asset['_id'], course_key.run)  # pylint: disable=protected-access
-            self.export(asset_location, output_directory)
+            # TODO: On 6/19/14, I had to put a try/except around this
+            # to export a course. The course failed on JSON files in
+            # the /static/ directory placed in it with an import.
+            # 
+            # If this hasn't been looked at in a while, remove this comment. 
+            #
+            # When debugging course exports, this might be a good place
+            # to look. -- pmitros
+            self.export(asset_location, output_directory) 
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
                     policy.setdefault(asset_location.name, {})[attr] = value
