@@ -117,6 +117,19 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
                 response_data.append(serializer.data)
         return Response(response_data, status=status.HTTP_200_OK)
 
+    @link()
+    def submissions(self, request, pk):
+        """
+        View Submissions for a specific Workgroup
+        """
+        submissions = WorkgroupSubmission.objects.filter(workgroup=pk)
+        response_data = []
+        if submissions:
+            for submission in submissions:
+                serializer = WorkgroupSubmissionSerializer(submission)
+                response_data.append(serializer.data)
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
 class ProjectsViewSet(viewsets.ModelViewSet):
     """
