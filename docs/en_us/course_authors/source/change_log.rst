@@ -12,6 +12,8 @@ June, 2014
 
    * - Date
      - Change
+   * - 06/17/14   
+     - Added :ref:`TOC Transcripts` section to :ref:`Working with Video Components`.
    * - 06/06/14   
      - Added a description of email task workflow states to the :ref:`Launch`
        section.
