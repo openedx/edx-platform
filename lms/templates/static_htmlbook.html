@@ -11,8 +11,10 @@
 </%block>
 
 <%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <script type="text/javascript">
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+	tinyMCE.baseURL = "${static.url('js/vendor/tinymce/js/tinymce')}";
 (function($) {
     $.fn.myHTMLViewer = function(options) {
         var urlToLoad = null;
