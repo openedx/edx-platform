@@ -7,81 +7,19 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    def forwards(self, orm):      
-
-        # Adding M2M table for field groups on 'Organization'
-        db.create_table('api_manager_organization_groups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('organization', models.ForeignKey(orm['api_manager.organization'], null=False)),
-            ('group', models.ForeignKey(orm['auth.group'], null=False))
-        ))
-        db.create_unique('api_manager_organization_groups', ['organization_id', 'group_id'])
+    def forwards(self, orm):
+        # Adding field 'WorkgroupSubmission.document_filename'
+        db.add_column('projects_workgroupsubmission', 'document_filename',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-      
-        # Removing M2M table for field groups on 'Organization'
-        db.delete_table('api_manager_organization_groups')
+        # Deleting field 'WorkgroupSubmission.document_filename'
+        db.delete_column('projects_workgroupsubmission', 'document_filename')
 
 
     models = {
-        'api_manager.coursecontentgrouprelationship': {
-            'Meta': {'unique_together': "(('course_id', 'content_id', 'group_profile'),)", 'object_name': 'CourseContentGroupRelationship'},
-            'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'group_profile': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['api_manager.GroupProfile']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'record_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
-        },
-        'api_manager.coursegrouprelationship': {
-            'Meta': {'object_name': 'CourseGroupRelationship'},
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'record_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
-        },
-        'api_manager.coursemodulecompletion': {
-            'Meta': {'object_name': 'CourseModuleCompletion'},
-            'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'course_completions'", 'to': "orm['auth.User']"})
-        },
-        'api_manager.groupprofile': {
-            'Meta': {'object_name': 'GroupProfile', 'db_table': "'auth_groupprofile'"},
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'group': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.Group']", 'unique': 'True'}),
-            'group_type': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'record_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
-        },
-        'api_manager.grouprelationship': {
-            'Meta': {'object_name': 'GroupRelationship'},
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'group': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.Group']", 'unique': 'True', 'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'parent_group': ('django.db.models.fields.related.ForeignKey', [], {'default': '0', 'related_name': "'child_groups'", 'null': 'True', 'blank': 'True', 'to': "orm['api_manager.GroupRelationship']"}),
-            'record_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
-        },
-        'api_manager.linkedgrouprelationship': {
-            'Meta': {'object_name': 'LinkedGroupRelationship'},
-            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'from_group_relationship': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'from_group_relationships'", 'to': "orm['api_manager.GroupRelationship']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'record_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'to_group_relationship': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'to_group_relationships'", 'to': "orm['api_manager.GroupRelationship']"})
-        },
         'api_manager.organization': {
             'Meta': {'object_name': 'Organization'},
             'contact_email': ('django.db.models.fields.EmailField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -150,7 +88,50 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroups'", 'to': "orm['projects.Project']"}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'workgroups'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['auth.User']"})
+        },
+        'projects.workgrouppeerreview': {
+            'Meta': {'object_name': 'WorkgroupPeerReview'},
+            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_peer_reviewees'", 'to': "orm['auth.User']"}),
+            'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'peer_reviews'", 'to': "orm['projects.Workgroup']"})
+        },
+        'projects.workgroupreview': {
+            'Meta': {'object_name': 'WorkgroupReview'},
+            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_reviews'", 'to': "orm['projects.Workgroup']"})
+        },
+        'projects.workgroupsubmission': {
+            'Meta': {'object_name': 'WorkgroupSubmission'},
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'document_filename': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'document_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'document_mime_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'document_url': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['auth.User']"}),
+            'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['projects.Workgroup']"})
+        },
+        'projects.workgroupsubmissionreview': {
+            'Meta': {'object_name': 'WorkgroupSubmissionReview'},
+            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reviews'", 'to': "orm['projects.WorkgroupSubmission']"})
         }
     }
 
-    complete_apps = ['api_manager']
+    complete_apps = ['projects']
