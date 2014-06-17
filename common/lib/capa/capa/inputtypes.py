@@ -221,7 +221,7 @@ class InputTypeBase(object):
         self.status = state.get('status', 'unanswered')
 
         try:
-            # Pre-parse and propcess all the declared requirements.
+            # Pre-parse and process all the declared requirements.
             self.process_requirements()
 
             # Call subclass "constructor" -- means they don't have to worry about calling
