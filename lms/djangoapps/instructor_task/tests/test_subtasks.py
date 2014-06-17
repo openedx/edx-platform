@@ -7,7 +7,11 @@ from mock import Mock, patch
 
 from student.models import CourseEnrollment
 
-from instructor_task.subtasks import queue_subtasks_for_query
+from instructor_task.subtasks import (
+    queue_subtasks_for_query,
+    generate_lists_from_queryset,
+    get_number_of_subtasks_for_queryset
+)
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 
@@ -40,6 +44,15 @@ class TestSubtasks(InstructorTaskCourseTestCase):
         self._enroll_students_in_course(self.course.id, initial_count)
         task_queryset = CourseEnrollment.objects.filter(course_id=self.course.id)
 
+        def item_list_generator(queryset, items_per_query, ordering_key, all_item_fields):
+            for item_list in generate_lists_from_queryset(queryset, items_per_query, ordering_key, all_item_fields):
+                for item in item_list:
+                    yield item
+
+        item_generator = item_list_generator(task_queryset, items_per_query, 'pk', ['pk'])
+        total_num_items=task_queryset.count()
+        total_num_subtasks=get_number_of_subtasks_for_queryset(total_num_items, items_per_query, items_per_task)
+
         def initialize_subtask_info(*args):  # pylint: disable=unused-argument
             """Instead of initializing subtask info enroll some more students into course."""
             self._enroll_students_in_course(self.course.id, extra_count)
@@ -51,10 +64,12 @@ class TestSubtasks(InstructorTaskCourseTestCase):
                 entry=instructor_task,
                 action_name='action_name',
                 create_subtask_fcn=create_subtask_fcn,
-                item_queryset=task_queryset,
+                item_generator=item_generator,
                 item_fields=[],
                 items_per_query=items_per_query,
                 items_per_task=items_per_task,
+                total_num_items=total_num_items,
+                total_num_subtasks=total_num_subtasks,
             )
 
     def test_queue_subtasks_for_query1(self):
@@ -91,5 +106,5 @@ class TestSubtasks(InstructorTaskCourseTestCase):
         mock_create_subtask_fcn_args = mock_create_subtask_fcn.call_args_list
         self.assertEqual(len(mock_create_subtask_fcn_args[0][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[1][0][0]), 3)
-        self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 4)
-        self.assertEqual(len(mock_create_subtask_fcn_args[3][0][0]), 4)
+        self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 3)
+        self.assertEqual(len(mock_create_subtask_fcn_args[3][0][0]), 5)
