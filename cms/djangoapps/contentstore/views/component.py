@@ -259,7 +259,8 @@ def container_handler(request, usage_key_string):
             parent = get_parent_xblock(parent)
         ancestor_xblocks.reverse()
 
-        if is_unit(xblock):
+        is_unit_page = is_unit(xblock)
+        if is_unit_page:
             unit = xblock
         else:
             unit = ancestor_xblocks[0] if ancestor_xblocks else None
@@ -273,6 +274,7 @@ def container_handler(request, usage_key_string):
             'unit_publish_state': unit_publish_state,
             'xblock_locator': usage_key,
             'unit': unit,
+            'is_unit_page': is_unit_page,
             'subsection': subsection,
             'section': section,
             'new_unit_category': 'vertical',
