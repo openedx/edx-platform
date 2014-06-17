@@ -261,7 +261,7 @@ def see_upsell_link_on_my_dashboard(step):
 @step(u'I do not see the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
     course_link_css = UPSELL_LINK_CSS
-    assert not world.is_css_present(course_link_css)
+    assert world.is_css_not_present(course_link_css)
 
 
 @step(u'I select the upsell link on my dashboard')
