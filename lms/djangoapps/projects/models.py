@@ -58,6 +58,7 @@ class WorkgroupSubmission(TimeStampedModel):
     document_id = models.CharField(max_length=255)
     document_url = models.CharField(max_length=255)
     document_mime_type = models.CharField(max_length=255)
+    document_filename = models.CharField(max_length=255, blank=True, null=True)
 
 
 class WorkgroupSubmissionReview(TimeStampedModel):
