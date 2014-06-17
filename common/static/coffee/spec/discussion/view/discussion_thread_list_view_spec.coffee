@@ -69,13 +69,14 @@ describe "DiscussionThreadListView", ->
                     </form>
                 </div>
             </div>
-            <div class="sort-bar">
-              <span class="sort-label" id="sort-label">Sort by:</span>
-              <ul role="radiogroup" aria-labelledby="sort-label">
-                  <li><a href="#" role="radio" aria-checked="false" data-sort="date">date</a></li>
-                  <li><a href="#" role="radio" aria-checked="false" data-sort="votes">votes</a></li>
-                  <li><a href="#" role="radio" aria-checked="false" data-sort="comments">comments</a></li>
-              </ul>
+            <div class="forum-nav-refine-bar">
+                <span class="forum-nav-sort">
+                    <select class="forum-nav-sort-control">
+                        <option value="date">by recent activity</option>
+                        <option value="comments">by most activity</option>
+                        <option value="votes">by most votes</option>
+                    </select>
+                </span>
             </div>
             <div class="search-alerts"></div>
             <ul class="forum-nav-thread-list"></ul>
@@ -149,7 +150,7 @@ describe "DiscussionThreadListView", ->
       expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text()).toEqual(sort_order[0])
       expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text()).toEqual(sort_order[1])
       expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text()).toEqual(sort_order[2])
-      expect(view.$el.find(".sort-bar a.active").text()).toEqual(type)
+      expect(view.$el.find(".forum-nav-sort-control").val()).toEqual(type)
 
     describe "thread rendering should be correct", ->
         checkRender = (threads, type, sort_order) ->
@@ -157,6 +158,8 @@ describe "DiscussionThreadListView", ->
             view = makeView(discussion)
             view.render()
             checkThreadsOrdering(view, sort_order, type)
+            expect(view.$el.find(".forum-nav-thread-comments-count:visible").length).toEqual(if type == "votes" then 0 else 3)
+            expect(view.$el.find(".forum-nav-thread-votes-count:visible").length).toEqual(if type == "votes" then 3 else 0)
 
         it "with sort preference date", ->
             checkRender(@threads, "date", [ "Thread1", "Thread2", "Thread3"])
@@ -167,12 +170,13 @@ describe "DiscussionThreadListView", ->
         it "with sort preference comments", ->
             checkRender(@threads, "comments", [ "Thread3", "Thread2", "Thread1"])
 
-    describe "Sort click should be correct", ->
+    describe "Sort change should be correct", ->
       changeSorting = (threads, selected_type, new_type, sort_order) ->
         discussion = new Discussion(_.map(threads, (thread) -> new Thread(thread)), {pages: 1, sort: selected_type})
         view = makeView(discussion)
         view.render()
-        expect(view.$el.find(".sort-bar a.active").text()).toEqual(selected_type)
+        sortControl = view.$el.find(".forum-nav-sort-control")
+        expect(sortControl.val()).toEqual(selected_type)
         sorted_threads = []
         if new_type == 'date'
           sorted_threads = [threads[0], threads[1], threads[2]]
@@ -186,9 +190,8 @@ describe "DiscussionThreadListView", ->
           )
           {always: ->}
         )
-        view.$el.find(".sort-bar a[data-sort='"+new_type+"']").click()
+        sortControl.val(new_type).change()
         expect($.ajax).toHaveBeenCalled()
-        expect(view.sortBy).toEqual(new_type)
         checkThreadsOrdering(view, sort_order, new_type)
 
       it "with sort preference date", ->

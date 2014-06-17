@@ -6,18 +6,17 @@ if Backbone?
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "focus .post-search-field": "showSearch"
-      "click .sort-bar a": "sortThreads"
+      "change .forum-nav-sort-control": "sortThreads"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
-      "change .cohort-options": "chooseCohort"
+      "change .forum-nav-filter-cohort-control": "chooseCohort"
       'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
-      @sortBy = "date"
       @discussionIds=""
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
@@ -30,7 +29,6 @@ if Backbone?
         #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
       @sidebar_padding = 10
-      @sidebar_header_height = 87
       @boardName
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
@@ -71,6 +69,7 @@ if Backbone?
       current_el = @$(".forum-nav-thread[data-id=#{thread_id}]")
       active = current_el.has(".forum-nav-thread-link.is-active").length != 0
       current_el.replaceWith(content)
+      @showMetadataAccordingToSort()
       if active
         @setActiveThread(thread_id)
 
@@ -88,7 +87,7 @@ if Backbone?
       scrollTop = $(window).scrollTop();
       windowHeight = $(window).height();
 
-      discussionBody = $(".discussion-article")
+      discussionBody = $(".discussion-column")
       discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top
       discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight()
 
@@ -111,7 +110,9 @@ if Backbone?
       sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
       sidebar.css 'height', sidebarHeight
 
-      @$('.forum-nav-thread-list').css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
+      browseSearchHeight = @$(".browse-search").outerHeight()
+      refineBarHeight = @$(".forum-nav-refine-bar").outerHeight()
+      @$('.forum-nav-thread-list').css('height', (sidebarHeight - browseSearchHeight - refineBarHeight - 2) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
@@ -123,6 +124,7 @@ if Backbone?
     render: ->
       @timer = 0
       @$el.html(@template())
+      @$(".forum-nav-sort-control").val(@collection.sort_preference)
 
       $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
@@ -131,9 +133,6 @@ if Backbone?
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
       @renderThreads()
-      sort_element = @$('.sort-bar a[data-sort="' + this.collection.sort_preference + '"]')
-      sort_element.attr('aria-checked',true)
-      sort_element.addClass('active')
       @
 
     renderThreads: =>
@@ -144,9 +143,23 @@ if Backbone?
         rendered.append content
 
       @$(".forum-nav-thread-list").html(rendered.html())
+      @showMetadataAccordingToSort()
+
       @renderMorePages()
       @updateSidebar()
       @trigger "threads:rendered"
+
+    showMetadataAccordingToSort: () =>
+      # Ensure that threads display metadata appropriate for the current sort
+      voteCounts = @$(".forum-nav-thread-votes-count")
+      commentCounts = @$(".forum-nav-thread-comments-count")
+      voteCounts.hide()
+      commentCounts.hide()
+      switch @$(".forum-nav-sort-control").val()
+        when "date", "comments"
+          commentCounts.show()
+        when "votes"
+          voteCounts.show()
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
@@ -197,17 +210,17 @@ if Backbone?
         @renderThreads()
         DiscussionUtil.discussionAlert(gettext("Sorry"), gettext("We had some trouble loading more threads. Please try again."))
 
-      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy}, error)
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @$(".forum-nav-sort-control").val()}, error)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
-      unreadCount = thread.get('unread_comments_count')
+      unreadCount = thread.get('unread_comments_count') + (if thread.get("read") then 0 else 1)
       if unreadCount > 0
         content.find('.forum-nav-thread-comments-count').attr(
           "data-tooltip",
           interpolate(
             ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', unreadCount),
-            {unread_count: thread.get('unread_comments_count')},
+            {unread_count: unreadCount},
             true
           )
         )
@@ -340,26 +353,26 @@ if Backbone?
         if discussionId == "#all"
           @discussionIds = ""
           @$(".post-search-field").val("")
-          @$('.cohort').show()                    
+          @$('.forum-nav-filter-cohort').show()
           @retrieveAllThreads()
         else if discussionId == "#flagged"
           @discussionIds = ""
           @$(".post-search-field").val("")
-          @$('.cohort').hide() 
+          @$('.forum-nav-filter-cohort').hide()
           @retrieveFlaggedThreads() 
         else if discussionId == "#following"
           @retrieveFollowed(event)
-          @$('.cohort').hide()
+          @$('.forum-nav-filter-cohort').hide()
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           
           if $(event.target).attr('cohorted') == "True"
-            @retrieveDiscussions(discussionIds, "function(){$('.cohort').show();}")
+            @retrieveDiscussions(discussionIds, "function(){$('.forum-nav-filter-cohort').show();}")
           else
-            @retrieveDiscussions(discussionIds, "function(){$('.cohort').hide();}")
+            @retrieveDiscussions(discussionIds, "function(){$('.forum-nav-filter-cohort').hide();}")
     
     chooseCohort: (event) ->
-      @group_id = @$('.cohort-options :selected').val()
+      @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
       @collection.current_page = 0
       @collection.reset()
       @loadMorePages(event)
@@ -400,14 +413,8 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      activeSort = @$(".sort-bar a.active")
-      activeSort.removeClass("active")
-      activeSort.attr("aria-checked", "false")
-      newSort = $(event.target)
-      newSort.addClass("active")
-      newSort.attr("aria-checked", "true")
-      @sortBy = newSort.data("sort")
-      @displayedCollection.setSortComparator(@sortBy)
+      @displayedCollection.setSortComparator(@$(".forum-nav-sort-control").val())
+
       @retrieveFirstPage(event)
 
     performSearch: (event) ->

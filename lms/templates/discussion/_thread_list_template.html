@@ -26,23 +26,27 @@
             </form>
         </div>
     </div>
-    <div class="sort-bar">
-        <span class="sort-label" id="sort-label">${_("Sort by:")}</span>
-        <ul role="radiogroup" aria-labelledby="sort-label">
-            <li><a href="#" role="radio" aria-checked="false" data-sort="date">${_("date")}</a></li>
-            <li><a href="#" role="radio" aria-checked="false" data-sort="votes">${_("votes")}</a></li>
-            <li><a href="#" role="radio" aria-checked="false" data-sort="comments">${_("comments")}</a></li>
-        </ul>
-
+    <div class="forum-nav-refine-bar">
         %if is_course_cohorted and is_moderator:
-        <span class="group-filter-label cohort">${_("Show:")}</span>
-            <select class="group-filter-select cohort-options cohort">
-                <option value="all">${_("View All")}</option>
+        <span class="forum-nav-filter-cohort">
+            <select class="forum-nav-filter-cohort-control">
+                <option value="all">${_("View all cohorts")}</option>
                     %for c in cohorts:
-                        <option value="${c['id']}">${_("View as {name}").format(name=c['name'])}</option>
+                        <option value="${c['id']}">${_("View as {cohort_name}").format(cohort_name=c['name'])}</option>
                     %endfor
             </select>
         %endif
+
+        <span class="forum-nav-sort">
+            <select class="forum-nav-sort-control">
+                ## Translators: This is a menu option for sorting forum threads
+                <option value="date">${_("by recent activity")}</option>
+                ## Translators: This is a menu option for sorting forum threads
+                <option value="comments">${_("by most activity")}</option>
+                ## Translators: This is a menu option for sorting forum threads
+                <option value="votes">${_("by most votes")}</option>
+            </select>
+        </span>
     </div>
     <div class="search-alerts"></div>
     <ul class="forum-nav-thread-list"></ul>

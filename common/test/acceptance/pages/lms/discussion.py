@@ -179,19 +179,20 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         Return true if the browser is on the right page else false.
         """
-        return self.q(css="body.discussion .sort-bar").present
+        return self.q(css="body.discussion .forum-nav-sort-control").present
 
-    def get_selected_sort_preference_text(self):
+    def get_selected_sort_preference(self):
         """
         Return the text of option that is selected for sorting.
         """
-        return self.q(css="body.discussion .sort-bar a.active").text[0].lower()
+        options = self.q(css="body.discussion .forum-nav-sort-control option")
+        return options.filter(lambda el: el.is_selected())[0].get_attribute("value")
 
     def change_sort_preference(self, sort_by):
         """
         Change the option of sorting by clicking on new option.
         """
-        self.q(css="body.discussion .sort-bar a[data-sort='{0}']".format(sort_by)).click()
+        self.q(css="body.discussion .forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
 
     def refresh_page(self):
         """
