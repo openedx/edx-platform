@@ -12,9 +12,9 @@ class @Annotatable
 
     # these selectors are for responding to events from the annotation capa problem type
     problemXModuleSelector:     '.xmodule_CapaModule'
-    problemSelector:            'section.problem'
-    problemInputSelector:       'section.problem .annotation-input'
-    problemReturnSelector:      'section.problem .annotation-return'
+    problemSelector:            'div.problem'
+    problemInputSelector:       'div.problem .annotation-input'
+    problemReturnSelector:      'div.problem .annotation-return'
 
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug

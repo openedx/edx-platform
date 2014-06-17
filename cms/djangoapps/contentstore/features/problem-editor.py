@@ -16,10 +16,32 @@ SHOW_ANSWER = "Show Answer"
 TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
 MATLAB_API_KEY = "Matlab API key"
 
+
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
     world.create_course_with_unit()
     step.given("I have created another Blank Common Problem")
+
+
+@step('I have created a unit with advanced module "(.*)"$')
+def i_created_unit_with_advanced_module(step, advanced_module):
+    world.create_course_with_unit()
+
+    url = world.browser.url
+    step.given("I select the Advanced Settings")
+    change_value(step, 'advanced_modules', '["{}"]'.format(advanced_module))
+    world.visit(url)
+    world.wait_for_xmodule()
+
+
+@step('I have created an advanced component "(.*)" of type "(.*)"')
+def i_create_new_advanced_component(step, component_type, advanced_component):
+    world.create_component_instance(
+        step=step,
+        category='advanced',
+        component_type=component_type,
+        advanced_component=advanced_component
+    )
 
 
 @step('I have created another Blank Common Problem$')
@@ -28,6 +50,40 @@ def i_create_new_common_problem(step):
         step=step,
         category='problem',
         component_type='Blank Common Problem'
+    )
+
+
+@step('when I mouseover on "(.*)"')
+def i_mouseover_on_html_component(step, element_class):
+    action_css = '.{}'.format(element_class)
+    world.trigger_event(action_css, event='mouseover')
+
+
+@step(u'I can see Reply to Annotation link$')
+def i_see_reply_to_annotation_link(_step):
+    css_selector = 'a.annotatable-reply'
+    world.wait_for_visible(css_selector)
+
+
+@step(u'I see that page has scrolled "(.*)" when I click on "(.*)" link$')
+def i_see_annotation_problem_page_scrolls(_step, scroll_direction, link_css):
+    scroll_js = "$(window).scrollTop();"
+    scroll_height_before = world.browser.evaluate_script(scroll_js)
+    world.css_click("a.{}".format(link_css))
+    scroll_height_after = world.browser.evaluate_script(scroll_js)
+    if scroll_direction == "up":
+        assert scroll_height_after < scroll_height_before
+    elif scroll_direction == "down":
+        assert scroll_height_after > scroll_height_before
+
+
+@step('I have created an advanced problem of type "(.*)"$')
+def i_create_new_advanced_problem(step, component_type):
+    world.create_component_instance(
+        step=step,
+        category='problem',
+        component_type=component_type,
+        is_advanced=True
     )
 
 
@@ -245,6 +301,21 @@ def i_can_see_message(_step, msg):
 @step(u'I can edit the problem$')
 def i_can_edit_problem(_step):
     world.edit_component()
+
+
+@step(u'I edit first blank advanced problem for annotation response$')
+def i_edit_blank_problem_for_annotation_response(_step):
+    edit_css = """$('.component-header:contains("Blank Advanced Problem")').parent().find('a.edit-button').click()"""
+    text = """
+        <problem>
+            <annotationresponse>
+                <annotationinput><text>Text of annotation</text></annotationinput>
+            </annotationresponse>
+        </problem>"""
+    world.browser.execute_script(edit_css)
+    world.wait_for_ajax_complete()
+    type_in_codemirror(0, text)
+    world.save_component()
 
 
 @step(u'I can see cheatsheet$')
