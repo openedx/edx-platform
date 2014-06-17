@@ -107,5 +107,8 @@ TEST_COURSE_OVERVIEW_CONTENT = dedent(
     <section class="faq">
         <p>Some text here</p>
     </section>
+
+    <section class="intro-video" data-videoid="foobar">
+    </section>
     """
 )
