@@ -158,6 +158,22 @@ class ViewsTestCase(TestCase):
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
+    def test_unicode_handling_in_url(self):
+        url_parts = [
+            '/courses',
+            self.course.id.to_deprecated_string(),
+            self.chapter.location.name,
+            self.section.location.name,
+            '1'
+        ]
+
+        for idx, val in enumerate(url_parts):
+            url_parts_copy = url_parts[:]
+            url_parts_copy[idx] = val + u'χ'
+            request_url = '/'.join(url_parts_copy)
+            response = self.client.get(request_url)
+            self.assertEqual(response.status_code, 404)
+
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))
         mock_user = MagicMock()
