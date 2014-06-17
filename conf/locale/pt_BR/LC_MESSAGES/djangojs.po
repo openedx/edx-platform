@@ -5,21 +5,25 @@
 # 
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
-# andreibosco <andreibosco@gmail.com>, 2013
-# andreibosco <andreibosco@gmail.com>, 2013
+# Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
+# Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # brk0_0, 2013
 # brunojm <brunojm@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
 # rqllira <contato@raquellira.com>, 2014
+# edgarapmelo <edgarapmelo@gmail.com>, 2014
+# javiercencig <javier@jecnet.com.br>, 2014
+# Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
-# marcelosoaressouza <marcelo@juntadados.org>, 2014
+# Lulatini <lulatini@gmail.com>, 2014
+# Marcelo Soares Souza <marcelo@juntadados.org>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
-# brk0_0, 2013
+# Paulo Castro, 2013
 # RenataBarboza, 2013
-# RenataBarboza, 2013-2014
-# rpietrobon <pietr007@gmail.com>, 2013-2014
+# Renata Barboza-Murray, 2013-2014
+# Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -28,25 +32,40 @@
 # 
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
-# andreibosco <andreibosco@gmail.com>, 2013
+# Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # brk0_0, 2013
 # brunojm <brunojm@gmail.com>, 2014
+# Daniel Linhares <danielinhares@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # RenataBarboza, 2013
-# RenataBarboza, 2014
+# Renata Barboza-Murray, 2014
+# #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# mmauryx <matheus_w_dias@hotmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
-"PO-Revision-Date: 2014-05-25 02:51+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-06-12 12:23-0400\n"
+"PO-Revision-Date: 2014-06-12 23:21+0000\n"
+"Last-Translator: mmauryx <matheus_w_dias@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -55,7 +74,7 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
 #: cms/static/js/views/asset.js cms/static/js/views/baseview.js
@@ -69,23 +88,29 @@ msgstr "Cancelar"
 
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
 msgid "This link will open in a new browser window/tab"
-msgstr "Este link será aberto em uma nova janela/aba do navegador"
+msgstr "Este link será aberto em uma nova janela/guia do navegador"
+
+#: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Delete"
+msgstr "Excluir"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr ""
+msgstr "Exibir anotações"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ocultar anotações "
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
-msgstr ""
+msgstr "Expandir instruções"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Contrair instruções"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
@@ -93,7 +118,7 @@ msgstr "Comentário"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr ""
+msgstr "Responder à anotação"
 
 #. Translators: %(earned)s is the number of points earned. %(total)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -129,7 +154,7 @@ msgstr "Ocultar resposta"
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr "Mostrar resposta"
+msgstr "Exibir resposta"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
@@ -144,17 +169,17 @@ msgstr "Resposta ocultada"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unanswered"
-msgstr ""
+msgstr "não respondida"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr ""
+msgstr "Status: não enviado"
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "You need to pick a rating before you can submit."
-msgstr ""
+msgstr "É necessário escolher uma avaliação para poder enviar."
 
 #. Translators: this message appears when transitioning between openended
 #. grading
@@ -164,6 +189,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr ""
+"A sua pontuação não cumpriu os critérios para passar para a próxima etapa."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
@@ -180,38 +206,45 @@ msgstr "Enviar avaliação"
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
-msgstr ""
+msgstr "A sua reposta foi enviada. Por favor, verifique depois a sua nota."
 
 #. Translators: this button is clicked to submit a student's rating of
 #. an evaluator's assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit post-assessment"
-msgstr ""
+msgstr "Enviar pós-avaliação"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "Resposta salva, mas ainda não enviada."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
 msgstr ""
+"Por favor, confirme que deseja enviar o seu trabalho. Não será possível "
+"modificá-lo após o envio."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
+"O arquivo que você está tentando enviar é muito grande para o nosso sistema."
+" Por favor, escolha um arquivo com menos de 2 MB ou copie o link para este "
+"arquivo na caixa de resposta."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
 msgstr ""
+"Tem certeza que deseja excluir as suas respostas anteriores para esta "
+"questão?"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
-msgstr ""
+msgstr "Passou para a próxima etapa."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -220,6 +253,10 @@ msgid ""
 " uploaded the image to another website, you can paste a link to it into the "
 "answer box."
 msgstr ""
+"O envio de arquivos é necessário para esta questão, porém esta "
+"funcionalidade não é suportada na versão do seu navegador. Tente uma nova "
+"versão do Google Chrome. Outra opção, caso tenha enviado a imagem para outra"
+" página web, é colar o link no campo de resposta."
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -227,7 +264,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr "Mostrar pergunta"
+msgstr "Exibir pergunta"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
@@ -239,6 +276,8 @@ msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"Erro na sequencia! Não é possível navegar para a guia %(tab_name)s no "
+"SequenceModule atual. Por favor, entre em contato com a equipe do curso."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
@@ -280,16 +319,28 @@ msgid "Maximum"
 msgstr "Máximo"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid "This browser cannot play .mp4, .ogg, or "
+msgid ""
+"VideoPlayer: Element corresponding to the given selector does not found."
 msgstr ""
+"VideoPlayer: o elemento correspondente ao seletor definido não foi "
+"localizado."
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or .webm files."
+msgstr ""
+"Não é possível executar arquivos .mp4, .ogg ou .webm com este navegador."
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "Try using a different browser, such as Google Chrome."
+msgstr "Tente usar um navegador diferente, como o Google Chrome."
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr ""
+msgstr "Barra deslizante do vídeo"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
-msgstr "Pausa"
+msgstr "Pausar"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Play"
@@ -297,7 +348,7 @@ msgstr "Reproduzir"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr "Preencher navegador"
+msgstr "Ocupar todo o navegador"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
@@ -305,7 +356,7 @@ msgstr "Sair da tela cheia do navegador"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr ""
+msgstr "Alta definição ativada"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
@@ -318,7 +369,7 @@ msgstr "Posição do vídeo"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr "Vídeo encerrado"
+msgstr "Vídeo concluído"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -340,7 +391,7 @@ msgstr[1] "%(value)s segundos"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr "A legenda aparecerá quando"
+msgstr "A legenda será exibida quando"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
@@ -348,16 +399,16 @@ msgstr "Ativar legenda"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
-msgstr ""
+msgstr "Desativar legenda"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr ""
+msgstr "Ocultar discussão"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
-msgstr ""
+msgstr "Mostrar discussão"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -374,11 +425,14 @@ msgstr "Desculpe"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
 msgstr ""
+"Houve um problema ao carregar a discussão. Por favor, tente novamente."
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
 msgstr ""
+"Houve um problema ao carregar os tópicos que você solicitou. Por favor, "
+"tente novamente."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "Loading content"
@@ -389,11 +443,13 @@ msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
+"Houve um problema ao processar seu pedido. Por favor, certifique-se de ter "
+"copiado qualquer trabalho não salvo e, em seguida, recarregue a página."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
-"Tivemos alguns problemas ao processar o seu pedido. Por favor, tente "
+"Houve algum problema ao processar a sua solicitação. Por favor, tente "
 "novamente."
 
 #: common/static/coffee/src/discussion/utils.js
@@ -418,49 +474,56 @@ msgstr "Abrir"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "remove vote"
-msgstr ""
+msgstr "excluir voto"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote"
-msgstr ""
+msgstr "votar"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote (click to remove your vote)"
 msgid_plural "votes (click to remove your vote)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "voto (clique para excluir o seu voto)"
+msgstr[1] "votos (clique para excluir o seu voto)"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote (click to vote)"
 msgid_plural "votes (click to vote)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "voto (clique para votar)"
+msgstr[1] "votos (clique para votar)"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr ""
+msgstr "Carregar mais"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr ""
+msgstr "Carregando mais tópicos"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
 msgstr ""
+"Houve um problema ao carregar mais tópicos. Por favor, tente novamente."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(unread_count)s novo comentário"
+msgstr[1] "%(unread_count)s novos comentários"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
+msgstr "Carregando a lista de tópicos"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid ""
+"No results found for %(original_query)s. Showing results for "
+"%(suggested_query)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
-msgstr ""
+msgstr "Clique para excluir a denúncia"
 
 #. Translators: The text between start_sr_span and end_span is not shown
 #. in most browsers but will be read by screen readers.
@@ -468,23 +531,25 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
+"Abuso denunciado%(start_sr_span)s, clique para excluir a "
+"denúncia%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Report Misuse"
-msgstr ""
+msgstr "Denunciar abuso"
 
 #. Translators: The text between start_sr_span and end_span is not shown
 #. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
+msgstr "Fixado%(start_sr_span)s, clique para desafixar%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to unpin"
-msgstr ""
+msgstr "Clique para desafixar"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
@@ -492,26 +557,29 @@ msgstr "Marcado"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
-msgstr ""
+msgstr "Marcar tópico"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr ""
+msgstr "O tópico selecionado foi excluído. Por favor, selecione outro tópico."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
 msgstr ""
+"Houve algum problema ao carregar as respostas. Por favor, recarregue a "
+"página."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
+"Houve algum problema ao carregar mais respostas. Por favor, tente novamente."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(numResponses)s resposta"
+msgstr[1] "%(numResponses)s respostas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -520,24 +588,26 @@ msgstr "Exibindo todas as respostas"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Exibindo a primeira resposta"
+msgstr[1] "Exibindo as primeiras %(numResponses)s respostas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr ""
+msgstr "Carregar todas as respostas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr ""
+msgstr "Carregar as próximas %(numResponses)s respostas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr ""
+msgstr "Você tem certeza de que deseja excluir esta publicação?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
+"Houve algum problema ao carregar a página solicitada. Por favor, tente "
+"novamente"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -551,47 +621,46 @@ msgstr "equipe"
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Community TA"
-msgstr ""
+msgstr "Assistente de ensino da comunidade"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported, click to remove report"
-msgstr ""
+msgstr "Abuso denunciado, clique para excluir a denúncia"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr "Você tem certeza que deseja excluir este comentário?"
+msgstr "Tem certeza que deseja excluir este comentário?"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
 msgstr ""
-"Ocorreram alguns problemas ao apagar este comentário. Por favor, tente "
-"novamente."
+"Houve algum problema ao excluir este comentário. Por favor, tente novamente."
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr ""
+msgstr "Você tem certeza de que deseja excluir esta resposta?"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
-msgstr ""
+msgstr "Largue a imagem de destino"
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dragging out of slider"
-msgstr ""
+msgstr "Arrastando para fora da barra deslizante"
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dragging"
-msgstr ""
+msgstr "arrastando"
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dropped in slider"
-msgstr ""
+msgstr "solta na barra deslizante"
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dropped on target"
-msgstr ""
+msgstr "solta no destino"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
@@ -612,7 +681,7 @@ msgstr "aproximadamente um minuto"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minutos"
+msgstr[0] "%d minuto"
 msgstr[1] "%d minutos"
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -622,7 +691,7 @@ msgstr "aproximadamente uma hora"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "aproximadamente %d horas"
+msgstr[0] "aproximadamente %d hora"
 msgstr[1] "aproximadamente %d horas"
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -633,7 +702,7 @@ msgstr "um dia"
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dia"
-msgstr[1] "%d dia"
+msgstr[1] "%d dias"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -642,7 +711,7 @@ msgstr "aproximadamente um mês"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d meses"
+msgstr[0] "%d mês"
 msgstr[1] "%d meses"
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -652,8 +721,99 @@ msgstr "aproximadamente um ano"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d anos"
+msgstr[0] "%d ano"
 msgstr[1] "%d anos"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "User"
+msgstr "Usuário"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Annotation"
+msgstr "Anotação"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Start"
+msgstr "Iniciar"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "End"
+msgstr "Finalizar"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "#Replies"
+msgstr "#Respostas"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Date posted"
+msgstr "Data da publicação"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "More"
+msgstr "Mais"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "My Notes"
+msgstr "Minhas anotações"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Instructor"
+msgstr "Instrutor"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Public"
+msgstr "Público"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Search"
+msgstr "Pesquisar"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Users"
+msgstr "Usuários"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Tags"
+msgstr "Marcações"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Annotation Text"
+msgstr "Texto da anotação"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Clear"
+msgstr "Limpar"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Text"
+msgstr "Texto"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Video"
+msgstr "Vídeo"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Image"
+msgstr "Imagem"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Reply"
+msgstr "Responder"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Edit"
+msgstr "Editar"
+
+#: common/static/js/vendor/ova/catch/js/catch.js
+msgid "Tags:"
+msgstr "Marcações:"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
@@ -664,12 +824,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Esta é a lista de %s disponíveis. Você pode escolher alguns selecionando-os "
-"na caixa abaixo e clicando na seta \"Escolher\" entre as duas caixas. "
+"Esta é a lista de %s disponíveis. É possível escolher alguns dos itens "
+"selecionando-os na caixa abaixo e clicando na seta \"Escolher\" entre as "
+"duas caixas. "
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Digite nesta caixa para filtrar a lista de %s disponíveis."
+msgstr "Digite neste campo para filtrar a lista de %s disponíveis."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
@@ -681,7 +842,7 @@ msgstr "Escolher todos"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Click to choose all %s at once."
-msgstr "Clique para escolher todos %s de uma vez."
+msgstr "Clique para escolher todos os %s de uma vez."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose"
@@ -700,8 +861,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Esta é a lista de %s escolhidos. Você pode remover alguns selecionando-os na"
-" caixa abaixo e clicando na seta \"Remover\" entre as duas caixas."
+"Esta é a lista de %s escolhidos. É possível excluir alguns selecionando-os "
+"na caixa abaixo e clicando na seta \"Excluir\" entre as duas caixas."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove all"
@@ -722,6 +883,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Há alterações não salvas nos campos editáveis individuais. Ao executar uma "
+"ação, as alterações não salvas serão perdidas. "
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -729,6 +892,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Uma ação foi selecionada, mas as alterações nos campos individuais não foram"
+" salvas. Por favor, clique em OK para salvar. A ação deverá ser executada "
+"novamente. "
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -736,6 +902,9 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Uma ação foi selecionada, mas nenhuma alteração foi realizada nos campos "
+"individuais. Provavelmente, o botão Ir seja o mais indicado em vez do botão "
+"Salvar. "
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
@@ -753,7 +922,7 @@ msgstr "Dom|Seg|Ter|Qua|Qui|Sex|Sáb"
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
 msgid "Show"
-msgstr "Mostrar"
+msgstr "Exibir"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
 msgid "Hide"
@@ -775,7 +944,7 @@ msgstr "Relógio"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Choose a time"
-msgstr "Escolher um horário"
+msgstr "Escolha um horário"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Midnight"
@@ -783,7 +952,7 @@ msgstr "Meia-noite"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "6 a.m."
-msgstr "06:00"
+msgstr "6 horas"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
@@ -808,19 +977,19 @@ msgstr "Amanhã"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "Abrir calculadora"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
-msgstr ""
+msgstr "Fechar calculadora"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Preview"
-msgstr ""
+msgstr "Pré-visualizar"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr ""
+msgstr "Corpo da mensagem"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
@@ -828,19 +997,19 @@ msgstr "Erro ao recuperar distribuição."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Unavailable metric display."
-msgstr ""
+msgstr "Painel de indicadores indisponível."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching grade distributions."
-msgstr ""
+msgstr "Erro ao recuperar as distribuições de notas."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Last Updated: <%= timestamp %>"
-msgstr ""
+msgstr "Última Atualização: <%= timestamp %>"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "<%= num_students %> students scored."
-msgstr ""
+msgstr "<%= num_students %> alunos avaliados."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
@@ -848,15 +1017,15 @@ msgstr "Carregando..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr ""
+msgstr "Ocorreu um erro ao obter a lista de alunos."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr ""
+msgstr "Erro ao recuperar a configuração para a correção."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr ""
+msgstr "Erro ao gerar notas. Por favor, tente novamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -867,8 +1036,8 @@ msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
 msgstr ""
-"Links são gerados sob demanda e expiram dentro de 5 minutos devido à "
-"natureza sensível da informação do estudante."
+"Os links são gerados a pedido e expiram em 5 minutos devido à natureza "
+"delicada das informações do aluno."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
@@ -885,27 +1054,27 @@ msgstr "Revogar acesso"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr "Insira um nome de usuário ou email"
+msgstr "Digite um nome de usuário ou email"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
-msgstr "Insira um nome de usuário ou e-mail."
+msgstr "Digite um nome de usuário ou e-mail."
 
 #. Translators: A rolename appears this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
-msgstr ""
+msgstr "Erro ao recuperar a lista de funções"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
-msgstr "Erro ao alterar permissões de usuários."
+msgstr "Erro ao alterar as permissões do usuário."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%= identifier %>'."
 msgstr ""
-"Não foi possível achar um usuário com o nome de usuário ou email '<%= "
+"Não foi possível localizar um usuário com o nome de usuário ou email '<%= "
 "identifier %>'."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -913,44 +1082,45 @@ msgid ""
 "Error: User '<%= username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
+"Erro: O usuário '<%= username %>' ainda não ativou a sua conta. Os usuários "
+"devem criar e ativar a  conta antes de terem uma função atribuída."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr ""
+msgstr "Erro: você não pode se excluir do grupo de Instrutores!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr "Erro ao adicionar/remover usuários como testadores beta."
+msgstr "Erro ao adicionar/excluir usuários como testadores beta."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr ""
-"Os seguintes usuários foram adicionados como testadores beta com sucesso:"
+"Os seguintes usuários foram adicionados corretamente como testadores beta:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
-msgstr ""
-"Esses usuários foram removidos do grupo de testadores beta com sucesso:"
+msgstr "Os seguintes usuários foram excluídos do grupo de testadores beta:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
-msgstr ""
+msgstr "Os seguintes usuários não foram adicionados como testadores beta:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr ""
-"Os seguintes usuários não foram removidos do grupo de testadores beta:"
+"Os seguintes usuários não foram excluídos do grupo de testadores beta:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
-"Os usuários devem criar e ativar suas contas antes de serem promovidos a "
+"Os usuários devem criar e ativar as suas contas antes de serem promovidos a "
 "testadores beta."
 
 #. Translators: A list of identifiers (which are email addresses and/or
@@ -958,23 +1128,27 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
 msgstr ""
+"Não foi possível localizar usuários associados aos seguintes "
+"identificadores:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
-msgstr ""
+msgstr "Erro ao fazer inscrição/cancelar inscrição de usuários."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
-msgstr ""
+msgstr "Os seguintes endereços de email e/ou nomes de usuário são inválidos:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
 msgstr ""
+"Os seguintes usuários foram inscritos corretamente e um e-mail foi enviado "
+"para eles:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
-msgstr "Os seguintes usuários foram matriculados com sucesso:"
+msgstr "Os seguintes usuários foram inscritos com sucesso:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -982,13 +1156,13 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
 msgstr ""
-"E-mails foram enviados com sucesso aos seguintes usuários. Eles poderão se "
-"matricular assim que se registrarem:"
+"O e-mail de inscrição foi enviado corretamente para os seguintes usuários, "
+"que poderão se inscrever após realizar o cadastro:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
-msgstr "Os seguintes usuários poderão se matricular assim que se registrarem:"
+msgstr "Os seguintes usuários poderão se inscrever após realizar o cadastro:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -996,13 +1170,13 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
 msgstr ""
-"E-mails foram enviados com sucesso aos seguintes usuários. Eles poderão se "
-"matricular assim que se registrarem:"
+"O e-mail de inscrição foi enviado corretamente aos seguintes usuários, que "
+"poderão se inscrever após a realização do cadastro:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
-msgstr "Os seguintes usuários serão matriculados assim que se registrarem:"
+msgstr "Os seguintes usuários serão inscritos após o cadastro:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -1010,49 +1184,58 @@ msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
 msgstr ""
-"E-mails enviados com sucesso. Os seguintes usuários não estão mais "
-"matriculados no curso:"
+"E-mails enviados corretamente. Os seguintes usuários não estão mais "
+"inscritos no curso:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
-msgstr "Os seguintes usuários não estão mais matriculados no curso:"
+msgstr "Os seguintes usuários não estão mais inscritos no curso:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
+"Os seguintes usuários não estavam inscritos no curso e, portanto, não "
+"puderam ser excluídos:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr "Sua mensagem deve ter um título."
+msgstr "A sua mensagem deve ter um título."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr "Sua mensagem não deve estar em branco."
+msgstr "A sua mensagem não pode ficar em branco."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "O seu e-mail foi incluído corretamente na fila de envio."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to yourself. Is this "
 "OK?"
 msgstr ""
+"Você está prestes a enviar um email com o título '<%= subject %>' para si "
+"mesmo. Tem certeza?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to everyone who is "
 "staff or instructor on this course. Is this OK?"
 msgstr ""
+"Você está prestes a enviar um email com o título '<%= subject %>' para todos"
+" da equipe ou os instrutores deste curso. Tem certeza?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to ALL (everyone who "
 "is enrolled in this course as student, staff, or instructor). Is this OK?"
 msgstr ""
+"Você está prestes a enviar um email com o título '<%= subject %>' para TODOS"
+" (todos os alunos inscritos neste curso, a equipe e os instrutores). Tem "
+"certeza?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -1060,18 +1243,23 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
+"O seu e-mail foi incluído corretamente na fila de envio. Note que com turmas"
+" grandes é possível que este processo demore até uma hora (ou mais, se "
+"outros cursos estiverem enviando e-mails simultaneamente) para enviar todos "
+"os e-mails."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr ""
+msgstr "Erro ao enviar o e-mail."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr ""
+msgstr "Não há histórico de e-mails para este curso."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
 msgstr ""
+"Ocorreu um erro ao obter o histórico de tarefas por e-mail para este curso."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1079,13 +1267,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "Adicione o endereço de e-mail ou o nome de usuário de um aluno."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%= student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
+"Erro ao obter o url de progresso do aluno '<%= student_id %>'. Certifique-se"
+" que o identificador de estudante esteja escrito corretamente."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1095,13 +1285,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
-msgstr ""
+msgstr "Por favor, informe o local do problema."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
 msgstr ""
+"Sucesso! As tentativas para resolver o exercício '<% = problem_id%>' e aluno"
+" '<% = student_id%>' foram zeradas."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1109,11 +1301,16 @@ msgid ""
 " '<%= student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
+"Houve um erro ao zerar as tentativas do problema '<%= problem_id %>' para o "
+"aluno  '<%= student_id %>'. Certifique-se que o identificador do problema e "
+"do aluno estejam corretos."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
 msgstr ""
+"Excluir status do aluno '<%= student_id %>' para o problema '<%= problem_id "
+"%>'?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1121,10 +1318,13 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
+"Erro ao excluir o status do aluno '<%= student_id %>' para o problema '<%= "
+"problem_id %>'. Certifique-se que o identificador do problema e do aluno "
+"estejam corretos."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
-msgstr ""
+msgstr "Status do módulo excluído corretamente."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1132,6 +1332,9 @@ msgid ""
 "'<%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
+"Uma nova correção foi iniciada para o problema \"<% = problem_id%> ' e o "
+"aluno' <% = student_id%> '. Clique no botão 'Exibir histórico de tarefas do "
+"aluno' para ver o status da tarefa."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1139,6 +1342,9 @@ msgid ""
 "'<%= student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
+"Erro ao iniciar uma tarefa para reavaliar o problema '<%= problem_id %>' do "
+"aluno '<%= student_id %>'. Certifique-se que o identificador do problema e "
+"do aluno estejam corretos."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1146,10 +1352,14 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
+"Erro na obtenção do histórico de tarefas do problema  '<%= problem_id %>' e "
+"do aluno  '<%= student_id %>'. Certifique-se que o identificador do problema"
+" e do aluno estejam corretos."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
 msgstr ""
+"Zerar as tentativas para todos os alunos no problema '<% = problem_id%> \"?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1157,6 +1367,9 @@ msgid ""
 " Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
+"A tarefa de zerar as tentativas para o problema '<%= problem_id%>' foi "
+"iniciada corretamente. Clique o botão 'Exibir o histórico de Tarefas' do "
+"problema para ver o status desta tarefa."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1164,10 +1377,14 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
+"Erro ao iniciar um tarefa para zerar as tentativas de todos os alunos no "
+"problema '<%= problem_id %>'. Certifique-se que o identificador do problema "
+"esteja correto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
 msgstr ""
+"Corrigir novamente o problema '<% = problem_id%>' para todos os alunos?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1175,12 +1392,17 @@ msgid ""
 "students. Click the 'Show Background Task History for Problem' button to see"
 " the status of the task."
 msgstr ""
+"A tarefa de corrigir novamente o problema '<% = problem_id%>' foi iniciada "
+"corretamente para todos os alunos. Clique no botão para 'Exibir o histórico "
+"de tarefas' para ver o status da tarefa."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
+"Erro ao iniciar um tarefa para reavaliar o problema '<%= problem_id %>'. "
+"Certifique-se que o identificador do problema esteja correto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
@@ -1197,7 +1419,7 @@ msgstr "Tipo de tarefa"
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task inputs"
-msgstr ""
+msgstr "Informações para a tarefa"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -1227,7 +1449,7 @@ msgstr "Duração (segundos)"
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "State"
-msgstr ""
+msgstr "Status"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -1243,23 +1465,23 @@ msgstr "Progresso da tarefa"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
-msgstr ""
+msgstr "A notas foram salvas. Buscando a próxima tarefa para ser corrigida."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr ""
+msgstr "Nome do problema"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr ""
+msgstr "Corrigido"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
-msgstr ""
+msgstr "Disponível para correção"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Required"
-msgstr ""
+msgstr "Obrigatório"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Progress"
@@ -1267,7 +1489,7 @@ msgstr "Progresso"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Back to problem list"
-msgstr ""
+msgstr "Voltar para lista de problemas"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Try loading again"
@@ -1279,15 +1501,15 @@ msgstr "<%= num %> disponível"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
-msgstr ""
+msgstr "<%= num %> avaliados"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr ""
+msgstr "<%= num %> adicionais necessários para começar o ML"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
-msgstr "Checar novamente para envio"
+msgstr "Verificar novamente para envio"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state: <%= state %>"
@@ -1295,7 +1517,7 @@ msgstr "O sistema obteve um estado inválido: <%= state %>"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state for submission: "
-msgstr ""
+msgstr "O sistema atingiu um estado inválido para envio:"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
@@ -1304,20 +1526,20 @@ msgstr "(Ocultar)"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr "(Mostrar)"
+msgstr "(Exibir)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
-msgstr ""
+msgstr "Inserir hiperlink"
 
 #. Translators: Please keep the quotation marks (") around this text
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
 msgid "\"optional title\""
-msgstr ""
+msgstr "\"título opcional\""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type url)"
-msgstr ""
+msgstr "Inserir imagem (envie o arquivo ou digite o url)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -1341,7 +1563,7 @@ msgstr "Citação em bloco (Ctrl+Q)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr "Amostra de Código (Ctrl+K)"
+msgstr "Amostra de código (Ctrl+K)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
@@ -1353,7 +1575,7 @@ msgstr "Lista numerada (Ctrl+O)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
-msgstr "Lista com Marcadores (Ctrl+U)"
+msgstr "Lista com marcadores (Ctrl+U)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading (Ctrl+H)"
@@ -1361,7 +1583,7 @@ msgstr "Cabeçalho (Ctrl+H)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
-msgstr "Regra horizontal (Ctrl+R)"
+msgstr "Linha horizontal (Ctrl+R)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
@@ -1385,11 +1607,11 @@ msgstr "texto enfatizado"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr "insira a descrição da imagem aqui"
+msgstr "digite a descrição da imagem aqui"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr "insira a descrição do link aqui"
+msgstr "digite a descrição do link aqui"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
@@ -1409,48 +1631,48 @@ msgstr "Cabeçalho"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
-msgstr ""
+msgstr "Ocorreu um erro desconhecido."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
-msgstr ""
+msgstr "Tentativas para usuários {user} zeradas corretamente"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to reset attempts."
-msgstr ""
+msgstr "Falha ao zerar tentativas."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
-msgstr ""
+msgstr "O status do aluno para o usuário {user} foi excluído corretamente"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to delete student state."
-msgstr ""
+msgstr "Falha ao excluir o status do aluno."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
-msgstr ""
+msgstr "Problema de usuário {user} reavaliado corretamente"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem."
-msgstr ""
+msgstr "Falha ao reavaliar o problema."
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
-msgstr "Não é possível recuperar dados. Tente novamente mais tarde."
+msgstr "Não foi possível recuperar dados. Tente novamente mais tarde."
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "student(s) opened Subsection"
-msgstr ""
+msgstr "Abriu subdivisão para aluno(s)"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "students"
-msgstr ""
+msgstr "alunos"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "questions"
-msgstr ""
+msgstr "perguntas"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1478,13 +1700,12 @@ msgid "Saving&hellip;"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
-msgid "Delete Component Confirmation"
+msgid "Delete Page Confirmation"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
-"Are you sure you want to delete this component? This action cannot be "
-"undone."
+"Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
@@ -1628,19 +1849,15 @@ msgstr ""
 "\n"
 "Além disso, qualquer conteúdo que possua links ou se refira a este item não irá funcionar mais (ex.: imagens e/ou links quebrados) "
 
-#: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
-msgid "Delete"
-msgstr ""
-
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
 msgstr ""
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 msgid "Name"
 msgstr ""
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 msgid "Date Added"
 msgstr ""
 
@@ -1649,10 +1866,12 @@ msgid "Uploading…"
 msgstr ""
 
 #: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
 msgstr ""
 
 #: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr ""
 
@@ -1764,6 +1983,8 @@ msgid "Deleting"
 msgstr ""
 
 #: cms/static/js/views/uploads.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
 msgstr ""
 
@@ -1811,6 +2032,8 @@ msgid "Adding&hellip;"
 msgstr ""
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/section-name-edit.underscore
 msgid "Save"
 msgstr ""
 
@@ -1855,4 +2078,409 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
+msgstr ""
+
+#: common/templates/js/image-modal.underscore
+msgid "Fullscreen"
+msgstr ""
+
+#: common/templates/js/image-modal.underscore
+msgid "Large"
+msgstr ""
+
+#: common/templates/js/image-modal.underscore
+msgid "Zoom In"
+msgstr ""
+
+#: common/templates/js/image-modal.underscore
+msgid "Zoom Out"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Common Problem Types"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Advanced"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component.underscore
+msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "List of uploaded files and assets in this course"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "Embed URL"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "External URL"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/basic-modal.underscore
+msgid "Actions"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "You haven't added any assets to this course yet."
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "Upload your first asset"
+msgstr ""
+
+#: cms/templates/js/asset-upload-modal.underscore
+msgid "close"
+msgstr ""
+
+#: cms/templates/js/asset.underscore
+msgid "Open/download this file"
+msgstr ""
+
+#: cms/templates/js/asset.underscore
+msgid "Delete this asset"
+msgstr ""
+
+#: cms/templates/js/asset.underscore
+msgid "Lock this asset"
+msgstr ""
+
+#: cms/templates/js/asset.underscore
+msgid "Lock/unlock file"
+msgstr ""
+
+#: cms/templates/js/checklist.underscore
+msgid "{number}% of checklists completed"
+msgstr ""
+
+#: cms/templates/js/checklist.underscore
+msgid "Tasks Completed:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Assignment Type Name"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "e.g. Homework, Midterm Exams"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Abbreviation"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "e.g. HW, Midterm"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Weight of Total Grade"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "as a percent, e.g. 40"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Total Number"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "total exercises assigned"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Number of Droppable"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "total exercises that won't be graded"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid "You have no handouts defined"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid ""
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Name"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter %s"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "provide the title/name of the chapter that will be used in navigating"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Asset"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH%d.pdf"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "upload a PDF file or provide the path to a Studio asset file"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Upload PDF"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "delete chapter"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "error.message"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook information"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook Name"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Introduction to Cookie Baking"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid ""
+"provide the title/name of the text book as you would like your students to "
+"see it"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Chapter(s) information"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Add a Chapter"
+msgstr ""
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Add"
+msgstr ""
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+#: cms/templates/js/mock/mock-xmodule-editor.underscore
+#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Clear Value"
+msgstr ""
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Replace"
+msgstr ""
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Download"
+msgstr ""
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "You haven't added any textbooks to this course yet."
+msgstr ""
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "Add your first textbook"
+msgstr ""
+
+#: cms/templates/js/paging-footer.underscore
+#: cms/templates/js/paging-header.underscore
+msgid "Previous"
+msgstr ""
+
+#: cms/templates/js/paging-footer.underscore
+msgid "Page number"
+msgstr ""
+
+#: cms/templates/js/paging-footer.underscore
+#: cms/templates/js/paging-header.underscore
+msgid "Next"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr ""
+
+#: cms/templates/js/upload-dialog.underscore
+msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Add URLs for additional versions"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid ""
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
+"another version. These URLs cannot be YouTube URLs. The first listed video "
+"that\\'s compatible with the student\\'s computer will play."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Default Timed Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Timed Transcript Conflict"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid ""
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid "Which timed transcript would you like to use?"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Error."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid "Timed Transcript from"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid "Timed Transcript Found"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript. "
+"If you want to replace this transcript, upload a new .srt transcript file."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Upload New Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Upload New .srt Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Download Transcript for Editing"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "No EdX Timed Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid ""
+"EdX doesn\\'t have a timed transcript for this video in Studio, but we found"
+" a transcript on YouTube. You can import the YouTube transcript or upload "
+"your own .srt transcript file."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Import YouTube Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid "No Timed Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid ""
+"EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
+"file."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid ""
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Do you want to replace the edX transcript with the YouTube transcript?"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Yes, replace the edX transcript with the YouTube transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Timed Transcript Uploaded Successfully"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to replace this "
+"transcript, upload a new .srt transcript file. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript."
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Confirm Timed Transcript"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid ""
+"You changed a video URL, but did not change the timed transcript file. Do "
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
+msgstr ""
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Use Current Transcript"
 msgstr ""

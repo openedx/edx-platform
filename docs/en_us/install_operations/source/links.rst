@@ -10,3 +10,9 @@
 .. _edx configuration repository wiki: https://github.com/edx/configuration/wiki
 .. _Devstack wiki: https://github.com/edx/configuration/wiki/edX-Developer-Stack
 .. _Developing on Devstack: https://github.com/edx/edx-platform/wiki/Developing-on-the-edX-Developer-Stack
+.. _RabbitMQ: http://www.rabbitmq.com/
+.. _Discern: http://code.edx.org/discern/
+.. _Ease: https://github.com/edx/ease
+.. _VirtualBox Guest Editions: http://www.virtualbox.org/manual/ch04.html
+.. _Vagrant documentation: http://docs.vagrantup.com/v2/
+.. _Vagrant's documentation on boxes: http://docs.vagrantup.com/v2/boxes.html

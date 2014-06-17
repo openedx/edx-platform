@@ -460,7 +460,12 @@ if Backbone?
             @collection.current_page = response.page
             @collection.pages = response.num_pages
             if !_.isNull response.corrected_text
-              @addSearchAlert('Showing results for "' + response.corrected_text + '"');
+              message = interpolate(
+                _.escape(gettext('No results found for %(original_query)s. Showing results for %(suggested_query)s.')),
+                {"original_query": "<em>" + _.escape(text) + "</em>", "suggested_query": "<em>" + response.corrected_text + "</em>"},
+                true
+              )
+              @addSearchAlert(message)
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway

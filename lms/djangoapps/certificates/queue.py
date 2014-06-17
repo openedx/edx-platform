@@ -180,7 +180,7 @@ class XQueueCertInterface(object):
             course_name = course.display_name or course_id.to_deprecated_string()
             is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
             grade = grades.grade(student, self.request, course)
-            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
+            enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
             mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
             user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
             user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)

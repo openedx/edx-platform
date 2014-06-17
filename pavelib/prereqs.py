@@ -151,3 +151,15 @@ def install_prereqs():
     install_ruby_prereqs()
     install_node_prereqs()
     install_python_prereqs()
+
+@task
+def install_asset_prereqs():
+    """
+    Installs Ruby and Node
+    """
+    if os.environ.get("NO_PREREQ_INSTALL", False):
+        return
+
+    install_ruby_prereqs()
+    install_node_prereqs()
+

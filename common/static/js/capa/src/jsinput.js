@@ -181,19 +181,15 @@ var JSInput = (function ($, undefined) {
     }
 
     function walkDOM() {
-        var dataProcessed, all;
-
-        // Find all jsinput elements
-        allSections = $('section.jsinput');
-
+        var allSections = $('section.jsinput');
         // When a JSInput problem loads, its data-processed attribute is false,
         // so the jsconstructor will be called for it.
         // The constructor will not be called again on subsequent reruns of
         // this file by other JSInput. Only if it is reloaded, either with the
         // rest of the page or when it is submitted, will this constructor be
-        // called again. 
+        // called again.
         allSections.each(function(index, value) {
-            dataProcessed = ($(value).attr("data-processed") === "true");
+            var dataProcessed = ($(value).attr("data-processed") === "true");
             if (!dataProcessed) {
                 jsinputConstructor(value);
                 $(value).attr("data-processed", 'true');

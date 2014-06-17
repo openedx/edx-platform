@@ -130,9 +130,10 @@ def compile_sass(debug=False):
     """
     sh(cmd(
         'sass', '' if debug else '--style compressed',
+        "--sourcemap",
         "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
         "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS)
+        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS),
     ))
 
 
@@ -189,7 +190,7 @@ def watch_assets(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_asset_prereqs')
 @consume_args
 def update_assets(args):
     """

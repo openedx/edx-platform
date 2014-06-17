@@ -66,8 +66,7 @@ def _clear_assets(location):
     for asset in assets:
         asset_location = AssetLocation._from_deprecated_son(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
-        mongo_id = asset_location.to_deprecated_son()
-        store.delete(mongo_id)
+        store.delete(asset_location)
 
 
 def _get_subs_id(filename):

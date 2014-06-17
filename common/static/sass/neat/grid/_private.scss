@@ -22,9 +22,9 @@ $layout-direction: nil !default;
 
 @function get-parent-columns($columns) {
   @if $columns != $grid-columns {
-    $parent-columns: $columns;
+    $parent-columns: $columns !global;
   } @else {
-    $parent-columns: $grid-columns;
+    $parent-columns: $grid-columns !global;
   }
 
   @return $parent-columns;
@@ -40,11 +40,4 @@ $layout-direction: nil !default;
   }
 
   @return $display-table;
-}
-
-@function get-padding-for-table-layout($columns, $total-columns) {
-  $total-padding: flex-gutter($total-columns) * ($columns - 1);
-  $padding: $total-padding / $columns;
-
-  @return $padding;
 }

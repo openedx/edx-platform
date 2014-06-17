@@ -45,8 +45,12 @@ body.discussion {
       // alert copy
       .message {
         @include font-size(12);
-        @extend %t-weight5;
         color: $white;
+
+        em {
+          @extend %t-weight5;
+          font-style: italic;
+        }
       }
 
       // links to jump to users/content in alerts

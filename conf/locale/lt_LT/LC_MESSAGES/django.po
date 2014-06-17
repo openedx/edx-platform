@@ -7,8 +7,8 @@
 # Riina <ciairdabar@yahoo.com>, 2014
 # Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2014
-# zzygis <zzygis@gmail.com>, 2013
-# zzygis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -18,17 +18,18 @@
 # Riina <ciairdabar@yahoo.com>, 2014
 # Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2014
-# zzygis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Eva Pavlova <evutte@gmail.com>, 2014
+# Edukometrija <jolitad@mruni.eu>, 2014
+# evutte <evutte@gmail.com>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2013-2014
-# zzygis <zzygis@gmail.com>, 2013
-# zzygis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -36,8 +37,9 @@
 # 
 # Translators:
 # Riina <ciairdabar@yahoo.com>, 2014
+# Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2013
-# zzygis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -45,8 +47,8 @@
 # 
 # Translators:
 # Edukometrija <jolitad@mruni.eu>, 2014
-# zzygis <zzygis@gmail.com>, 2013
-# zzygis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
+# Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -59,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"POT-Creation-Date: 2014-06-12 12:24-0400\n"
 "PO-Revision-Date: 2014-05-23 00:34+0000\n"
 "Last-Translator: Riina <ciairdabar@yahoo.com>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)\n"
@@ -78,13 +80,34 @@ msgstr ""
 msgid "Open Ended Panel"
 msgstr ""
 
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "Diskusija"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
+
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
 msgstr "Sąžiningumo deklaracijos sertifikatas"
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
-msgstr "Registracija uždaryta"
+msgstr "Registracija baigta"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
@@ -112,7 +135,7 @@ msgstr "Techninė pagalba"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Student"
-msgstr ""
+msgstr "Kurso dalyvis"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -217,7 +240,7 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
@@ -405,6 +428,10 @@ msgstr "Paskyra su tokiu el. pašto adresu jau egzistuoja."
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "Senasis el. pašto adresas yra toks pat, kaip ir naujasis."
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -833,6 +860,20 @@ msgstr ""
 msgid "processing"
 msgstr ""
 
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your file(s) have been submitted. As soon as your submission is graded, this"
@@ -855,6 +896,15 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr ""
@@ -865,6 +915,10 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
 msgstr ""
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
@@ -895,7 +949,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Could not interpret '{student_answer}' as a number."
-msgstr ""
+msgstr "Neįmanoma {student_answer} suprasti kaip skaičiaus."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use variables ({bad_variables}) in numerical problems."
@@ -907,7 +961,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid math syntax: '{student_answer}'"
-msgstr ""
+msgstr "Neteisinga matematinė sintaksė: {student_answer}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use complex numbers in range tolerance problems"
@@ -937,7 +991,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error getting student answer from {student_answers}"
-msgstr ""
+msgstr "klaida gaunant kurso dalyvio atsakymą iš {student_answers}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer entered!"
@@ -958,7 +1012,7 @@ msgid "No answer provided."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
+msgid "Error: No grader has been set up for this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1002,6 +1056,19 @@ msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr ""
 
@@ -1010,6 +1077,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1025,6 +1093,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1056,7 +1125,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
-msgstr ""
+msgstr "Kurso dalyvis šį uždavinį bandė išspręsti tiek kartų"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1068,6 +1137,8 @@ msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
 msgstr ""
+"Apibrėžia, kiek kartų kurso dalyvis gali bandyti atsakyti į šį uždavinį. "
+"Jeigu dydis nenustatytas, bandymų skaičius neribojamas."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1082,6 +1153,9 @@ msgid ""
 "by an instructor, and will override the global due date if it is set to a "
 "date that is later than the global due date."
 msgstr ""
+"Data, kai konkretus kurso dalyvis turi pateikti šio uždavinio atsakymą. Ją "
+"gali nustatyti lektorius ir ji panaikina visuotinę pateikimo datą, jeigu ji "
+"yra vėlesnė už visuotinę pateikimo datą."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1142,6 +1216,10 @@ msgid ""
 "This setting only applies to problems that can have randomly generated "
 "numeric values. A default value can be set in Advanced Settings."
 msgstr ""
+"Apibrėžia, kaip dažnai įvestys atsitiktinai atrenkamos kurso dalyviui "
+"parsisiunčiant uždavinį. Ši nuostata taikoma tik tiems uždaviniams, kuriuose"
+" gali būti atsitiktinai generuojamų skaitinių reikšmių. Numatytąją vertę "
+"galima nustatyti papildomose nuostatose."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "On Reset"
@@ -1149,7 +1227,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Per Student"
-msgstr ""
+msgstr "Kiekvienam kurso dalyviui"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1159,7 +1237,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the correctness of current student answers"
-msgstr ""
+msgstr "Kurso dalyvių dabartinių atsakymų teisingumo žinynas"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary for maintaining the state of inputtypes"
@@ -1167,11 +1245,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the current student responses"
-msgstr ""
+msgstr "Kurso dalyvių dabartinių atsakymų žinynas"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
-msgstr ""
+msgstr "Ar kurso dalyvis atsakė į uždavinį"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Random seed for this student"
@@ -1190,6 +1268,8 @@ msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
 msgstr ""
+"Kiek sekundžių kurso dalyvis turi palaukti prieš pakartotinai pateikdamas "
+"uždavinio, kurį spręsti galima daug kartų, sprendimą."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1334,7 +1414,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Current task that the student is on."
-msgstr ""
+msgstr "Dabar kurso dalyvis atlieka šią užduotį."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
@@ -1343,6 +1423,11 @@ msgid ""
 "created and students have attempted it (for example changes a self assessed "
 "problem to self and peer assessed."
 msgstr ""
+"Išsaugotų kurso dalyvių būsenų žinynų sąrašų sąrašas. Šis laukas yra "
+"užpildytas tik tada, jeigu sukūrus modulį ir kurso dalyviams bandžius jį "
+"spręsti lektorius pakeičia užduotis (pavyzdžiui, uždavinį, kai savo "
+"atsakymus vertina pats kurso dalyvis, pakeičia uždaviniu, kai savo atsakymus"
+" vertina pats kurso dalyvis ir jo atsakymus vertina bendrakursiai. "
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "List of state dictionaries of each task within this module."
@@ -1350,7 +1435,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Which step within the current task that the student is on."
-msgstr ""
+msgstr "Kokį šios užduoties žingsnį dabar atlieka kurso dalyvis."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
@@ -1363,6 +1448,8 @@ msgid ""
 "Defines whether the student gets credit for this problem. Credit is based on"
 " peer grades of this problem."
 msgstr ""
+"Apibrėžia, ar įskaitomas šis kurso dalyvio uždavinys. Įskaita priklauso nuo "
+"to, kaip šį uždavinį įvertino bendrakursiai."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "If the problem is ready to be reset or not."
@@ -1370,7 +1457,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "The number of times the student can try to answer this problem."
-msgstr ""
+msgstr "Kiek kartų kurso dalyvis gali bandyti atsakyti į šį uždavinį. "
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Allow File Uploads"
@@ -1378,7 +1465,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Whether or not the student can submit files as a response."
-msgstr ""
+msgstr "Ar kurso dalyvis gali atsakydamas pateikti failus."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Disable Quality Filter"
@@ -1410,6 +1497,7 @@ msgid ""
 "The minimum number of calibration essays each student will need to complete "
 "for peer grading."
 msgstr ""
+"Kiek mažiausiai bendraklasių darbų kiekvienas kurso dalyvis turi patikrinti."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Maximum Peer Grading Calibrations"
@@ -1420,6 +1508,8 @@ msgid ""
 "The maximum number of calibration essays each student will need to complete "
 "for peer grading."
 msgstr ""
+"Kiek daugiausiai bendraklasių darbų kiekvienas kurso dalyvis turi "
+"patikrinti."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Peer Graders per Response"
@@ -1438,6 +1528,8 @@ msgid ""
 "The number of other students each student making a submission will have to "
 "grade."
 msgstr ""
+"Kiek kitų kurso dalyvių darbų turės įvertinti kiekvienas atsakymą "
+"pateikiantis kurso dalyvis."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Allow \"overgrading\" of peer submissions"
@@ -1450,6 +1542,11 @@ msgid ""
 "are eligible to grade already have enough graders.  This is intended for use"
 " when settings for `Required Peer Grading` > `Peer Graders per Response`"
 msgstr ""
+"EKSPERIMENTINĖ FUNKCIJA. Leisti kurso dalyviams vertinti bendrakursių "
+"pateiktis, kurias jau įvertino reikalingas vertintojų skaičius, bet TIK "
+"TADA, KAI visas pateiktis, kurias jie gali vertinti, jau įvertino pakankamai"
+" vertintojų. Ši funkcija numatyta nuostatoms \"Privalomas bendrakursių "
+"vertinimas\" > \"Kiekvieną atsakymą turi įvertinti tiek bendrakursių\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Getting Started With Studio"
@@ -1478,6 +1575,8 @@ msgid ""
 "Establish your course's student enrollment and launch dates on the Schedule "
 "and Details page."
 msgstr ""
+"Nustatykite registracijos į savo kursą ir jo pradžios datas tvarkaraščio ir "
+"informacijos puslapyje."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Edit Course Details &amp; Schedule"
@@ -1538,6 +1637,8 @@ msgid ""
 "Specify the release dates for each Section in your course. Sections become "
 "visible to students on their release dates."
 msgstr ""
+"Nurodykite kiekvienos savo kurso temos paskelbimo datą. Kurso dalyviai gali "
+"matyti temas nuo jų paskelbimo dienos."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Designate a Subsection as Graded"
@@ -1642,6 +1743,9 @@ msgid ""
 " and more. Draft the text students will read before deciding to enroll in "
 "your course."
 msgstr ""
+"edX kursai turi puslapį \"Apie kursą\", jame yra vaizdo įrašas apie kursą, "
+"jo aprašas ir kita. Sukurkite tekstą, kurį skaitys kurso dalyviai prieš "
+"nuspręsdami užsirašyti į jūsų kursą."
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/course_module.py
@@ -1659,6 +1763,8 @@ msgid ""
 "Showing prospective students who their instructor will be is helpful. "
 "Include staff bios on the course About page."
 msgstr ""
+"Naudinga būsimiems kurso dalyviams parodyti, kas bus jų lektorius. Personalo"
+" biografijas įdėkite puslapyje \"Apie kursą\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Add Course FAQs"
@@ -1677,6 +1783,8 @@ msgid ""
 "Let students know what knowledge and/or skills they should have before they "
 "enroll in your course."
 msgstr ""
+"Praneškite kurso dalyviams, kokių žinių ir / arba įgūdžių jie turi turėti "
+"prieš užsirašydami į Jūsų kursą."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -1790,11 +1898,55 @@ msgstr ""
 msgid "Secret Token String for Annotation"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
 "also use the display name to identify this component."
 msgstr ""
+"Įveskite šio komponento pavadinimą, kurį matys kurso dalyviai. Analitinėse "
+"ataskaitose irgi gali būti naudojamas šis pavadinimas, identifikuojantis šį "
+"komponentą."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -1935,13 +2087,83 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: 'Courseware' refers to the tab in the courseware that leads to
-#. the content of a course
-#: common/lib/xmodule/xmodule/tabs.py
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration for how users are grouped for this content experiment. "
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/split_test_studio_header.html
+msgid "You must select a group configuration for this content experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment will not be shown to students because it refers to a"
+" group configuration that has been deleted. You can delete this experiment "
+"or reinstate the group configuration to repair it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment is in an invalid state and cannot be repaired. "
+"Please delete and recreate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
-msgstr ""
+msgstr "Kursų medžiaga"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -1960,13 +2182,6 @@ msgstr "Pažanga"
 #: lms/templates/wiki/base.html
 msgid "Wiki"
 msgstr "Žinynas"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
-msgstr "Diskusija"
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
@@ -2014,6 +2229,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2135,6 +2360,8 @@ msgid ""
 "You have attempted this question {number_of_student_attempts} times. You are"
 " only allowed to attempt it {max_number_of_attempts} times."
 msgstr ""
+"Į šį klausimą bandėte atsakyti {number_of_student_attempts} kartus. Jums "
+"leidžiama bandyti tik {max_number_of_attempts} kartus.  "
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "The problem state got out-of-sync. Please try reloading the page."
@@ -2300,10 +2527,6 @@ msgid "Basic"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -2404,6 +2627,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2579,26 +2803,19 @@ msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Opened by this number of students"
-msgstr ""
+msgstr "Atidaryta šio kurso dalyvių skaičiaus"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "subsections"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
-msgstr ""
+msgstr "Kurso dalyvių skaičius"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
-msgstr ""
+msgid "Percent of Students"
+msgstr "Kurso dalyvių procentas"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/folditchallenge.html
@@ -2645,7 +2862,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
-msgstr "KLAIDA: Rodymui skirtų video nerasta!"
+msgstr "KLAIDA: Rodymui skirtų vaizdų nerasta!"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -2700,23 +2917,18 @@ msgid "Failed in authenticating {0}\n"
 msgstr "Nepavyko atpažinti {0}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "fixed password"
 msgstr "nustatytas slaptažodis"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr ""
 
@@ -2778,13 +2990,11 @@ msgid "Courses loaded in the modulestore"
 msgstr "Kursai įkelti į modulių saugyklą"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 msgid "username"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr ""
 
@@ -2827,7 +3037,7 @@ msgstr ""
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
+msgstr "{0} kursas duomenų kataloge jau yra! (vis tiek įkelti iš naujo)"
 
 #. Translators: unable to download the course content from
 #. the source git repository. Clone occurs if this is brand
@@ -2883,7 +3093,6 @@ msgid "Deleted"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "kurso_id"
 
@@ -2901,15 +3110,13 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
-msgstr ""
+msgstr "Visų kursų registracijos informacija"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "pilnas_pavadinimas"
 
@@ -2918,26 +3125,6 @@ msgid ""
 "Import the specified git repository and optional branch into the modulestore"
 " and optionally specified directory."
 msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
-msgstr "Klaida – neįmanoma rasti kurso tokiu ID"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -2995,6 +3182,10 @@ msgstr "Naudotojas neegzistuoja."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "Užduotis jau paleista."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3070,10 +3261,11 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
+"Sėkmingai pakeista numatyta kurso dalyvio {0} pateikimo data iš {1} į {2}"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
-msgstr ""
+msgstr "Sėkmingai atnaujinta kurso dalyvio {0} pateikimo data iš {1} į {2}"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
@@ -3101,11 +3293,12 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Found a single student.  "
-msgstr ""
+msgstr "Rastas vienintelis kurso dalyvis."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Couldn't find student with that email or username."
 msgstr ""
+"Nepavyko rasti kurso dalyvio su šiuo el. pašto adresu ar naudotojo vardu."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_key}"
@@ -3163,7 +3356,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Deleted student module state for {state}!"
-msgstr ""
+msgstr "Panaikinta kurso dalyvio modulio būsena {state}!"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to delete module state for {id}/{url}. "
@@ -3181,6 +3374,8 @@ msgstr ""
 msgid ""
 "Failed to create a background task for rescoring \"{key}\" for student {id}."
 msgstr ""
+"Nepavyko sukurti kurso dalyvio {id} pirminės įvertinimo perskaičiavimo "
+"užduoties {key}. "
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for rescoring \"{key}\": {id}."
@@ -3221,7 +3416,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Student profile data for course {course_id}"
-msgstr ""
+msgstr "{course_id} kurso dalyvio profilio duomenys"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Found {num} records to dump."
@@ -3233,7 +3428,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Student state for problem {problem}"
-msgstr ""
+msgstr "Kurso dalyvio {problem} uždavinio būsena"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Beta Testers"
@@ -3348,17 +3543,19 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Enrollment of students"
-msgstr ""
+msgstr "Kurso dalyvių registracija"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Un-enrollment of students"
-msgstr ""
+msgstr "Kurso dalyvių išbraukimas iš sąrašo"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
 "Failed to find any background tasks for course \"{course}\", module "
 "\"{problem}\" and student \"{student}\"."
 msgstr ""
+"Nepavyko rasti kurso dalyvio {student} {course} kurso {problem} modulio "
+"pirminių užduočių."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
@@ -3465,41 +3662,42 @@ msgstr ""
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
+"Neįmanoma rasti kurso dalyvio {student} pateikčių, kurias reikia {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for student '{student}'"
-msgstr ""
+msgstr "Kurso dalyvio {student} uždavinio nepavyko {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for student '{student}'"
-msgstr ""
+msgstr "Kurso dalyvio {student} uždavinys sėkmingai {action} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find any students with submissions to be {action}"
-msgstr ""
+msgstr "Neįmanoma rasti kurso dalyvių, kurių pateiktis reikia {action} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for any of {attempted} students"
-msgstr ""
+msgstr "Nė vienam iš {attempted} kurso dalyvių nepavyko uždavinio {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for {attempted} students"
-msgstr ""
+msgstr "{attempted} kurso dalyviai sėkmingai {action} uždavinį"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem {action} for {succeeded} of {attempted} students"
-msgstr ""
+msgstr "{succeeded} iš {attempted} kurso dalyvių {action} uždavinį"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
@@ -3548,6 +3746,9 @@ msgid ""
 "      Dear %(student_name)s,\n"
 "    "
 msgstr ""
+"\n"
+"      Gerb. %(student_name)s,\n"
+"    "
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
 msgid ""
@@ -3610,11 +3811,11 @@ msgid ""
 " point of contact."
 msgstr ""
 "Įvyko klaida, bandant susisiekti su vertinimo paslauga. Prašome pranešti "
-"jūsų edX kontaktiniam asmeniui."
+"savo edX kontaktiniam asmeniui."
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "for course {0} and student {1}."
-msgstr "{0} kursui ir {1} studentui."
+msgstr "{0} kursui ir {1} kurso dalyviui."
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
@@ -3708,7 +3909,7 @@ msgid ""
 "Please do NOT include your credit card information."
 msgstr ""
 "Atkreipkite dėmesį, kad per 2 savaites jūs galite panaikinti savo "
-"Patvirtinto sertifikato registraciją ir susigrąžinti pilną sumokėtą sumą. "
+"Patvirtinto sertifikato registraciją ir susigrąžinti visą sumokėtą sumą. "
 "Norėdami susigrąžinti pinigus, kreipkitės šiuo adresu: {billing_email}. "
 "Rašydami elektroninį laišką, nurodykite savo užsakymo numerį. Laiške "
 "NEREIKIA nurodyti savo kreditinės kortelės informacijos."
@@ -3867,12 +4068,10 @@ msgid "The course you requested does not exist."
 msgstr "Jūsų prašomas kursas neegzistuoja."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr "{0} kursas jau yra jūsų krepšelyje."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr "Jūs jau esate prisiregistravę {0} kursui."
 
@@ -3886,13 +4085,13 @@ msgstr "Jums nesuteikta teisė peržiūrėti šio puslapio."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
-msgstr "Mokėjimo apdorojimas negražino reikalaujamo parametro: {0}"
+msgstr "Mokėjimo apdorojimas negrąžino reikalaujamo parametro: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
-"Mokėjimo apdorojimas gražino neteisingai įvestą reikšmę {0} parametrui {1}."
+"Mokėjimo apdorojimas grąžino neteisingai įvestą reikšmę {0} parametrui {1}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -4304,7 +4503,7 @@ msgid ""
 "correctly. <br /> Required fields are noted by <strong "
 "class=\"indicator\">bold text and an asterisk (*)</strong>."
 msgstr ""
-"Prašome įvesti slaptažodį du kartus, tokiu būdų bus galima patikrinti, kad "
+"Prašome įvesti slaptažodį du kartus, tokiu būdu bus galima patikrinti, kad "
 "slaptažodis įvestas tesingai. <br /> Būtini laukai yra pažymėti <strong "
 "class=\"indicator\">paryškintu šriftu bei žvaigždute (*)</strong>."
 
@@ -4516,7 +4715,7 @@ msgstr ""
 "Mygtuku spustelėkite kiekvieną versiją, kad pamatytumėte redaguotas eilutes."
 " Spustelėkite \"Peržiūra\" mygtuką, kad pamatytumėte, kaip straipsnis šiuo "
 "metu atrodo. Puslapio apačioje galite pasirinkti kurią nors iš versijų arba "
-"senąją versiją apjungti su dabartine naująja."
+"senąją versiją sujungti su dabartine naująja."
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -4536,7 +4735,7 @@ msgstr "Pakeisti"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Merge selected with current..."
-msgstr "Apjungti pasirinktą su einamuoju..."
+msgstr "Sujungti pasirinktą su einamuoju..."
 
 #: lms/templates/wiki/history.html
 msgid "Switch to selected version"
@@ -4556,18 +4755,18 @@ msgstr "Persijungti į šią versiją"
 
 #: lms/templates/wiki/history.html
 msgid "Merge Revision"
-msgstr ""
+msgstr "Sujungti versijas"
 
 #: lms/templates/wiki/history.html
 msgid "Merge with current"
-msgstr "Apjungti su einamuoju"
+msgstr "Sujungti su einamuoju"
 
 #: lms/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
 msgstr ""
-"Apjungus šią versiją su einamąją versija visi duomenys iš abiejų versijų bus"
+"Sujungus šią versiją su einamąją versija visi duomenys iš abiejų versijų bus"
 " išsaugoti ir apjungti apytiksliai tose pačiose vietose, kuriose jie buvo "
 "pradinėse versijose. "
 
@@ -4577,7 +4776,7 @@ msgstr "Po šio veiksmo būtinai patikrinkite rezultatus."
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Create new merged version"
-msgstr "Sukurti naują apjungtą versiją"
+msgstr "Sukurti naują sujungtą versiją"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing revision:"
@@ -4585,7 +4784,7 @@ msgstr ""
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing a merge between two revisions:"
-msgstr ""
+msgstr "Peržiūrėti dvi sujungtas versijas:"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
@@ -4624,7 +4823,7 @@ msgid ""
 "This wiki uses <strong>Markdown</strong> for styling. There are several "
 "useful guides online. See any of the links below for in-depth details:"
 msgstr ""
-"Rašymo stiliuj wiki naudoja <strong>Markdown</strong> sintaksę. Interente "
+"Rašymo stiliui wiki naudoja <strong>Markdown</strong> sintaksę. Internete "
 "galima rasti keletą naudingų Markdown aprašų. Žiūrėkite bet kurią iš žemiau "
 "pateiktų nuorodų:"
 
@@ -4729,39 +4928,39 @@ msgstr "Įkėlimai"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
-msgstr "Įkelti naują bylą"
+msgstr "Įkelti naują failą"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
-msgstr "Ieškoti ir pridėti bylą"
+msgstr "Ieškoti ir pridėti failą"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload File"
-msgstr "Įkelti bylą"
+msgstr "Įkelti failą"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
-msgstr "Įkelti bylą"
+msgstr "Įkelti failą"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search files and articles"
-msgstr "Bylų ir straipsnių paieška"
+msgstr "Failų ir straipsnių paieška"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
 msgstr ""
-"Jūs galite naudotis bylomis iš kitų straipsnių. Tačiau šios bylos gali būti "
-"pakeistos atliekant kitų straipsnių atnaujinimus."
+"Jūs galite naudotis failais iš kitų straipsnių. Tačiau šie failai gali būti "
+"pakeisti atliekant kitų straipsnių atnaujinimus."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
 msgstr ""
-"Bylos, kurios yra prieinamos šiame straipsnyje. Kopijuokite markdown žymę, "
-"nurodančią tiesiogiai iš straipsnio į bylą."
+"Failai, prieinami šiame straipsnyje. Kopijuokite markdown žymę, nurodančią "
+"tiesiogiai iš straipsnio į failą."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Markdown tag"
@@ -4777,7 +4976,7 @@ msgstr "Dydis"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File History"
-msgstr "Bylos istorija"
+msgstr "Failo istorija"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
@@ -4797,7 +4996,7 @@ msgstr "anonimas (IP prisijungęs)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File history"
-msgstr "Bylos istorija"
+msgstr "Failo istorija"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
@@ -4895,6 +5094,19 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -5040,7 +5252,7 @@ msgstr ""
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr ""
@@ -5158,8 +5370,9 @@ msgstr ""
 msgid "Privacy Policy"
 msgstr ""
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
@@ -5194,7 +5407,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select your contribution for this course (min. $"
-msgstr ""
+msgstr "Pasirinkite šiam kursui įnašo sumą (min. $"
 
 #: common/templates/course_modes/choose.html
 #: lms/templates/verify_student/photo_verification.html
@@ -5241,6 +5454,13 @@ msgid ""
 " below, and then click the 'Select Certificate' button to complete your "
 "registration."
 msgstr ""
+"Jei negalite sumokėti minimalaus mokesčio arba neatitinkate reikalavimų, "
+"galite klausytis kurso negaunant už tai kreditų arba pasirinkti gauti "
+"sąžiningumą patvirtinantį sertifikatą, kuris yra nemokamas. Jei norėtumėte "
+"gauti sąžiningumą patvirtinantį sertifikatą, pažymėkite varnele sąžiningumo "
+"deklaracijos sertifikato langelį, nurodykite priežastį, kodėl negalite "
+"siekti asmens tapatybe patvirtinto sertifikato, o tada spragtelėkite "
+"\"Pasirinkti sertifikatą\" mygtuką registracijai užbaigti. "
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
@@ -5290,14 +5510,19 @@ msgid ""
 "photo and ID and is checked throughout the course to verify that it is you "
 "who earned the passing grade."
 msgstr ""
+"Asmens tapatybe patvirtinto sertifikato išdavimui reikalingas jūsų tapatybę "
+"įrodantis dokumentas ir nuotrauka. Jie bus tikrinami kurso metu siekiant "
+"įsitikinti, kad tikrai jūs pats pelnėte teigiamą įvertinimą."
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
-msgstr ""
+msgstr "Klausytis kurso nerenkant kreditų"
 
 #: common/templates/course_modes/choose.html
 msgid "Sign up to audit this course for free and track your own progress."
 msgstr ""
+"Prisijunkite, norėdami nemokamai klausytis šio kurso nerenkant kreditų ir "
+"sekti savo pažangą."
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -5360,6 +5585,10 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
+"Mums labai svarbūs jūsų atsiliepimai, jie mums padeda  tobulinti kursus. Jei"
+" jūs esate prisiregistravęs kurso dalyvis ir turite klausimų, atsiliepimų, "
+"pasiūlymų ar tam tikrame kurse kilus kitų problemų prašome rašyti diskusijų "
+"forumuose that&nbsp;class."
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
@@ -5474,31 +5703,31 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr ""
+msgstr "Dabartiniai kursai"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
-msgstr ""
+msgstr "Jūs dar neužsiregistravote nei vienam kursui."
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
-msgstr ""
+msgstr "Ieškoti kursų!"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't been enrolled in any courses yet."
-msgstr ""
+msgstr "Jūs dar neįsirašėte nei į vieną kursą."
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Kursai negali būti pakrauti"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
-msgstr ""
+msgstr "{course_number} el. pašto nustatymai"
 
 #: lms/templates/dashboard.html
 msgid "Receive course emails"
-msgstr ""
+msgstr "Gauti kurso el. laiškus"
 
 #: lms/templates/dashboard.html
 msgid "Save Settings"
@@ -5609,27 +5838,27 @@ msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
-msgstr ""
+msgstr "Kurso dalyvio priėmimo forma"
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Kursas:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
-msgstr ""
+msgstr "Pridėti naujus kurso dalyvius"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
-msgstr ""
+msgstr "Esantys kurso dalyviai:"
 
 #: lms/templates/enroll_students.html
 msgid "New students added: "
-msgstr ""
+msgstr "Pridėti nauji kurso dalyviai:"
 
 #: lms/templates/enroll_students.html
 msgid "Students rejected: "
-msgstr ""
+msgstr "Atmesti kurso dalyviai:"
 
 #: lms/templates/enroll_students.html
 msgid "Debug: "
@@ -5702,6 +5931,12 @@ msgid ""
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
 msgstr ""
+"{platform_name} yra ne pelno organizacija įsteigta bendradarbiaujant "
+"{Harvard} ir {MIT} siekiant teikti geriausią aukštąjį išsilavinimą bet kokio"
+" amžiaus studentams visame pasaulyje kur tik yra prieiga prie interneto. "
+"{platform_name}'s nemokami masiniai atvirieji interneto kursai yra "
+"interaktyvūs ir įvairiomis temomis, įskaitant kompiuterių mokslą, visuomenės"
+" sveikatą ir dirbtinį intelektą."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -5748,6 +5983,9 @@ msgid ""
 "this course</strong>, post in the {link_start}course discussion "
 "forum{link_end}."
 msgstr ""
+"Jei turite <strong>klausimų apie kurso paskaitas, namų darbus, priemones ar "
+"šio kurso</strong> medžiagą, rašykite į {link_start}kurso diskusijos "
+"forumą{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -5888,17 +6126,13 @@ msgstr ""
 msgid "Please try again later."
 msgstr ""
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
 msgstr ""
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
-msgstr ""
+msgstr "Nemokami kursai <strong>{university_name}</strong>"
 
 #: lms/templates/index.html
 msgid "The Future of Online Education"
@@ -5974,7 +6208,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Access My Courses"
-msgstr ""
+msgstr "Eiti į mano kursus"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
@@ -5986,7 +6220,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "to access your account and courses"
-msgstr ""
+msgstr "prisijungti prie savo paskyros ir kursų"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
@@ -6072,7 +6306,7 @@ msgstr ""
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable or Reenable student accounts"
-msgstr ""
+msgstr "Blokuoti ar atkurti kurso dalyvių paskyras"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -6088,7 +6322,7 @@ msgstr ""
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
-msgstr ""
+msgstr "Kurso dalyviai, kurių paskyros yra užblokuotos"
 
 #: lms/templates/manage_user_standing.html
 msgid "(reload your page to refresh)"
@@ -6132,11 +6366,6 @@ msgstr ""
 msgid "Accepted"
 msgstr ""
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr ""
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr ""
@@ -6159,7 +6388,7 @@ msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Find Courses"
-msgstr ""
+msgstr "Ieškoti kursų"
 
 #: lms/templates/navigation.html
 msgid "Dashboard for:"
@@ -6185,7 +6414,7 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
-msgstr ""
+msgstr "Kursai"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -6204,6 +6433,11 @@ msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or "
 "{ff_link_start}Firefox{ff_link_end}."
+msgstr ""
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
 msgstr ""
 
 #: lms/templates/problem.html
@@ -6318,6 +6552,10 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
+"Prisijungę prie {platform_name} turėsite prieigą prie visų esamų ir būsimų "
+"nemokamų kursų. Dar nepasiruošę pradėti mokymosi? Prisijungus būsite "
+"įtraukti į mūsų pašto adresų sąrašą ir mes informuosime jus apie naujus "
+"kursus. "
 
 #: lms/templates/register-sidebar.html
 msgid "Next Steps"
@@ -6330,6 +6568,11 @@ msgid ""
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
+"Netrukus gausite elektroninį laišką su aktyvavimo nuoroda, kurią paspaudus "
+"aktyvavimas bus baigtas. Negavote elektroninio laiško? Patikrinkite "
+"\"Šlamštas\" laiškų aplanką ir pažymėkite elektroninius laiškus, gautus nuo "
+"class.stanford.edu, \"Ne šlamštas\". Taip jūsų kurso elektroniniai laiškai "
+"galės pasiekti jūsų el. pašto dėžutę."
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -6352,6 +6595,8 @@ msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
 msgstr ""
+"Prisiregistravus, atsakymus į daugelį klausimų galima rasti kurso diskusijų "
+"forumuose arba DUK skiltyje."
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -6532,6 +6777,10 @@ msgstr ""
 msgid "Group {group_id}"
 msgstr ""
 
+#: lms/templates/split_test_studio_header.html
+msgid "Select a Group Configuration"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr ""
@@ -6579,16 +6828,16 @@ msgstr ""
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Student Attempts"
-msgstr ""
+msgstr "Nustatyti, kad kurso dalyvis galėtų bandyti iš naujo"
 
 #: lms/templates/staff_problem_info.html
 msgid "Delete Student State"
-msgstr ""
+msgstr "Panaikinti kurso dalyvio būseną "
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Student Submission"
-msgstr ""
+msgstr "Iš naujo įvertinti kurso dalyvio darbą"
 
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -6613,7 +6862,7 @@ msgstr ""
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
 msgid "{course_number} Textbook"
-msgstr ""
+msgstr "{course_number} vadovėlis"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
@@ -6679,10 +6928,12 @@ msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
+"Norėdami valdyti registraciją į kursus, eikite į kiekvieno kurso lektoriaus "
+"informacinį puslapį."
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr ""
+msgstr "Kurso personalo ir lektorių valdymas"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
@@ -6690,7 +6941,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
-msgstr ""
+msgstr "Kursų administravimas"
 
 #. Translators: Repo is short for git repository or source of
 #. courseware; see http://git-scm.com/about
@@ -6708,16 +6959,16 @@ msgstr ""
 #. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
-msgstr ""
+msgstr "Įkelti naują kursą iš github"
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
-msgstr ""
+msgstr "Kurso identifikacijos numeris arba katalogas"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
-msgstr ""
+msgstr "Pašalinti kursą iš svetainės"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
@@ -6733,7 +6984,7 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Course ID"
-msgstr ""
+msgstr "Kurso identifikacijos numeris"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7035,6 +7286,8 @@ msgstr[2] ""
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
 msgstr ""
+"Pateikiant darbą įvyko klaida. Prašome kreiptis į kursą administruojantį "
+"personalą."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
@@ -7067,7 +7320,7 @@ msgstr ""
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohorts in the course"
-msgstr ""
+msgstr "Kurso kohortos"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add cohort"
@@ -7100,7 +7353,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "About {course.display_number_with_default}"
-msgstr ""
+msgstr "Apie {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
@@ -7108,20 +7361,22 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
-msgstr ""
+msgstr "Peržiūrėti kurso medžiagą"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
-msgstr ""
+msgstr "Šis kursas yra įdėtas į jūsų <a href=\"{cart_link}\">krepšelį</a>."
 
 #: lms/templates/courseware/course_about.html
 msgid ""
 "Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
 msgstr ""
+"Pridėti {course.display_number_with_default} į krepšelį "
+"({currency_symbol}{cost})"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
-msgstr ""
+msgstr "Registruotis {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -7182,15 +7437,15 @@ msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Student view"
-msgstr ""
+msgstr "Kurso dalyvio langas"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
-msgstr ""
+msgstr "Nemokami kursai pirmaujančiuose universitetuose."
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr ""
+msgstr "Nemokami kursai, siūlomi {university_name}."
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -7201,7 +7456,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr ""
+msgstr "{course_number} kurso medžiaga"
 
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
@@ -7209,6 +7464,10 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
+msgstr "Kursų navigacija"
+
+#: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -7320,7 +7579,7 @@ msgstr ""
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
-msgstr ""
+msgstr "Ieškoti kurso dalyvių"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
@@ -7332,7 +7591,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
-msgstr ""
+msgstr "Kurso atnaujinimai &amp; Naujienos"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -7340,7 +7599,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
-msgstr ""
+msgstr "Kurso dalijamoji medžiaga"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
@@ -7413,6 +7672,10 @@ msgid ""
 "{max_enrollment} students. We are urgently working on fixing this issue. "
 "Thank you for your patience as we continue working to improve the platform!"
 msgstr ""
+"Dėmesio: kai kurie iš šių mygtukų neveikia, kai kursas yra didelis. Šios "
+"funkcijos yra laikinai išjungtos, jei kurse yra daugiau nei {max_enrollment}"
+" kurso dalyvių. Mes stengiamės kuo skubiau išspręsti šią problemą. Dėkojame "
+"už kantrybę, mes ir toliau stengiamės gerinti šią mokymosi platformą!"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Export grades to remote gradebook"
@@ -7423,6 +7686,8 @@ msgid ""
 "The assignments defined for this course should match the ones stored in the "
 "gradebook, for this to work properly!"
 msgstr ""
+"Kad programa tinkamai veiktų, šio kurso užduotys turi atitikti užduotis, "
+"esančias pažymių knygelėje."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7436,7 +7701,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Course-specific grade adjustment"
-msgstr ""
+msgstr "Kurso vertinimo koregavimas"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7469,7 +7734,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student-specific grade inspection and adjustment"
-msgstr ""
+msgstr "Kurso dalyvio vertinimo tikrinimas ir koregavimas "
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7480,15 +7745,19 @@ msgstr ""
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
+"Žemiau nurodykite {platform_name} kurso dalyvio el. pašto adresą arba "
+"vartotojo vardą:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Click this, and a link to student's progress page will appear below:"
 msgstr ""
+"Spustelėjus šią nuorodą žemiau atsivers kurso dalyvio pažangos puslapis:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "You may also delete the entire state of a student for the specified module:"
 msgstr ""
+"Jūs taip pat galite panaikinti visą pasirinkto modulio dalyvio būseną: "
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -7496,6 +7765,9 @@ msgid ""
 " a table below. To see status for all tasks submitted for this problem and "
 "student, click on this button:"
 msgstr ""
+"Vertinimai perskaičiuojami foniniame režime, o aktyvių užduočių būsena bus "
+"matoma žemiau esančioje lentelėje. Jei norite pamatyti visų veiksmų, vykdomų"
+" šiai užduočiai ir kurso dalyviui, būsenas, spauskite šį mygtuką:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Select a problem and an action:"
@@ -7554,14 +7826,16 @@ msgid ""
 "Enroll or un-enroll one or many students: enter emails, separated by new "
 "lines or commas;"
 msgstr ""
+"Užregistruoti arba išregistruoti vieną ar keletą kurso dalyvių: įveskite el."
+" pašto adresus, atskirtus kableliais arba iš naujos eilutės;"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Notify students by email"
-msgstr ""
+msgstr "Pranešti kurso dalyviams elektroniniu paštu"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Auto-enroll students when they activate"
-msgstr ""
+msgstr "Automatiškai užregistruoti kurso dalyvius, kai jie aktyvuojasi"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Problem urlname:"
@@ -7575,6 +7849,10 @@ msgid ""
 "as configured via the <tt>days_early_for_beta</tt> option in the course "
 "policy."
 msgstr ""
+"Įvesti kurso dalyvių, kurie turėtų tapti beta versijos bandytojais, "
+"vartotojų vardus arba el. pašto adresus, atskirtus kableliais arba iš naujos"
+" eilutės. Jie galės anksčiau pamatyti kursų medžiagą, kaip numatyta kurso "
+"<tt>days_early_for_beta</tt> nuostatuose."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7598,7 +7876,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "All (students, staff and instructors)"
-msgstr ""
+msgstr "Visiems (kursų dalyviams, personalui ir lektoriams)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7615,6 +7893,8 @@ msgid ""
 "Please try not to email students more than once per week. Important things "
 "to consider before sending:"
 msgstr ""
+"Stenkitės nesiųsti kurso dalyviams el. laiškų dažniau nei kartą per savaitę."
+" Svarbūs dalykai, kuriuos reikia apsvarstyti prieš siunčiant laišką:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7656,14 +7936,16 @@ msgid ""
 "Students enrolled (historical count, includes those who have since "
 "unenrolled):"
 msgstr ""
+"Užsiregistravę kurso dalyviai (bendras skaičius, įskaičiuojant ir "
+"išsiregistravusius):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students active in the last week:"
-msgstr ""
+msgstr "Pastarąją savaitę aktyvūs kurso dalyviai:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student activity day by day"
-msgstr ""
+msgstr "Kurso dalyvio veikla kiekvieną dieną"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Day"
@@ -7671,7 +7953,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students"
-msgstr ""
+msgstr "Kurso dalyviai"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Score distribution for problems"
@@ -7683,7 +7965,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Points Earned (Num Students)"
-msgstr ""
+msgstr "Gauta taškų (Num Students)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -7698,7 +7980,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Count of Students that Opened a Subsection"
-msgstr ""
+msgstr "Skaičius kurso dalyvių, atidariusių potemę"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -7712,17 +7994,19 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
-msgstr ""
+msgstr "Teisingai atsakę kurso dalyviai"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Number of students"
-msgstr ""
+msgstr "Kurso dalyvių skaičius"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
 "(shown here as an example):"
 msgstr ""
+"Visų kursų dalyvių pasiskirstymas pagal šalį nuo rugs.-12 iki spal.-17 d., 1"
+" serveris (pateikta kaip pavyzdys):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -7767,11 +8051,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Course errors"
-msgstr ""
+msgstr "Kurso klaidos"
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "About {course_id}"
-msgstr ""
+msgstr "Apie {course_id}"
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "Coming Soon"
@@ -7779,11 +8063,11 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "About {course_number}"
-msgstr ""
+msgstr "Apie {course_number}"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
-msgstr ""
+msgstr "Prisijungti prie kurso medžiagos"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
@@ -7807,7 +8091,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
-msgstr ""
+msgstr "{course_number} Pažanga"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
@@ -7819,7 +8103,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr ""
+msgstr "Kurso dalyvio '{username}' ({email}) pažanga"
 
 #: lms/templates/courseware/progress.html
 msgid "Download your certificate"
@@ -7843,7 +8127,7 @@ msgstr ""
 
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
-msgstr ""
+msgstr "{course.display_number_with_default} kurso Informacija"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -7856,6 +8140,8 @@ msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
+"Baigiamieji kurso duomenys šiuo metu apibendrinami. Netrukus bus paskelbti "
+"jūsų galutiniai rezultatai."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -7917,12 +8203,12 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
-msgstr ""
+msgstr "Užpildykite atsiliepimų apie kursą apklausą"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
-msgstr ""
+msgstr "{course_number} {course_name} Viršelio nuotrauka"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as a verified student"
@@ -7940,7 +8226,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as an honor code student"
-msgstr ""
+msgstr "Jūs esate užsiregistravęs kaip sąžiningumą deklaravęs kurso dalyvis"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/static_templates/honor.html
@@ -7958,11 +8244,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr ""
+msgstr "Kursas užbaigtas - {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr ""
+msgstr "Kursas pradėtas - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -7970,7 +8256,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
-msgstr ""
+msgstr "Kursas prasideda - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Document your accomplishment!"
@@ -7982,7 +8268,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Take this course as an ID-verified student."
-msgstr ""
+msgstr "Dalyvauti šiame kurse tapatybe patvirtintu dalyviu."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -7998,11 +8284,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
-msgstr ""
+msgstr "Peržiūrėti archyvuotus kursus"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
-msgstr ""
+msgstr "Peržiūrėti kursą"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -8111,6 +8397,8 @@ msgid ""
 "If you fail to pass a verification attempt before your course ends, you will"
 " not receive a verified certificate."
 msgstr ""
+"Jei nepraeisite asmens tapatybės patikros iki kurso pabaigos, tapatybe "
+"patvirtinto sertifikato negausite."
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -8487,7 +8775,7 @@ msgstr[2] ""
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
 msgid "Discussion - {course_number}"
-msgstr ""
+msgstr "Diskusija - {course_number}"
 
 #: lms/templates/discussion/maintenance.html
 msgid "We're sorry"
@@ -8626,7 +8914,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "Dear student,"
-msgstr ""
+msgstr "Gerb. kurso dalyvi,"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -8768,7 +9056,7 @@ msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
-msgstr ""
+msgstr "Gerb. kurso dalyvi,"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid ""
@@ -8789,7 +9077,7 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
-msgstr ""
+msgstr "{course_number} personalo reitingai"
 
 #: lms/templates/instructor/staff_grading.html
 msgid ""
@@ -8826,7 +9114,7 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Student Response"
-msgstr ""
+msgstr "Kurso dalyvio atsakymas"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -8835,7 +9123,7 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Feedback for student (optional)"
-msgstr ""
+msgstr "Atsiliepimas apie kurso dalyvį (nebūtinas)"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Flag as inappropriate content for later review"
@@ -8876,6 +9164,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Total number of enrollees (instructors, staff members, and students)"
 msgstr ""
+"Bendras užsiregistravusiųjų skaičius (lektoriai, personalas ir kurso "
+"dalyviai)"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -8883,15 +9173,15 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
-msgstr ""
+msgstr "Kurso pavadinimas"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
-msgstr ""
+msgstr "Kurso rodomas pavadinimas:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
-msgstr ""
+msgstr "Ar šis kursas jau prasidėjo?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -8905,7 +9195,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
-msgstr ""
+msgstr "Ar šis kursas jau baigėsi?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -8919,13 +9209,16 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
-msgstr ""
+msgstr "Kurso perspėjimai"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "Click to generate a CSV file of all students enrolled in this course, along "
 "with profile information such as email address and username:"
 msgstr ""
+"Paspauskite, norėdami sugeneruoti visų užsiregistravusių kurso dalyvių CSV "
+"failą, kartu su profilio informacija, tokia kaip el. pašto adresas ir "
+"naudotojo vardas:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -8936,10 +9229,12 @@ msgid ""
 "For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
+"Jei kursas mažesnės apimties, paspauskite ir užsiregistravusių kurso dalyvių"
+" profilio informaciją pamatysite šiame puslapyje:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
-msgstr ""
+msgstr "Pateikti užsiregistravusių kurso dalyvių profilio informaciją"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -8959,7 +9254,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
-msgstr ""
+msgstr "Gauti anonimizuotus kurso dalyvių duomenis CSV formatu"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports"
@@ -8971,6 +9266,9 @@ msgid ""
 "Links to generated reports appear in a table below when report generation is"
 " complete."
 msgstr ""
+"Paspauskite, norėdami suformuoti visų šiuo metu užsiregistravusių kurso "
+"dalyvių įvertinimų ataskaitą CSV formatu. Kai ataskaita bus baigta, nuorodos"
+" į ataskaitas atsiras žemiau pateiktoje lentelėje."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -8978,6 +9276,9 @@ msgid ""
 "patient and do not click the button multiple times. Clicking the button "
 "multiple times will significantly slow the grade generation process."
 msgstr ""
+"Kai kursas yra didelis, šios ataskaitos formavimas gali trukti keletą "
+"valandų. Būkite kantrūs ir nespauskite mygtuko keletą kartų. Paspaudus "
+"mygtuką keletą kartų, įvertinimų formavimo procesas ženkliai sulėtės. "
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -9017,6 +9318,9 @@ msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
+"<b>Dėmesio</b>: Siekiant išsaugoti kursų dalyvių duomenų saugumą, šių "
+"nuorodų negalima išsaugoti ar išsiųsti el. paštu. Nuorodų kopijos baigia "
+"galioti po 5 min."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -9029,6 +9333,10 @@ msgid ""
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
 msgstr ""
+"Šioje temoje jūs turite galimybę individualiems kurso dalyviams pratęsti tam"
+" tikrų skyrių pridavimo terminą. Atkreipkite dėmesį, kad vėliausia data bus "
+"visada užimta; šio įrankio negalima naudoti kurso dalyvio užduoties "
+"pridavimo terminui paankstinti."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -9046,7 +9354,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
-msgstr ""
+msgstr "Pakeisti kurso dalyviui pateikimo datą"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Viewing granted extensions"
@@ -9057,24 +9365,29 @@ msgid ""
 "Here you can see what extensions have been granted on particular units or "
 "for a particular student."
 msgstr ""
+"Čia galite pamatyti tam tikro skyriaus arba tam tikram kurso dalyviui "
+"pratęstus terminus."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Choose a graded unit and click the button to obtain a list of all students "
 "who have extensions for the given unit."
 msgstr ""
+"Pasirinkite skyrių ir spustelėkite mygtuką, kad gautumėte visų kurso dalyvių"
+" sąrašą, kuriems šiame skyriuje yra pratęstas darbo pateikimo terminas."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
-msgstr ""
+msgstr "Rodyti visus kurso dalyvius, kuriems atidėta pateikimo data"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Specify a student to see all of that student's extensions."
 msgstr ""
+"Pasirinkti kurso dalyvį norint peržiūrėti visas jam atidėtas pateikimo datas"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
-msgstr ""
+msgstr "Rodyti kurso dalyvio atidėtas pateikimo datas"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Resetting extensions"
@@ -9086,10 +9399,13 @@ msgid ""
 "on a particular unit. This will revert the due date for the student back to "
 "the problem's original due date."
 msgstr ""
+"Atstatant užduoties pateikimo datą  kurso dalyvio tam tikro skyriaus "
+"pateikimo termino pratęsimas yra panaikinamas. Jam bus grąžinta pirminė "
+"užduoties pateikimo data."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
-msgstr ""
+msgstr "Atstatyti kurso dalyviui pateikimo datą"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -9219,7 +9535,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
-msgstr ""
+msgstr "Kurso personalas"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -9228,6 +9544,11 @@ msgid ""
 "course data. Course staff are not automatically given access to Studio and "
 "will not be able to edit your course."
 msgstr ""
+"Kursą aptarnaujantis personalas gali padėti jums valdyti tik kai kuriuos "
+"kurso aspektus. Personalas gali užregistruoti ir išregistruoti kurso "
+"dalyvius, keisti jų balus ir matyti kurso duomenis. Personalui nėra "
+"automatiškai suteikiama prieiga prie Studio ir jie negali redaguoti jūsų "
+"kurso."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
@@ -9256,6 +9577,9 @@ msgid ""
 "Beta testers can see course content before the rest of the students. They "
 "can make sure that the content works, but have no additional privileges."
 msgstr ""
+"Beta versijos bandytojai gali peržiūrėti kurso turinį anksčiau nei kiti "
+"kurso dalyviai. Jie patikrina, ar turinys veikia, tačiau neturi jokių kitų "
+"papildomų privilegijų."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -9359,16 +9683,18 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
-msgstr ""
+msgstr "Atsisiųsti pradėjusių kurso dalyvių failą CSV formatu"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Grades as a CSV"
-msgstr ""
+msgstr "Atsisiųsti kurso dalyvių įvertinimo failą CSV formatu"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
 msgstr ""
+"Tai yra dalinis sąrašas, norėdami peržiūrėti visus kurso dalyvius, "
+"atsisiųskite failą CSV formatu."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -9384,6 +9710,8 @@ msgid ""
 "Please try not to email students more than once per week. Before sending "
 "your email, consider:"
 msgstr ""
+"Stenkitės nesiųsti kurso dalyviams el. laiškų dažniau nei kartą per savaitę."
+" Prieš siunčiant el. laišką apsvarstykite:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -9400,6 +9728,8 @@ msgid ""
 "To see the status for all bulk email tasks ever submitted for this course, "
 "click on this button:"
 msgstr ""
+"Norėdami pamatyti visų šio kurso el. laiškų masinių siuntimų būseną, "
+"spustelėkite šį mygtuką:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Email Task History"
@@ -9407,13 +9737,16 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
-msgstr ""
+msgstr "Kurso dalyvio pažymių knygelė"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Click here to view the gradebook for enrolled students. This feature is only"
 " visible to courses with a small number of total enrolled students."
 msgstr ""
+"Norėdami pamatyti užsiregistravusių kurso dalyvių pažymių knygelę, "
+"spustelėkite čia. Ši funkcija matoma tik tiems kursams, kuriuose yra "
+"užsiregistravę nedaug dalyvių."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
@@ -9421,24 +9754,26 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr ""
+msgstr "Kurso dalyvio vertinimo tikrinimas"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
-msgstr ""
+msgstr "Kurso dalyvio el. paštas arba naudotojo vardas"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
 msgstr ""
+"Norėdami peržvelgti kurso dalyvio pažangos informaciją, spustelėkite šią "
+"nuorodą:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Progress Page"
-msgstr ""
+msgstr "Kursų dalyvio pažangos puslapis"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade adjustment"
-msgstr ""
+msgstr "Kurso dalyvio vertinimo koregavimas"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -9453,10 +9788,12 @@ msgstr ""
 msgid ""
 "You may also delete the entire state of a student for the specified problem:"
 msgstr ""
+"Jūs taip pat galite pašalinti visą pasirinktos užduoties kurso dalyvio "
+"būseną:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Delete Student State for Problem"
-msgstr ""
+msgstr "Pašalinti kursų dalyvio uždavinio būseną "
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -9464,10 +9801,14 @@ msgid ""
 " the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
 " for this problem and student, click on this button:"
 msgstr ""
+"Iš naujo formuojami vertinimai, ir lentelėje \"Laukiančios vykdymo "
+"lektoriaus užduotys\" bus matoma aktyvių užduočių būsena. Jei norite "
+"pamatyti visų veiksmų, vykdomų šiai užduočiai ir kurso dalyviui, būsenas, "
+"spauskite šį mygtuką:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
-msgstr ""
+msgstr "Rodyti kurso dalyvio foninių užduočių istoriją"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
@@ -9475,11 +9816,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset ALL students' attempts"
-msgstr ""
+msgstr "Nustatyti, kad VISI kurso dalyviai galėtų bandyti iš naujo"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore ALL students' problem submissions"
-msgstr ""
+msgstr "Iš naujo įvertinti VISŲ kurso dalyvių pateiktus darbus"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -9487,6 +9828,9 @@ msgid ""
 "appear in a table on the Course Info tab. To see status for all tasks "
 "submitted for this problem, click on this button"
 msgstr ""
+"Aukščiau esantys veiksmai veikia foniniame režime, o aktyvių užduočių būsena"
+" bus matoma lentelėje, esančioje \"Kurso informacija\" skiltyje. Jei norite "
+"pamatyti visų veiksmų, vykdomų šiai užduočiai, paspauskite šį mygtuką"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
@@ -9522,7 +9866,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
-msgstr ""
+msgstr "{course_number} kompleksiniai pranešimai "
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "Open Ended Console"
@@ -9538,7 +9882,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "{course_number} Flagged Open Ended Problems"
-msgstr ""
+msgstr "{course_number} pažymėtos pasirenkamo atsakymo užduotys"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Flagged Open Ended Problems"
@@ -9549,6 +9893,8 @@ msgid ""
 "Here are a list of open ended problems for this course that have been "
 "flagged by students as potentially inappropriate."
 msgstr ""
+"Čia rasite pasirenkamo atsakymo užduočių sąrašą, kurias kursų dalyviai "
+"pažymėjo kaip galimai netinkamas."
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "No flagged problems exist."
@@ -9564,7 +9910,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "{course_number} Open Ended Problems"
-msgstr ""
+msgstr "{course_number} pasirenkamo atsakymo užduotys"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "Open Ended Problems"
@@ -9572,7 +9918,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "Here is a list of open ended problems for this course."
-msgstr ""
+msgstr "Čia rasite šio kurso pasirenkamo atsakymo uždavinių sąrašą."
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "You have not attempted any open ended problems yet."
@@ -9610,6 +9956,8 @@ msgstr ""
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
 msgstr ""
+"Žemiau pateiktas šio kurso užduočių, laukiančių bendrakursių vertinimo, "
+"sąrašas."
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Due date"
@@ -9836,7 +10184,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Register for [Course Name] | Receipt (Order"
-msgstr ""
+msgstr "Registruotis į [Course Name] | kvitas (užsakymas"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Thank you for your Purchase!"
@@ -9972,6 +10320,8 @@ msgid ""
 "You are now registered as a verified student! Your registration details are "
 "below."
 msgstr ""
+"Jūs priregistruotas kaip patvirtintas kurso dalyvis! Jūsų registracijos "
+"duomenys pateikiami žemiau."
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "You are registered for:"
@@ -9980,6 +10330,8 @@ msgstr ""
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "A list of courses you have just registered for as a verified student"
 msgstr ""
+"Kursų sąrašas, į kuriuos jūs užsiregistravote kaip patvirtintas kursų "
+"dalyvis "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Options"
@@ -9991,7 +10343,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to Course"
-msgstr ""
+msgstr "Eiti į kursą"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
@@ -10008,12 +10360,17 @@ msgid ""
 "You can now register for any of the verified certificate courses this "
 "semester without having to re-verify."
 msgstr ""
+"Gavome identifikacijos detales jūsų tapatybės patvirtinimui. Jei iškils "
+"problemų, mes su jumis susisieksime. Dabar galite registruotis bet kuriam "
+"patvirtinto sertifikato šio semestro kursui be pakartotino patvirtinimo."
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid ""
 "The professor will ask you to periodically submit a new photo to verify your"
 " work during the course (usually at exam times)."
 msgstr ""
+"Dėstytojas paprašys reguliariai pateikti naują jūsų nuotrauką, siekdamas "
+"patikrinti jūsų darbą kurso metu (paprastai egzaminų metu)."
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Payment Details"
@@ -10200,6 +10557,8 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 msgid "You can always continue to audit the course without verifying."
 msgstr ""
+"Galite tęsti kurso klausymą nerenkant kreditų nepatvirtinus asmens "
+"tapatybės."
 
 #: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/photo_verification.html
@@ -10207,6 +10566,8 @@ msgid ""
 "You can always {a_start} audit the course for free {a_end} without "
 "verifying."
 msgstr ""
+"Visada galite {a_start} klausytis kurso nerenkant kreditų nemokamai {a_end},"
+" nepatvirtinus tapatybės."
 
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
@@ -10530,6 +10891,12 @@ msgid ""
 "to re-verify multiple times, once for every important point in each course "
 "you are taking as a verified student."
 msgstr ""
+"Svarbiausiais momentais kurso eigoje, lektorius paprašys jūsų pakartotinai "
+"patvirtinti tapatybę pateikiant naują jūsų veido nuotrauką. Mes nusiųsime "
+"naująją nuotrauką palyginimui su asmens dokumento nuotrauka, kurį jūs "
+"pateikėte registruodamiesi. Jei jūs kaip tapatybe patvirtintas dalyvis "
+"mokotės keletą kursų, jums gali tekti pakartotinai patvirtinti tapatybę "
+"keletą kartų."
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "What will I need to re-verify?"
@@ -10776,6 +11143,9 @@ msgid ""
 "connected and working to continue registering, or select to {a_start} audit "
 "the course for free {a_end} without verifying."
 msgstr ""
+"Jūsų internetinė kamera nėra prijungta. Norėdami tęsti registraciją, "
+"prijunkite kamerą, arba pasirinkite {a_start} kurso klausymą nerenkant "
+"kreditų nemokamai {a_end}, nepatvirtinus asmens tapatybės."
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
@@ -10810,7 +11180,7 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Please confirm your contribution for this course (min. $"
-msgstr ""
+msgstr "Patvirtinkite šiam kursui įnašo sumą (min. $"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid ""
@@ -10879,6 +11249,7 @@ msgid ""
 "There are three things you will need to upgrade to being an ID verified "
 "student:"
 msgstr ""
+"Norint tapti tapatybe patvirtintu kurso dalyviu jums reikės trijų dalykų:"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "What You Will Need to Register"
@@ -10888,6 +11259,8 @@ msgstr ""
 msgid ""
 "There are three things you will need to register as an ID verified student:"
 msgstr ""
+"Norint prisiregistruoti tapatybe patvirtintu kurso dalyviu jums bus "
+"reikalingi trys dalykai:"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Activate Your Account"
@@ -11089,7 +11462,7 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
-msgstr ""
+msgstr "Failai &amp; Įkėlimai"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/edit-tabs.html cms/templates/overview.html
@@ -11106,7 +11479,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 msgid "Upload New File"
-msgstr ""
+msgstr "Įkelti naują failą"
 
 #: cms/templates/asset_index.html
 msgid "Loading&hellip;"
@@ -11114,7 +11487,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"
-msgstr ""
+msgstr "Kokie failai čia išvardyti?"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -11125,7 +11498,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "File URLs"
-msgstr ""
+msgstr "Failų URL nuorodos"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -11154,11 +11527,11 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
-msgstr ""
+msgstr "Pasirinkite failą"
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "Jūsų failas buvo pašalintas."
 
 #: cms/templates/asset_index.html
 msgid "close alert"
@@ -11187,6 +11560,8 @@ msgid ""
 "Course checklists are tools to help you understand and keep track of all the"
 " steps necessary to get your course ready for students."
 msgstr ""
+"Kurso veiksmų sąrašai yra priemonė, padedanti jums suprasti ir laikytis visų"
+" kurso rengimo veiksmų."
 
 #: cms/templates/checklists.html
 msgid ""
@@ -11198,7 +11573,9 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
@@ -11214,17 +11591,12 @@ msgstr ""
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
 msgid "Container"
-msgstr ""
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
 msgstr ""
 
 #: cms/templates/container.html cms/templates/container.html
@@ -11259,6 +11631,11 @@ msgid ""
 "existing content."
 msgstr ""
 
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
+msgstr ""
+
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
 msgstr ""
@@ -11273,6 +11650,10 @@ msgid ""
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
 msgstr ""
+"Kurso atnaujinimais praneškite kurso dalyviams apie svarbias datas ar "
+"egzaminus, akcentuokite tam tikras diskusijas forumuose, paskelbkite "
+"tvarkaraščio pokyčius ir atsakykite į kurso dalyvių klausimus. Atnaujinimus "
+"pridedate ir redaguojate HTML aplinkoje."
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -11339,16 +11720,21 @@ msgid ""
 "course content. For example, you can create pages for the grading policy, "
 "course slides, and a course calendar. "
 msgstr ""
+"Jūs galite kurti ir redaguoti pasirinktinius puslapius ir juose kurso "
+"dalyviams pateikti papildomą kurso turinį. Pavyzdžiui, galite sukurti "
+"vertinimo strategijos, kurso skaidrių ir kurso kalendoriaus puslapius. "
 
 #: cms/templates/edit-tabs.html
 msgid "How do pages look to students in my course?"
-msgstr ""
+msgstr "Kaip puslapiai atrodys mano kurso dalyviams?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Students see the default and custom pages at the top of your course and use "
 "these links to navigate."
 msgstr ""
+"Kurso dalyviai mato numatytuosius ir pasirinktinius puslapius jūsų kurso "
+"viršuje ir naudodamiesi šiomis nuorodomis naršo."
 
 #: cms/templates/edit-tabs.html
 msgid "See an example"
@@ -11574,10 +11960,14 @@ msgid ""
 "information, discussion forum data, course settings, and course team "
 "information, is not exported."
 msgstr ""
+"Eksportuojamas tik kurso turinys ir struktūra (įskaitant temas, potemes ir "
+"skyrius). Kiti duomenys, įskaitant kurso dalyvių duomenis, vertinimo "
+"informaciją, diskusijų forumo duomenis, kurso nustatymus ir kurso komandos "
+"informaciją, neeksportuojami."
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
-msgstr ""
+msgstr "Atidaromas parsiųstas failas"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -11646,7 +12036,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
+"Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11667,6 +12057,10 @@ msgid ""
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
+"Jūsų kurso pateikimo esminis dalykas yra tai, kaip jis organizuojamas. "
+"Sistemoje pateikiamas<strong>Temų struktūros</strong> redaktorius leidžia "
+"kurti paprastą temų hierarchiją, jas perstumdyti ir perkelti taip, kad būtų "
+"tinkamai organizuojamas jūsų kurso dalyvių darbas."
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
@@ -11685,7 +12079,7 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
+"let you reorganize quickly."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11697,6 +12091,8 @@ msgid ""
 "Build and release <strong>sections</strong> to your students incrementally. "
 "You don't have to have it all done at once."
 msgstr ""
+"Kurkite ir perduokite <strong>temas</strong> kurso dalyviams pakopa po "
+"pakopos. Neprivalote būti padarę visko iš karto."
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html
@@ -11706,9 +12102,8 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11717,8 +12112,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11730,6 +12125,8 @@ msgid ""
 "Work visually and see exactly what your students will see. Reorganize all "
 "your content with drag and drop."
 msgstr ""
+"Dirbkite vizualiai ir matykite tiksliai taip, kaip matys jūsų kurso "
+"dalyviai. Pertvarkykite turinį stumdydami ir perkeldami elementus."
 
 #: cms/templates/howitworks.html
 msgid "A Broad Library of Problem Types"
@@ -11737,8 +12134,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
 msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
@@ -11764,8 +12161,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11829,6 +12226,8 @@ msgid ""
 "Simply set the date of a section or subsection, and Studio will publish it "
 "to your students for you."
 msgstr ""
+"Tiesiog nustatykite temos ar potemės datą ir Studio paskelbs jas jūsų kurso "
+"dalyviams."
 
 #: cms/templates/html_error.html
 msgid "We're having trouble rendering your component"
@@ -11839,6 +12238,8 @@ msgid ""
 "Students will not be able to access this component. Re-edit your component "
 "to fix the error."
 msgstr ""
+"Kurso dalyviai negalės matyti šio komponento. Paredaguokite jį ir "
+"ištaisykite klaidą."
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Course Import"
@@ -11874,14 +12275,15 @@ msgstr ""
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
 msgstr ""
+"Pasirinkite .tar.gz failą, kuriuo norite pakeisti savo studijų dalyko turinį"
 
 #: cms/templates/import.html
 msgid "Choose a File to Import"
-msgstr ""
+msgstr "Pasirinkite failą, kurį norite importuoti"
 
 #: cms/templates/import.html
 msgid "File Chosen:"
-msgstr ""
+msgstr "Pasirinktas failas:"
 
 #: cms/templates/import.html
 msgid "Replace my course with the one above"
@@ -11897,7 +12299,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Transferring your file to our servers"
-msgstr ""
+msgstr "Jūsų failas perkeliamas į serverį"
 
 #: cms/templates/import.html
 msgid "Unpacking"
@@ -11962,6 +12364,10 @@ msgid ""
 "information, discussion forum data, course settings, and course team "
 "information, remains the same as it was in the existing course."
 msgstr ""
+"Importuojamas tik kurso turinys ir struktūra (įskaitant temas, potemes ir "
+"skyrius). Kiti duomenys, įskaitant kurso dalyvių duomenis, vertinimo "
+"informaciją, diskusijų forumo duomenis, kurso nustatymus ir kurso komandos "
+"informaciją, lieka tokie patys kaip esamame kurse."
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -11974,6 +12380,10 @@ msgid ""
 "associated with those Problem components may be lost. This data includes "
 "students' problem scores."
 msgstr ""
+"Jeigu importuojate vykstant kursui ir pakeičiate kokių nors uždavinių "
+"komponentų URL vardus (arba URL vardų mazgus), kurso dalyvių duomenys, "
+"susiję su tais uždavinių komponentais, gali būti prarasti. Šie duomenys "
+"apima kurso dalyvių uždavinių įvertinimus."
 
 #: cms/templates/import.html
 msgid "There was an error during the upload process."
@@ -11981,11 +12391,11 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "Išpakuojant failą įvyko klaida."
 
 #: cms/templates/import.html
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "Tikrinant jūsų pateiktą failą įvyko klaida."
 
 #: cms/templates/import.html
 msgid "There was an error while importing the new course to our database."
@@ -11997,7 +12407,7 @@ msgstr ""
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Choose new file"
-msgstr ""
+msgstr "Pasirinkite naują failą"
 
 #: cms/templates/import.html
 msgid "Your import is in progress; navigating away will abort it."
@@ -12510,6 +12920,8 @@ msgid ""
 "On the date set below, this section - {name} - will be released to students."
 " Any units marked private will only be visible to admins."
 msgstr ""
+"Toliau nustatytą dieną ši tema - {name} - bus paskelbta kurso dalyviams. "
+"Skyriai, pažymėti kaip konfidencialūs, bus matomi tik administratoriams."
 
 #: cms/templates/overview.html
 msgid "Form Actions"
@@ -12618,15 +13030,15 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
-msgstr ""
+msgstr "(kurso dalyvių registracijai ir prieigai)"
 
 #: cms/templates/settings.html
 msgid "Send a note to students via email"
-msgstr ""
+msgstr "Siųsti pastabą kurso dalyviams elektroniniu paštu"
 
 #: cms/templates/settings.html
 msgid "Invite your students"
-msgstr ""
+msgstr "Pakvieskite savo kurso dalyvius"
 
 #: cms/templates/settings.html
 msgid "Promoting Your Course with edX"
@@ -12673,7 +13085,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "First day students can enroll"
-msgstr ""
+msgstr "Pirma diena, kai kurso dalyviai gali registruotis"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
@@ -12685,7 +13097,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Last day students can enroll"
-msgstr ""
+msgstr "Paskutinė diena, kai kurso dalyviai gali registruotis"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
@@ -12701,8 +13113,7 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -12711,7 +13122,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Information for prospective students"
-msgstr ""
+msgstr "Informacija būsimiems kurso dalyviams"
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
@@ -12722,6 +13133,8 @@ msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
 msgstr ""
+"Matomas kurso katalogo puslapyje kurso dalyviams užėjus ant kurso "
+"pavadinimo. Ribojama iki ~150 simbolių."
 
 #: cms/templates/settings.html
 msgid "Course Overview"
@@ -12746,6 +13159,8 @@ msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
 msgstr ""
+"Jūs galite tvarkyti šį paveikslėlį kartu su visais kitais savo <a "
+"href='{}'>failais &amp; siuntomis</a>"
 
 #: cms/templates/settings.html
 msgid ""
@@ -12781,7 +13196,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr ""
+msgstr "Šio kurso dalyvių lūkesčiai"
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
@@ -12800,6 +13215,8 @@ msgid ""
 "Your course's schedule determines when students can enroll in and begin a "
 "course."
 msgstr ""
+"Jūsų kurso tvarkaraštyje nurodoma, kada galima registruotis į kursą ir jį "
+"pradėti."
 
 #: cms/templates/settings.html
 msgid ""
@@ -12808,6 +13225,10 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
+"Kita šio puslapio informacija yra jūsų kurso puslapyje \"Apie kursą\". Ši "
+"informacija yra studijų dalyko apžvalga, studijų dalyko paveikslėlis, "
+"pristatomasis vaizdelis ir apytikriai laiko reikalavimai. Kurso dalyviai "
+"naujus kursus renkasi iš puslapių \"Apie kursą\"."
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html
@@ -12882,7 +13303,7 @@ msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
-msgstr ""
+msgstr "Bendra jūsų kurso dalyvių galutinių įvertinimų skalė"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
@@ -12891,6 +13312,8 @@ msgstr ""
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
 msgstr ""
+"Kurso dalyvių darbo vertinimo galutiniai terminai, reikalavimai ir "
+"mechanizmas"
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
@@ -12924,6 +13347,8 @@ msgid ""
 "You can specify whether your course offers students a grace period for late "
 "assignments."
 msgstr ""
+"Galite nurodyti, ar jūsų kurse numatomas termino pratęsimo laikotarpis "
+"užduotims, už kurias vėluojama atsiskaityti."
 
 #: cms/templates/settings_graders.html
 msgid ""
@@ -12931,6 +13356,9 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr ""
+"Taip pat galite kurti tokių tipų užduotis kaip namų darbai, laboratoriniai "
+"darbai, apklausos ir egzaminai ir nurodyti, kiek kiekvieno tipo užduotis yra"
+" verta."
 
 #: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_vertical_wrapper.html
@@ -12962,6 +13390,9 @@ msgid ""
 "textbooks into chapters can also help students more easily find topic-based "
 "information."
 msgstr ""
+"Vadovėlį suskaidžius į skyrius kurso dalyviams sutrumpėja įkėlimo laikas, "
+"ypač tiems, kurių interneto ryšys yra lėtas. Suskaidžius vadovėlį į skyrius "
+"kurso dalyviams taip pat gali būti lengviau rasti informaciją pagal temą."
 
 #: cms/templates/textbooks.html
 msgid "What if my book isn't divided into chapters?"
@@ -13027,12 +13458,16 @@ msgid ""
 "This unit is scheduled to be released to <strong>students</strong> on "
 "<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
+"Šis potemės \"{link_start}{name}{link_end}\" skyrius <strong>{date}</strong>"
+" bus paskelbtas <strong>kurso dalyviams</strong>."
 
 #: cms/templates/unit.html
 msgid ""
 "This unit is scheduled to be released to <strong>students</strong> with the "
 "subsection {link_start}{name}{link_end}"
 msgstr ""
+"Šis potemės \"{link_start}{name}{link_end}\" skyrius bus paskelbtas "
+"<strong>kurso dalyviams</strong>."
 
 #: cms/templates/unit.html
 msgid "Delete Draft"
@@ -13153,7 +13588,7 @@ msgstr ""
 msgid "Help &amp; Account Navigation"
 msgstr ""
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -13167,14 +13602,6 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html
@@ -13262,6 +13689,22 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about edX Studio?"
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"This content experiment refers to a group configuration that has been "
+"deleted."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid "This content experiment uses group configuration '{0}'."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

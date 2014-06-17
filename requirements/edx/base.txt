@@ -132,3 +132,6 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
 git+https://github.com/mitocw/django-cas.git
+
+# edX packages
+edx-submissions==0.0.2

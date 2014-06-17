@@ -158,7 +158,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         return courses.values()
 
-    def get_course(self, course_key, depth=None):
+    def get_course(self, course_key, depth=0):
         """
         returns the course module associated with the course_id. If no such course exists,
         it returns None
