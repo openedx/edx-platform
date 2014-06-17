@@ -38,6 +38,7 @@ from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inhe
 from xmodule.tabs import StaticTab, CourseTabList
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.exceptions import HeartbeatFailure
 
 log = logging.getLogger(__name__)
 
@@ -1034,3 +1035,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         field_data = KvsFieldData(kvs)
         return field_data
+
+    def heartbeat(self):
+        """
+        Check that the db is reachable.
+        """
+        if self.database.connection.alive():
+            return {MONGO_MODULESTORE_TYPE: True}
+        else:
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')

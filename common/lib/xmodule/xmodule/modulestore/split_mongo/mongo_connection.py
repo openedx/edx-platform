@@ -4,6 +4,7 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import re
 import pymongo
 from bson import son
+from xmodule.exceptions import HeartbeatFailure
 
 class MongoConnection(object):
     """
@@ -40,6 +41,15 @@ class MongoConnection(object):
         self.course_index.write_concern = {'w': 1}
         self.structures.write_concern = {'w': 1}
         self.definitions.write_concern = {'w': 1}
+
+    def heartbeat(self):
+        """
+        Check that the db is reachable.
+        """
+        if self.database.connection.alive():
+            return True
+        else:
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name))
 
     def get_structure(self, key):
         """

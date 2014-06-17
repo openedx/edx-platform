@@ -1769,3 +1769,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         courses = []
         return courses
+
+    def heartbeat(self):
+        """
+        Check that the db is reachable.
+        """
+        return {SPLIT_MONGO_MODULESTORE_TYPE: self.db_connection.heartbeat()}
