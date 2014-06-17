@@ -23,6 +23,7 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          Http404)
 from django.shortcuts import redirect
+from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
@@ -1511,14 +1512,21 @@ def password_reset_confirm_wrapper(
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
             else:
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-            err_msg = _("You are re-using a password that you have used recently. You must "
-                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+            err_msg = ungettext(
+                "You are re-using a password that you have used recently. You must have {num} distinct password before reusing a previous password.",
+                "You are re-using a password that you have used recently. You must have {num} distinct passwords before reusing a previous password.",
+                num_distinct
+            ).format(num=num_distinct)
 
         # also, check to see if passwords are getting reset too frequent
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
-                        "{0} day(s) must elapse between password resets").format(num_days)
+            err_msg = ungettext(
+                # Translators: If you need to use a variable number instead of the number "one", use {num} in its place.
+                "You are resetting passwords too frequently. Due to security policies, one day must elapse between password resets",
+                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets",
+                num_days
+            ).format(num=num_days)
 
     if err_msg:
         # We have an password reset attempt which violates some security policy, use the

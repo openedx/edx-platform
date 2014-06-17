@@ -703,7 +703,7 @@ class FileSubmission(InputTypeBase):
         pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
         """
         _ = self.capa_system.i18n.ugettext
-        submitted_msg = _("Your file(s) have been submitted. As soon as your submission is"
+        submitted_msg = _("Your files have been submitted. As soon as your submission is"
                           " graded, this message will be replaced with the grader's feedback.")
         self.submitted_msg = submitted_msg
 
