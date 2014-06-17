@@ -44,11 +44,10 @@ CHINESE_LANGUAGE_CODE_MAP = {
     'zh-hans-cn': 'zh-CN',  # Chinese (Simplified, China)
     'zh-hans-sg': 'zh-CN',  # Chinese (Simplified, Singapore)
     'zh-hant': 'zh-TW',     # Chinese (Traditional)
-    'zh-hant-hk': 'zh-TW',  # Chinese (Traditional, Hongkong)
+    'zh-hant-hk': 'zh-HK',  # Chinese (Traditional, Hongkong)
     'zh-hant-mo': 'zh-TW',  # Chinese (Traditional, Macau)
     'zh-hant-tw': 'zh-TW',  # Chinese (Traditional, Taiwan)
     # The following are the old-style language codes that django does not recognize
-    'zh-hk': 'zh-TW',       # Chinese (Traditional, Hongkong)
     'zh-mo': 'zh-TW',       # Chinese (Traditional, Macau)
     'zh-sg': 'zh-CN',       # Chinese (Simplified, Singapore)
 }

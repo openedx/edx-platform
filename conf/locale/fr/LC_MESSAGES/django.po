@@ -5,37 +5,37 @@
 # 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
-# chrisc <christopher.castermane@student.uclouvain.be>, 2014
+# Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
-# francoisedocq, 2014
-# francoisedocq, 2014
-# francoisedocq, 2014
-# isabellegonon <isabelle.gonon@cnam.fr>, 2013
-# isabellegonon <isabelle.gonon@cnam.fr>, 2013
-# jsicsic <jsicsic@gmail.com>, 2013
+# Françoise Docq, 2014
+# Françoise Docq, 2014
+# Françoise Docq, 2014
+# Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
+# Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
+# Jeremie Sicsic <jsicsic@gmail.com>, 2013
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
-# JRolland <julien.rolland33@gmail.com>, 2013
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
 # jsa_edx <jsa@edx.org>, 2014
-# jsicsic <jsicsic@gmail.com>, 2013
+# Jeremie Sicsic <jsicsic@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
-# JRolland <julien.rolland33@gmail.com>, 2013
-# marcotuts, 2014
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
+# Marco Morales, 2014
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013-2014
-# Yannick1 <yannick.petit@gmail.com>, 2013
-# pchiu <philippe.chiu@gmail.com>, 2013-2014
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
+# Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014
-# sarina <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 # SLOG90 <slog90@gmail.com>, 2014
-# Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
-# Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
-# antoviaque <xavier@antoviaque.org>, 2014
-# Yannick1 <yannick.petit@gmail.com>, 2013
+# Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
+# Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
+# Xavier Antoviaque <xavier@antoviaque.org>, 2014
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -45,19 +45,19 @@
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # francoisedocq, 2014
-# francoisedocq, 2014
-# francoisedocq, 2014
-# isabellegonon <isabelle.gonon@cnam.fr>, 2013
-# JRolland <julien.rolland33@gmail.com>, 2013
-# jsicsic <jsicsic@gmail.com>, 2013
+# Françoise Docq, 2014
+# Françoise Docq, 2014
+# Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
+# Jeremie Sicsic <jsicsic@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014
 # SLOG90 <slog90@gmail.com>, 2014
-# Steven_Bernard <steven.bernard@u-paris2.fr>, 2013
-# Yannick1 <yannick.petit@gmail.com>, 2013
+# Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
 # ytabaa <ytabaa@uae.ac.ma>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/projects/p/edx-platform/language/fr/)
@@ -65,34 +65,34 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# aissam <ais.salhy@gmail.com>, 2014
+# SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
-# chrisc <christopher.castermane@student.uclouvain.be>, 2014
+# Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # ClaudeCoulombe <claude.coulombe@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
-# francoisedocq, 2014
+# Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
-# Gilles_Langevin <langevin.net@gmail.com>, 2013
-# Gilles_Langevin <langevin.net@gmail.com>, 2013
+# Gilles Langevin <langevin.net@gmail.com>, 2013
+# Gilles Langevin <langevin.net@gmail.com>, 2013
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
-# JRolland <julien.rolland33@gmail.com>, 2013
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
-# JRolland <julien.rolland33@gmail.com>, 2013
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
 # Manjari <mringuet@gmail.com>, 2014
-# Mtiana <mtiana8@gmail.com>, 2014
+# Ramarohetra Malalatiana <mtiana8@gmail.com>, 2014
 # eddy01 <ngwa.edwin@yahoo.com>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
-# Yannick1 <yannick.petit@gmail.com>, 2013
-# pchiu <philippe.chiu@gmail.com>, 2013-2014
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
+# Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014
-# sarina <sarina@edx.org>, 2014
-# antoviaque <xavier@antoviaque.org>, 2014
-# Yannick1 <yannick.petit@gmail.com>, 2013
+# Sarina Canelake <sarina@edx.org>, 2014
+# Xavier Antoviaque <xavier@antoviaque.org>, 2014
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -100,19 +100,19 @@
 # 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
-# chrisc <christopher.castermane@student.uclouvain.be>, 2014
+# Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
-# francoisedocq, 2014
+# Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
-# Gilles_Langevin <langevin.net@gmail.com>, 2013
-# JRolland <julien.rolland33@gmail.com>, 2013
+# Gilles Langevin <langevin.net@gmail.com>, 2013
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014
-# sarina <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 # SLOG90 <slog90@gmail.com>, 2014
-# Yannick1 <yannick.petit@gmail.com>, 2013
+# PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -128,17 +128,17 @@
 # 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
-# chrisc <christopher.castermane@student.uclouvain.be>, 2014
-# francoisedocq, 2014
+# Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
+# Françoise Docq, 2014
 # qcappart <quentin.c@swing.be>, 2014
-# sarina <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"POT-Creation-Date: 2014-06-12 12:24-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
-"Last-Translator: antoviaque <xavier@antoviaque.org>\n"
+"Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -154,6 +154,25 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "Tableau de bord des questions ouvertes"
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "Discussion"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "Exercice"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -298,7 +317,7 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
@@ -382,7 +401,7 @@ msgstr "Votre nom légal doit contenir au minimum deux caractères"
 
 #: common/djangoapps/student/views.py
 msgid "A valid password is required"
-msgstr "Un mot de passe vide est requis"
+msgstr "Le mot de passe est invalide"
 
 #: common/djangoapps/student/views.py
 msgid "Accepting Terms of Service is required"
@@ -491,6 +510,10 @@ msgstr "Un compte avec cette adresse email existe déjà."
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "Le nouvel email est identique à l'ancien."
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -921,6 +944,20 @@ msgstr ""
 msgid "processing"
 msgstr ""
 
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your file(s) have been submitted. As soon as your submission is graded, this"
@@ -949,6 +986,15 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Erreur {err} dans la fonction d'indice {hintfn}."
@@ -960,6 +1006,10 @@ msgstr "(Ligne de code source non disponible)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "Regardez la ligne de source XML {sourcenum}."
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr ""
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -1061,7 +1111,7 @@ msgid "No answer provided."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
+msgid "Error: No grader has been set up for this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1113,6 +1163,19 @@ msgstr ""
 "Erreur dans l'évaluation de SchematicResponse. L'erreur est: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr ""
 "La réponse de l'équipe pédagogique ne peut pas être interprétée comme un "
@@ -1123,6 +1186,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr "Ne peut pas interpréter '{given_answer}' comme étant un nombre."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1138,6 +1202,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1912,6 +1977,47 @@ msgstr ""
 msgid "Secret Token String for Annotation"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -2057,6 +2163,75 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "Erreur"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration for how users are grouped for this content experiment. "
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/split_test_studio_header.html
+msgid "You must select a group configuration for this content experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment will not be shown to students because it refers to a"
+" group configuration that has been deleted. You can delete this experiment "
+"or reinstate the group configuration to repair it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment is in an invalid state and cannot be repaired. "
+"Please delete and recreate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
 #. the content of a course
@@ -2084,13 +2259,6 @@ msgstr "Progression"
 #: lms/templates/wiki/base.html
 msgid "Wiki"
 msgstr "Wiki"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
-msgstr "Discussion"
 
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
@@ -2143,6 +2311,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2453,10 +2631,6 @@ msgid "Basic"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -2557,6 +2731,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2735,18 +2910,12 @@ msgstr ""
 msgid "subsections"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "Exercice"
-
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
+msgid "Percent of Students"
 msgstr ""
 
 #: lms/templates/folditchallenge.html
@@ -2850,23 +3019,18 @@ msgid "Failed in authenticating {0}\n"
 msgstr "Échec lors de l’authentification {0}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "fixed password"
 msgstr "mot de passe fixé"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr "Tout est ok!"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr "Vous devez fournir un nom d'utilisateur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr "Vous devez fournir un nom complet"
 
@@ -2929,13 +3093,11 @@ msgid "Courses loaded in the modulestore"
 msgstr "Cours chargés dans le modulestore"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 msgid "username"
 msgstr "nom d'utilisateur"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr "e-mail"
 
@@ -3043,7 +3205,6 @@ msgid "Deleted"
 msgstr "Supprimé"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "course_id"
 
@@ -3064,12 +3225,10 @@ msgid "Enrollment information for all courses"
 msgstr "Information d'inscription pour tous les cours"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr "rôle"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "nom complet"
 
@@ -3078,26 +3237,6 @@ msgid ""
 "Import the specified git repository and optional branch into the modulestore"
 " and optionally specified directory."
 msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr "Impossible de trouver l'utilisateur ayant l'adresse e-mail"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr "Impossible de trouver l'utilisateur ayant le nom d'utilisateur"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr "Échec lors de l’authentification"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr "Impossible de cloner ou récupérer le répertoire"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
-msgstr "Erreur - impossible de trouver le cours avec l'identifiant"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -3156,6 +3295,10 @@ msgstr "L'utilisateur n'existe pas."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "La tâche est déjà lancée."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4076,12 +4219,10 @@ msgid "The course you requested does not exist."
 msgstr "Le cours demandé n'existe pas."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr "Le cours {0} est déjà dans votre panier."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr "Vous êtes déjà inscrit pour le cours {0}."
 
@@ -4721,7 +4862,9 @@ msgstr "Supprimer l'article"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4764,6 +4907,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Vous allez supprimer un article. Veuillez confirmer."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5218,6 +5362,19 @@ msgstr ""
 msgid "Upload completed"
 msgstr "Téléchargement terminé"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
@@ -5371,7 +5528,7 @@ msgstr "Chargement en cours..."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Voir"
@@ -5490,8 +5647,9 @@ msgstr "Conditions générales du service"
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Aide"
@@ -6305,13 +6463,9 @@ msgstr "Veuillez {link_start}nous envoyer un email{link_end}."
 msgid "Please try again later."
 msgstr "Veuillez réessayer plus tard."
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "Vous n'avez pas de note."
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
+msgstr ""
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -6571,11 +6725,6 @@ msgstr "Données brutes :"
 msgid "Accepted"
 msgstr "Accepté"
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Erreur"
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr "Rejeté"
@@ -6648,6 +6797,11 @@ msgstr ""
 "supporté. Nous recommandons vivement d'utiliser "
 "{chrome_link_start}Chrome{chrome_link_end} ou "
 "{ff_link_start}Firefox{ff_link_end}."
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "Vous n'avez pas de note."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -7000,6 +7154,10 @@ msgstr "Connexion"
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
 msgid "Group {group_id}"
+msgstr ""
+
+#: lms/templates/split_test_studio_header.html
+msgid "Select a Group Configuration"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
@@ -7714,6 +7872,10 @@ msgstr "Retour à l'examen"
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
 msgstr "Menu du cours"
+
+#: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
@@ -8582,11 +8744,11 @@ msgstr "Mettre à niveau vers un parcours vérifié"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
-msgstr "Voir les Cours archivés"
+msgstr "Voir le cours"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
-msgstr "Voir le Cours"
+msgstr "Voir le cours"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12102,7 +12264,9 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "Dupliquer"
@@ -12118,17 +12282,12 @@ msgstr "Supprimer ce composant"
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
 msgid "Container"
-msgstr ""
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
 msgstr ""
 
 #: cms/templates/container.html cms/templates/container.html
@@ -12161,6 +12320,11 @@ msgid ""
 "this page. In the case of experiment blocks, this allows you to confirm that"
 " you have properly configured your experiment groups and make changes to "
 "existing content."
+msgstr ""
+
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -12567,10 +12731,8 @@ msgstr "Bienvenue sur"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
+"Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
-"Studio vous aide à gérer vos cours en ligne, afin que vous puissiez vous "
-"concentrer sur la pédagogie"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
@@ -12614,10 +12776,8 @@ msgstr "Changez tout à tout moment"
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
+"let you reorganize quickly."
 msgstr ""
-"Dessinez votre progression et construisez du contenu n'importe où. Les "
-"outils de glisser-déposer vous permettront de le réorganiser rapidement."
 
 #: cms/templates/howitworks.html
 msgid "Go A Week Or A Semester At A Time"
@@ -12639,14 +12799,9 @@ msgstr "L’apprentissage réclame plus que des cours magistraux"
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
-"Studio vous laisse agréger votre contenu de la manière qui sera la plus "
-"pédagogique &mdash; de courtes séquences vidéos entrelacées d'exercices et "
-"autres. Insérez vos vidéos et créez une grande variété d'exercices types en "
-"juste quelques clics."
 
 #: cms/templates/howitworks.html
 msgid "Create Learning Pathways"
@@ -12654,11 +12809,9 @@ msgstr "Créez des progressions pédagogiques"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
 msgstr ""
-"Aidez vos étudiants à comprendre une notion après l'autre avec des éléments "
-"multimédia, HTML, et des exercices."
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
@@ -12678,11 +12831,9 @@ msgstr "Un grand catalogue de problèmes types"
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
 msgstr ""
-"Studio a environ une douzaine de types de problèmes à proposer à vos "
-"étudiants, pas uniquement des QCM."
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
@@ -12714,11 +12865,9 @@ msgstr "Modifications instantanées"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
-"Quelque chose à rectifier ? Pas de problème. Quand vous le souhaitez, vos "
-"modifications sont en ligne quand vous cliquez sur Enregistrer."
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
@@ -13756,16 +13905,8 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
-"Ces dates correspondent à <strong>quand votre contenu de cours sera "
-"visible</strong>, et <strong>ne sont pas les dates affichées sur le sommaire"
-" du cours</strong>. Pour renseigner la date de début de cours et la date "
-"d'inscription affichées sur le sommaire de votre cours, suivez les "
-"instructions fournies par votre <abbr title=\"Program Manager\">PM</abbr> ou"
-" Conrad Warre <a rel=\"email\" class=\"action action-email\" "
-"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -14255,7 +14396,7 @@ msgstr "Exporter"
 msgid "Help &amp; Account Navigation"
 msgstr "Aide &amp; Navigation Profil"
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -14270,14 +14411,6 @@ msgstr "Se déconnecter"
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
 msgstr "Vous n'êtes pas connecté"
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr "Comment fonctionne Studio"
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
-msgstr "Aide Studio"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -14364,6 +14497,22 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about edX Studio?"
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"This content experiment refers to a group configuration that has been "
+"deleted."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid "This content experiment uses group configuration '{0}'."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

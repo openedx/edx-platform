@@ -116,6 +116,14 @@ class CoursePagesTest(UniqueCourseTest):
         # Log in
         self.auth_page.visit()
 
+        # In the real workflow you will be at the dashboard page
+        # after you log in. This test was intermittently failing on the
+        # first (asset) page load with a 404.
+        # Not exactly sure why, so adding in a visit
+        # to the dashboard page here to replicate the usual flow.
+        self.dashboard_page = DashboardPage(self.browser)
+        self.dashboard_page.visit()
+
         # Verify that each page is available
         for page in self.pages:
             page.visit()

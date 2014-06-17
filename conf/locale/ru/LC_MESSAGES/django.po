@@ -6,26 +6,27 @@
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
 # berseneva, 2013
-# Tenrius <tenrius@gmail.com>, 2013
-# ejikjane <eugenia000@gmail.com>, 2013
-# eudj1n <eudjin@gmail.com>, 2014
-# ejikjane <eugenia000@gmail.com>, 2013
-# Katerina Arinarkina <rosemaily@gmail.com>, 2014
-# Olga Maksimenkova <omaksimenkova@hse.ru>, 2014
-# Man2Life <pavelyushchenko@gmail.com>, 2013
+# Danil Moskovoy <tenrius@gmail.com>, 2013
+# Evgeniya <eugenia000@gmail.com>, 2013
+# Евгений Козлов <eudjin@gmail.com>, 2014
+# Evgeniya <eugenia000@gmail.com>, 2013
+# Katerina <rosemaily@gmail.com>, 2014
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mchalyk <mchalyk@gmail.com>, 2014
-# Nichik <dmi.nichik@gmail.com>, 2013
-# Katerina Arinarkina <rosemaily@gmail.com>, 2014
-# serge_ru, 2014
-# berseneva, 2013
-# Tenrius <tenrius@gmail.com>, 2013
-# viktoria <viktoria@cde.ifmo.ru>, 2013
-# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
+# Katerina <rosemaily@gmail.com>, 2014
+# Sergej Ivakin, 2014
+# Tatiane Berseneva, 2013
+# Danil Moskovoy <tenrius@gmail.com>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -33,12 +34,12 @@
 # 
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
 # berseneva, 2013
-# ejikjane <eugenia000@gmail.com>, 2013
-# Olga Maksimenkova <omaksimenkova@hse.ru>, 2014
-# Tenrius <tenrius@gmail.com>, 2013
-# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Evgeniya <eugenia000@gmail.com>, 2013
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Danil Moskovoy <tenrius@gmail.com>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Weyedide <weyedide@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)
@@ -48,34 +49,34 @@
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
 # berseneva, 2013
-# Tenrius <tenrius@gmail.com>, 2013
-# eudj1n <eudjin@gmail.com>, 2014
-# Gfirey <pashkun73@gmail.com>, 2013
-# Gfirey <pashkun73@gmail.com>, 2013
-# Katerina Arinarkina <rosemaily@gmail.com>, 2014
+# Danil Moskovoy <tenrius@gmail.com>, 2013
+# Евгений Козлов <eudjin@gmail.com>, 2014
+# Gubin Pavel <pashkun73@gmail.com>, 2013
+# Gubin Pavel <pashkun73@gmail.com>, 2013
+# Katerina <rosemaily@gmail.com>, 2014
 # KhJulia <lnujulia@ukr.net>, 2014
-# Olga Maksimenkova <omaksimenkova@hse.ru>, 2014
-# Man2Life <pavelyushchenko@gmail.com>, 2013
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mchalyk <mchalyk@gmail.com>, 2014
-# Nichik <dmi.nichik@gmail.com>, 2013
-# Man2Life <pavelyushchenko@gmail.com>, 2013
-# Katerina Arinarkina <rosemaily@gmail.com>, 2014
+# Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
+# Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
+# Katerina <rosemaily@gmail.com>, 2014
+# Sergej Ivakin, 2014
 # serge_ru, 2014
-# serge_ru, 2014
-# serge_ru, 2014
-# berseneva, 2013
-# Tenrius <tenrius@gmail.com>, 2013
+# Sergej Ivakin, 2014
+# Tatiane Berseneva, 2013
+# Danil Moskovoy <tenrius@gmail.com>, 2013
 # Toskira <toskira@gmail.com>, 2014
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
-# viktoria <viktoria@cde.ifmo.ru>, 2013
-# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
-# Nichik <dmi.nichik@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
+# Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -84,15 +85,15 @@
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# asandler <setcursorpos@gmail.com>, 2013
+# Андрей Сандлер <setcursorpos@gmail.com>, 2013
 # berseneva, 2013
-# eudj1n <eudjin@gmail.com>, 2014
-# Gfirey <pashkun73@gmail.com>, 2013
-# Man2Life <pavelyushchenko@gmail.com>, 2013
-# Nichik <dmi.nichik@gmail.com>, 2013
-# Tenrius <tenrius@gmail.com>, 2013
+# Евгений Козлов <eudjin@gmail.com>, 2014
+# Gubin Pavel <pashkun73@gmail.com>, 2013
+# Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
+# Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
+# Danil Moskovoy <tenrius@gmail.com>, 2013
 # Toskira <toskira@gmail.com>, 2014
-# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Weyedide <weyedide@gmail.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -101,8 +102,8 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# viktoria <viktoria@cde.ifmo.ru>, 2013
-# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -110,16 +111,16 @@
 # 
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# Olga Maksimenkova <omaksimenkova@hse.ru>, 2014
-# Katerina Arinarkina <rosemaily@gmail.com>, 2014
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Katerina <rosemaily@gmail.com>, 2014
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
-"PO-Revision-Date: 2014-05-15 15:15+0000\n"
+"POT-Creation-Date: 2014-06-12 12:24-0400\n"
+"PO-Revision-Date: 2014-06-06 20:50+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -137,13 +138,32 @@ msgstr ""
 msgid "Open Ended Panel"
 msgstr ""
 
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "Задача"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
+
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
-msgstr "Регистрация закрыта"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
@@ -232,7 +252,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr ""
+msgstr "Идентификатор курса не указан"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
@@ -275,7 +295,7 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
@@ -283,15 +303,17 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: common/djangoapps/student/views.py
 msgid "Email or password is incorrect."
-msgstr ""
+msgstr "Неверный адрес электронной почты  или пароль."
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
+"Эта учётная запись не была активирована. Мы  отправили вам ещё одно "
+"активационное сообщение. Пожалуйста, проверьте свою электронную почту."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -323,7 +345,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
+msgstr "Учётная запись с электронным адресом '{email}' уже существует."
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
@@ -413,13 +435,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
-msgstr ""
+msgstr "Не удалось отправить сообщение для активации учётной записи."
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
-"Неизвестная ошибка. Пожалуйста, сообщите нам о её возникновении по "
-"электронной почте."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -460,11 +480,15 @@ msgstr "Учётная запись с таким адресом электро�
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr "Старый и новый адреса электронной почты совпадают."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
-msgstr ""
+msgstr "Имя - обязательное поле"
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Invalid ID"
@@ -887,6 +911,20 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
+msgstr "обработка"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "ChoiceGroup: неопределённый тег {tag_name}"
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -911,6 +949,15 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr ""
@@ -922,6 +969,10 @@ msgstr "(Строка исходного кода недоступна)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr "Не разрешается исполнение небезопасного Javascript кода."
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -983,6 +1034,10 @@ msgstr ""
 msgid "error"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html
 msgid "or"
 msgstr "или"
@@ -1010,8 +1065,8 @@ msgid "No answer provided."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
-msgstr ""
+msgid "Error: No grader has been set up for this problem."
+msgstr "Ошибка: для данного задания не назначен способ оценивания "
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1054,6 +1109,21 @@ msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+"Ошибка в описании задания! Невозможно сформировать прямоугольник с "
+"координатами {sr_coords}"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr ""
 
@@ -1062,6 +1132,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1077,6 +1148,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1772,6 +1844,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr ""
+"Исходный код для документов LaTeX. Эта функция поддерживается не полностью."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
@@ -1838,6 +1911,47 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Secret Token String for Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -1914,6 +2028,8 @@ msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
 msgstr ""
+"Результат сохранён в xblock KVS -- опубликованный результат продублирован в "
+"django DB."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Comment as returned from grader, LTI2.0 spec"
@@ -1983,6 +2099,80 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Peer Grading Interface"
+msgstr "Интерфейс взаимной проверки"
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "Ошибка"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration for how users are grouped for this content experiment. "
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/split_test_studio_header.html
+msgid "You must select a group configuration for this content experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment will not be shown to students because it refers to a"
+" group configuration that has been deleted. You can delete this experiment "
+"or reinstate the group configuration to repair it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment is in an invalid state and cannot be repaired. "
+"Please delete and recreate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment uses group configuration '{experiment_name}'."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -2009,13 +2199,6 @@ msgstr "Прогресс"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
-msgstr ""
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
@@ -2064,6 +2247,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2350,10 +2543,6 @@ msgid "Basic"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -2416,6 +2605,8 @@ msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
+"Если вы не хотите, чтобы видео было воспроизведено целиком, установите время"
+" начала запуска. Формат ЧЧ:ММ:СС. Максимально допустимое значение 23:59:59."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Start Time"
@@ -2426,6 +2617,8 @@ msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
+"Если вы не хотите, чтобы видео было воспроизведено целиком, установите время"
+" остановки. Формат ЧЧ:ММ:СС. Максимально допустимое значение 23:59:59."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
@@ -2454,6 +2647,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2558,6 +2752,8 @@ msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
 msgstr ""
+"Загрузите сопроводительные материалы для этого видео. Студенты смогут "
+"скачать их по ссылке \"Скачать дополнительные материалы\" под видео."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
@@ -2633,20 +2829,15 @@ msgstr ""
 msgid "subsections"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "Задача"
-
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
+msgid "Percent of Students"
 msgstr ""
 
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/folditchallenge.html
 msgid "Score"
 msgstr "Балл"
@@ -2744,23 +2935,18 @@ msgid "Failed in authenticating {0}\n"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "fixed password"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr "Необходимо указать имя пользователя"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr "Необходимо указать полное имя"
 
@@ -2825,7 +3011,6 @@ msgid "username"
 msgstr "username"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr ""
 
@@ -2919,7 +3104,6 @@ msgid "Deleted"
 msgstr "Удалено"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "course_id"
 
@@ -2940,12 +3124,10 @@ msgid "Enrollment information for all courses"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr "роль"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "full_name"
 
@@ -2953,26 +3135,6 @@ msgstr "full_name"
 msgid ""
 "Import the specified git repository and optional branch into the modulestore"
 " and optionally specified directory."
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
@@ -3012,6 +3174,8 @@ msgstr "максимальный размер загружаемого файл�
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
+"Ошибка при загрузке файла. Пожалуйста, свяжитесь с администратором сайта. "
+"Спасибо."
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
@@ -3027,6 +3191,10 @@ msgstr "Пользователя не существует."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -3141,11 +3309,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Summary Grades of students enrolled in {course_key}"
-msgstr ""
+msgstr "Итоговые оценки студентов, зачисленных на курс {course_key}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Raw Grades of students enrolled in {course_key}"
-msgstr ""
+msgstr "Предварительные оценки студентов, зачисленных на курс {course_key}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for rescoring \"{problem_url}\"."
@@ -3698,6 +3866,8 @@ msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
 msgstr ""
+"Посетите <a href=\"{dashboard_link}\">Панель управления</a>, чтобы увидеть "
+"новые курсы, на которые Вы записались."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
@@ -3874,12 +4044,10 @@ msgid "The course you requested does not exist."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr ""
 
@@ -4357,7 +4525,7 @@ msgstr ""
 
 #: lms/templates/wiki/article.html
 msgid "This article was last modified:"
-msgstr ""
+msgstr "Последние изменения были внесены в эту статью:"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
 msgid "Add new article"
@@ -4379,7 +4547,9 @@ msgstr "Удалить статью"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4419,6 +4589,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Вы собираетесь удалить статью. Пожалуйста, подтвердите."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4481,6 +4652,9 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
+"При нажатии на каждую версию открывается список изменённых строк. Нажмите "
+"«Предварительный просмотр», чтобы увидеть текущий вид статьи. Внизу страницы"
+" вы можете изменить конкретную версию или слить старую с текущей."
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -4504,7 +4678,7 @@ msgstr ""
 
 #: lms/templates/wiki/history.html
 msgid "Switch to selected version"
-msgstr ""
+msgstr "Переключиться на выбранную версию"
 
 #: lms/templates/wiki/history.html
 msgid "Wiki Revision Preview"
@@ -4589,7 +4763,7 @@ msgstr "Markdown: основы"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Quick Markdown Syntax Guide"
-msgstr ""
+msgstr "Краткое руководство по синтаксису Markdown"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Miniature Markdown Guide"
@@ -4608,7 +4782,7 @@ msgstr ""
 #. Translators: Do not translate "edX"
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "edX Additions:"
-msgstr ""
+msgstr "Дополнения edX:"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Math Expression"
@@ -4646,7 +4820,7 @@ msgstr "**выделение жирным** или __выделение жирн
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Unordered List"
-msgstr ""
+msgstr "Маркированный список"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Sub Item 1"
@@ -4845,6 +5019,19 @@ msgstr ""
 msgid "Upload completed"
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
@@ -4901,7 +5088,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "По указателю элемент найти не удалось."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
@@ -4988,7 +5175,7 @@ msgstr ""
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr ""
@@ -5106,8 +5293,9 @@ msgstr ""
 msgid "Privacy Policy"
 msgstr "Политика конфиденциальности"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html
 msgid "Help"
 msgstr "Помощь"
@@ -5276,7 +5464,7 @@ msgstr ""
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Скрыть пояснения"
 
 #: lms/templates/contact.html lms/templates/static_templates/about.html
 #: lms/templates/static_templates/about.html
@@ -5285,7 +5473,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Faq"
-msgstr ""
+msgstr "ЧаВо"
 
 #: lms/templates/contact.html lms/templates/footer.html
 msgid "Press"
@@ -5650,6 +5838,12 @@ msgid ""
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
 msgstr ""
+"{platform_name} — некоммерческая платформа, созданная благодаря партнёрству "
+"{Harvard} и {MIT}. Её задача - предоставить доступ к наилучшему высшему "
+"образованию имеющим доступ в Интернет студентам всех возрастов, по всему "
+"миру. Бесплатные онлайн курсы {platform_name} интерактивны; они охватывают "
+"ряд предметов, включая информатику, здравоохранение и искусственный "
+"интеллект."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -5839,12 +6033,8 @@ msgstr ""
 msgid "Please try again later."
 msgstr ""
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
 msgstr ""
 
 #: lms/templates/index.html
@@ -6085,11 +6275,6 @@ msgstr "Необработанные данные:"
 msgid "Accepted"
 msgstr "Принято"
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Ошибка"
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr "Отказано"
@@ -6162,6 +6347,11 @@ msgstr ""
 " настоятельно рекомендуем использовать "
 "{chrome_link_start}Chrome{chrome_link_end} или "
 "{ff_link_start}Firefox{ff_link_end}."
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr ""
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -6487,6 +6677,10 @@ msgstr ""
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
 msgid "Group {group_id}"
+msgstr ""
+
+#: lms/templates/split_test_studio_header.html
+msgid "Select a Group Configuration"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
@@ -7168,6 +7362,10 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -8167,14 +8365,9 @@ msgstr ""
 msgid "new post title"
 msgstr ""
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "Заголовок"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -9016,8 +9209,6 @@ msgid ""
 "Specify the extension due date and time (in UTC; please specify "
 "{format_string})."
 msgstr ""
-"Укажите дату и время, до которой продлён срок сдачи (в UTC, пожалуйста, "
-"используйте формат времени {format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -9735,7 +9926,7 @@ msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Или вернуться на {link_start}домашнюю страницу{link_end}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -11182,7 +11373,9 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
@@ -11198,17 +11391,12 @@ msgstr ""
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
 msgid "Container"
-msgstr ""
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
 msgstr ""
 
 #: cms/templates/container.html cms/templates/container.html
@@ -11241,6 +11429,11 @@ msgid ""
 "this page. In the case of experiment blocks, this allows you to confirm that"
 " you have properly configured your experiment groups and make changes to "
 "existing content."
+msgstr ""
+
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -11630,7 +11823,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
+"Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11669,7 +11862,7 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
+"let you reorganize quickly."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11690,9 +11883,8 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11701,8 +11893,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -11721,8 +11913,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
 msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
@@ -11748,8 +11940,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -12685,8 +12877,7 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -13137,7 +13328,7 @@ msgstr ""
 msgid "Help &amp; Account Navigation"
 msgstr ""
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -13151,14 +13342,6 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html
@@ -13248,6 +13431,22 @@ msgstr ""
 msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr ""
 
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"This content experiment refers to a group configuration that has been "
+"deleted."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid "This content experiment uses group configuration '{0}'."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr ""
@@ -13307,6 +13506,8 @@ msgstr ""
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
 msgstr ""
+"Коротко опишите причину редактирования, которая будет записана в журнал "
+"исправлений."
 
 #: wiki/forms.py
 msgid ""
@@ -13368,7 +13569,7 @@ msgstr ""
 #: wiki/forms.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
-msgstr ""
+msgstr "Вы уверены?!"
 
 #: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
@@ -13439,7 +13640,7 @@ msgstr ""
 #: wiki/models/article.py wiki/models/pluginbase.py
 #: wiki/plugins/attachments/models.py
 msgid "current revision"
-msgstr ""
+msgstr "текущая версия"
 
 #: wiki/models/article.py
 msgid ""
@@ -13480,19 +13681,19 @@ msgstr ""
 
 #: wiki/models/article.py
 msgid "group read access"
-msgstr ""
+msgstr "право на чтение для группы"
 
 #: wiki/models/article.py
 msgid "group write access"
-msgstr ""
+msgstr "право на запись для группы"
 
 #: wiki/models/article.py
 msgid "others read access"
-msgstr ""
+msgstr "право на чтение для других пользователей"
 
 #: wiki/models/article.py
 msgid "others write access"
-msgstr ""
+msgstr "право на запись для других пользователей"
 
 #: wiki/models/article.py
 msgid "Article without content (%(id)d)"
@@ -13516,7 +13717,7 @@ msgstr ""
 
 #: wiki/models/article.py
 msgid "revision number"
-msgstr ""
+msgstr "номер версии"
 
 #: wiki/models/article.py
 msgid "IP address"
@@ -13540,7 +13741,7 @@ msgstr "содержание статьи"
 
 #: wiki/models/article.py
 msgid "article title"
-msgstr ""
+msgstr "заголовок статьи"
 
 #: wiki/models/article.py
 msgid ""
@@ -13550,11 +13751,11 @@ msgstr ""
 
 #: wiki/models/pluginbase.py
 msgid "original article"
-msgstr ""
+msgstr "исходный текст статьи"
 
 #: wiki/models/pluginbase.py
 msgid "Permissions are inherited from this article"
-msgstr ""
+msgstr "Права доступа унаследованы от данной статьи"
 
 #: wiki/models/pluginbase.py
 msgid "A plugin was changed"
@@ -13646,11 +13847,11 @@ msgstr ""
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revision"
-msgstr ""
+msgstr "версия вложения"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revisions"
-msgstr ""
+msgstr "версии вложений"
 
 #: wiki/plugins/attachments/views.py
 msgid "%s was successfully added."
@@ -13690,7 +13891,7 @@ msgstr ""
 
 #: wiki/plugins/attachments/views.py
 msgid "This article is no longer related to the file %s."
-msgstr ""
+msgstr "Эта статья больше не связана с файлом %s."
 
 #: wiki/plugins/attachments/wiki_plugin.py
 msgid "A file was changed: %s"
@@ -13808,7 +14009,7 @@ msgstr ""
 
 #: wiki/views/accounts.py
 msgid "You are no longer logged in. Bye bye!"
-msgstr ""
+msgstr "Вы вышли из системы. До свидания!"
 
 #: wiki/views/accounts.py
 msgid "You are now logged in! Have fun!"
@@ -13824,7 +14025,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "There was an error creating this article."
-msgstr ""
+msgstr "При создании статьи произошла ошибка."
 
 #: wiki/views/article.py
 msgid ""
@@ -13848,7 +14049,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "A new revision of the article was succesfully added."
-msgstr ""
+msgstr "Новая версия статьи была успешно добавлена."
 
 #: wiki/views/article.py
 msgid "Restoring article"
@@ -13860,15 +14061,15 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "The article %s is now set to display revision #%d"
-msgstr ""
+msgstr "Отображается версия #%d статьи %s  "
 
 #: wiki/views/article.py
 msgid "New title"
-msgstr ""
+msgstr "Новый заголовок"
 
 #: wiki/views/article.py
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
-msgstr ""
+msgstr "Слияние версий #%(r1)d и #%(r2)d"
 
 #: wiki/views/article.py
 msgid ""

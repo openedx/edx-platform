@@ -1,0 +1,169 @@
+###################################
+June 10, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of June 10,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_. 
+
+In addition, you can sign up for the new `edX Release Announcements mailing
+list`_ to get an email message when we have updated the edX Course Staff Release
+Notes.
+
+
+***************************************
+The New Key Introspection API
+***************************************
+
+This release implements a change in the edX Platform software architecture. The
+Key Introspection API is now used to uniquely identify Xblocks, the building
+blocks for edX courses. This change simplifies the way that the application
+identifies the course content internally. This change does not affect how you
+author content.
+
+In edX Studio, URL formats have changed for all courses. If you previously bookmarked a page in Studio, that bookmark will no longer work. You must update the URL. 
+
+Following is a sample of this format change:
+
+* Old URL: ``https://studio.edx.org/course/OrganizationX.Econ101.2014_T1/branch/draft/block/2014_T1``
+
+* New URL: ``https://studio.edx.org/course/slashes:OrganizationX+Econ101+2014_T1``
+  
+This change does not affect student-visible URLs.
+
+In the edX LMS, the only change is that to reset attempts or rescore student
+responses in the **Student Admin** tab on the Instructor Dashboard, you must now
+specify the complete location identifier of the problem. The `Student Grades and
+Grading`_ section is updated with this revised requirement.
+
+For additional technical detail about this architectural change and the opportunities it creates, see `Opaque Keys`_ on the GitHub wiki.
+
+***************************************
+edX Learning Management System
+***************************************
+   
+* A problem with the **Register** button on `edX Edge`_ is fixed. If you are not
+  logged in to edX Edge, you are redirected to the login page, from which new
+  users can register.
+  
+* If a student's browser does not support HTML5 videos, and the course video is
+  only available in HTML5, the following error message is now displayed to the
+  student:  ``This browser cannot play .mp4, .ogg, or .webm files. Try using a
+  different browser, such as Google Chrome.`` (BLD-638)
+
+* Video transcripts are now displayed correctly on iPads. (BLD-1033)
+  
+===========================
+Accessibility Improvements
+===========================
+
+* Drag and drop problems are updated to improve accessibility for screen
+  readers:
+  
+  * User interface elements that receive focus now have a visual focus
+    indicated. (LMS-1940)
+  
+  * Each user interface element now exposes its name, state, role, and value to
+    assistive technologies. (LMS-1904)
+
+  * The target image now has an ``alt`` attribute. (LMS-1699)
+
+
+**************************
+edX Documentation
+**************************
+
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** button in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  * Added a description of email task workflow states to the `Course Launching
+    Activities`_ section.
+
+  * Added `Review Grades for Enrolled Students (Small Courses)`_ to the `Student
+    Grades and Grading`_ section.
+
+  * Updated `Working with Video Components`_ to include recommendations to use
+    .mp4 and .webm video formats for browser compatibility.
+
+  * Revised the `Student Grades and Grading`_ section based on the new
+    requirement to specify the complete location identifier of a problem to
+    adjust student grades.
+
+  * Updated the `Problem with Adaptive Hint`_ section to reflect formatting
+    requirements for the Python script and the ``correct_answer`` attribute.
+
+  * Reorganized, updated, and streamlined these sections in the `Running Your
+    Course`_ chapter:
+
+    * Divided "Grade and Answer Data" into separate sections for `Student Grades
+      and Grading`_ and `Answer Data`_.
+
+    * Moved information about the student Progress page from the "Checking
+      Student Progress and Issuing Certificates" section to `Student Grades and
+      Grading`_.
+
+    * Renamed the "Checking Student Progress and
+      Issuing Certificates" section to `Assign Final Grades and Issue
+      Certificates`_.
+
+  
+* `Creating Peer Assessments`_
+  
+  This is a new document that covers using Open Response Assessments 2.0.
+
+
+* `edX Data Documentation`_
+  
+  Recent changes include:
+
+  Added descriptions of the following events to the `Tracking Logs`_ chapter:
+
+  *  ``edx.course.enrollment.upgrade.clicked``
+  *  ``edx.course.enrollment.upgrade.succeeded``
+  *  ``edx.forum.searched``
+  *  ``load_video``
+  *  ``hide_transcript``
+  *  ``show_transcript``
+  *  ``problem_reset``
+  *  ``problem_graded``
+
+
+* `Installing, Configuring, and Running the edX Platform`_
+  
+  This is a new document that covers installing and running Devstack.
+
+
+* `edX Platform Developer Documentation`_
+
+
+  
+* `edX XBlock Documentation`_
+  
+
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+.. include:: links.rst

@@ -38,3 +38,20 @@ class UndefinedContext(Exception):
     Tried to access an xmodule field which needs a different context (runtime) to have a value.
     """
     pass
+
+
+class HeartbeatFailure(Exception):
+    """
+    Raised when heartbeat fails.
+    """
+
+    def __unicode__(self, *args, **kwargs):
+        return self.message
+
+
+    def __init__(self, msg, service):
+        """
+        In addition to a msg, provide the name of the service.
+        """
+        self.service = service
+        return super(HeartbeatFailure, self).__init__(msg)

@@ -27,4 +27,5 @@ urlpatterns = patterns('django_comment_client.base.views',  # nopep8
     url(r'^(?P<commentable_id>[\w\-.]+)/threads/create$', 'create_thread', name='create_thread'),
     url(r'^(?P<commentable_id>[\w\-.]+)/follow$', 'follow_commentable', name='follow_commentable'),
     url(r'^(?P<commentable_id>[\w\-.]+)/unfollow$', 'unfollow_commentable', name='unfollow_commentable'),
+    url(r'users$', 'users', name='users'),
 )

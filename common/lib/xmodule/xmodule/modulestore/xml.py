@@ -815,3 +815,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         courses = self.get_courses()
         return [course.location for course in courses if (course.wiki_slug == wiki_slug)]
+
+    def heartbeat(self):
+        """
+        Ensure that every known course is loaded and ready to go. Really, just return b/c
+        if this gets called the __init__ finished which means the courses are loaded.
+
+        Returns the course count
+        """
+        return {XML_MODULESTORE_TYPE: True}
+
