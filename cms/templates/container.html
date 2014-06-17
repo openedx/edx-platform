@@ -1,4 +1,13 @@
 <%inherit file="base.html" />
+<%def name="online_help_token()">
+<%
+is_unit_page = unit.location == xblock.location
+if is_unit_page:
+    return "unit"
+else:
+    return "container"
+%>
+</%def>
 <%!
 import json
 
