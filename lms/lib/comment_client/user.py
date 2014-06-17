@@ -135,13 +135,18 @@ class User(models.Model):
             thread_count=response.get('thread_count', 0)
         )
 
-    def social_stats(self, end_date=None):
-        return get_user_social_stats(self.id, self.course_id, end_date=end_date)
+    def social_stats(self):
+        if not self.course_id:
+            raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
 
-    @classmethod
-    def all_social_stats(cls, course_id, end_date=None, thread_type=None, thread_ids=None):
-        """ Get social stats for all users participating in a course """
-        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
+        url = _url_for_user_social_stats(self.id)
+        params = {'course_id': self.course_id}
+        response = perform_request(
+            'get',
+            url,
+            params
+        )
+        return response
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
