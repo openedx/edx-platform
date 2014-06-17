@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration
+from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupons
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -46,6 +46,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.user.set_password('password')
         self.user.save()
         self.cost = 40
+        self.coupon_code = 'abcde'
+        self.percentage_discount = 10
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
         self.course_mode = CourseMode(course_id=self.course_key,
@@ -57,6 +59,22 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.verified_course_key = verified_course.id
         self.cart = Order.get_cart_for_user(self.user)
         self.addCleanup(patcher.stop)
+
+    def add_coupon(self, course_key, is_active):
+        """
+        add dummy coupon into models
+        """
+        coupon = Coupons(code=self.coupon_code, description='testing code', course_id=course_key,
+                         percentage_discount=self.percentage_discount, created_by=self.user, is_active=is_active)
+        coupon.save()
+
+    def add_course_to_user_cart(self):
+        """
+        adding course to user cart
+        """
+        self.login_user()
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        return reg_item
 
     def login_user(self):
         self.client.login(username=self.user.username, password="password")
@@ -71,6 +89,97 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 400)
         self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
+
+    def test_course_discount_invalid_coupon(self):
+        self.add_coupon(self.course_key, True)
+        self.add_course_to_user_cart()
+        non_existing_code = "non_existing_code"
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': non_existing_code})
+        self.assertEqual(resp.status_code, 404)
+        self.assertIn("Discount does not exist against coupon '{0}'.".format(non_existing_code), resp.content)
+
+    def test_course_discount_inactive_coupon(self):
+        self.add_coupon(self.course_key, False)
+        self.add_course_to_user_cart()
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Coupon '{0}' is inactive.".format(self.coupon_code), resp.content)
+
+    def test_course_does_not_exist_in_cart_against_valid_coupon(self):
+        course_key = self.course_key.to_deprecated_string() + 'testing'
+        self.add_coupon(course_key, True)
+        self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 404)
+        self.assertIn("The coupon '{0}' is not valid for any course in the shopping cart.".format(self.coupon_code), resp.content)
+
+    def test_course_discount_for_valid_active_coupon_code(self):
+
+        self.add_coupon(self.course_key, True)
+        self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        # discount_price should be updated for that course
+        item = self.cart.orderitem_set.all().select_subclasses()[0]
+        self.assertGreater(item.discount_price, 0)
+
+        # after getting 10 percent discount
+        self.assertEqual(self.cart.total_cost, 36)
+
+        # now testing coupon code already used scenario, reusing the same coupon code
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("The coupon '{0}' already used.".format(self.coupon_code), resp.content)
+
+    @patch('shoppingcart.views.log.exception')
+    def test_non_existing_coupon_redemption_on_removing_item(self, exception_log):
+
+        reg_item = self.add_course_to_user_cart()
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': reg_item.id})
+        exception_log.assert_called_with(
+            'Coupon redemption does not exist for order item id={0}.'.format(reg_item.id))
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals(self.cart.orderitem_set.count(), 0)
+
+    @patch('shoppingcart.views.log.info')
+    def test_existing_coupon_redemption_on_removing_item(self, info_log):
+
+        self.add_coupon(self.course_key, True)
+        reg_item = self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': reg_item.id})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals(self.cart.orderitem_set.count(), 0)
+        info_log.assert_called_with(
+            'Coupon redemption entry removed for user {0} for order item {1}'.format(self.user, reg_item.id))
+
+    def test_coupon_discount_for_multiple_courses_in_cart(self):
+
+        reg_item = self.add_course_to_user_cart()
+        self.add_coupon(self.course_key, True)
+        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.assertEquals(self.cart.orderitem_set.count(), 2)
+
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        # discount_price should be updated for that particular course for which coupon code is registered
+        items = self.cart.orderitem_set.all().select_subclasses()
+        for item in items:
+            if item.id == reg_item.id:
+                self.assertGreater(item.discount_price, 0)
+            elif item.id == cert_item.id:
+                self.assertEquals(item.discount_price, None)
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
