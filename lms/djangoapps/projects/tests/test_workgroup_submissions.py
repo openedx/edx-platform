@@ -47,6 +47,7 @@ class SubmissionsApiTests(TestCase):
         self.test_document_id = "Document12345.pdf"
         self.test_document_url = "http://test-s3.amazonaws.com/bucketname"
         self.test_document_mime_type = "application/pdf"
+        self.test_document_filename = "Test PDF Document"
 
         self.test_user = User.objects.create(
             email="test@edx.org",
@@ -133,6 +134,7 @@ class SubmissionsApiTests(TestCase):
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
             'document_mime_type': self.test_document_mime_type,
+            'document_filename': self.test_document_filename,
         }
         response = self.do_post(self.test_submissions_uri, submission_data)
         self.assertEqual(response.status_code, 400)
@@ -143,6 +145,7 @@ class SubmissionsApiTests(TestCase):
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
             'document_mime_type': self.test_document_mime_type,
+            'document_filename': self.test_document_filename,
         }
         response = self.do_post(self.test_submissions_uri, submission_data)
         self.assertEqual(response.status_code, 400)
@@ -154,6 +157,7 @@ class SubmissionsApiTests(TestCase):
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
             'document_mime_type': self.test_document_mime_type,
+            'document_filename': self.test_document_filename,
         }
         response = self.do_post(self.test_submissions_uri, submission_data)
         self.assertEqual(response.status_code, 201)
@@ -172,6 +176,7 @@ class SubmissionsApiTests(TestCase):
         self.assertEqual(response.data['document_id'], self.test_document_id)
         self.assertEqual(response.data['document_url'], self.test_document_url)
         self.assertEqual(response.data['document_mime_type'], self.test_document_mime_type)
+        self.assertEqual(response.data['document_filename'], self.test_document_filename)
         self.assertIsNotNone(response.data['reviews'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
@@ -188,6 +193,7 @@ class SubmissionsApiTests(TestCase):
             'document_id': self.test_document_id,
             'document_url': self.test_document_url,
             'document_mime_type': self.test_document_mime_type,
+            'document_filename': self.test_document_filename,
         }
         response = self.do_post(self.test_submissions_uri, submission_data)
         self.assertEqual(response.status_code, 201)
