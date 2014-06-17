@@ -548,11 +548,12 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         sections = response.data['sections']
-        self.assertEqual(len(sections), 4)
+        self.assertEqual(len(sections), 5)
         self.assertIsNotNone(self._find_item_by_class(sections, 'about'))
         self.assertIsNotNone(self._find_item_by_class(sections, 'prerequisites'))
         self.assertIsNotNone(self._find_item_by_class(sections, 'course-staff'))
         self.assertIsNotNone(self._find_item_by_class(sections, 'faq'))
+        self.assertIsNotNone(self._find_item_by_class(sections, 'intro-video'))
 
         course_staff = self._find_item_by_class(sections, 'course-staff')
         staff = course_staff['articles']
@@ -577,6 +578,10 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(faq['body']), 0)
         invalid_tab = self._find_item_by_class(sections, 'invalid_tab')
         self.assertFalse(invalid_tab)
+
+        intro_video = self._find_item_by_class(sections, 'intro-video')
+        self.assertEqual(len(intro_video['attributes']), 1)
+        self.assertEqual(intro_video['attributes']['data-videoid'], 'foobar')
 
     def test_courses_overview_get_invalid_course(self):
         #try a bogus course_id to test failure case
