@@ -1,0 +1,94 @@
+###################################
+June 17, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of June 17,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_. 
+
+In addition, you can sign up for the `edX Release Announcements mailing
+list`_ to get an email message when we have updated the edX Course Staff Release
+Notes.
+
+
+***************************************
+edX Studio
+***************************************
+
+* For videos, you can now create a transcript file that functions as a table of contents. The file contains links to different parts of the video. (BLD-933)
+
+  .. image:: /images/VideoTOC.png
+     :width: 500
+     :alt: Video with a transcript file that acts as a table of contents
+
+* Course teams can now set the Matlab API key globally in the advanced settings for the course. 
+
+***************************************
+edX Learning Management System
+***************************************
+   
+* When you search a discussion forum, the search engine now retrieves common misspellings and alternate spellings of the search term. (FOR-591)
+
+* When a course has no content, users who try to access the course see a "No content has been added to this course" message rather than a 404 or 500 error message. 
+  
+* The edX user ID is now included in student profile information. (LMS-2791)
+
+
+**************************
+edX Documentation
+**************************
+
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  * Updated `Bulk Email`_ to add information about possible bulk email states and situations in which enrolled students don't receive bulk e-mail. (DOC-362)
+
+  * Added a description of the Student Gradebook, which is available for courses with enrollments of fewer than 200 students, to `Grade and Answer Data`_.
+
+  * Added recommendation to use only .mp4 and .webm video formats to `Working with Video Components`_. 
+
+  * Updated `Working with Video Components`_ with information about adding a transcript that serves as a table of contents for a video.
+
+
+* `edX Data Documentation`_
+
+
+* `edX Platform Developer Documentation`_
+
+ 
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+   Recent changes include:
+
+   * Added the `Installing the edX Production Stack`_ section.
+  
+
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+.. include:: links.rst
