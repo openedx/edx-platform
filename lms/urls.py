@@ -152,7 +152,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
     # Make the assumption that the URL we want is the lowercased
     # version of the map key
-    urlpatterns += (url(r'^%s' % key.lower(),
+    urlpatterns += (url(r'^%s$' % key.lower(),
                         'static_template_view.views.render',
                         {'template': template}, name=value),)
 
