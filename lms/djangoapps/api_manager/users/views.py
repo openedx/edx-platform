@@ -37,6 +37,9 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from courseware import grades
 from courseware.courses import get_course
 
+from lms.lib.comment_client.user import User as CommentUser
+from lms.lib.comment_client.utils import CommentClientRequestError
+
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -913,3 +916,33 @@ class UsersWorkgroupsList(SecureListAPIView):
         if course_id:
             queryset = queryset.filter(project__course_id=course_id)
         return queryset
+
+
+class UsersSocialMetrics(SecureListAPIView):
+    """
+    ### The UsersSocialMetrics view allows clients to query about the activity of a user in the
+    forums
+    - URI: ```/api/users/{user_id}/courses/{course_id}/metrics/social/```
+    - GET: Returns a list of social metrics for that user in the specified course
+    """
+
+    def get(self, request, user_id, course_id): # pylint: disable=W0613
+
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
+        comment_user = CommentUser.from_django_user(user)
+        comment_user.course_id = course_id
+
+        try:
+            data = comment_user.social_stats()
+            http_status = status.HTTP_200_OK
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, http_status)
