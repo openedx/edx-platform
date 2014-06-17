@@ -1,0 +1,20 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "outline" %></%def>
+<%!
+import logging
+from util.date_utils import get_default_time_display
+from django.utils.translation import ugettext as _
+from contentstore.utils import reverse_usage_url
+%>
+<%block name="title">${_("Coupons")}</%block>
+<%block name="bodyclass">is-signedin course view-outline</%block>
+<%namespace name='static' file='static_content.html'/>
+<%namespace name="units" file="widgets/units.html" />
+<%block name="content">
+<form action="add_coupon" method="post" enctype="multipart/form-data" >
+  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+  ${form}
+
+  <input type="submit" value="Submit" />
+ </form>
+</%block>

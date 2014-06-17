@@ -304,6 +304,28 @@ class OrderItem(models.Model):
         return ''
 
 
+class Coupons(models.Model):
+    """
+    This table contains coupon codes
+    A user can get a discount offer on course if provide coupon code
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    description = models.CharField(max_length=256, null=True, blank=True)
+    course_id = CourseKeyField(max_length=256)
+    percentage_discount = models.IntegerField(default=0)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    is_active = models.BooleanField(default=True)
+
+
+class CouponRedemption(models.Model):
+    """
+    This table contain coupon redemption info
+    """
+    order = models.ForeignKey(Order, db_index=True)
+    user = models.ForeignKey(User, db_index=True)
+    coupon = models.ForeignKey(Coupons, db_index=True)
+
 class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
