@@ -31,7 +31,7 @@ from xmodule_django.models import CourseKeyField
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException)
 
 from microsite_configuration import microsite
 
@@ -217,7 +217,7 @@ class OrderItem(models.Model):
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    discount_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    discount_price = models.DecimalField(decimal_places=2, max_digits=30, null=True)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True, db_index=True)
@@ -229,7 +229,10 @@ class OrderItem(models.Model):
     @property
     def line_cost(self):
         """ Return the total cost of this OrderItem """
-        return self.qty * self.unit_cost
+        if self.discount_price is not None:
+            return self.qty * self.discount_price
+        else:
+            return self.qty * self.unit_cost
 
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
@@ -326,6 +329,40 @@ class CouponRedemption(models.Model):
     order = models.ForeignKey(Order, db_index=True)
     user = models.ForeignKey(User, db_index=True)
     coupon = models.ForeignKey(Coupons, db_index=True)
+
+    @classmethod
+    def get_discount_price(cls, percentage_discount, value):
+        """
+        return discounted price against coupon
+        """
+        discount = Decimal("{0:.2f}".format(Decimal(percentage_discount / 100.00) * value))
+        return value - discount
+
+    @classmethod
+    def add_coupon_redemption(cls, coupon, order):
+        """
+        add coupon info into coupon_redemption model
+        """
+        purchased_cart_items = order.orderitem_set.all().select_subclasses()
+
+        for item in purchased_cart_items:
+            if item.course_id == coupon.course_id:
+                coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
+                if not created:
+                    log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
+                                  .format(coupon.code, order.user.username, order.id))
+                    raise CouponAlreadyExistException
+
+                discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
+                item.discount_price = discount_price
+                item.save()
+                log.info("Discount generated for user {0} against order id '{1}' "
+                         .format(order.user.username, order.id))
+                return coupon_redemption
+
+        log.warning("Course item does not exist for coupon '{0}'".format(coupon.code))
+        raise ItemDoesNotExistAgainstCouponException
+
 
 class PaidCourseRegistration(OrderItem):
     """
