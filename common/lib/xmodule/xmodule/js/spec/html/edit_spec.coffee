@@ -1,8 +1,14 @@
 describe 'HTMLEditingDescriptor', ->
   beforeEach ->
     window.baseUrl = "/static/deadbeef"
+    window.analytics = jasmine.createSpyObj('analytics', ['track'])
+    window.course_location_analytics = jasmine.createSpy()
+    window.unit_location_analytics = jasmine.createSpy()
   afterEach ->
     delete window.baseUrl
+    delete window.analytics
+    delete window.course_location_analytics
+    delete window.unit_location_analytics
   describe 'Visual HTML Editor', ->
     beforeEach ->
       loadFixtures 'html-edit-visual.html'
