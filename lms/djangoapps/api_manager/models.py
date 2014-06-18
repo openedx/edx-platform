@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group, User
 from django.db import models
 from django.utils import timezone
 from model_utils.models import TimeStampedModel
+from .utils import is_int
 
 from projects.models import Workgroup
 
@@ -154,3 +155,30 @@ class CourseModuleCompletion(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True, related_name="course_completions")
     course_id = models.CharField(max_length=255, db_index=True)
     content_id = models.CharField(max_length=255, db_index=True)
+
+
+class APIUserQuerySet(models.query.QuerySet):  # pylint: disable=R0924
+    """ Custom QuerySet to modify id based lookup """
+    def filter(self, *args, **kwargs):
+        if 'id' in kwargs and not is_int(kwargs['id']):
+            kwargs['anonymoususerid__anonymous_user_id'] = kwargs['id']
+            del kwargs['id']
+        return super(APIUserQuerySet, self).filter(*args, **kwargs)
+
+
+class APIUserManager(models.Manager):
+    """ Custom Manager """
+    def get_query_set(self):
+        return APIUserQuerySet(self.model)
+
+
+class APIUser(User):
+    """
+    A proxy model for django's auth.User to add AnonymousUserId fallback
+    support in User lookups
+    """
+    objects = APIUserManager()
+
+    class Meta:
+        """ Meta attribute to make this a proxy model"""
+        proxy = True
