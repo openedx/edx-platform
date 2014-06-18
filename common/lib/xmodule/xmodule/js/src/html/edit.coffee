@@ -125,7 +125,7 @@ class @HTMLEditingDescriptor
     # The input argument is a dict with the text content.
     content = rewriteStaticLinks(source.content, '/static/', @base_asset_url)
     source.content = content
-    @capture_analytics("HTML Editor: HTML Save")
+    @capture_analytics("HTML Editor: Save")
 
   initInstanceCallback: (visualEditor) =>
     visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))

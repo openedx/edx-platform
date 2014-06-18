@@ -106,6 +106,20 @@ define(["jquery", "underscore.string", "jasmine", "coffee/src/views/unit", "js/m
                     create_sinon.respondWithError(requests);
                     verifyComponents(unitView, ['loc_1', 'loc_2']);
                 });
+
+                it('calls analytics', function () {
+                    initialize(this);
+                    clickDuplicate(0);
+                    create_sinon.respondWithJson(requests, { 'locator': 'duplicated_item' });
+                    expect(window.analytics.track).toHaveBeenCalledWith(
+                        'Component: Duplicate',
+                        {
+                            'course': window.course_location_analytics,
+                            'unit_id': window.unit_location_analytics,
+                            'component_id': 'duplicated_item'
+                        }
+                    );
+                });
             });
 
             describe('createNewComponent ', function () {
@@ -146,6 +160,40 @@ define(["jquery", "underscore.string", "jasmine", "coffee/src/views/unit", "js/m
                     clickNewComponent();
                     create_sinon.respondWithError(requests);
                     verifyComponents(unitView, ['loc_1', 'loc_2']);
+                });
+
+                it('calls analytics', function () {
+                    initialize(this);
+                    clickNewComponent();
+                    create_sinon.respondWithJson(requests, { 'locator': 'new_item' });
+                    expect(window.analytics.track).toHaveBeenCalledWith(
+                        'Component: New',
+                        {
+                            'course': window.course_location_analytics,
+                            'unit_id': window.unit_location_analytics,
+                            'component_id': 'new_item'
+                        }
+                    );
+                });
+            });
+
+            describe('setVisibility', function () {
+                var changeVisibility = function () {
+                    unitView.$('.visibility-select').val('private').change();
+                };
+
+                it('calls analytics', function() {
+                    initialize(this);
+                    changeVisibility();
+                    create_sinon.respondWithJson(requests, { });
+                    expect(window.analytics.track).toHaveBeenCalledWith(
+                        'Component: Visibility',
+                        {
+                            'course': window.course_location_analytics,
+                            'unit_id': window.unit_location_analytics,
+                            'visibility': 'private'
+                        }
+                    );
                 });
             });
 
