@@ -125,4 +125,3 @@ class SearchResultFixture(DiscussionContentFixture):
 
     def get_config_data(self):
         return {"search_result": json.dumps(self.result)}
-

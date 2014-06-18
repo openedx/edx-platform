@@ -12,7 +12,8 @@ from ..pages.lms.discussion import (
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
     DiscussionUserProfilePage,
-    DiscussionTabHomePage
+    DiscussionTabHomePage,
+    DiscussionSortPreferencePage,
 )
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..fixtures.discussion import (
@@ -22,7 +23,7 @@ from ..fixtures.discussion import (
     Thread,
     Response,
     Comment,
-    SearchResult
+    SearchResult,
 )
 
 
@@ -458,3 +459,52 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.setup_corrected_text(None)
         self.page.perform_search()
         self.check_search_alert_messages([])
+
+
+class DiscussionSortPreferenceTest(UniqueCourseTest):
+    """
+    Tests for the discussion page displaying a single thread.
+    """
+
+    def setUp(self):
+        super(DiscussionSortPreferenceTest, self).setUp()
+
+        # Create a course to register for.
+        CourseFixture(**self.course_info).install()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
+        self.sort_page.visit()
+
+    def test_default_sort_preference(self):
+        """
+        Test to check the default sorting preference of user. (Default = date )
+        """
+        selected_sort = self.sort_page.get_selected_sort_preference_text()
+        self.assertEqual(selected_sort, "date")
+
+    def test_change_sort_preference(self):
+        """
+        Test that if user sorting preference is changing properly.
+        """
+        selected_sort = ""
+        for sort_type in ["votes", "comments", "date"]:
+            self.assertNotEqual(selected_sort, sort_type)
+            self.sort_page.change_sort_preference(sort_type)
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)
+
+    def test_last_preference_saved(self):
+        """
+        Test that user last preference is saved.
+        """
+        selected_sort = ""
+        for sort_type in ["votes", "comments", "date"]:
+            self.assertNotEqual(selected_sort, sort_type)
+            self.sort_page.change_sort_preference(sort_type)
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)
+            self.sort_page.refresh_page()
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)
