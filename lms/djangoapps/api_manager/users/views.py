@@ -782,10 +782,12 @@ class UsersCoursesGradesDetail(SecureAPIView):
 
         courseware_summary = grades.progress_summary(student, request, course)
         grade_summary = grades.grade(student, request, course)
+        grading_policy = course.grading_policy
 
         response_data = {
             'courseware_summary': courseware_summary,
-            'grade_summary': grade_summary
+            'grade_summary': grade_summary,
+            'grading_policy': grading_policy
         }
 
         return Response(response_data)
