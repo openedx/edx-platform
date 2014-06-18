@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 from courseware.courses import get_course
@@ -37,8 +37,8 @@ class Command(BaseCommand):
         task_number = options['task_number']
 
         if len(args) == 2:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            usage_key = course_id.make_usage_key_from_deprecated_string(args[1])
+            course_id = CourseKey.from_string(args[0])
+            usage_key = UsageKey.from_string(args[1]).map_into_course(course_id)
         else:
             print self.help
             return
@@ -51,7 +51,7 @@ class Command(BaseCommand):
 
         descriptor = modulestore().get_item(usage_key, depth=0)
         if descriptor is None:
-            print "Location {0} not found in course".format(usage_key)
+            print "Problem {0} not found in course".format(usage_key)
             return
 
         try:
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             print "\nOperation Cancelled"
 
 
-def calculate_task_statistics(students, course, location, task_number, write_to_file=True):
+def calculate_task_statistics(students, course, usage_key, task_number, write_to_file=True):
     """Print stats of students."""
 
     stats = {
@@ -79,7 +79,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
     students_with_graded_submissions = []  # pylint: disable=invalid-name
     students_with_no_state = []
 
-    student_modules = StudentModule.objects.filter(module_state_key=location, student__in=students).order_by('student')
+    student_modules = StudentModule.objects.filter(module_state_key=usage_key, student__in=students).order_by('student')
     print "Total student modules: {0}".format(student_modules.count())
 
     for index, student_module in enumerate(student_modules):
@@ -89,7 +89,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         student = student_module.student
         print "{0}:{1}".format(student.id, student.username)
 
-        module = get_module_for_student(student, location)
+        module = get_module_for_student(student, usage_key)
         if module is None:
             print "  WARNING: No state found"
             students_with_no_state.append(student)
@@ -116,7 +116,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
     print "----------------------------------"
     print "Time: {0}".format(time.strftime("%Y %b %d %H:%M:%S +0000", time.gmtime()))
     print "Course: {0}".format(course.id)
-    print "Location: {0}".format(location)
+    print "UsageKey: {0}".format(usage_key)
     print "No state: {0}".format(len(students_with_no_state))
     print "Initial State: {0}".format(stats[OpenEndedChild.INITIAL] - len(students_with_saved_answers))
     print "Saved answers: {0}".format(len(students_with_saved_answers))
@@ -125,7 +125,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
     print "----------------------------------"
 
     if write_to_file:
-        filename = "stats.{0}.{1}".format(location.course, location.name)
+        filename = "stats.{0}.{1}".format(usage_key.course_key.course, usage_key.name)
         time_stamp = time.strftime("%Y%m%d-%H%M%S")
         with open('{0}.{1}.csv'.format(filename, time_stamp), 'wb') as csv_file:
             writer = csv.writer(csv_file, delimiter=' ', quoting=csv.QUOTE_MINIMAL)

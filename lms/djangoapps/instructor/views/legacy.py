@@ -26,14 +26,15 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey, i4xEncoder
+
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
-from opaque_keys import InvalidKeyError
 from lms.lib.xblock.runtime import quote_slashes
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -76,7 +77,6 @@ from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
-from opaque_keys.edx.locations import i4xEncoder
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ def split_by_comma_and_whitespace(a_str):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
     instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
@@ -223,13 +223,13 @@ def instructor_dashboard(request, course_id):
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, get_grades=False, use_offline=use_offline)
-        datatable['title'] = _('List of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
+        datatable['title'] = _('List of students enrolled in {course_key}').format(course_key=unicode(course_key))
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
-        datatable['title'] = _('Summary Grades of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
+        datatable['title'] = _('Summary Grades of students enrolled in {course_key}').format(course_key=unicode(course_key))
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
@@ -241,17 +241,17 @@ def instructor_dashboard(request, course_id):
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
-        return return_csv('grades_{0}.csv'.format(course_key.to_deprecated_string()),
+        return return_csv('grades_{0}.csv'.format(unicode(course_key)),
                           get_student_grade_summary_data(request, course, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
-        return return_csv('grades_{0}_raw.csv'.format(course_key.to_deprecated_string()),
+        return return_csv('grades_{0}_raw.csv'.format(unicode(course_key)),
                           get_student_grade_summary_data(request, course, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
-        return return_csv('answer_dist_{0}.csv'.format(course_key.to_deprecated_string()), get_answers_distribution(request, course_key))
+        return return_csv('answer_dist_{0}.csv'.format(unicode(course_key)), get_answers_distribution(request, course_key))
 
     elif 'Dump description of graded assignments configuration' in action:
         # what is "graded assignments configuration"?
@@ -261,7 +261,7 @@ def instructor_dashboard(request, course_id):
     elif "Rescore ALL students' problem submissions" in action:
         problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
+            problem_location = UsageKey.from_string(problem_location_str).map_into_course(course_key)
             instructor_task = submit_rescore_problem_for_all_students(request, problem_location)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
@@ -275,7 +275,7 @@ def instructor_dashboard(request, course_id):
                     "rescore-all-submissions",
                     {
                         "problem": problem_location_str,
-                        "course": course_key.to_deprecated_string()
+                        "course": unicode(course_key)
                     },
                     page="idashboard"
                 )
@@ -297,7 +297,7 @@ def instructor_dashboard(request, course_id):
     elif "Reset ALL students' attempts" in action:
         problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
+            problem_location = UsageKey.from_string(problem_location_str).map_into_course(course_key)
             instructor_task = submit_reset_problem_attempts_for_all_students(request, problem_location)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
@@ -309,7 +309,7 @@ def instructor_dashboard(request, course_id):
                     "reset-all-attempts",
                     {
                         "problem": problem_location_str,
-                        "course": course_key.to_deprecated_string()
+                        "course": unicode(course_key)
                     },
                     page="idashboard"
                 )
@@ -337,7 +337,7 @@ def instructor_dashboard(request, course_id):
         else:
             problem_location_str = strip_if_string(request.POST.get('problem_for_student', ''))
             try:
-                problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
+                problem_location = UsageKey.from_string(problem_location_str).map_into_course(course_key)
             except InvalidKeyError:
                 msg += '<font color="red">{text}</font>'.format(
                     text=_('Could not find problem location "{url}".').format(
@@ -351,7 +351,7 @@ def instructor_dashboard(request, course_id):
     elif "Show Background Task History" in action:
         problem_location_str = strip_if_string(request.POST.get('problem_for_all_students', ''))
         try:
-            problem_location = course_key.make_usage_key_from_deprecated_string(problem_location_str)
+            problem_location = UsageKey.from_string(problem_location_str).map_into_course(course_key)
         except InvalidKeyError:
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Could not find problem location "{url}".').format(
@@ -371,7 +371,7 @@ def instructor_dashboard(request, course_id):
         )
         problem_location_str = strip_if_string(request.POST.get('problem_for_student', ''))
         try:
-            module_state_key = course_key.make_usage_key_from_deprecated_string(problem_location_str)
+            module_state_key = UsageKey.from_string(problem_location_str).map_into_course(course_key)
         except InvalidKeyError:
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Could not find problem location "{url}".').format(
@@ -392,8 +392,8 @@ def instructor_dashboard(request, course_id):
                     try:
                         sub_api.reset_score(
                             anonymous_id_for_user(student, course_key),
-                            course_key.to_deprecated_string(),
-                            module_state_key.to_deprecated_string(),
+                            unicode(course_key),
+                            unicode(module_state_key),
                         )
                     except sub_api.SubmissionError:
                         # Trust the submissions API to log the error
@@ -426,7 +426,7 @@ def instructor_dashboard(request, course_id):
                         event = {
                             "problem": problem_location_str,
                             "student": unique_student_identifier,
-                            "course": course_key.to_deprecated_string()
+                            "course": unicode(course_key)
                         }
                         track.views.server_track(
                             request,
@@ -455,7 +455,7 @@ def instructor_dashboard(request, course_id):
                             "student": unicode(student),
                             "problem": student_module.module_state_key,
                             "instructor": unicode(request.user),
-                            "course": course_key.to_deprecated_string()
+                            "course": unicode(course_key)
                         }
                         track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                         msg += "<font color='green'>{text}</font>".format(
@@ -484,7 +484,7 @@ def instructor_dashboard(request, course_id):
                                 {
                                     "problem": module_state_key,
                                     "student": unique_student_identifier,
-                                    "course": course_key.to_deprecated_string()
+                                    "course": unicode(course_key)
                                 },
                                 page="idashboard"
                             )
@@ -506,7 +506,7 @@ def instructor_dashboard(request, course_id):
         msg += message
         if student is not None:
             progress_url = reverse('student_progress', kwargs={
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': unicode(course_key),
                 'student_id': student.id
             })
             track.views.server_track(
@@ -515,7 +515,7 @@ def instructor_dashboard(request, course_id):
                 {
                     "student": unicode(student),
                     "instructor": unicode(request.user),
-                    "course": course_key.to_deprecated_string()
+                    "course": unicode(course_key)
                 },
                 page="idashboard"
             )
@@ -650,10 +650,10 @@ def instructor_dashboard(request, course_id):
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = _('Student profile data for course {course_id}').format(
-            course_id=course_key.to_deprecated_string()
+            course_id=unicode(course_key)
         )
         return return_csv(
-            'profiledata_{course_id}.csv'.format(course_id=course_key.to_deprecated_string()),
+            'profiledata_{course_id}.csv'.format(course_id=unicode(course_key)),
             datatable
         )
 
@@ -690,7 +690,7 @@ def instructor_dashboard(request, course_id):
 
         datatable = {'header': ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']}
         datatable['data'] = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_key, save=False)] for s in students]
-        return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
+        return return_csv(unicode(course_key).replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
     # Group management
@@ -723,14 +723,14 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_key, rolename, datatable)
         track.views.server_track(
-            request, "list-forum-admins", {"course": course_key.to_deprecated_string()}, page="idashboard"
+            request, "list-forum-admins", {"course": unicode(course_key)}, page="idashboard"
         )
 
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
         track.views.server_track(
-            request, "remove-forum-admin", {"username": uname, "course": course_key.to_deprecated_string()},
+            request, "remove-forum-admin", {"username": uname, "course": unicode(course_key)},
             page="idashboard"
         )
 
@@ -738,7 +738,7 @@ def instructor_dashboard(request, course_id):
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
         track.views.server_track(
-            request, "add-forum-admin", {"username": uname, "course": course_key.to_deprecated_string()},
+            request, "add-forum-admin", {"username": uname, "course": unicode(course_key)},
             page="idashboard"
         )
 
@@ -747,14 +747,14 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_key, rolename, datatable)
         track.views.server_track(
-            request, "list-forum-mods", {"course": course_key.to_deprecated_string()}, page="idashboard"
+            request, "list-forum-mods", {"course": unicode(course_key)}, page="idashboard"
         )
 
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
         track.views.server_track(
-            request, "remove-forum-mod", {"username": uname, "course": course_key.to_deprecated_string()},
+            request, "remove-forum-mod", {"username": uname, "course": unicode(course_key)},
             page="idashboard"
         )
 
@@ -762,7 +762,7 @@ def instructor_dashboard(request, course_id):
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
         track.views.server_track(
-            request, "add-forum-mod", {"username": uname, "course": course_key.to_deprecated_string()},
+            request, "add-forum-mod", {"username": uname, "course": unicode(course_key)},
             page="idashboard"
         )
 
@@ -771,7 +771,7 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_key, rolename, datatable)
         track.views.server_track(
-            request, "list-forum-community-TAs", {"course": course_key.to_deprecated_string()},
+            request, "list-forum-community-TAs", {"course": unicode(course_key)},
             page="idashboard"
         )
 
@@ -780,7 +780,7 @@ def instructor_dashboard(request, course_id):
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
         track.views.server_track(
             request, "remove-forum-community-TA", {
-                "username": uname, "course": course_key.to_deprecated_string()
+                "username": uname, "course": unicode(course_key)
             },
             page="idashboard"
         )
@@ -790,7 +790,7 @@ def instructor_dashboard(request, course_id):
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
         track.views.server_track(
             request, "add-forum-community-TA", {
-                "username": uname, "course": course_key.to_deprecated_string()
+                "username": uname, "course": unicode(course_key)
             },
             page="idashboard"
         )
@@ -855,7 +855,7 @@ def instructor_dashboard(request, course_id):
                 # any transaction that has been pending up to this point will also be
                 # committed.
                 email = CourseEmail.create(
-                    course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
+                    unicode(course_key), request.user, email_to_option, email_subject, html_message
                 )
 
                 # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
@@ -910,7 +910,7 @@ def instructor_dashboard(request, course_id):
         """
         url = settings.ANALYTICS_SERVER_URL + \
             u"get?aname={}&course_id={}&apikey={}".format(
-                analytics_name, course_key.to_deprecated_string(), settings.ANALYTICS_API_KEY
+                analytics_name, unicode(course_key), settings.ANALYTICS_API_KEY
             )
         try:
             res = requests.get(url)
@@ -984,8 +984,8 @@ def instructor_dashboard(request, course_id):
         fragment = html_module.render('studio_view')
         fragment = wrap_xblock(
             'LmsRuntime', html_module, 'studio_view', fragment, None,
-            extra_data={"course-id": course_key.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+            extra_data={"course-id": unicode(course_key)},
+            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id))
         )
         email_editor = fragment.content
 
@@ -1033,14 +1033,14 @@ def instructor_dashboard(request, course_id):
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key': course_key.to_deprecated_string()}),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key': unicode(course_key)}),
 
         'analytics_results': analytics_results,
         'disable_buttons': disable_buttons,
         'metrics_results': metrics_results,
     }
 
-    context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()})
+    context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
@@ -1106,7 +1106,7 @@ def _list_course_forum_members(course_key, rolename, datatable):
     # make sure datatable is set up properly for display first, before checking for errors
     datatable['header'] = [_('Username'), _('Full name'), _('Roles')]
     datatable['title'] = _('List of Forum {name}s in course {id}').format(
-        name=rolename, id=course_key.to_deprecated_string()
+        name=rolename, id=unicode(course_key)
     )
     datatable['data'] = []
     try:
@@ -1153,7 +1153,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
             msg = '<font color="red">' + _('Error: user "{username}" does not have rolename "{rolename}", cannot remove').format(username=uname, rolename=rolename) + '</font>'
         else:
             user.roles.remove(role)
-            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id.to_deprecated_string(), rolename=rolename) + '</font>'
+            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=unicode(course.id), rolename=rolename) + '</font>'
     else:
         if alreadyexists:
             msg = '<font color="red">' + _('Error: user "{username}" already has rolename "{rolename}", cannot add').format(username=uname, rolename=rolename) + '</font>'
@@ -1162,7 +1162,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
                 msg = '<font color="red">' + _('Error: user "{username}" should first be added as staff before adding as a forum administrator, cannot add').format(username=uname) + '</font>'
             else:
                 user.roles.add(role)
-                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id.to_deprecated_string(), rolename=rolename) + '</font>'
+                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=unicode(course.id), rolename=rolename) + '</font>'
 
     return msg
 
@@ -1184,7 +1184,7 @@ def _role_members_table(role, title, course_key):
     uset = role.users_with_role()
     datatable = {'header': [_('Username'), _('Full name')]}
     datatable['data'] = [[x.username, x.profile.name] for x in uset]
-    datatable['title'] = _('{title} in course {course_key}').format(title=title, course_key=course_key.to_deprecated_string())
+    datatable['title'] = _('{title} in course {course_key}').format(title=title, course_key=unicode(course_key))
     return datatable
 
 
@@ -1482,7 +1482,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
         course_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
+            path=reverse('course_root', kwargs={'course_id': unicode(course_key)})
         )
         # We can't get the url to the course's About page if the marketing site is enabled.
         course_about_url = None
@@ -1490,7 +1490,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
             course_about_url = u'{proto}://{site}{path}'.format(
                 proto=protocol,
                 site=stripped_site_name,
-                path=reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
+                path=reverse('about_course', kwargs={'course_id': unicode(course_key)})
             )
 
         # Composition of email
@@ -1840,14 +1840,14 @@ def get_background_task_table(course_key, problem_url=None, student=None, task_t
     if (history_entries.count()) == 0:
         if problem_url is None:
             msg += '<font color="red">Failed to find any background tasks for course "{course}".</font>'.format(
-                course=course_key.to_deprecated_string()
+                course=unicode(course_key)
             )
         elif student is not None:
             template = '<font color="red">' + _('Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".') + '</font>'
-            msg += template.format(course=course_key.to_deprecated_string(), problem=problem_url, student=student.username)
+            msg += template.format(course=unicode(course_key), problem=problem_url, student=student.username)
         else:
             msg += '<font color="red">' + _('Failed to find any background tasks for course "{course}" and module "{problem}".').format(
-                course=course_key.to_deprecated_string(), problem=problem_url
+                course=unicode(course_key), problem=problem_url
             ) + '</font>'
     else:
         datatable['header'] = ["Task Type",
@@ -1884,16 +1884,16 @@ def get_background_task_table(course_key, problem_url=None, student=None, task_t
             datatable['data'].append(row)
 
         if problem_url is None:
-            datatable['title'] = "{course_id}".format(course_id=course_key.to_deprecated_string())
+            datatable['title'] = "{course_id}".format(course_id=unicode(course_key))
         elif student is not None:
             datatable['title'] = "{course_id} > {location} > {student}".format(
-                course_id=course_key.to_deprecated_string(),
+                course_id=unicode(course_key),
                 location=problem_url,
                 student=student.username
             )
         else:
             datatable['title'] = "{course_id} > {location}".format(
-                course_id=course_key.to_deprecated_string(), location=problem_url
+                course_id=unicode(course_key), location=problem_url
             )
 
     return msg, datatable

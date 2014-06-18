@@ -18,7 +18,7 @@ from django.test.utils import override_settings
 from contentstore.tests.utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
 FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True
@@ -84,7 +84,7 @@ class TestGitExport(CourseTestCase):
         """
         Test several bad URLs for validation
         """
-        course_key = SlashSeparatedCourseKey('org', 'course', 'run')
+        course_key = CourseKey.from_string('org/course/run')
         with self.assertRaisesRegexp(GitExportError, str(GitExportError.URL_BAD)):
             git_export_utils.export_to_git(course_key, 'Sillyness')
 
@@ -101,7 +101,7 @@ class TestGitExport(CourseTestCase):
         """
         test_repo_path = '{}/test_repo'.format(git_export_utils.GIT_REPO_EXPORT_DIR)
         self.assertFalse(os.path.isdir(test_repo_path))
-        course_key = SlashSeparatedCourseKey('foo', 'blah', '100-')
+        course_key = CourseKey.from_string('foo/blah/100-')
         # Test bad clones
         with self.assertRaisesRegexp(GitExportError,
                                      str(GitExportError.CANNOT_PULL)):

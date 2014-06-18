@@ -33,8 +33,7 @@ from xmodule.modulestore.mixed import store_branch_setting
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.keys import UsageKey, AssetKey, CourseKey
 from xmodule.modulestore.store_utilities import clone_course, delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -52,6 +51,7 @@ from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseCreatorRole, CourseInstructorRole
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -131,7 +131,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         descriptor = store.get_items(course.id, category='vertical',)
         resp = self.client.get_html(get_url('unit_handler', descriptor[0].location))
         self.assertEqual(resp.status_code, 200)
-        _test_no_locations(self, resp)
 
         for expected in expected_types:
             self.assertIn(expected, resp.content)
@@ -157,7 +156,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         resp = self.client.get_html(get_url('unit_handler', usage_key))
         self.assertEqual(resp.status_code, 400)
-        _test_no_locations(self, resp, status_code=400)
 
     def check_edit_unit(self, test_course_name):
         _, course_items = import_from_xml(modulestore(), self.user.id, 'common/test/data/', [test_course_name])
@@ -223,7 +221,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         draft_store = modulestore()
         import_from_xml(draft_store, self.user.id, 'common/test/data/', ['simple'])
 
-        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        course_key = CourseKey.from_string('edX/simple/2012_Fall')
         html_usage_key = course_key.make_usage_key('html', 'test_html')
         course = draft_store.get_course(course_key)
         html_module = draft_store.get_item(html_usage_key)
@@ -284,7 +282,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         store = modulestore()
         import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
 
-        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        course_key = CourseKey.from_string('edX/simple/2012_Fall')
         course = store.get_course(course_key)
 
         # make sure no draft items have been returned
@@ -331,7 +329,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         module_store = modulestore()
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'])
-        course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         self.assertGreater(len(course.textbooks), 0)
 
     def test_import_polls(self):
@@ -364,14 +362,12 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
             get_url('xblock_view_handler', usage_key, kwargs={'view_name': 'container_preview'})
         )
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment when preview no longer has locations being returned.
-        # _test_no_locations(self, resp)
 
         # These are the data-ids of the xblocks contained in the vertical.
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+sample_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+separate_file_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+video_with_end_time')
-        self.assertContains(resp, 'edX+toy+2012_Fall+poll_question+T1_changemind_poll_foo_2')
+        self.assertContains(resp, 'i4x://edX/toy/video/sample_video')
+        self.assertContains(resp, 'i4x://edX/toy/video/separate_file_video')
+        self.assertContains(resp, 'i4x://edX/toy/video/video_with_end_time')
+        self.assertContains(resp, 'i4x://edX/toy/poll_question/T1_changemind_poll_foo_2')
 
     def test_delete(self):
         store = modulestore()
@@ -428,7 +424,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         module_store = modulestore()
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, verbose=True)
 
-        course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         self.assertIsNotNone(course)
 
@@ -448,7 +444,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         content = None
         try:
-            location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+            location = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.txt')
             content = content_store.find(location)
         except NotFoundError:
             pass
@@ -474,7 +470,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         This test will exercise the soft delete/restore functionality of the assets
         '''
         content_store, trash_store, thumbnail_location, _location = self._delete_asset_in_course()
-        asset_location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+        asset_location = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in store, but they should not be there any longer
         content = content_store.find(asset_location, throw_on_not_found=False)
@@ -518,7 +514,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         _, course_items = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
-        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+        location = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.txt')
         content = content_store.find(location, throw_on_not_found=False)
         thumbnail_location = content.thumbnail_location
         self.assertIsNotNone(content)
@@ -534,7 +530,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         url = reverse_course_url(
             'assets_handler',
             course.id,
-            kwargs={'asset_key_string': course.id.make_asset_key('asset', 'sample_static.txt')}
+            kwargs={'asset_key_string': unicode(course.id.make_asset_key('asset', 'sample_static.txt'))}
         )
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
@@ -551,7 +547,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(module_store, self.user.id, data_dir, ['course_info_updates'],
                         static_content_store=content_store, verbose=True)
 
-        course_id = SlashSeparatedCourseKey('edX', 'course_info_updates', '2014_T1')
+        course_id = CourseKey.from_string('edX/course_info_updates/2014_T1')
         course = module_store.get_course(course_id)
 
         self.assertIsNotNone(course)
@@ -603,7 +599,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         __, trash_store, __, _location = self._delete_asset_in_course()
 
         # make sure there's something in the trashcan
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '6.002_Spring_2012')
+        course_id = CourseKey.from_string('edX/toy/6.002_Spring_2012')
         all_assets, __ = trash_store.get_all_content_for_course(course_id)
         self.assertGreater(len(all_assets), 0)
 
@@ -711,7 +707,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'])
 
-        source_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        source_course_id = CourseKey.from_string('edX/toy/2012_Fall')
         dest_course_id = _get_course_id(course_data)
 
         # let's force a non-portable link in the clone source
@@ -761,7 +757,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
     def test_bad_contentstore_request(self):
         resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
-        _test_no_locations(self, resp, 400)
 
     def test_rewrite_nonportable_links_on_import(self):
         module_store = modulestore()
@@ -770,7 +765,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # first check a static asset link
-        course_key = SlashSeparatedCourseKey('edX', 'toy', 'run')
+        course_key = CourseKey.from_string('edX/toy/run')
         html_module_location = course_key.make_usage_key('html', 'nonportable')
         html_module = module_store.get_item(html_module_location)
         self.assertIn('/static/foo.jpg', html_module.data)
@@ -832,12 +827,12 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         # get a vertical (and components in it) to copy into an orphan sub dag
         vertical = module_store.get_item(course_id.make_usage_key('vertical', 'vertical_test'), depth=1)
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        vertical.location = vertical.location.replace(name='no_references')
+        vertical.location = vertical.location.replace(block_id='no_references')
 
         module_store.update_item(vertical, self.user.id, allow_not_found=True)
         orphan_vertical = module_store.get_item(vertical.location)
@@ -866,7 +861,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         # add the new private and new public to list of children
         sequential = module_store.get_item(course_id.make_usage_key('sequential', 'vertical_sequential'))
-        private_location_no_draft = private_vertical.location.replace(revision=MongoRevisionKey.published)
+        private_location_no_draft = private_vertical.location.for_branch(MongoRevisionKey.published)
         sequential.children.append(private_location_no_draft)
         sequential.children.append(public_vertical_location)
         module_store.update_item(sequential, self.user.id)
@@ -919,7 +914,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         )
         # import to different course id
         self.check_import(
-            module_store, root_dir, content_store, SlashSeparatedCourseKey('anotherX', 'anotherToy', 'Someday'),
+            module_store, root_dir, content_store, CourseKey.from_string('anotherX/anotherToy/Someday'),
             locked_asset_key, locked_asset_attrs
         )
 
@@ -999,7 +994,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
@@ -1029,7 +1024,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['word_cloud'])
-        course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
+        course_id = CourseKey.from_string('HarvardX/ER22x/2013_Spring')
 
         verticals = module_store.get_items(course_id, category='vertical')
 
@@ -1057,7 +1052,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         verticals = module_store.get_items(course_id, category='vertical')
 
@@ -1090,7 +1085,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'])
 
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         # Export the course
         root_dir = path(mkdtemp_clean())
@@ -1128,7 +1123,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
     def test_prefetch_children(self):
         mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         import_from_xml(modulestore(), self.user.id, 'common/test/data/', ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         wrapper = MongoCollectionFindWrapper(mongo_store.collection.find)
         mongo_store.collection.find = wrapper.find
@@ -1196,7 +1191,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         for descriptor in items:
             resp = self.client.get_html(get_url('unit_handler', descriptor.location))
             self.assertEqual(resp.status_code, 200)
-            _test_no_locations(self, resp)
 
 
 class ContentStoreTest(ContentStoreTestCase):
@@ -1475,7 +1469,6 @@ class ContentStoreTest(ContentStoreTestCase):
             status_code=200,
             html=True
         )
-        _test_no_locations(self, resp)
 
     def test_course_factory(self):
         """Test that the course factory works correctly."""
@@ -1498,7 +1491,6 @@ class ContentStoreTest(ContentStoreTestCase):
             status_code=200,
             html=True
         )
-        _test_no_locations(self, resp)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -1506,7 +1498,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-locator="location:MITx+999+Robot_Super_Course+course+Robot_Super_Course" data-course-key="slashes:MITx+999+Robot_Super_Course">',
+            '<article class="courseware-overview" data-locator="i4x://MITx/999/course/Robot_Super_Course" data-course-key="MITx/999/Robot_Super_Course">',
             status_code=200,
             html=True
         )
@@ -1522,13 +1514,12 @@ class ContentStoreTest(ContentStoreTestCase):
         }
 
         resp = self.client.ajax_post(reverse_url('xblock_handler'), section_data)
-        _test_no_locations(self, resp, html=False)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertRegexpMatches(
             data['locator'],
-            r"location:MITx\+999\+Robot_Super_Course\+chapter\+([0-9]|[a-f]){3,}$"
+            r"i4x://MITx/999/chapter/([0-9]|[a-f]){3,}$"
         )
 
     def test_capa_module(self):
@@ -1563,7 +1554,6 @@ class ContentStoreTest(ContentStoreTestCase):
                 get_url(handler, course_key, 'course_key_string')
             )
             self.assertEqual(resp.status_code, 200)
-            _test_no_locations(self, resp)
 
         _, course_items = import_from_xml(modulestore(), self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
@@ -1589,20 +1579,17 @@ class ContentStoreTest(ContentStoreTestCase):
         subsection_key = course_key.make_usage_key('sequential', 'test_sequence')
         resp = self.client.get_html(get_url('subsection_handler', subsection_key))
         self.assertEqual(resp.status_code, 200)
-        _test_no_locations(self, resp)
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')
         resp = self.client.get_html(get_url('unit_handler', unit_key))
         self.assertEqual(resp.status_code, 200)
-        _test_no_locations(self, resp)
 
         def delete_item(category, name):
             """ Helper method for testing the deletion of an xblock item. """
             item_key = course_key.make_usage_key(category, name)
             resp = self.client.delete(get_url('xblock_handler', item_key))
             self.assertEqual(resp.status_code, 204)
-            _test_no_locations(self, resp, status_code=204, html=False)
 
         # delete a component
         delete_item(category='html', name='test_html')
@@ -1645,7 +1632,7 @@ class ContentStoreTest(ContentStoreTestCase):
         module_store = modulestore()
 
         # If reimporting into the same course do not change the wiki_slug.
-        target_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        target_course_id = CourseKey.from_string('edX/toy/2012_Fall')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
@@ -1663,7 +1650,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
-        target_course_id = SlashSeparatedCourseKey('MITx', '999', '2013_Spring')
+        target_course_id = CourseKey.from_string('MITx/999/2013_Spring')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
@@ -1687,7 +1674,7 @@ class ContentStoreTest(ContentStoreTestCase):
         import_from_xml(module_store, self.user.id, 'common/test/data/', ['simple'])
         did_load_item = False
         try:
-            course_key = SlashSeparatedCourseKey('edX', 'simple', 'problem')
+            course_key = CourseKey.from_string('edX/simple/problem')
             usage_key = course_key.make_usage_key('problem', 'ps01-simple')
             module_store.get_item(usage_key)
             did_load_item = True
@@ -1805,7 +1792,6 @@ class ContentStoreTest(ContentStoreTestCase):
         Show the course overview page.
         """
         resp = self.client.get_html(get_url('course_handler', course_key, 'course_key_string'))
-        _test_no_locations(self, resp)
         return resp
 
     def test_wiki_slug(self):
@@ -1887,7 +1873,6 @@ class EntryPageTestCase(TestCase):
     def _test_page(self, page, status_code=200):
         resp = self.client.get_html(page)
         self.assertEqual(resp.status_code, status_code)
-        _test_no_locations(self, resp, status_code)
 
     def test_how_it_works(self):
         self._test_page("/howitworks")
@@ -1924,20 +1909,4 @@ def _course_factory_create_course():
 
 def _get_course_id(course_data):
     """Returns the course ID (org/number/run)."""
-    return SlashSeparatedCourseKey(course_data['org'], course_data['number'], course_data['run'])
-
-
-def _test_no_locations(test, resp, status_code=200, html=True):
-    """
-    Verifies that "i4x", which appears in old locations, but not
-    new locators, does not appear in the HTML response output.
-    Used to verify that database refactoring is complete.
-    """
-    test.assertNotContains(resp, 'i4x', status_code=status_code, html=html)
-    if html:
-        # For HTML pages, it is nice to call the method with html=True because
-        # it checks that the HTML properly parses. However, it won't find i4x usages
-        # in JavaScript blocks.
-        content = resp.content
-        hits = len(re.findall(r"(?<!jump_to/)i4x://", content))
-        test.assertEqual(hits, 0, "i4x found outside of LMS jump-to links")
+    return CourseKey.from_string("/".join([course_data['org'], course_data['number'], course_data['run']]))

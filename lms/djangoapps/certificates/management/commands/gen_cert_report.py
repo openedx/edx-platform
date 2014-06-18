@@ -10,7 +10,6 @@ from django.conf import settings
 from opaque_keys import InvalidKeyError
 from xmodule.course_module import CourseDescriptor
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from django.db.models import Count
 
@@ -48,11 +47,7 @@ class Command(BaseCommand):
         # Find all courses that have ended
 
         if options['course']:
-            try:
-                course_id = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
-                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_id = CourseKey.from_string(options['course'])
         else:
             raise CommandError("You must specify a course")
 
@@ -120,7 +115,7 @@ class Command(BaseCommand):
                        )
 
         # print the report
-        print "{0:>26}".format(course_id.to_deprecated_string()),
+        print "{0:>26}".format(unicode(course_id)),
         for heading in status_headings:
             if heading in cert_data[course_id]:
                 print "{:>16}".format(cert_data[course_id][heading]),

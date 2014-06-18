@@ -24,8 +24,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -60,11 +61,11 @@ class StartView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestVerifyView(TestCase):
+class TestVerifyView(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        self.course_key = SlashSeparatedCourseKey('Robot', '999', 'Test_Course')
+        self.course_key = CourseKey.from_string('Robot/999/Test_Course')
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(course_id=self.course_key,
                                    mode_slug="verified",
@@ -82,7 +83,7 @@ class TestVerifyView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestVerifiedView(TestCase):
+class TestVerifiedView(ModuleStoreTestCase):
     """
     Tests for VerifiedView.
     """
@@ -96,7 +97,7 @@ class TestVerifiedView(TestCase):
         """
         Test VerifiedView when there is no active verified mode for course.
         """
-        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id.to_deprecated_string()})
+        url = reverse('verify_student_verified', kwargs={"course_id": unicode(self.course_id)})
 
         verify_mode = CourseMode.mode_for_course(self.course_id, "verified")
         # Verify mode should be None.
@@ -110,7 +111,7 @@ class TestVerifiedView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestReverifyView(TestCase):
+class TestReverifyView(ModuleStoreTestCase):
     """
     Tests for the reverification views
 
@@ -156,7 +157,7 @@ class TestReverifyView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestPhotoVerificationResultsCallback(TestCase):
+class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
     """
@@ -368,12 +369,12 @@ class TestPhotoVerificationResultsCallback(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestMidCourseReverifyView(TestCase):
+class TestMidCourseReverifyView(ModuleStoreTestCase):
     """ Tests for the midcourse reverification views """
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
-        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
+        self.course_key = CourseKey.from_string("Robot/999/Test_Course")
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
         patcher = patch('student.models.tracker')
@@ -383,7 +384,7 @@ class TestMidCourseReverifyView(TestCase):
     @patch('verify_student.views.render_to_response', render_mock)
     def test_midcourse_reverify_get(self):
         url = reverse('verify_student_midcourse_reverify',
-                      kwargs={"course_id": self.course_key.to_deprecated_string()})
+                      kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url)
 
         # Check that user entering the reverify flow was logged
@@ -391,7 +392,7 @@ class TestMidCourseReverifyView(TestCase):
             'edx.course.enrollment.reverify.started',
             {
                 'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
+                'course_id': unicode(self.course_key),
                 'mode': "verified",
             }
         )
@@ -404,7 +405,7 @@ class TestMidCourseReverifyView(TestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_midcourse_reverify_post_success(self):
         window = MidcourseReverificationWindowFactory(course_id=self.course_key)
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': unicode(self.course_key)})
 
         response = self.client.post(url, {'face_image': ','})
 
@@ -413,7 +414,7 @@ class TestMidCourseReverifyView(TestCase):
             'edx.course.enrollment.reverify.submitted',
             {
                 'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
+                'course_id': unicode(self.course_key),
                 'mode': "verified",
             }
         )
@@ -433,7 +434,7 @@ class TestMidCourseReverifyView(TestCase):
             start_date=datetime.now(pytz.UTC) - timedelta(days=100),
             end_date=datetime.now(pytz.UTC) - timedelta(days=50),
         )
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': unicode(self.course_key)})
         response = self.client.post(url, {'face_image': ','})
         self.assertEquals(response.status_code, 302)
         with self.assertRaises(ObjectDoesNotExist):
@@ -455,7 +456,7 @@ class TestMidCourseReverifyView(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestReverificationBanner(TestCase):
+class TestReverificationBanner(ModuleStoreTestCase):
     """ Tests for the midcourse reverification  failed toggle banner off """
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})

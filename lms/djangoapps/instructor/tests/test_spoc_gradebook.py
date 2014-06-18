@@ -73,7 +73,7 @@ class TestGradebook(ModuleStoreTestCase):
 
         self.response = self.client.get(reverse(
             'spoc_gradebook',
-            args=(self.course.id.to_deprecated_string(),)
+            args=(unicode(self.course.id),)
         ))
 
     def test_response_code(self):

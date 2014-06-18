@@ -7,8 +7,8 @@ import requests
 from datetime import datetime
 import dateutil.parser
 from lazy import lazy
+from xblock.core import XBlock
 
-from opaque_keys.edx.locations import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -550,10 +550,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, Location):
-                self.wiki_slug = self.location.course
-            elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.id.offering or self.display_name
+            if self.id.deprecated:
+                self.wiki_slug = self.id.course
+            else:
+                self.wiki_slug = u"{}.{}".format(self.id.course, self.id.run)
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),

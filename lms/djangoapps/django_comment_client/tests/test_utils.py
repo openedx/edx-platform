@@ -42,7 +42,7 @@ class DictionaryTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class AccessUtilsTestCase(TestCase):
+class AccessUtilsTestCase(ModuleStoreTestCase):
     def setUp(self):
         self.course = CourseFactory.create()
         self.course_id = self.course.id
@@ -123,8 +123,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                 reverse(
                     "jump_to",
                     kwargs={
-                        "course_id": self.course.id.to_deprecated_string(),
-                        "location": discussion.location.to_deprecated_string()
+                        "course_id": unicode(self.course.id),
+                        "location": unicode(discussion.location)
                     }
                 )
             )

@@ -65,7 +65,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", c4x_link_base, text, str(exc))
 
     jump_to_link_base = u'/courses/{course_key_string}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
-        course_key_string=source_course_id.to_deprecated_string(), course_key=source_course_id
+        course_key_string=unicode(source_course_id), course_key=source_course_id
     )
     try:
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
@@ -80,7 +80,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = u'/courses/{}/'.format(source_course_id.to_deprecated_string())
+            generic_courseware_link_base = u'/courses/{}/'.format(unicode(source_course_id))
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception as exc:  # pylint: disable=broad-except
             logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))
@@ -124,8 +124,8 @@ def clone_course(modulestore, contentstore, source_course_id, dest_course_id, us
     dest_modules = modulestore.get_items(dest_course_id)
 
     for module in dest_modules:
-        if module.location.category == 'course' or (
-                module.location.category == 'about' and module.location.name == 'overview'
+        if module.location.block_type == 'course' or (
+            module.location.block_type == 'about' and module.location.name == 'overview'
         ):
             continue
         # only course and about overview allowed

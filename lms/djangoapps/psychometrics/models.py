@@ -15,7 +15,7 @@ class PsychometricData(models.Model):
 
     Links to instances of StudentModule, but only those for capa problems.
 
-    Note that StudentModule.module_state_key is a :class:`Location` instance.
+    Note that StudentModule.module_state_key is a :class:`.UsageKey` instance.
 
     checktimes is extracted from tracking logs, or added by capa module via psychometrics callback.
     """

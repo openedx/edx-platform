@@ -9,10 +9,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
-from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 
 class LMSLinksTestCase(TestCase):
@@ -61,12 +61,12 @@ class LMSLinksTestCase(TestCase):
 
     def get_about_page_link(self):
         """ create mock course and return the about page link """
-        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        course_key = CourseKey.from_string('mitX/101/test')
         return utils.get_lms_link_for_about_page(course_key)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        course_key = CourseKey.from_string('mitX/101/test')
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
@@ -160,7 +160,7 @@ class ExtraPanelTabTestCase(TestCase):
                 self.assertEqual(actual_tabs, expected_tabs)
 
 
-class CourseImageTestCase(TestCase):
+class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
     def test_get_image_url(self):
@@ -239,7 +239,7 @@ class XBlockVisibilityTestCase(TestCase):
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
-        location = Location('edX', 'visibility', '2012_Fall', 'vertical', name)
+        location = UsageKey.from_string('i4x://edX/visibility/vertical/{}'.format(name))
 
         vertical = modulestore().create_xmodule(location)
         vertical.start = start_date

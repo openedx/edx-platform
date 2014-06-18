@@ -1,5 +1,6 @@
 import logging
 
+from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -52,7 +53,7 @@ def generate_problem_url(problem_url_parts, base_course_url):
             # This is the course_key. We need to turn it into its deprecated
             # form.
             if i == 0:
-                part = part.to_deprecated_string()
+                part = unicode(part)
             # This is placed between the course id and the rest of the url.
             if i == 1:
                 problem_url += "courseware/"
@@ -159,7 +160,7 @@ class StudentProblemList(object):
         for problem in self.problem_list:
             try:
                 # Try to load the problem.
-                usage_key = self.course_id.make_usage_key_from_deprecated_string(problem['location'])
+                usage_key = UsageKey.from_string(problem['location']).map_into_course(self.course_id)
                 problem_url_parts = search.path_to_location(modulestore(), usage_key)
             except (ItemNotFoundError, NoPathToItem):
                 # If the problem cannot be found at the location received from the grading controller server,

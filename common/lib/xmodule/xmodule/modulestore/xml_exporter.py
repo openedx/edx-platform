@@ -4,10 +4,11 @@ Methods for exporting course data to XML
 
 import logging
 import lxml.etree
+from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore import EdXJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.mixed import store_branch_setting
 from fs.osfs import OSFS
@@ -107,7 +108,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     # and index here since the XML modulestore cannot load draft modules
     draft_verticals = modulestore.get_items(
         course_key,
-        category='vertical',
+        block_type='vertical',
         revision=ModuleStoreEnum.RevisionOption.draft_only
     )
     if len(draft_verticals) > 0:
@@ -121,7 +122,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
             if parent_loc is not None:
                 logging.debug('parent_loc = {0}'.format(parent_loc))
                 if parent_loc.category in DIRECT_ONLY_CATEGORIES:
-                    draft_vertical.xml_attributes['parent_sequential_url'] = parent_loc.to_deprecated_string()
+                    draft_vertical.xml_attributes['parent_sequential_url'] = unicode(parent_loc)
                     sequential = modulestore.get_item(parent_loc)
                     index = sequential.children.index(draft_vertical.location)
                     draft_vertical.xml_attributes['index_in_children_list'] = str(index)

@@ -250,4 +250,4 @@ class CourseAuthorization(models.Model):
         if self.email_enabled:
             not_en = ""
         # pylint: disable=no-member
-        return u"Course '{}': Instructor Email {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+        return u"Course '{}': Instructor Email {}Enabled".format(unicode(self.course_id), not_en)

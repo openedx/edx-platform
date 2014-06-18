@@ -100,7 +100,7 @@ textarea {
           %>
           % for cil in logs:
               <%
-                  course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None
+                  course_id_string = unicode(cil.course_id) if cil.course_id else None
 
                   # Appropriate datetime string for current locale and timezone
                   date = get_time_display(cil.created.replace(tzinfo=UTC),

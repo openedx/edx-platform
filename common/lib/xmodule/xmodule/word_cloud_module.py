@@ -233,7 +233,7 @@ class WordCloudModule(WordCloudFields, XModule):
         """Template rendering."""
         context = {
             'element_id': self.location.html_id(),
-            'element_class': self.location.category,
+            'element_class': self.location.block_type,
             'ajax_url': self.system.ajax_url,
             'num_inputs': self.num_inputs,
             'submitted': self.submitted

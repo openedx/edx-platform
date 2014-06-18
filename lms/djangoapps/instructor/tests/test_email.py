@@ -18,7 +18,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from mock import patch
 
 from bulk_email.models import CourseAuthorization
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -35,7 +35,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 
@@ -116,14 +116,14 @@ class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     Check for email view on the new instructor dashboard
     """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
         # Create instructor account
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_key.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course_key)})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 

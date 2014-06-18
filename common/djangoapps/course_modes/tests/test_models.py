@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from datetime import datetime, timedelta
 import pytz
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
@@ -19,7 +19,7 @@ class CourseModeModelTest(TestCase):
     """
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
+        self.course_key = CourseKey.from_string('Test/TestCourse/TestCourseRun')
         CourseMode.objects.all().delete()
 
     def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices='', currency='usd'):
@@ -111,5 +111,5 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
+        modes = CourseMode.modes_for_course(CourseKey.from_string('TestOrg/TestCourse/TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)

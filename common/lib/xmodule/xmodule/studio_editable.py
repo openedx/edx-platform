@@ -27,7 +27,7 @@ class StudioEditableModule(object):
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
-                'id': child.location.to_deprecated_string(),
+                'id': unicode(child.location),
                 'content': rendered_child.content
             })
 

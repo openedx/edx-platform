@@ -265,7 +265,7 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course.
         """
-        return "slashes:{org}+{number}+{run}".format(**self._course_dict)
+        return "{org}/{number}/{run}".format(**self._course_dict)
 
     @property
     def _course_location(self):

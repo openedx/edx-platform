@@ -67,7 +67,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
         self.course_key = self.course.id
-        settings.COURSE_LISTINGS['default'] = [self.course_key.to_deprecated_string()]
+        settings.COURSE_LISTINGS['default'] = [unicode(self.course_key)]
         course_mode = CourseMode(course_id=self.course_key,
                                  mode_slug="honor",
                                  mode_display_name="honor cert",
@@ -268,4 +268,4 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         Fill in gap in test coverage.  __unicode__ method of PaidCourseRegistrationAnnotation
         """
-        self.assertEqual(unicode(self.annotation), u'{} : {}'.format(self.course_key.to_deprecated_string(), self.TEST_ANNOTATION))
+        self.assertEqual(unicode(self.annotation), u'{} : {}'.format(unicode(self.course_key), self.TEST_ANNOTATION))

@@ -15,7 +15,6 @@ from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.test_video import VideoDescriptorTestBase
 
-
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from .test_video_handlers import TestVideo

@@ -9,7 +9,6 @@ from instructor.views.legacy import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 from django.core.management.base import BaseCommand
@@ -43,12 +42,7 @@ class Command(BaseCommand):
 
         request = DummyRequest()
         # parse out the course into a coursekey
-        try:
-            course_key = CourseKey.from_string(course_id)
-        # if it's not a new-style course key, parse it from an old-style
-        # course key
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
 
         try:
             course = get_course_by_id(course_key)

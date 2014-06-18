@@ -247,7 +247,7 @@ class TestWordCloud(BaseTestXmodule):
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
-            'element_class': self.item_descriptor.location.category,
+            'element_class': self.item_descriptor.location.block_type,
             'element_id': self.item_descriptor.location.html_id(),
             'num_inputs': 5,  # default value
             'submitted': False  # default value

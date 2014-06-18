@@ -87,14 +87,14 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             # access to the user context, and this will only be seen by staff
             error_msg = 'Error not available'
 
-        if location.category == 'error':
+        if location.block_type == 'error':
             location = location.replace(
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
                 # but url_names aren't guaranteed to be unique between descriptor types,
                 # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
                 # it will be written out with the original url_name.
-                name=hashlib.sha1(contents.encode('utf8')).hexdigest()
+                block_id=hashlib.sha1(contents.encode('utf8')).hexdigest()
             )
 
         # real metadata stays in the content, but add a display name

@@ -5,12 +5,12 @@ from static_replace import (replace_static_urls, replace_course_urls,
                             _url_replace_regex)
 from mock import patch, Mock
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
-COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
+COURSE_KEY = CourseKey.from_string('org/course/run')
 STATIC_SOURCE = '"/static/file.png"'
 
 

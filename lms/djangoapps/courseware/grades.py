@@ -178,7 +178,7 @@ def _grade(student, request, course, keep_raw_scores):
     # scores that were registered with the submissions API, which for the moment
     # means only openassessment (edx-ora2)
     submissions_scores = sub_api.get_scores(
-        course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id)
+        unicode(course.id), anonymous_id_for_user(student, course.id)
     )
 
     totaled_scores = {}
@@ -202,7 +202,7 @@ def _grade(student, request, course, keep_raw_scores):
             # API. If scores exist, we have to calculate grades for this section.
             if not should_grade_section:
                 should_grade_section = any(
-                    descriptor.location.to_deprecated_string() in submissions_scores
+                    unicode(descriptor.location) in submissions_scores
                     for descriptor in section['xmoduledescriptors']
                 )
 
@@ -346,7 +346,7 @@ def _progress_summary(student, request, course):
             # This student must not have access to the course.
             return None
 
-    submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+    submissions_scores = sub_api.get_scores(unicode(course.id), anonymous_id_for_user(student, course.id))
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
@@ -423,7 +423,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
     if not user.is_authenticated():
         return (None, None)
 
-    location_url = problem_descriptor.location.to_deprecated_string()
+    location_url = unicode(problem_descriptor.location)
     if location_url in scores_cache:
         return scores_cache[location_url]
 

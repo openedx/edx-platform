@@ -8,12 +8,12 @@ from glob import glob
 from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 
 
@@ -60,13 +60,13 @@ class TestXMLModuleStore(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'], load_error_modules=False)
 
         # Look up the errors during load. There should be none.
-        errors = modulestore.get_course_errors(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
+        errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
         assert errors == []
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
     def test_tilde_files_ignored(self, _fake_glob):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['tilde'], load_error_modules=False)
-        about_location = SlashSeparatedCourseKey('edX', 'tilde', '2012_Fall').make_usage_key(
+        about_location = CourseKey.from_string('edX/tilde/2012_Fall').make_usage_key(
             'about', 'index',
         )
         about_module = modulestore.get_item(about_location)
@@ -87,7 +87,7 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertEqual(len(course_locations), 0)
 
         # now set toy course to share the wiki with simple course
-        toy_course = store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        toy_course = store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
 
         course_locations = store.get_courses_for_wiki('toy')
@@ -96,7 +96,7 @@ class TestXMLModuleStore(unittest.TestCase):
         course_locations = store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            self.assertIn(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
+            self.assertIn(UsageKey.from_string('i4x://edX/{}/course/2012_Fall'.format(course_number)), course_locations)
 
     def test_has_course(self):
         """
@@ -104,6 +104,6 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         check_has_course_method(
             XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple']),
-            SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
-            locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
+            CourseKey.from_string('edX/toy/2012_Fall'),
+            locator_key_fields=CourseLocator.KEY_FIELDS
         )

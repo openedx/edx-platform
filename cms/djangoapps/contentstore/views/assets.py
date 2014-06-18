@@ -172,7 +172,7 @@ def _upload_asset(request, course_key):
 
     # compute a 'filename' which is similar to the location formatting, we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
-    # here. We're just imposing the Location string formatting expectations to
+    # here. We're just imposing the AssetKey string formatting expectations to
     # keep things a bit more consistent
     upload_file = request.FILES['file']
     filename = upload_file.name
@@ -278,7 +278,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
-    asset_url = location.to_deprecated_string()
+    asset_url = unicode(location)
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
@@ -286,7 +286,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'url': asset_url,
         'external_url': external_url,
         'portable_url': StaticContent.get_static_path_from_location(location),
-        'thumbnail': thumbnail_location.to_deprecated_string() if thumbnail_location is not None else None,
+        'thumbnail': unicode(thumbnail_location) if thumbnail_location is not None else None,
         'locked': locked,
         # Needed for Backbone delete/update.
         'id': unicode(location)

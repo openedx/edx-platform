@@ -13,12 +13,11 @@ from opaque_keys import InvalidKeyError
 from . import ModuleStoreWriteBase
 from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from opaque_keys.edx.locator import CourseLocator, Locator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 import itertools
 
 
@@ -43,11 +42,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
             try:
                 self.mappings[CourseKey.from_string(course_id)] = store_name
             except InvalidKeyError:
-                try:
-                    self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
-                except InvalidKeyError:
-                    log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
-                    continue
+                log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
+                continue
 
         for store_settings in stores:
             key = store_settings['NAME']
@@ -55,7 +51,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if is_xml:
                 # restrict xml to only load courses in mapping
                 store_settings['OPTIONS']['course_ids'] = [
-                    course_key.to_deprecated_string()
+                    unicode(course_key)
                     for course_key, store_key in self.mappings.iteritems()
                     if store_key == key
                 ]
@@ -151,7 +147,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
-                For some modulestores, ``name`` is another commonly provided key (Location based stores)
+                For some modulestores, ``name`` is another commonly provided key
                 For some modulestores,
                 you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
                 useless) or a function accepting one arg to do inequality
@@ -183,18 +179,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
             for course in store.get_courses():
                 course_id = self._clean_course_id_for_mapping(course.id)
                 if course_id not in courses:
-                    if has_locators and isinstance(course_id, SlashSeparatedCourseKey):
-
-                        # see if a locator version of course is in the result
-                        try:
-                            course_locator = loc_mapper().translate_location_to_course_locator(course_id)
-                            if course_locator in courses:
-                                continue
-                        except ItemNotFoundError:
-                            # if there's no existing mapping, then the course can't have been in split
-                            pass
-
-                    # course is indeed unique. save it in result
                     courses[course_id] = course
 
         return courses.values()
@@ -275,13 +259,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id=None, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the course run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -293,7 +278,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store {}".format(store))
 
-        return store.create_course(org, offering, user_id, fields, **kwargs)
+        return store.create_course(org, course, run, user_id, fields, **kwargs)
 
     def create_item(self, course_or_parent_loc, category, user_id=None, **kwargs):
         """

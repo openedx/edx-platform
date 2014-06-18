@@ -3,14 +3,13 @@ Test the loc mapper store
 """
 import unittest
 import uuid
-from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import MongoRevisionKey
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 import bson.son
 
 
@@ -56,14 +55,15 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         org = 'foo_org'
         course1 = 'bar_course'
         run = 'baz_run'
-        loc_mapper().create_map_entry(SlashSeparatedCourseKey(org, course1, run))
+        loc_mapper().create_map_entry(CourseKey.from_string("/".join([org, course1, run])))
         # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
             '_id': _construct_course_son(org, course1, run)
         })
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['org'], org)
-        self.assertEqual(entry['offering'], '{}.{}'.format(course1, run))
+        self.assertEqual(entry['course'], course1)
+        self.assertEqual(entry['run'], run)
         self.assertEqual(entry['draft_branch'], ModuleStoreEnum.BranchName.draft)
         self.assertEqual(entry['prod_branch'], ModuleStoreEnum.BranchName.published)
         self.assertEqual(entry['block_map'], {})
@@ -72,7 +72,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         # oldname: {category: newname}
         block_map = {'abc123': {'problem': 'problem2'}}
         loc_mapper().create_map_entry(
-            SlashSeparatedCourseKey(org, course2, run),
+            CourseKey.from_string("/".join([org, course2, run])),
             'foo_org.geek_dept',
             'quux_course.baz_run',
             'wip',
@@ -83,7 +83,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         })
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['org'], 'foo_org.geek_dept')
-        self.assertEqual(entry['offering'], '{}.{}'.format(course2, run))
+        self.assertEqual(entry['course'], course2)
+        self.assertEqual(entry['run'], run)
         self.assertEqual(entry['draft_branch'], 'wip')
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
@@ -95,14 +96,15 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         org = u'foo_org'
         course = u'bar_course'
         run = u'baz_run'
-        course_location = SlashSeparatedCourseKey(org, course, run)
+        course_location = CourseKey.from_string("/".join([org, course, run]))
         loc_mapper().create_map_entry(course_location)
         # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
             '_id': loc_mapper()._construct_course_son(course_location)
         })
         self.assertIsNotNone(entry, 'Entry not found in loc_mapper')
-        self.assertEqual(entry['offering'], u'{1}.{2}'.format(org, course, run))
+        self.assertEqual(entry['course'], course)
+        self.assertEqual(entry['run'], run)
 
         # now delete course location from loc_mapper and cache and test that course location no longer
         # exists in loca_mapper and cache
@@ -119,9 +121,9 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         cached_value = loc_mapper()._get_course_location_from_cache(course_location)
         self.assertIsNone(cached_value, 'Entry found in cache')
 
-    def translate_n_check(self, location, org, offering, block_id, branch, add_entry=False):
+    def translate_n_check(self, location, org, course, run, block_id, branch, add_entry=False):
         """
-        Request translation, check org, offering, block_id, and branch
+        Request translation, check org, course, run, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
             location,
@@ -129,7 +131,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.org, org)
-        self.assertEqual(prob_locator.offering, offering)
+        self.assertEqual(prob_locator.course, course)
+        self.assertEqual(prob_locator.run, run)
         self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
 
@@ -138,7 +141,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             published=(branch == ModuleStoreEnum.BranchName.published),
         )
         self.assertEqual(course_locator.org, org)
-        self.assertEqual(course_locator.offering, offering)
+        self.assertEqual(course_locator.course, course)
+        self.assertEqual(course_locator.run, run)
         self.assertEqual(course_locator.branch, branch)
 
     def test_translate_location_read_only(self):
@@ -149,7 +153,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         org = 'foo_org'
         course = 'bar_course'
         run = 'baz_run'
-        slash_course_key = SlashSeparatedCourseKey(org, course, run)
+        slash_course_key = CourseKey.from_string("/".join([org, course, run]))
         with self.assertRaises(ItemNotFoundError):
             _ = loc_mapper().translate_location(
                 Location(org, course, run, 'problem', 'abc123'),
@@ -179,7 +183,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
                 add_entry_if_missing=False
             )
         test_no_cat_locn = test_problem_locn.replace(category=None)
-        with self.assertRaises(InvalidLocationError):
+        with self.assertRaises(InvalidKeyError):
             loc_mapper().translate_location(
                 slash_course_key.make_usage_key(None, 'abc123'), test_no_cat_locn, False, False
             )
@@ -199,7 +203,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         test_delta_new_org = '{}.geek_dept'.format(org)
         test_delta_new_offering = '{}.{}'.format(course, run)
         loc_mapper().create_map_entry(
-            SlashSeparatedCourseKey(org, course, run),
+            CourseKey.from_string("/".join([org, course, run])),
             test_delta_new_org, test_delta_new_offering,
             block_map=distractor_block_map
         )
@@ -234,7 +238,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         delta_new_org = '{}.geek_dept'.format(org)
         run = 'delta_run'
         delta_new_offering = '{}.{}'.format(course, run)
-        delta_course_locn = SlashSeparatedCourseKey(org, course, run)
+        delta_course_locn = CourseKey.from_string("/".join([org, course, run]))
         loc_mapper().create_map_entry(
             delta_course_locn,
             delta_new_org, delta_new_offering,
@@ -277,7 +281,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertIsNone(prob_location, 'found entry in empty map table')
 
         loc_mapper().create_map_entry(
-            SlashSeparatedCourseKey(org, course, run),
+            CourseKey.from_string("/".join([org, course, run])),
             new_style_org, new_style_offering,
             block_map={
                 'abc123': {'problem': 'problem2'},
@@ -291,7 +295,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
         # test get_course keyword
         prob_location = loc_mapper().translate_locator_to_location(prob_locator, get_course=True)
-        self.assertEqual(prob_location, SlashSeparatedCourseKey(org, course, run))
+        self.assertEqual(prob_location, CourseKey.from_string("/".join([org, course, run])))
         # explicit branch
         prob_locator = prob_locator.for_branch(ModuleStoreEnum.BranchName.draft)
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
@@ -333,7 +337,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         delta_run = 'delta_run'
         new_style_offering = '{}.{}'.format(course, delta_run)
         loc_mapper().create_map_entry(
-            SlashSeparatedCourseKey(org, course, delta_run),
+            CourseKey.from_string("/".join([org, course, delta_run])),
             new_style_org, new_style_offering,
             block_map={'abc123': {'problem': 'problem3'}}
         )

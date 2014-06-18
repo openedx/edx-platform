@@ -59,7 +59,7 @@ class Note(models.Model):
         Returns the absolute url for the note object.
         """
         # pylint: disable=no-member
-        kwargs = {'course_id': self.course_id.to_deprecated_string(), 'note_id': str(self.pk)}
+        kwargs = {'course_id': unicode(self.course_id), 'note_id': str(self.pk)}
         return reverse('notes_api_note', kwargs=kwargs)
 
     def as_dict(self):

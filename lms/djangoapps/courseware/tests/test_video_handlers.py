@@ -8,6 +8,7 @@ import textwrap
 import json
 from datetime import timedelta
 from webob import Request
+from opaque_keys.edx.locator import AssetLocator
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -22,7 +23,6 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
-from opaque_keys.edx.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0
@@ -65,7 +65,7 @@ def _clear_assets(location):
 
     assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
-        asset_location = AssetLocation._from_deprecated_son(asset["_id"], location.course_key.run)
+        asset_location = AssetLocator._from_deprecated_son(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
         store.delete(asset_location)
 

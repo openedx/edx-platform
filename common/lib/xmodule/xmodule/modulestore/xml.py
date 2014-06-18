@@ -21,13 +21,13 @@ from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.tabs import CourseTabList
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
-from . import ModuleStoreReadBase, Location, ModuleStoreEnum
+from . import ModuleStoreReadBase, ModuleStoreEnum
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
@@ -94,8 +94,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Things to try to get a name, in order  (key, cleaning function, remove key after reading?)
                 lookups = [('url_name', id, False),
                            ('slug', id, True),
-                           ('name', Location.clean, False),
-                           ('display_name', Location.clean, False)]
+                           ('name', BlockUsageLocator.clean, False),
+                           ('display_name', BlockUsageLocator.clean, False)]
 
                 url_name = None
                 for key, clean, remove in lookups:
@@ -246,7 +246,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
 class CourseLocationGenerator(IdGenerator):
     """
-    IdGenerator for Location-based definition ids and usage ids
+    IdGenerator for UsageKey-based definition ids and usage ids
     based within a course
     """
     def __init__(self, course_id):
@@ -270,7 +270,7 @@ def _make_usage_key(course_key, value):
     """
     if isinstance(value, UsageKey):
         return value
-    return course_key.make_usage_key_from_deprecated_string(value)
+    return UsageKey.from_string(value).map_into_course(course_key)
 
 
 def _convert_reference_fields_to_keys(xblock):  # pylint: disable=invalid-name
@@ -341,7 +341,7 @@ class ParentTracker(object):
         """
         Add a parent of child location to the set of parents.  Duplicate calls have no effect.
 
-        child and parent must be :class:`.Location` instances.
+        child and parent must be :class:`.UsageKey` instances.
         """
         self._parents[child] = parent
 
@@ -391,7 +391,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         if course_ids is not None:
-            course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
+            course_ids = (CourseKey.from_string(course_id) for course_id in course_ids)
+            course_ids = [course_key for course_key in course_ids if self._validate_course_key(course_key)]
 
         self.load_error_modules = load_error_modules
 
@@ -403,7 +404,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.default_class = class_
 
         self.parent_trackers = defaultdict(ParentTracker)
-        self.reference_type = Location
+        self.reference_type = BlockUsageLocator
 
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
@@ -423,6 +424,36 @@ class XMLModuleStore(ModuleStoreReadBase):
                                   os.path.exists(self.data_dir / d / "course.xml")])
         for course_dir in course_dirs:
             self.try_load_course(course_dir, course_ids)
+
+    def _validate_course_key(self, course_key):
+        """
+        Check that course_key is valid for this ModuleStore.
+
+        Args:
+            course_key (:class:`opaque_keys.edx.keys.CourseKey`): The key to validate.
+
+        Returns:
+            True if the key is valid, False otherwise.
+        """
+        if not course_key.deprecated:
+            log.warning("XMLModuleStore only supports deprecated course key formats, not %s", course_key)
+            return False
+        return True
+
+    def _validate_usage_key(self, usage_key):
+        """
+        Check that usage_key is valid for this ModuleStore.
+
+        Args:
+            usage_key (:class:`opaque_keys.edx.keys.UsageKey`): The key to validate.
+
+        Returns:
+            True if the key is valid, False otherwise.
+        """
+        if not usage_key.deprecated or not self._validate_course_key(usage_key.course_key):
+            log.warning("XMLModuleStore only supports deprecated usage key formats, not %s", usage_key)
+            return False
+        return True
 
     def try_load_course(self, course_dir, course_ids=None):
         '''
@@ -536,14 +567,14 @@ class XMLModuleStore(ModuleStoreReadBase):
                 policy = {}
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
-                    url_name = Location.clean(course_data.get('name'))
+                    url_name = BlockUsageLocator.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
                 else:
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
 
-            course_id = SlashSeparatedCourseKey(org, course, url_name)
+            course_id = CourseLocator(org, course, url_name, deprecated=True)
             if course_ids is not None and course_id not in course_ids:
                 return None
 
@@ -618,7 +649,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             dirname, field, file_suffix = file_path.split('/')[-1].split('.')
             if file_suffix == 'json' and field not in DEFAULT_CONTENT_FIELDS:
                 slug = os.path.splitext(os.path.basename(dirname))[0]
-                location = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                location = course_descriptor.scope_ids.usage_id.replace(block_type=category, block_id=slug)
                 with open(file_path) as field_content_file:
                     field_data = json.load(field_content_file)
                     data_content = {field: field_data}
@@ -661,7 +692,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                                 data_content['category'] = category
                     else:
                         slug = os.path.splitext(os.path.basename(filepath))[0]
-                        loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                        loc = course_descriptor.scope_ids.usage_id.replace(block_type=category, block_id=slug)
                         # html file with html data content
                         html = f.read().decode('utf-8')
                         try:
@@ -701,7 +732,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         Returns True if location exists in this ModuleStore.
         """
-        return usage_key in self.modules[usage_key.course_key]
+        return self._validate_usage_key(usage_key) and usage_key in self.modules[usage_key.course_key]
 
     def get_item(self, usage_key, depth=0):
         """
@@ -715,6 +746,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         usage_key: a UsageKey that matches the module we are looking for.
         """
+        if not self._validate_usage_key(usage_key):
+            raise ItemNotFoundError(usage_key)
+
         try:
             return self.modules[usage_key.course_key][usage_key]
         except KeyError:
@@ -739,21 +773,24 @@ class XMLModuleStore(ModuleStoreReadBase):
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
-                For this modulestore, ``name`` is another commonly provided key (Location based stores)
+                For this modulestore, ``name`` is another commonly provided key
                 (but not revision!)
                 For this modulestore,
                 you can search dates by providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
+        if not self._validate_course_key(course_id):
+            return []
+
         items = []
 
-        category = kwargs.pop('category', None)
-        name = kwargs.pop('name', None)
+        block_type = kwargs.pop('block_type', kwargs.pop('category', None))
+        block_id = kwargs.pop('block_id', kwargs.pop('name', None))
 
         def _block_matches_all(mod_loc, module):
-            if category and mod_loc.category != category:
+            if block_type and mod_loc.block_type != block_type:
                 return False
-            if name and mod_loc.name != name:
+            if block_id and mod_loc.block_id != block_id:
                 return False
             return all(
                 self._block_matches(module, fields or {})
@@ -793,6 +830,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
         '''
+        if not self._validate_usage_key(location):
+            raise ItemNotFoundError(location)
+
         if not self.parent_trackers[location.course_key].is_known(location):
             raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
 

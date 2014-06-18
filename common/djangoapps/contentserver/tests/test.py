@@ -14,9 +14,9 @@ from django.test.utils import override_settings
 
 from student.models import CourseEnrollment
 
+from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
 
@@ -39,18 +39,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.contentstore = contentstore()
 
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
         import_from_xml(modulestore(), '**replace_user**', 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
 
         # A locked asset
         self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
-        self.url_locked = self.locked_asset.to_deprecated_string()
+        self.url_locked = unicode(self.locked_asset)
 
         # An unlocked asset
         self.unlocked_asset = self.course_key.make_asset_key('asset', 'another_static.txt')
-        self.url_unlocked = self.unlocked_asset.to_deprecated_string()
+        self.url_unlocked = unicode(self.unlocked_asset)
 
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
 

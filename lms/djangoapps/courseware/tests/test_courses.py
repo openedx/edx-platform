@@ -19,7 +19,7 @@ from courseware.courses import (
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 CMS_BASE_TEST = 'testcms'
@@ -39,9 +39,9 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/slashes:org+num+name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/org/num/name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/location:org+num+name+course+name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/i4x://org/num/course/name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
 
@@ -157,7 +157,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
-    toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    toy_course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
     def test_get_course_info_section_render(self):
         course = get_course_by_id(self.toy_course_key)

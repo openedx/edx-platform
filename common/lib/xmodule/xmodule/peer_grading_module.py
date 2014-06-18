@@ -18,6 +18,7 @@ from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingS
 from open_ended_grading_classes import combined_open_ended_rubric
 from django.utils.timezone import UTC
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from opaque_keys.edx.keys import UsageKey
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +197,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return self.peer_grading()
         else:
             # b/c handle_ajax expects serialized data payload and directly calls peer_grading
-            return self.peer_grading_problem({'location': self.link_to_location.to_deprecated_string()})['html']
+            return self.peer_grading_problem({'location': unicode(self.link_to_location)})['html']
 
     def handle_ajax(self, dispatch, data):
         """
@@ -265,7 +266,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
-                        self.system.location.to_deprecated_string(), self.system.anonymous_student_id
+                        unicode(self.system.location), self.system.anonymous_student_id
                     ))
                 return None
             count_graded = response['count_graded']
@@ -617,7 +618,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = self.link_to_location
 
         elif data.get('location') is not None:
-            problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
+            problem_location = UsageKey.from_string(data.get('location')).map_into_course(self.course_id)
 
         module = self._find_corresponding_module_for_location(problem_location)
 

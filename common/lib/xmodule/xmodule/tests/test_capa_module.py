@@ -17,6 +17,7 @@ import unittest
 from mock import Mock, patch
 import webob
 from webob.multidict import MultiDict
+from opaque_keys.edx.keys import UsageKey
 
 import xmodule
 from xmodule.tests import DATA_DIR
@@ -24,7 +25,6 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
-from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -101,14 +101,7 @@ class CapaFactory(object):
 
             attempts: also added to instance state.  Will be converted to an int.
         """
-        location = Location(
-            "edX",
-            "capa_test",
-            "2012_Fall",
-            "problem",
-            "SampleProblem{0}".format(cls.next_num()),
-            None
-        )
+        location = UsageKey.from_string('i4x://edX/capa_test/problem/SampleProblem{}'.format(cls.next_num()))
         if xml is None:
             xml = cls.sample_problem_xml
         field_data = {'data': xml}

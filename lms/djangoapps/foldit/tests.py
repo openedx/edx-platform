@@ -13,7 +13,7 @@ from student.tests.factories import UserFactory
 
 from datetime import datetime, timedelta
 from pytz import UTC
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -24,8 +24,8 @@ class FolditTestCase(TestCase):
         self.factory = RequestFactory()
         self.url = reverse('foldit_ops')
 
-        self.course_id = SlashSeparatedCourseKey('course', 'id', '1')
-        self.course_id2 = SlashSeparatedCourseKey('course', 'id', '2')
+        self.course_id = CourseKey.from_string('course/id/1')
+        self.course_id2 = CourseKey.from_string('course/id/2')
 
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()

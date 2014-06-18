@@ -21,7 +21,8 @@ from unittest.case import SkipTest
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from mock import Mock, patch
 
@@ -133,7 +134,7 @@ class CourseEndingTest(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class DashboardTest(TestCase):
+class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
@@ -243,8 +244,8 @@ class EnrollInCourseTest(TestCase):
 
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
-        course_id_partial = SlashSeparatedCourseKey("edX", "Test101", None)
+        course_id = CourseKey.from_string("edX/Test101/2013")
+        course_id_partial = CourseLocator('edX', 'Test101', None, deprecated=True)
 
         # Test basic enrollment
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
@@ -297,7 +298,7 @@ class EnrollInCourseTest(TestCase):
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.activated',
             {
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': unicode(course_key),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
@@ -309,7 +310,7 @@ class EnrollInCourseTest(TestCase):
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.deactivated',
             {
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': unicode(course_key),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
@@ -319,7 +320,7 @@ class EnrollInCourseTest(TestCase):
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseKey.from_string("edX/Test101/2013")
 
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
@@ -335,7 +336,7 @@ class EnrollInCourseTest(TestCase):
 
     def test_enrollment_by_email(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseKey.from_string("edX/Test101/2013")
 
         CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
@@ -372,8 +373,8 @@ class EnrollInCourseTest(TestCase):
 
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id1 = SlashSeparatedCourseKey("edX", "Test101", "2013")
-        course_id2 = SlashSeparatedCourseKey("MITx", "6.003z", "2012")
+        course_id1 = CourseKey.from_string("edX/Test101/2013")
+        course_id2 = CourseKey.from_string("MITx/6.003z/2012")
 
         CourseEnrollment.enroll(user, course_id1)
         self.assert_enrollment_event_was_emitted(user, course_id1)
@@ -394,7 +395,7 @@ class EnrollInCourseTest(TestCase):
 
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseKey.from_string("edX/Test101/2013")
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
         # Creating an enrollment doesn't actually enroll a student
@@ -531,7 +532,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     def test_change_enrollment_add_to_cart(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id.to_deprecated_string(),
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': unicode(self.course.id),
                                                                        'enrollment_action': 'add_to_cart'})
         request.user = self.user
         response = change_enrollment(request)
@@ -542,7 +543,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class AnonymousLookupTable(TestCase):
+class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions
     """

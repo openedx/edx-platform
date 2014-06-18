@@ -19,10 +19,6 @@ class OverSpecificationError(Exception):
     pass
 
 
-class InvalidLocationError(Exception):
-    pass
-
-
 class NoPathToItem(Exception):
     pass
 

@@ -1,6 +1,8 @@
 """
 Tests of edX Studio runtime functionality
 """
+from opaque_keys.edx.keys import UsageKey
+
 from urlparse import urlparse
 
 from mock import Mock
@@ -13,6 +15,7 @@ class TestHandlerUrl(TestCase):
 
     def setUp(self):
         self.block = Mock()
+        self.block.scope_ids.usage_id = UsageKey.from_string('i4x://org/course/category/name')
 
     def test_trailing_charecters(self):
         self.assertFalse(handler_url(self.block, 'handler').endswith('?'))

@@ -72,7 +72,7 @@ class StaticBookTest(ModuleStoreTestCase):
         Automatically provides the course id.
 
         """
-        kwargs['course_id'] = self.course.id.to_deprecated_string()
+        kwargs['course_id'] = unicode(self.course.id)
         url = reverse(url_name, kwargs=kwargs)
         return url
 

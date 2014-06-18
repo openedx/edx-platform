@@ -263,7 +263,7 @@ class LTIModuleTest(LogicTest):
 
     def test_lis_result_sourcedid(self):
         expected_sourcedId = u':'.join(urllib.quote(i) for i in (
-            self.system.course_id.to_deprecated_string(),
+            unicode(self.system.course_id),
             self.xmodule.get_resource_link_id(),
             self.user_id
         ))
@@ -432,4 +432,4 @@ class LTIModuleTest(LogicTest):
         """
         Tests that LTI parameter context_id is equal to course_id.
         """
-        self.assertEqual(self.system.course_id.to_deprecated_string(), self.xmodule.context_id)
+        self.assertEqual(unicode(self.system.course_id), self.xmodule.context_id)

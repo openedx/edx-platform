@@ -22,12 +22,12 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name
-course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
+course_id = CourseKey.from_string(u'edX/test_course/test')
 location = partial(course_id.make_usage_key, u'problem')
 
 
@@ -42,7 +42,7 @@ class UserProfileFactory(StudentUserProfileFactory):
 
 class InstructorFactory(UserFactory):
     """
-    Given a course Location, returns a User object with instructor
+    Given a CourseKey, returns a User object with instructor
     permissions for `course`.
     """
     last_name = "Instructor"
@@ -56,7 +56,7 @@ class InstructorFactory(UserFactory):
 
 class StaffFactory(UserFactory):
     """
-    Given a course Location, returns a User object with staff
+    Given a CourseKey, returns a User object with staff
     permissions for `course`.
     """
     last_name = "Staff"
@@ -70,7 +70,7 @@ class StaffFactory(UserFactory):
 
 class BetaTesterFactory(UserFactory):
     """
-    Given a course Location, returns a User object with beta-tester
+    Given a CourseKey, returns a User object with beta-tester
     permissions for `course`.
     """
     last_name = "Beta-Tester"
@@ -84,7 +84,7 @@ class BetaTesterFactory(UserFactory):
 
 class OrgStaffFactory(UserFactory):
     """
-    Given a course Location, returns a User object with org-staff
+    Given a CourseKey, returns a User object with org-staff
     permissions for `course`.
     """
     last_name = "Org-Staff"
@@ -98,7 +98,7 @@ class OrgStaffFactory(UserFactory):
 
 class OrgInstructorFactory(UserFactory):
     """
-    Given a course Location, returns a User object with org-instructor
+    Given a CourseKey, returns a User object with org-instructor
     permissions for `course`.
     """
     last_name = "Org-Instructor"
@@ -127,7 +127,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
+    course_id = CourseKey.from_string("MITx/999/Robot_Super_Course")
     state = None
     grade = None
     max_grade = None

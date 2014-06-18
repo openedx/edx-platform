@@ -2,7 +2,7 @@
 from south.v2 import DataMigration
 from xmodule.modulestore.django import loc_mapper, modulestore
 import re
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 import logging
 from django.db.models.query_utils import Q
@@ -81,9 +81,9 @@ class Migration(DataMigration):
                             {"_id.category": "course", "_id.course": mongo_query}, fields=["_id"]
                         ):
                             mongo_id_dict = mongo_entry['_id']
-                            course_key = SlashSeparatedCourseKey(
+                            course_key = CourseKey.from_string("/".join([
                                 mongo_id_dict['org'], mongo_id_dict['course'], mongo_id_dict['name']
-                            )
+                            ]))
                             _migrate_users(course_key, role)
 
 

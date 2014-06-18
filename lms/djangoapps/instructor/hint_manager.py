@@ -20,7 +20,7 @@ from courseware.models import XModuleUserStateSummaryField
 import courseware.module_render as module_render
 import courseware.model_data as model_data
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -29,7 +29,7 @@ def hint_manager(request, course_id):
     """
     The URL landing function for all calls to the hint manager, both POST and GET.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     try:
         get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:
@@ -166,7 +166,7 @@ def delete_hints(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
-        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
+        problem_key = UsageKey.from_string(problem_id).map_into_course(course_id)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
         this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
@@ -194,7 +194,7 @@ def change_votes(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk, new_votes = request.POST.getlist(key)
-        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
+        problem_key = UsageKey.from_string(problem_id).map_into_course(course_id)
         this_problem = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)
         problem_dict = json.loads(this_problem.value)
         # problem_dict[answer][pk] points to a [hint_text, #votes] pair.
@@ -214,7 +214,7 @@ def add_hint(request, course_id, field):
     """
 
     problem_id = request.POST['problem']
-    problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
+    problem_key = UsageKey.from_string(problem_id).map_into_course(course_id)
     answer = request.POST['answer']
     hint_text = request.POST['hint']
 
@@ -261,7 +261,7 @@ def approve(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
-        problem_key = course_id.make_usage_key_from_deprecated_string(problem_id)
+        problem_key = UsageKey.from_string(problem_id).map_into_course(course_id)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
         problem_in_mod = XModuleUserStateSummaryField.objects.get(field_name=field, usage_id=problem_key)

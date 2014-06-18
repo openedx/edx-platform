@@ -9,7 +9,7 @@ from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from django.utils.timezone import UTC
 
 
@@ -33,7 +33,7 @@ class DummySystem(ImportSystem):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[],
                                   load_error_modules=load_error_modules)
-        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
+        course_id = CourseKey.from_string("/".join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()

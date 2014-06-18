@@ -413,7 +413,7 @@ class CombinedOpenEndedV1Module():
         :param message: A message to put in the log.
         :return: None
         """
-        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  It has been reset, and you now have a new attempt. {2}".format(self.system.anonymous_student_id, self.location.to_deprecated_string(), message)
+        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  It has been reset, and you now have a new attempt. {2}".format(self.system.anonymous_student_id, unicode(self.location), message)
         self.current_task_number = 0
         self.student_attempts = 0
         self.old_task_states.append(self.task_states)

@@ -6,7 +6,6 @@ from importlib import import_module
 from collections import namedtuple
 
 from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -15,7 +14,7 @@ from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDja
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 from django.conf import settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -122,11 +121,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
-        if default == 'split':
-            offering = course_key.offering.replace('/', '.')
-        else:
-            offering = course_key.offering
-        course = self.store.create_course(course_key.org, offering)
+        course = self.store.create_course(course_key.org, course_key.course, course_key.run)
         category = self.writable_chapter_location.category
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
@@ -215,7 +210,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         # convert to CourseKeys
         self.course_locations = {
-            course_id: SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id: CourseKey.from_string(course_id)
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         # and then to the root UsageKey
@@ -223,17 +218,13 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+        self.fake_location = BlockUsageLocator(CourseLocator('foo', 'bar', 'slowly', branch='published'), 'vertical', 'baz')
         self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
-            category='chapter', name='Overview'
+            block_type='chapter', block_id='Overview'
         )
-
-        # get Locators and set up the loc mapper if app is Locator based
-        if default == 'split':
-            self.fake_location = loc_mapper().translate_location(self.fake_location)
 
         self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
 
@@ -255,7 +246,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         )
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type(
-            SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
+            CourseKey.from_string('foo/bar/2012_Fall')), mongo_ms_type
         )
 
     @ddt.data('draft', 'split')
@@ -266,7 +257,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         # try negative cases
         self.assertFalse(self.store.has_item(
-            self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
+            self.course_locations[self.XML_COURSEID1].replace(block_id='not_findable', block_type='problem')
         ))
         self.assertFalse(self.store.has_item(self.fake_location))
 
@@ -279,7 +270,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # try negative cases
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(
-                self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
+                self.course_locations[self.XML_COURSEID1].replace(block_id='not_findable', block_type='problem')
             )
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.fake_location)
@@ -290,7 +281,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         for course_locn in self.course_locations.itervalues():  # pylint: disable=maybe-no-member
             locn = course_locn.course_key
             # NOTE: use get_course if you just want the course. get_items is expensive
-            modules = self.store.get_items(locn, category='course')
+            modules = self.store.get_items(locn, block_type='course')
             self.assertEqual(len(modules), 1)
             self.assertEqual(modules[0].location, course_locn)
 
@@ -366,7 +357,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
-            xml_store.create_course("org", "course/run", 999)
+            xml_store.create_course("org", "course", "run", 999)
 
     @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):
@@ -470,7 +461,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         if default_ms == 'split':
             self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
         else:
-            self.assertEqual(found_orphans, [orphan.location.to_deprecated_string()])
+            self.assertEqual(found_orphans, [unicode(orphan.location)])
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):

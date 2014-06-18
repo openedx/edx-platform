@@ -11,7 +11,6 @@ from mock import Mock, patch
 from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
@@ -19,7 +18,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
@@ -36,7 +35,7 @@ class DummySystem(ImportSystem):
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
-        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
+        course_id = CourseKey.from_string("/".join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()
@@ -344,7 +343,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print("Checking {0}".format(node.location.to_deprecated_string()))
+            print("Checking {0}".format(unicode(node.location)))
             self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
                 check_for_key(key, c, value)
@@ -384,9 +383,9 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'two_toys'])
 
-        location = Location("edX", "toy", "2012_Fall", "video", "Welcome", None)
+        location = CourseKey.from_string("edX/toy/2012_Fall").make_usage_key('video', "Welcome")
         toy_video = modulestore.get_item(location)
-        location_two = Location("edX", "toy", "TT_2012_Fall", "video", "Welcome", None)
+        location_two = CourseKey.from_string("edX/toy/TT_2012_Fall").make_usage_key('video', "Welcome")
         two_toy_video = modulestore.get_item(location_two)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")
@@ -459,7 +458,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        toy_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         course = modulestore.get_course(toy_id)
         chapters = course.get_children()
@@ -520,7 +519,7 @@ class ImportTestCase(BaseCourseTestCase):
         '''
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
 
-        sa_id = SlashSeparatedCourseKey("edX", "gst_test", "2012_Fall")
+        sa_id = CourseKey.from_string("edX/gst_test/2012_Fall")
         location = sa_id.make_usage_key("graphical_slider_tool", "sample_gst")
         gst_sample = modulestore.get_item(location)
         render_string_from_sample_gst_xml = """
@@ -550,7 +549,7 @@ class ImportTestCase(BaseCourseTestCase):
         """
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        toy_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         course = modulestore.get_course(toy_id)
 

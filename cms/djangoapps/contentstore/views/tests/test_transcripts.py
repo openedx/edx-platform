@@ -164,7 +164,7 @@ class TestUploadtranscripts(Basetranscripts):
         self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "file" form data.')
 
     def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
+        # Test for raising `InvalidKeyError` exception.
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
@@ -384,7 +384,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.assertEqual(resp.status_code, 404)
 
     def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
+        # Test for raising `InvalidKeyError` exception.
         link = reverse('download_transcripts')
         resp = self.client.get(link, {'locator': 'BAD_LOCATOR'})
         self.assertEqual(resp.status_code, 404)
@@ -606,7 +606,7 @@ class TestChecktranscripts(Basetranscripts):
         self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
     def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
+        # Test for raising `InvalidKeyError` exception.
         link = reverse('check_transcripts')
         data = {
             'locator': '',

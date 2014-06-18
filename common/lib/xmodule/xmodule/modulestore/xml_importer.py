@@ -1,23 +1,26 @@
 import logging
 import os
 import mimetypes
-from path import path
 import json
+from path import path
 
-from .xml import XMLModuleStore, ImportSystem, ParentTracker
-from xblock.runtime import KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleDescriptor
+import xblock
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+from xblock.runtime import KvsFieldData, DictKeyValueStore
+
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
-from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
-from .store_utilities import rewrite_nonportable_content_links
-import xblock
+from xmodule.x_module import XModuleDescriptor
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.exceptions import InvalidLocationError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
+
+from .inheritance import own_metadata
+from .store_utilities import rewrite_nonportable_content_links
+from .xml import XMLModuleStore, ImportSystem, ParentTracker
 
 log = logging.getLogger(__name__)
 
@@ -170,9 +173,9 @@ def import_from_xml(
         # Creates a new course if it doesn't already exist
         if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
             try:
-                store.create_course(dest_course_id.org, dest_course_id.offering)
-            except InvalidLocationError:
-                # course w/ same org and course exists 
+                store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run)
+            except InvalidKeyError:
+                # course w/ same org and course exists
                 log.debug(
                     "Skipping import of course with id, {0},"
                     "since it collides with an existing one".format(dest_course_id)
@@ -327,7 +330,7 @@ def _import_module_and_update_references(
         source_course_id, dest_course_id,
         do_import_static=True, runtime=None):
 
-    logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
+    logging.debug(u'processing import of module {}...'.format(unicode(module.location)))
 
     if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
@@ -340,8 +343,8 @@ def _import_module_and_update_references(
 
     # Move the module to a new course
     new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
-    if new_usage_key.category == 'course':
-        new_usage_key = new_usage_key.replace(name=dest_course_id.run)
+    if new_usage_key.block_type == 'course':
+        new_usage_key = new_usage_key.replace(block_id=dest_course_id.run)
     new_module = store.create_xmodule(new_usage_key, runtime=runtime)
 
     def _convert_reference_fields_to_new_namespace(reference):
@@ -485,7 +488,7 @@ def _import_course_draft(
                     # aka sequential), so we have to replace the location.name
                     # with the XML filename that is part of the pack
                     fn, fileExtension = os.path.splitext(filename)
-                    descriptor.location = descriptor.location.replace(name=fn)
+                    descriptor.location = descriptor.location.replace(block_id=fn)
 
                     index = int(descriptor.xml_attributes['index_in_children_list'])
                     if index in drafts:
@@ -505,18 +508,18 @@ def _import_course_draft(
                         # Update the module's location to DRAFT revision
                         # We need to call this method (instead of updating the location directly)
                         # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module.location.replace(revision=MongoRevisionKey.draft))
+                        _update_module_location(module, module.location.for_branch(MongoRevisionKey.draft))
 
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
                         # filtered out from the non-draft store export
-                        if module.location.category == 'vertical':
-                            non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
+                        if module.location.block_type == 'vertical':
+                            non_draft_location = module.location.for_branch(MongoRevisionKey.published)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
-                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
+                            seq_location = UsageKey.from_string(sequential_url).map_into_course(course_key)
 
                             # IMPORTANT: Be sure to update the sequential
                             # in the NEW namespace
@@ -557,7 +560,7 @@ def check_module_metadata_editability(module):
     we can't support editing. However we always allow 'display_name'
     and 'xml_attributes'
     '''
-    allowed = allowed_metadata_by_category(module.location.category)
+    allowed = allowed_metadata_by_category(module.location.block_type)
     if '*' in allowed:
         # everything is allowed
         return 0
@@ -571,7 +574,7 @@ def check_module_metadata_editability(module):
         print(
             ": found non-editable metadata on {url}. "
             "These metadata keys are not supported = {keys}".format(
-                url=module.location.to_deprecated_string(), keys=illegal_keys
+                url=unicode(module.location), keys=illegal_keys
             )
         )
 
@@ -582,7 +585,7 @@ def validate_no_non_editable_metadata(module_store, course_id, category):
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
-        if module.location.category == category:
+        if module.location.block_type == category:
             err_cnt = err_cnt + check_module_metadata_editability(module)
 
     return err_cnt
@@ -595,19 +598,19 @@ def validate_category_hierarchy(
     parents = []
     # get all modules of parent_category
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == parent_category:
+        if module.location.block_type == parent_category:
             parents.append(module)
 
     for parent in parents:
         for child_loc in parent.children:
-            if child_loc.category != expected_child_category:
+            if child_loc.block_type != expected_child_category:
                 err_cnt += 1
                 print(
                     "ERROR: child {child} of parent {parent} was expected to be "
                     "category of {expected} but was {actual}".format(
                         child=child_loc, parent=parent.location,
                         expected=expected_child_category,
-                        actual=child_loc.category
+                        actual=child_loc.block_type
                     )
                 )
 
@@ -651,7 +654,7 @@ def validate_course_policy(module_store, course_id):
     # is there a reliable way to get the module location just given the course_id?
     warn_cnt = 0
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == 'course':
+        if module.location.block_type == 'course':
             if not module._field_data.has(module, 'rerandomize'):
                 warn_cnt += 1
                 print(
@@ -777,7 +780,7 @@ def _update_module_location(module, new_location):
 
     Args:
         module (XModuleMixin): The module to update.
-        new_location (Location): The new location of the module.
+        new_location (UsageKey): The new usage_key of the module.
 
     Returns:
         None

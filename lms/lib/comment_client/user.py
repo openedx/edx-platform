@@ -86,7 +86,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
-        params = {'course_id': self.course_id.to_deprecated_string()}
+        params = {'course_id': unicode(self.course_id)}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -102,7 +102,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
-        params = {'course_id': self.course_id.to_deprecated_string()}
+        params = {'course_id': unicode(self.course_id)}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -119,7 +119,7 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = self.course_id.to_deprecated_string()
+            retrieve_params['course_id'] = unicode(self.course_id)
         try:
             response = perform_request(
                 'get',

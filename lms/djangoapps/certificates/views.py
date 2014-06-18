@@ -12,7 +12,7 @@ from certificates.models import certificate_status_for_student, CertificateStatu
 from certificates.queue import XQueueCertInterface
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def request_certificate(request):
             xqci = XQueueCertInterface()
             username = request.user.username
             student = User.objects.get(username=username)
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
+            course_key = CourseKey.from_string(request.POST.get('course_id'))
             course = modulestore().get_course(course_key, depth=2)
 
             status = certificate_status_for_student(student, course_key)['status']
@@ -60,7 +60,7 @@ def update_certificate(request):
         xqueue_header = json.loads(request.POST.get('xqueue_header'))
 
         try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
+            course_key = CourseKey.from_string(xqueue_body['course_id'])
 
             cert = GeneratedCertificate.objects.get(
                 user__username=xqueue_body['username'],

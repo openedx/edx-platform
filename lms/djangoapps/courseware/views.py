@@ -23,6 +23,8 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
 from markupsafe import escape
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from courseware import grades
 from courseware.access import has_access
@@ -44,10 +46,8 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
-from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger("edx.courseware")
 
@@ -108,7 +108,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
 
     context = dict([
         ('toc', toc),
-        ('course_id', course.id.to_deprecated_string()),
+        ('course_id', unicode(course.id)),
         ('csrf', csrf(request)['csrf_token']),
         ('due_date_display_format', course.due_date_display_format)
     ] + template_imports.items())
@@ -174,7 +174,7 @@ def redirect_to_course_position(course_module, content_depth):
     the first child.
 
     """
-    urlargs = {'course_id': course_module.id.to_deprecated_string()}
+    urlargs = {'course_id': unicode(course_module.id)}
     chapter = get_current_child(course_module, min_depth=content_depth)
     if chapter is None:
         # oops.  Something bad has happened.
@@ -263,7 +263,7 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user  # keep just one instance of User
     course = get_course_with_access(user, 'load', course_key, depth=2)
@@ -271,8 +271,8 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
-        return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+        log.debug(u'User %s tried to view course %s but is not enrolled', user, unicode(course.location))
+        return redirect(reverse('about_course', args=[unicode(course_key)]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -284,7 +284,7 @@ def index(request, course_id, chapter=None, section=None,
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
-            return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+            return redirect(reverse('about_course', args=[unicode(course_key)]))
 
         studio_url = get_studio_url(course_key, 'course')
 
@@ -334,7 +334,7 @@ def index(request, course_id, chapter=None, section=None,
             # User may be trying to access a chapter that isn't live yet
             if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                 log.debug('staff masq as student: no chapter %s' % chapter)
-                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+                return redirect(reverse('courseware', args=[unicode(course.id)]))
             raise Http404
 
         if section is not None:
@@ -344,7 +344,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
-                    return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+                    return redirect(reverse('courseware', args=[unicode(course.id)]))
                 raise Http404
 
             ## Allow chromeless operation
@@ -400,7 +400,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
                 raise Http404
             prev_section_url = reverse('courseware_section', kwargs={
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': unicode(course_key),
                 'chapter': chapter_descriptor.url_name,
                 'section': prev_section.url_name
             })
@@ -460,7 +460,7 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     items = modulestore().get_items(course_key, name=module_id)
 
     if len(items) == 0:
@@ -471,10 +471,10 @@ def jump_to_id(request, course_id, module_id):
     if len(items) > 1:
         log.warning(
             u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
+                module_id, course_id, request.META.get("HTTP_REFERER", ""), unicode(items[0].location)
             ))
 
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    return jump_to(request, course_id, unicode(items[0].location))
 
 
 @ensure_csrf_cookie
@@ -488,8 +488,8 @@ def jump_to(request, course_id, location):
     has access, and what they should see.
     """
     try:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        usage_key = course_key.make_usage_key_from_deprecated_string(location)
+        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(location).map_into_course(course_key)
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
@@ -503,13 +503,13 @@ def jump_to(request, course_id, location):
     # args provided by the redirect.
     # Rely on index to do all error handling and access control.
     if chapter is None:
-        return redirect('courseware', course_id=course_key.to_deprecated_string())
+        return redirect('courseware', course_id=unicode(course_key))
     elif section is None:
-        return redirect('courseware_chapter', course_id=course_key.to_deprecated_string(), chapter=chapter)
+        return redirect('courseware_chapter', course_id=unicode(course_key), chapter=chapter)
     elif position is None:
-        return redirect('courseware_section', course_id=course_key.to_deprecated_string(), chapter=chapter, section=section)
+        return redirect('courseware_section', course_id=unicode(course_key), chapter=chapter, section=section)
     else:
-        return redirect('courseware_position', course_id=course_key.to_deprecated_string(), chapter=chapter, section=section, position=position)
+        return redirect('courseware_position', course_id=unicode(course_key), chapter=chapter, section=section, position=position)
 
 
 @ensure_csrf_cookie
@@ -519,7 +519,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
@@ -528,7 +528,7 @@ def course_info(request, course_id):
 
     context = {
         'request': request,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': unicode(course_key),
         'cache': None,
         'course': course,
         'staff_access': staff_access,
@@ -547,7 +547,7 @@ def static_tab(request, course_id, tab_slug):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
     tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
@@ -578,7 +578,7 @@ def syllabus(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
 
@@ -614,16 +614,16 @@ def course_about(request, course_id):
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):
         raise Http404
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course_key, 'settings/details')
 
     if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id.to_deprecated_string()])
+        course_target = reverse('info', args=[unicode(course.id)])
     else:
-        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+        course_target = reverse('about_course', args=[unicode(course.id)])
 
     show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
@@ -641,7 +641,7 @@ def course_about(request, course_id):
             in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key)
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-            reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
+            reg_url=reverse('register_user'), course_id=unicode(course.id))
 
     # see if we have already filled up all allowed enrollments
     is_course_full = CourseEnrollment.is_course_full(course)
@@ -667,22 +667,22 @@ def mktg_course_about(request, course_id):
     This is the button that gets put into an iframe on the Drupal site
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     try:
         course = get_course_with_access(request.user, 'see_exists', course_key)
     except (ValueError, Http404) as e:
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response(
-            'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
+            'courseware/mktg_coming_soon.html', {'course_id': unicode(course_key)}
         )
 
     registered = registered_for_course(course, request.user)
 
     if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id.to_deprecated_string()])
+        course_target = reverse('info', args=[unicode(course.id)])
     else:
-        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+        course_target = reverse('about_course', args=[unicode(course.id)])
 
     allow_registration = has_access(request.user, 'enroll', course)
 
@@ -709,7 +709,7 @@ def progress(request, course_id, student_id=None):
     there are unanticipated errors.
     """
     with grades.manual_transaction():
-        return _progress(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), student_id)
+        return _progress(request, CourseKey.from_string(course_id), student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -787,12 +787,12 @@ def submission_history(request, course_id, student_username, location):
     StudentModuleHistory records.
     """
     try:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid course id.')))
 
     try:
-        usage_key = course_key.make_usage_key_from_deprecated_string(location)
+        usage_key = UsageKey.from_string(location).map_into_course(course_key)
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 
@@ -833,7 +833,7 @@ def submission_history(request, course_id, student_username, location):
         'history_entries': history_entries,
         'username': student.username,
         'location': location,
-        'course_id': course_key.to_deprecated_string()
+        'course_id': unicode(course_key)
     }
 
     return render_to_response('courseware/submission_history.html', context)
@@ -906,7 +906,7 @@ def get_course_lti_endpoints(request, course_id):
         (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
     """
     try:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
         return HttpResponse(status=404)
 

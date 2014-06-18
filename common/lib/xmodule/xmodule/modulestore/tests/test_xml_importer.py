@@ -6,10 +6,9 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, ScopeIds
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import _import_module_and_update_references
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.tests import DATA_DIR
 from uuid import uuid4
 import unittest
@@ -132,7 +131,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = UsageKey.from_string('i4x://org/import/category/stubxblock')
 
         # Explicitly set the content and settings fields
         self.xblock.test_content_field = "Explicitly set"
@@ -140,7 +139,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.xblock.save()
 
         # Move to different runtime w/ different course id
-        target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
+        target_location_namespace = CourseKey.from_string("org/course/run")
         new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),
@@ -171,13 +170,13 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_default_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = UsageKey.from_string('i4x://org/import/category/stubxblock')
 
         # Do NOT set any values, so the fields should use the defaults
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = UsageKey.from_string('i4x://org/course/category/stubxblock')
         new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),
@@ -205,11 +204,11 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_inherited_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = UsageKey.from_string('i4x://org/import/category/stubxblock')
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = UsageKey.from_string('i4x://org/course/category/stubxblock')
         new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),

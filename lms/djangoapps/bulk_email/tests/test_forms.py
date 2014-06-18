@@ -17,7 +17,7 @@ from mock import patch
 
 from bulk_email.models import CourseAuthorization
 from bulk_email.forms import CourseAuthorizationAdminForm
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -39,7 +39,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Initially course shouldn't be authorized
         self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
         # Test authorizing the course, which should totally work
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': unicode(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
         self.assertTrue(form.is_valid())
@@ -52,7 +52,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Initially course shouldn't be authorized
         self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
         # Test authorizing the course, which should totally work
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': unicode(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
         self.assertTrue(form.is_valid())
@@ -61,7 +61,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
 
         # Now make a new course authorization with the same course id that tries to turn email off
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': False}
+        form_data = {'course_id': unicode(self.course.id), 'email_enabled': False}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should not work because course_id field is unique
         self.assertFalse(form.is_valid())
@@ -78,15 +78,15 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_typo(self):
         # Munge course id
-        bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), '', self.course.id.run + '_typo')
+        bad_id = u'Broken{}/{}/{}_typo'.format(self.course.id.org, self.course.id.course, self.course.id.run)
 
-        form_data = {'course_id': bad_id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': bad_id, 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
         msg = u'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id.to_deprecated_string())
+        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
         msg += 'Please recheck that you have supplied a valid course id.'
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
@@ -130,17 +130,17 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_xml_course_authorization(self):
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
         # Assert this is an XML course
         self.assertEqual(modulestore().get_modulestore_type(course_id), ModuleStoreEnum.Type.xml)
 
-        form_data = {'course_id': course_id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': unicode(course_id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
         msg = u"Course Email feature is only available for courses authored in Studio. "
-        msg += u'"{0}" appears to be an XML backed course.'.format(course_id.to_deprecated_string())
+        msg += u'"{0}" appears to be an XML backed course.'.format(unicode(course_id))
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):

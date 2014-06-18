@@ -5,6 +5,7 @@ from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTabList, WikiTab
 from contentstore.utils import reverse_course_url
@@ -193,7 +194,7 @@ class TabsPageTests(CourseTestCase):
 
 
 
-class PrimitiveTabEdit(TestCase):
+class PrimitiveTabEdit(ModuleStoreTestCase):
     """Tests for the primitive tab edit data manipulations"""
 
     def test_delete(self):

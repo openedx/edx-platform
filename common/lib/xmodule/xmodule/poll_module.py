@@ -95,7 +95,7 @@ class PollModule(PollFields, XModule):
         """Renders parameters to template."""
         params = {
                   'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
+                  'element_class': self.location.block_type,
                   'ajax_url': self.system.ajax_url,
                   'configuration_json': self.dump_poll(),
                   }

@@ -27,14 +27,14 @@ blocks for edX courses. This change simplifies the way that the application
 identifies the course content internally. This change does not affect how you
 author content.
 
-In edX Studio, URL formats have changed for all courses. If you previously bookmarked a page in Studio, that bookmark will no longer work. You must update the URL. 
+In edX Studio, URL formats have changed for all courses. If you previously bookmarked a page in Studio, that bookmark will no longer work. You must update the URL.
 
 Following is a sample of this format change:
 
 * Old URL: ``https://studio.edx.org/course/OrganizationX.Econ101.2014_T1/branch/draft/block/2014_T1``
 
-* New URL: ``https://studio.edx.org/course/slashes:OrganizationX+Econ101+2014_T1``
-  
+* New URL: ``https://studio.edx.org/course/OrganizationX/Econ101/2014_T1`` or ``https://studio.edx.org/course/course-locator:OrganizationX+Econ101+2014_T1``
+
 This change does not affect student-visible URLs.
 
 In the edX LMS, the only change is that to reset attempts or rescore student

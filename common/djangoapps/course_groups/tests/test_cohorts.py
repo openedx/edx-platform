@@ -9,7 +9,7 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
                                    is_commentable_cohorted, get_cohort_by_name)
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 
@@ -85,7 +85,7 @@ class TestCohorts(django.test.TestCase):
         Make sure that course is reloaded every time--clear out the modulestore.
         """
         clear_existing_modulestores()
-        self.toy_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.toy_course_key = CourseKey.from_string("edX/toy/2012_Fall")
 
     def test_get_cohort(self):
         """
@@ -194,8 +194,8 @@ class TestCohorts(django.test.TestCase):
             self.assertLess(num_users, 50)
 
     def test_get_course_cohorts(self):
-        course1_key = SlashSeparatedCourseKey('a', 'b', 'c')
-        course2_key = SlashSeparatedCourseKey('e', 'f', 'g')
+        course1_key = CourseKey.from_string('a/b/c')
+        course2_key = CourseKey.from_string('e/f/g')
 
         # add some cohorts to course 1
         cohort = CourseUserGroup.objects.create(name="TestCohort",

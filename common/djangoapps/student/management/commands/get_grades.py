@@ -9,7 +9,6 @@ from django.core.management.base import BaseCommand, CommandError
 import os
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.contrib.auth.models import User
 from optparse import make_option
 import datetime
@@ -72,12 +71,7 @@ class Command(BaseCommand):
 
         # parse out the course into a coursekey
         if options['course']:
-            try:
-                course_key = CourseKey.from_string(options['course'])
-            # if it's not a new-style course key, parse it from an old-style
-            # course key
-            except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_key = CourseKey.from_string(options['course'])
 
         print "Fetching enrolled students for {0}".format(course_key)
         enrolled_students = User.objects.filter(

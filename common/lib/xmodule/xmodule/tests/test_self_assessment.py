@@ -2,11 +2,11 @@ from datetime import datetime
 import json
 import unittest
 from mock import Mock, MagicMock
-from webob.multidict import MultiDict
+from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
+from webob.multidict import MultiDict
 from xblock.fields import ScopeIds
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
-from opaque_keys.edx.locations import Location
 from lxml import etree
 
 from . import get_test_system
@@ -30,7 +30,7 @@ class SelfAssessmentTest(unittest.TestCase):
         'hintprompt': 'Consider this...',
     }
 
-    location = Location("edX", "sa_test", "run", "selfassessment", "SampleQuestion", None)
+    location = UsageKey.from_string("i4x://edX/sa_test/selfassessment/SampleQuestion")
 
     descriptor = Mock()
 

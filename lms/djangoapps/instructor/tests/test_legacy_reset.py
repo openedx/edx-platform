@@ -48,19 +48,19 @@ class InstructorResetStudentStateTest(ModuleStoreTestCase, LoginEnrollmentTestCa
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(self.student, self.course.id),
-            'course_id': self.course.id.to_deprecated_string(),
-            'item_id': problem_location.to_deprecated_string(),
+            'course_id': unicode(self.course.id),
+            'item_id': unicode(problem_location),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
-        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.post(url, {
             'action': 'Delete student state for module',
             'unique_student_identifier': self.student.email,
-            'problem_for_student': problem_location.to_deprecated_string(),
+            'problem_for_student': unicode(problem_location),
         })
 
         self.assertEqual(response.status_code, 200)

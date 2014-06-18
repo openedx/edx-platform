@@ -8,7 +8,6 @@ from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from django.core.management.base import BaseCommand
 
@@ -30,12 +29,7 @@ class Command(BaseCommand):
             return
         course_key = None
         # parse out the course id into a coursekey
-        try:
-            course_key = CourseKey.from_string(course_id)
-        # if it's not a new-style course key, parse it from an old-style
-        # course key
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         try:
             _course = get_course_by_id(course_key)
         except Exception as err:

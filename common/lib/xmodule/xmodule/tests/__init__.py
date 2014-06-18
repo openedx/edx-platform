@@ -20,7 +20,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
@@ -47,7 +47,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
+            usage_id=unicode(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -55,12 +55,12 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
+            usage_id=unicode(block.scope_ids.usage_id),
             uri=uri,
         )
 
 
-def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
+def get_test_system(course_id=CourseKey.from_string('org/course/run')):
     """
     Construct a test ModuleSystem instance.
 

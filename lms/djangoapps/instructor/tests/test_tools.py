@@ -97,7 +97,7 @@ class TestFindUnit(ModuleStoreTestCase):
         """
         Test finding a nested unit.
         """
-        url = self.homework.location.to_deprecated_string()
+        url = unicode(self.homework.location)
         self.assertEqual(tools.find_unit(self.course, url), self.homework)
 
     def test_find_unit_notfound(self):
@@ -136,7 +136,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
 
         def urls(seq):
             "URLs for sequence of nodes."
-            return sorted(i.location.to_deprecated_string() for i in seq)
+            return sorted(unicode(i.location) for i in seq)
 
         self.assertEquals(
             urls(tools.get_units_with_due_date(self.course)),
@@ -153,7 +153,7 @@ class TestTitleOrUrl(unittest.TestCase):
 
     def test_url(self):
         unit = mock.Mock(display_name=None)
-        unit.location.to_deprecated_string.return_value = 'test:hello'
+        unit.location.__unicode__ = mock.Mock(return_value=u'test:hello')
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 

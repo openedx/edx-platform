@@ -12,18 +12,18 @@ class Command(BaseCommand):
     "Rollback a course that was migrated to the split Mongo datastore"
 
     help = "Rollback a course that was migrated to the split Mongo datastore"
-    args = "org offering"
+    args = "org course run"
 
     def handle(self, *args, **options):
         if len(args) < 2:
             raise CommandError(
-                "rollback_split_course requires 2 arguments (org offering)"
+                "rollback_split_course requires 2 arguments (org course run)"
             )
 
         try:
-            locator = CourseLocator(org=args[0], offering=args[1])
+            locator = CourseLocator(org=args[0], course=args[1], run=args[2])
         except ValueError:
-            raise CommandError("Invalid org or offering string {}, {}".format(*args))
+            raise CommandError("Invalid org, course, or run string {}, {}, {}".format(*args))
 
         location = loc_mapper().translate_locator_to_location(locator, get_course=True)
         if not location:

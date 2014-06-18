@@ -85,8 +85,8 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return reverse(
             'xblock_handler',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
-                'usage_id': quote_slashes(problem_location.to_deprecated_string()),
+                'course_id': unicode(self.course.id),
+                'usage_id': quote_slashes(unicode(problem_location)),
                 'handler': 'xmodule_handler',
                 'suffix': dispatch,
             }
@@ -248,7 +248,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
+            reverse('progress', kwargs={'course_id': unicode(self.course.id)})
         )
 
         return grades.grade(self.student_user, fake_request, self.course)
@@ -266,7 +266,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
+            reverse('progress', kwargs={'course_id': unicode(self.course.id)})
         )
 
         progress_summary = grades.progress_summary(
@@ -494,7 +494,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # score read from StudentModule and our student gets an A instead.
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3').to_deprecated_string(): (1, 1)
+                unicode(self.problem_location('p3')): (1, 1)
             }
             self.check_grade_percent(1.0)
             self.assertEqual(self.get_grade_summary()['grade'], 'A')
@@ -510,13 +510,13 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3').to_deprecated_string(): (1, 1)
+                unicode(self.problem_location('p3')): (1, 1)
             }
             self.get_grade_summary()
 
             # Verify that the submissions API was sent an anonymized student ID
             mock_get_scores.assert_called_with(
-                self.course.id.to_deprecated_string(), '99ac6730dc5f900d69fd735975243b31'
+                unicode(self.course.id), '99ac6730dc5f900d69fd735975243b31'
             )
 
     def test_weighted_homework(self):
@@ -1014,7 +1014,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
             student=self.student_user
         )
         student_module.module_state_key = student_module.module_state_key.replace(
-            name=student_module.module_state_key.name + "_fake"
+            block_id=student_module.module_state_key.name + "_fake"
         )
         student_module.save()
 

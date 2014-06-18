@@ -41,7 +41,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         'xblock_mixins': (InheritanceMixin,)
     }
 
-    split_course_key = CourseLocator('test_org', 'test_course.runid', branch=ModuleStoreEnum.BranchName.draft)
+    split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)
 
     def setUp(self):
         self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
@@ -137,6 +137,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.split_mongo.create_course(
                 self.split_course_key.org, self.split_course_key.offering, self.userid, fields=fields, root_block_id='runid'
             )
-        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', fields=fields)
+        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

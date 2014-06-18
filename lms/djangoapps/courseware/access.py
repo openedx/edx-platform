@@ -9,7 +9,6 @@ from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from opaque_keys.edx.locations import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
@@ -23,7 +22,7 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -85,8 +84,8 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
 
-    if isinstance(obj, Location):
-        return _has_access_location(user, action, obj, course_key)
+    if isinstance(obj, UsageKey):
+        return _has_access_usage_key(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
         return _has_access_string(user, action, obj, course_key)
@@ -292,7 +291,7 @@ def _has_access_xmodule(user, action, xmodule, course_key):
     return has_access(user, action, xmodule.descriptor, course_key)
 
 
-def _has_access_location(user, action, location, course_key):
+def _has_access_usage_key(user, action, usage_key, course_key):
     """
     Check if user has access to this location.
 
@@ -301,13 +300,13 @@ def _has_access_location(user, action, location, course_key):
 
     NOTE: if you add other actions, make sure that
 
-     has_access(user, location, action) == has_access(user, get_item(location), action)
+     has_access(user, usage_key, action) == has_access(user, get_item(usage_key), action)
     """
     checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, location, course_key)
+        'staff': lambda: _has_staff_access_to_usage_key(user, usage_key, course_key)
     }
 
-    return _dispatch(checkers, action, user, location)
+    return _dispatch(checkers, action, user, usage_key)
 
 
 def _has_access_course_key(user, action, course_key):
@@ -319,8 +318,8 @@ def _has_access_course_key(user, action, course_key):
     'instructor' : True if the user has staff access to this location
     """
     checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, None, course_key),
-        'instructor': lambda: _has_instructor_access_to_location(user, None, course_key),
+        'staff': lambda: _has_staff_access_to_usage_key(user, None, course_key),
+        'instructor': lambda: _has_instructor_access_to_usage_key(user, None, course_key),
     }
 
     return _dispatch(checkers, action, user, course_key)
@@ -363,7 +362,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.to_deprecated_string() if isinstance(obj, XBlock) else str(obj),
+              unicode(obj.location) if isinstance(obj, XBlock) else str(obj),
               action)
         return result
 
@@ -407,15 +406,15 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # p
     return descriptor.start
 
 
-def _has_instructor_access_to_location(user, location, course_key=None):
+def _has_instructor_access_to_usage_key(user, usage_key, course_key=None):
     if course_key is None:
-        course_key = location.course_key
+        course_key = usage_key.course_key
     return _has_access_to_course(user, 'instructor', course_key)
 
 
-def _has_staff_access_to_location(user, location, course_key=None):
+def _has_staff_access_to_usage_key(user, usage_key, course_key=None):
     if course_key is None:
-        course_key = location.course_key
+        course_key = usage_key.course_key
     return _has_access_to_course(user, 'staff', course_key)
 
 
@@ -472,7 +471,7 @@ def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylin
 
     descriptor: something that has a location attribute
     """
-    return _has_instructor_access_to_location(user, descriptor.location, course_key)
+    return _has_instructor_access_to_usage_key(user, descriptor.location, course_key)
 
 
 def _has_staff_access_to_descriptor(user, descriptor, course_key):
@@ -481,7 +480,7 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
 
     descriptor: something that has a location attribute
     """
-    return _has_staff_access_to_location(user, descriptor.location, course_key)
+    return _has_staff_access_to_usage_key(user, descriptor.location, course_key)
 
 
 def get_user_role(user, course_key):

@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 
 from licenses.models import CourseSoftware, UserLicense
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             raise CommandError("Incorrect number of arguments")
 
         course_id = args[0]
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         if not modulestore().has_course(course_key):
             raise CommandError("Unknown course_id")
 

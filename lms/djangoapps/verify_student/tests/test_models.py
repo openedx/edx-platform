@@ -2,7 +2,8 @@
 from datetime import timedelta, datetime
 import json
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from opaque_keys.edx.keys import CourseKey
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
 from mock import patch
 import pytz
@@ -219,7 +220,7 @@ class TestPhotoVerification(TestCase):
         old_key = orig_attempt.photo_id_key
 
         window = MidcourseReverificationWindowFactory(
-            course_id=SlashSeparatedCourseKey("pony", "rainbow", "dash"),
+            course_id=CourseKey.from_string("pony/rainbow/dash"),
             start_date=datetime.now(pytz.utc) - timedelta(days=5),
             end_date=datetime.now(pytz.utc) + timedelta(days=5)
         )
@@ -420,7 +421,7 @@ class TestPhotoVerification(TestCase):
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestMidcourseReverification(TestCase):
+class TestMidcourseReverification(ModuleStoreTestCase):
     """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
     def setUp(self):
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')

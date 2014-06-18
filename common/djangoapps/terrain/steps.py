@@ -21,7 +21,7 @@ from .course_helpers import *
 from .ui_helpers import *
 from nose.tools import assert_equals  # pylint: disable=E0611
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -112,7 +112,7 @@ def i_am_not_logged_in(step):
 
 @step('I am staff for course "([^"]*)"$')
 def i_am_staff_for_course_by_id(step, course_id):
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     world.register_by_course_key(course_key, True)
 
 

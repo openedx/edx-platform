@@ -7,7 +7,7 @@ from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.tests.test_util_open_ended import DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
@@ -22,11 +22,11 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
     external grading service.
     """
-    course_id = SlashSeparatedCourseKey('edX', 'open_ended', '2012_Fall')
+    course_id = CourseKey.from_string('edX/open_ended/2012_Fall')
     problem_location = course_id.make_usage_key("peergrading", "PeerGradingSample")
     coe_location = course_id.make_usage_key("combinedopenended", "SampleQuestion")
     calibrated_dict = {'location': "blah"}
-    coe_dict = {'location': coe_location.to_deprecated_string()}
+    coe_dict = {'location': unicode(coe_location)}
     save_dict = MultiDict({
         'location': "blah",
         'submission_id': 1,
@@ -149,7 +149,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         # pylint: disable=protected-access
         with self.assertRaises(ItemNotFoundError):
             self.peer_grading._find_corresponding_module_for_location(
-                Location('org', 'course', 'run', 'category', 'name', 'revision')
+                UsageKey.from_string('i4x://org/course/category/name@revision')
             )
 
     def test_get_instance_state(self):
@@ -251,7 +251,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     external grading service.
     """
 
-    course_id = SlashSeparatedCourseKey('edX', 'open_ended', '2012_Fall')
+    course_id = CourseKey.from_string('edX/open_ended/2012_Fall')
     problem_location = course_id.make_usage_key("peergrading", "PeerGradingScored")
 
     def get_module_system(self, descriptor):
@@ -292,7 +292,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading that is linked to an open ended module.
     """
-    course_id = SlashSeparatedCourseKey('edX', 'open_ended', '2012_Fall')
+    course_id = CourseKey.from_string('edX/open_ended/2012_Fall')
     problem_location = course_id.make_usage_key("peergrading", "PeerGradingLinked")
     coe_location = course_id.make_usage_key("combinedopenended", "SampleQuestion")
 
@@ -317,7 +317,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
             'data': '<peergrading/>',
             'location': self.problem_location,
             'use_for_single_location': True,
-            'link_to_location': self.coe_location.to_deprecated_string(),
+            'link_to_location': unicode(self.coe_location),
             'graded': True,
             })
 
@@ -429,7 +429,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
 
         # If we specify a location, it will render the problem for that location.
-        data = peer_grading.handle_ajax('problem', {'location': self.coe_location.to_deprecated_string()})
+        data = peer_grading.handle_ajax('problem', {'location': unicode(self.coe_location)})
         self.assertTrue(json.loads(data)['success'])
 
         # If we don't specify a location, it should use the linked location.

@@ -3,7 +3,8 @@ from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
 from decorator import contextmanager
@@ -50,13 +51,10 @@ class CourseFactory(XModuleFactory):
         # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
-        name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
-        run = kwargs.get('run', name)
-
-        location = Location(org, number, run, 'course', name)
+        run = kwargs.get('run', kwargs.get('name', BlockUsageLocator.clean(kwargs.get('display_name'))))
 
         # Write the data to the mongo datastore
-        new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
+        new_course = store.create_course(org, number, run, fields=kwargs.get('metadata', None))
 
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
@@ -96,16 +94,16 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
+        default_parent = CourseKey.from_string('MITx/999/Robot_Super_Course').make_usage_key('course', 'Robot_Super_Course')
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
         # In this case, we'll just return the default parent_location
         except CyclicDefinitionError:
-            return default_location
+            return default_parent
 
         if parent is None:
-            return default_location
+            return default_parent
 
         return parent.location
 
@@ -145,13 +143,15 @@ class ItemFactory(XModuleFactory):
         location = kwargs.pop('location')
         user_id = kwargs.pop('user_id', 999)
 
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         assert location != parent_location
 
         store = kwargs.pop('modulestore')
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
-        parent = kwargs.pop('parent', None) or store.get_item(parent_location)
+        parent = kwargs.pop('parent', None)
+        if not parent and parent_location:
+            parent = store.get_item(parent_location)
 
         if 'boilerplate' in kwargs:
             template_id = kwargs.pop('boilerplate')
@@ -177,7 +177,7 @@ class ItemFactory(XModuleFactory):
 
         store.update_item(module, '**replace_user**')
 
-        if 'detached' not in module._class_tags:
+        if 'detached' not in module._class_tags and parent is not None:
             parent.children.append(location)
             store.update_item(parent, '**replace_user**')
 

@@ -1,5 +1,5 @@
 '''
-Method for converting among our differing Location/Locator whatever reprs
+Method for converting among our differing UsageKey formats
 '''
 from random import randint
 import re
@@ -8,9 +8,8 @@ import bson.son
 import urllib
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class LocMapperStore(object):
@@ -59,7 +58,7 @@ class LocMapperStore(object):
                          prod_branch=ModuleStoreEnum.BranchName.published,
                          block_map=None):
         """
-        Add a new entry to map this SlashSeparatedCourseKey to the new style CourseLocator.org & offering. If
+        Add a new entry to map this SlashSeparatedCourseKey to the new style CourseLocator.org. If
         org and offering are not provided, it defaults them based on course_key.
 
         WARNING: Exactly 1 CourseLocator key should index a given SlashSeparatedCourseKey.
@@ -150,7 +149,7 @@ class LocMapperStore(object):
             entry = self._migrate_if_necessary([entry])[0]
 
         block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
-        category = location.category
+        category = location.block_type
         if block_id is None:
             if add_entry_if_missing:
                 block_id = self._add_to_block_map(
@@ -166,7 +165,7 @@ class LocMapperStore(object):
                     category = block_id.keys()[0]
                     block_id = block_id.values()[0]
                 else:
-                    raise InvalidLocationError()
+                    raise InvalidKeyError()
             elif category in block_id:
                 block_id = block_id[category]
             elif add_entry_if_missing:
@@ -176,7 +175,8 @@ class LocMapperStore(object):
 
         prod_course_locator = CourseLocator(
             org=entry['org'],
-            offering=entry['offering'],
+            course=entry['course'],
+            run=entry['run'],
             branch=entry['prod_branch']
         )
         published_usage = BlockUsageLocator(
@@ -321,13 +321,13 @@ class LocMapperStore(object):
                 # The downside is that if there's more than one course mapped to from the same org/course root
                 # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
                 # if there are few == org/course roots or their content is unrelated, this will work well.
-                block_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
+                block_id = self._verify_uniqueness(location.block_type + location.name[:3], block_map)
             else:
                 # if 2 different category locations had same name, then they'll collide. Make the later
                 # mapped ones unique
                 block_id = self._verify_uniqueness(location.name, block_map)
         encoded_location_name = self.encode_key_for_mongo(location.name)
-        block_map.setdefault(encoded_location_name, {})[location.category] = block_id
+        block_map.setdefault(encoded_location_name, {})[location.block_type] = block_id
         self.location_map.update(course_son, {'$set': {'block_map': block_map}})
         return block_id
 
@@ -349,7 +349,7 @@ class LocMapperStore(object):
         """
         Construct the SON needed to repr the course_key for either a query or an insertion
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         return bson.son.SON([
             ('org', course_key.org),
             ('course', course_key.course),
@@ -457,7 +457,7 @@ class LocMapperStore(object):
         the get_course query
         """
         setmany = {}
-        if location.category == 'course':
+        if location.block_type == 'course':
             setmany[self._course_key_cache_string(published_usage)] = location.course_key
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
@@ -508,12 +508,12 @@ class LocMapperStore(object):
         Remove the location of course (draft and published) from cache
         """
         delete_keys = []
-        if location.category == 'course':
+        if location.block_type == 'course':
             delete_keys.append(self._course_key_cache_string(published_usage.course_key))
 
         delete_keys.append(unicode(published_usage))
         delete_keys.append(unicode(draft_usage))
-        delete_keys.append(u'{}+{}'.format(old_course_id, location.to_deprecated_string()))
+        delete_keys.append(u'{}+{}'.format(old_course_id, unicode(location)))
         delete_keys.append(old_course_id)
         self.cache.delete_many(delete_keys)
 

@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
                                  OrderItemSubclassPK)
@@ -32,7 +32,7 @@ class OrderTest(ModuleStoreTestCase):
         course = CourseFactory.create(org='org', number='test', display_name='Test Course')
         self.course_key = course.id
         for i in xrange(1, 5):
-            CourseFactory.create(org='org', number='test', display_name='Test Course {0}'.format(i))
+            CourseFactory.create(org='org', number='test{}'.format(i), display_name='Test Course {}'.format(i))
         self.cost = 40
 
     def test_get_cart_for_user(self):
@@ -56,7 +56,7 @@ class OrderTest(ModuleStoreTestCase):
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        CertificateItem.add_to_order(cart, SlashSeparatedCourseKey('org', 'test', 'Test_Course_1'), self.cost, 'honor')
+        CertificateItem.add_to_order(cart, CourseKey.from_string('org/test1/Test_Course_1'), self.cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), 2)
         self.assertTrue(cart.has_items())
         cart.clear()
@@ -78,12 +78,12 @@ class OrderTest(ModuleStoreTestCase):
     def test_total_cost(self):
         cart = Order.get_cart_for_user(user=self.user)
         # add items to the order
-        course_costs = [('org/test/Test_Course_1', 30),
-                        ('org/test/Test_Course_2', 40),
-                        ('org/test/Test_Course_3', 10),
-                        ('org/test/Test_Course_4', 20)]
+        course_costs = [('org/test1/Test_Course_1', 30),
+                        ('org/test2/Test_Course_2', 40),
+                        ('org/test3/Test_Course_3', 10),
+                        ('org/test4/Test_Course_4', 20)]
         for course, cost in course_costs:
-            CertificateItem.add_to_order(cart, SlashSeparatedCourseKey.from_deprecated_string(course), cost, 'honor')
+            CertificateItem.add_to_order(cart, CourseKey.from_string(course), cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), len(course_costs))
         self.assertEquals(cart.total_cost, sum(cost for _course, cost in course_costs))
 
@@ -262,7 +262,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
-        self.assertFalse(PaidCourseRegistration.contained_in_order(self.cart, SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course_abcd")))
+        self.assertFalse(PaidCourseRegistration.contained_in_order(self.cart, CourseKey.from_string("MITx/999/Robot_Super_Course_abcd")))
 
         self.assertEqual(self.cart.total_cost, self.cost)
 
@@ -310,13 +310,13 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
     def test_purchased_callback_exception(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        reg1.course_id = SlashSeparatedCourseKey("changed", "forsome", "reason")
+        reg1.course_id = CourseKey.from_string("changed/forsome/reason")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
-        reg1.course_id = SlashSeparatedCourseKey("abc", "efg", "hij")
+        reg1.course_id = CourseKey.from_string("abc/efg/hij")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()

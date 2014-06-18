@@ -13,6 +13,7 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -20,7 +21,7 @@ from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class EmbargoMiddlewareTests(TestCase):
+class EmbargoMiddlewareTests(ModuleStoreTestCase):
     """
     Tests of EmbargoMiddleware
     """
@@ -32,8 +33,8 @@ class EmbargoMiddlewareTests(TestCase):
         self.embargo_course.save()
         self.regular_course = CourseFactory.create(org="Regular")
         self.regular_course.save()
-        self.embargoed_page = '/courses/' + self.embargo_course.id.to_deprecated_string() + '/info'
-        self.regular_page = '/courses/' + self.regular_course.id.to_deprecated_string() + '/info'
+        self.embargoed_page = '/courses/' + unicode(self.embargo_course.id) + '/info'
+        self.regular_page = '/courses/' + unicode(self.regular_course.id) + '/info'
         EmbargoedCourse(course_id=self.embargo_course.id, embargoed=True).save()
         EmbargoedState(
             embargoed_countries="cu, ir, Sy, SD",

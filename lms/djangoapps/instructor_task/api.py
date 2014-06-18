@@ -119,7 +119,7 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
 
     The problem's attempts will be reset for all students who have accessed the
     particular problem in a course.  Parameters are the `course_id` and
-    the `usage_key`, which must be a :class:`Location`.
+    the `usage_key`, which must be a :class:`.UsageKey`.
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being reset.
@@ -148,7 +148,7 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
 
     The problem's state will be deleted for all students who have accessed the
     particular problem in a course.  Parameters are the `course_id` and
-    the `usage_key`, which must be a :class:`Location`.
+    the `usage_key`, which must be a :class:`.UsageKey`.
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the particular problem's state is already being deleted.

@@ -43,7 +43,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 log = logging.getLogger(__name__)
@@ -273,7 +273,7 @@ class Users(SysadminDashboardView):
         self.msg += u'<ol>'
         for course in self.get_courses():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(course.id.to_deprecated_string()), course.location.to_deprecated_string())
+                escape(unicode(course.id)), unicode(course.location))
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -511,7 +511,7 @@ class Courses(SysadminDashboardView):
 
         for course in self.get_courses():
             gdir = course.id.course
-            data.append([course.display_name, course.id.to_deprecated_string()]
+            data.append([course.display_name, unicode(course.id)]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'),
@@ -556,7 +556,7 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_key = CourseKey.from_string(course_id)
             course_found = False
             if course_key in courses:
                 course_found = True
@@ -597,7 +597,7 @@ class Courses(SysadminDashboardView):
                 # don't delete user permission groups, though
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), course.location.to_deprecated_string(), course.id.to_deprecated_string(), course.display_name)
+                        _('Deleted'), unicode(course.location), unicode(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),
@@ -686,7 +686,7 @@ class GitLogs(TemplateView):
 
         course_id = kwargs.get('course_id')
         if course_id:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id = CourseKey.from_string(course_id)
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
@@ -737,7 +737,7 @@ class GitLogs(TemplateView):
             log.debug('cilset length={0}'.format(len(cilset)))
         mdb.disconnect()
         context = {'cilset': cilset,
-                   'course_id': course_id.to_deprecated_string() if course_id else None,
+                   'course_id': unicode(course_id) if course_id else None,
                    'error_msg': error_msg}
 
         return render_to_response(self.template_name, context)

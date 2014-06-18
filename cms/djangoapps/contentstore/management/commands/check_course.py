@@ -3,7 +3,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -13,10 +12,7 @@ class Command(BaseCommand):
         if len(args) != 1:
             raise CommandError("check_course requires one argument: <course_id>")
 
-        try:
-            course_key = CourseKey.from_string(args[0])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         store = modulestore()
 
@@ -47,7 +43,7 @@ class Command(BaseCommand):
         # check for dangling discussion items, this can cause errors in the forums
         def _get_discussion_items(module):
             discussion_items = []
-            if module.location.category == 'discussion':
+            if module.location.block_type == 'discussion':
                 discussion_items = discussion_items + [module.location]
 
             for child in module.get_children():

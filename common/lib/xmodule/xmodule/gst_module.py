@@ -108,7 +108,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
 
         # these 3 will be used in class methods
         self.html_id = self.location.html_id()
-        self.html_class = self.location.category
+        self.html_class = self.location.block_type
 
         self.configuration_json = self.build_configuration_json()
         params = {

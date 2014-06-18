@@ -114,7 +114,7 @@ class SplitTestFields(object):
     )
 
     # group_id is an int
-    # child is a serialized UsageId (aka Location).  This child
+    # child is a serialized UsageId. This child
     # location needs to actually match one of the children of this
     # Block.  (expected invariant that we'll need to test, and handle
     # authoring tools that mess this up)
@@ -243,7 +243,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
             contents.append({
                 'group_id': group_id,
-                'id': child.location.to_deprecated_string(),
+                'id': unicode(child.location),
                 'content': rendered_child.content
             })
 
@@ -328,7 +328,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Record in the tracking logs which child was rendered
         """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('xblock.split_test.child_render', {'child-id': self.child.scope_ids.usage_id.to_deprecated_string()})
+        self.system.track_function('xblock.split_test.child_render', {'child-id': unicode(self.child.scope_ids.usage_id)})
         return Response()
 
     def get_icon_class(self):
@@ -360,7 +360,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         renderable_groups = {}
         # json.dumps doesn't know how to handle Location objects
         for group in self.group_id_to_child:
-            renderable_groups[group] = self.group_id_to_child[group].to_deprecated_string()
+            renderable_groups[group] = unicode(self.group_id_to_child[group])
         xml_object.set('group_id_to_child', json.dumps(renderable_groups))
         xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():
@@ -572,7 +572,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_and_save_xmodule'), \
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
-        dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
+        dest_usage_key = self.location.replace(block_type="vertical", category=uuid4().hex)
         metadata = {'display_name': group.name}
         modulestore.create_and_save_xmodule(
             dest_usage_key,

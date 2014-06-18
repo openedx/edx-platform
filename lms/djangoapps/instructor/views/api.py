@@ -67,7 +67,7 @@ from .tools import (
     strip_if_string,
     bulk_email_is_enabled_for_course,
 )
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 
 log = logging.getLogger(__name__)
@@ -192,7 +192,7 @@ def require_level(level):
     def decorator(func):  # pylint: disable=C0111
         def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
-            course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id']))
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
             if has_access(request.user, level, course):
                 return func(*args, **kwargs)
@@ -243,7 +243,7 @@ def students_update_enrollment(request, course_id):
         ]
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     action = request.GET.get('action')
     identifiers_raw = request.GET.get('identifiers')
@@ -333,7 +333,7 @@ def bulk_beta_modify_access(request, course_id):
       anything split_input_list can handle.
     - action is one of ['add', 'remove']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     action = request.GET.get('action')
     identifiers_raw = request.GET.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
@@ -417,7 +417,7 @@ def modify_access(request, course_id):
     rolename is one of ['instructor', 'staff', 'beta']
     action is one of ['allow', 'revoke']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
@@ -499,7 +499,7 @@ def list_course_role_members(request, course_id):
         ]
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
@@ -519,7 +519,7 @@ def list_course_role_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
@@ -534,14 +534,14 @@ def get_grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'grading_config_summary': grading_config_summary,
     }
     return JsonResponse(response_payload)
@@ -559,7 +559,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = [
@@ -589,7 +589,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     if not csv:
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': unicode(course_id),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -612,7 +612,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     # TODO: the User.objects query and CSV generation here could be
     # centralized into analytics. Currently analytics has similar functionality
     # but not quite what's needed.
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(mimetype='text/csv')
@@ -632,7 +632,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     ).order_by('id')
     header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
     rows = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_id, save=False)] for s in students]
-    return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
+    return csv_response(unicode(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @ensure_csrf_cookie
@@ -647,7 +647,7 @@ def get_distribution(request, course_id):
         empty response['feature_results'] object.
     A list of available will be available in the response['available_features']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     feature = request.GET.get('feature')
     # alternate notations of None
     if feature in (None, 'null', ''):
@@ -663,7 +663,7 @@ def get_distribution(request, course_id):
         ))
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'queried_feature': feature,
         'available_features': available_features,
         'feature_display_names': analytics.distributions.DISPLAY_NAMES,
@@ -702,13 +702,13 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
 
-    progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
+    progress_url = reverse('student_progress', kwargs={'course_id': unicode(course_id), 'student_id': user.id})
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'progress_url': progress_url,
     }
     return JsonResponse(response_payload)
@@ -739,7 +739,7 @@ def reset_student_attempts(request, course_id):
             requires instructor access
             mutually exclusive with all_students
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
@@ -768,7 +768,7 @@ def reset_student_attempts(request, course_id):
             return HttpResponseForbidden("Requires instructor access.")
 
     try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest()
 
@@ -812,7 +812,7 @@ def rescore_problem(request, course_id):
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
     student_identifier = request.GET.get('unique_student_identifier', None)
     student = None
@@ -830,7 +830,7 @@ def rescore_problem(request, course_id):
         )
 
     try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest("Unable to parse problem id")
 
@@ -896,7 +896,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     """
     List background email tasks.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
     tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
@@ -920,7 +920,7 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     problem_location_str = strip_if_string(request.GET.get('problem_location_str', False))
     student = request.GET.get('unique_student_identifier', None)
     if student is not None:
@@ -933,7 +933,7 @@ def list_instructor_tasks(request, course_id):
 
     if problem_location_str:
         try:
-            module_state_key = course_id.make_usage_key_from_deprecated_string(problem_location_str)
+            module_state_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
         except InvalidKeyError:
             return HttpResponseBadRequest()
         if student:
@@ -959,7 +959,7 @@ def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     report_store = ReportStore.from_config()
 
     response_payload = {
@@ -978,7 +978,7 @@ def calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     try:
         instructor_task.api.submit_calculate_grades_csv(request, course_key)
         success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
@@ -1005,7 +1005,7 @@ def list_forum_members(request, course_id):
 
     Takes query parameter `rolename`.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
@@ -1046,7 +1046,7 @@ def list_forum_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         rolename: map(extract_user_info, users),
     }
     return JsonResponse(response_payload)
@@ -1066,7 +1066,7 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     if not bulk_email_is_enabled_for_course(course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
@@ -1084,7 +1084,7 @@ def send_email(request, course_id):
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'success': True,
     }
     return JsonResponse(response_payload)
@@ -1113,7 +1113,7 @@ def update_forum_role_membership(request, course_id):
     - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     - `action` is one of ['allow', 'revoke']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
@@ -1151,7 +1151,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Role does not exist.")
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'action': action,
     }
     return JsonResponse(response_payload)
@@ -1170,7 +1170,7 @@ def proxy_legacy_analytics(request, course_id):
 
     `aname` is a query parameter specifying which analytic to query.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     analytics_name = request.GET.get('aname')
 
     # abort if misconfigured
@@ -1180,7 +1180,7 @@ def proxy_legacy_analytics(request, course_id):
     url = "{}get?aname={}&course_id={}&apikey={}".format(
         settings.ANALYTICS_SERVER_URL,
         analytics_name,
-        course_id.to_deprecated_string(),
+        unicode(course_id),
         settings.ANALYTICS_API_KEY,
     )
 
@@ -1215,9 +1215,9 @@ def _display_unit(unit):
     """
     name = getattr(unit, 'display_name', None)
     if name:
-        return u'{0} ({1})'.format(name, unit.location.to_deprecated_string())
+        return u'{0} ({1})'.format(name, unicode(unit.location))
     else:
-        return unit.location.to_deprecated_string()
+        return unicode(unit.location)
 
 
 @handle_dashboard_error
@@ -1229,7 +1229,7 @@ def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     due_date = parse_datetime(request.GET.get('due_datetime'))
@@ -1250,7 +1250,7 @@ def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     set_due_date_extension(course, unit, student, None)
@@ -1270,7 +1270,7 @@ def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     unit = find_unit(course, request.GET.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
@@ -1286,7 +1286,7 @@ def show_student_extensions(request, course_id):
     particular course.
     """
     student = get_student_from_identifier(request.GET.get('student'))
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
 
@@ -1318,7 +1318,7 @@ def spoc_gradebook(request, course_id):
     - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     - Only displayed to course staff
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
     enrolled_students = User.objects.filter(

@@ -41,7 +41,7 @@ class TestLTI(BaseTestXmodule):
         mocked_decoded_signature = u'my_signature='
 
         # Note: this course_id is actually a course_key
-        context_id = self.item_descriptor.course_id.to_deprecated_string()
+        context_id = unicode(self.item_descriptor.course_id)
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
@@ -160,7 +160,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             parent_location=self.section2.location,
             display_name="lti draft",
             category="lti",
-            location=self.course.id.make_usage_key('lti', 'lti_published').replace(revision=MongoRevisionKey.draft),
+            location=self.course.id.make_usage_key('lti', 'lti_published').for_branch(MongoRevisionKey.draft),
         )
 
     def expected_handler_url(self, handler):
@@ -168,8 +168,8 @@ class TestLTIModuleListing(ModuleStoreTestCase):
         return "https://{}{}".format(settings.SITE_NAME, reverse(
             'courseware.module_render.handle_xblock_callback_noauth',
             args=[
-                self.course.id.to_deprecated_string(),
-                quote_slashes(unicode(self.lti_published.scope_ids.usage_id.to_deprecated_string()).encode('utf-8')),
+                unicode(self.course.id),
+                quote_slashes(unicode(unicode(self.lti_published.scope_ids.usage_id)).encode('utf-8')),
                 handler
             ]
         ))
@@ -187,7 +187,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
-        response = get_course_lti_endpoints(request, self.course.id.to_deprecated_string())
+        response = get_course_lti_endpoints(request, unicode(self.course.id))
 
         self.assertEqual(200, response.status_code)
         self.assertEqual('application/json', response['Content-Type'])
@@ -206,5 +206,5 @@ class TestLTIModuleListing(ModuleStoreTestCase):
         for method in DISALLOWED_METHODS:
             request = mock.Mock()
             request.method = method
-            response = get_course_lti_endpoints(request, self.course.id.to_deprecated_string())
+            response = get_course_lti_endpoints(request, unicode(self.course.id))
             self.assertEqual(405, response.status_code)
