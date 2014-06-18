@@ -24,6 +24,9 @@ from courseware.courses import get_course_by_id, get_cms_course_link, get_course
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
+from shoppingcart.models import Coupons
+from course_modes.models import CourseMode
+
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
@@ -62,6 +65,14 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_key, access),
     ]
 
+    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    has_course_mode = CourseMode.mode_for_course(course_key, 'honor')
+    course_mode_price = False
+    if has_course_mode:
+        if has_course_mode.min_price > 0:
+            course_mode_price = True
+
+
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
 
@@ -72,6 +83,11 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to Metrics tab by featue flag and staff authorization
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
         sections.append(_section_metrics(course_key, access))
+
+     # Gate access to Ecommerce tab
+    if course_mode_price:
+        sections.append(_section_e_commerce(course_key, access))
+
 
     studio_url = None
     if is_studio_course:
@@ -105,6 +121,24 @@ The dictionary must include at least {
 section_key will be used as a css attribute, javascript tie-in, and template import filename.
 section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
+
+
+def _section_e_commerce(course_key, access):
+    """ Provide data for the corresponding dashboard section """
+    coupons = Coupons.objects.filter(course_id=course_key).filter(is_active=True)
+
+    section_data = {
+        'section_key': 'e-commerce',
+        'section_display_name': _('E-Commerce'),
+        'access': access,
+        'course_id': course_key.to_deprecated_string(),
+        'ajax_remove_coupon_url': reverse('remove_coupon'),
+        'ajax_edit_coupon_info': reverse('edit_coupon_info'),
+        'ajax_update_coupon': reverse('update_coupon'),
+        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'coupons': coupons
+    }
+    return section_data
 
 
 def _section_course_info(course_key, access):
