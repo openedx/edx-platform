@@ -3,16 +3,14 @@ import uuid
 import json
 from collections import OrderedDict
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.response import Response
 
-
-
-from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile
+from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
 from xmodule.modulestore.django import modulestore
 from api_manager.permissions import SecureAPIView
 from xmodule.modulestore import Location, InvalidLocationError
