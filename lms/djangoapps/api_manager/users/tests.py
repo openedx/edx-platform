@@ -913,9 +913,6 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
-        print 'data type == ' + response.data.__class__.__name__
-        print 'data = {}'.format(response.data)
-
         courseware_summary = response.data['courseware_summary']
         self.assertEqual(len(courseware_summary), 2)
         self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
@@ -930,6 +927,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(sections), 1)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
+
+        grade_summary = response.data['grade_summary']
+        self.assertGreater(len(grade_summary['section_breakdown']), 0)
+        grading_policy = response.data['grading_policy']
+        self.assertGreater(len(grading_policy['GRADER']), 0)
+        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
