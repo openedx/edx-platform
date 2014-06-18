@@ -21,6 +21,8 @@ import re
 from bson.son import SON
 from fs.osfs import OSFS
 from path import path
+from datetime import datetime
+from pytz import UTC
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -207,6 +209,23 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     # to python values
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.to_deprecated_string(), {})
                     inherit_metadata(module, metadata_to_inherit)
+
+                edit_info = json_data.get('edit_info')
+
+                # migrate published_by and published_date if edit_info isn't present
+                if not edit_info:
+                    module.edited_by = module.edited_on = module.published_date = None
+                    # published_date was previously stored as a list of time components instead of a datetime
+                    if metadata.get('published_date'):
+                        module.published_date = datetime(*metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                    module.published_by = metadata.get('published_by')
+                # otherwise restore the stored editing information
+                else:
+                    module.edited_by = edit_info.get('edited_by')
+                    module.edited_on = edit_info.get('edited_on')
+                    module.published_date = edit_info.get('published_date')
+                    module.published_by = edit_info.get('published_by')
+
                 # decache any computed pending field settings
                 module.save()
                 return module
@@ -827,7 +846,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         return xmodule
 
     def create_and_save_xmodule(self, location, definition_data=None, metadata=None, system=None,
-                                fields={}):
+                                fields={}, user_id=None):
         """
         Create the new xmodule and save it. Does not return the new module because if the caller
         will insert it as a child, it's inherited metadata will completely change. The difference
@@ -838,12 +857,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param definition_data: can be empty. The initial definition_data for the kvs
         :param metadata: can be empty, the initial metadata for the kvs
         :param system: if you already have an xblock from the course, the xblock.runtime value
+        :param user_id: the user that created the xblock
         """
         # differs from split mongo in that I believe most of this logic should be above the persistence
         # layer but added it here to enable quick conversion. I'll need to reconcile these.
         new_object = self.create_xmodule(location, definition_data, metadata, system, fields)
         location = new_object.scope_ids.usage_id
-        self.update_item(new_object, allow_not_found=True)
+        self.update_item(new_object, allow_not_found=True, user_id=user_id)
 
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -857,7 +877,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     url_slug=new_object.scope_ids.usage_id.name,
                 )
             )
-            self.update_item(course)
+            self.update_item(course, user_id=user_id)
 
         return new_object
 
@@ -889,7 +909,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False):
         """
         Update the persisted version of xblock to reflect its current values.
 
@@ -903,7 +923,16 @@ class MongoModuleStore(ModuleStoreWriteBase):
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
+                'edit_info': {
+                    'edited_on': datetime.now(UTC),
+                    'edited_by': user_id,
+                }
             }
+
+            if isPublish:
+                payload['edit_info']['published_date'] = datetime.now(UTC)
+                payload['edit_info']['published_by'] = user_id
+
             if xblock.has_children:
                 children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
