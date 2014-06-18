@@ -47,34 +47,3 @@ Feature: LMS.Video component
     And I see video button "quality" is inactive
     And I click video button "quality"
     Then I see video button "quality" is active
-
-  # 29 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Transcripts are available on different speeds of Flash mode
-  #  Given I am registered for the course "test_course"
-  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #  And it has a video in "Flash" mode
-  #  Then the video has rendered in "Flash" mode
-  #  And I make sure captions are opened
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "1.50" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "0.75" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "1.25" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
-
-  # 30 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Elapsed time calculates correctly on different speeds of Flash mode
-  #  Given I am registered for the course "test_course"
-  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #  And it has a video in "Flash" mode
-  #  And I make sure captions are opened
-  #  Then I select the "1.50" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "4", video module shows elapsed time "7"
-  #  Then I select the "0.75" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "3", video module shows elapsed time "9"
-  #  Then I select the "1.25" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "2", video module shows elapsed time "4"
