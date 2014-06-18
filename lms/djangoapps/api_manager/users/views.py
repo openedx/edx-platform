@@ -2,7 +2,7 @@
 
 import logging
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 
 from api_manager.permissions import SecureAPIView, SecureListAPIView
-from api_manager.models import GroupProfile
+from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
@@ -525,7 +525,7 @@ class UsersGroupsList(SecureAPIView):
             return Response(response_data, status=status.HTTP_409_CONFLICT)
         except ObjectDoesNotExist:
             existing_user.groups.add(existing_group.id)
-            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
             response_data['group_id'] = str(existing_group.id)
             response_data['user_id'] = str(existing_user.id)
             return Response(response_data, status=status.HTTP_201_CREATED)
@@ -813,7 +813,7 @@ class UsersPreferences(SecureAPIView):
     * POSTing a duplicate preference will cause the existing preference to be overwritten (effectively a PUT operation)
     """
 
-    def get(self, request, user_id): # pylint: disable=W0613
+    def get(self, request, user_id):  # pylint: disable=W0613
         """
         GET returns the preferences for the specified user
         """
