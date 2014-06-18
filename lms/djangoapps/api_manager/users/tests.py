@@ -50,6 +50,7 @@ class UsersApiTests(TestCase):
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
         self.test_city = str(uuid.uuid4())
+        self.org_base_uri = '/api/organizations/'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
@@ -115,7 +116,7 @@ class UsersApiTests(TestCase):
 
     def test_user_list_get(self):
         test_uri = '/api/users'
-
+        users = []
         # create a 25 new users
         for i in xrange(1, 26):
             data = {
@@ -128,6 +129,19 @@ class UsersApiTests(TestCase):
 
             response = self.do_post(test_uri, data)
             self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        # create organizations and add users to them
+        total_orgs = 30
+        for i in xrange(0, total_orgs):
+            data = {
+                'name': '{} {}'.format('Org', i),
+                'display_name': '{} {}'.format('Org display name', i),
+                'users': users
+            }
+            response = self.do_post(self.org_base_uri, data)
+            self.assertEqual(response.status_code, 201)
+
         # fetch data without any filters applied
         response = self.do_get('{}?page=1'.format(test_uri))
         self.assertEqual(response.status_code, 400)
@@ -138,6 +152,10 @@ class UsersApiTests(TestCase):
         response = self.do_get('{}?ids={}'.format(test_uri, '3'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data['results'][0]['organizations']), total_orgs)
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
         # fetch user data by multiple ids
         response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
         self.assertEqual(response.status_code, 200)
@@ -961,7 +979,7 @@ class UsersApiTests(TestCase):
                 'display_name': 'Org display name' + str(i),
                 'users': [user_id]
             }
-            response = self.do_post('/api/organizations/', data)
+            response = self.do_post(self.org_base_uri, data)
             self.assertEqual(response.status_code, 201)
 
         test_uri = '/api/users/{}/organizations/'.format(user_id)

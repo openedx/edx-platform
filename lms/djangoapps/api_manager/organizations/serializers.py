@@ -25,3 +25,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
         fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone', 'workgroups',
                   'users', 'groups', 'created', 'modified')
         read_only = ('url', 'id', 'created')
+
+
+class BasicOrganizationSerializer(serializers.ModelSerializer):
+    """ Serializer for Basic Organization fields """
+    url = serializers.HyperlinkedIdentityField(view_name='organization-detail')
+
+    class Meta:
+        """ Serializer/field specification """
+        model = Organization
+        fields = ('url', 'id', 'name', 'created', 'display_name')
+        read_only = ('url', 'id', 'created',)
