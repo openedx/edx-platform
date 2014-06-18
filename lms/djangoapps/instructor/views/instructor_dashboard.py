@@ -252,7 +252,7 @@ def _section_metrics(course_key, access):
     """Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'metrics',
-        'section_display_name': ('Metrics'),
+        'section_display_name': _('Metrics'),
         'access': access,
         'course_id': course_key.to_deprecated_string(),
         'sub_section_display_name': get_section_display_name(course_key),

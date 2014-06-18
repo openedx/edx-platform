@@ -1522,9 +1522,8 @@ def password_reset_confirm_wrapper(
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
             err_msg = ungettext(
-                # Translators: If you need to use a variable number instead of the number "one", use {num} in its place.
-                "You are resetting passwords too frequently. Due to security policies, one day must elapse between password resets",
-                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets",
+                "You are resetting passwords too frequently. Due to security policies, {num} day must elapse between password resets.",
+                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets.",
                 num_days
             ).format(num=num_days)
 
