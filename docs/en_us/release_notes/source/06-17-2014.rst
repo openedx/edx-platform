@@ -33,6 +33,8 @@ edX Studio
 edX Learning Management System
 ***************************************
    
+* Mandarin Chinese has been added as a language option.
+
 * When you search a discussion forum, the search engine now retrieves common misspellings and alternate spellings of the search term. (FOR-591)
 
 * When a course has no content, users who try to access the course see a "No content has been added to this course" message rather than a 404 or 500 error message. 
