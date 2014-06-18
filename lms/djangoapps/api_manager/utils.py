@@ -44,3 +44,14 @@ def generate_base_uri(request, strip_qs=False):
         return request.build_absolute_uri(request.path)  # Don't need querystring that why giving location parameter
     else:
         return request.build_absolute_uri()
+
+
+def is_int(value):
+    """
+    checks if a string value can be interpreted as integer
+    """
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
