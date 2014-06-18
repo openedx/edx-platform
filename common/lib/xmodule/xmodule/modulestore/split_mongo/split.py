@@ -349,7 +349,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def has_course(self, course_id, ignore_case=False):
         '''
-        Does this course exist in this modulestore.
+        Does this course exist in this modulestore. This method does not verify that the branch &/or
+        version in the course_id exists. Use get_course_index_info to check that.
         '''
         assert(isinstance(course_id, CourseLocator))
         course_entry = self.db_connection.get_course_index(course_id, ignore_case)
@@ -1298,7 +1299,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         self.db_connection.update_course_index(updated_index_entry)
 
-    # TODO impl delete_all_versions
     def delete_item(self, usage_locator, user_id, delete_all_versions=False, delete_children=False, force=False):
         """
         Delete the block or tree rooted at block (if delete_children) and any references w/in the course to the block
