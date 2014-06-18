@@ -48,7 +48,7 @@ class Command(BaseCommand):
             mstore, data_dir, course_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
             do_import_static=do_import_static,
-            create_new_course=True,
+            create_new_course_if_not_present=True,
         )
 
         for course in course_items:
