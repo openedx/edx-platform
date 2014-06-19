@@ -613,6 +613,12 @@ def change_enrollment(request):
         if is_course_full:
             return HttpResponseBadRequest(_("Course is full"))
 
+        # check to see if user is currently enrolled in that course
+        if CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(
+                _("Student is already enrolled")
+            )
+
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
         available_modes = CourseMode.modes_for_course(course_id)
