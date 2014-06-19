@@ -3,11 +3,13 @@
 """
 Acceptance tests for Video.
 """
+from unittest import skipIf, skip
+from nose.plugins.attrib import attr
+from box.test.flaky import flaky
 
 import json
-from unittest import skipIf, skip
 import requests
-from box.test.flaky import flaky
+
 from ..helpers import UniqueCourseTest, is_youtube_available
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.tab_nav import TabNavPage
@@ -41,6 +43,7 @@ class YouTubeConfigError(Exception):
 
 @flaky
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
+@attr('shard_1')  # Shard for jenkins matrix config
 class VideoBaseTest(UniqueCourseTest):
     """
     Base class for tests of the Video Player

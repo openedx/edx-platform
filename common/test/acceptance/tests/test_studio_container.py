@@ -10,8 +10,9 @@ from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
 
 from unittest import skip
+from nose.plugins.attrib import attr
 
-
+@attr('shard_1')  # Shard for jenkins matrix config
 class ContainerBase(UniqueCourseTest):
     """
     Base class for tests that do operations on the container page.
