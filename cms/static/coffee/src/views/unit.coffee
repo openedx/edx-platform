@@ -162,7 +162,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 url: @model.url() + "?" + $.param({recurse: true})
             }).success(=>
 
-                analytics.track "Component: Delete Draft",
+                analytics.track "Unit: Delete Draft",
                     course: course_location_analytics
                     unit_id: unit_location_analytics
 
@@ -249,7 +249,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @model.save(metadata: metadata)
             # Update name shown in the right-hand side location summary.
             $('.unit-location .editing .unit-name').html(metadata.display_name)
-            analytics.track "Component: Edit Name",
+            analytics.track "Unit: Edit Name",
                 course: course_location_analytics
                 unit_id: unit_location_analytics
                 display_name: metadata.display_name

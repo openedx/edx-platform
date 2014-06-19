@@ -177,7 +177,7 @@ define(["jquery", "underscore.string", "jasmine", "coffee/src/views/unit", "js/m
                 });
             });
 
-            describe('setVisibility', function () {
+            describe('Changing unit visibility', function () {
                 var changeVisibility = function () {
                     unitView.$('.visibility-select').val('private').change();
                 };
@@ -192,6 +192,26 @@ define(["jquery", "underscore.string", "jasmine", "coffee/src/views/unit", "js/m
                             'course': window.course_location_analytics,
                             'unit_id': window.unit_location_analytics,
                             'visibility': 'private'
+                        }
+                    );
+                });
+            });
+
+            describe('Changing unit display name', function () {
+                var changeDisplayName = function () {
+                    unitView.$('.unit-display-name-input').val('New name').change();
+                };
+
+                it('calls analytics', function () {
+                    initialize(this);
+                    changeDisplayName();
+                    create_sinon.respondWithJson(requests, { });
+                    expect(window.analytics.track).toHaveBeenCalledWith(
+                        'Unit: Edit Name',
+                        {
+                            'course': window.course_location_analytics,
+                            'unit_id': window.unit_location_analytics,
+                            'display_name': 'New name'
                         }
                     );
                 });
