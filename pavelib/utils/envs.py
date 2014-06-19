@@ -7,7 +7,7 @@ import sys
 import json
 from lazy import lazy
 from path import path
-
+import memcache
 
 class Env(object):
     """
@@ -19,6 +19,66 @@ class Env(object):
 
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
+
+    # Bok_choy dirs
+    BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
+    BOK_CHOY_LOG_DIR = REPO_ROOT / "test_root" / "log"
+    BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
+    BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
+
+    # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
+    # For this reason, the stubs package is currently located in the Django app called "terrain"
+    # where other lettuce configuration is stored.
+    BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
+
+    # Directory that videos are served from
+    VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
+
+    BOK_CHOY_SERVERS = {
+        'lms': {
+            'port': 8003,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lms.log"
+        },
+        'cms': {
+            'port': 8031,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_studio.log"
+        }
+    }
+
+    BOK_CHOY_STUBS = {
+
+        'xqueue': {
+            'port': 8040,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_xqueue.log",
+            'config': 'register_submission_url=http://0.0.0.0:8041/test/register_submission',
+        },
+
+        'ora': {
+            'port': 8041,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_ora.log",
+            'config': '',
+        },
+
+        'comments': {
+            'port': 4567,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_comments.log",
+        },
+
+        'video': {
+            'port': 8777,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_video_sources.log",
+            'config': "root_dir={}".format(VIDEO_SOURCE_DIR),
+        },
+
+        'youtube': {
+            'port': 9080,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_youtube.log",
+        }
+    }
+
+    # Mongo databases that will be dropped before/after the tests run
+    BOK_CHOY_MONGO_DATABASE = "test"
+    BOK_CHOY_CACHE = memcache.Client(['0.0.0.0:11211'], debug=0)
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
