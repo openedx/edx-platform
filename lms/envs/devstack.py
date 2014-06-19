@@ -79,9 +79,7 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
-#CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = 'https://testsecureacceptance.cybersource.com/pay'
-CC_PROCESSOR['CyberSource']['SECRET_KEY'] = '51c8b01198464f2aba584782982611b1ae1fec4badb64f35b0eb9f3f06f10282049df0e3aa9b48019fcebb945a19e2e39dd983c2fd174a7786d50d8d8f5ac37fee751141720145c3b1b490e1c9356470eb5c76bc3909428bb2cd73c1c0390852952eea8a93c0418facdd1f3773a05882f209b79ff8724347bd8baf51c7b2f430'
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
