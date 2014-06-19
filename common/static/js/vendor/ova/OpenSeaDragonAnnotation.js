@@ -71,8 +71,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         this.isDrawing = false; //if the user is drawing something
         this.rectPosition = undefined;
         
-    //Init
-    this.init();
+        //Init
+        this.init();
     };
     
     //-- Methods
@@ -167,7 +167,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 var rectPosition = an.rangePosition;
                 //Span
                 span.className = "annotator-hl";
-                span.style.border = '1px solid rgba(0,0,0,0.5)';
+                span.style.border = '2px solid rgba(0,0,0,0.5)';
+                span.style.background = 'rgba(0,0,0,0)';
                 var onAnnotationMouseMove = this.__bind(this._onAnnotationMouseMove,this);
                 var onAnnotationClick = this.__bind(this._onAnnotationClick,this);
                 $.addEvent(span, "mousemove", onAnnotationMouseMove, true);
@@ -219,8 +220,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 var position = mouse.minus( elementPosition );
                 viewer.innerTracker.setTracking(false);
                 this.rect = document.createElement('div');
-                this.rect.style.background = 'rgba(0,0,0,0.25)';
-                this.rect.style.border = '1px solid rgba(0,0,0,0.5)';
+                this.rect.style.background = 'rgba(0,0,0,0)';
+                this.rect.style.border = '2px solid rgba(0,0,0,0.5)';
                 this.rect.style.position = 'absolute';
                 this.rect.className = 'DrawingRect';
                 //set the initial position
@@ -306,7 +307,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                     var maxx = l + w;
                     var maxy = t + h;
                     this.style.background = (y <= maxy && y >= t) && (x <= maxx && x >= l)?
-                        'rgba(12, 150, 0, 0.3)':'rgba(255, 255, 10, 0.3)';
+                        'rgba(255, 255, 10, 0.05)':'rgba(0, 0, 0, 0)';
                     return (y <= maxy && y >= t) && (x <= maxx && x >= l)? jQuery(this).data("annotation") : null;
                 });
                 //show the annotation in the viewer
@@ -537,13 +538,13 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         _ref = OpenSeaDragon.__super__.constructor.apply(this, arguments);
         this.__indexOf = [].indexOf; 
         if(!this.__indexOf){
-	        this.__indexOf = function(item) { 
-	        	for (var i = 0, l = this.length; i < l; i++) { 
-	        		if (i in this && this[i] === item) 
-	        			return i; 
-	        	} 
-	        	return -1; 
-	        }
+            this.__indexOf = function(item) { 
+                for (var i = 0, l = this.length; i < l; i++) { 
+                    if (i in this && this[i] === item) 
+                        return i; 
+                } 
+                return -1; 
+            }
 
         }
         return _ref;
@@ -586,29 +587,31 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         if (this.EditOpenSeaDragonAn()){
             var annotator = this.annotator;
             var osda = annotator.osda;
-            var position = osda.rectPosition;
+            var position = osda.rectPosition || {};
             var isNew = typeof annotation.media=='undefined';
-            if (typeof annotation.media == 'undefined') annotation.media = "image"; // - media
-            annotation.target = annotation.target || {}; // - target
-            annotation.target.container = osda.viewer.id || ""; // - target.container
-            //Save source url
-            var source = osda.viewer.source;
-            var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-            var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-            annotation.target.src = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
-            annotation.target.ext = source.fileFormat || ""; // - target.ext (extension)
-            annotation.bounds = osda.viewer.drawer.viewport.getBounds() || {}; // - bounds
+            if(isNew){
+                if (typeof annotation.media == 'undefined') annotation.media = "image"; // - media
+                annotation.target = annotation.target || {}; // - target
+                annotation.target.container = osda.viewer.id || ""; // - target.container
+                //Save source url
+                var source = osda.viewer.source;
+                var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+                var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
+                annotation.target.src = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
+                annotation.target.ext = source.fileFormat || ""; // - target.ext (extension)
+                annotation.bounds = osda.viewer.drawer.viewport.getBounds() || {}; // - bounds
 
-            var finalimagelink = source["@id"].replace("/info.json", "");
-            var highlightX = Math.round(position.left * source["width"]);
-            var highlightY = Math.round(position.top * source["width"]);
-            var highlightWidth = Math.round(position.width * source["width"]);
-            var highlightHeight = Math.round(position.height * source["width"]);
-            annotation.target.thumb = finalimagelink + "/" + highlightX + "," + highlightY + "," + highlightWidth + "," + highlightHeight + "/full/0/native." + source["formats"][0];
-            if(isNew) annotation.rangePosition =     position || {};    // - rangePosition
-            annotation.updated = new Date().toISOString(); // - updated
-            if (typeof annotation.created == 'undefined')
-                annotation.created = annotation.updated; // - created
+                var finalimagelink = source["@id"].replace("/info.json", "");
+                var highlightX = Math.round(position.left * source["width"]);
+                var highlightY = Math.round(position.top * source["width"]);
+                var highlightWidth = Math.round(position.width * source["width"]);
+                var highlightHeight = Math.round(position.height * source["width"]);
+                annotation.target.thumb = finalimagelink + "/" + highlightX + "," + highlightY + "," + highlightWidth + "," + highlightHeight + "/full/0/native." + source["formats"][0];
+                if(isNew) annotation.rangePosition =     position || {};    // - rangePosition
+                annotation.updated = new Date().toISOString(); // - updated
+                if (typeof annotation.created == 'undefined')
+                    annotation.created = annotation.updated; // - created
+            }
         }else{
             if (typeof annotation.media == 'undefined')
                 annotation.media = "text"; // - media
@@ -691,7 +694,7 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         //-- Viewer
         function hideViewer(){
             jQuery(annotator.osda.viewer.canvas.parentNode).find('.annotator-hl').map(function() {
-                return this.style.background = 'rgba(255, 255, 10, 0.3)';
+                return this.style.background = 'rgba(0, 0, 0, 0)';
             });
             annotator.viewer.unsubscribe("hide", hideViewer);
         };
@@ -791,8 +794,8 @@ OpenSeadragonAnnotation = function (element, options) {
     if (typeof Annotator.Plugin["Flagging"] === 'function') 
         this.annotator.addPlugin("Flagging");
 
-    if (typeof Annotator.Plugin["HighlightTags"] === 'function')
-        this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
+    /*if (typeof Annotator.Plugin["HighlightTags"] === 'function')
+        this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);*/
 
     //- OpenSeaDragon
     this.viewer =  OpenSeadragon(options.optionsOpenSeadragon);
