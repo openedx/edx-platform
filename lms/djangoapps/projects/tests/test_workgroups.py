@@ -29,6 +29,11 @@ class SecureClient(Client):
         kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
         super(SecureClient, self).__init__(*args, **kwargs)
 
+    def delete_with_data(self, *args, **kwargs):
+        """ Construct a DELETE request that includes data."""
+        kwargs.update({'REQUEST_METHOD': 'DELETE'})
+        return super(SecureClient, self).put(*args, **kwargs)
+
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class WorkgroupsApiTests(ModuleStoreTestCase):
@@ -122,6 +127,16 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         }
         response = self.client.delete(uri, headers=headers)
         return response
+
+    def do_delete_with_data(self, uri, data):
+        """Submit an HTTP DELETE request with payload """
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Edx-Api-Key': str(TEST_API_KEY),
+        }
+        response = self.client.delete_with_data(uri, data, headers=headers)
+        return response
+
 
     def test_workgroups_list_post(self):
         data = {
@@ -232,6 +247,37 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users'][0]['id'], self.test_user.id)
+
+    def test_workgroups_users_delete(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_workgroup_uri = response.data['url']
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        # test if workgroup has exactly one user
+        response = self.do_get(test_workgroup_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users']), 1)
+
+        # test to delete a user from workgroup
+        data = {"id": self.test_user.id}
+        response = self.do_delete_with_data(users_uri, data)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_workgroup_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users']), 0)
+
+        # test to delete an invalide user from workgroup
+        data = {"id": '345345344'}
+        response = self.do_delete_with_data(users_uri, data)
+        self.assertEqual(response.status_code, 400)
 
     def test_workgroups_users_get(self):
         data = {
