@@ -351,13 +351,13 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
     def is_browser_on_page(self):
         return self.q(css=".discussion-body section.home-header").present
 
-    def perform_search(self):
+    def perform_search(self, text="dummy"):
         self.q(css=".discussion-body .sidebar .search").first.click()
         EmptyPromise(
             lambda: self.q(css=".discussion-body .sidebar .search.is-open").present,
             "waiting for search input to be available"
         ).fulfill()
-        self.q(css="#search-discussions").fill("dummy" + chr(10))
+        self.q(css="#search-discussions").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"
@@ -365,6 +365,9 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
 
     def get_search_alert_messages(self):
         return self.q(css=self.ALERT_SELECTOR + " .message").text
+
+    def get_search_alert_links(self):
+        return self.q(css=self.ALERT_SELECTOR + " .link-jump")
 
     def dismiss_alert_message(self, text):
         """

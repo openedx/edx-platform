@@ -84,63 +84,6 @@ describe "DiscussionThreadListView", ->
         @view = new DiscussionThreadListView({collection: @discussion, el: $(".sidebar")})
         @view.render()
 
-    testAlertMessages = (expectedMessages) ->
-        expect($(".search-alert .message").map( ->
-          $(@).html()
-        ).get()).toEqual(expectedMessages)
-
-    it "renders and removes search alerts", ->
-        testAlertMessages []
-        foo = @view.addSearchAlert("foo")
-        testAlertMessages ["foo"]
-        bar = @view.addSearchAlert("bar")
-        testAlertMessages ["foo", "bar"]
-        @view.removeSearchAlert(foo.cid)
-        testAlertMessages ["bar"]
-        @view.removeSearchAlert(bar.cid)
-        testAlertMessages []
-
-    it "clears all search alerts", ->
-        @view.addSearchAlert("foo")
-        @view.addSearchAlert("bar")
-        @view.addSearchAlert("baz")
-        testAlertMessages ["foo", "bar", "baz"]
-        @view.clearSearchAlerts()
-        testAlertMessages []
-
-    testCorrection = (view, correctedText) ->
-        spyOn(view, "addSearchAlert")
-        $.ajax.andCallFake(
-            (params) =>
-                params.success(
-                    {discussion_data: [], page: 42, num_pages: 99, corrected_text: correctedText}, 'success'
-                )
-                {always: ->}
-        )
-        view.searchFor("dummy")
-        expect($.ajax).toHaveBeenCalled()
-
-    it "adds a search alert when an alternate term was searched", ->
-        testCorrection(@view, "foo")
-        expect(@view.addSearchAlert).toHaveBeenCalled()
-        expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/foo/)
-
-    it "does not add a search alert when no alternate term was searched", ->
-        testCorrection(@view, null)
-        expect(@view.addSearchAlert).not.toHaveBeenCalled()
-
-    it "clears search alerts when a new search is performed", ->
-        spyOn(@view, "clearSearchAlerts")
-        spyOn(DiscussionUtil, "safeAjax")
-        @view.searchFor("dummy")
-        expect(@view.clearSearchAlerts).toHaveBeenCalled()
-
-    it "clears search alerts when the underlying collection changes", ->
-        spyOn(@view, "clearSearchAlerts")
-        spyOn(@view, "renderThread")
-        @view.collection.trigger("change", new Thread({id: 1}))
-        expect(@view.clearSearchAlerts).toHaveBeenCalled()
-
     makeView = (discussion) ->
       return new DiscussionThreadListView(
           el: $(".sidebar"),
@@ -202,3 +145,129 @@ describe "DiscussionThreadListView", ->
 
       it "with sort preference comments", ->
           changeSorting(@threads, "votes", "comments", ["Thread3", "Thread2", "Thread1"])
+
+    describe "search alerts", ->
+
+        testAlertMessages = (expectedMessages) ->
+            expect($(".search-alert .message").map( ->
+              $(@).html()
+            ).get()).toEqual(expectedMessages)
+
+        it "renders and removes search alerts", ->
+            testAlertMessages []
+            foo = @view.addSearchAlert("foo")
+            testAlertMessages ["foo"]
+            bar = @view.addSearchAlert("bar")
+            testAlertMessages ["foo", "bar"]
+            @view.removeSearchAlert(foo.cid)
+            testAlertMessages ["bar"]
+            @view.removeSearchAlert(bar.cid)
+            testAlertMessages []
+
+        it "clears all search alerts", ->
+            @view.addSearchAlert("foo")
+            @view.addSearchAlert("bar")
+            @view.addSearchAlert("baz")
+            testAlertMessages ["foo", "bar", "baz"]
+            @view.clearSearchAlerts()
+            testAlertMessages []
+
+    describe "search spell correction", ->
+
+        beforeEach ->
+            spyOn(@view, "searchForUser")
+
+        testCorrection = (view, correctedText) ->
+            spyOn(view, "addSearchAlert")
+            $.ajax.andCallFake(
+                (params) =>
+                    params.success(
+                        {discussion_data: [], page: 42, num_pages: 99, corrected_text: correctedText}, 'success'
+                    )
+                    {always: ->}
+            )
+            view.searchFor("dummy")
+            expect($.ajax).toHaveBeenCalled()
+
+        it "adds a search alert when an alternate term was searched", ->
+            testCorrection(@view, "foo")
+            expect(@view.addSearchAlert.callCount).toEqual(1)
+            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/foo/)
+
+        it "does not add a search alert when no alternate term was searched", ->
+            testCorrection(@view, null)
+            expect(@view.addSearchAlert.callCount).toEqual(1)
+            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/no threads matched/i)
+
+        it "clears search alerts when a new search is performed", ->
+            spyOn(@view, "clearSearchAlerts")
+            spyOn(DiscussionUtil, "safeAjax")
+            @view.searchFor("dummy")
+            expect(@view.clearSearchAlerts).toHaveBeenCalled()
+
+        it "clears search alerts when the underlying collection changes", ->
+            spyOn(@view, "clearSearchAlerts")
+            spyOn(@view, "renderThread")
+            @view.collection.trigger("change", new Thread({id: 1}))
+            expect(@view.clearSearchAlerts).toHaveBeenCalled()
+
+    describe "username search", ->
+
+        it "makes correct ajax calls", ->
+            $.ajax.andCallFake(
+                (params) =>
+                    expect(params.data.username).toEqual("testing-username")
+                    expect(params.url.path()).toEqual(DiscussionUtil.urlFor("users"))
+                    params.success(
+                        {users: []}, 'success'
+                    )
+                    {always: ->}
+            )
+            @view.searchForUser("testing-username")
+            expect($.ajax).toHaveBeenCalled()
+
+        setAjaxResults = (threadSuccess, userResult) ->
+            # threadSuccess is a boolean indicating whether the thread search ajax call should succeed
+            # userResult is the value that should be returned as data from the username search ajax call
+            $.ajax.andCallFake(
+                (params) =>
+                    if params.data.text and threadSuccess
+                        params.success(
+                            {discussion_data: [], page: 42, num_pages: 99, corrected_text: "dummy"},
+                            "success"
+                        )
+                    else if params.data.username
+                        params.success(
+                            {users: userResult},
+                            "success"
+                        )
+                    {always: ->}
+            )
+
+        it "gets called after a thread search succeeds", ->
+            spyOn(@view, "searchForUser").andCallThrough()
+            setAjaxResults(true, [])
+            @view.searchFor("gizmo")
+            expect(@view.searchForUser).toHaveBeenCalled()
+            expect($.ajax.mostRecentCall.args[0].data.username).toEqual("gizmo")
+
+        it "does not get called after a thread search fails", ->
+            spyOn(@view, "searchForUser").andCallThrough()
+            setAjaxResults(false, [])
+            @view.searchFor("gizmo")
+            expect(@view.searchForUser).not.toHaveBeenCalled()
+
+        it "adds a search alert when an username was matched", ->
+            spyOn(@view, "addSearchAlert")
+            setAjaxResults(true, [{username: "gizmo", id: "1"}])
+            @view.searchForUser("dummy")
+            expect($.ajax).toHaveBeenCalled()
+            expect(@view.addSearchAlert).toHaveBeenCalled()
+            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/gizmo/)
+
+        it "does not add a search alert when no username was matched", ->
+            spyOn(@view, "addSearchAlert")
+            setAjaxResults(true, [])
+            @view.searchForUser("dummy")
+            expect($.ajax).toHaveBeenCalled()
+            expect(@view.addSearchAlert).not.toHaveBeenCalled()
