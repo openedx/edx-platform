@@ -157,9 +157,13 @@ class @HTMLEditingDescriptor
     data: text
 
   capture_analytics: (event_name) =>
-    properties = editor: @editor_choice
+    # don't track if course_location_analytics is not defined
+    # this can happen when composing a bulk email in LMS
     if course_location_analytics?
-      properties['course'] = course_location_analytics
-    if unit_location_analytics?
-      properties['unit_id'] = unit_location_analytics
-    analytics.track event_name, properties
+      properties =
+        course: course_location_analytics
+        editor: @editor_choice
+      # unit_location_analytics is not defined when editing a course page
+      if unit_location_analytics?
+        properties['unit_id'] = unit_location_analytics
+      analytics.track event_name, properties
