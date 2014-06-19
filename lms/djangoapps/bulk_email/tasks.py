@@ -5,7 +5,6 @@ to a course.
 import re
 import random
 import json
-import math
 from time import sleep
 
 from dogapi import dog_stats_api
@@ -93,16 +92,18 @@ BULK_EMAIL_FAILURE_ERRORS = (
     SMTPException,
 )
 
-def _get_recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
+
+def _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
     """
     Generates lists of email recipients corresponding to the requested to_option category.
 
     `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
 
+    `recipient_fields` refers to the fields that each query will return
+
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
     will be properly deduped.
     """
-
     if to_option in [SEND_TO_MYSELF, SEND_TO_STAFF]:
         # for these options, _get_querysets_for_to_option only returns one queryset
         recipient_qset = _get_querysets_for_to_option(to_option, course_id, user_id)[0]
@@ -122,6 +123,7 @@ def _get_recipient_lists_generator(user_id, to_option, course_id, recipient_fiel
             recipient_fields
         ):
             yield item_sublist
+
 
 def _get_querysets_for_to_option(to_option, course_id, user_id):
     """
@@ -155,15 +157,20 @@ def _get_querysets_for_to_option(to_option, course_id, user_id):
             )
             return [unenrolled_staff_instr_qset, enrollment_qset]
 
+
 def _get_num_items_for_to_option(to_option, course_id, user_id):
     """
-    Returns the amount of recipients for a given `to_option`
+    Returns the amount of recipients for a given to_option
     """
     return sum(
         [queryset.count() for queryset in _get_querysets_for_to_option(to_option, course_id, user_id)]
     )
 
+
 def _get_num_subtasks_for_to_option(to_option, course_id, user_id):
+    """
+    Returns the number of subtasks for a given to_option
+    """
     num_subtasks = 0
     recipient_qsets = _get_querysets_for_to_option(to_option, course_id, user_id)
     for recipient_qset in recipient_qsets:
@@ -175,8 +182,15 @@ def _get_num_subtasks_for_to_option(to_option, course_id, user_id):
             )
     return num_subtasks
 
+
 def recipient_generator(user_id, to_option, course_id, recipient_fields):
-    for item_sublist in _get_recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
+    """
+    Generates users for a given to_option. Because it iterates over
+    _recipient_lists_generator, it will execute the queries for users
+    in chunks.
+    `recipient_fields` refers to the fields that each query will return
+    """
+    for item_sublist in _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
         for item in item_sublist:
             yield item
 

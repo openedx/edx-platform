@@ -177,6 +177,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
+
     def test_no_duplicate_emails_staff_instructor(self):
         """
         Test that no duplicate emails are sent to a course instructor that is

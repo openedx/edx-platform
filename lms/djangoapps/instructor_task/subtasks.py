@@ -29,15 +29,16 @@ class DuplicateTaskException(Exception):
     pass
 
 
-def generate_lists_from_queryset(queryset, items_per_query, ordering_key, all_item_fields):
+def generate_lists_from_queryset(queryset, items_per_query, ordering_key, item_fields):
     """
-    Chunks up a query and generates the chunks.
+    Chunks up a query into subqueries that are ordered by a provided `ordering_key`.
+    Returns only those fields specified in `item_fields`.
     """
     total_num_items = queryset.count()
     num_queries = int(math.ceil(float(total_num_items) / float(items_per_query)))
-    if ordering_key not in all_item_fields:
-        all_item_fields.append(ordering_key)
-    queryset = queryset.order_by(ordering_key).values(*all_item_fields)
+    if ordering_key not in item_fields:
+        item_fields.append(ordering_key)
+    queryset = queryset.order_by(ordering_key).values(*item_fields)
     last_key = queryset[0][ordering_key] - 1
 
     for query_number in range(num_queries):
@@ -79,16 +80,19 @@ def _generate_items_for_subtask(
     total_num_items,
     total_num_subtasks,
     items_per_query,
-    items_per_task
+    items_per_task,
 ):
     """
     Generates a chunk of "items" that should be passed into a subtask.
 
     Arguments:
-        `item_queryset` : a query set that defines the "items" that should be passed to subtasks.
+        `item_generator` : a generator that generates the "items" that should be passed to subtasks.
         `item_fields` : the fields that should be included in the dict that is returned.
             These are in addition to the 'pk' field.
-        `total_num_items` : the result of item_queryset.count().
+        `total_num_items` : the amount of items that we expect the item_generator to produce.
+            If the item_generator is a queryset, it is possible that this parameter
+            will not accurately reflect how many items were produced by the generator
+        `total_num_subtasks`
         `items_per_query` : size of chunks to break the query operation into.
         `items_per_task` : maximum size of chunks to break each query chunk into for use by a subtask.
 
@@ -98,7 +102,8 @@ def _generate_items_for_subtask(
     """
     num_items_queued = 0
     all_item_fields = list(item_fields)
-    all_item_fields.append('pk')
+    if 'pk' not in all_item_fields:
+        all_item_fields.append('pk')
     num_subtasks = 0
 
     items_for_task = []
