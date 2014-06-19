@@ -119,7 +119,7 @@ Annotator.Plugin.Share = (function(_super) {
 	}
 	
 	//Create the actions for the buttons
-	Share.prototype.buttonsActions = function(field,method,url) {
+	Share.prototype.buttonsActions = function(field,method,url, annotation) {
 		var share = this;
 		
 		// hide popup when user clicks on close button
@@ -138,11 +138,11 @@ Annotator.Plugin.Share = (function(_super) {
 		$(field).find('.share-button-annotator.share-button').click(function() {
 		    event.preventDefault(); // disable normal link function so that it doesn't refresh the page
 		    var _field = this,
-		    	ovaId = $(this).attr('annotationId'),
+		    	ovaId = annotation.id,
 		    	title = method == 1?'Share':'Share without saving';
 		    
 		    // share.uri will be useful for buildHTMLPopup functions
-		    share.uri = share.createAPIURL(method,ovaId,url); 
+		    share.uri = share.createAPIURL(method,ovaId,url, annotation); 
 		    
 		    //display your popup
 		    $(this).parent().find('.share-popup-overlay-bg').show(); 
@@ -154,7 +154,7 @@ Annotator.Plugin.Share = (function(_super) {
 			if (typeof share.options.shareIn!='undefined'){
 				share.options.shareIn.forEach(function(item) {
 					$(_field).parent().find('.share-'+item+'-annotator.share-button').click(function() {
-						var url = share.createAPIURL(method,ovaId,url),
+						var url = share.createAPIURL(method,ovaId,url, annotation),
 							title = "Sharing a annotation with Open Video Annotation";
 							link = encodeURIComponent(url),
 							noteText = share.getSource('ovaText'),
@@ -174,12 +174,12 @@ Annotator.Plugin.Share = (function(_super) {
 	};
 	
 	
-	Share.prototype.createAPIURL = function(method,ovaId,url) {
+	Share.prototype.createAPIURL = function(method,ovaId,url, annotation) {
 		var annotator = this.annotator,
 			editor = annotator.editor,
 			method = method || 1,
 			//url = location.protocol + '//' + location.host + location.pathname,
-			url = url || window.location.href;
+			url = annotation.uri || window.location.href;
 		
 		url += (url.indexOf('?') >= 0)?'&':'?';
 			
@@ -327,21 +327,13 @@ Annotator.Plugin.Share = (function(_super) {
 									});
 								}
 							}
-						}else if(self._isVideo(an)){//It is a OpenSeaDragon Annotation
-							if (typeof mplayer[an.target.container]!='undefined'){
-								var player = mplayer[an.target.container];
-								if (player.id_ == an.target.container){
-									var anFound = an;
-									videojs(player.id_).ready(function(){
-										if (player.techName != 'Youtube'){
-											player.preload('auto');
-										}
-										player.autoPlayAPI = anFound;
-										player.play();
-									});
-								}
-							}
+						}else if(self._isImage(an)){//It is a OpenSeaDragon Annotation
+							var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
+                			osda.viewer.viewport.fitBounds(bounds, false);
+							$('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
+                                        'slow');
 						}else{//It is a text
+						    self._isImage(an);
 							var hasRanges = typeof an.ranges!='undefined' && typeof an.ranges[0] !='undefined',
 								startOffset = hasRanges?an.ranges[0].startOffset:'',
 								endOffset = hasRanges?an.ranges[0].endOffset:'';
@@ -457,6 +449,10 @@ Annotator.Plugin.Share = (function(_super) {
 		return (isVideo && hasContainer && isNumber);
 	}
 	
+	Share.prototype._isImage = function(annotation){
+		return annotation.media == 'image';
+	}
+	
 	Share.prototype.getParameterByName = function(name) {
 		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -486,9 +482,8 @@ Annotator.Plugin.Share = (function(_super) {
 				return self.buildHTMLShareButton('Share:',self.getSource('ovaId'));
 			});
 			
-			
 		//Create the actions for the buttons
-		this.buttonsActions(field[0],1,this.options.baseUrl); //1 is the method of the API that will be for share some annotation in the database
+		this.buttonsActions(field[0],1,this.options.baseUrl, annotation); //1 is the method of the API that will be for share some annotation in the database
 		return ret;
 	};
 

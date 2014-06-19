@@ -1013,6 +1013,9 @@ OpenSeadragonAnnotation = function (element, options) {
     
     //Set annotator.editor.OpenSeaDragon by default
     this.annotator.editor.OpenSeaDragon=-1;
+    
+    //We need to make sure that osda is accessible via annotator
+    this.annotator.osda = this;
 
     function reloadEditor(){
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
