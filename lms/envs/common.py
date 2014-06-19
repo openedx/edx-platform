@@ -196,7 +196,7 @@ FEATURES = {
     'ENABLE_SHOPPING_CART': False,
 
     # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': True,
+    'STORE_BILLING_INFO': False,
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
@@ -701,7 +701,7 @@ CC_PROCESSOR = {
         'MERCHANT_ID': '',
         'SERIAL_NUMBER': '',
         'ORDERPAGE_VERSION': '7',
-        'PURCHASE_ENDPOINT': 'https://testsecureacceptance.cybersource.com/pay',
+        'PURCHASE_ENDPOINT': '',
     }
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
