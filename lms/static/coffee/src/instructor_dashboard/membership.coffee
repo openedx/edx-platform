@@ -142,7 +142,7 @@ class AuthListWidget extends MemberListWidget
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
       error: std_ajax_err => 
-        `// Translators: A rolename appears this sentence.`
+        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
         cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
   # send ajax request to modify access
@@ -453,7 +453,7 @@ class BatchEnrollment
         (sr.identifier for sr in notenrolled)
 
     if notunenrolled.length
-      `// Translators: A list of users appears after this sentence`
+      `// Translators: A list of users appears after this sentence. This situation arises when a staff member tries to unenroll a user who is not currently enrolled in this course.`
       render_list gettext("These users were not affiliated with the course so could not be unenrolled:"),
         (sr.identifier for sr in notunenrolled)
 

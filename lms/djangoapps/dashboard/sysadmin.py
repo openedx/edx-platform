@@ -135,16 +135,25 @@ class Users(SysadminDashboardView):
             try:
                 testuser = authenticate(username=euser.username, password=epass)
             except (TypeError, PermissionDenied, AttributeError), err:
-                msg += _('Failed in authenticating {0}, error {1}\n'
-                         ).format(euser, err)
+                # Translators: This message means that the user could not be authenticated (that is, we could
+                # not log them in for some reason - maybe they don't have permission, or their password was wrong)
+                msg += _('Failed in authenticating {username}, error {error}\n').format(
+                    username=euser,
+                    error=err
+                )
                 continue
             if testuser is None:
-                msg += _('Failed in authenticating {0}\n').format(euser)
+                # Translators: This message means that the user could not be authenticated (that is, we could
+                # not log them in for some reason - maybe they don't have permission, or their password was wrong)
+                msg += _('Failed in authenticating {username}\n').format(username=euser)
+                # Translators: this means that the password has been corrected (sometimes the database needs to be resynchronized)
+                # Translate this as meaning "the password was fixed" or "the password was corrected".
                 msg += _('fixed password')
                 euser.set_password(epass)
                 euser.save()
                 continue
         if not msg:
+            # Translators: this means everything happened successfully, yay!
             msg = _('All ok!')
         return msg
 
@@ -165,13 +174,16 @@ class Users(SysadminDashboardView):
             else:
                 email = uname
             if not email.endswith('@{0}'.format(email_domain)):
-                msg += u'{0} @{1}'.format(_('email must end in'), email_domain)
+                # Translators: Domain is an email domain, such as "@gmail.com"
+                msg += _('Email address must end in {domain}').format(domain="@{0}".format(email_domain))
                 return msg
             mit_domain = 'ssl:MIT'
             if ExternalAuthMap.objects.filter(external_id=email,
                                               external_domain=mit_domain):
-                msg += _('Failed - email {0} already exists as '
-                         'external_id').format(email)
+                msg += _('Failed - email {email_addr} already exists as {external_id}').format(
+                    email_addr=email,
+                    external_id="external_id"
+                )
                 return msg
             new_password = generate_password()
         else:
@@ -190,8 +202,10 @@ class Users(SysadminDashboardView):
         try:
             user.save()
         except IntegrityError:
-            msg += _('Oops, failed to create user {0}, '
-                     'IntegrityError').format(user)
+            msg += _('Oops, failed to create user {user}, {error}').format(
+                user=user,
+                error="IntegrityError"
+            )
             return msg
 
         reg = Registration()
@@ -217,7 +231,7 @@ class Users(SysadminDashboardView):
             eamap.dtsignup = timezone.now()
             eamap.save()
 
-        msg += _('User {0} created successfully!').format(user)
+        msg += _('User {user} created successfully!').format(user=user)
         return msg
 
     def delete_user(self, uname):
@@ -229,17 +243,19 @@ class Users(SysadminDashboardView):
             try:
                 user = User.objects.get(email=uname)
             except User.DoesNotExist, err:
-                msg = _('Cannot find user with email address {0}').format(uname)
+                msg = _('Cannot find user with email address {email_addr}').format(email_addr=uname)
                 return msg
         else:
             try:
                 user = User.objects.get(username=uname)
             except User.DoesNotExist, err:
-                msg = _('Cannot find user with username {0} - {1}'
-                        ).format(uname, str(err))
+                msg = _('Cannot find user with username {username} - {error}').format(
+                    username=uname,
+                    error=str(err)
+                )
                 return msg
         user.delete()
-        return _('Deleted user {0}').format(uname)
+        return _('Deleted user {username}').format(username=uname)
 
     def make_common_context(self):
         """Returns the datatable used for this view"""
@@ -252,7 +268,8 @@ class Users(SysadminDashboardView):
                                    User.objects.all().count()]]
 
         self.msg += u'<h2>{0}</h2>'.format(
-            _('Courses loaded in the modulestore'))
+            _('Courses loaded in the modulestore')
+        )
         self.msg += u'<ol>'
         for course in self.get_courses():
             self.msg += u'<li>{0} ({1})</li>'.format(
@@ -418,6 +435,9 @@ class Courses(SysadminDashboardView):
 
         msg = u''
         if not getattr(settings, 'GIT_IMPORT_WITH_XMLMODULESTORE', False):
+            # Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+            # "XMLModuleStore" and "MongoDB" are database systems. You should not
+            # translate these names.
             return _('Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is '
                      'not turned on, and it is generally not safe to import '
                      'into an XMLModuleStore with multithreaded. We '
@@ -449,7 +469,7 @@ class Courses(SysadminDashboardView):
 
         msg += u'<pre>{0}</pre>'.format(cmd_output)
         if not os.path.exists(gdir):
-            msg += _('Failed to clone repository to {0}').format(gdir)
+            msg += _('Failed to clone repository to {directory_name}').format(directory_name=gdir)
             return msg
         # Change branch if specified
         if branch:
@@ -469,8 +489,9 @@ class Courses(SysadminDashboardView):
             msg += u'<hr width="50%"><pre>{0}</pre>'.format(escape(errlog))
         else:
             course = self.def_ms.courses[os.path.abspath(gdir)]
-            msg += _('Loaded course {0} {1}<br/>Errors:').format(
-                cdir, course.display_name)
+            msg += _('Loaded course {course_name}<br/>Errors:').format(
+                course_name="{} {}".format(cdir, course.display_name)
+            )
             errors = self.def_ms.get_course_errors(course.id)
             if not errors:
                 msg += u'None'

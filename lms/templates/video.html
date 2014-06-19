@@ -122,6 +122,7 @@
                   % else:
                   <li class="a11y-menu-item">
                   % endif
+		      ## This is necessary so we don't scrape 'display_name' as a string.
 		      <% dname = item['display_name'] %>
                       <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
                         ${_(dname)}
