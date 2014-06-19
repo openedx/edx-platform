@@ -48,8 +48,12 @@
 @import 'views/shoppingcart';
 
 // applications
-@import 'discussion/discussion';
-@import 'discussion/discussion-developer';
+@import "discussion/utilities/variables";
+@import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import "discussion/elements/navigation";
+@import 'discussion/utilities/developer';
+@import 'discussion/utilities/shame';
+
 @import 'news';
 
 // temp - shame and developer

@@ -1,37 +1,62 @@
 describe "DiscussionThreadListView", ->
 
     beforeEach ->
-
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures """
         <script type="text/template" id="thread-list-item-template">
-          <a href="<%- id %>" data-id="<%- id %>">
-            <span class="title"><%- title %></span>
-            <span class="comments-count">
+          <li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
+            <a href="#" class="forum-nav-thread-link">
+              <div class="forum-nav-thread-wrapper-1">
+                <span class="forum-nav-thread-title"><%- title %></span>
                 <%
-            var fmt;
-            var data = {
-                'span_sr_open': '<span class="sr">',
-                'span_close': '</span>',
-                'unread_comments_count': unread_comments_count,
-                'comments_count': comments_count
-                };
-            if (unread_comments_count > 0) {
-                fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
-            } else {
-                fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
-            }
-            print(interpolate(fmt, data, true));
-            %>
-            </span>
-
-            <span class="votes-count">+<%=
-                interpolate(
-                    '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
-                    {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
-                    true
-                    )
-            %></span>
-          </a>
+                var labels = "";
+                if (pinned) {
+                    labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
+                }
+                if (typeof(subscribed) != "undefined" && subscribed) {
+                    labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>Following</li> ';
+                }
+                if (staff_authored) {
+                    labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>By: Staff</li> ';
+                }
+                if (community_ta_authored) {
+                    labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
+                }
+                if (labels != "") {
+                    print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
+                }
+                %>
+              </div><div class="forum-nav-thread-wrapper-2">
+                <% if (endorsed) { %>
+                  <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">Endorsed response</span></span>
+                <% } %>
+                <span class="forum-nav-thread-votes-count">+<%=
+                    interpolate(
+                        '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
+                        {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
+                        true
+                        )
+                %></span>
+                <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
+                    <%
+                var fmt;
+                var data = {
+                    'span_sr_open': '<span class="sr">',
+                    'span_close': '</span>',
+                    'unread_comments_count': unread_comments_count,
+                    'comments_count': comments_count
+                    };
+                if (unread_comments_count > 0) {
+                    fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
+                } else {
+                    fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
+                }
+                print(interpolate(fmt, data, true));
+                %>
+                </span>
+              </div>
+            </a>
+          </li>
         </script>
         <script type="text/template" id="thread-list-template">
             <div class="browse-search">
@@ -53,9 +78,7 @@ describe "DiscussionThreadListView", ->
               </ul>
             </div>
             <div class="search-alerts"></div>
-            <div class="post-list-wrapper">
-                <ul class="post-list"></ul>
-            </div>
+            <ul class="forum-nav-thread-list"></ul>
         </script>
         <script aria-hidden="true" type="text/template" id="search-alert-template">
             <div class="search-alert" id="search-alert-<%- cid %>">
@@ -71,18 +94,49 @@ describe "DiscussionThreadListView", ->
         <div class="sidebar"></div>
         """
         @threads = [
-          {id: "1", title: "Thread1", body: "dummy body", votes: {up_count: '20'}, unread_comments_count:0, comments_count:1, created_at: '2013-04-03T20:08:39Z',},
-          {id: "2", title: "Thread2", body: "dummy body", votes: {up_count: '42'}, unread_comments_count:0, comments_count:2, created_at: '2013-04-03T20:07:39Z',},
-          {id: "3", title: "Thread3", body: "dummy body", votes: {up_count: '12'}, unread_comments_count:0, comments_count:3, created_at: '2013-04-03T20:06:39Z',},
+          makeThreadWithProps({
+            id: "1",
+            title: "Thread1",
+            votes: {up_count: '20'},
+            comments_count: 1,
+            created_at: '2013-04-03T20:08:39Z',
+          }),
+          makeThreadWithProps({
+            id: "2",
+            title: "Thread2",
+            votes: {up_count: '42'},
+            comments_count: 2,
+            created_at: '2013-04-03T20:07:39Z',
+          }),
+          makeThreadWithProps({
+            id: "3",
+            title: "Thread3",
+            votes: {up_count: '12'},
+            comments_count: 3,
+            created_at: '2013-04-03T20:06:39Z',
+          }),
         ]
-        window.$$course_id = "TestOrg/TestCourse/TestRun"
-        window.user = new DiscussionUser({id: "567", upvoted_ids: []})
 
         spyOn($, "ajax")
 
         @discussion = new Discussion([])
         @view = new DiscussionThreadListView({collection: @discussion, el: $(".sidebar")})
         @view.render()
+
+    makeThreadWithProps = (props) ->
+      # Minimal set of properties necessary for rendering
+      thread = {
+        id: "dummy_id",
+        pinned: false,
+        endorsed: false,
+        votes: {up_count: '0'},
+        unread_comments_count: 0,
+        comments_count: 0,
+      }
+      $.extend(thread, props)
+
+    renderSingleThreadWithProps = (props) ->
+      makeView(new Discussion([new Thread(makeThreadWithProps(props))])).render()
 
     testAlertMessages = (expectedMessages) ->
         expect($(".search-alert .message").map( ->
@@ -148,15 +202,15 @@ describe "DiscussionThreadListView", ->
       )
 
     checkThreadsOrdering =  (view, sort_order, type) ->
-      expect(view.$el.find(".post-list .list-item").children().length).toEqual(3)
-      expect(view.$el.find(".post-list .list-item:nth-child(1) .title").text()).toEqual(sort_order[0])
-      expect(view.$el.find(".post-list .list-item:nth-child(2) .title").text()).toEqual(sort_order[1])
-      expect(view.$el.find(".post-list .list-item:nth-child(3) .title").text()).toEqual(sort_order[2])
+      expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)
+      expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text()).toEqual(sort_order[0])
+      expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text()).toEqual(sort_order[1])
+      expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text()).toEqual(sort_order[2])
       expect(view.$el.find(".sort-bar a.active").text()).toEqual(type)
 
     describe "thread rendering should be correct", ->
         checkRender = (threads, type, sort_order) ->
-            discussion = new Discussion(threads, {pages: 1, sort: type})
+            discussion = new Discussion(_.map(threads, (thread) -> new Thread(thread)), {pages: 1, sort: type})
             view = makeView(discussion)
             view.render()
             checkThreadsOrdering(view, sort_order, type)
@@ -172,7 +226,7 @@ describe "DiscussionThreadListView", ->
 
     describe "Sort click should be correct", ->
       changeSorting = (threads, selected_type, new_type, sort_order) ->
-        discussion = new Discussion(threads, {pages: 1, sort: selected_type})
+        discussion = new Discussion(_.map(threads, (thread) -> new Thread(thread)), {pages: 1, sort: selected_type})
         view = makeView(discussion)
         view.render()
         expect(view.$el.find(".sort-bar a.active").text()).toEqual(selected_type)
@@ -202,3 +256,47 @@ describe "DiscussionThreadListView", ->
 
       it "with sort preference comments", ->
           changeSorting(@threads, "votes", "comments", ["Thread3", "Thread2", "Thread1"])
+
+    describe "endorsed renders correctly", ->
+      it "when absent", ->
+        renderSingleThreadWithProps({})
+        expect($(".forum-nav-thread-endorsed").length).toEqual(0)
+
+      it "when present", ->
+        renderSingleThreadWithProps({endorsed: true})
+        expect($(".forum-nav-thread-endorsed").length).toEqual(1)
+
+    describe "post labels render correctly", ->
+      beforeEach ->
+        @moderatorId = "42"
+        @administratorId = "43"
+        @communityTaId = "44"
+        DiscussionUtil.loadRoles({
+          "Moderator": [parseInt(@moderatorId)],
+          "Administrator": [parseInt(@administratorId)],
+          "Community TA": [parseInt(@communityTaId)],
+        })
+
+      it "for pinned", ->
+        renderSingleThreadWithProps({pinned: true})
+        expect($(".forum-nav-thread-label-pinned").length).toEqual(1)
+
+      it "for following", ->
+        renderSingleThreadWithProps({subscribed: true})
+        expect($(".forum-nav-thread-label-following").length).toEqual(1)
+
+      it "for moderator", ->
+        renderSingleThreadWithProps({user_id: @moderatorId})
+        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+
+      it "for administrator", ->
+        renderSingleThreadWithProps({user_id: @administratorId})
+        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+
+      it "for community TA", ->
+        renderSingleThreadWithProps({user_id: @communityTaId})
+        expect($(".forum-nav-thread-label-community-ta").length).toEqual(1)
+
+      it "when none should be present", ->
+        renderSingleThreadWithProps({})
+        expect($(".forum-nav-thread-labels").length).toEqual(0)
