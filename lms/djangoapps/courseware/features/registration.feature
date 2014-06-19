@@ -1,4 +1,3 @@
-@shard_1
 Feature: LMS.Register for a course
   As a registered user
   In order to access my class content

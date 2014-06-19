@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Instructor Dash Data Download
     As an instructor or course staff,
     In order to manage my class

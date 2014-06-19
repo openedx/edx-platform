@@ -1,4 +1,3 @@
-@shard_1
 Feature: LMS.Navigate Course
     As a student in an edX course
     In order to access courseware

@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Graphical Slider Tool Module
   As a student, I want to view a Graphical Slider Tool Component
 

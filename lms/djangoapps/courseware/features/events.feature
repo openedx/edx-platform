@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Events
   As a researcher, I want to be able to track events in the LMS
 

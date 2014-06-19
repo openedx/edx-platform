@@ -1,4 +1,4 @@
-@shard_2 @requires_stub_youtube
+@requires_stub_youtube
 Feature: LMS.Video component
   As a student, I want to view course videos in LMS
 

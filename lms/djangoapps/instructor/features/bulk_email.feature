@@ -1,4 +1,3 @@
-@shard_2
 Feature: LMS.Instructor Dash Bulk Email
     As an instructor or course staff,
     In order to communicate with students and staff
