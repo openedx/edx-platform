@@ -1338,3 +1338,22 @@ class CoursesApiTests(TestCase):
         test_uri = '{}/{}/grades'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_project_list(self):
+        projects_uri = '/api/projects/'
+
+        for i in xrange(0, 25):
+            data = {
+                'course_id': self.test_course_id,
+                'content_id': '{}_{}'.format(self.test_course_content_id, i)
+            }
+            response = self.do_post(projects_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        response = self.do_get('{}/{}/projects/?page_size=10'.format(self.base_courses_uri, self.test_course_id))
+        self.assertEqual(response.data['count'], 25)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['num_pages'], 3)
+
+        response = self.do_get('{}/{}/projects/'.format(self.base_courses_uri, self.test_bogus_course_id))
+        self.assertEqual(response.status_code, 404)
