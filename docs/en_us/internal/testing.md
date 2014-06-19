@@ -133,6 +133,10 @@ or
 To run a single django test class:
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest
+    
+When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc. In this case, it is helpful to look at the output of paver, and run just the specific command (optionally, stripping away coverage metrics). At the time of this writing, the command is: 
+
+    python ./manage.py lms test --verbosity=1 lms/djangoapps/courseware/tests/test_courses.py   --traceback --settings=test
 
 To run a single django test:
 
