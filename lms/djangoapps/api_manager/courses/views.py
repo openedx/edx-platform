@@ -30,6 +30,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import generate_base_uri
+from projects.models import Project
+from projects.serializers import ProjectSerializer
 
 from .serializers import CourseModuleCompletionSerializer
 from .serializers import GradeSerializer
@@ -1375,3 +1377,24 @@ class CoursesGradesList(SecureListAPIView):
             serializer = GradeSerializer(row)
             response_data['grades'].append(serializer.data)
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class CoursesProjectList(SecureListAPIView):
+    """
+    ### The CoursesProjectList view allows clients to retrieve paginated list of projects by course
+    - URI: ```/api/courses/{course_id}/projects/```
+    - GET: Provides paginated list of projects for a course
+    """
+
+    serializer_class = ProjectSerializer
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            raise Http404
+
+        return Project.objects.filter(course_id=course_id)
