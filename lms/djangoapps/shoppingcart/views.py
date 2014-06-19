@@ -155,6 +155,8 @@ def show_receipt(request, ordernum):
     Displays a receipt for a particular order.
     404 if order is not yet purchased or request.user != order.user
     """
+
+    paid_course_ids =[]
     try:
         order = Order.objects.get(id=ordernum)
     except Order.DoesNotExist:
