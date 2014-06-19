@@ -898,7 +898,7 @@ class UsersWorkgroupsList(SecureListAPIView):
     - URI: ```/api/users/{user_id}/workgroups/```
     - GET: Provides paginated list of workgroups for a user
     To filter the user's workgroup set by course
-    GET ```/api/users/{user_id}/workgroups/?course={course_id}```
+    GET ```/api/users/{user_id}/workgroups/?course_id={course_id}```
     """
 
     serializer_class = BasicWorkgroupSerializer
