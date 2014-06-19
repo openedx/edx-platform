@@ -22,7 +22,7 @@ from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
 from mock import patch, Mock
 from shoppingcart.views import initialize_report
-
+from decimal import Decimal
 
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
@@ -59,6 +59,13 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.verified_course_key = verified_course.id
         self.cart = Order.get_cart_for_user(self.user)
         self.addCleanup(patcher.stop)
+
+    def get_discount(self):
+        """
+        This method simple return the discounted amount
+        """
+        val = Decimal("{0:.2f}".format(Decimal(self.percentage_discount / 100.00) * self.cost))
+        return self.cost - val
 
     def add_coupon(self, course_key, is_active):
         """
@@ -127,7 +134,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertGreater(item.discount_price, 0)
 
         # after getting 10 percent discount
-        self.assertEqual(self.cart.total_cost, 36)
+        self.assertEqual(self.cart.total_cost, self.get_discount())
 
         # now testing coupon code already used scenario, reusing the same coupon code
         resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
@@ -296,6 +303,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         resp2 = self.client.get(reverse('shoppingcart.views.show_receipt', args=[1000]))
         self.assertEqual(resp2.status_code, 404)
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_with_valid_coupon_code(self):
+        self.add_course_to_user_cart()
+        self.add_coupon(self.course_key, True)
+
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('FirstNameTesting123', resp.content)
+        self.assertIn(str(self.get_discount()), resp.content)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success(self):
