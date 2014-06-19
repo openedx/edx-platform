@@ -313,6 +313,26 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 @view.addAsset(model)
                 expect(@collection.add).not.toHaveBeenCalled()
 
+            it "calls analytics when an asset is added", ->
+                requests = setup.call(this)
+                addMockAsset.call(this, requests)
+                expect(window.analytics.track).toHaveBeenCalledWith(
+                    'File: Upload',
+                        'course': window.course_location_analytics
+                        'asset_id': 'new_actual_asset_url'
+                )
+
+            it "calls analytics when as asset is deleted", ->
+              requests = setup.call(this)
+              @view.$(".remove-asset-button")[0].click()
+              @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
+              req.respond(200) for req in requests
+              expect(window.analytics.track).toHaveBeenCalledWith(
+                  'File: Delete',
+                      'course': window.course_location_analytics
+                      'asset_id': 'actual_asset_url_1'
+              )
+
         describe "Sorting", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = ->
