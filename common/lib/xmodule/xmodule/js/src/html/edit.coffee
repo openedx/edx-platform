@@ -157,9 +157,9 @@ class @HTMLEditingDescriptor
     data: text
 
   capture_analytics: (event_name) =>
-    properties =
-        course: course_location_analytics
-        editor: @editor_choice
+    properties = editor: @editor_choice
+    if course_location_analytics?
+      properties['course'] = course_location_analytics
     if unit_location_analytics?
       properties['unit_id'] = unit_location_analytics
     analytics.track event_name, properties
