@@ -17,7 +17,8 @@ VIDEO_BUTTONS = {
     'pause': '.video_control.pause',
     'fullscreen': '.add-fullscreen',
     'download_transcript': '.video-tracks > a',
-    'speed': '.speeds'
+    'speed': '.speeds',
+    'quality': '.quality-control',
 }
 
 CSS_CLASS_NAMES = {
@@ -852,3 +853,33 @@ class VideoPage(PageObject):
             lambda: self.position(video_display_name) == position,
             'Position is {position}'.format(position=position)
         )
+
+    def is_quality_button_visible(self, video_display_name=None):
+        """
+        Get the visibility state of quality button
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            bool: visibility status
+
+        """
+        selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS['quality'])
+        return self.q(css=selector).visible
+
+    def is_quality_button_active(self, video_display_name=None):
+        """
+        Check if quality button is active or not.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            bool: active status
+
+        """
+        selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS['quality'])
+
+        classes = self.q(css=selector).attrs('class')[0].split()
+        return 'active' in classes

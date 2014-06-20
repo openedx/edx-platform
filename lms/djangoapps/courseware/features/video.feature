@@ -30,20 +30,3 @@ Feature: LMS.Video component
     When I open video "D"
     Then the video has rendered in "HTML5" mode
     And the video does not show the captions
-
-  # 4
-  @skip_firefox
-  Scenario: Quality button appears on play
-    Given the course has a Video component in "Youtube" mode
-    Then I see video button "quality" is hidden
-    And I click video button "play"
-    Then I see video button "quality" is visible
-
-  # 5
-  @skip_firefox
-  Scenario: Quality button works correctly
-    Given the course has a Video component in "Youtube" mode
-    And I click video button "play"
-    And I see video button "quality" is inactive
-    And I click video button "quality"
-    Then I see video button "quality" is active
