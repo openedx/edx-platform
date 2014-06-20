@@ -2,6 +2,7 @@
 from mock import MagicMock
 import xmodule.tabs as tabs
 import unittest
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class TabTestCase(unittest.TestCase):
@@ -9,7 +10,7 @@ class TabTestCase(unittest.TestCase):
     def setUp(self):
 
         self.course = MagicMock()
-        self.course.id = 'edX/toy/2012_Fall'
+        self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.fake_dict_tab = {'fake_key': 'fake_value'}
         self.settings = MagicMock()
         self.settings.FEATURES = {}
@@ -137,7 +138,7 @@ class ProgressTestCase(TabTestCase):
         return self.check_tab(
             tab_class=tabs.ProgressTab,
             dict_tab={'type': tabs.ProgressTab.type, 'name': 'same'},
-            expected_link=self.reverse('progress', args=[self.course.id]),
+            expected_link=self.reverse('progress', args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tabs.ProgressTab.type,
             invalid_dict_tab=None,
         )
@@ -161,7 +162,7 @@ class WikiTestCase(TabTestCase):
         return self.check_tab(
             tab_class=tabs.WikiTab,
             dict_tab={'type': tabs.WikiTab.type, 'name': 'same'},
-            expected_link=self.reverse('course_wiki', args=[self.course.id]),
+            expected_link=self.reverse('course_wiki', args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tabs.WikiTab.type,
             invalid_dict_tab=self.fake_dict_tab,
         )
@@ -220,7 +221,7 @@ class StaticTabTestCase(TabTestCase):
         tab = self.check_tab(
             tab_class=tabs.StaticTab,
             dict_tab={'type': tabs.StaticTab.type, 'name': 'same', 'url_slug': url_slug},
-            expected_link=self.reverse('static_tab', args=[self.course.id, url_slug]),
+            expected_link=self.reverse('static_tab', args=[self.course.id.to_deprecated_string(), url_slug]),
             expected_tab_id='static_tab_schmug',
             invalid_dict_tab=self.fake_dict_tab,
         )
@@ -257,7 +258,10 @@ class TextbooksTestCase(TabTestCase):
             # verify all textbook type tabs
             if isinstance(tab, tabs.SingleTextbookTab):
                 book_type, book_index = tab.tab_id.split("/", 1)
-                expected_link = self.reverse(type_to_reverse_name[book_type], args=[self.course.id, book_index])
+                expected_link = self.reverse(
+                    type_to_reverse_name[book_type],
+                    args=[self.course.id.to_deprecated_string(), book_index]
+                )
                 self.assertEqual(tab.link_func(self.course, self.reverse), expected_link)
                 self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
                 num_textbooks_found = num_textbooks_found + 1
@@ -279,7 +283,7 @@ class GradingTestCase(TabTestCase):
             tab_class=tab_class,
             dict_tab={'type': tab_class.type, 'name': name},
             expected_name=name,
-            expected_link=self.reverse(link_value, args=[self.course.id]),
+            expected_link=self.reverse(link_value, args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tab_class.type,
             invalid_dict_tab=None,
         )
@@ -314,7 +318,7 @@ class NotesTestCase(TabTestCase):
         return self.check_tab(
             tab_class=tabs.NotesTab,
             dict_tab={'type': tabs.NotesTab.type, 'name': 'same'},
-            expected_link=self.reverse('notes', args=[self.course.id]),
+            expected_link=self.reverse('notes', args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tabs.NotesTab.type,
             invalid_dict_tab=self.fake_dict_tab,
         )
@@ -341,7 +345,7 @@ class SyllabusTestCase(TabTestCase):
             tab_class=tabs.SyllabusTab,
             dict_tab={'type': tabs.SyllabusTab.type, 'name': name},
             expected_name=name,
-            expected_link=self.reverse('syllabus', args=[self.course.id]),
+            expected_link=self.reverse('syllabus', args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tabs.SyllabusTab.type,
             invalid_dict_tab=None,
         )
@@ -365,7 +369,7 @@ class InstructorTestCase(TabTestCase):
             tab_class=tabs.InstructorTab,
             dict_tab={'type': tabs.InstructorTab.type, 'name': name},
             expected_name=name,
-            expected_link=self.reverse('instructor_dashboard', args=[self.course.id]),
+            expected_link=self.reverse('instructor_dashboard', args=[self.course.id.to_deprecated_string()]),
             expected_tab_id=tabs.InstructorTab.type,
             invalid_dict_tab=None,
         )
@@ -603,7 +607,7 @@ class DiscussionLinkTestCase(TabTestCase):
         """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
-            if viewname == "django_comment_client.forum.views.forum_form_discussion" and args == [course.id]:
+            if viewname == "django_comment_client.forum.views.forum_form_discussion" and args == [course.id.to_deprecated_string()]:
                 return "default_discussion_link"
         return reverse_discussion_link
 

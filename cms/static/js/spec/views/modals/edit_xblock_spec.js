@@ -12,7 +12,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
             beforeEach(function () {
                 edit_helpers.installEditTemplates();
-                appendSetFixtures('<div class="xblock" data-locator="mock-xblock" data-display-name="Mock XBlock"></div>');
+                appendSetFixtures('<div class="xblock" data-locator="mock-xblock"></div>');
                 model = new XBlockInfo({
                     id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',

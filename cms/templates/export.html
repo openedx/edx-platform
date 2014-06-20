@@ -1,8 +1,8 @@
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "export" %></%def>
 <%namespace name='static' file='static_content.html'/>
 
 <%!
-  from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   import json
 %>

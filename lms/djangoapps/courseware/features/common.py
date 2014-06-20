@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
@@ -119,16 +120,19 @@ def go_into_course(step):
 
 
 def course_id(course_num):
-    return "%s/%s/%s" % (world.scenario_dict['COURSE'].org, course_num,
-                         world.scenario_dict['COURSE'].url_name)
+    return SlashSeparatedCourseKey(
+        world.scenario_dict['COURSE'].org,
+        course_num,
+        world.scenario_dict['COURSE'].url_name
+    )
 
 
 def course_location(course_num):
-    return world.scenario_dict['COURSE'].location._replace(course=course_num)
+    return world.scenario_dict['COURSE'].location.replace(course=course_num)
 
 
 def section_location(course_num):
-    return world.scenario_dict['SECTION'].location._replace(course=course_num)
+    return world.scenario_dict['SECTION'].location.replace(course=course_num)
 
 
 def visit_scenario_item(item_key):
@@ -140,8 +144,8 @@ def visit_scenario_item(item_key):
     url = django_url(reverse(
         'jump_to',
         kwargs={
-            'course_id': world.scenario_dict['COURSE'].id,
-            'location': str(world.scenario_dict[item_key].location),
+            'course_id': world.scenario_dict['COURSE'].id.to_deprecated_string(),
+            'location': world.scenario_dict[item_key].location.to_deprecated_string(),
         }
     ))
 

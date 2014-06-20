@@ -73,6 +73,24 @@ class CapaHtmlRenderTest(unittest.TestCase):
         span_element = rendered_html.find('span')
         self.assertEqual(span_element.text, 'Test text')
 
+    def test_anonymous_student_id(self):
+        # make sure anonymous_student_id is rendered properly as a context variable
+        xml_str = textwrap.dedent("""
+            <problem>
+            <span>Welcome $anonymous_student_id</span>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = new_loncapa_problem(xml_str)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+
+        # Expect that the anonymous_student_id was converted to "student"
+        span_element = rendered_html.find('span')
+        self.assertEqual(span_element.text, 'Welcome student')
+
     def test_render_script(self):
         # Generate some XML with a <script> tag
         xml_str = textwrap.dedent("""
@@ -153,9 +171,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # the solution
         expected_textline_context = {
             'STATIC_URL': '/dummy-static/',
-            'status': 'unsubmitted',
-            'status_class': 'unanswered',
-            'status_display': u'unanswered',
+            'status': the_system.STATUS_CLASS('unsubmitted'),
             'label': '',
             'value': '',
             'preprocessor': None,

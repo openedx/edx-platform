@@ -15,7 +15,6 @@ urlpatterns = ('',  # nopep8
     url(r'^request_certificate$', 'certificates.views.request_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
-    url(r'^token$', 'student.views.token', name="token"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
 
@@ -226,7 +225,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
         #View for mktg site
-        url(r'^mktg/(?P<course_id>.*)$',
+        url(r'^mktg/(?P<course_id>[^/]+/[^/]+/[^/]+)/?$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
 
         #Inside the course
@@ -274,14 +273,15 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
-
-        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
-
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
+            include('instructor.views.api_urls')),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.legacy.gradebook', name='gradebook'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'instructor.views.legacy.grade_summary', name='grade_summary'),
+            'instructor.views.instructor_dashboard.spoc_gradebook', name='spoc_gradebook'),
+
+        # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
+
+        # Open Ended grading views
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
@@ -302,21 +302,21 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.views.take_action_on_flags', name='open_ended_flagged_problems_take_action'),
 
         # Cohorts management
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts$',
             'course_groups.views.list_cohorts', name="cohorts"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/add$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts/add$',
             'course_groups.views.add_cohort',
             name="add_cohort"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)$',
             'course_groups.views.users_in_cohort',
             name="list_cohort"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/add$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/add$',
             'course_groups.views.add_users_to_cohort',
             name="add_to_cohort"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/delete$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/delete$',
             'course_groups.views.remove_user_from_cohort',
             name="remove_from_cohort"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/debug$',
+        url(r'^courses/(?P<course_key>[^/]+/[^/]+/[^/]+)/cohorts/debug$',
             'course_groups.views.debug_cohort_mgmt',
             name="debug_cohort_mgmt"),
 
@@ -377,13 +377,14 @@ if settings.COURSEWARE_ENABLED:
         )
 
 
-if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
-            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
-
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
-            include('instructor.views.api_urls'))
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_gradebook$',
+            'instructor.views.legacy.gradebook', name='gradebook_legacy'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_grade_summary$',
+            'instructor.views.legacy.grade_summary', name='grade_summary_legacy'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_instructor_dash$',
+            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_legacy"),
     )
 
 if settings.FEATURES.get('CLASS_DASHBOARD'):

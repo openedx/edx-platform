@@ -19,6 +19,7 @@
     @include box-sizing(border-box);
     @include ui-flexbox();
     @extend %ui-align-center-flex;
+    justify-content: space-between;
     border-bottom: 1px solid $gray-l4;
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
@@ -30,14 +31,14 @@
       @extend %ui-justify-left-flex;
       @include ui-flexbox();
       width: flex-grid(6,12);
-      vertical-align: top;
+      vertical-align: middle;
     }
 
     .header-actions {
       @include ui-flexbox();
       @extend %ui-justify-right-flex;
       width: flex-grid(6,12);
-      vertical-align: top;
+      vertical-align: middle;
     }
   }
 }
@@ -47,13 +48,18 @@
 // UI: xblocks - calls-to-action
 .wrapper-xblock .header-actions {
   @extend %actions-header;
+
+  .action-button [class^="icon-"] {
+    font-style: normal;
+  }
 }
 
 // UI: xblock is collapsible
-.wrapper-xblock.is-collapsible, .wrapper-xblock.xblock-type-container {
+.wrapper-xblock.is-collapsible,
+.wrapper-xblock.xblock-type-container {
 
   [class^="icon-"] {
-  font-style: normal;
+    font-style: normal;
   }
 
   .expand-collapse {

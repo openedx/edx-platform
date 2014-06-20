@@ -14,51 +14,52 @@ _ = lambda text: text
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
-        display_name="Display Name", help="Display name for this module.",
+        help=_("The name students see. This name appears in the course ribbon and as a header for the video."),
+        display_name=_("Component Display Name"),
         default="Video",
         scope=Scope.settings
     )
 
     saved_video_position = RelativeTime(
-        help="Current position in the video.",
+        help=_("Current position in the video."),
         scope=Scope.user_state,
         default=datetime.timedelta(seconds=0)
     )
     # TODO: This should be moved to Scope.content, but this will
     # require data migration to support the old video module.
     youtube_id_1_0 = String(
-        help="This is the Youtube ID reference for the normal speed video.",
-        display_name="Youtube ID",
+        help=_("Optional, for older browsers: the YouTube ID for the normal speed video."),
+        display_name=_("YouTube ID"),
         scope=Scope.settings,
         default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
-        help="Optional, for older browsers: the Youtube ID for the .75x speed video.",
-        display_name="Youtube ID for .75x speed",
+        help=_("Optional, for older browsers: the YouTube ID for the .75x speed video."),
+        display_name=_("YouTube ID for .75x speed"),
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
-        help="Optional, for older browsers: the Youtube ID for the 1.25x speed video.",
-        display_name="Youtube ID for 1.25x speed",
+        help=_("Optional, for older browsers: the YouTube ID for the 1.25x speed video."),
+        display_name=_("YouTube ID for 1.25x speed"),
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
-        help="Optional, for older browsers: the Youtube ID for the 1.5x speed video.",
-        display_name="Youtube ID for 1.5x speed",
+        help=_("Optional, for older browsers: the YouTube ID for the 1.5x speed video."),
+        display_name=_("YouTube ID for 1.5x speed"),
         scope=Scope.settings,
         default=""
     )
     start_time = RelativeTime(  # datetime.timedelta object
-        help="Start time for the video (HH:MM:SS). Max value is 23:59:59.",
-        display_name="Start Time",
+        help=_("Time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        display_name=_("Video Start Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     end_time = RelativeTime(  # datetime.timedelta object
-        help="End time for the video (HH:MM:SS). Max value is 23:59:59.",
-        display_name="End Time",
+        help=_("Time you want the video to stop if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        display_name=_("Video Stop Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
@@ -67,61 +68,61 @@ class VideoFields(object):
     # `source` is deprecated field and should not be used in future.
     # `download_video` is used instead.
     source = String(
-        help="The external URL to download the video.",
-        display_name="Download Video",
+        help=_("The external URL to download the video."),
+        display_name=_("Download Video"),
         scope=Scope.settings,
         default=""
     )
     download_video = Boolean(
-        help="Show a link beneath the video to allow students to download the video. Note: You must add at least one video source below.",
-        display_name="Video Download Allowed",
+        help=_("Allow students to download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. You must add at least one non-YouTube URL in the Video File URLs field."),
+        display_name=_("Video Download Allowed"),
         scope=Scope.settings,
         default=False
     )
     html5_sources = List(
-        help="A list of filenames to be used with HTML5 video. The first supported filetype will be displayed.",
-        display_name="Video Sources",
+        help=_("The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, set Video Download Allowed to True."),
+        display_name=_("Video File URLs"),
         scope=Scope.settings,
     )
     track = String(
-        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
-        display_name="Download Transcript",
+        help=_("By default, students can download an .srt or .txt transcript when you set Download Transcript Allowed to True. If you want to provide a downloadable transcript in a different format, we recommend that you upload a handout by using the Upload a Handout field. If this isn't possible, you can post a transcript file on the Files & Uploads page or on the Internet, and then add the URL for the transcript here. Students see a link to download that transcript below the video."),
+        display_name=_("Downloadable Transcript URL"),
         scope=Scope.settings,
         default=''
     )
     download_track = Boolean(
-        help="Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.",
-        display_name="Transcript Download Allowed",
+        help=_("Allow students to download the timed transcript. A link to download the file appears below the video. By default, the transcript is an .srt or .txt file. If you want to provide the transcript for download in a different format, upload a file by using the Upload Handout field."),
+        display_name=_("Download Transcript Allowed"),
         scope=Scope.settings,
         default=False
     )
     sub = String(
-        help="The name of the timed transcript track (for non-Youtube videos).",
-        display_name="Transcript (primary)",
+        help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. This transcript should be in English. You don't have to change this setting."),
+        display_name=_("Default Timed Transcript"),
         scope=Scope.settings,
         default=""
     )
     show_captions = Boolean(
-        help="This controls whether or not captions are shown by default.",
-        display_name="Transcript Display",
+        help=_("Specify whether the transcripts appear with the video by default."),
+        display_name=_("Show Transcript"),
         scope=Scope.settings,
         default=True
     )
     # Data format: {'de': 'german_translation', 'uk': 'ukrainian_translation'}
     transcripts = Dict(
-        help="Add additional transcripts in other languages.",
-        display_name="Transcript Translations",
+        help=_("Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language."),
+        display_name=_("Transcript Languages"),
         scope=Scope.settings,
         default={}
     )
     transcript_language = String(
-        help="Preferred language for transcript.",
-        display_name="Preferred language for transcript",
+        help=_("Preferred language for transcript."),
+        display_name=_("Preferred language for transcript"),
         scope=Scope.preferences,
         default="en"
     )
     transcript_download_format = String(
-        help="Transcript file format to download by user.",
+        help=_("Transcript file format to download by user."),
         scope=Scope.preferences,
         values=[
             # Translators: This is a type of file used for captioning in the video player.
@@ -131,22 +132,22 @@ class VideoFields(object):
         default='srt',
     )
     speed = Float(
-        help="The last speed that was explicitly set by user for the video.",
+        help=_("The last speed that the user specified for the video."),
         scope=Scope.user_state,
     )
     global_speed = Float(
-        help="Default speed in cases when speed wasn't explicitly for specific video.",
+        help=_("The default speed for the video."),
         scope=Scope.preferences,
         default=1.0
     )
     youtube_is_available = Boolean(
-        help="The availaibility of YouTube API for the user.",
+        help=_("Specify whether YouTube is available for the user."),
         scope=Scope.user_info,
         default=True
     )
 
     handout = String(
-        help="Upload a handout to accompany this video. Students can download the handout by clicking Download Handout under the video.",
-        display_name="Upload Handout",
+        help=_("Upload a handout to accompany this video. Students can download the handout by clicking Download Handout under the video."),
+        display_name=_("Upload Handout"),
         scope=Scope.settings,
     )

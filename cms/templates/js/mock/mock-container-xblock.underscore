@@ -1,127 +1,222 @@
 <header class="xblock-header"></header>
 
 <article class="xblock-render">
-    <div class="xblock" data-block-type="vertical">
-        <div class="vert-mod">
-            <div class="vert vert-0">
-
+    <div class="xblock" data-block-type="vertical" data-locator="locator-container">
+        <ol class="reorderable-container">
+            <li class="studio-xblock-wrapper is-draggable" data-locator="testCourse/branch/draft/split_test/splitFFF">
                 <div class="xblock" data-block-type="vertical">
-                    <div class="vert-mod">
-                        <div class="vert vert-0">
-
+                    <ol class="reorderable-container">
+                        <li class="studio-xblock-wrapper is-draggable" data-locator="locator-group-A">
                             <section class="wrapper-xblock level-nesting" data-locator="locator-group-A">
-                                <header class="xblock-header"></header>
+                                <header class="xblock-header">
+                                    <div class="header-actions">
+                                        <ul class="actions-list">
+                                            <li class="action-item action-drag">
+                                                <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </header>
 
                                 <article class="xblock-render">
                                     <div class="xblock" data-block-type="vertical">
-                                        <div class="vert-mod">
-                                            <div class="vert vert-0">
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A1">
-
+                                        <ol class="reorderable-container">
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-A1">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-A1">
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A2">
+                                            </li>
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-A2">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-A2">
 
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A3">
-
+                                            </li>
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-A3">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-A3">
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-                                            </div>
-                                        </div>
+                                            </li>
+                                        </ol>
+                                        <div class="add-xblock-component new-component-item adding"></div>
                                     </div>
                                 </article>
                             </section>
-
+                        </li>
+                        <li class="studio-xblock-wrapper is-draggable" data-locator="locator-group-B">
                             <section class="wrapper-xblock level-nesting" data-locator="locator-group-B">
-                                <header class="xblock-header"></header>
+                                <header class="xblock-header">
+                                    <div class="header-actions">
+                                        <ul class="actions-list">
+                                            <li class="action-item action-drag">
+                                                <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </header>
 
                                 <article class="xblock-render">
                                     <div class="xblock" data-block-type="vertical">
-                                        <div class="vert-mod">
-                                            <div class="vert vert-0">
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B1">
+                                        <ol class="reorderable-container">
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-B1">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-B1">
 
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B2">
+                                            </li>
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-B2">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-B2">
 
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-
-                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B3">
+                                            </li>
+                                            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-component-B3">
+                                                <section class="wrapper-xblock level-element"
+                                                         data-locator="locator-component-B3">
 
                                                     <header class="xblock-header">
                                                         <div class="header-actions">
                                                             <ul class="actions-list">
-                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
-                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
-                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                                <li class="action-item action-edit"><a
+                                                                        href="#"
+                                                                        class="edit-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate"><a
+                                                                        href="#"
+                                                                        class="duplicate-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-delete"><a
+                                                                        href="#"
+                                                                        class="delete-button action-button"></a>
+                                                                </li>
+                                                                <li class="action-item action-drag">
+                                                                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render"></article>
                                                 </section>
-                                            </div>
-                                        </div>
+                                            </li>
+                                        </ol>
+                                        <div class="add-xblock-component new-component-item adding"></div>
                                     </div>
                                 </article>
                             </section>
-                        </div>
-                    </div>
+                        </li>
+                    </ol>
                 </div>
-            </div>
-        </div>
+            </li>
+        </ol>
     </div>
 </article>

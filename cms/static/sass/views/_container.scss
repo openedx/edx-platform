@@ -7,7 +7,7 @@
 // ====================
 
 // UI: container page view
-body.view-container {
+.view-container {
 
   .mast {
     border-bottom: none;
@@ -97,7 +97,24 @@ body.view-container {
 }
 
 // UI: xblock rendering
-body.view-container  .content-primary {
+body.view-container .content-primary {
+
+  // dragging bits
+  .ui-sortable-helper {
+
+    article {
+      display: none;
+    }
+  }
+
+  .component-placeholder {
+    height: ($baseline*2.5);
+    opacity: .5;
+    margin: $baseline;
+    background-color: $gray-l5;
+    border-radius: ($baseline/2);
+    border: 2px dashed $gray-l2;
+  }
 
   .wrapper-xblock {
     @extend %wrap-xblock;
@@ -114,18 +131,17 @@ body.view-container  .content-primary {
     // CASE: nesting level xblock rendering
     &.level-nesting {
       @include transition(all $tmg-f2 linear 0s);
-      border: none;
+      border: 1px solid $gray-l3;
       padding-bottom: $baseline;
-      box-shadow: none;
 
-      &:hover {
-        background-color: $gray-l6;
-        box-shadow: 0 0 1px $shadow-d2 inset;
+      // min-height to allow drop when empty
+      .reorderable-container {
+        min-height: $baseline;
       }
 
       .xblock-header {
         @include ui-flexbox();
-        margin-bottom: ($baseline/2);
+        margin-bottom: 0;
         border-bottom: none;
         background: none;
       }
@@ -177,6 +193,24 @@ body.view-container  .content-primary {
           display: none;
         }
       }
+    }
+  }
+
+  // add a new component menu override - most styles currently live in _unit.scss
+  .new-component-item {
+    margin: $baseline ($baseline/2);
+    border: 1px solid $gray-l3;
+    border-radius: ($baseline/4);
+    box-shadow: 0 1px 3px $shadow inset;
+    background-color: $gray-l5;
+    padding: ($baseline/2);
+
+    h5 {
+      margin-bottom: ($baseline*.75);
+    }
+
+    .new-component-type a {
+      margin-bottom: ($baseline/2);
     }
   }
 }

@@ -16,7 +16,12 @@ def can_execute_unsafe_code(course_id):
     # a list of regexes configured on the server.
     # If this is not defined in the environment variables then default to the most restrictive, which
     # is 'no unsafe courses'
+    # TODO: This should be a database configuration, where we can mark individual courses as being
+    # safe/unsafe. Someone in the future should switch us over to that rather than using regexes
+    # in a settings file
+    # To others using this: the code as-is is brittle and likely to be changed in the future,
+    # as per the TODO, so please consider carefully before adding more values to COURSES_WITH_UNSAFE_CODE
     for regex in getattr(settings, 'COURSES_WITH_UNSAFE_CODE', []):
-        if re.match(regex, course_id):
+        if re.match(regex, course_id.to_deprecated_string()):
             return True
     return False

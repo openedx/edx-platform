@@ -2,14 +2,8 @@
     <div class="script_placeholder" data-src="/static/js/capa/protex/protex.nocache.js?raw"/>
     <div class="script_placeholder" data-src="${applet_loader}"/>
 
-    % if status == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
-    % elif status == 'correct':
-    <div class="correct" id="status_${id}">
-    % elif status == 'incorrect':
-    <div class="incorrect" id="status_${id}">
-    % elif status == 'incomplete':
-    <div class="incomplete" id="status_${id}">
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    <div class="${status.classname}" id="status_${id}">
     % endif
 
     <div id="protex_container"></div>
@@ -17,15 +11,7 @@
     <input type="hidden" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"/>
 
     <p class="status" aria-describedby="input_${id}">
-      % if status == 'unsubmitted':
-      unanswered
-      % elif status == 'correct':
-      correct
-      % elif status == 'incorrect':
-      incorrect
-      % elif status == 'incomplete':
-      incomplete
-      % endif
+    ${status.display_name}
     </p>
 
     <p id="answer_${id}" class="answer"></p>

@@ -6,7 +6,7 @@ E2E tests for the LMS.
 from unittest import skip
 
 from .helpers import UniqueCourseTest, load_data_str
-from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.find_courses import FindCoursesPage
 from ..pages.lms.course_about import CourseAboutPage
 from ..pages.lms.course_info import CourseInfoPage
@@ -380,6 +380,10 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
                 )
             )
         ).install()
+
+    @skip('Flakey test, TE-401')
+    def test_acid_block(self):
+        super(XBlockAcidNoChildTest, self).test_acid_block()
 
 
 class XBlockAcidChildTest(XBlockAcidBase):

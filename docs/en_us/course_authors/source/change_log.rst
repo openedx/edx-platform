@@ -2,6 +2,71 @@
 Change Log
 ############
 
+***********
+May, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 05/22/14
+     - Reorganized, updated, and streamlined these sections in the :ref:`Running
+       Your Course Index` chapter:
+
+       * Divided *Grade and Answer Data* into separate sections for
+         :ref:`Grades` and :ref:`Review_Answers`.
+       * Moved information about the student **Progress** page from the
+         *Checking Student Progress and Issuing Certificates* section to
+         :ref:`Grades`.
+       * Renamed the *Checking Student Progress and Issuing Certificates*
+         section to :ref:`Checking Student Progress and Issuing Certificates`.
+
+   * - 
+     - Updated :ref:`Problem with Adaptive Hint` to reflect formatting
+       requirements for the Python script and the correct_answer attribute.
+   * - 05/21/14
+     - Added warning that version 1 of the :ref:`Open Response Assessments<Open
+       Response Assessment>` suite has been deprecated and added a link to the
+       `new ORA information <http://edx-open-response-
+       assessments.readthedocs.org/en/latest/>`_.
+   * - 05/16/14
+     - Updated :ref:`Working with Video Components` to reflect UI changes.
+   * - 05/14/14
+     - Updated the :ref:`Running Your Course Index` chapter to remove references
+       to the "new beta" Instructor Dashboard.
+   * - 05/13/14
+     - Updated the :ref:`Enrollment` section to reflect that usernames or email
+       addresses can be used to batch enroll students.
+   * - 
+     - Updated the :ref:`Grades` section to reflect new features on the problem
+       **Staff Debug** viewer for rescoring, resetting attempts, and deleting
+       student state.
+   * - 
+     - Updated the :ref:`Course_Staffing` section to state the labeling
+       differences between Studio and the LMS with respect to course team roles.
+   * - 05/09/14
+     - Updated :ref:`Assigning_discussion_roles` with a note about course staff
+       requiring explicit granting of discussion administration roles.
+   * - 
+     - Added :ref:`VitalSource` topic.
+   * - 05/08/14
+     - Added warnings to :ref:`Add a File` about file size.
+   * - 05/07/14
+     - Updated the :ref:`Discussions` chapter to include a topic on closing
+       discussions.
+   * - 05/06/14
+     - Expanded the :ref:`Grades` chapter to include a topic on interpreting the
+       score histograms for problems.
+   * - 
+     - Updated :ref:`LTI Component` to reflect changes to the Studio UI.
+   * - 05/02/14
+     - Updated :ref:`Drag and Drop` information.
+   * - 
+     - Updated :ref:`IFrame` documentation.
+
 ************
 April, 2014
 ************
@@ -12,8 +77,10 @@ April, 2014
 
    * - Date
      - Change
+   * - 04/28/14
+     - Updated :ref:`Show or Hide the Course Wiki Page` to include note about Wiki content being available after you hide the Wiki page.
    * - 04/26/14
-     - Updated label information; added XML information to :ref:`Problem with Adaptive Hint`  
+     - Updated label information; added XML information to :ref:`Problem with Adaptive Hint`.  
    * - 04/24/14
      - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
    * -    

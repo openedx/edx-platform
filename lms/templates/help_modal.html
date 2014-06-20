@@ -99,7 +99,7 @@
       <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
-      <input name="course_id" type="hidden" value="${course.id | h}">
+      <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
 % endif
       <div class="submit">
         <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">

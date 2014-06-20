@@ -31,27 +31,48 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
         },
 
         messageHtml: function() {
+            var message;
+            if (this.view.collection.sortDirection === 'asc') {
+                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+                message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s ascending');
+            } else {
+                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added descending"
+                message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s descending');
+            }
+            return '<p>' + interpolate(message, {
+                current_item_range: this.currentItemRangeLabel(),
+                total_items_count: this.totalItemsCountLabel(),
+                sort_name: this.sortNameLabel()
+            }, true) + "</p>";
+        },
+
+        currentItemRangeLabel: function() {
             var view = this.view,
                 collection = view.collection,
                 start = collection.start,
                 count = collection.size(),
-                sortName = view.sortDisplayName(),
-                sortDirectionName = view.sortDirectionName(),
-                end = start + count,
-                total = collection.totalCount,
-                fmts = gettext('Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s');
-
-            return '<p>' + interpolate(fmts, {
+                end = start + count;
+            return interpolate('<span class="count-current-shown">%(start)s-%(end)s</span>', {
                 start: Math.min(start + 1, end),
-                end: end,
-                total: total,
-                sort_order: sortName,
-                sort_direction: sortDirectionName,
-                current_span: '<span class="count-current-shown">',
-                total_span: '<span class="count-total">',
-                order_span: '<span class="sort-order">',
-                end_span: '</span>'
-            }, true) + "</p>";
+                end: end
+            }, true);
+        },
+
+        totalItemsCountLabel: function() {
+            var totalItemsLabel;
+            // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
+            totalItemsLabel = interpolate(gettext('%(total_items)s total'), {
+                total_items: this.view.collection.totalCount
+            }, true);
+            return interpolate('<span class="count-total">%(total_items_label)s</span>', {
+                total_items_label: totalItemsLabel
+            }, true);
+        },
+
+        sortNameLabel: function() {
+            return interpolate('<span class="sort-order">%(sort_name)s</span>', {
+                sort_name: this.view.sortDisplayName()
+            }, true);
         },
 
         nextPage: function() {

@@ -21,6 +21,7 @@ from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
+from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
 
 from pytz import UTC
@@ -1144,7 +1145,6 @@ class NumericalResponseTest(ResponseTest):
     # We blend the line between integration (using evaluator) and exclusively
     # unit testing the NumericalResponse (mocking out the evaluator)
     # For simple things its not worth the effort.
-
     def test_grade_range_tolerance(self):
         problem_setup = [
             # [given_asnwer, [list of correct responses], [list of incorrect responses]]
@@ -1201,9 +1201,20 @@ class NumericalResponseTest(ResponseTest):
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_percent_tolerance(self):
+        # Positive only range
         problem = self.build_problem(answer=4, tolerance="10%")
-        correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
-        incorrect_responses = ["", "4.5", "3.5", "0"]
+        correct_responses = ["4.0", "4.00", "4.39", "3.61"]
+        incorrect_responses = ["", "4.41", "3.59", "0"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        # Negative only range
+        problem = self.build_problem(answer=-4, tolerance="10%")
+        correct_responses = ["-4.0", "-4.00", "-4.39", "-3.61"]
+        incorrect_responses = ["", "-4.41", "-3.59", "0"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        # Mixed negative/positive range
+        problem = self.build_problem(answer=1, tolerance="200%")
+        correct_responses = ["1", "1.00", "2.99", "0.99"]
+        incorrect_responses = ["", "3.01", "-1.01"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_floats(self):

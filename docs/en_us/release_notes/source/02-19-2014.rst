@@ -2,26 +2,36 @@
 February 19, 2014
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `Additional transcripts`_ for videos.
+
+  * `Course data`_ in the instructor dashboard.
+
+  * `Staffing data`_ in the instructor dashboard.
+
+  * `Enrollment data`_ in the instructor dashboard.
+
+  * The `Gene Explorer`_ tool.
 
 
-Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+* `edX Data Documentation`_
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
-Recent documentation additions include:
-
-* `Additional transcripts <http://edx.readthedocs.org/projects/ca/en/latest/create_video.html#additional-transcripts>`_ for videos.
-
-* `Course data <http://edx.readthedocs.org/projects/ca/en/latest/course_data.html#course-data>`_ in the instructor dashboard.
-
-* `Staffing data <http://edx.readthedocs.org/projects/ca/en/latest/course_staffing.html#course-staffing>`_ in the instructor dashboard.
-
-* `Enrollment data <http://edx.readthedocs.org/projects/ca/en/latest/course_enrollment.html#enrollment>`_ in the instructor dashboard.
-
-* The `Gene Explorer <http://edx.readthedocs.org/projects/ca/en/latest/additional_tools.html#gene-explorer>`_ tool.
+* `edX Platform Developer Documentation`_
 
 
 *************
@@ -35,7 +45,7 @@ edX Studio
 
 * A problem with changing a unit from Public to Private, which caused the error message "Studio's having trouble saving your work. The studio servers encountered an error" is fixed. (STUD-1316) 
 
-* The workflows for adding Latex HTML components and problems written in Latex are changed. You can no longer upload Latex files directly from the unit page.  See the following sections in documentation for more information:  `Import LaTeX Code into an HTML Component <http://edx.readthedocs.org/projects/ca/en/latest/create_html_component.html#import-latex-code>`_ and `Problem Written in LaTeX <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#problem-written-in-latex>`_.
+* The workflows for adding Latex HTML components and problems written in Latex are changed. You can no longer upload Latex files directly from the unit page.  See the following sections in documentation for more information:  `Import LaTeX Code into an HTML Component`_ and `Problem Written in LaTeX`_.
 
 * Developers can now include key-value pairs as a configurable setting in Studio without a special interface. This will be applicable to developers adding multiple-language video transcripts, the LTI custom parameters field, or any field where possible inputs are not known at compile-time. (BLD-658)
 
@@ -47,7 +57,7 @@ edX Studio
 Accessibility Improvements
 ===========================
 
-* Course authors can now add labels to input fields for problems, making problems more accessible to screen readers. For more information, see the chapter `Working with Problem Components <http://edx.readthedocs.org/projects/ca/en/latest/create_problem_component.html>`_ in *Building a Course with edX Studio*. (LMS-1895)
+* Course authors can now add labels to input fields for problems, making problems more accessible to screen readers. For more information, see the chapter `Working with Problem Components`_ in *Building a Course with edX Studio*. (LMS-1895)
 
 ***************************************
 edX Learning Management System
@@ -57,7 +67,7 @@ edX Learning Management System
 
 * When a student stops playing a video before it ends and closes the browser, the video starts from the place where the student stopped watching the next time the student views the video. (BLD-385)
 
-
+.. include:: links.rst
 
 
 

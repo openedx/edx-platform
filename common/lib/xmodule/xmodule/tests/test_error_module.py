@@ -4,8 +4,8 @@ Tests for ErrorModule and NonStaffErrorModule
 import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml import CourseLocationGenerator
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.x_module import XModuleDescriptor, XModule
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
@@ -17,9 +17,8 @@ from xblock.test.tools import unabc
 class SetupTestErrorModules():
     def setUp(self):
         self.system = get_test_system()
-        self.org = "org"
-        self.course = "course"
-        self.location = Location(['i4x', self.org, self.course, None, None])
+        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.location = self.course_id.make_usage_key('foo', 'bar')
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
 
@@ -35,7 +34,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = ErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.org, self.course),
+            CourseLocationGenerator(self.course_id),
             self.error_msg
         )
         self.assertIsInstance(descriptor, ErrorDescriptor)
@@ -70,7 +69,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.org, self.course)
+            CourseLocationGenerator(self.course_id)
         )
         self.assertIsInstance(descriptor, NonStaffErrorDescriptor)
 
@@ -78,7 +77,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.org, self.course)
+            CourseLocationGenerator(self.course_id)
         )
         descriptor.xmodule_runtime = self.system
         context_repr = self.system.render(descriptor, 'student_view').content
@@ -130,7 +129,7 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
-            ScopeIds(None, None, None, 'i4x://org/course/broken/name')
+            ScopeIds(None, None, None, Location('org', 'course', 'run', 'broken', 'name', None))
         )
         self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor

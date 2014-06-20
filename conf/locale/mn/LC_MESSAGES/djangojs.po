@@ -4,18 +4,21 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# zolboo0411 <zolboo0411@yahoo.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# uuganaa45 <uuganaa45@gmail.com>, 2014
+# zolboo0411 <zolboo0411@yahoo.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
-"PO-Revision-Date: 2014-03-19 20:22+0000\n"
+"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"PO-Revision-Date: 2014-05-25 02:51+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/edx-platform/language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -26,14 +29,16 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr ""
 
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
-#: cms/static/js/base.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
+#: cms/static/js/views/asset.js cms/static/js/views/baseview.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -212,6 +217,49 @@ msgid ""
 "SequenceModule. Please contact the course staff."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Volume"
+msgstr ""
+
+#. Translators: Volume level equals 0%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Muted"
+msgstr ""
+
+#. Translators: Volume level in range ]0,20]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very low"
+msgstr ""
+
+#. Translators: Volume level in range ]20,40]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Low"
+msgstr ""
+
+#. Translators: Volume level in range ]40,60]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Average"
+msgstr ""
+
+#. Translators: Volume level in range ]60,80]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Loud"
+msgstr ""
+
+#. Translators: Volume level in range ]80,99]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very loud"
+msgstr ""
+
+#. Translators: Volume level equals 100%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Maximum"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or "
+msgstr ""
+
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr ""
@@ -267,45 +315,6 @@ msgid_plural "%(value)s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Volume"
-msgstr ""
-
-#. Translators: Volume level equals 0%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Muted"
-msgstr ""
-
-#. Translators: Volume level in range (0,20]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very low"
-msgstr ""
-
-#. Translators: Volume level in range (20,40]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Low"
-msgstr ""
-
-#. Translators: Volume level in range (40,60]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Average"
-msgstr ""
-
-#. Translators: Volume level in range (60,80]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Loud"
-msgstr ""
-
-#. Translators: Volume level in range (80,100)%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very loud"
-msgstr ""
-
-#. Translators: Volume level equals 100%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Maximum"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
 msgstr ""
@@ -333,6 +342,8 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr ""
@@ -389,16 +400,14 @@ msgid "vote"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid ""
-"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
-msgid_plural ""
-"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgid "vote (click to remove your vote)"
+msgid_plural "votes (click to remove your vote)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
-msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
+msgid "vote (click to vote)"
+msgid_plural "votes (click to vote)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -461,6 +470,11 @@ msgid "Pin Thread"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid ""
+"The thread you selected has been deleted. Please select another thread."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
 msgstr ""
 
@@ -496,6 +510,10 @@ msgstr ""
 msgid "Are you sure you want to delete this post?"
 msgstr ""
 
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
+
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr ""
@@ -526,6 +544,26 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/base_image.js
+msgid "Drop target image"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging out of slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped in slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped on target"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -874,9 +912,10 @@ msgid ""
 "beta tester."
 msgstr ""
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -884,7 +923,7 @@ msgid "Error enrolling/unenrolling users."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
+msgid "The following email addresses and/or usernames are invalid:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -997,8 +1036,8 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error getting student progress url for '<%= student_id %>'. Check that the "
-"student identifier is spelled correctly."
+"Error getting student progress url for '<%= student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1008,7 +1047,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Please enter a problem urlname."
+msgid "Please enter a problem location."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1020,8 +1059,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+" '<%= student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1032,7 +1071,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Check that the problem and student identifiers are spelled correctly."
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1049,15 +1089,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+"'<%= student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Check that the problem and student identifiers are spelled "
-"correctly."
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1074,7 +1114,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Check that the problem identifier is spelled correctly."
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1090,8 +1131,8 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
-" problem identifier is spelled correctly."
+"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1218,15 +1259,16 @@ msgid "(Show)"
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgid "Insert Hyperlink"
+msgstr ""
+
+#. Translators: Please keep the quotation marks (") around this text
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
+msgid "\"optional title\""
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Image (upload file or type "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
+msgid "Insert Image (upload file or type url)"
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
@@ -1317,9 +1359,49 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
 msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
@@ -1336,18 +1418,14 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr ""
 
-#: cms/static/coffee/src/views/module_edit.js
-msgid "<em>Editing:</em> %s"
-msgstr ""
-
-#: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
+#: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
 msgstr ""
 
@@ -1363,26 +1441,23 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
-msgid "Adding&hellip;"
-msgstr ""
-
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr ""
 
@@ -1517,6 +1592,22 @@ msgstr ""
 msgid "Date Added"
 msgstr ""
 
+#: cms/static/js/views/assets.js
+msgid "Uploading…"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Choose File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Upload New File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Load Another File"
+msgstr ""
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr ""
@@ -1527,6 +1618,10 @@ msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
+msgstr ""
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
 msgstr ""
 
 #: cms/static/js/views/edit_textbook.js
@@ -1542,6 +1637,10 @@ msgstr ""
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
+msgstr ""
+
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
 msgstr ""
 
 #: cms/static/js/views/overview.js
@@ -1568,19 +1667,26 @@ msgstr ""
 msgid "Not Graded"
 msgstr ""
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr ""
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr ""
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
 msgstr ""
 
 #: cms/static/js/views/section_edit.js
@@ -1603,6 +1709,10 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
+msgstr ""
+
+#: cms/static/js/views/uploads.js
+msgid "Upload"
 msgstr ""
 
 #: cms/static/js/views/uploads.js
@@ -1634,6 +1744,30 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr ""
 
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr ""
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Settings"
+msgstr ""
+
+#: cms/static/js/views/components/add_xblock.js
+msgid "Adding&hellip;"
+msgstr ""
+
+#: cms/static/js/views/modals/base_modal.js
+msgid "Save"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -1657,4 +1791,14 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation"
 msgstr ""

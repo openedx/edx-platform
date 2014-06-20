@@ -51,7 +51,8 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 5/10"
   And I see graph with total progress "5%"
   Then I click on the "Instructor" tab
-  And I click on the "Gradebook" tab
+  And I click on the "Student Admin" tab
+  And I click on the "View Gradebook" link
   And I see in the gradebook table that "HW" is "50"
   And I see in the gradebook table that "Total" is "5"
 

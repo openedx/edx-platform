@@ -3,14 +3,37 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+####################################
+edX Course Staff Release Notes
+####################################
 
-Contents
-========
+The *edX Course Staff Release Notes* provide a cumulative list of changes
+that affect course authoring in edX Studio and the edX Learning Management
+System.
+
+This document contains a page for each update to the edX system, which includes
+both `edx.org`_ and `edX Edge`_. Each page contains information on new or
+changed documentation, as well as new features and changes in edX Studio, the
+edX Learning Management System, Discussion Forums, Analytics, accessibility, and
+more.
+
+You can sign up for the new `edX Release Announcements mailing list`_ to get an
+email message when we have updated the edX Course Staff Release Notes.
+
+
+
+*************
+2014
+*************
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
 
    read_me
+   05-20-2014
+   05-15-2014
+   05-12-2014
+   04-29-2014
    04-23-2014
    04-16-2014
    04-09-2014
@@ -26,6 +49,14 @@ Contents
    01-29-2014
    01-16-2014
    01-07-2014
+
+*************
+2013
+*************
+
+.. toctree::
+   :maxdepth: 1
+
    12-17-2013
    12-09-2013
    12-03-2013
@@ -34,7 +65,4 @@ Contents
    10-23-2013
 
 
-
-
-
-
+.. include:: links.rst

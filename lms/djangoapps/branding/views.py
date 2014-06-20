@@ -26,6 +26,12 @@ def index(request):
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
         from external_auth.views import ssl_login
+        # Set next URL to dashboard if it isn't set to avoid
+        # caching a redirect to / that causes a redirect loop on logout
+        if not request.GET.get('next'):
+            req_new = request.GET.copy()
+            req_new['next'] = reverse('dashboard')
+            request.GET = req_new
         return ssl_login(request)
 
     enable_mktg_site = microsite.get_value(
@@ -41,10 +47,7 @@ def index(request):
     # keep specialized logic for Edge until we can migrate over Edge to fully use
     # microsite definitions
     if domain and 'edge.edx.org' in domain:
-        context = {
-            'suppress_toplevel_navigation': True
-        }
-        return render_to_response('university_profile/edge.html', context)
+        return redirect(reverse("signin_user"))
 
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled

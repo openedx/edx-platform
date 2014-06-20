@@ -1,9 +1,10 @@
 <%inherit file="base.html" />
+<%def name="online_help_token()"><% return "checklist" %></%def>
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
-<%block name="title">Course Checklists</%block>
+<%block name="title">${_("Course Checklists")}</%block>
 <%block name="bodyclass">is-signedin course view-checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -63,7 +64,7 @@ require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">Studio checklists</h3>
+        <h3 class="title title-3">${_("Studio checklists")}</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:

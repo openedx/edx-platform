@@ -51,6 +51,7 @@ lib_paths:
 src_paths:
     - coffee/src
     - js/src
+    - js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

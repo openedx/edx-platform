@@ -8,18 +8,21 @@ from xblock.fields import Dict, String, Scope, Boolean, Float, Reference
 
 from xmodule.capa_module import ComplexEncoder
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.raw_module import RawDescriptor
 from xmodule.timeinfo import TimeInfo
 from xmodule.util.duedate import get_extended_due_date
 from xmodule.x_module import XModule, module_attr
-from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 
 from open_ended_grading_classes import combined_open_ended_rubric
 from django.utils.timezone import UTC
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 log = logging.getLogger(__name__)
+
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
@@ -28,57 +31,57 @@ MAX_ALLOWED_FEEDBACK_LENGTH = 5000
 
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
-        display_name="Show Single Problem",
-        help='When True, only the single problem specified by "Link to Problem Location" is shown. '
-             'When False, a panel is displayed with all problems available for peer grading.',
+        display_name=_("Show Single Problem"),
+        help=_('When True, only the single problem specified by "Link to Problem Location" is shown. '
+             'When False, a panel is displayed with all problems available for peer grading.'),
         default=False,
         scope=Scope.settings
     )
     link_to_location = Reference(
-        display_name="Link to Problem Location",
-        help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
+        display_name=_("Link to Problem Location"),
+        help=_('The location of the problem being graded. Only used when "Show Single Problem" is True.'),
         default="",
         scope=Scope.settings
     )
     graded = Boolean(
-        display_name="Graded",
-        help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
+        display_name=_("Graded"),
+        help=_('Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.'),
         default=False,
         scope=Scope.settings
     )
     due = Date(
-        help="Due date that should be displayed.",
+        help=_("Due date that should be displayed."),
         scope=Scope.settings)
     extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
+        help=_("Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
              "date if it is set to a date that is later than the global due "
-             "date.",
+             "date."),
         default=None,
         scope=Scope.user_state,
     )
     graceperiod = Timedelta(
-        help="Amount of grace to give on the due date.",
+        help=_("Amount of grace to give on the due date."),
         scope=Scope.settings
     )
     student_data_for_location = Dict(
-        help="Student data for a given peer grading problem.",
+        help=_("Student data for a given peer grading problem."),
         scope=Scope.user_state
     )
     weight = Float(
-        display_name="Problem Weight",
-        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. If the value is not set, each problem is worth one point."),
         scope=Scope.settings, values={"min": 0, "step": ".1"},
         default=1
     )
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
         default="Peer Grading Interface"
     )
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default='<peergrading></peergrading>',
         scope=Scope.content
     )
@@ -192,7 +195,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.use_for_single_location_local:
             return self.peer_grading()
         else:
-            return self.peer_grading_problem({'location': self.link_to_location})['html']
+            # b/c handle_ajax expects serialized data payload and directly calls peer_grading
+            return self.peer_grading_problem({'location': self.link_to_location.to_deprecated_string()})['html']
 
     def handle_ajax(self, dispatch, data):
         """
@@ -263,7 +267,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
-                        self.system.location.url(), self.system.anonymous_student_id
+                        self.system.location.to_deprecated_string(), self.system.anonymous_student_id
                     ))
                 return None
             count_graded = response['count_graded']
@@ -565,7 +569,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         good_problem_list = []
         for problem in problem_list:
-            problem_location = Location(problem['location'])
+            problem_location = problem['location']
             try:
                 descriptor = self._find_corresponding_module_for_location(problem_location)
             except (NoPathToItem, ItemNotFoundError):
@@ -590,7 +594,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
-            'course_id': self.course_id,
             'ajax_url': ajax_url,
             'success': success,
             'problem_list': good_problem_list,
@@ -613,10 +616,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error(
                     "Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
-            problem_location = Location(self.link_to_location)
+            problem_location = self.link_to_location
 
         elif data.get('location') is not None:
-            problem_location = Location(data.get('location'))
+            problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
 
         module = self._find_corresponding_module_for_location(problem_location)
 

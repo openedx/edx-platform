@@ -11,7 +11,7 @@
   cert_name_short = course.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
-  
+
   cert_name_long = course.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
@@ -21,9 +21,13 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
-  <article class="course ${enrollment.mode}">
+  % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+    <article class="course ${enrollment.mode}">
+  % else:
+    <article class="course">
+  %endif
     <%
-      course_target = reverse('info', args=[course.id])
+      course_target = reverse('info', args=[course.id.to_deprecated_string()])
     %>
 
     % if show_courseware_link:
@@ -35,13 +39,24 @@
         <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
       </div>
     % endif
-
-    % if enrollment.mode == "verified":
-      <span class="sts-enrollment">
-        <span class="label">${_("Enrolled as: ")}</span>
-        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
-        <span class="sts-enrollment-value">${_("ID Verified")}</span>
-      </span>
+    % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+        % if enrollment.mode == "verified":
+          <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
+            <span class="sts-enrollment-value">${_("Verified")}</span>
+          </span>
+        % elif enrollment.mode == "honor":
+          <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Honor Code")}</span>
+          </span>
+        % elif enrollment.mode == "audit":
+          <span class="sts-enrollment" title="${_("You're auditing this course")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Auditing")}</span>
+          </span>
+        % endif
     % endif
 
     <section class="info">
@@ -91,10 +106,10 @@
 
               <ul class="actions message-actions">
                 <li class="action-item">
-                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
+                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id.to_deprecated_string()})}?upgrade=True">
                     <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
                     <span class="wrapper-copy">
-                      <span class="copy" id="upgrade-to-verified" data-course-id="${course.id}" data-user="${user.username}">${_("Upgrade to Verified Track")}</span>
+                      <span class="copy" id="upgrade-to-verified" data-course-id="${course.id.to_deprecated_string()}" data-user="${user.username}">${_("Upgrade to Verified Track")}</span>
                     </span>
                   </a>
                 </li>
@@ -113,25 +128,25 @@
 
       % if enrollment.mode != "verified":
         ## Translators: The course's name will be added to the end of this sentence.
-        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from")}'; document.getElementById('refund-info').innerHTML=''">
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from")}'; document.getElementById('refund-info').innerHTML=''">
           ${_('Unregister')}
         </a>
       % elif show_refund_option:
         ## Translators: The course's name will be added to the end of this sentence.
-        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
-          document.getElementById('refund-info').innerHTML='${_("In order to request a refund for the amount you paid, you will need to send an email to {billing_email}.  Be sure to include your email and the course name.").format(billing_email=billing_email)}'">
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
+        document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">
           ${_('Unregister')}
         </a>
       % else:
         ## Translators: The course's name will be added to the end of this sentence.
-        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
         document.getElementById('refund-info').innerHTML=gettext('The refund deadline for this course has passed, so you will not receive a refund.')">
           ${_('Unregister')}
         </a>
       % endif
 
 % if show_email_settings:
-        <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
+        <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" data-optout="${course.id.to_deprecated_string() in course_optouts}">${_('Email Settings')}</a>
 % endif
 
 

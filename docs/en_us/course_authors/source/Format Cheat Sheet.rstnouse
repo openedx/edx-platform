@@ -52,7 +52,7 @@ Table Formatting
 With a header row
 
 .. list-table::
-   :widths: 10 80
+   :widths: 15 15 70
    :header-rows: 1
  
    * - First Name
@@ -70,7 +70,7 @@ With a header row
 With a bolded first column
 
 .. list-table::
-   :widths: 10 80
+   :widths: 15 15 70
    :stub-columns: 1
  
    * - First Name
@@ -101,8 +101,46 @@ To make the cross reference in text:
 
         see :ref:`Set Grade Brackets<Set-Grade-Brackets>`
 
+To cross-reference a topic, but use your own text instead of the topic title, use the :ref: directive, but enter your own text followed by the topic anchor in angle brackets:
+
+        If you want to add a graded tool or exercise, add the tool as a :ref:`custom JavaScript problem<Custom JavaScript>` or an :ref:`LTI component<LTI Component>`.
+
+        (In this sentence, the text appears as "custom JavaScript problem" and "LTI component", and the linked-to topic titles are "Custom JavaScript Problem" and "LTI Component".)
+
 External page reference
 
         see `Create a Problem <http://site.Create_Problem.html>`_ 
 
       
+*******
+Tables
+*******
+
+Example of a table with a cell that includes a bulleted list. The balnk lines before and after are critical.
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``correct_map``
+     - dict
+     - For each problem ID value listed by ``answers``, provides:
+       
+       * ``correctness``: string; 'correct', 'incorrect'
+       * ``hint``: string; Gives optional hint. Nulls allowed. 
+       * ``hintmode``: string; None, 'on_request', 'always'. Nulls allowed. 
+       * ``msg``: string; Gives extra message response.
+       * ``npoints``: integer; Points awarded for this ``answer_id``. Nulls allowed.
+       * ``queuestate``: dict; None when not queued, else ``{key:'', time:''}``
+         where ``key`` is a secret string dump of a DateTime object in the form
+         '%Y%m%d%H%M%S'. Nulls allowed. 
+
+   * - ``grade``
+     - integer
+     - Current grade value. 
+   * - ``max_grade``
+     - integer
+     - Maximum possible grade value.

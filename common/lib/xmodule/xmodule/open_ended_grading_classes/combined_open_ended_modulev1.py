@@ -10,8 +10,9 @@ from xmodule.open_ended_grading_classes import self_assessment_module
 from xmodule.open_ended_grading_classes import open_ended_module
 from xmodule.util.duedate import get_extended_due_date
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 log = logging.getLogger("edx.courseware")
 
@@ -412,7 +413,7 @@ class CombinedOpenEndedV1Module():
         :param message: A message to put in the log.
         :return: None
         """
-        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  It has been reset, and you now have a new attempt. {2}".format(self.system.anonymous_student_id, self.location.url(), message)
+        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  It has been reset, and you now have a new attempt. {2}".format(self.system.anonymous_student_id, self.location.to_deprecated_string(), message)
         self.current_task_number = 0
         self.student_attempts = 0
         self.old_task_states.append(self.task_states)
@@ -800,7 +801,7 @@ class CombinedOpenEndedV1Module():
         success = False
         allowed_to_submit = True
         try:
-            response = self.peer_gs.get_data_for_location(self.location.url(), student_id)
+            response = self.peer_gs.get_data_for_location(self.location, student_id)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']

@@ -5,7 +5,7 @@ Support for inheritance of fields down an XBlock hierarchy.
 from datetime import datetime
 from pytz import UTC
 
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
@@ -78,7 +78,15 @@ class InheritanceMixin(XBlockMixin):
     use_latex_compiler = Boolean(
         help="Enable LaTeX templates?",
         default=False,
-        scope=Scope.settings)
+        scope=Scope.settings
+    )
+    max_attempts = Integer(
+        display_name="Maximum Attempts",
+        help=("Defines the number of times a student can try to answer this problem. "
+              "If the value is not set, infinite attempts are allowed."),
+        values={"min": 0}, scope=Scope.settings
+    )
+
 
 
 def compute_inherited_metadata(descriptor):

@@ -1,3 +1,22 @@
+/* 
+Grid Annotation Plugin v1.0
+Copyright (C) 2014 Daniel Cebrian Robles and Luis Duarte
+License: https://github.com/danielcebrian/share-annotator/blob/master/License.rst
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 //The name of the plugin that the user will write in the html
 window.CatchAnnotation = ("CatchAnnotation" in window) ? CatchAnnotation : {};
 window.CatchSources = ("CatchSources" in window) ? CatchSources : {};
@@ -23,29 +42,29 @@ annotationList:
                 '</div>'+
 
                 '<div class="annotatedBy field">'+
-                    'User'+
+                    gettext('User')+
                 '</div>'+
 
                 '<div class="body field">'+
-                    'Annotation'+
+                    gettext('Annotation')+
                 '</div>'+  
                 
                 '{{#if videoFormat}}'+
                     '<div class="start field">'+
-                        'Start'+
+                        gettext('Start')+
                     '</div>'+
 
                     '<div class="end field">'+
-                        'End'+
+                        gettext('End')+
                     '</div>'+
                 '{{/if}}'+
                 
                 '<div class="totalreplies field">'+
-                    '#Replies'+
+                    gettext('#Replies')+
                 '</div>'+
                 
                 '<div class="annotatedAt field">'+
-                    'Date posted'+
+                    gettext('Date posted')+
                 '</div>'+
             '</div>'+
         '</div>'+
@@ -54,35 +73,43 @@ annotationList:
         '{{/each}}'+
     '</div>'+
     '<div class="annotationListButtons">'+
-        '<div class="moreButtonCatch">More</div>'+
+        '<div class="moreButtonCatch">'+gettext('More')+'</div>'+
     '</div>',
+    
+//Main->PublicPrivateInstructor
+annotationPublicPrivateInstructor:
+    '<div class="selectors"><div class="PublicPrivate myNotes active">'+gettext('My Notes')+'<span class="action">myNotes</span></div>'+ 
+    '<div class="PublicPrivate instructor"> '+gettext('Instructor')+'<span class="action">instructor</span></div>'+
+    '<div class="PublicPrivate public"> '+gettext('Public')+'<span class="action">public</span></div></div>'+
+    '<div class="searchbox"><div class="searchinst">'+gettext('Search')+'</div><select class="dropdown-list">'+
+    '<option>'+gettext('Users')+'</option>'+
+    '<option>'+gettext('Tags')+'</option>'+
+    '<option>'+gettext('Annotation Text')+'</option>'+
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">'+gettext('Clear')+'</div></div>',
     
 //Main->PublicPrivate
 annotationPublicPrivate:
-    '<div class="selectors"><div class="PublicPrivate myNotes active">My Notes<span class="action">myNotes</span></div>'+ 
-    '<div class="PublicPrivate public"> Public<span class="action">public</span></div></div>'+
-    '<div class="searchbox"><div class="searchinst">Search</div><select class="dropdown-list">'+
-    '<option>Users</option>'+
-    '<option>Tags</option>'+
-    '<option>Annotation Text</option>'+
-    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div></div>',
+    '<div class="selectors"><div class="PublicPrivate myNotes active">'+gettext('My Notes')+'<span class="action">myNotes</span></div>'+ 
+    '<div class="PublicPrivate public"> '+gettext('Public')+'<span class="action">public</span></div></div>'+
+    '<div class="searchbox"><div class="searchinst">'+gettext('Search')+'</div><select class="dropdown-list">'+
+    '<option>'+gettext('Users')+'</option>'+
+    '<option>'+gettext('Tags')+'</option>'+
+    '<option>'+gettext('Annotation Text')+'</option>'+
+    '</select><input type="text" name="search"/><div class="search-icon" alt="Run search."></div><div class="clear-search-icon" alt="Clear search.">'+gettext('Clear')+'</div></div>',
     
 //Main->MediaSelector
 annotationMediaSelector:
     '<ul class="ui-tabs-nav">'+
         '<li class="ui-state-default" media="text">'+
-            'Text'+
+            gettext('Text')+
         '</li>'+
         '<li class="ui-state-default" media="video">'+
-            'Video'+
+            gettext('Video')+
+        '</li>'+
+        '<li class="ui-state-default" media="image">'+
+            gettext('Image')+
         '</li>'+
     '</ul>',
-//    '<div class="selButtonCatch">Text<span class="action">text</span></div>'+
-//    '<div class="selButtonCatch">Video<span class="action">video</span></div>',
-//        '<div class="selButtonCatch">Images<span class="action">image</span></div>'+
-//        '<div class="selButtonCatch">Audio<span class="action">audio</span></div>'+
-//        '<div class="selButtonCatch">Maps<span class="action">map</span></div>'+
-//        '<div class="selButtonCatch">3D studio<span class="action">3d</span></div>',
 
 //Main->ContainerRow
 annotationItem: 
@@ -110,7 +137,7 @@ annotationReply:
                         '<div class="map"></div>'+
                     '</div>'+
                     '{{/if}}'+
-                    '<div class="deleteReply">Delete</div>'+
+                    '<div class="deleteReply">'+gettext('Delete')+'</div>'+
                 '</p>'+
                 '<p>'+
                     '{{#if this.text}}'+
@@ -162,7 +189,15 @@ annotationRow:
 
 //Main->ContainerRow->DetailRow
 annotationDetail:
-    '<div class="annotationDetail">'+
+    '{{#if mediatypeforgrid.text}}'+
+      '<div class="annotationDetail">'+
+    '{{/if}}'+
+    '{{#if mediatypeforgrid.video}}'+
+        '<div class="annotationDetail videoAnnotationDetail">'+
+    '{{/if}}'+
+    '{{#if mediatypeforgrid.image}}'+
+        '<div class="annotationDetail imageAnnotationDetail">'+
+    '{{/if}}'+
         '<div class="detailHeader">'+
             '<span class="closeDetailIcon">'+
                 '<img src="'+root+'closeIcon.png" alt="Hide Details" />'+
@@ -181,89 +216,41 @@ annotationDetail:
             '{{/if}}'+
         '</div>'+
 
+    '{{#if mediatypeforgrid.text}}'+
         '<div class="quote">'+
             '<div style="text-align: center">'+
             '<div class="quoteItem">“</div><div class="quoteText">{{{ quote }}}</div><div class="quoteItem">”</div></div>'+
             '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
             '<span class="uri" style="display:none">{{{uri}}}</span>'+
         '</div>'+
-
-        '<div class="body">'+
-            '{{{ text }}}'+
-        '</div>'+
-        
-        '<div class="controlReplies">'+
-            '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
-            '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
-            '{{#if authToEditButton}}'+
-                '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
-            '{{/if}}'+
-            '{{#if authToDeleteButton}}'+
-                '<div class="deleteAnnotation" style="text-decoration:underline">Delete</div>'+
-            '{{/if}}'+
-            
-        '</div>'+
-        
-        '<div class="replies"></div>'+
-
-    '{{#if tags}}'+
-        '<div class="tags">'+
-            '<h3>Tags:</h3>'+
-            '{{#each tags}}'+
-                '<div class="tag">'+
-                    '{{this}}'+
-                '</div>'+
-            '{{/each}}'+
-        '</div>'+
     '{{/if}}'+
-
-        '<div class="controlPanel">'+
-            //'<img class="privacy_button" src="'+root+'privacy_icon.png" width="36" height="36" alt="Privacy Settings" title="Privacy Settings">'+
-//            '<img class="groups_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Groups Access" title="Groups Access">'+
-            //'<img class="share_button" src="'+root+'share_icon.png" width="36" height="36" alt="Share Annotation" title="Share Annotation"/>'+
-        '</div>'+
-    '</div>',
-    
-//Main->ContainerRow->DetailRow (Video)
-videoAnnotationDetail:
-    '<div class="annotationDetail videoAnnotationDetail">'+
-        '<div class="detailHeader">'+
-            '<span class="closeDetailIcon">'+
-                '<img src="'+root+'closeIcon.png" alt="Hide Details" />'+
-            '</span>'+
-            'On  {{ updated }} <!--<a href="index.php?r=user/user/view&id={{{user.id}}}">-->{{{ user.name }}}<!--</a>-->{{#if geolocation}}, wrote from {{/if}}'+
-            '{{#if geolocation}}'+
-                '<span class="geolocationIcon">'+
-                    '<img src="'+root+'geolocation_icon.png"width="25" height="25" alt="Location Map" title="Show Location Map" data-dropdown="myLocationMap"/>'+
-                    '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
-                    '<span class="latitude" style="display:none">{{{ geolocation.latitude }}}</span>'+
-                    '<span class="longitude" style="display:none">{{{ geolocation.longitude }}}</span>'+
-                '</span>'+
-                '<div id="myLocationMap" data-dropdown-content class="f-dropdown content">'+
-                    '<div class="map"></div>'+
-                '</div>'+
-            '{{/if}}'+
-        '</div>'+
-
+    '{{#if mediatypeforgrid.video}}'+
         '<div class="playMediaButton">'+
             'Play segment {{{ rangeTime.start }}} - {{{ rangeTime.end }}}'+
             '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
             '<span class="uri" style="display:none">{{{uri}}}</span>'+
             '<span class="container" style="display:none">{{{target.container}}}</span>'+
         '</div>'+
-
+    '{{/if}}'+
+    '{{#if mediatypeforgrid.image}}'+
+        '<div class="zoomToImageBounds">'+
+            '<img src="{{{ thumbnailLink }}}">'+
+            '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
+            '<span class="uri" style="display:none">{{{uri}}}</span>'+
+        '</div>'+
+    '{{/if}}'+
         '<div class="body">'+
             '{{{ text }}}'+
         '</div>'+
 
         '<div class="controlReplies">'+
-            '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
+            '<div class="newReply" style="text-decoration:underline">'+gettext('Reply')+'</div>&nbsp;'+
             '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
             '{{#if authToEditButton}}'+
-                '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
+                '<div class="editAnnotation" style="text-decoration:underline">'+gettext('Edit')+'</div>'+
             '{{/if}}'+
             '{{#if authToDeleteButton}}'+
-                '<div class="deleteAnnotation" style="text-decoration:underline">Delete</div>'+
+                '<div class="deleteAnnotation" style="text-decoration:underline">'+gettext('Delete')+'</div>'+
             '{{/if}}'+
         '</div>'+
         
@@ -272,7 +259,7 @@ videoAnnotationDetail:
         
     '{{#if tags}}'+
         '<div class="tags">'+
-            '<h3>Tags:</h3>'+
+            '<h3>'+gettext('Tags:')+'</h3>'+
             '{{#each tags}}'+
                 '<div class="tag">'+
                     '{{this}}'+
@@ -282,10 +269,6 @@ videoAnnotationDetail:
     '{{/if}}'+
 
         '<div class="controlPanel">'+
-            //'<img class="privacy_button" src="'+root+'privacy_icon.png" width="36" height="36" alt="Privacy Settings" title="Privacy Settings">'+
-//            '<img class="groups_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Groups Access" title="Groups Access">'+
-//            '<img class="reply_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Reply" title="Reply" idAnnotation="{{{ id }}}">'+
-            //'<img class="share_button" src="'+root+'share_icon.png" width="36" height="36" alt="Share Annotation" title="Share Annotation"/>'+
         '</div>'+
     '</div>',
 };
@@ -318,14 +301,14 @@ CatchAnnotation = function (element, options) {
     
     //Reset element an create a new element div
     element.html('<div id="mainCatch" class="annotationListContainer"></div>');
-    
+    this.current_tab = this.options.default_tab;
     //INIT
     var self = this;
     $( document ).ready(function() {
         self.init();
         self.refreshCatch(true);
-	var moreBut = self.element.find('.annotationListButtons .moreButtonCatch');
-	moreBut.hide();	
+        var moreBut = self.element.find('.annotationListButtons .moreButtonCatch');
+        moreBut.hide(); 
     });
     
     return this;
@@ -338,16 +321,16 @@ CatchAnnotation.prototype = {
         this.TEMPLATENAMES = [
             "annotationList", //Main
             "annotationPublicPrivate", //Main->PublicPrivate
+            "annotationPublicPrivateInstructor", //Main->PublicPrivateInstructor
             "annotationMediaSelector", //Main->MediaSelector
             "annotationItem", //Main->ContainerRow
             "annotationReply",//Main->ContainerRow->Reply
             "annotationRow", //Main->ContainerRow->Row
             "annotationDetail",//Main->ContainerRow->DetailRow
-            "videoAnnotationDetail"//Main->ContainerRow->DetailRow (Video)
         ];
         //annotator
-        var wrapper = $('.annotator-wrapper').parent()[0],
-            annotator = $.data(wrapper, 'annotator');
+        var wrapper = $('.annotator-wrapper').parent()[0];
+        var annotator = $.data(wrapper, 'annotator');
         this.annotator = annotator;
         
         //Subscribe to annotator
@@ -365,10 +348,22 @@ CatchAnnotation.prototype = {
         this.HTMLTEMPLATES = CatchSources.HTMLTEMPLATES(this.options.imageUrlRoot);
         this.TEMPLATES = {};
         this._compileTemplates();
+        
+        // the default annotations are the user's personal ones instead of instructor
+        // if the default tab is instructor, we must refresh the catch to pull the ones
+        // under the instructor's email. passing empty strings as arguments will default
+        // to pulling the annotations for the email within this.options.userId.
+        if(this.options.default_tab.toLowerCase() == 'instructor'){
+            this.options.userId = this.options.instructor_email;
+            this._refresh('','');
+        }
     },
 //    
 //     GLOBAL UTILITIES
 // 
+    getTemplate: function(templateName){
+        return this.TEMPLATES[templateName]() || '';
+    },
     refreshCatch: function(newInstance) {
         var mediaType = this.options.media || 'text',
             annotationItems = [],
@@ -400,7 +395,7 @@ CatchAnnotation.prototype = {
                     evenOrOdd: index % 2 ? "odd" : "even",
                     openOrClosed: "closed",
                     annotationRow: self.TEMPLATES.annotationRow(item),
-                    annotationDetail: (mediaType === "video") ? self.TEMPLATES.videoAnnotationDetail(item):self.TEMPLATES.annotationDetail(item),
+                    annotationDetail: self.TEMPLATES.annotationDetail(item),
                 });
                 index++;
                 annotationItems.push(html);
@@ -409,10 +404,16 @@ CatchAnnotation.prototype = {
         
         if (newInstance){
             var videoFormat = (mediaType === "video") ? true:false;
+            var publicPrivateTemplate = '';
+            if (self.options.showPublicPrivate) {
+                var templateName = this.options.instructor_email ? 
+                    "annotationPublicPrivateInstructor" : 
+                    "annotationPublicPrivate";
+            }
             el.html(self.TEMPLATES.annotationList({ 
                 annotationItems: annotationItems, 
                 videoFormat: videoFormat,
-                PublicPrivate: self.options.showPublicPrivate?self.TEMPLATES.annotationPublicPrivate():'',
+                PublicPrivate: this.getTemplate(templateName),
                 MediaSelector: self.options.showMediaSelector?self.TEMPLATES.annotationMediaSelector():'',
             }));
         }else{
@@ -431,28 +432,41 @@ CatchAnnotation.prototype = {
         //Set PublicPrivate
         var PublicPrivateButtons = el.find('.annotationListButtons .PublicPrivate').removeClass('active'); //reset
         for (var index=0;index<PublicPrivateButtons.length;index++) {
-            var span = $(PublicPrivateButtons[index]).find('span'),
-                isUser = (typeof self.options.userId!='undefined' && self.options.userId!='' && self.options.userId!=null);
-            if (isUser && span.html()=="myNotes") $(PublicPrivateButtons[index]).addClass('active');
-            else if (!isUser && span.html()=="public") $(PublicPrivateButtons[index]).addClass('active');
+            var span = $(PublicPrivateButtons[index]).find('span');
+            if (span.html().toLowerCase()==self.current_tab.toLowerCase()) {
+                switch (self.current_tab.toLowerCase()){
+                    case 'public':
+                        self.options.userId = '';
+                        break;
+                    case 'instructor':
+                        self.options.userId = this.options.instructor_email;
+                        break;
+                    default:
+                        self.options.userId = this.annotator.plugins.Permissions.user.id;
+                        break;
+                }
+                $(PublicPrivateButtons[index]).addClass('active');
+            }
         }
         
         //reset all old events
         el.off();
         
         //Bind functions
-        var openAnnotationItem = this.__bind(this._openAnnotationItem,this),
-	    closeAnnotationItem = this.__bind(this._closeAnnotationItem,this),
-            onGeolocationClick = this.__bind(this._onGeolocationClick,this),
-            onPlaySelectionClick = this.__bind(this._onPlaySelectionClick,this),
-            onShareControlsClick = this.__bind(this._onShareControlsClick,this),
-            onSelectionButtonClick = this.__bind(this._onSelectionButtonClick,this),
-            onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick,this),
-            onQuoteMediaButton = this.__bind(this._onQuoteMediaButton,this),
-            onControlRepliesClick = this.__bind(this._onControlRepliesClick,this),
-            onMoreButtonClick = this.__bind(this._onMoreButtonClick,this),
+        var openAnnotationItem = this.__bind(this._openAnnotationItem, this),
+        closeAnnotationItem = this.__bind(this._closeAnnotationItem, this),
+            onGeolocationClick = this.__bind(this._onGeolocationClick, this),
+            onPlaySelectionClick = this.__bind(this._onPlaySelectionClick, this),
+            onShareControlsClick = this.__bind(this._onShareControlsClick, this),
+            onSelectionButtonClick = this.__bind(this._onSelectionButtonClick, this),
+            onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick, this),
+            onQuoteMediaButton = this.__bind(this._onQuoteMediaButton, this),
+            onControlRepliesClick = this.__bind(this._onControlRepliesClick, this),
+            onMoreButtonClick = this.__bind(this._onMoreButtonClick, this),
             onSearchButtonClick = this.__bind(this._onSearchButtonClick, this),
-            onDeleteReplyButtonClick = this.__bind(this._onDeleteReplyButtonClick,this);
+            onClearSearchButtonClick = this.__bind(this._onClearSearchButtonClick, this),
+            onDeleteReplyButtonClick = this.__bind(this._onDeleteReplyButtonClick, this),
+            onZoomToImageBoundsButtonClick = this.__bind(this._onZoomToImageBoundsButtonClick, this);
     
         //Open Button
         el.on("click", ".annotationItem .annotationRow", openAnnotationItem);
@@ -472,6 +486,12 @@ CatchAnnotation.prototype = {
             //PlaySelection button
             el.on("click",".annotationItem .annotationDetail .quote", onQuoteMediaButton);
         }
+
+        //IMAGE
+        if (this.options.media=='image') {
+            //PlaySelection button
+            el.on("click",".annotationItem .annotationDetail .zoomToImageBounds", onZoomToImageBoundsButtonClick);
+        }
         
         //controlReplies
         el.on("click",".annotationItem .controlReplies", onControlRepliesClick);
@@ -485,6 +505,9 @@ CatchAnnotation.prototype = {
         
         //Search Button
         el.on("click",".searchbox .search-icon", onSearchButtonClick);
+
+        //Clear Search Button
+        el.on("click",".searchbox .clear-search-icon", onClearSearchButtonClick);
         
         //Delete Reply Button
         el.on("click", ".replies .replyItem .deleteReply", onDeleteReplyButtonClick);
@@ -493,16 +516,16 @@ CatchAnnotation.prototype = {
     changeMedia: function(media) {
         var media = media || 'text';
         this.options.media = media;
-	this._refresh();
+        this._refresh();
         this.refreshCatch(true);
-	this.checkTotAnnotations();
+        this.checkTotAnnotations();
     },
     changeUserId: function(userId) {
         var userId = userId || '';
         this.options.userId = userId;
         this._refresh();
         this.refreshCatch(true);
-	this.checkTotAnnotations();
+        this.checkTotAnnotations();
     },
     loadAnnotations: function() {
         var annotator = this.annotator,
@@ -520,9 +543,9 @@ CatchAnnotation.prototype = {
         //annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         //Make sure to be openned all annotations for this pagination
-	loadFromSearch.limit = this.options.pagination+loadedAn;
-	loadFromSearch.offset = 0;
-	annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
+    loadFromSearch.limit = this.options.pagination+loadedAn;
+    loadFromSearch.offset = 0;
+    annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         //text loading annotations
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
@@ -568,7 +591,6 @@ CatchAnnotation.prototype = {
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
         moreBut.html('More');
         
-        setTimeout();
     },
 
 //    
@@ -591,21 +613,26 @@ CatchAnnotation.prototype = {
             var annotations = annotator.plugins['Store'].annotations,
                 tot = typeof annotations !='undefined'?annotations.length:0,
                 attempts = 0; // max 100
+            if(annotation.media == "image"){
+            	self.refreshCatch(true);
+            	self.checkTotAnnotations();
+            } else {
             //This is to watch the annotations object, to see when is deleted the annotation
-            var ischanged = function(){
-                var new_tot = annotator.plugins['Store'].annotations.length;
-                if (attempts<100)
-                    setTimeout(function(){
-                        if (new_tot != tot){
-                            self.refreshCatch(true);
-			    self.checkTotAnnotations();
-                        }else{
-                            attempts++;
-                            ischanged();
-                        }
-                    },100); //wait for the change in the annotations
-            };
-            ischanged();
+				var ischanged = function(){
+					var new_tot = annotator.plugins['Store'].annotations.length;
+					if (attempts<100)
+						setTimeout(function(){
+							if (new_tot != tot){
+								self.refreshCatch(true);
+								self.checkTotAnnotations();
+							}else{
+								attempts++;
+								ischanged();
+							}
+						},100); //wait for the change in the annotations
+				};
+				ischanged();
+            }
         });
         annotator.subscribe("annotationCreated", function (annotation){
             var attempts = 0; // max 100
@@ -617,7 +644,7 @@ CatchAnnotation.prototype = {
                             self.refreshCatch();
                             if (typeof annotation.parent != 'undefined' && annotation.parent != '0'){
                                 var replies = $("[annotationid="+annotation.parent+"]").find(".controlReplies .hideReplies");
-				replies.show();
+                                replies.show();
                                 replies.click();
                                 replies.click();
                             }
@@ -632,7 +659,7 @@ CatchAnnotation.prototype = {
     },
     __bind: function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     _compileTemplates: function() {
-    	var self = this;
+        var self = this;
         //Change the html tags to functions 
         this.TEMPLATENAMES.forEach(function(templateName) {
             self.TEMPLATES[templateName] = Handlebars.compile(self.HTMLTEMPLATES[templateName]);
@@ -678,6 +705,13 @@ CatchAnnotation.prototype = {
         });//Change to < and > tags
         item.plainText = item.plainText.replace(/<\/?[^>]+(>|$)/g, "").replace('&nbsp;',''); //remove all the html tags
         
+        item.mediatypeforgrid = {};
+        item.mediatypeforgrid[item.media] = true;
+
+        if (item.mediatypeforgrid.image) {
+            item.thumbnailLink = item.target.thumb;
+        };
+
         //Flags
         if(!this.options.flags && typeof item.tags != 'undefined' && item.tags.length > 0){
             for(var len=item.tags.length, index = len-1; index >= 0; --index){
@@ -775,6 +809,30 @@ CatchAnnotation.prototype = {
                         }
                     }
                 }
+            }
+        }
+    },
+    _onZoomToImageBoundsButtonClick: function(evt){
+        var zoomToBounds = $(evt.target).hasClass('zoomToImageBounds')?$(evt.target):$(evt.target).parents('.zoomToImageBounds:first'),
+            osdaId = zoomToBounds.find('.idAnnotation').html(),
+            uri = zoomToBounds.find('.uri').html();
+
+        var allannotations = this.annotator.plugins['Store'].annotations,
+            osda = this.annotator.osda;
+
+        if(this.options.externalLink){
+            uri += (uri.indexOf('?') >= 0)?'&osdaId='+osdaId:'?osdaId='+osdaId;
+            location.href = uri;
+        }
+        for(var item in allannotations){
+            var an = allannotations[item];
+            if (typeof an.id!='undefined' && an.id == osdaId){//this is the annotation
+                var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
+                osda.viewer.viewport.fitBounds(bounds, false);
+
+                console.log(an.target.container);
+                $('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
+                                        'slow');
             }
         }
     },
@@ -1007,8 +1065,18 @@ CatchAnnotation.prototype = {
             userId = '';
     
         //Get userI
-         userId = (action.html()=="myNotes")? this.annotator.plugins.Permissions.user.id : '';
-        
+        switch (action.html()){
+            case 'public':
+                userId = '';
+                break;
+            case 'instructor':
+                userId = this.options.instructor_email;
+                break;
+            default:
+                userId = this.annotator.plugins.Permissions.user.id;
+                break;
+        }
+        this.current_tab = action.html();
         //Change userid and refresh
         this.changeUserId(userId);
     },
@@ -1065,6 +1133,9 @@ CatchAnnotation.prototype = {
         this._refresh(searchtype,searchInput);
         
     },
+    _onClearSearchButtonClick: function(evt){
+        this._refresh('','');    
+    },
     _clearAnnotator: function(){
         var annotator = this.annotator,
             store = annotator.plugins.Store,
@@ -1095,13 +1166,10 @@ CatchAnnotation.prototype = {
                     annotation = item.data('annotation');
         var authorized = permissions.options.userAuthorize('delete', annotation,permissions.user);
         if(authorized){
-            //annotator.deleteAnnotation(annotation);
             if(confirm('Would you like to delete this reply?')){
               annotator.plugins['Store']._apiRequest('destroy', annotation, function(){});
               item.remove();
-          }
+            }
         }
     }
 }
-
-

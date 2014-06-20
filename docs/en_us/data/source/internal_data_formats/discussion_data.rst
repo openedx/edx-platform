@@ -18,15 +18,21 @@ The primary collection that holds all of the discussion posts written by users i
 
 A sample of the field/value pairs that are in the mongo file, and descriptions of the attributes that these two types of objects share and that are specific to each type, follow.
 
+In addition to these collections, events are also emitted to track specific user activities. See :ref:`forum_events`.
+
 *********
 Samples
 *********
 
-Two sample rows, or JSON documents, from a .mongo file of discussion data follow. The JSON documents are minified before they are added to the log file, so they appear in compact format.
+Two sample rows, or JSON documents, from a ``.mongo`` file of discussion data
+follow. 
 
 ----------------------------------------
 CommentThread Document Example
 ----------------------------------------
+
+The JSON documents that include discussion data are delivered in a compact,
+machine-readable format that can be difficult to read at a glance.
 
 .. code-block:: json
 
@@ -42,7 +48,8 @@ CommentThread Document Example
  1358134453862 }, "votes" : { "count" : 1, "down" : [], "down_count" : 0, "point" : 1, "up" : 
  [ "48" ], "up_count" : 1 } }
 
-If you use a JSON formatter to "pretty print" this document, a version that is more readable is produced.
+If you use a JSON formatter to "pretty print" this document, a version that is
+more readable is produced.
 
 .. code-block:: json
 

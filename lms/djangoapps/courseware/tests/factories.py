@@ -1,3 +1,5 @@
+# Factories don't have __init__ methods, and are self documenting
+# pylint: disable=W0232, C0111
 import json
 from functools import partial
 import factory
@@ -6,9 +8,6 @@ from factory.django import DjangoModelFactory
 # Imported to re-export
 # pylint: disable=unused-import
 from student.tests.factories import UserFactory  # Imported to re-export
-from student.tests.factories import GroupFactory  # Imported to re-export
-from student.tests.factories import CourseEnrollmentAllowedFactory  # Imported to re-export
-from student.tests.factories import RegistrationFactory  # Imported to re-export
 # pylint: enable=unused-import
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
@@ -23,15 +22,23 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
-location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
+# TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
+# pylint: disable=invalid-name
+course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
+location = partial(course_id.make_usage_key, u'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
     courseware = 'course.xml'
 
+
+# For the following factories, these are disabled because we're ok ignoring the
+# unused arguments create and **kwargs in the line:
+# course_key(self, create, extracted, **kwargs)
+# pylint: disable=unused-argument
 
 class InstructorFactory(UserFactory):
     """
@@ -41,9 +48,9 @@ class InstructorFactory(UserFactory):
     last_name = "Instructor"
 
     @factory.post_generation
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for a course instructor user")
+            raise ValueError("Must specify a CourseKey for a course instructor user")
         CourseInstructorRole(extracted).add_users(self)
 
 
@@ -55,9 +62,9 @@ class StaffFactory(UserFactory):
     last_name = "Staff"
 
     @factory.post_generation
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for a course staff user")
+            raise ValueError("Must specify a CourseKey for a course staff user")
         CourseStaffRole(extracted).add_users(self)
 
 
@@ -69,9 +76,9 @@ class BetaTesterFactory(UserFactory):
     last_name = "Beta-Tester"
 
     @factory.post_generation
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for a beta-tester user")
+            raise ValueError("Must specify a CourseKey for a beta-tester user")
         CourseBetaTesterRole(extracted).add_users(self)
 
 
@@ -83,10 +90,10 @@ class OrgStaffFactory(UserFactory):
     last_name = "Org-Staff"
 
     @factory.post_generation
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for an org-staff user")
-        OrgStaffRole(extracted).add_users(self)
+            raise ValueError("Must specify a CourseKey for an org-staff user")
+        OrgStaffRole(extracted.org).add_users(self)
 
 
 class OrgInstructorFactory(UserFactory):
@@ -97,10 +104,10 @@ class OrgInstructorFactory(UserFactory):
     last_name = "Org-Instructor"
 
     @factory.post_generation
-    def course(self, create, extracted, **kwargs):
+    def course_key(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for an org-instructor user")
-        OrgInstructorRole(extracted).add_users(self)
+            raise ValueError("Must specify a CourseKey for an org-instructor user")
+        OrgInstructorRole(extracted.org).add_users(self)
 
 
 class GlobalStaffFactory(UserFactory):
@@ -112,6 +119,7 @@ class GlobalStaffFactory(UserFactory):
     @factory.post_generation
     def set_staff(self, create, extracted, **kwargs):
         GlobalStaff().add_users(self)
+# pylint: enable=unused-argument
 
 
 class StudentModuleFactory(DjangoModelFactory):
@@ -119,7 +127,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = "MITx/999/Robot_Super_Course"
+    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
     state = None
     grade = None
     max_grade = None
@@ -131,7 +139,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('usage_id').url()
+    usage_id = location('usage_id')
 
 
 class StudentPrefsFactory(DjangoModelFactory):

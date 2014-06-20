@@ -11,6 +11,7 @@
 # hoad, 2013
 # hoad, 2013
 # ngocchung75 <ngocchung75@gmail.com>, 2013
+# An Walker <neyugn2909@gmail.com>, 2014
 # hdvd2309 <huynq23091@gmail.com>, 2013-2014
 # ppanhh <vietnamesel10n@gmail.com>, 2013
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -24,14 +25,16 @@
 # hdvd2309 <huynq23091@gmail.com>, 2013-2014
 # hoad, 2013
 # ngocchung75 <ngocchung75@gmail.com>, 2013
+# An Walker <neyugn2909@gmail.com>, 2014
+# An Walker <neyugn2909@gmail.com>, 2014
 # hdvd2309 <huynq23091@gmail.com>, 2014
 # ppanhh <vietnamesel10n@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 11:10-0400\n"
-"PO-Revision-Date: 2014-04-24 13:20+0000\n"
+"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"PO-Revision-Date: 2014-05-25 02:51+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -47,12 +50,11 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
-#: cms/static/js/base.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
+#: cms/static/js/views/asset.js cms/static/js/views/baseview.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
-#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -64,11 +66,11 @@ msgstr "Liên kết này sẽ mở ra trong một cửa sổ hoặc tab mới c�
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr ""
+msgstr "Hiện Chú Thích"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ẩn Chú Thích"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
@@ -93,7 +95,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] ""
+msgstr[0] "(%(earned)s/%(possible)s điểm)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
@@ -157,7 +159,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Submit"
-msgstr ""
+msgstr "Gửi"
 
 #. Translators: one clicks this button after one has finished filling out the
 #. grading
@@ -179,7 +181,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "Câu trả lời đã lưu lại nhưng vẫn chưa được gửi."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -216,12 +218,12 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr ""
+msgstr "Hiện Câu Hỏi"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
-msgstr ""
+msgstr "Ẩn Câu Hỏi"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -229,9 +231,52 @@ msgid ""
 "SequenceModule. Please contact the course staff."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Volume"
+msgstr "Âm lượng"
+
+#. Translators: Volume level equals 0%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Muted"
+msgstr "Tắt âm"
+
+#. Translators: Volume level in range ]0,20]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very low"
+msgstr "Rất nhỏ"
+
+#. Translators: Volume level in range ]20,40]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Low"
+msgstr "Nhỏ"
+
+#. Translators: Volume level in range ]40,60]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Average"
+msgstr "Vừa phải"
+
+#. Translators: Volume level in range ]60,80]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Loud"
+msgstr "To"
+
+#. Translators: Volume level in range ]80,99]%
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Very loud"
+msgstr "Rất to"
+
+#. Translators: Volume level equals 100%.
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Maximum"
+msgstr "Tối đa"
+
+#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or "
+msgstr ""
+
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr ""
+msgstr "Thanh trượt video"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
@@ -243,7 +288,7 @@ msgstr "Phát"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr "Đổ đầy trình duyệt"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
@@ -251,11 +296,11 @@ msgstr "Thoát khỏi chế độ toàn màn hình"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr ""
+msgstr "Bật chất lượng HD"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr ""
+msgstr "Tắt chất lượng HD"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
@@ -269,60 +314,21 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
+msgstr[0] "%(value)s giờ"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
+msgstr[0] "%(value)s phút"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Volume"
-msgstr "Âm lượng"
-
-#. Translators: Volume level equals 0%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Muted"
-msgstr ""
-
-#. Translators: Volume level in range (0,20]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very low"
-msgstr ""
-
-#. Translators: Volume level in range (20,40]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Low"
-msgstr ""
-
-#. Translators: Volume level in range (40,60]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Average"
-msgstr ""
-
-#. Translators: Volume level in range (60,80]%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Loud"
-msgstr ""
-
-#. Translators: Volume level in range (80,100)%
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Very loud"
-msgstr ""
-
-#. Translators: Volume level equals 100%.
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Maximum"
-msgstr ""
+msgstr[0] "%(value)s giây"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr "Chú thích sẽ được hiển thị khi"
+msgstr "Phụ đề sẽ được hiển thị khi"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
@@ -335,11 +341,11 @@ msgstr "Tắt phụ đề"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr ""
+msgstr "Ẩn Thảo Luận"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
-msgstr ""
+msgstr "Hiển Thị Thảo Luận"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -351,30 +357,32 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
-msgstr ""
+msgstr "Rất tiếc"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
-msgstr ""
+msgstr "Xảy ra sự cố trong lúc tải nội dung thảo luận. Vui lòng thử lại."
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
-msgstr ""
+msgstr "Xảy ra sự cố trong lúc tải chủ đề bạn yêu cầu. Vui lòng thử lại."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "Loading content"
-msgstr ""
+msgstr "Đang tải nội dung"
 
 #: common/static/coffee/src/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
+"Xảy ra sự cố trong lúc xử lý yêu cầu của bạn. Bạn hãy sao chép lại phần nội "
+"dung nào chưa được lưu lại sau đó tải lại trang để tiếp tục."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
-msgstr ""
+msgstr "Xảy ra sự cố trong lúc xử lý yêu cầu của bạn. Vui lòng thử lại."
 
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
@@ -384,25 +392,25 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/new_post_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Close"
-msgstr ""
+msgstr "Đóng"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Open"
-msgstr ""
+msgstr "Mở"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "remove vote"
-msgstr ""
+msgstr "bỏ bầu chọn"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote"
-msgstr ""
+msgstr "bầu chọn"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote (click to remove your vote)"
@@ -416,28 +424,28 @@ msgstr[0] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr ""
+msgstr "Tải thêm"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr ""
+msgstr "Đang tải thêm các chủ đề"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
-msgstr ""
+msgstr "Xảy ra sự cố trong lúc tải thêm các chủ đề. Vui lòng thử lại."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] ""
+msgstr[0] "%(unread_count)s bình luận mới"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
-msgstr ""
+msgstr "Đang tải danh sách các chủ đề"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
-msgstr ""
+msgstr "Nhấp chọn để bỏ báo cáo"
 
 #. Translators: The text between start_sr_span and end_span is not shown
 #. in most browsers but will be read by screen readers.
@@ -536,14 +544,34 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr ""
+msgstr "Bạn chắc chắn muốn xóa bình luận này?"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
-msgstr ""
+msgstr "Xảy ra sự cố khi xóa bình luận này. Vui lòng thử lại."
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/base_image.js
+msgid "Drop target image"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging out of slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dragging"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped in slider"
+msgstr ""
+
+#: common/static/js/capa/drag_and_drop/draggable_events.js
+msgid "dropped on target"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -560,48 +588,48 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "khoảng một phút"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
+msgstr[0] "%d phút"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "khoảng một giờ"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
+msgstr[0] "khoảng %d giờ"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "một ngày"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
+msgstr[0] "%d ngày"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "khoảng một tháng"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
+msgstr[0] "%d tháng"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "khoảng một năm"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
+msgstr[0] "%d năm"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
@@ -613,7 +641,7 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Đây là danh sách %s có sẵn. Bạn có thể lựa chọn bằng cách chọn chúng trong "
-"hộp dưới đây và sau đó nhấn vào mũi tên \"Chọn\" giữa hai hộp."
+"hộp dưới đây rồi nhấn vào mũi tên \"Chọn\" giữa hai hộp."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Type into this box to filter down the list of available %s."
@@ -641,7 +669,7 @@ msgstr "Loại bỏ"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Chosen %s"
-msgstr "Chọn %s"
+msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid ""
@@ -669,8 +697,6 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Bạn chưa lưu thay đổi trên các trường có thể chỉnh sửa thuộc về cá nhân. Nếu"
-" bạn chạy một hành động, thay đổi của bạn sẽ bị mất."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -678,8 +704,6 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Bạn đã chọn một hành động, nhưng bạn chưa lưu thay đổi của bạn vào các "
-"trường thuộc về cá nhân. Hãy nhấn OK để lưu. Bạn sẽ cần chạy lại hành động."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -687,21 +711,20 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Bạn đã chọn một hành động, và bạn chưa thực hiện bất kỳ thay đổi nào trên "
-"các trường thuộc về cá nhân. Có lẽ bạn đang tìm kiếm nút Go chứ không phải "
-"nút Save."
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
+"Tháng 1|Tháng 2|Tháng 3|Tháng 4|Tháng 5|Tháng 6|Tháng 7|Tháng 8|Tháng "
+"9|Tháng 10|Tháng 11|Tháng 12"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
 #: lms/static/admin/js/calendar.js
 msgid "S|M|T|W|T|F|S"
-msgstr ""
+msgstr "CN|T2|T3|T4|T5|T6|T7"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
@@ -715,7 +738,7 @@ msgstr "Ẩn"
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr ""
+msgstr "Chủ Nhật|Thứ 2|Thứ 3|Thứ 4|Thứ 5|Thứ 6|Thứ 7"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
@@ -736,7 +759,7 @@ msgstr "Nửa đêm"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "6 a.m."
-msgstr "6 a.m."
+msgstr "6h sáng"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
@@ -797,7 +820,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
-msgstr ""
+msgstr "Đang tải..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -964,11 +987,11 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr ""
+msgstr "Tin nhắn của bạn phải có tiêu đề."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr ""
+msgstr "Tin nhắn của bạn phải có nội dung."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
@@ -1021,8 +1044,8 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error getting student progress url for '<%= student_id %>'. Check that the "
-"student identifier is spelled correctly."
+"Error getting student progress url for '<%= student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1032,7 +1055,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Please enter a problem urlname."
+msgid "Please enter a problem location."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1044,8 +1067,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+" '<%= student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1056,7 +1079,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Check that the problem and student identifiers are spelled correctly."
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1073,15 +1097,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Check that the problem and student identifiers are "
-"spelled correctly."
+"'<%= student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Check that the problem and student identifiers are spelled "
-"correctly."
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1098,7 +1122,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Check that the problem identifier is spelled correctly."
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1114,8 +1139,8 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
-" problem identifier is spelled correctly."
+"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1235,11 +1260,11 @@ msgstr ""
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
-msgstr ""
+msgstr "(Ẩn)"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr ""
+msgstr "(Hiện)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -1260,27 +1285,27 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr ""
+msgstr "In đậm (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
-msgstr ""
+msgstr "In nghiêng (Ctrl+I)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr ""
+msgstr "Liên kết (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
-msgstr ""
+msgstr "Đoạn trích dẫn (Ctrl+Q)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr ""
+msgstr "Code Mẫu (Ctrl+K)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
-msgstr ""
+msgstr "Hình Ảnh (Ctrl+G)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
@@ -1320,19 +1345,19 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr ""
+msgstr "nhập mô tả cho hình ảnh ở đây"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr ""
+msgstr "nhập mô tả cho liên kết ở đây"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
-msgstr ""
+msgstr "Đoạn trích dẫn"
 
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
 msgid "enter code here"
-msgstr ""
+msgstr "nhập code ở đây"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
@@ -1342,9 +1367,49 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: lms/static/js/staff_debug_actions.js
+msgid "Unknown Error Occurred."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully reset the attempts for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to reset attempts."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully deleted student state for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to delete student state."
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem for user {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "student(s) opened Subsection"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "students"
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "questions"
 msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
@@ -1356,6 +1421,8 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Lỗi này có thể do máy chủ của chúng tôi hoặc kết nối internet của bạn. Hãy "
+"thử tải lại trang hoặc kiểm tra lại kết nối internet."
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
@@ -1365,7 +1432,8 @@ msgstr ""
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
@@ -1373,13 +1441,15 @@ msgstr "Đang lưu&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Component Confirmation"
-msgstr ""
+msgstr "Xác Nhận Xóa Thành Phần"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this component? This action cannot be "
 "undone."
 msgstr ""
+"Bạn có chắc chắn bạn muốn xóa thành phần này? Hành động này không thể hoàn "
+"tác."
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
@@ -1387,25 +1457,21 @@ msgstr ""
 msgid "Deleting&hellip;"
 msgstr "Đang xóa&hellip;"
 
-#: cms/static/coffee/src/views/unit.js
-msgid "Adding&hellip;"
-msgstr ""
-
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
-msgstr ""
+msgstr "Xóa thành phần này?"
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "Xóa thành phần này là vĩnh viễn và không thể hoàn tác."
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
-msgstr ""
+msgstr "Vâng, xóa thành phần này"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -1425,23 +1491,22 @@ msgstr "Vâng, xóa"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr ""
+msgstr "Vui lòng không dùng khoảng trắng trong mục này"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
+"Vui lòng không sử dụng bất kỳ dấu cách hoặc ký tự đặc biệt trong mục này."
 
 #: cms/static/js/index.js
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr ""
-"Độ dài kết hợp bởi tên tổ chức, mã số khóa học, và trường thông tin về khóa "
-"học không thể nhiều hơn 65 ký tự."
 
 #: cms/static/js/index.js
 msgid "Required field."
-msgstr "Trường yêu cầu."
+msgstr ""
 
 #: cms/static/js/sock.js
 msgid "Hide Studio Help"
@@ -1465,11 +1530,11 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
+msgstr "hoặc"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr "Khoá học phải có một ngày bắt đầu ấn định."
+msgstr "Khoá học phải ấn định ngày bắt đầu."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
@@ -1485,15 +1550,15 @@ msgstr "Ngày bắt đầu ghi danh không thể sau ngày kết thúc ghi danh.
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
-msgstr ""
+msgstr "Ngày kết thúc ghi danh không thể sau ngày kết thúc khóa học."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr "Khóa chỉ nên chứa các chữ cái, con số, _, hoặc -"
+msgstr "Key chỉ nên chứa các chữ cái, con số, _, hoặc -"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr "Đã có kiểu công việc khác với tên này."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
@@ -1501,15 +1566,15 @@ msgstr "Xin vui lòng nhập một số nguyên trong khoảng 0 đến 100."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "Vui lòng nhập một số nguyên lớn hơn 0."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
-msgstr ""
+msgstr "Vui lòng nhập số nguyên không âm"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Không thể bỏ thêm <% attrs.types %> hơn sẽ được giao."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -1525,9 +1590,6 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
-"Bạn có chắc bạn muốn xóa mục này. Nó không thể phục hồi!\n"
-"\n"
-"Ngoài ra bất kỳ nội dung liên kết hoặc tham khảo đến mục này sẽ không còn hoạt động (ví dụ: hỏng hình ảnh, liên kết...)"
 
 #: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
 msgid "Delete"
@@ -1543,19 +1605,35 @@ msgstr "Tên"
 
 #: cms/static/js/views/assets.js
 msgid "Date Added"
-msgstr "Ngày thêm vào"
+msgstr "Ngày Thêm Vào"
+
+#: cms/static/js/views/assets.js
+msgid "Uploading…"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Choose File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Upload New File"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Load Another File"
+msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr "Bạn có chắc chắn bạn muốn xóa bản cập nhật này?"
+msgstr "Bạn chắc chắn muốn xóa bản cập nhật này?"
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Hành động này không thể hoàn tác."
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Tải lên một file PDF mới đến “<%= name %>”"
+msgstr "Tải lên một file PDF mới lên “<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -1568,13 +1646,15 @@ msgstr "Đang lưu"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "Có lỗi trong quá trình tải lên"
 
 #: cms/static/js/views/import.js
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr ""
+"Định dạng tập tin không được hỗ trợ. Xin vui lòng tải lên một tập tin với "
+"phần mở rộng <code>tar.gz</code>."
 
 #: cms/static/js/views/metadata.js
 msgid "Upload File"
@@ -1590,11 +1670,11 @@ msgstr "Mở Rộng Tất Cả Mục"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr ""
+msgstr "Ngày phát hành:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
+msgstr "{month}/{day}/{year} lúc {hour}:{minute} UTC"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
@@ -1604,19 +1684,26 @@ msgstr ""
 msgid "Not Graded"
 msgstr ""
 
-#: cms/static/js/views/paging.js
-msgid "ascending"
-msgstr ""
-
-#: cms/static/js/views/paging.js
-msgid "descending"
-msgstr ""
-
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
-"%(total_span)s%(total)s total%(end_span)s, sorted by "
-"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
 msgstr ""
 
 #: cms/static/js/views/section_edit.js
@@ -1636,8 +1723,6 @@ msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
-"Xóa một giáo trình không thể được hoàn tác và một khi đã xóa bất kỳ tham "
-"chiếu đến nó trong bảng điều khiển chương trình học của bạn cũng sẽ bị xóa."
 
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
@@ -1645,15 +1730,15 @@ msgstr "Đang xóa"
 
 #: cms/static/js/views/uploads.js
 msgid "Upload"
-msgstr ""
+msgstr "Tải lên"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr "Chúng tôi xin lỗi, có lỗi xảy ra"
+msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr ""
+msgstr "Bạn đã thực hiện một số thay đổi"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
@@ -1663,7 +1748,7 @@ msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "Bạn đã thực hiện một số thay đổi, nhưng có một số lỗi"
 
 #: cms/static/js/views/validation.js
 msgid ""
@@ -1678,19 +1763,23 @@ msgstr "Lưu Thay Đổi"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "Thay đổi của bạn đã được lưu."
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
-msgstr ""
+msgstr "Trình biên tập"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Settings"
-msgstr ""
+msgstr "Thiết lập"
+
+#: cms/static/js/views/components/add_xblock.js
+msgid "Adding&hellip;"
+msgstr "Đang thêm&hellip;"
 
 #: cms/static/js/views/modals/base_modal.js
 msgid "Save"
-msgstr ""
+msgstr "Lưu"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
@@ -1698,7 +1787,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
-msgstr ""
+msgstr "Đang chỉnh sửa: %(title)s"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -1706,12 +1795,12 @@ msgid ""
 "with key and value formatting, as validation is not implemented."
 msgstr ""
 "Các thay đổi sẽ không có hiệu lực cho đến khi bạn lưu tiến trình của bạn. "
-"Hãy cẩn thận với khóa và định dạng của giá trị, bởi vì sự xác nhận chưa được"
-" hoàn thành."
+"Hãy cẩn thận với key và định dạng của giá trị, bởi vì sự xác nhận chưa được "
+"hoàn thành."
 
 #: cms/static/js/views/settings/advanced.js
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "Thay đổi chính sách của bạn đã được lưu."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -1719,12 +1808,10 @@ msgid ""
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
 msgstr ""
-"Xin lưu ý rằng sự xác nhận chính sách của bạn và các cặp giá trị hiện đang "
-"không ở vị trí. Nếu bạn gặp khó khăn, vui lòng xem lại chính sách của bạn."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr ""
+msgstr "Tải lên hình ảnh khóa học của bạn."
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."

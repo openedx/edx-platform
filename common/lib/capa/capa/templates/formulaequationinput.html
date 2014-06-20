@@ -1,6 +1,6 @@
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
-  <div class="${status_class}" id="status_${id}">
+  <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value|h}"
         aria-label="${label}"
@@ -20,7 +20,7 @@
               % else:
               ${label}
               %endif
-          </span> - ${status_display}
+          </span> - ${status.display_name}
       </p>
 
       <div id="input_${id}_preview" class="equation">

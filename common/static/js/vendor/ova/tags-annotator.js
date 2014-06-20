@@ -1,3 +1,27 @@
+/* 
+ HighlightTags Annotator Plugin v1.0 (https://github.com/lduarte1991/tags-annotator)
+ Copyright (C) 2014 Luis F Duarte
+ License: https://github.com/lduarte1991/tags-annotator/blob/master/LICENSE.rst
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+  
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+/*===============================================================================
+  ===============================================================================
+  ===============================================================================
+  ===============================================================================
+  ==============================================================================*/
 /*
  * jQuery Plugin: Tokenizing Autocomplete Text Entry
  * Version 1.6.0
@@ -11,7 +35,7 @@
 (function ($) {
 // Default settings
 var DEFAULT_SETTINGS = {
-	// Search settings
+    // Search settings
     method: "GET",
     contentType: "json",
     queryParam: "q",
@@ -20,33 +44,33 @@ var DEFAULT_SETTINGS = {
     propertyToSearch: "name",
     jsonContainer: null,
 
-	// Display settings
+    // Display settings
     hintText: "Type in a search term",
-    noResultsText: "No results",
+    noResultsText: "Not Found. Hit ENTER to add a personal tag.",
     searchingText: "Searching...",
     deleteText: "&times;",
     animateDropdown: true,
 
-	// Tokenization settings
+    // Tokenization settings
     tokenLimit: null,
     tokenDelimiter: ",",
     preventDuplicates: false,
 
-	// Output settings
+    // Output settings
     tokenValue: "id",
 
-	// Prepopulation settings
+    // Prepopulation settings
     prePopulate: null,
     processPrePopulate: false,
 
-	// Manipulation settings
+    // Manipulation settings
     idPrefix: "token-input-",
 
-	// Formatters
+    // Formatters
     resultsFormatter: function(item){ return "<li>" + item[this.propertyToSearch]+ "</li>" },
     tokenFormatter: function(item) { return "<li><p>" + item[this.propertyToSearch] + "</p></li>" },
 
-	// Callbacks
+    // Callbacks
     onResult: null,
     onAdd: null,
     onDelete: null,
@@ -115,8 +139,8 @@ var methods = {
         return this;
     },
     get: function() {
-    	return this.data("tokenInputObject").getTokens();
-   	}
+        return this.data("tokenInputObject").getTokens();
+       }
 }
 
 // Expose the .tokenInput function to jQuery as a plugin
@@ -271,7 +295,10 @@ $.TokenList = function (input, url_or_data, settings) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
                     hidden_input.change();
                     return false;
-                  }
+                  } else{
+                    add_token({id:$(this).val(), name:$(this).val()});
+                    hidden_input.change();
+                  } 
                   break;
 
                 case KEY.ESCAPE:
@@ -414,8 +441,8 @@ $.TokenList = function (input, url_or_data, settings) {
     }
     
     this.getTokens = function() {
-   		return saved_tokens;
-   	}
+           return saved_tokens;
+       }
 
     //
     // Private functions
@@ -866,232 +893,232 @@ var _ref,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 Annotator.Plugin.HighlightTags = (function(_super) {
-	__extends(HighlightTags, _super);
-	
-    HighlightTags.prototype.options = null;
-	
+    __extends(HighlightTags, _super);
     
-	function HighlightTags(element,options) {
-		this.pluginSubmit = __bind(this.pluginSubmit, this);
-		this.updateViewer = __bind(this.updateViewer, this);
-		this.colorize = __bind(this.colorize, this);
-		this.updateField = __bind(this.updateField, this);
+    HighlightTags.prototype.options = null;
+    
+    
+    function HighlightTags(element,options) {
+        this.pluginSubmit = __bind(this.pluginSubmit, this);
+        this.updateViewer = __bind(this.updateViewer, this);
+        this.colorize = __bind(this.colorize, this);
+        this.updateField = __bind(this.updateField, this);
 
         this.options = options;
-		_ref = HighlightTags.__super__.constructor.apply(this, arguments);
-		return _ref;
-	}
-	
+        _ref = HighlightTags.__super__.constructor.apply(this, arguments);
+        return _ref;
+    }
+    
     //example variables to be used to receive input in the annotator view
-	HighlightTags.prototype.field = null;
-	HighlightTags.prototype.input = null;
-	HighlightTags.prototype.colors = null;
-        HighlightTags.prototype.isFirstTime = true;
+    HighlightTags.prototype.field = null;
+    HighlightTags.prototype.input = null;
+    HighlightTags.prototype.colors = null;
+    HighlightTags.prototype.isFirstTime = true;
     
     //this function will initialize the plug in. Create your fields here in the editor and viewer.
     HighlightTags.prototype.pluginInit = function() {
-		console.log("HighlightTags-pluginInit");
-		//Check that annotator is working
-		if (!Annotator.supported()) {
-			return; 
-		}
-		
-		this.field = this.annotator.editor.addField({
-			type: 'input',
-			load: this.updateField,
-			submit: this.pluginSubmit,
-		});
-		
-		
-		
-		var self = this;
-		
-		var newfield = Annotator.$('<li class="annotator-item">'+ "<div><input placeholder =\"Add tags\" type=\"text\" id=\"tag-input\" name=\"tags\" /></div>"+'</li>');
+        console.log("HighlightTags-pluginInit");
+        //Check that annotator is working
+        if (!Annotator.supported()) {
+            return; 
+        }
+        
+        this.field = this.annotator.editor.addField({
+            type: 'input',
+            load: this.updateField,
+            submit: this.pluginSubmit,
+        });
+        
+        
+        
+        var self = this;
+        
+        var newfield = Annotator.$('<li class="annotator-item">'+ "<div><input placeholder =\"Add tags\" type=\"text\" id=\"tag-input\" name=\"tags\" /></div>"+'</li>');
                 Annotator.$(self.field).replaceWith(newfield);
                 self.field=newfield[0];
                 
                 //
-		
-			
-		//-- Viewer
-		var newview = this.annotator.viewer.addField({
-			load: this.updateViewer,
-		});
-		
-		this.colors = this.getHighlightTags();
-		var self = this;
-		this.annotator.subscribe('annotationsLoaded', function(){setTimeout(function(){self.colorize()},1000)});
-		this.annotator.subscribe('annotationUpdated', this.colorize);
-		this.annotator.subscribe('flaggedAnnotation', this.updateViewer);
-		this.annotator.subscribe('annotationCreated', this.colorize);
-
-	};
-	
-	HighlightTags.prototype.getHighlightTags = function(){
-		if (typeof this.options.tag != 'undefined') {
-			var self = this;
-			var final = {},	prelim = this.options.tag.split(",");
-			prelim.forEach(function(item){
-				var temp = item.split(":");
-				final[temp[0]] = self.getRGB(temp[1]);
-			});
-			return final;
-		}
-		return {};
-	}
-	
-	HighlightTags.prototype.getRGB = function(item){
-		function getColorValues( color ){
-	var values = { red:null, green:null, blue:null, alpha:null };
-	if( typeof color == 'string' ){
-		/* hex */
-		if( color.indexOf('#') === 0 ){
-			color = color.substr(1)
-			if( color.length == 3 )
-				values = {
-					red:   parseInt( color[0]+color[0], 16 ),
-					green: parseInt( color[1]+color[1], 16 ),
-					blue:  parseInt( color[2]+color[2], 16 ),
-					alpha: .3
-				}
-			else
-				values = {
-					red:   parseInt( color.substr(0,2), 16 ),
-					green: parseInt( color.substr(2,2), 16 ),
-					blue:  parseInt( color.substr(4,2), 16 ),
-					alpha: .3
-				}
-		/* rgb */
-		}else if( color.indexOf('rgb(') === 0 ){
-			var pars = color.indexOf(',');
-			values = {
-				red:   parseInt(color.substr(4,pars)),
-				green: parseInt(color.substr(pars+1,color.indexOf(',',pars))),
-				blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(')'))),
-				alpha: .3
-			}
-		/* rgba */
-		}else if( color.indexOf('rgba(') === 0 ){
-			var pars = color.indexOf(','),
-				repars = color.indexOf(',',pars+1);
-			values = {
-				red:   parseInt(color.substr(5,pars)),
-				green: parseInt(color.substr(pars+1,repars)),
-				blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(',',repars))),
-				alpha: parseFloat(color.substr(color.indexOf(',',repars+1)+1,color.indexOf(')')))
-			}
-		/* verbous */
-		}else{
-			var stdCol = { acqua:'#0ff',   teal:'#008080',   blue:'#00f',      navy:'#000080',
-						   yellow:'#ff0',  olive:'#808000',  lime:'#0f0',      green:'#008000',
-						   fuchsia:'#f0f', purple:'#800080', red:'#f00',       maroon:'#800000',
-						   white:'#fff',   gray:'#808080',   silver:'#c0c0c0', black:'#000' };
-			if( stdCol[color]!=undefined )
-				values = getColorValues(stdCol[color]);
-		}
-	}
-	return values
-}
-		return getColorValues(item)
-	}
-	
-	HighlightTags.prototype.colorize = function(){
-	    
-		var annotations = Array.prototype.slice.call($(".annotator-hl"));
-		for (annNum = 0; annNum < annotations.length; ++annNum){
-			var anns = $.data(annotations[annNum],"annotation");
-			if (typeof anns.tags != "undefined" && anns.tags.length == 0) {
-				$(annotations[annNum]).css("background-color","");
-			}
-			if (typeof anns.tags != "undefined" && this.colors !== {}) {
-				
-				for(var index = 0; index < anns.tags.length; ++index){
-					
-					if (typeof this.colors[anns.tags[index]] != "undefined") {
-						var finalcolor = this.colors[anns.tags[index]];
-						$(annotations[annNum]).css("background","rgba("+finalcolor.red+","+finalcolor.green+","+finalcolor.blue+",0.3");
-					}else{
-						$(annotations[annNum]).css("background","");
-					}
-				}
-				
-			}else{
-				$(annotations[annNum]).css("background","");
-			}
-		}
-	}
-	
-	HighlightTags.prototype.updateField = function(field, annotation){
+        
             
-	
+        //-- Viewer
+        var newview = this.annotator.viewer.addField({
+            load: this.updateViewer,
+        });
+        
+        this.colors = this.getHighlightTags();
+        var self = this;
+        this.annotator.subscribe('annotationsLoaded', function(){setTimeout(function(){self.colorize()},1000)});
+        this.annotator.subscribe('annotationUpdated', this.colorize);
+        this.annotator.subscribe('flaggedAnnotation', this.updateViewer);
+        this.annotator.subscribe('annotationCreated', this.colorize);
+
+    };
+    
+    HighlightTags.prototype.getHighlightTags = function(){
+        if (typeof this.options.tag != 'undefined') {
+            var self = this;
+            var final = {},    prelim = this.options.tag.split(",");
+            prelim.forEach(function(item){
+                var temp = item.split(":");
+                final[temp[0]] = self.getRGB(temp[1]);
+            });
+            return final;
+        }
+        return {};
+    }
+    
+    HighlightTags.prototype.getRGB = function(item){
+        function getColorValues( color ){
+    var values = { red:null, green:null, blue:null, alpha:null };
+    if( typeof color == 'string' ){
+        /* hex */
+        if( color.indexOf('#') === 0 ){
+            color = color.substr(1)
+            if( color.length == 3 )
+                values = {
+                    red:   parseInt( color[0]+color[0], 16 ),
+                    green: parseInt( color[1]+color[1], 16 ),
+                    blue:  parseInt( color[2]+color[2], 16 ),
+                    alpha: .3
+                }
+            else
+                values = {
+                    red:   parseInt( color.substr(0,2), 16 ),
+                    green: parseInt( color.substr(2,2), 16 ),
+                    blue:  parseInt( color.substr(4,2), 16 ),
+                    alpha: .3
+                }
+        /* rgb */
+        }else if( color.indexOf('rgb(') === 0 ){
+            var pars = color.indexOf(',');
+            values = {
+                red:   parseInt(color.substr(4,pars)),
+                green: parseInt(color.substr(pars+1,color.indexOf(',',pars))),
+                blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(')'))),
+                alpha: .3
+            }
+        /* rgba */
+        }else if( color.indexOf('rgba(') === 0 ){
+            var pars = color.indexOf(','),
+                repars = color.indexOf(',',pars+1);
+            values = {
+                red:   parseInt(color.substr(5,pars)),
+                green: parseInt(color.substr(pars+1,repars)),
+                blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(',',repars))),
+                alpha: parseFloat(color.substr(color.indexOf(',',repars+1)+1,color.indexOf(')')))
+            }
+        /* verbous */
+        }else{
+            var stdCol = { acqua:'#0ff',   teal:'#008080',   blue:'#00f',      navy:'#000080',
+                           yellow:'#ff0',  olive:'#808000',  lime:'#0f0',      green:'#008000',
+                           fuchsia:'#f0f', purple:'#800080', red:'#f00',       maroon:'#800000',
+                           white:'#fff',   gray:'#808080',   silver:'#c0c0c0', black:'#000' };
+            if( stdCol[color]!=undefined )
+                values = getColorValues(stdCol[color]);
+        }
+    }
+    return values
+}
+        return getColorValues(item)
+    }
+    
+    HighlightTags.prototype.colorize = function(){
+        
+        var annotations = Array.prototype.slice.call($(".annotator-hl"));
+        for (annNum = 0; annNum < annotations.length; ++annNum){
+            var anns = $.data(annotations[annNum],"annotation");
+            if (typeof anns.tags != "undefined" && anns.tags.length == 0) {
+                $(annotations[annNum]).css("background-color","");
+            }
+            if (typeof anns.tags != "undefined" && this.colors !== {}) {
+                
+                for(var index = 0; index < anns.tags.length; ++index){
+                    
+                    if (typeof this.colors[anns.tags[index]] != "undefined") {
+                        var finalcolor = this.colors[anns.tags[index]];
+                        $(annotations[annNum]).css("background","rgba("+finalcolor.red+","+finalcolor.green+","+finalcolor.blue+",0.3");
+                    }else{
+                        $(annotations[annNum]).css("background","");
+                    }
+                }
+                
+            }else{
+                $(annotations[annNum]).css("background","");
+            }
+        }
+    }
+    
+    HighlightTags.prototype.updateField = function(field, annotation){
+            
+    
             if(this.isFirstTime){
                 var tags = this.options.tag.split(",");
-		var tokensavailable = [];
+        var tokensavailable = [];
                 tags.forEach (function(tagnames){
-			lonename = tagnames.split(":");
-			
-			tokensavailable.push({'id': lonename[0], 'name':lonename[0]});
-		});
+            lonename = tagnames.split(":");
+            
+            tokensavailable.push({'id': lonename[0], 'name':lonename[0]});
+        });
                 $("#tag-input").tokenInput(tokensavailable);
                 this.isFirstTime = false;
             }
             $('#token-input-tag-input').attr('placeholder','Add tags...');
-            $('#tag-input').tokenInput('clear');			
+            $('#tag-input').tokenInput('clear');            
             if (typeof annotation.tags != "undefined") {
                 for (tagnum = 0; tagnum < annotation.tags.length; tagnum++){
                     var n = annotation.tags[tagnum];
-						if (typeof this.annotator.plugins["HighlightTags"] != 'undefined') {
-							if (annotation.tags[tagnum].indexOf("flagged-")==-1){
-								$('#tag-input').tokenInput('add',{'id':n,'name':n});
-							}
-						} else{
-							$('#tag-input').tokenInput('add',{'id':n,'name':n});
-						}
+                        if (typeof this.annotator.plugins["HighlightTags"] != 'undefined') {
+                            if (annotation.tags[tagnum].indexOf("flagged-")==-1){
+                                $('#tag-input').tokenInput('add',{'id':n,'name':n});
+                            }
+                        } else{
+                            $('#tag-input').tokenInput('add',{'id':n,'name':n});
+                        }
                 }
             }
-		
-	}
+        
+    }
     
     //The following function is run when a person hits submit.
     HighlightTags.prototype.pluginSubmit = function(field, annotation) {
-		var tokens = Array.prototype.slice.call($(".token-input-input-token").parent().find('.token-input-token'));
-		var arr = [];
-		tokens.forEach(function(element){
-			tag = element.firstChild.firstChild;
-			arr.push(tag.nodeValue);
-		});
-		annotation.tags = arr;
+        var tokens = Array.prototype.slice.call($(".token-input-input-token").parent().find('.token-input-token'));
+        var arr = [];
+        tokens.forEach(function(element){
+            tag = element.firstChild.firstChild;
+            arr.push(tag.nodeValue);
+        });
+        annotation.tags = arr;
     }
 
     //The following allows you to edit the annotation popup when the viewer has already
     //hit submit and is just viewing the annotation.
-	HighlightTags.prototype.updateViewer = function(field, annotation) {
-		if (typeof annotation.tags != "undefined") {
-			if (annotation.tags.length == 0) {
-				$(field).remove();
-				return;
-			}
-			var nonFlagTags = true;
+    HighlightTags.prototype.updateViewer = function(field, annotation) {
+        if (typeof annotation.tags != "undefined") {
+            if (annotation.tags.length == 0) {
+                $(field).remove();
+                return;
+            }
+            var nonFlagTags = true;
             var tokenList = "<ul class=\"token-input-list\">";
-			for (tagnum = 0; tagnum < annotation.tags.length; ++tagnum){
-				if (typeof this.annotator.plugins["Flagging"] != 'undefined') {
-					if (annotation.tags[tagnum].indexOf("flagged-")==-1){
-						tokenList += "<li class=\"token-input-token\"><p>"+ annotation.tags[tagnum]+"</p></span></li>";
-						nonFlagTags = false;
-					}
-				} else{
-					tokenList += "<li class=\"token-input-token\"><p>"+ annotation.tags[tagnum]+"</p></span></li>";
-				}
-			}
+            for (tagnum = 0; tagnum < annotation.tags.length; ++tagnum){
+                if (typeof this.annotator.plugins["Flagging"] != 'undefined') {
+                    if (annotation.tags[tagnum].indexOf("flagged-")==-1){
+                        tokenList += "<li class=\"token-input-token\"><p>"+ annotation.tags[tagnum]+"</p></span></li>";
+                        nonFlagTags = false;
+                    }
+                } else{
+                    tokenList += "<li class=\"token-input-token\"><p>"+ annotation.tags[tagnum]+"</p></span></li>";
+                }
+            }
             tokenList += "</ul>";
             $(field).append(tokenList);
-			if (nonFlagTags) {
-				$(field).remove();
-			}
-			
-		} else{
-			$(field).remove();
-		}
+            if (nonFlagTags) {
+                $(field).remove();
+            }
+            
+        } else{
+            $(field).remove();
+        }
         this.annotator.publish("finishedDrawingTags");
     }
     

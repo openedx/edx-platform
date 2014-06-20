@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from shoppingcart.models import CertificateItem
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -30,32 +31,35 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        source = options['source_course']
-        dest = options['dest_course']
+        source_key = SlashSeparatedCourseKey.from_deprecated_string(options['source_course'])
+        dest_key = SlashSeparatedCourseKey.from_deprecated_string(options['dest_course'])
 
         source_students = User.objects.filter(
-            courseenrollment__course_id=source)
+            courseenrollment__course_id=source_key
+        )
 
         for user in source_students:
-            if CourseEnrollment.is_enrolled(student, dest):
+            if CourseEnrollment.is_enrolled(user, dest_key):
                 # Un Enroll from source course but don't mess
                 # with the enrollment in the destination course.
-                CourseEnrollment.unenroll(user,source)
-                print("Unenrolled {} from {}".format(user.username, source))
+                CourseEnrollment.unenroll(user, source_key)
+                print("Unenrolled {} from {}".format(user.username, source_key.to_deprecated_string()))
                 msg = "Skipping {}, already enrolled in destination course {}"
-                print(msg.format(user.username, dest))
+                print(msg.format(user.username, dest_key.to_deprecated_string()))
                 continue
 
             print("Moving {}.".format(user.username))
             # Find the old enrollment.
-            enrollment = CourseEnrollment.objects.get(user=user,
-                course_id=source)
+            enrollment = CourseEnrollment.objects.get(
+                user=user,
+                course_id=source_key
+            )
 
             # Move the Student between the classes.
             mode = enrollment.mode
             old_is_active = enrollment.is_active
-            CourseEnrollment.unenroll(user,source)
-            new_enrollment = CourseEnrollment.enroll(user, dest, mode=mode)
+            CourseEnrollment.unenroll(user, source_key)
+            new_enrollment = CourseEnrollment.enroll(user, dest_key, mode=mode)
 
             # Unenroll from the new coures if the user had unenrolled
             # form the old course.
@@ -65,12 +69,13 @@ class Command(BaseCommand):
             if mode == 'verified':
                 try:
                     certificate_item = CertificateItem.objects.get(
-                        course_id=source,
-                        course_enrollment=enrollment)
+                        course_id=source_key,
+                        course_enrollment=enrollment
+                    )
                 except CertificateItem.DoesNotExist:
                     print("No certificate for {}".format(user))
                     continue
 
-                certificate_item.course_id = dest
+                certificate_item.course_id = dest_key
                 certificate_item.course_enrollment = new_enrollment
                 certificate_item.save()

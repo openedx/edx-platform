@@ -7,7 +7,6 @@ import json
 from courseware.models import StudentModule
 from track.models import TrackingLog
 from psychometrics.models import PsychometricData
-from xmodule.modulestore import Location
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -32,9 +31,8 @@ class Command(BaseCommand):
         smset = StudentModule.objects.using(db).exclude(max_grade=None)
 
         for sm in smset:
-            url = sm.module_state_key
-            location = Location(url)
-            if not location.category == "problem":
+            usage_key = sm.module_state_key
+            if not usage_key.block_type == "problem":
                 continue
             try:
                 state = json.loads(sm.state)

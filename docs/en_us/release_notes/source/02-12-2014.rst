@@ -2,19 +2,31 @@
 February 12, 2014
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `Set the Advertised Start Date`_
+  * `Full Screen Image`_
 
 
-New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+* `edX Data Documentation`_
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
-Recent documentation additions include:
+* `edX Platform Developer Documentation`_
 
-* `Set the Advertised Start Date <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_
-* `Full Screen Image <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#full-screen-image>`_
+
 
 
 *************
@@ -24,9 +36,9 @@ edX Studio
 
 * The improved layout of components in a unit page now includes visual separation of the header, making clear that the display name for each component is not rendered to students.
 
-* The new Full Screen Image tool allows students to enlarge an image, so they can see all the detail in context. You can create a full screen image with a new HTML component template. For more information, see the `updated documentation <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#full-screen-image>`_.
+* The new Full Screen Image tool allows students to enlarge an image, so they can see all the detail in context. You can create a full screen image with a new HTML component template. For more information, see the `Full Screen Image`_ documentation.
 
-* If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not now list a start date for the course. Students just see that the course has not yet started. For more information, see the `documentation <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_.
+* If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not now list a start date for the course. Students just see that the course has not yet started. For more information, see the `Set the Advertised Start Date`_ documentation.
 
 
 ***************************************
@@ -66,3 +78,6 @@ Discussions
 
 * The **Add a Response** button no longer appears in forum threads when students are not allowed to respond. (FOR-452)
 
+
+
+.. include:: links.rst

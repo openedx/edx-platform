@@ -14,7 +14,7 @@ html.video-fullscreen{
 .wrap-instructor-info {
   margin: ($baseline/2) ($baseline/4) 0 0;
   overflow: hidden;
-  
+
   &.studio-view {
     position: relative;
     top: -($baseline/2);
@@ -189,6 +189,15 @@ div.course-wrapper {
           }
         }
       }
+    }
+
+    div.staff_actions {
+      p.error {
+        color: $error-red
+      }
+      p.success {
+        color: $success-color;
+     }
     }
 
     div.staff_info {

@@ -34,7 +34,7 @@ class EmbargoedStateAdmin(ConfigurationModelAdmin):
     form = EmbargoedStateForm
     fieldsets = (
         (None, {
-            'fields': ('embargoed_countries',),
+            'fields': ('enabled', 'embargoed_countries',),
             'description': textwrap.dedent("""Enter the two-letter ISO-3166-1 Alpha-2
             code of the country or countries to embargo in the following box. For help,
             see <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Officially_assigned_code_elements">
@@ -51,7 +51,7 @@ class IPFilterAdmin(ConfigurationModelAdmin):
     form = IPFilterForm
     fieldsets = (
         (None, {
-            'fields': ('whitelist', 'blacklist'),
+            'fields': ('enabled', 'whitelist', 'blacklist'),
             'description': textwrap.dedent("""Enter specific IP addresses to explicitly
             whitelist (not block) or blacklist (block) in the appropriate box below.
             Separate IP addresses with a comma. Do not surround with quotes.

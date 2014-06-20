@@ -38,10 +38,13 @@ Feature: CMS.Create Subsection
     Then I see the subsection release date is 12/25/2011 03:00
     And I see the subsection due date is 01/02/2012 04:00
 
+  @skip_safari
   Scenario: Set release and due dates of subsection on enter
     Given I have opened a new subsection in Studio
     And I set the subsection release date on enter to 04/04/2014 03:00
     And I set the subsection due date on enter to 04/04/2014 04:00
+    Then I see the subsection release date is 04/04/2014 03:00
+    And I see the subsection due date is 04/04/2014 04:00
     And I reload the page
     Then I see the subsection release date is 04/04/2014 03:00
     And I see the subsection due date is 04/04/2014 04:00
@@ -55,14 +58,17 @@ Feature: CMS.Create Subsection
     And I confirm the prompt
     Then the subsection does not exist
 
+  @skip_safari
   Scenario: Sync to Section
     Given I have opened a new course section in Studio
     And I click the Edit link for the release date
     And I set the section release date to 01/02/2103
     And I have added a new subsection
     And I click on the subsection
-    And I set the subsection release date to 01/20/2103
+    And I set the subsection release date to 06/20/2104
+    Then I see the subsection release date is 06/20/2104
     And I reload the page
+    Then I see the subsection release date is 06/20/2104
     And I click the link to sync release date to section
     And I wait for "1" second
     And I reload the page

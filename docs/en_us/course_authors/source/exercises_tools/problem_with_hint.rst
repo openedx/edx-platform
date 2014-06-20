@@ -57,7 +57,7 @@ To create the above problem:
 	    </text>
     </problem>
 
-.. _Drag and Drop Problem XML:
+.. _Problem with Adaptive Hint XML:
 
 *********************************
 Problem with Adaptive Hint XML
@@ -83,10 +83,10 @@ Template
 	  ans = str(student_answers[aid]).lower()
 	  print 'hint_fn called, ans=', ans
 	  hint = ''
-	  if 'INCORRECT ANSWER 1' in ans:
-	     hint = 'HINT FOR INCORRECT ANSWER 1'
-	  elif 'INCORRECT ANSWER 2' in ans:
-	     hint = 'HINT FOR INCORRECT ANSWER 2'
+	  if 'incorrect answer 1' in ans:
+	     hint = 'hint for incorrect answer 1'
+	  elif 'incorrect answer 2' in ans:
+	     hint = 'hint for incorrect answer 2'
 
 	  if hint:
 	    hint = "&lt;font color='blue'&gt;Hint: {0}&lt;/font&gt;".format(hint)
@@ -95,13 +95,14 @@ Template
 	    <p>TEXT OF PROBLEM</p>
 	    <p>
 	      <customresponse cfn="test_str" expect="ANSWER">
-	        <textline correct_answer="ANSWER" label="LABEL TEXT"/>
+	        <textline correct_answer="answer" label="LABEL TEXT"/>
 	        <hintgroup hintfn="hint_fn"/>
 	      </customresponse>
 	    </p>
 	  </text>
 	</problem>
 
+.. note:: If the hints that you supply include characters, the letters must be lowercase.
 
 ========
 Tags
@@ -129,6 +130,7 @@ Tags
 
   .. list-table::
      :widths: 20 80
+     :header-rows: 1
 
      * - Attribute
        - Description
@@ -139,7 +141,10 @@ Tags
      * - hidden (optional)
        - If set to "true", students cannot see the response field.
      * - correct_answer (optional)
-       - Lists the correct answer to the problem.
+       - The answer to the problem. To supply a correct_answer value that
+         includes letters, all letters **must be lowercase**. (Students'
+         responses to the problem are not case sensitive. They can contain both
+         uppercase and lowercase letters.)
 
   Children
   
@@ -151,8 +156,9 @@ Tags
 
   .. list-table::
      :widths: 20 80
+     :header-rows: 1
 
      * - Attribute
        - Description
      * - hintfn
-       - Must be set to **hint_fn** (i.e., the tag must appear as ``<hintgroup hintfn="hint_fn"/>``).
+       - Must be set to **hint_fn** (that is, the tag must appear as ``<hintgroup hintfn="hint_fn"/>``).

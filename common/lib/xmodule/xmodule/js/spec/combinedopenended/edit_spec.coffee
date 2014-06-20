@@ -20,6 +20,18 @@ describe 'OpenEndedMarkdownEditingDescriptor', ->
       expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('xml only')
 
+  describe 'advanced editor opens correctly', ->
+    it 'click on advanced editor should work', ->
+      loadFixtures 'combinedopenended-with-markdown.html'
+      @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
+      spyOn(@descriptor, 'confirmConversionToXml').andReturn(true)
+      expect(@descriptor.confirmConversionToXml).not.toHaveBeenCalled()
+      e = jasmine.createSpyObj('e', [ 'preventDefault' ])
+      @descriptor.onShowXMLButton(e)
+      expect(e.preventDefault).toHaveBeenCalled()
+      expect(@descriptor.confirmConversionToXml).toHaveBeenCalled()
+      expect($('.editor-bar').length).toEqual(0)
+
   describe 'insertPrompt', ->
     it 'inserts the template if selection is empty', ->
       revisedSelection = OpenEndedMarkdownEditingDescriptor.insertPrompt('')

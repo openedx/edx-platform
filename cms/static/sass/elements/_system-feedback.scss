@@ -190,7 +190,7 @@
   @include transition(all $tmg-f3 ease-in-out  0s);
   position: fixed;
   top: 0;
-  background: $black-t0;
+  background: $black-t1;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -676,11 +676,6 @@
   // prompt showing
   &.prompt-is-shown {
 
-    .wrapper-view {
-      -webkit-filter: blur(($baseline/10)) grayscale(25%);
-      filter: blur(($baseline/10)) grayscale(25%);
-    }
-
     .wrapper-prompt.is-shown {
       visibility: visible;
       pointer-events: auto;
@@ -693,11 +688,6 @@
 
   // prompt hiding
   &.prompt-is-hiding {
-
-    .wrapper-view {
-      -webkit-filter: blur(($baseline/10)) grayscale(25%);
-      filter: blur(($baseline/10)) grayscale(25%);
-    }
 
     .wrapper-prompt {
 
