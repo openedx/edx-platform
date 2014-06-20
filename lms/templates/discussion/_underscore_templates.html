@@ -260,11 +260,12 @@
         <% 
         js_block =  u"""
         var fmt;
+        // Counts in data do not include the post itself, but the UI should
         var data = {{
             'span_sr_open': '<span class=\"sr\">',
             'span_close': '</span>',
-            'unread_comments_count': unread_comments_count,
-            'comments_count': comments_count
+            'unread_comments_count': unread_comments_count + (read ? 0 : 1),
+            'comments_count': comments_count + 1
             }};
         if (unread_comments_count > 0) {{
             fmt = '{markup_with_unread}';
