@@ -2,6 +2,8 @@
 Acceptance tests for Studio related to the split_test module.
 """
 
+from unittest import skip
+
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from ..pages.studio.component_editor import ComponentEditorView
@@ -132,6 +134,7 @@ class SplitTest(ContainerBase):
         container = self.go_to_container_page()
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
 
+    @skip("This fails periodically where it fails to trigger the add missing groups action.Dis")
     def test_missing_group(self):
         """
         The case of a split test with invalid configuration (missing group).
