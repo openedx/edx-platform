@@ -51,7 +51,7 @@ def add_coupon(request):
     except Coupons.DoesNotExist:
         coupon = None
     if coupon:
-        return HttpResponseNotFound(_("Cannot add Coupon. Coupon code Already Exist"))
+        return HttpResponseNotFound(_("Coupon Already Exist").format(coupon.id))
     else:
         description = request.REQUEST.get('description')
         course_id = request.REQUEST.get('course_id')
@@ -72,9 +72,9 @@ def update_coupon(request):
     try:
         coupon = Coupons.objects.get(pk=coupon_id)
         code = request.REQUEST.get('code')
-        c_code = Coupons.objects.filter(code=code).filter(is_active=True).filter(~Q(id=coupon_id))
-        if c_code:
-            return HttpResponseNotFound(_("Cannot Update Coupon. Coupon code Already Exist"))
+        filtered_coupons = Coupons.objects.filter(code=code).filter(is_active=True).filter(~Q(id=coupon_id))
+        if filtered_coupons:
+            return HttpResponseNotFound(_("Coupon {0} Already Exist").format(coupon_id))
         else:
             description = request.REQUEST.get('description')
             course_id = request.REQUEST.get('course_id')
@@ -85,8 +85,8 @@ def update_coupon(request):
             coupon.percentage_discount = discount
             coupon.save()
     except ObjectDoesNotExist:
-        return HttpResponseNotFound(_("Coupon does not exist against coupon {0}".format(coupon_id)))
-    return HttpResponse(_("Coupon coupon {0} updated".format(coupon_id)))
+        return HttpResponseNotFound(_("Coupon {0} not found".format(coupon_id)))
+    return HttpResponse(_("Coupon {0} updated Successfully".format(coupon_id)))
 
 
 @require_POST
@@ -109,5 +109,5 @@ def edit_coupon_info(request):
             context = {'success': False,
                        'message': _("Coupon is not active or request made by Anonymous User")}
     except ObjectDoesNotExist:
-        context = {'success': False, 'message': _("Coupon does not exist against coupon {0}".format(coupon_id))}
+        context = {'success': False, 'message': _("Coupon {0} not found".format(coupon_id))}
     return HttpResponse(json.dumps(context), content_type="application/json")
