@@ -296,45 +296,43 @@ class ProctorModuleInfo(object):
                 ret["grade_%s" % stat['name']] = ''
         return ret
 
+    def _get_od_for_assignment(self, student, assignment):
+        return OrderedDict(id=student.id,
+                           name=student.profile.name,
+                           username=student.username,
+                           assignment=assignment['name'],
+                           problem=assignment['problem'],
+                           date=str(datetime.datetime.now()),
+                           earned=assignment['earned'],
+                           possible=assignment['possible'])
+
     def get_assignments_attempted_and_failed(self, student, do_reset=False):
         status = self.get_student_status(student)
-        assignments = []
-        for stat in status['assignments']:
-            if stat['attempted']:
-                if not stat['earned'] == stat['possible']:
-                    log.info(
-                        "Student %s Assignment %s attempted '%s' but failed "
-                        "(%s/%s)" % (student, stat['name'], stat['problem'],
-                                     stat['earned'], stat['possible']))
-                    assignments.append(OrderedDict(
-                        id=student.id,
-                        name=student.profile.name,
-                        username=student.username,
-                        assignment=stat['name'],
-                        problem=stat['problem'],
-                        date=str(datetime.datetime.now()),
-                        earned=stat['earned'],
-                        possible=stat['possible'],
-                    ))
-                    if do_reset:
-                        aaf = assignments[-1]
-                        try:
-                            log.debug('resetting %s for student %s' %
-                                      (aaf['assignment'], aaf['username']))
-                            cloc = self.course.location
-                            assi_url = Location(cloc.tag, cloc.org,
-                                                cloc.course, 'proctor',
-                                                aaf['assignment'])
-                            pmod = self.ms.get_instance(self.course.id,
-                                                        assi_url.url())
-                            tnset = TreeNodeSet(self.course.id, pmod, self.ms,
-                                                student)
-                            msg = tnset.reset_randomization()
-                            log.debug(str(msg))
-                        except Exception:
-                            log.exception("Failed to do reset of %s for %s" %
-                                          (aaf['assignment'], student))
-        return assignments
+        failed = [self._get_od_for_assignment(a) for a in status['assignments']
+                  if a['attempted'] and a['earned'] != a['possible']]
+        for f in failed:
+            log.info(
+                "Student %s Assignment %s attempted '%s' but failed "
+                "(%s/%s)" % (student, f['assignment'], f['problem'],
+                             f['earned'], f['possible']))
+            if do_reset:
+                try:
+                    log.debug('resetting %s for student %s' %
+                              (f['assignment'], f['username']))
+                    cloc = self.course.location
+                    assi_url = Location(cloc.tag, cloc.org,
+                                        cloc.course, 'proctor',
+                                        f['assignment'])
+                    pmod = self.ms.get_instance(self.course.id,
+                                                assi_url.url())
+                    tnset = TreeNodeSet(self.course.id, pmod, self.ms,
+                                        student)
+                    msg = tnset.reset_randomization()
+                    log.debug(str(msg))
+                except Exception:
+                    log.exception("Failed to do reset of %s for %s" %
+                                  (f['assignment'], student))
+        return failed
 
 
 def getip(request):
