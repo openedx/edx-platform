@@ -189,7 +189,7 @@ ${fragment.foot_html()}
 <div class="container">
   <div class="course-wrapper">
 
-% if not disable_accordion:
+% if disable_accordion is UNDEFINED:
     <div class="course-index" role="navigation">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>

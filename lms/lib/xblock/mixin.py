@@ -19,19 +19,19 @@ class LmsBlockMixin(XBlockMixin):
         scope=Scope.settings,
     )
     chrome = String(
-        help="Which chrome to show. Options: "
-             "chromeless -- No chrome"
-             "tabs -- just tabs"
-             "accordion -- just accordion"
+        help="Which chrome to show. Options: \n"
+             "chromeless -- No chrome\n"
+             "tabs -- just tabs\n"
+             "accordion -- just accordion\n"
              "tabs,accordion -- Full Chrome",
         scope=Scope.settings,
-        default = None,
+        default=None,
     )
     default_tab = String(
-        help="Override which tab is selected."
+        help="Override which tab is selected. "
              "If not set, courseware tab is shown.",
         scope=Scope.settings,
-        default = None,
+        default=None,
     )
     source_file = String(help="source file name (eg for latex)", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)

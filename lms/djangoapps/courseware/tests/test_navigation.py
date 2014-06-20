@@ -69,6 +69,20 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.staff_user = GlobalStaffFactory()
 
+    def assertTabActive(self, tabname, response):
+        ''' Check if the progress tab is active in the tab set ''' 
+        for line in response.content.split('\n'):
+            if tabname in line and 'active' in line:
+                return
+        raise AssertionError("assertTabActive failed: "+tabname+" not active")
+
+    def assertTabInactive(self, tabname, response):
+        ''' Check if the progress tab is active in the tab set ''' 
+        for line in response.content.split('\n'):
+            if tabname in line and 'active' in line:
+                raise AssertionError("assertTabInactive failed: "+tabname+" active")
+        return
+
     def test_chrome_settings(self):
         '''
         Test settings for disabling and modifying navigation chrome in the courseware: 
@@ -84,34 +98,28 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('none', False, False),
             ('fullchrome', True, True),
             ('accordion', True, False),
-            ('fullchrome', True, True))
+            ('fullchrome', True, True)
+            )
         for (displayname, accordion, tabs) in test_data:
             response = self.client.get(reverse('courseware_section', kwargs={
-                        'course_id': self.course.id.to_deprecated_string(),
-                        'chapter': 'Chrome',
-                        'section': displayname,
-                        }))
+                'course_id': self.course.id.to_deprecated_string(),
+                'chapter': 'Chrome',
+                'section': displayname,
+            }))
             self.assertEquals('open_close_accordion' in response.content, accordion)
             self.assertEquals('course-tabs' in response.content, tabs)
         
-        def tab_active(tabname, response):
-            ''' Check if the progress tab is active in the tab set ''' 
-            for line in response.content.split('\n'):
-                if tabname in line and 'active' in line:
-                    return True
-            return False
-
-        self.assertFalse(tab_active('progress', response))
-        self.assertTrue(tab_active('courseware', response))
+        self.assertTabInactive('progress', response)
+        self.assertTabActive('courseware', response)
 
         response = self.client.get(reverse('courseware_section', kwargs={
-                    'course_id': self.course.id.to_deprecated_string(),
-                    'chapter': 'Chrome',
-                    'section': 'progress_tab',
-                    }))
+            'course_id': self.course.id.to_deprecated_string(),
+            'chapter': 'Chrome',
+            'section': 'progress_tab',
+        }))
 
-        self.assertTrue(tab_active('progress', response))
-        self.assertFalse(tab_active('courseware', response))
+        self.assertTabActive('progress', response)
+        self.assertTabInactive('courseware', response)
 
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
     def test_inactive_session_timeout(self):
