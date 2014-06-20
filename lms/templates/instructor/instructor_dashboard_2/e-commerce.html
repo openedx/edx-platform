@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
-
+<%include file="edit_coupon_modal.html" />
 
 <div class="ecommerce-wrapper">
   <h2>${_("Coupons List")}</h2>
@@ -222,4 +222,3 @@
 
   }
 </script>
-<%include file="edit_coupon_modal.html" />
