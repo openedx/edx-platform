@@ -350,7 +350,7 @@ def index(request, course_id, chapter=None, section=None,
             if section_descriptor.chrome:
                 chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
                 if 'accordion' not in chrome:
-                    del context['accordion']
+                    context['disable_accordion'] = True
                 if 'tabs' not in chrome:
                     context['disable_tabs'] = True
 

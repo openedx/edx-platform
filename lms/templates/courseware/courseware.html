@@ -179,7 +179,7 @@ ${fragment.foot_html()}
 </div>
 % endif
 
-  <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -189,7 +189,7 @@ ${fragment.foot_html()}
 <div class="container">
   <div class="course-wrapper">
 
-% if accordion:
+% if not disable_accordion:
     <div class="course-index" role="navigation">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
