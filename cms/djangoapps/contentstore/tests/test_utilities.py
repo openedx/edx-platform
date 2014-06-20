@@ -1,9 +1,9 @@
 """ Unit tests for utility methods in views.py. """
 from django.conf import settings
 from contentstore.utils import get_modulestore
+from contentstore.utils import reverse_course_url
 from contentstore.views.utility import expand_utility_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import loc_mapper
 
 import json
 import mock
@@ -16,8 +16,7 @@ class UtilitiesTestCase(CourseTestCase):
         """ Creates the test course. """
         super(UtilitiesTestCase, self).setUp()
         self.course = CourseFactory.create(org='mitX', number='333', display_name='Utilities Course')
-        self.location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.utilities_url = self.location.url_reverse('utilities/', '')
+        self.utilities_url = reverse_course_url('utility_handler', self.course.id)
 
     def get_persisted_utilities(self):
         """ Returns the utilities. """
@@ -41,16 +40,15 @@ class UtilitiesTestCase(CourseTestCase):
         response = self.client.get(self.utilities_url)
         self.assertContains(response, "Bulk Operations")
         # Verify expansion of action URL happened.
-        self.assertContains(response, 'captions/mitX.333.Utilities_Course')
+        self.assertContains(response, '/utility/captions/slashes:mitX+333+Utilities_Course')
         # Verify persisted utility does NOT have expanded URL.
         utility_0 = self.get_persisted_utilities()[0]
-        self.assertEqual('utility/captions', get_action_url(utility_0, 0))
+        self.assertEqual('utility_captions_handler', get_action_url(utility_0, 0))
         payload = response.content
 
         # Now delete the utilities from the course and verify they get repopulated (for courses
         # created before utilities were introduced).
         with mock.patch('django.conf.settings.COURSE_UTILITIES', []):
-            print settings.COURSE_UTILITIES
             modulestore = get_modulestore(self.course.location)
             modulestore.update_item(self.course, self.user.id)
             self.assertEqual(self.get_persisted_utilities(), [])
@@ -68,25 +66,25 @@ class UtilitiesTestCase(CourseTestCase):
         # Verify that persisted utilities do not have expanded action URLs.
         # compare_utilities will verify that returned_utilities DO have expanded action URLs.
         pers = self.get_persisted_utilities()
-        self.assertEqual('utility/captions', get_first_item(pers[0]).get('action_url'))
+        self.assertEqual('utility_captions_handler', get_first_item(pers[0]).get('action_url'))
         for pay, resp in zip(pers, returned_utilities):
             self.compare_utilities(pay, resp)
 
     def test_utilities_post_unsupported(self):
         """ Post operation is not supported. """
-        update_url = self.location.url_reverse('utilities/', '100')
+        update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.post(update_url)
         self.assertEqual(response.status_code, 404)
 
     def test_utilities_put_unsupported(self):
         """ Put operation is not supported. """
-        update_url = self.location.url_reverse('utilities/', '100')
+        update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.put(update_url)
         self.assertEqual(response.status_code, 404)
 
     def test_utilities_delete_unsupported(self):
         """ Delete operation is not supported. """
-        update_url = self.location.url_reverse('utilities/', '100')
+        update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.delete(update_url)
         self.assertEqual(response.status_code, 404)
 
@@ -107,7 +105,7 @@ class UtilitiesTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(utility, index), stored)
 
-        test_expansion(settings.COURSE_UTILITIES[0], 0, 'utility/captions', '/utility/captions/mitX.333.Utilities_Course/branch/draft/block/Utilities_Course')
+        test_expansion(settings.COURSE_UTILITIES[0], 0, 'utility_captions_handler', '/utility/captions/slashes:mitX+333+Utilities_Course')
 
 
 def get_first_item(utility):

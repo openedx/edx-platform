@@ -8,11 +8,11 @@ from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from util.json_request import JsonResponse
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..utils import get_modulestore
+from contentstore.utils import reverse_course_url
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
+
 from .access import has_course_access
 
 __all__ = ['utility_handler']
@@ -22,7 +22,7 @@ __all__ = ['utility_handler']
 @require_http_methods(("GET"))
 @login_required
 @ensure_csrf_cookie
-def utility_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def utility_handler(request, course_key_string):
     """
     The restful handler for utilities.
 
@@ -30,22 +30,17 @@ def utility_handler(request, tag=None, package_id=None, branch=None, version_gui
         html: return html page for all utilities
         json: return json representing all utilities.
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
-
-    old_location = loc_mapper().translate_locator_to_location(location)
-
-    modulestore = get_modulestore(old_location)
-    course_module = modulestore.get_item(old_location)
-
+    course_module = modulestore().get_course(course_key)
     json_request = 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
     if request.method == 'GET':
         expanded_utilities = expand_all_action_urls(course_module)
         if json_request:
             return JsonResponse(expanded_utilities)
         else:
-            handler_url = location.url_reverse('utilities/', '')
+            handler_url = reverse_course_url('utility_handler', course_module.id)
             return render_to_response('utilities.html',
                                       {
                                           'handler_url': handler_url,
@@ -80,8 +75,6 @@ def expand_utility_action_url(course_module, utility):
 
     for item in expanded_utility.get('items'):
         url_prefix = item.get('action_url')
-        ctx_loc = course_module.location
-        location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-        item['action_url'] = location.url_reverse(url_prefix, '')
+        item['action_url'] = reverse_course_url(url_prefix, course_module.id)
 
     return expanded_utility

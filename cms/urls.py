@@ -90,8 +90,8 @@ urlpatterns += patterns(
     url(r'^settings/advanced/(?P<course_key_string>[^/]+)$', 'advanced_settings_handler'),
     url(r'^textbooks/(?P<course_key_string>[^/]+)$', 'textbooks_list_handler'),
     url(r'^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
-    url(r'^utilities/<?P<course_key_string>[^/]+)$', 'utility_handler'),
-    url(r'^utility/captions/<?P<course_key_string>[^/]+$', 'utility_captions_handler'),
+    url(r'^utilities/(?P<course_key_string>[^/]+)$', 'utility_handler'),
+    url(r'^utility/captions/(?P<course_key_string>[^/]+)$', 'utility_captions_handler'),
 )
 
 js_info_dict = {

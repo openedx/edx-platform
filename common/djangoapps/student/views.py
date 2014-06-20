@@ -708,13 +708,15 @@ def _check_can_enroll_in_course(user, course_id, access_type="enroll"):
     Returns (bool, error_message), where error message is only applicable if bool == False
     """
     try:
-        course = course_from_id(course_id)
+        course = modulestore().get_course(course_id)
     except ItemNotFoundError:
-        log.warning("User {0} tried to enroll in non-existent course {1}"
-                    .format(user.username, course_id))
+        log.warning(
+            "User {0} tried to enroll in non-existent course {1}"
+                .format(user.username, course_id),
+        )
         return False, _("Course id is invalid")
 
-    if not has_access(user, course, access_type):
+    if not has_access(user, access_type, course):
         return False, _("Enrollment is closed")
 
     return True, ""

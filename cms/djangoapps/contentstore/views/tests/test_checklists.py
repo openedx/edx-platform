@@ -139,6 +139,7 @@ class ChecklistTestCase(CourseTestCase):
 
         test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/slashes:mitX+333+Checklists_Course/')
         test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/slashes:mitX+333+Checklists_Course')
+        raise Exception('FUNK CHECKLIST {}'.format(self.course.checklists[2]))
         test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
 
 

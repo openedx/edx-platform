@@ -476,7 +476,7 @@ COURSE_UTILITIES = [
      "items": [
          {"short_description": "Get all captions from YouTube",
           "long_description": "This utility will attempt to get or update captions for all videos in the course from YouTube. Please allow it a couple of minutes to run.",
-          "action_url": "utility/captions",
+          "action_url": "utility_captions_handler",
           "action_text": "Check Captions",
           "action_external": False}]}
 ]

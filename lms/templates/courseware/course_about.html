@@ -59,7 +59,7 @@
 
     $(".course_sneakpeek").click(function(event) {
       $.ajax({
-        url: "${reverse('course_sneakpeek', args=[course.id])}",
+        url: "${reverse('course_sneakpeek', args=[course.id.to_deprecated_string()])}",
         type: "POST",
         complete: sneakpeek_handler
       });

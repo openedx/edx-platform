@@ -12,6 +12,7 @@ from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_modulestore, reverse_course_url
 
@@ -113,12 +114,12 @@ def expand_checklist_action_url(course_module, checklist):
     expanded_checklist = copy.deepcopy(checklist)
 
     urlconf_map = {
-        "ManageUsers": "course_team",
-        "CourseOutline": "course",
-        "StaticPages": "tabs",
-        "SettingsDetails": "settings/details",
-        "SettingsGrading": "settings/grading",
-        "SettingsAdvanced": "settings/advanced",
+        "ManageUsers": "course_team_handler",
+        "CourseOutline": "course_handler",
+        "StaticPages": "tabs_handler",
+        "SettingsDetails": "settings_handler",
+        "SettingsGrading": "grading_handler",
+        "SettingsAdvanced": "advanced_settings_handler",
     }
     lms_urlconf_map = {
         "Wiki": "course_wiki",
@@ -128,16 +129,15 @@ def expand_checklist_action_url(course_module, checklist):
     for item in expanded_checklist.get('items'):
         action_url = item.get('action_url')
         if action_url in urlconf_map:
-            url_prefix = urlconf_map[action_url]
-            ctx_loc = course_module.location
-            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-            item['action_url'] = location.url_reverse(url_prefix, '')
+            item['action_url'] = reverse_course_url(urlconf_map[action_url], course_module.id)
         elif action_url in lms_urlconf_map:
-            lms_base = settings.LMS_BASE
-            course_id = course_module.location.course_id
-            url_postfix = lms_urlconf_map[action_url]
-            url = 'http://' + lms_base + '/courses/' + course_id + '/' + url_postfix
-            item['action_url'] = url
+            item['action_url'] = '/'.join([
+                'http:/',
+                settings.LMS_BASE,
+                'courses',
+                course_module.id.to_deprecated_string(),
+                lms_urlconf_map[action_url],
+            ])
 
     return expanded_checklist
 

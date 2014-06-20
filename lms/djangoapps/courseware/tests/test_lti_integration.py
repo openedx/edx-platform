@@ -12,7 +12,6 @@ from django.conf import settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore import Location
 
 from courseware.tests import BaseTestXmodule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -148,29 +147,18 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             display_name="section2",
             category='sequential')
 
-        self.published_location_dict = {'tag': 'i4x',
-                                        'org': self.course.location.org,
-                                        'category': 'lti',
-                                        'course': self.course.location.course,
-                                        'name': 'lti_published'}
-        self.draft_location_dict = {'tag': 'i4x',
-                                    'org': self.course.location.org,
-                                    'category': 'lti',
-                                    'course': self.course.location.course,
-                                    'name': 'lti_draft',
-                                    'revision': 'draft'}
         # creates one draft and one published lti module, in different sections
         self.lti_published = ItemFactory.create(
             parent_location=self.section1.location,
             display_name="lti published",
             category="lti",
-            location=Location(self.published_location_dict),
+            location=self.course.id.make_usage_key('lti', 'lti_published'),
         )
         self.lti_draft = ItemFactory.create(
             parent_location=self.section2.location,
             display_name="lti draft",
             category="lti",
-            location=Location(self.draft_location_dict),
+            location=self.course.id.make_usage_key('lti', 'lti_published').replace(revision='draft'),
         )
 
     def expected_handler_url(self, handler):

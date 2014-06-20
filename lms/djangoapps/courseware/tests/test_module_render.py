@@ -111,17 +111,17 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         mock_request = MagicMock()
         mock_request.user = self.mock_user
-        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+        course = get_course_with_access(self.mock_user, 'load', self.course_key)
 
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course_id, self.mock_user, course, depth=2)
+            self.toy_course.id, self.mock_user, course, depth=2)
 
         module = render.get_module(
             self.mock_user,
             mock_request,
-            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            self.location,
             field_data_cache,
-            self.course_id
+            self.toy_course.id,
         )
         self.assertTrue(module.xmodule_runtime.send_users_emailaddr_with_coderesponse)
         self.assertEqual(module.xmodule_runtime.deanonymized_user_email, self.mock_user.email)
@@ -133,17 +133,17 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         mock_request = MagicMock()
         mock_request.user = self.mock_user
-        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+        course = get_course_with_access(self.mock_user, 'load', self.course_key)
 
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course_id, self.mock_user, course, depth=2)
+            self.toy_course.id, self.mock_user, course, depth=2)
 
         module = render.get_module(
             self.mock_user,
             mock_request,
-            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            self.location,
             field_data_cache,
-            self.course_id
+            self.toy_course.id,
         )
         self.assertFalse(hasattr(module.xmodule_runtime, 'send_users_emailaddr_with_coderesponse'))
         self.assertFalse(hasattr(module.xmodule_runtime, 'deanonymized_user_email'))
