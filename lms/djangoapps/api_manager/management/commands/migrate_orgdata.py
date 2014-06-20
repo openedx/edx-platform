@@ -16,12 +16,23 @@ class Command(BaseCommand):
 
         for org in org_groups:
             data = json.loads(org.data)
+
+            name = org.name
+            display_name = data.get('display_name', name)
+            contact_name = data.get('contact_name', None)
+            contact_email = data.get('email', None)
+            if contact_email is None:
+                contact_email = data.get('contact_email', None)
+            contact_phone = data.get('phone', None)
+            if contact_phone is None:
+                contact_phone = data.get('contact_phone', None)
+
             migrated_org = Organization.objects.create(
-                name=data['name'],
-                display_name=data['display_name'],
-                contact_name=data['contact_name'],
-                contact_email=data['contact_email'],
-                contact_phone=data['contact_phone']
+                name=name,
+                display_name=display_name,
+                contact_name=contact_name,
+                contact_email=contact_email,
+                contact_phone=contact_phone
             )
             group = Group.objects.get(groupprofile=org.id)
             users = group.user_set.all()
