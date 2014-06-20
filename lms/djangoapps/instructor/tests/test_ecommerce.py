@@ -15,6 +15,7 @@ from shoppingcart.models import Coupons
 from mock import patch
 
 
+# pylint: disable=E1101
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestECommerceDashboardViews(ModuleStoreTestCase):
     """
@@ -50,74 +51,107 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue(self.e_commerce_link in response.content)
 
     def test_add_coupon(self):
+        """
+        Test Add Coupon Scenarios. Handle all the HttpResponses return by add_coupon view
+        """
         # URL for add_coupon
-        self.url = reverse('add_coupon')
+        add_coupon_url = reverse('add_coupon')
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
             'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5
         }
-        response = self.client.post(self.url, data)
+        response = self.client.post(add_coupon_url, data)
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 111
         }
+        response = self.client.post(add_coupon_url, data)
+        self.assertTrue("Coupon Already Exist" in response.content)
+
         response = self.client.post(self.url, data)
-        self.assertTrue("Cannot add Coupon. Coupon code Already Exist" in response.content)
+        self.assertTrue('<td>ADSADASDSAD</td>' in response.content)
+        self.assertTrue('<td>A2314</td>' in response.content)
+        self.assertFalse('<td>111</td>' in response.content)
 
     def test_delete_coupon(self):
+        """
+        Test Delete Coupon Scenarios. Handle all the HttpResponses return by remove_coupon view
+        """
         coupon = Coupons(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
 
         coupon.save()
-        # URL for add_coupon
-        self.url = reverse('remove_coupon')
-        response = self.client.post(self.url, {'id': coupon.id})
+
+        response = self.client.post(self.url)
+        self.assertTrue('<td>AS452</td>' in response.content)
+
+        # URL for remove_coupon
+        delete_coupon_url = reverse('remove_coupon')
+        response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertTrue('coupon id={0} updated successfully'.format(coupon.id) in response.content)
 
         coupon.is_active = False
         coupon.save()
-        response = self.client.post(self.url, {'id': coupon.id})
+
+        response = self.client.post(self.url)
+        self.assertFalse('<td>AS452</td>' in response.content)
+        response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertTrue('coupon id={0} is already inactive or request made by Anonymous User'.format(coupon.id) in response.content)
 
-        response = self.client.post(self.url, {'id': 24454})
+        response = self.client.post(delete_coupon_url, {'id': 24454})
         self.assertTrue('Cannot remove coupon Coupon id={0}. DoesNotExist or coupon is already deleted'.format(24454) in response.content)
 
     def test_edit_coupon_info(self):
+        """
+        Test Edit Coupon Info Scenarios. Handle all the HttpResponses return by edit_coupon_info view
+        """
         coupon = Coupons(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
         coupon.save()
-        # URL for add_coupon
-        self.url = reverse('edit_coupon_info')
-        response = self.client.post(self.url, {'id': coupon.id})
+        # URL for edit_coupon_info
+        edit_url = reverse('edit_coupon_info')
+        response = self.client.post(edit_url, {'id': coupon.id})
         self.assertTrue('coupon id={0} fields updated successfully'.format(coupon.id) in response.content)
 
-        response = self.client.post(self.url, {'id': 444444})
-        self.assertTrue('Coupon does not exist against coupon {0}'.format(444444) in response.content)
+        response = self.client.post(edit_url, {'id': 444444})
+        self.assertTrue('Coupon {0} not found'.format(444444) in response.content)
 
         coupon.is_active = False
         coupon.save()
-        response = self.client.post(self.url, {'id': coupon.id})
+        response = self.client.post(edit_url, {'id': coupon.id})
         self.assertTrue('"success": false' in response.content)
 
     def test_update_coupon(self):
+        """
+        Test Update Coupon Info Scenarios. Handle all the HttpResponses return by update_coupon view
+        """
         coupon = Coupons(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
         coupon.save()
-        data = {'coupon_id': coupon.id, 'code': 'update_code', 'discount': '12'}
-        # URL for add_coupon
-        self.url = reverse('update_coupon')
-        response = self.client.post(self.url, data=data)
-        self.assertTrue('Coupon coupon {0} updated'.format(coupon.id)in response.content)
+        response = self.client.post(self.url)
+        self.assertTrue('<td>AS452</td>' in response.content)
+        data = {
+            'coupon_id': coupon.id, 'code': 'update_code', 'discount': '12',
+            'course_id': coupon.course_id.to_deprecated_string()
+        }
+        # URL for update_coupon
+        update_coupon_url = reverse('update_coupon')
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue('Coupon {0} updated Successfully'.format(coupon.id)in response.content)
+
+        response = self.client.post(self.url)
+        self.assertTrue('<td>update_code</td>' in response.content)
+        self.assertTrue('<td>12</td>' in response.content)
 
         data['coupon_id'] = 1000  # Coupon Not Exist with this ID
-        response = self.client.post(self.url, data=data)
-        self.assertTrue('Coupon does not exist against coupon {0}'.format(coupon.id)in response.content)
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue('Coupon {0} not found'.format(1000)in response.content)
 
         coupon1 = Coupons(
             code='11111', description='coupon', course_id=self.course.id.to_deprecated_string(),
@@ -125,5 +159,5 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         )
         coupon1.save()
         data = {'coupon_id': coupon.id, 'code': '11111', 'discount': '12'}
-        response = self.client.post(self.url, data=data)
-        self.assertTrue('Cannot Update Coupon. Coupon code Already Exist' in response.content)
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue('Coupon {0} Already Exist'.format(coupon.id) in response.content)
