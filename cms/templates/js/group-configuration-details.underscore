@@ -1,0 +1,42 @@
+<div class="view-group-configuration view-group-configuration-<%= index %>">
+    <div class="wrapper-group-configuration">
+        <header class="group-configuration-header">
+            <h3 class="group-configuration-title">
+                <a href="#" class="group-toggle <% if(showGroups){ print('hide'); } else { print('show'); } %>-groups">
+                    <i class="ui-toggle-expansion icon-caret-<% if(showGroups){ print('down'); } else { print('right'); } %>"></i>
+                    <%= name %>
+                </a>
+            </h3>
+        </header>
+
+        <ol class="group-configuration-info group-configuration-info-<% if(showGroups){ print('block'); } else { print('inline'); } %>">
+          <% if (_.isNumber(id)) { %>
+            <li class="group-configuration-id"
+                ><span class="group-configuration-label"><%= gettext('ID') %>: </span
+                ><span class="group-configuration-value"><%= id %></span
+            ></li>
+          <% } %>
+          <% if (showGroups) { %>
+            <li class="group-configuration-description">
+                <%= description %>
+            </li>
+          <% } else { %>
+            <li class="group-configuration-groups-count">
+                <%= groupsCountMessage %>
+            </li>
+          <% } %>
+        </ol>
+
+        <% if(showGroups) { %>
+          <% allocation = Math.floor(100 / groups.length) %>
+            <ol class="groups groups-<%= index %>">
+              <% groups.each(function(group, groupIndex) { %>
+                <li class="group group-<%= groupIndex %>"
+                  ><span class="group-name"><%= group.get('name') %></span
+                  ><span class="group-allocation"><%= allocation %>%</span
+                ></li>
+              <% }) %>
+            </ol>
+        <% } %>
+    </div>
+</div>

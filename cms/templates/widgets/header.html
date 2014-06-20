@@ -27,6 +27,7 @@
             settings_url = reverse('contentstore.views.settings_handler', kwargs={'course_key_string': unicode(course_key)})
             grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
+            group_configurations_config_url = reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
       <h2 class="info-course">
@@ -84,6 +85,11 @@
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
+                  % if "split_test" in context_course.advanced_modules:
+                  <li class="nav-item nav-course-settings-group-configurations">
+                    <a href="${group_configurations_config_url}">${_("Group Configurations")}</a>
+                  </li>
+                  % endif
                 </ul>
               </div>
             </div>

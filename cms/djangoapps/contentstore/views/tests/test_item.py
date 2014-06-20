@@ -12,9 +12,12 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_usage_url
+from contentstore.utils import reverse_usage_url, reverse_course_url
 
-from contentstore.views.component import component_handler, get_component_templates
+from contentstore.views.component import (
+    component_handler, get_component_templates,
+    SPLIT_TEST_COMPONENT_TYPE
+)
 
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
@@ -824,7 +827,7 @@ class TestEditSplitModule(ItemTest):
 
     def test_create_groups(self):
         """
-        Test that verticals are created for the experiment groups when
+        Test that verticals are created for the configuration groups when
         a spit test module is edited.
         """
         split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
@@ -851,15 +854,16 @@ class TestEditSplitModule(ItemTest):
 
     def test_change_user_partition_id(self):
         """
-        Test what happens when the user_partition_id is changed to a different experiment.
+        Test what happens when the user_partition_id is changed to a different groups
+        group configuration.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_vertical_0_location = split_test.children[0]
         initial_vertical_1_location = split_test.children[1]
 
-        # Set to second experiment
+        # Set to second group configuration
         split_test = self._update_partition_id(1)
         # We don't remove existing children.
         self.assertEqual(5, len(split_test.children))
@@ -881,12 +885,12 @@ class TestEditSplitModule(ItemTest):
         """
         Test that nothing happens when the user_partition_id is set to the same value twice.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
-        # Set again to first experiment.
+        # Set again to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
@@ -897,12 +901,12 @@ class TestEditSplitModule(ItemTest):
 
         The user_partition_id will be updated, but children and group_id_to_child map will not change.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
-        # Set to an experiment that doesn't exist.
+        # Set to an group configuration that doesn't exist.
         split_test = self._update_partition_id(-50)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
@@ -913,7 +917,7 @@ class TestEditSplitModule(ItemTest):
 
         Also test that deleting a child not in the group_id_to_child_map behaves properly.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         self._update_partition_id(0)
         split_test = self._assert_children(2)
         vertical_1_usage_key = split_test.children[1]
@@ -980,6 +984,34 @@ class TestEditSplitModule(ItemTest):
         split_test.add_missing_groups(self.request)
         split_test = self._assert_children(3)
         self.assertEqual(group_id_to_child, split_test.group_id_to_child)
+
+    def test_view_index_ok(self):
+        """
+        Basic check that the groups configuration page responds correctly.
+        """
+        if SPLIT_TEST_COMPONENT_TYPE not in self.course.advanced_modules:
+            self.course.advanced_modules.append(SPLIT_TEST_COMPONENT_TYPE)
+            self.store.update_item(self.course, self.user.id)
+
+        url = reverse_course_url('group_configurations_list_handler', self.course.id)
+        resp = self.client.get(url)
+        self.assertContains(resp, self.course.display_name)
+        self.assertContains(resp, 'First Partition')
+        self.assertContains(resp, 'alpha')
+        self.assertContains(resp, 'Second Partition')
+        self.assertContains(resp, 'Group 1')
+
+    def test_view_index_disabled(self):
+        """
+        Check that group configuration page is not displayed when turned off.
+        """
+        if SPLIT_TEST_COMPONENT_TYPE in self.course.advanced_modules:
+            self.course.advanced_modules.remove(SPLIT_TEST_COMPONENT_TYPE)
+            self.store.update_item(self.course, self.user.id)
+
+        url = reverse_course_url('group_configurations_list_handler', self.course.id)
+        resp = self.client.get(url)
+        self.assertContains(resp, "module is disabled")
 
 
 @ddt.ddt
