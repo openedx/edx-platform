@@ -119,7 +119,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
+<%block name="pagetitle">${get_course_about_section(course, "title")}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -128,7 +128,7 @@
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
+            ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
