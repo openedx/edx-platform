@@ -111,7 +111,8 @@ class GroupsApiTests(ModuleStoreTestCase):
 
     def test_group_list_get_with_profile(self):
         group_type = 'series'
-        profile_data = {'display_name': 'My first series'}
+        display_name = 'My first series'
+        profile_data = {'display_name': display_name}
         data = {
             'name': self.test_group_name,
             'type': group_type,
@@ -130,13 +131,14 @@ class GroupsApiTests(ModuleStoreTestCase):
         test_uri = '{}?type={}'.format(self.base_groups_uri, group_type)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['id'], group_id)
-        self.assertEqual(response.data[0]['type'], 'series')
-        self.assertEqual(response.data[0]['name'], self.test_group_name)
-        response_profile_data = response.data[0]['data']
-        self.assertEqual(response_profile_data['display_name'], 'My first series')
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['num_pages'], 1)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], group_id)
+        self.assertEqual(response.data['results'][0]['type'], group_type)
+        self.assertEqual(response.data['results'][0]['name'], self.test_group_name)
+        response_profile_data = response.data['results'][0]['data']
+        self.assertEqual(response_profile_data['display_name'], display_name)
 
         # query the group detail
         test_uri = '{}/{}'.format(self.base_groups_uri, str(group_id))
@@ -146,15 +148,17 @@ class GroupsApiTests(ModuleStoreTestCase):
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['name'], self.test_group_name)
-        self.assertEqual(response.data['type'], 'series')
+        self.assertEqual(response.data['type'], group_type)
         response_profile_data = response.data['data']
-        self.assertEqual(response_profile_data['display_name'], 'My first series')
+        self.assertEqual(response_profile_data['display_name'], display_name)
 
         # update the profile
-        profile_data = {'display_name': 'My updated series'}
+        updated_group_type = 'seriesX'
+        updated_display_name = 'My updated series'
+        profile_data = {'display_name': updated_display_name}
         data = {
             'name': self.test_group_name,
-            'type': 'seriesX',
+            'type': updated_group_type,
             'data': profile_data
         }
         response = self.do_post(test_uri, data)
@@ -164,17 +168,17 @@ class GroupsApiTests(ModuleStoreTestCase):
         test_uri = self.base_groups_uri + '?type=series'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data['results']), 0)
 
-        test_uri = self.base_groups_uri + '?type=seriesX'
+        test_uri = '{}?type={}'.format(self.base_groups_uri, updated_group_type)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['id'], group_id)
-        self.assertEqual(response.data[0]['type'], 'seriesX')
-        self.assertEqual(response.data[0]['name'], self.test_group_name)
-        response_profile_data = response.data[0]['data']
-        self.assertEqual(response_profile_data['display_name'], 'My updated series')
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], group_id)
+        self.assertEqual(response.data['results'][0]['type'], updated_group_type)
+        self.assertEqual(response.data['results'][0]['name'], self.test_group_name)
+        response_profile_data = response.data['results'][0]['data']
+        self.assertEqual(response_profile_data['display_name'], updated_display_name)
 
     def test_group_list_post_invalid_name(self):
         data = {'name': '', 'type': 'test'}
@@ -197,12 +201,12 @@ class GroupsApiTests(ModuleStoreTestCase):
         test_uri = '{}?type=test'.format(self.base_groups_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
+        self.assertEqual(response.data['results'][0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
         profile.name = None
         profile.save()
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
+        self.assertEqual(response.data['results'][0]['name'], '{:04d}: {}'.format(group_id, self.test_group_name))
 
     def test_group_detail_get(self):
         data = {'name': self.test_group_name, 'type': 'test'}
