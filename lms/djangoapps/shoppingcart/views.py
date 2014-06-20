@@ -82,6 +82,11 @@ def show_cart(request):
 def clear_cart(request):
     cart = Order.get_cart_for_user(request.user)
     cart.clear()
+    coupon_redemption = CouponRedemption.objects.filter(user=request.user, order=cart.id)
+    if coupon_redemption:
+        coupon_redemption.delete()
+        log.info('Coupon redemption entry removed for user {0} for order {1}'.format(request.user, cart.id))
+
     return HttpResponse('Cleared')
 
 
