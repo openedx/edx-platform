@@ -170,7 +170,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         info_log.assert_called_with(
             'Coupon redemption entry removed for user {0} for order item {1}'.format(self.user, reg_item.id))
 
-    def test_coupon_discount_for_multiple_courses_in_cart(self):
+    @patch('shoppingcart.views.log.info')
+    def test_coupon_discount_for_multiple_courses_in_cart(self, info_log):
 
         reg_item = self.add_course_to_user_cart()
         self.add_coupon(self.course_key, True)
@@ -187,6 +188,33 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                 self.assertGreater(item.discount_price, 0)
             elif item.id == cert_item.id:
                 self.assertEquals(item.discount_price, None)
+
+        # Delete the discounted item, corresponding coupon redemption should be removed for that particular discounted item
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': reg_item.id})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals(self.cart.orderitem_set.count(), 1)
+        info_log.assert_called_with(
+            'Coupon redemption entry removed for user {0} for order item {1}'.format(self.user, reg_item.id))
+
+    @patch('shoppingcart.views.log.info')
+    def test_remove_coupon_redemption_on_clear_cart(self, info_log):
+
+        reg_item = self.add_course_to_user_cart()
+        CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.assertEquals(self.cart.orderitem_set.count(), 2)
+
+        self.add_coupon(self.course_key, True)
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals(self.cart.orderitem_set.count(), 0)
+
+        info_log.assert_called_with(
+            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
