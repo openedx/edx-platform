@@ -43,6 +43,7 @@ log = logging.getLogger(__name__)
 
 # NOTE: unit_handler assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+SPLIT_TEST_COMPONENT_TYPE = 'split_test'
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
@@ -61,11 +62,11 @@ else:
         # XBlocks from pmitros repos are prototypes. They should not be used
         # except for edX Learning Sciences experiments on edge.edx.org without
         # further work to make them robust, maintainable, finalize data formats,
-        # etc. 
+        # etc.
         'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-        'split_test'
+        SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'

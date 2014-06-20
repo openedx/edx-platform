@@ -44,7 +44,8 @@ from .access import has_course_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY
+    ADVANCED_COMPONENT_POLICY_KEY,
+    SPLIT_TEST_COMPONENT_TYPE,
 )
 
 from django_comment_common.models import assign_default_role
@@ -65,7 +66,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
-           'textbooks_list_handler', 'textbooks_detail_handler']
+           'textbooks_list_handler', 'textbooks_detail_handler',
+           'group_configurations_list_handler']
 
 
 class AccessListFallback(Exception):
@@ -266,7 +268,6 @@ def course_index(request, course_key):
     course_module = _get_course_module(course_key, request.user, depth=3)
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
-
 
     return render_to_response('overview.html', {
         'context_course': course_module,
@@ -604,7 +605,7 @@ def _config_course_advanced_components(request, course_module):
                         # Indicate that tabs should not be filtered out of
                         # the metadata
                         filter_tabs = False  # Set this flag to avoid the tab removal code below.
-                    found_ac_type = True  #break
+                    found_ac_type = True  # break
 
             # If we did not find a module type in the advanced settings,
             # we may need to remove the tab from the course.
@@ -852,6 +853,28 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
         course_module.pdf_textbooks = remaining_textbooks
         store.update_item(course_module, request.user.id)
         return JsonResponse()
+
+
+@require_http_methods(("GET"))
+@login_required
+@ensure_csrf_cookie
+def group_configurations_list_handler(request, course_key_string):
+    """
+    A RESTful handler for Group Configurations
+
+    GET
+        html: return Group Configurations list page (Backbone application)
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
+    group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+    splite_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+    return render_to_response('group_configurations.html', {
+        'context_course': course,
+        'group_configuration_url': group_configuration_url,
+        'configurations': [u.to_json() for u in course.user_partitions] if splite_test_enabled else None,
+    })
 
 
 def _get_course_creator_status(user):

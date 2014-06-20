@@ -47,6 +47,7 @@
 @import 'views/checklists';
 @import 'views/textbooks';
 @import 'views/export-git';
+@import 'views/group-configuration';
 
 // base - contexts
 @import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
