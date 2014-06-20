@@ -115,7 +115,7 @@
   }
 
   .introduction {
-    padding: ($baseline*2) $baseline 0 $baseline;
+    padding: 0;
 
     header {
       position: relative;
@@ -533,8 +533,6 @@
   }
 
   .introduction {
-    padding: 0;
-
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
@@ -547,8 +545,6 @@
 .view-register {
 
   .introduction {
-    padding: 0;
-
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
@@ -559,26 +555,21 @@
 
 // password reset
 .view-passwordreset {
-  background: $sidebar-color;
 
-  header.global {
-
-    h1 {
-      float: none;
-    }
+  header.global .nav-courseware .cta-login {
+    display: none;
   }
 
   .introduction {
-    width: auto;
-    padding: 0;
-
-    header h1 {
-      margin: 0;
+    header {
+      height: 120px;
+      border-bottom: 1px solid $m-gray;
+      background: transparent $passwordreset-banner-image 0 0 no-repeat;
     }
   }
 
   .content {
-    margin-top: 0;
+    padding: 0;
   }
 }
 
