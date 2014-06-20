@@ -658,6 +658,36 @@ class UsersApiTests(TestCase):
             data=StringResponseXMLFactory().build_xml(answer='foo'),
             display_name="Chapter 3"
         )
+        sequential1 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 1"
+        )
+        sequential2 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 2"
+        )
+        vertical1 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 1"
+        )
+        vertical2 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 2"
+        )
+        vertical3 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 3"
+        )
 
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -672,12 +702,33 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         position_data = {
             'position': {
-                'parent_content_id': unicode(course.id),
-                'child_content_id': unicode(chapter3.location)
+                'parent_content_id': str(course.id),
+                'child_content_id': str(chapter3.location)
             }
         }
         response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(chapter3.location))
+        self.assertEqual(response.data['position'], chapter3.id)
+        position_data = {
+            'position': {
+                'parent_content_id': str(chapter3.id),
+                'child_content_id': str(sequential2.location)
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.data['position'], sequential2.id)
+        position_data = {
+            'position': {
+                'parent_content_id': str(sequential2.id),
+                'child_content_id': str(vertical3.location)
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.data['position'], vertical3.id)
+
+        response = self.do_get(response.data['uri'])
+        self.assertEqual(response.data['position_tree']['chapter']['id'], chapter3.id)
+        self.assertEqual(response.data['position_tree']['sequential']['id'], sequential2.id)
+        self.assertEqual(response.data['position_tree']['vertical']['id'], vertical3.id)
 
     def test_user_courses_detail_post_invalid_course(self):
         test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
@@ -786,6 +837,9 @@ class UsersApiTests(TestCase):
         }
         response = self.do_post(confirm_uri, data=position_data)
         self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
+        response = self.do_get(confirm_uri)
+        self.assertGreater(response.data['position'], 0) # Position in the GET response is an integer!
+        self.assertEqual(response.data['position_tree']['chapter']['id'], chapter1.id)
 
     def test_user_courses_detail_get_invalid_course(self):
         test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
