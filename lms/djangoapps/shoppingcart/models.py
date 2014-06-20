@@ -314,8 +314,8 @@ class Coupons(models.Model):
     A user can get a discount offer on course if provide coupon code
     """
     code = models.CharField(max_length=32, db_index=True)
-    description = models.CharField(max_length=256, null=True, blank=True)
-    course_id = CourseKeyField(max_length=256)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    course_id = CourseKeyField(max_length=255)
     percentage_discount = models.IntegerField(default=0)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
