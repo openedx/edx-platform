@@ -828,20 +828,23 @@ input[name="subject"] {
         border-bottom: 1px solid $border-color-1;
 
         &.c_code {
-          width: 182px;
+          width: 170px;
+        }
+        &.c_count {
+          width: 85px;
         }
         &.c_course_id {
           width: 320px;
           word-wrap: break-word;
         }
         &.c_discount {
-          width: 170px;
+          width: 90px;
         }
         &.c_action {
-          width: 100px;
+          width: 89px;
         }
         &.c_dsc{
-          width: 280px;
+          width: 260px;
           word-wrap: break-word;
         }
       }
@@ -880,8 +883,12 @@ input[name="subject"] {
       }
       td:nth-child(2){
          line-height: 22px;
-        padding-right: 50px;
+        padding-right: 0px;
         word-wrap: break-word;
+      }
+      td:nth-child(5){
+        padding-left: 0;
+        text-align: center;
       }
       td{
         a.edit-right{
