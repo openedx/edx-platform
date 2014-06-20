@@ -33,7 +33,7 @@ Annotator.Plugin.Share = (function(_super) {
 				return 'https://www.facebook.com/sharer/sharer.php?s=100&p[url]='+link+'&p[title]='+encodeURIComponent('Open Video Annotation')+'&p[summary]='+noteText;
 			},
 			'twitter':function(title,link,noteText){
-				return 'https://twitter.com/intent/tweet?original_referer='+link+'&source=tweetbutton&url='+link+ "&via=OpenVideoAnnotation&text=" +encodeURIComponent('I want to share the next Open Video Annotation: ');
+				return 'https://twitter.com/intent/tweet?original_referer='+link+'&source=tweetbutton&url='+link+ "&via=OpenVideoAnnotation&text=" +encodeURIComponent('I want to share the following Open Video Annotation: ');
 			},
 			'google':function(title,link,noteText){
 				return 'https://plus.google.com/share?url='+link;
@@ -135,8 +135,9 @@ Annotator.Plugin.Share = (function(_super) {
 			return false;
 		});
 		// Share button
-		$(field).find('.share-button-annotator.share-button').click(function() {
+		$(field).find('.share-button-annotator.share-button').click(function(event) {
 		    event.preventDefault(); // disable normal link function so that it doesn't refresh the page
+		    annotation = share.getAnnotationFromId(event.currentTarget.attributes.annotationid);
 		    var _field = this,
 		    	ovaId = annotation.id,
 		    	title = method == 1?'Share':'Share without saving';
@@ -470,6 +471,17 @@ Annotator.Plugin.Share = (function(_super) {
 		URL = URL.replace(/(\?|&)$/,'');
 		regex = null;
 		return URL;
+	}
+	
+	Share.prototype.getAnnotationFromId = function(ovaId){
+		var annotationList = this.annotator.plugins.Store.annotations;
+		var value = undefined;
+		$.each(annotationList, function(key, val){
+			if(val.id == ovaId.nodeValue){
+				value = val;
+			}
+		});
+		return value;
 	}
 
 	Share.prototype.updateViewer = function(field, annotation) {
