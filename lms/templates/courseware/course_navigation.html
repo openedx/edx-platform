@@ -20,7 +20,7 @@ def url_class(is_active):
 <%! from courseware.views import notification_image_for_tab %>
 <% import waffle %>
 
-% if disable_tabs is UNDEFINED:
+% if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
