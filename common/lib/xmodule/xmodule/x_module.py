@@ -32,6 +32,25 @@ log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
 
+# xblock view names
+
+# This is the view that will be rendered to display the XBlock in the LMS.
+# It will also be used to render the block in "preview" mode in Studio, unless
+# the XBlock also implements author_view.
+STUDENT_VIEW = 'student_view'
+
+# An optional view of the XBlock similar to student_view, but with possible inline
+# editing capabilities. This view differs from studio_view in that it should be as similar to student_view
+# as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
+AUTHOR_VIEW = 'author_view'
+
+# The view used to render an editor in Studio. The editor rendering can be completely different
+# from the LMS student_view, and it is only shown when the author selects "Edit".
+STUDIO_VIEW = 'studio_view'
+
+# Views that present a "preview" view of an xblock (as opposed to an editing view).
+PREVIEW_VIEWS = [STUDENT_VIEW, AUTHOR_VIEW]
+
 
 class OpaqueKeyReader(IdReader):
     """
@@ -934,7 +953,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
     max_score = module_attr('max_score')
-    student_view = module_attr('student_view')
+    student_view = module_attr(STUDENT_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
 
@@ -1138,7 +1157,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         return result
 
     def render(self, block, view_name, context=None):
-        if view_name == 'student_view':
+        if view_name in PREVIEW_VIEWS:
             assert block.xmodule_runtime is not None
             if isinstance(block, (XModule, XModuleDescriptor)):
                 to_render = block._xmodule

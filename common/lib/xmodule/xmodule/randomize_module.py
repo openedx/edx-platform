@@ -1,7 +1,7 @@
 import logging
 import random
 
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 
 from lxml import etree
@@ -83,7 +83,7 @@ class RandomizeModule(RandomizeFields, XModule):
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content=u"<div>Nothing to randomize between</div>")
 
-        return self.child.render('student_view', context)
+        return self.child.render(STUDENT_VIEW, context)
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
