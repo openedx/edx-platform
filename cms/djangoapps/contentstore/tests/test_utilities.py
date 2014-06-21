@@ -74,19 +74,19 @@ class UtilitiesTestCase(CourseTestCase):
         """ Post operation is not supported. """
         update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.post(update_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 405)
 
     def test_utilities_put_unsupported(self):
         """ Put operation is not supported. """
         update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.put(update_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 405)
 
     def test_utilities_delete_unsupported(self):
         """ Delete operation is not supported. """
         update_url = reverse_course_url('utility_handler', self.course.id)
         response = self.client.delete(update_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 405)
 
     def test_expand_utility_action_url(self):
         """
