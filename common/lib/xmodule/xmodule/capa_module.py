@@ -42,6 +42,7 @@ class CapaModule(CapaMixin, XModule):
         """
         Accepts the same arguments as xmodule.x_module:XModule.__init__
         """
+        # import pudb; pu.db
         super(CapaModule, self).__init__(*args, **kwargs)
 
     def handle_ajax(self, dispatch, data):

@@ -17,6 +17,7 @@ import sys
 import logging
 import copy
 import re
+import traceback
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -563,6 +564,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         to specified depth
         """
         data_cache = self._cache_children(course_key, items, depth)
+        cache_size = len(data_cache)
+        # try:
+        #     1/0
+        # except Exception:
+        #     logging.exception("data_cache has {}".format(len(data_cache)))
+        #     traceback.format_exc()
+        # print "data_cache has {}".format(len(data_cache))
+        # print items
+        # import pudb; pu.db
 
         # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
         # bother with the metadata inheritance

@@ -206,6 +206,8 @@ class CapaMixin(CapaFields):
     """
 
     def __init__(self, *args, **kwargs):
+        #import pudb; pu.db
+
         super(CapaMixin, self).__init__(*args, **kwargs)
 
         due_date = get_extended_due_date(self)

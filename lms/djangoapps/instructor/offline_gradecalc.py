@@ -41,7 +41,7 @@ def offline_grade_calculation(course_key):
     enc = MyEncoder()
 
     print "{} enrolled students".format(len(enrolled_students))
-    course = get_course_by_id(course_key)
+    course = get_course_by_id(course_key, depth=None)
 
     for student in enrolled_students:
         request = DummyRequest()
