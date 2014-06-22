@@ -11,6 +11,8 @@ Change Log
 
    * - Date
      - Change
+   * - 06/23/14
+     - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
    * - 05/23/14
      - Added descriptions of the enrollment upgrade events to the
        :ref:`Tracking Logs` chapter.
