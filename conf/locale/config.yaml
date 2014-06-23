@@ -2,6 +2,7 @@
 
 locales:
     - en  # English - Source Language
+    - am  # Amharic
     - ar  # Arabic
     - az  # Azerbaijani
     - bg_BG  # Bulgarian (Bulgaria)
@@ -59,6 +60,7 @@ locales:
     - si  # Sinhala
     - sk  # Slovak
     - sl  # Slovenian
+    - ta  # Tamil
     - th  # Thai
     - tr_TR  # Turkish (Turkey)
     - uk  # Ukranian

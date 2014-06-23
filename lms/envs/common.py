@@ -565,6 +565,7 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
+    ('am', u'አማርኛ'),  # Amharic
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
@@ -622,6 +623,7 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('ta', u'தமிழ்'),  # Tamil
     ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Ukranian

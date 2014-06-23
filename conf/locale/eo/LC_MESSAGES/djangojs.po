@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-13 09:23-0400\n"
-"PO-Revision-Date: 2014-06-13 13:24:28.607488\n"
+"POT-Creation-Date: 2014-06-23 07:56-0400\n"
+"PO-Revision-Date: 2014-06-23 11:58:12.329666\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -300,9 +300,9 @@ msgstr "Mäxïmüm #"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
-"VideoPlayer: Element corresponding to the given selector does not found."
+"VideoPlayer: Element corresponding to the given selector was not found."
 msgstr ""
-"VïdéöPläýér: Élémént çörréspöndïng tö thé gïvén séléçtör döés nöt föünd. "
+"VïdéöPläýér: Élémént çörréspöndïng tö thé gïvén séléçtör wäs nöt föünd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
@@ -380,6 +380,10 @@ msgstr "Türn ön çäptïöns Ⱡ'σ#"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
 msgstr "Türn öff çäptïöns Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr "Çréätïng mïssïng gröüps&hellip; Ⱡ'σяєм#"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -506,6 +510,14 @@ msgid ""
 msgstr ""
 "Nö résülts föünd för %(original_query)s. Shöwïng résülts för "
 "%(suggested_query)s. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr "Nö thréäds mätçhéd ýöür qüérý. Ⱡ'σяєм #"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
+msgstr "Shöw pösts ßý %(username)s. Ⱡ'σ#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
@@ -652,10 +664,12 @@ msgstr "dröppéd ïn slïdér Ⱡ'σ#"
 msgid "dropped on target"
 msgstr "dröppéd ön tärgét Ⱡ'σ#"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
 msgstr "%s ägö Ⱡ'σяєм ιρѕ#"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
 msgstr "%s fröm nöw Ⱡ#"
@@ -1000,6 +1014,9 @@ msgstr "Prévïéw #"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
 msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
@@ -1069,7 +1086,8 @@ msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
 
-#. Translators: A rolename appears this sentence.;
+#. Translators: A rolename appears this sentence. A rolename is something like
+#. "staff" or "beta tester".;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
 msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
@@ -1207,7 +1225,9 @@ msgid "The following users are no longer enrolled in the course:"
 msgstr ""
 "Thé föllöwïng üsérs äré nö löngér énrölléd ïn thé çöürsé: Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#. Translators: A list of users appears after this sentence;
+#. Translators: A list of users appears after this sentence. This situation
+#. arises when a staff member tries to unenroll a user who is not currently
+#. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
@@ -1684,16 +1704,22 @@ msgid "Unable to retrieve data, please try again later."
 msgstr "Ûnäßlé tö rétrïévé dätä, pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "student(s) opened Subsection"
-msgstr "stüdént(s) öpénéd Süßséçtïön Ⱡ'σяєм #"
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] "%(num_students)s stüdént öpénéd Süßséçtïön Ⱡ'σяєм #"
+msgstr[1] "%(num_students)s stüdénts öpénéd Süßséçtïön Ⱡ'σяєм #"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "students"
-msgstr "stüdénts #"
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] "%(num_students)s stüdént Ⱡ#"
+msgstr[1] "%(num_students)s stüdénts Ⱡ#"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "questions"
-msgstr "qüéstïöns #"
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] "%(num_questions)s qüéstïön Ⱡ#"
+msgstr[1] "%(num_questions)s qüéstïöns Ⱡ'#"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1757,6 +1783,10 @@ msgstr ""
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr "Ýés, délété thïs çömpönént Ⱡ'σяєм#"
+
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм#"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -2336,8 +2366,8 @@ msgstr ""
 "séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Chapter(s) information"
-msgstr "Çhäptér(s) ïnförmätïön Ⱡ'σяє#"
+msgid "Chapter information"
+msgstr "Çhäptér ïnförmätïön Ⱡ'σя#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"

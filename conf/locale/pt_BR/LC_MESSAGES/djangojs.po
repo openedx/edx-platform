@@ -14,6 +14,7 @@
 # edgarapmelo <edgarapmelo@gmail.com>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
+# Kevin Grist <kgrist@localconcept.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Lulatini <lulatini@gmail.com>, 2014
@@ -41,6 +42,7 @@
 # niels006 <niels006@gmail.com>, 2014
 # RenataBarboza, 2013
 # Renata Barboza-Murray, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -58,9 +60,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:23-0400\n"
-"PO-Revision-Date: 2014-06-12 23:21+0000\n"
-"Last-Translator: mmauryx <matheus_w_dias@hotmail.com>\n"
+"POT-Creation-Date: 2014-06-19 00:15-0400\n"
+"PO-Revision-Date: 2014-06-19 04:17+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -320,10 +322,8 @@ msgstr "Máximo"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
-"VideoPlayer: Element corresponding to the given selector does not found."
+"VideoPlayer: Element corresponding to the given selector was not found."
 msgstr ""
-"VideoPlayer: o elemento correspondente ao seletor definido não foi "
-"localizado."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
@@ -662,10 +662,12 @@ msgstr "solta na barra deslizante"
 msgid "dropped on target"
 msgstr "solta no destino"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
 msgstr "%s atrás"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
 msgstr "%s a partir de agora"
@@ -991,6 +993,9 @@ msgstr "Pré-visualizar"
 msgid "Post body"
 msgstr "Corpo da mensagem"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
 msgstr "Erro ao recuperar distribuição."
@@ -1060,7 +1065,8 @@ msgstr "Digite um nome de usuário ou email"
 msgid "Please enter a username or email."
 msgstr "Digite um nome de usuário ou e-mail."
 
-#. Translators: A rolename appears this sentence.;
+#. Translators: A rolename appears this sentence. A rolename is something like
+#. "staff" or "beta tester".;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
 msgstr "Erro ao recuperar a lista de funções"
@@ -1192,7 +1198,9 @@ msgstr ""
 msgid "The following users are no longer enrolled in the course:"
 msgstr "Os seguintes usuários não estão mais inscritos no curso:"
 
-#. Translators: A list of users appears after this sentence;
+#. Translators: A list of users appears after this sentence. This situation
+#. arises when a staff member tries to unenroll a user who is not currently
+#. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
@@ -1292,8 +1300,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
 msgstr ""
-"Sucesso! As tentativas para resolver o exercício '<% = problem_id%>' e aluno"
-" '<% = student_id%>' foram zeradas."
+"Sucesso! As tentativas para resolver o exercício '<%= problem_id %>' e aluno"
+" '<%= student_id %>' foram zeradas."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1332,9 +1340,9 @@ msgid ""
 "'<%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
-"Uma nova correção foi iniciada para o problema \"<% = problem_id%> ' e o "
-"aluno' <% = student_id%> '. Clique no botão 'Exibir histórico de tarefas do "
-"aluno' para ver o status da tarefa."
+"Uma nova correção foi iniciada para o problema '<%= problem_id %>' e o aluno"
+" '<%= student_id %>'. Clique no botão 'Exibir histórico de tarefas do aluno'"
+" para ver o status da tarefa."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1359,7 +1367,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
 msgstr ""
-"Zerar as tentativas para todos os alunos no problema '<% = problem_id%> \"?"
+"Zerar as tentativas para todos os alunos no problema '<%= problem_id %>'?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1367,7 +1375,7 @@ msgid ""
 " Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
-"A tarefa de zerar as tentativas para o problema '<%= problem_id%>' foi "
+"A tarefa de zerar as tentativas para o problema '<%= problem_id %>' foi "
 "iniciada corretamente. Clique o botão 'Exibir o histórico de Tarefas' do "
 "problema para ver o status desta tarefa."
 
@@ -1384,7 +1392,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
 msgstr ""
-"Corrigir novamente o problema '<% = problem_id%>' para todos os alunos?"
+"Corrigir novamente o problema '<%= problem_id %>' para todos os alunos?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1392,7 +1400,7 @@ msgid ""
 "students. Click the 'Show Background Task History for Problem' button to see"
 " the status of the task."
 msgstr ""
-"A tarefa de corrigir novamente o problema '<% = problem_id%>' foi iniciada "
+"A tarefa de corrigir novamente o problema '<%= problem_id %>' foi iniciada "
 "corretamente para todos os alunos. Clique no botão para 'Exibir o histórico "
 "de tarefas' para ver o status da tarefa."
 
@@ -1663,16 +1671,22 @@ msgid "Unable to retrieve data, please try again later."
 msgstr "Não foi possível recuperar dados. Tente novamente mais tarde."
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "student(s) opened Subsection"
-msgstr "Abriu subdivisão para aluno(s)"
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "students"
-msgstr "alunos"
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "questions"
-msgstr "perguntas"
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -2266,7 +2280,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Chapter(s) information"
+msgid "Chapter information"
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
