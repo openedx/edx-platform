@@ -52,7 +52,6 @@ path.py==3.0.1
 Pillow==1.7.8
 pip>=1.4
 polib==1.0.3
-psycopg2==2.5.2
 pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1
