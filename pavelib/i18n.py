@@ -5,7 +5,6 @@ import sys
 import subprocess
 from path import path
 from paver.easy import task, cmdopts, needs, sh
-from pavelib.utils.envs import Env
 
 try:
     from pygments.console import colorize
@@ -26,7 +25,7 @@ def i18n_extract(options):
     Extract localizable strings from sources
     """
     verbose = getattr(options, "verbose", None)
-    cmd = Env.REPO_ROOT / "i18n" / "extract.py"
+    cmd = "i18n_tool extract"
 
     if verbose:
         cmd += " -vv"
@@ -40,7 +39,7 @@ def i18n_generate():
     """
     Compile localizable strings from sources, extracting strings first.
     """
-    cmd = Env.REPO_ROOT / "i18n" / "generate.py"
+    cmd = "i18n_tool generate"
     sh(cmd)
 
 
@@ -51,7 +50,7 @@ def i18n_generate_strict():
     Compile localizable strings from sources, extracting strings first.
     Complains if files are missing.
     """
-    cmd = Env.REPO_ROOT / "i18n" / "generate.py"
+    cmd = "i18n_tool generate"
     sh(cmd + " --strict")
 
 
@@ -62,7 +61,7 @@ def i18n_dummy():
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
-    cmd = Env.REPO_ROOT / "i18n" / "dummy.py"
+    cmd = "i18n_tool dummy"
     sh(cmd)
 
 
@@ -116,7 +115,7 @@ def i18n_transifex_push():
     """
     Push source strings to Transifex for translation
     """
-    cmd = Env.REPO_ROOT / "i18n" / "transifex.py"
+    cmd = "i18n_tool transifex"
     sh("{cmd} push".format(cmd=cmd))
 
 
@@ -126,7 +125,7 @@ def i18n_transifex_pull():
     """
     Pull translated strings from Transifex
     """
-    cmd = Env.REPO_ROOT / "i18n" / "transifex.py"
+    cmd = "i18n_tool transifex"
     sh("{cmd} pull".format(cmd=cmd))
 
 

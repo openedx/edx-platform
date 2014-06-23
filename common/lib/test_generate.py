@@ -10,10 +10,10 @@ from mock import patch
 from polib import pofile
 from pytz import UTC
 
+from i18n import config
 from i18n import extract
 from i18n import generate
 from i18n import dummy
-from i18n.config import CONFIGURATION
 
 
 class TestGenerate(TestCase):
@@ -24,13 +24,15 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cfg = os.path.join('conf', 'locale', 'config.yaml')
+        config.CONFIGURATION = config.Configuration(cfg)
         sys.stderr.write(
             "\nExtracting i18n strings and generating dummy translations; "
             "this may take a few minutes\n"
         )
         sys.stderr.flush()
-        extract.main(verbosity=0)
-        dummy.main(verbosity=0)
+        extract.main(verbosity=0, config=cfg)
+        dummy.main(verbosity=0, config=cfg)
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
@@ -41,13 +43,13 @@ class TestGenerate(TestCase):
         """
         Tests merge script on English source files.
         """
-        filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
-        generate.merge(CONFIGURATION.source_locale, target=filename)
+        filename = os.path.join(config.CONFIGURATION.source_messages_dir, random_name())
+        generate.merge(config.CONFIGURATION.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
     # Patch dummy_locales to not have esperanto present
-    @patch.object(CONFIGURATION, 'dummy_locales', ['fake2'])
+    @patch.object(config.CONFIGURATION, 'dummy_locales', ['fake2'])
     def test_main(self):
         """
         Runs generate.main() which should merge source files,
@@ -57,10 +59,10 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main(verbosity=0, strict=False)
-        for locale in CONFIGURATION.translated_locales:
+        for locale in config.CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'
-                path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
+                path = os.path.join(config.CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
                 self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
@@ -81,7 +83,7 @@ class TestGenerate(TestCase):
         # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 
         """
-        path = os.path.join(CONFIGURATION.get_messages_dir(locale), 'django.po')
+        path = os.path.join(config.CONFIGURATION.get_messages_dir(locale), 'django.po')
         po = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(po.header)

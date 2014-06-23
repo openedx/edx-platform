@@ -37,9 +37,6 @@ end
 
 deprecated("coverage", "paver coverage", false)
 
-# deprecates i18n:test from i18n.rake
-deprecated("i18n:test", 'paver test_i18n', false)
-
 deprecated("clean_reports_dir", "paver clean_reports_dir", false)
 deprecated("clean_test_files", "paver clean_test_files", false)
 deprecated("test:clean_mongo", "paver clean_mongo", false)
