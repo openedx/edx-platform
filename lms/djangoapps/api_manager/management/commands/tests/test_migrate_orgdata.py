@@ -33,7 +33,7 @@ class MigrateOrgDataTests(TestCase):
         profile, _ = GroupProfile.objects.get_or_create(
             group_id=group.id,
             group_type=group_type,
-            name=group_name,
+            name=groupdata['name'],
             data=json.dumps(groupdata)
         )
         user = User.objects.create(email='user1@edx.org', username='user1', password='user1')
@@ -56,7 +56,7 @@ class MigrateOrgDataTests(TestCase):
         profile2, _ = GroupProfile.objects.get_or_create(
             group_id=group2.id,
             group_type=group2_type,
-            name=group2_name,
+            name=groupdata['name'],
             data=json.dumps(groupdata)
         )
         user2 = User.objects.create(email='user2@edx.org', username='user2', password='user2')
