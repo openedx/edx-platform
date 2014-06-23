@@ -20,12 +20,13 @@ def url_class(is_active):
 <%! from courseware.views import notification_image_for_tab %>
 <% import waffle %>
 
+% if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
       % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id)):
         <%
-            tab_is_active = (tab.tab_id == active_page)
+            tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)
         %>
         % if waffle.flag_is_active(request, 'visual_treatment'):
@@ -55,6 +56,7 @@ def url_class(is_active):
     </ol>
   </div>
 </nav>
+%endif
 
 % if masquerade is not UNDEFINED:
   % if staff_access and masquerade is not None:
