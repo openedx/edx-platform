@@ -408,6 +408,11 @@ def register_user(request, extra_context=None):
         overrides['selected_provider'] = current_provider.NAME
         context.update(overrides)
 
+    try:
+        if settings.FEATURES["USE_CUSTOM_THEME"]:
+            return render_to_response("theme-register.html", context)
+    except TopLevelLookupException:
+        pass
     return render_to_response('register.html', context)
 
 
@@ -559,6 +564,11 @@ def dashboard(request):
         context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
         context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
+    try:
+        if settings.FEATURES["USE_CUSTOM_THEME"]:
+            return render_to_response("theme-dashboard.html", context)
+    except TopLevelLookupException:
+        pass
     return render_to_response('dashboard.html', context)
 
 

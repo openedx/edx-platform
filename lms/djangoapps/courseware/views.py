@@ -46,6 +46,8 @@ from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEnd
 import shoppingcart
 from opaque_keys import InvalidKeyError
 
+from mako.exceptions import TopLevelLookupException
+
 from microsite_configuration import microsite
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
@@ -485,6 +487,11 @@ def course_info(request, course_id):
         'reverifications': reverifications,
     }
 
+    try:
+        if settings.FEATURES["USE_CUSTOM_THEME"]:
+            return render_to_response("courseware/theme-info.html", context)
+    except TopLevelLookupException:
+        pass
     return render_to_response('courseware/info.html', context)
 
 
@@ -603,8 +610,7 @@ def course_about(request, course_id):
     # see if we have already filled up all allowed enrollments
     is_course_full = CourseEnrollment.is_course_full(course)
 
-# python -m coverage run --rcfile=lms/.coveragerc hich ./manage.pyu
-    return render_to_response('courseware/course_about.html', {
+    context = {
         'course': course,
         'regularly_registered': regularly_registered,
         'sneakpeek_allowed': sneakpeek_allowed,
@@ -616,7 +622,14 @@ def course_about(request, course_id):
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,
         'is_course_full': is_course_full
-    })
+    }
+
+    try:
+        if settings.FEATURES["USE_CUSTOM_THEME"]:
+            return render_to_response("courseware/theme-course_about.html", context)
+    except TopLevelLookupException:
+        pass
+    return render_to_response('courseware/course_about.html', context)
 
 
 @ensure_csrf_cookie
