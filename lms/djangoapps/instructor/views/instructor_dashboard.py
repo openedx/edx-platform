@@ -125,7 +125,7 @@ section_display_name will be used to generate link titles in the nav bar.
 
 def _section_e_commerce(course_key, access):
     """ Provide data for the corresponding dashboard section """
-    coupons = Coupons.objects.filter(course_id=course_key).filter(is_active=True)
+    coupons = Coupons.objects.filter(course_id=course_key).order_by('-is_active')
 
     section_data = {
         'section_key': 'e-commerce',
