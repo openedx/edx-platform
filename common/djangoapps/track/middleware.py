@@ -64,7 +64,6 @@ class TrackMiddleware(object):
 
             # TODO: Confirm no large file uploads
             event = json.dumps(event)
-            event = event[:512]
 
             views.server_track(request, request.META['PATH_INFO'], event)
         except:
