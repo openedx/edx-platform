@@ -95,8 +95,6 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         coupon.is_active = False
         coupon.save()
 
-        response = self.client.post(self.url)
-        self.assertFalse('<td>AS452</td>' in response.content)
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertTrue('coupon id={0} is already inactive or request made by Anonymous User'.format(coupon.id) in response.content)
 
