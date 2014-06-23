@@ -920,23 +920,23 @@ class CapaModuleTest(unittest.TestCase):
         # more attempts than allowed.
         attempts = random.randint(1, 10)
         module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.check_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.check_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.check_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         # If no limit on attempts
         module = CapaFactory.create(attempts=attempts - 3)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=0)
         self.assertEqual(module.check_button_name(), "Submit")
