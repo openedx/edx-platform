@@ -191,6 +191,21 @@ class LTIFields(object):
         default=False,
         scope=Scope.settings
     )
+    title_postscript = String(
+        display_name="Post-script to component title",
+        default="(External Resource)",
+        scope=Scope.settings
+    )
+    grader_feedback_label = String(
+        display_name="String label for grader feedback",
+        default="Feedback on your work from the grader:",
+        scope=Scope.settings
+    )
+    instruction_text = String(
+        display_name="Additional instruction text for component",
+        default="",
+        scope=Scope.settings
+    )
 
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
@@ -370,6 +385,9 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'weight': self.weight,
             'module_score': self.module_score,
             'comment': sanitized_comment,
+            'title_postscript': self.title_postscript,
+            'grader_feedback_label': self.grader_feedback_label,
+            'instruction_text': self.instruction_text,
         }
 
     def get_html(self):
