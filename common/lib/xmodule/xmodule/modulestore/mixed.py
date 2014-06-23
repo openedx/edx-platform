@@ -19,6 +19,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+import itertools
 
 log = logging.getLogger(__name__)
 
@@ -331,6 +332,18 @@ class MixedModuleStore(ModuleStoreWriteBase):
         for modulestore in self.modulestores.values():
             courses.extend(modulestore.get_courses_for_wiki(wiki_slug))
         return courses
+
+    def heartbeat(self):
+        """
+        Delegate to each modulestore and package the results for the caller.
+        """
+        # could be done in parallel threads if needed
+        return dict(
+            itertools.chain.from_iterable(
+                store.heartbeat().iteritems()
+                for store in self.modulestores.itervalues()
+            )
+        )
 
 
 def _compare_stores(left, right):

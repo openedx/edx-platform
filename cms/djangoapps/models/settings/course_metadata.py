@@ -1,7 +1,6 @@
 from xblock.fields import Scope
 
 from contentstore.utils import get_modulestore
-from cms.lib.xblock.mixin import CmsBlockMixin
 
 
 class CourseMetadata(object):
@@ -33,9 +32,6 @@ class CourseMetadata(object):
         result = {}
 
         for field in descriptor.fields.values():
-            if field.name in CmsBlockMixin.fields:
-                continue
-
             if field.scope != Scope.settings:
                 continue
 

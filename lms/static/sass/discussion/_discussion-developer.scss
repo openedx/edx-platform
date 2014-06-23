@@ -70,11 +70,12 @@ body.discussion {
         @include transition(none);
         @extend %t-weight5;
         padding: ($baseline/4) ($baseline/2);
+        color: $white;
 
         // reseting poorly globally scoped hover/focus state for this control
         &:hover, &:focus {
-          color: $link-color;
-          text-decoration: underline;
+          color: $white;
+          text-decoration: none;
         }
       }
     }

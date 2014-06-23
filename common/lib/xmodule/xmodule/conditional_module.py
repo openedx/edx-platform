@@ -8,7 +8,7 @@ from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
 
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 from xblock.fields import Scope, ReferenceList
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -160,7 +160,7 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [child.render('student_view').content for child in self.get_display_items()]
+        html = [child.render(STUDENT_VIEW).content for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 

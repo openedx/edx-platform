@@ -7,6 +7,9 @@ the top.  Include a label indicating the component affected.
 
 Studio: Move Peer Assessment into advanced problems menu.
 
+Studio: Support creation and editing of split_test instances (Content Experiments)
+entirely in Studio. STUD-1658.
+
 Blades: Add context-aware video index. BLD-933
 
 Blades: Fix bug with incorrect link format and redirection. BLD-1049

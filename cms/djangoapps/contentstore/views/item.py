@@ -23,6 +23,7 @@ import xmodule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
@@ -180,15 +181,15 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock = store.get_item(usage_key)
         is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
-        unit_views = ['student_view']
+        unit_views = PREVIEW_VIEWS
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
         xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
 
-        if view_name == 'studio_view':
+        if view_name == STUDIO_VIEW:
             try:
-                fragment = xblock.render('studio_view')
+                fragment = xblock.render(STUDIO_VIEW)
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
@@ -213,7 +214,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # Note: this special case logic can be removed once the unit page is replaced
             # with the new container view.
             context = {
-                'runtime_type': 'studio',
                 'container_view': is_container_view,
                 'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,

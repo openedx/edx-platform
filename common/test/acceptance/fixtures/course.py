@@ -200,6 +200,7 @@ class CourseFixture(StudioApiFixture):
         self._handouts = []
         self._children = []
         self._assets = []
+        self._advanced_settings = {}
 
     def __str__(self):
         """
@@ -236,6 +237,12 @@ class CourseFixture(StudioApiFixture):
         """
         self._assets.extend(asset_name)
 
+    def add_advanced_settings(self, settings):
+        """
+        Adds advanced settings to be set on the course when the install method is called.
+        """
+        self._advanced_settings.update(settings)
+
     def install(self):
         """
         Create the course and XBlocks within the course.
@@ -248,6 +255,7 @@ class CourseFixture(StudioApiFixture):
         self._install_course_handouts()
         self._configure_course()
         self._upload_assets()
+        self._add_advanced_settings()
         self._create_xblock_children(self._course_location, self._children)
 
         return self
@@ -415,6 +423,23 @@ class CourseFixture(StudioApiFixture):
                 raise CourseFixtureError('Could not upload {asset_name} with {url}. Status code: {code}'.format(
                     asset_name=asset_name, url=url, code=upload_response.status_code))
 
+    def _add_advanced_settings(self):
+        """
+        Add advanced settings.
+        """
+        url = STUDIO_BASE_URL + "/settings/advanced/" + self._course_key
+
+        # POST advanced settings to Studio
+        response = self.session.post(
+            url, data=self._encode_post_dict(self._advanced_settings),
+            headers=self.headers,
+        )
+
+        if not response.ok:
+            raise CourseFixtureError(
+                "Could not update advanced details to '{0}' with {1}: Status was {2}.".format(
+                    self._advanced_settings, url, response.status_code))
+
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """
         Recursively create XBlock children.
@@ -489,6 +514,6 @@ class CourseFixture(StudioApiFixture):
         Encode `post_dict` (a dictionary) as UTF-8 encoded JSON.
         """
         return json.dumps({
-            k: v.encode('utf-8') if v is not None else v
+            k: v.encode('utf-8') if isinstance(v, basestring) else v
             for k, v in post_dict.items()
         })

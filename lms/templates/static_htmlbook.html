@@ -11,8 +11,9 @@
 </%block>
 
 <%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <script type="text/javascript">
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
 (function($) {
     $.fn.myHTMLViewer = function(options) {
         var urlToLoad = null;
@@ -38,7 +39,7 @@
         if(options.notesEnabled) {
             onComplete = function(url) {
                 return function() {
-                    $('#viewerContainer').trigger('notes:init', [url]);
+                    $('#viewerContainer').trigger('notes:init', [url, "${storage}", "${token}"]);
                 }
             };
         }

@@ -28,6 +28,11 @@
       display: inline-block;
       width: 50%;
       vertical-align: middle;
+
+      .xblock-display-name {
+        display: inline-block;
+        vertical-align: middle;
+      }
     }
 
     .header-actions {
@@ -147,47 +152,51 @@
     padding: ($baseline/2) ($baseline*.75);
     color: $white;
 
-    .message-text {
-      display: inline-block;
-      width: 93%;
-      vertical-align: top;
-    }
-
     [class^="icon-"] {
       font-style: normal;
     }
 
     &.information {
+      @extend %t-copy-sub1;
       background-color: $gray-l5;
       color: $gray-d2;
     }
 
-    &.warning {
+    &.validation {
       background-color: $gray-d2;
-      padding: ($baseline/2) $baseline;
       color: $white;
 
-      .icon-warning-sign {
-        margin-right: ($baseline/2);
-        color: $orange;
+      a {
+        color: $blue-l2;
       }
 
-      .message-text {
-        display: inline-block;
-        width: 93%;
-        vertical-align: top;
+      &.has-warnings {
+        border-bottom: 3px solid $orange;
+
+        .icon-warning-sign {
+          margin-right: ($baseline/2);
+          color: $orange;
+        }
+      }
+
+      &.has-errors {
+        border-bottom: 3px solid $red-l2;
+
+        .icon-exclamation-sign {
+          margin-right: ($baseline/2);
+          color: $red-l2;
+        }
       }
     }
+  }
 
-    &.error {
-      background-color: $gray-d2;
-      padding: ($baseline/2) $baseline;
-      color: $white;
+  .xblock-message-list {
+    margin-bottom: 0;
+  }
 
-      .icon-exclamation-sign {
-        margin-right: ($baseline/2);
-        color: $red-l2;
-      }
-    }
+  .xblock-message-actions {
+    @extend %actions-header;
+    padding: ($baseline/2) $baseline;
+    background-color: $gray-d1;
   }
 }

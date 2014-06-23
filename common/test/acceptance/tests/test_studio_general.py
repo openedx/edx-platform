@@ -1,6 +1,8 @@
 """
 Acceptance tests for Studio.
 """
+
+from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
 from ..pages.studio.asset_index import AssetIndexPage
@@ -107,6 +109,7 @@ class CoursePagesTest(UniqueCourseTest):
             ]
         ]
 
+    @skip('Intermittently failing with Page not found error for Assets. TE-418')
     def test_page_existence(self):
         """
         Make sure that all these pages are accessible once you have a course.
@@ -115,6 +118,14 @@ class CoursePagesTest(UniqueCourseTest):
         """
         # Log in
         self.auth_page.visit()
+
+        # In the real workflow you will be at the dashboard page
+        # after you log in. This test was intermittently failing on the
+        # first (asset) page load with a 404.
+        # Not exactly sure why, so adding in a visit
+        # to the dashboard page here to replicate the usual flow.
+        self.dashboard_page = DashboardPage(self.browser)
+        self.dashboard_page.visit()
 
         # Verify that each page is available
         for page in self.pages:

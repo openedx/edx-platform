@@ -7,6 +7,7 @@ import os
 import subprocess
 import signal
 import psutil
+import atexit
 
 
 def kill_process(proc):
@@ -45,6 +46,9 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
             pids.extend([subprocess.Popen(cmd, **kwargs)])
 
         def _signal_handler(*args):
+            """
+            What to do when process is ended
+            """
             print("\nEnding...")
 
         signal.signal(signal.SIGINT, _signal_handler)
@@ -68,3 +72,36 @@ def run_process(cmd, out_log=None, err_log=None):
     Terminates the process on CTRL-C or if an error occurs.
     """
     return run_multi_processes([cmd], out_log=out_log, err_log=err_log)
+
+
+def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
+    """
+    Runs a command as a background process. Sends SIGINT at exit.
+    """
+
+    kwargs = {'shell': True, 'cwd': cwd}
+    if out_log:
+        out_log_file = open(out_log, 'w')
+        kwargs['stdout'] = out_log_file
+
+    if err_log:
+        err_log_file = open(err_log, 'w')
+        kwargs['stderr'] = err_log_file
+
+    proc = subprocess.Popen(cmd, **kwargs)
+
+    def exit_handler():
+        """
+        Send SIGINT to the process's children. This is important
+        for running commands under coverage, as coverage will not
+        produce the correct artifacts if the child process isn't
+        killed properly.
+        """
+        p1_group = psutil.Process(proc.pid)
+
+        child_pids = p1_group.get_children(recursive=True)
+
+        for child_pid in child_pids:
+            os.kill(child_pid.pid, signal.SIGINT)
+
+    atexit.register(exit_handler)
