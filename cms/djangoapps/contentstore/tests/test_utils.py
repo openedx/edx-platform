@@ -2,13 +2,17 @@
 import collections
 import copy
 import mock
+from datetime import datetime, timedelta
+from pytz import UTC
 
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+
+from xmodule.modulestore.django import modulestore
 
 
 class LMSLinksTestCase(TestCase):
@@ -183,3 +187,64 @@ class CourseImageTestCase(TestCase):
                 course=course.location.course
             )
         )
+
+class XBlockVisibilityTestCase(TestCase):
+    """Tests for xblock visibility for students."""
+
+    def test_private_unreleased_xblock(self):
+        """Verifies that a private unreleased xblock is not visible"""
+        location = Location('edX', 'visibility', '2012_Fall', 'vertical', 'private_unreleased')
+        dummy_user = 123
+
+        modulestore('draft').create_and_save_xmodule(location, user_id=dummy_user)
+        vertical = modulestore().get_item(location)
+
+        vertical.start = datetime.now(UTC) + timedelta(1)
+        modulestore('draft').update_item(vertical, dummy_user)
+        vertical = modulestore().get_item(location)
+
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_private_released_xblock(self):
+        """Verifies that a private released xblock is not visible"""
+        location = Location('edX', 'visibility', '2012_Fall', 'vertical', 'private_released')
+        dummy_user = 123
+
+        modulestore('draft').create_and_save_xmodule(location, user_id=dummy_user)
+        vertical = modulestore().get_item(location)
+
+        vertical.start = datetime(1970, 1, 1)
+        modulestore('draft').update_item(vertical, dummy_user)
+        vertical = modulestore().get_item(location)
+
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_public_unreleased_xblock(self):
+        """Verifies that a public (published) unreleased xblock is not visible"""
+        location = Location('edX', 'visibility', '2012_Fall', 'vertical', 'public_unreleased')
+        dummy_user = 123
+
+        modulestore('draft').create_and_save_xmodule(location, user_id=dummy_user)
+        vertical = modulestore().get_item(location)
+
+        vertical.start = datetime.now(UTC) + timedelta(1)
+        modulestore('draft').update_item(vertical, dummy_user)
+        modulestore('draft').publish(location, dummy_user)
+        vertical = modulestore().get_item(location)
+
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_public_released_xblock(self):
+        """Verifies that a public (published) released xblock is visible"""
+        location = Location('edX', 'visibility', '2012_Fall', 'vertical', 'public_released')
+        dummy_user = 123
+
+        modulestore('draft').create_and_save_xmodule(location, user_id=dummy_user)
+        vertical = modulestore().get_item(location)
+
+        vertical.start = datetime(1970, 1, 1)
+        modulestore('draft').update_item(vertical, dummy_user)
+        modulestore('draft').publish(location, dummy_user)
+        vertical = modulestore().get_item(location)
+
+        self.assertTrue(utils.is_xblock_visible_to_students(vertical))

@@ -3,6 +3,8 @@
 import copy
 import logging
 import re
+from datetime import datetime
+from pytz import UTC
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -154,6 +156,24 @@ def compute_publish_state(xblock):
     else:
         return PublishState.public
 
+def is_xblock_visible_to_students(xblock):
+    """
+    Returns true if there is a published version of xblock that has been released.
+    """
+
+    # Find the published version, if it exists
+    try:
+        published = modulestore('direct').get_item(xblock.location)
+    # The xblock isn't visible if there's no published version
+    except ItemNotFoundError:
+        return False
+
+    # Check start date
+    if 'detached' not in published._class_tags and published.start is not None:
+        return datetime.now(UTC) > published.start
+
+    # No start date, so it's always visible
+    return True
 
 def add_extra_panel_tab(tab_type, course):
     """
