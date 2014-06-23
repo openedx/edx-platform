@@ -16,7 +16,24 @@ from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
+from microsite_configuration import microsite
 
+
+def get_cybersource_config():
+    """
+    This method will return any microsite specific cybersource configuration, otherwise
+    we return the default configuration
+    """
+    config_key = microsite.get_value('cybersource_config_key')
+    config = {}
+    if config_key:
+        # The microsite CyberSource configuration will be subkeys inside of the normal default
+        # CyberSource configuration
+        config = settings.CC_PROCESSOR['CyberSource']['microsites'][config_key]
+    else:
+        config = settings.CC_PROCESSOR['CyberSource']
+
+    return config
 
 def process_postpay_callback(params):
     """
@@ -53,7 +70,7 @@ def processor_hash(value):
     """
     Performs the base64(HMAC_SHA1(key, value)) used by CyberSource Hosted Order Page
     """
-    shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET', '')
+    shared_secret = get_cybersource_config().get('SHARED_SECRET', '')
     hash_obj = hmac.new(shared_secret.encode('utf-8'), value.encode('utf-8'), sha1)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
@@ -63,9 +80,9 @@ def sign(params, signed_fields_key='orderPage_signedFields', full_sig_key='order
     params needs to be an ordered dict, b/c cybersource documentation states that order is important.
     Reverse engineered from PHP version provided by cybersource
     """
-    merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID', '')
-    order_page_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION', '7')
-    serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER', '')
+    merchant_id = get_cybersource_config().get('MERCHANT_ID', '')
+    order_page_version = get_cybersource_config().get('ORDERPAGE_VERSION', '7')
+    serial_number = get_cybersource_config().get('SERIAL_NUMBER', '')
 
     params['merchantID'] = merchant_id
     params['orderPage_timestamp'] = int(time.time() * 1000)
@@ -123,7 +140,7 @@ def get_purchase_params(cart):
     return params
 
 def get_purchase_endpoint():
-    return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
+    return get_cybersource_config().get('PURCHASE_ENDPOINT', '')
 
 def payment_accepted(params):
     """
@@ -215,7 +232,9 @@ def record_purchase(params, order):
 
 def get_processor_decline_html(params):
     """Have to parse through the error codes to return a helpful message"""
-    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
+
+    # see if we have an override in the microsites
+    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
 
     msg = dedent(_(
             """
@@ -238,7 +257,8 @@ def get_processor_decline_html(params):
 def get_processor_exception_html(exception):
     """Return error HTML associated with exception"""
 
-    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
+    # see if we have an override in the microsites
+    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     if isinstance(exception, CCProcessorDataException):
         msg = dedent(_(
                 """
