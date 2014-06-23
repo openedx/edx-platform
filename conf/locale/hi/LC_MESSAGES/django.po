@@ -67,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:24-0400\n"
+"POT-Creation-Date: 2014-06-19 00:16-0400\n"
 "PO-Revision-Date: 2014-03-28 05:40+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -403,15 +403,23 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -888,11 +896,9 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"आपकी फ़ाइल (ओं) को दर्ज़ कर लिया गया है। जैसे ही प्रस्तुति ग्रेड कर कर दी "
-"जाएगी, यह संदेश ग्रेडर की राय के साथ बदल दिया जाएगा।"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -912,6 +918,26 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -2922,18 +2948,65 @@ msgstr "निर्दिष्ट दूरस्थ शाखा उपलब
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "निर्दिष्ट शाखा पर स्विच करने में असमर्थ. अपनी शाखा नाम की जाँच करें."
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
-msgstr "प्रमाणीकरण में विफल {0}, त्रुटि {1}\n"
+#: lms/djangoapps/dashboard/support.py cms/templates/login.html
+#: cms/templates/register.html
+msgid "Email Address"
+msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "प्रमाणीकरण में विफल {0}\n"
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "पाठ्यक्रम आईडी"
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr ""
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "पासवर्ड निश्चित कर दिया गया "
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
 msgstr "सब ठीक है!"
@@ -2946,13 +3019,14 @@ msgstr "उपयोगकर्ता का नाम देना अनि�
 msgid "Must provide full name"
 msgstr "पूरा नाम देना आवश्यक है"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "ईमेल को समाप्त होना चाहिए"
+msgid "Email address must end in {domain}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "विफल - ईमेल {0} पहले से ही external_id के रूप में मौजूद है "
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -2964,24 +3038,24 @@ msgid "email address required (not username)"
 msgstr "ईमेल पते की आवश्यकता है (उपयोगकर्ता नाम की नहीं)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "ओह, इंटेग्रिटी त्रुटि, उपयोगकर्ता {0} बनाने में विफल"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "उपयोगकर्ता {0} सफलतापूर्वक बनाया गया!"
+msgid "User {user} created successfully!"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "उपयोगकर्ता इस ईमेल पते {0} से नहीं खोजा जा सका है"
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "उपयोगकर्ता नाम {0} - {1} के साथ उपयोगकर्ता को नहीं खोजा जा सका"
+msgid "Cannot find user with username {username} - {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "उपयोगकर्ता {0} नष्ट करें"
+msgid "Deleted user {username}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -3039,6 +3113,9 @@ msgstr ""
 msgid "Added Course"
 msgstr "पाठ्यक्रम जोड़ा गया"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -3071,16 +3148,16 @@ msgstr ""
 "की जांच करें। आउटपुट था: {0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "भंडार को {0} क्लोन करने में असफल "
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "सफलतापूर्वक शाखा का बदलाव: {branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "लोड किए गए पाठ्यक्रम {0} {1}<br/>में त्रुटियाँ:"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
@@ -3091,6 +3168,8 @@ msgstr "पाठ्यक्रम का नाम"
 msgid "Directory/ID"
 msgstr "निर्देशिका/आईडी"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Git प्रतिबद्ध"
@@ -3313,6 +3392,10 @@ msgstr "डेटा डाउनलोड"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "एनेलिटिक्स"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "मेट्रिक्स"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -4556,6 +4639,51 @@ msgstr "कोई कीमत नहीं चुनी गई है या �
 msgid "Skip to this view's content"
 msgstr "इस दृश्य के कन्टेन्ट पर जाएं"
 
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -5264,7 +5392,6 @@ msgid "Video"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr ""
 
@@ -5580,10 +5707,8 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
 msgstr ""
-"मुझे भुगतान क्यों करना होगा? तब क्या होगा अगर मैं सभी आवश्यकताओं को पूरा "
-"नहीं कर पाता या कर पाती?"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5626,34 +5751,19 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
-"अगर आप न्यूनतम शुल्क नहीं दे सकते या फिर आप कोर्स की आवश्यकताएं नहीं पूरी "
-"करते तो आप पाठ्यक्रम को ऑडिट कर सकते हैं या फिर निःशुल्क तौर पर ऑनर कोड "
-"प्रमाण पत्र के लिए पढ़ सकते हैं। अगर आप ऑनर कोड प्रमाण पत्र के लिए पढ़ना "
-"चाहें तो ऑनर कोड प्रमाण पत्र के डिब्बे को क्लिक करें और हमें लिख कर बताएं कि"
-" आप वेरीफ़ाइड प्रमाण पत्र को क्यों नहीं कर सकते। इसके बाद अपनी रजिस्ट्रेशन "
-"पूरी करने के लिए 'प्रमाण पत्र चुनें' बटन को क्लिक करें।"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "ऑनर कोड प्रमाणपत्र चुनें"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "अपनी स्थिति स्पष्ट करें:"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"कृपया कुछ वाक्यों में लिखें की आप भुगतान सहित वैरीफाईड प्रमाण पत्र को छोड़कर "
-"ऑनर कोड प्रमाण पत्र की और क्यों बढ़ना चाहते हैं:"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -5843,6 +5953,12 @@ msgstr "कुछ गड़बड़ हो गई। कृपया बाद 
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "कृपया अपना नया ई-मेल वैरीफ़ाई करें"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7227,11 +7343,6 @@ msgstr "प्लेटफ़ॉर्म संस्करण"
 msgid "Date"
 msgstr "तारीख़"
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "पाठ्यक्रम आईडी"
-
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7929,10 +8040,6 @@ msgid "Manage Groups"
 msgstr "समूहों का प्रबंधन करें"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "मेट्रिक्स"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
 msgstr "ग्रेड यहां से डाउनलोड करें"
 
@@ -8296,11 +8403,9 @@ msgstr "छात्रों की संख्या"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-"देशों के हिसाब से छात्रों का वितरण, सभी पाठ्यक्रम, सितम्बर-12 से अक्तूबर-17 "
-"तक, सरवर 1 (यहां एक उदाहरण के तौर पर दिखाया गया है):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9760,10 +9865,6 @@ msgid ""
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "भाग_डिस्प्ले_नाम"
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -10624,15 +10725,12 @@ msgstr "इतने आइटम ऑर्डर किए हैं:"
 msgid "Qty"
 msgstr "मात्रा"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "Note: items with strikethough like"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "भुगतान वापिस हो गया है।"
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -10802,10 +10900,6 @@ msgstr "ऑर्डर न."
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "कुल"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "यह"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -13176,10 +13270,6 @@ msgstr ""
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to edX Studio"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
 msgstr ""
 
 #: cms/templates/login.html

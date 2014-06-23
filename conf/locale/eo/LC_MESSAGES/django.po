@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-13 09:24-0400\n"
-"PO-Revision-Date: 2014-06-13 13:24:28.573689\n"
+"POT-Creation-Date: 2014-06-23 07:58-0400\n"
+"PO-Revision-Date: 2014-06-23 11:58:12.299623\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -382,21 +382,35 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
-"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {0} "
-"dïstïnçt pässwörd(s) ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
+" dïstïnçt pässwörd ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
+msgstr[1] ""
+"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
+" dïstïnçt pässwörds ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
-"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {0} "
-"däý(s) müst éläpsé ßétwéén pässwörd réséts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
+"däý müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+msgstr[1] ""
+"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
+"däýs müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -876,12 +890,12 @@ msgstr "Éxpéçtéd ä <choice> täg; göt {given_tag} ïnstéäd Ⱡ'σяєм 
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"Ýöür fïlé(s) hävé ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs"
-" méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя#"
+"Ýöür fïlés hävé ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs "
+"méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -905,6 +919,26 @@ msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 "Nö réspönsé fröm Xqüéüé wïthïn {xqueue_timeout} séçönds. Àßörtéd. Ⱡ'σяєм "
 "ιρѕυм ∂σ#"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "Çännöt çönnéçt tö thé qüéüé Ⱡ'σяєм#"
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "Nö förmülä spéçïfïéd. Ⱡ'σя#"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "Çöüldn't pärsé förmülä: {error_msg} Ⱡ'σяєм#"
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "Érrör whïlé réndérïng prévïéw Ⱡ'σяєм #"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "Sörrý, çöüldn't pärsé förmülä Ⱡ'σяєм #"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "{input_type}: unexpected tag {tag_name}"
@@ -2305,14 +2339,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"The configuration for how users are grouped for this content experiment. "
-"After you select the group configuration and save the content experiment, "
-"you cannot change this setting."
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
 msgstr ""
-"Thé çönfïgürätïön för höw üsérs äré gröüpéd för thïs çöntént éxpérïmént. "
-"Àftér ýöü séléçt thé gröüp çönfïgürätïön änd sävé thé çöntént éxpérïmént, "
-"ýöü çännöt çhängé thïs séttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłι#"
+"Thé çönfïgürätïön défïnés höw üsérs äré gröüpéd för thïs çöntént éxpérïmént."
+" Çäütïön: Çhängïng thé gröüp çönfïgürätïön öf ä stüdént-vïsïßlé éxpérïmént "
+"wïll ïmpäçt thé éxpérïmént dätä. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт,#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group Configuration"
@@ -2325,36 +2359,41 @@ msgstr ""
 " ∂σłσя#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/templates/split_test_studio_header.html
-msgid "You must select a group configuration for this content experiment."
+msgid "The experiment is not associated with a group configuration."
 msgstr ""
-"Ýöü müst séléçt ä gröüp çönfïgürätïön för thïs çöntént éxpérïmént. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
+"Thé éxpérïmént ïs nöt ässöçïätéd wïth ä gröüp çönfïgürätïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Select a Group Configuration"
+msgstr "Séléçt ä Gröüp Çönfïgürätïön Ⱡ'σяєм #"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"This content experiment will not be shown to students because it refers to a"
-" group configuration that has been deleted. You can delete this experiment "
-"or reinstate the group configuration to repair it."
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
 msgstr ""
-"Thïs çöntént éxpérïmént wïll nöt ßé shöwn tö stüdénts ßéçäüsé ït référs tö ä"
-" gröüp çönfïgürätïön thät häs ßéén délétéd. Ýöü çän délété thïs éxpérïmént "
-"ör réïnstäté thé gröüp çönfïgürätïön tö répäïr ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂#"
+"Thé éxpérïmént üsés ä délétéd gröüp çönfïgürätïön. Séléçt ä välïd gröüp "
+"çönfïgürätïön ör délété thïs éxpérïmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"This content experiment is in an invalid state and cannot be repaired. "
-"Please delete and recreate."
+"The experiment does not contain all of the groups in the configuration."
 msgstr ""
-"Thïs çöntént éxpérïmént ïs ïn än ïnvälïd stäté änd çännöt ßé répäïréd. "
-"Pléäsé délété änd réçréäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"Thé éxpérïmént döés nöt çöntäïn äll öf thé gröüps ïn thé çönfïgürätïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid "This content experiment uses group configuration '{experiment_name}'."
+msgid "Add Missing Groups"
+msgstr "Àdd Mïssïng Gröüps Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
 msgstr ""
-"Thïs çöntént éxpérïmént üsés gröüp çönfïgürätïön '{experiment_name}'. Ⱡ'σяєм"
-" ιρѕυм ∂σł#"
+"Thé éxpérïmént häs än ïnäçtïvé gröüp. Mövé çöntént ïntö äçtïvé gröüps, thén "
+"délété thé ïnäçtïvé gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
@@ -3212,22 +3251,70 @@ msgstr ""
 "Ûnäßlé tö swïtçh tö spéçïfïéd ßränçh. Pléäsé çhéçk ýöür ßränçh nämé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕ#"
 
+#: lms/djangoapps/dashboard/support.py cms/templates/login.html
+#: cms/templates/register.html
+msgid "Email Address"
+msgstr "Émäïl Àddréss Ⱡ'#"
+
+#: lms/djangoapps/dashboard/support.py
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "Çöürsé ÌD #"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr "Ûsér nöt föünd Ⱡ'#"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr "Ìnvälïd çöürsé ïd Ⱡ'σ#"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr "Çöürsé {course_id} nöt päst thé réfünd wïndöw. Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr "Nö ördér föünd för {user} ïn çöürsé {course_id} Ⱡ'σяєм ιρ#"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr "Ûnénrölléd {user} fröm {course_id} Ⱡ'σяє#"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr "Réfündéd {cost} för ördér ïd {order_id} Ⱡ'σяєм #"
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
+msgid "Failed in authenticating {username}, error {error}\n"
 msgstr ""
-"Fäïléd ïn äüthéntïçätïng {0}, érrör {1}\n"
+"Fäïléd ïn äüthéntïçätïng {username}, érrör {error}\n"
 " Ⱡ'σяєм ιρѕυ#\n"
 
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
+msgid "Failed in authenticating {username}\n"
 msgstr ""
-"Fäïléd ïn äüthéntïçätïng {0}\n"
+"Fäïléd ïn äüthéntïçätïng {username}\n"
 " Ⱡ'σяєм #\n"
 
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "fïxéd pässwörd Ⱡ'#"
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
 msgstr "Àll ök! #"
@@ -3240,13 +3327,15 @@ msgstr "Müst prövïdé üsérnämé Ⱡ'σя#"
 msgid "Must provide full name"
 msgstr "Müst prövïdé füll nämé Ⱡ'σяє#"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "émäïl müst énd ïn Ⱡ'σ#"
+msgid "Email address must end in {domain}"
+msgstr "Émäïl äddréss müst énd ïn {domain} Ⱡ'σяєм #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "Fäïléd - émäïl {0} älréädý éxïsts äs éxtérnäl_ïd Ⱡ'σяєм ιρѕυм #"
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
+"Fäïléd - émäïl {email_addr} älréädý éxïsts äs {external_id} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -3257,24 +3346,24 @@ msgid "email address required (not username)"
 msgstr "émäïl äddréss réqüïréd (nöt üsérnämé) Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "Ööps, fäïléd tö çréäté üsér {0}, ÌntégrïtýÉrrör Ⱡ'σяєм ιρѕυм #"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr "Ööps, fäïléd tö çréäté üsér {user}, {error} Ⱡ'σяєм ιρ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "Ûsér {0} çréätéd süççéssfüllý! Ⱡ'σяєм #"
+msgid "User {user} created successfully!"
+msgstr "Ûsér {user} çréätéd süççéssfüllý! Ⱡ'σяєм #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "Çännöt fïnd üsér wïth émäïl äddréss {0} Ⱡ'σяєм ιρѕ#"
+msgid "Cannot find user with email address {email_addr}"
+msgstr "Çännöt fïnd üsér wïth émäïl äddréss {email_addr} Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "Çännöt fïnd üsér wïth üsérnämé {0} - {1} Ⱡ'σяєм ιρѕυ#"
+msgid "Cannot find user with username {username} - {error}"
+msgstr "Çännöt fïnd üsér wïth üsérnämé {username} - {error} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "Délétéd üsér {0} Ⱡ'σ#"
+msgid "Deleted user {username}"
+msgstr "Délétéd üsér {username} Ⱡ'σ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -3328,6 +3417,9 @@ msgstr ""
 msgid "Added Course"
 msgstr "Àddéd Çöürsé Ⱡ#"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -3361,16 +3453,16 @@ msgstr ""
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "Fäïléd tö çlöné répösïtörý tö {0} Ⱡ'σяєм ι#"
+msgid "Failed to clone repository to {directory_name}"
+msgstr "Fäïléd tö çlöné répösïtörý tö {directory_name} Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "Süççéssfüllý swïtçhéd tö ßränçh: {branch_name} Ⱡ'σяєм ιρ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "Löädéd çöürsé {0} {1}<br/>Érrörs: Ⱡ'σяєм ι#"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr "Löädéd çöürsé {course_name}<br/>Érrörs: Ⱡ'σяєм#"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
@@ -3381,6 +3473,8 @@ msgstr "Çöürsé Nämé Ⱡ#"
 msgid "Directory/ID"
 msgstr "Dïréçtörý/ÌD Ⱡ#"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Gït Çömmït Ⱡ#"
@@ -3612,6 +3706,11 @@ msgstr "Dätä Döwnlöäd Ⱡ'#"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "Ànälýtïçs #"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "Métrïçs #"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -4917,6 +5016,51 @@ msgstr ""
 msgid "Skip to this view's content"
 msgstr "Skïp tö thïs vïéw's çöntént Ⱡ'σяєм#"
 
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr "Mänüäl Réfünd Ⱡ'#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr "Àßöüt tö réfünd thïs ördér: Ⱡ'σяєм#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr "Ördér Ìd: #"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr "Énröllmént: Ⱡ#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr "énrölléd #"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr "ünénrölléd Ⱡ#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr "Çöst: Ⱡ'σяєм ι#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr "ÇértïfïçätéÌtém Stätüs: Ⱡ'σяє#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr "Ördér Stätüs: Ⱡ'#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr "Fülfïlléd Tïmé: Ⱡ'#"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr "Réfünd Réqüést Tïmé: Ⱡ'σя#"
+
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -5653,7 +5797,6 @@ msgid "Video"
 msgstr "Vïdéö Ⱡ'σяєм ι#"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Blänk Ⱡ'σяєм ι#"
 
@@ -5984,10 +6127,10 @@ msgid "):"
 msgstr "): Ⱡ'#"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
 msgstr ""
-"Whý dö Ì hävé tö päý? Whät ïf Ì dön't méét äll thé réqüïréménts? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
+"Whý dö Ì hävé tö päý? Whät ïf Ì wänt ä fréé hönör çödé çértïfïçäté? Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -6030,36 +6173,26 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
 "Ìf ýöü çän't äfförd thé mïnïmüm féé ör dön't méét thé réqüïréménts, ýöü çän "
-"äüdït thé çöürsé ör éléçt tö pürsüé än hönör çödé çértïfïçäté ät nö çöst. Ìf"
-" ýöü wöüld lïké tö pürsüé thé hönör çödé çértïfïçäté, pléäsé çhéçk thé hönör"
-" çödé çértïfïçäté ßöx, téll üs whý ýöü çän't pürsüé thé vérïfïéd çértïfïçäté"
-" ßélöw, änd thén çlïçk thé 'Séléçt Çértïfïçäté' ßüttön tö çömplété ýöür "
-"régïsträtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂"
-" ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. #"
+"äüdït thé çöürsé ör éléçt tö pürsüé än hönör çödé çértïfïçäté ät nö çöst. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
+"Ìf ýöü wöüld lïké tö pürsüé thé hönör çödé çértïfïçäté, pléäsé çhéçk thé "
+"hönör çödé çértïfïçäté ßöx änd thén çlïçk thé 'Séléçt Çértïfïçäté' ßüttön tö"
+" çömplété ýöür régïsträtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłι#"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "Séléçt Hönör Çödé Çértïfïçäté Ⱡ'σяєм #"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "Éxpläïn ýöür sïtüätïön:  Ⱡ'σяє#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"Pléäsé wrïté ä féw sénténçés äßöüt whý ýöü'd lïké tö öpt öüt öf thé päïd "
-"vérïfïéd çértïfïçäté tö pürsüé thé hönör çödé çértïfïçäté: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -6270,6 +6403,14 @@ msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "Pléäsé vérïfý ýöür néw émäïl Ⱡ'σяєм #"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
+"Ýöü'll réçéïvé ä çönfïrmätïön ïn ýöür ïnßöx. Pléäsé çlïçk thé lïnk ïn thé "
+"émäïl tö çönfïrm thé émäïl çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7491,15 +7632,31 @@ msgstr "Àlréädý hävé än äççöünt? Ⱡ'σяє#"
 msgid "Login."
 msgstr "Lögïn. Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+"Thïs çöntént éxpérïmént üsés gröüp çönfïgürätïön '{experiment_name}'. Ⱡ'σяєм"
+" ιρѕυм ∂σł#"
+
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment has issues that affect content visibility."
+msgstr ""
+"Thïs çöntént éxpérïmént häs ïssüés thät äfféçt çöntént vïsïßïlïtý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/templates/split_test_author_view.html
+msgid "Active Groups"
+msgstr "Àçtïvé Gröüps Ⱡ'#"
+
+#: lms/templates/split_test_author_view.html
+msgid "Inactive Groups"
+msgstr "Ìnäçtïvé Gröüps Ⱡ'#"
+
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
 msgid "Group {group_id}"
 msgstr "Gröüp {group_id} #"
-
-#: lms/templates/split_test_studio_header.html
-msgid "Select a Group Configuration"
-msgstr "Séléçt ä Gröüp Çönfïgürätïön Ⱡ'σяєм #"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
@@ -7700,11 +7857,6 @@ msgstr "Plätförm Vérsïön Ⱡ'σ#"
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
 msgstr "Däté Ⱡ'σяєм#"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "Çöürsé ÌD #"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -8430,10 +8582,6 @@ msgid "Manage Groups"
 msgstr "Mänägé Gröüps Ⱡ'#"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "Métrïçs #"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
 msgstr "Grädé Döwnlöäds Ⱡ'#"
 
@@ -8810,10 +8958,10 @@ msgstr "Nümßér öf stüdénts Ⱡ'σ#"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-"Stüdént dïstrïßütïön pér çöüntrý, äll çöürsés, Sép-12 tö Öçt-17, 1 sérvér "
+"Stüdént dïstrïßütïön pér çöüntrý, äll çöürsés, Sép 12 tö Öçt 17, 1 sérvér "
 "(shöwn héré äs än éxämplé): Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -10406,10 +10554,6 @@ msgstr ""
 "çlïçkïng thé 'Révért tö Légäçý Däshßöärd' ßüttön äßövé. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ #"
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "séçtïön_dïspläý_nämé Ⱡ'σя#"
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -11311,15 +11455,14 @@ msgstr "Ìtéms ördéréd: Ⱡ'#"
 msgid "Qty"
 msgstr "Qtý Ⱡ'σя#"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "Nöté: ïtéms wïth strïkéthöügh lïké  Ⱡ'σяєм ιρ#"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr " hävé ßéén réfündéd. Ⱡ'σя#"
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
+"Nöté: ïtéms wïth strïkéthöügh lïké <del>thïs</del> hävé ßéén réfündéd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -11490,10 +11633,6 @@ msgstr "Ördér Nö. #"
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "Tötäl Ⱡ'σяєм ι#"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "thïs Ⱡ'σяєм#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -14154,10 +14293,6 @@ msgstr "Dön't hävé ä Stüdïö Àççöünt? Sïgn üp! Ⱡ'σяєм ιρѕ#
 msgid "Required Information to Sign In to edX Studio"
 msgstr "Réqüïréd Ìnförmätïön tö Sïgn Ìn tö édX Stüdïö Ⱡ'σяєм ιρѕυм#"
 
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr "Émäïl Àddréss Ⱡ'#"
-
 #: cms/templates/login.html
 msgid "Studio Support"
 msgstr "Stüdïö Süppört Ⱡ'#"
@@ -15297,27 +15432,6 @@ msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr ""
 "Hävé prößléms, qüéstïöns, ör süggéstïöns äßöüt édX Stüdïö? Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
-
-#: cms/templates/widgets/split-edit.html
-msgid ""
-"This content experiment refers to a group configuration that has been "
-"deleted."
-msgstr ""
-"Thïs çöntént éxpérïmént référs tö ä gröüp çönfïgürätïön thät häs ßéén "
-"délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-
-#: cms/templates/widgets/split-edit.html
-msgid "This content experiment uses group configuration '{0}'."
-msgstr ""
-"Thïs çöntént éxpérïmént üsés gröüp çönfïgürätïön '{0}'. Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: cms/templates/widgets/split-edit.html
-msgid ""
-"After you select the group configuration and save the content experiment, "
-"you cannot change this setting."
-msgstr ""
-"Àftér ýöü séléçt thé gröüp çönfïgürätïön änd sävé thé çöntént éxpérïmént, "
-"ýöü çännöt çhängé thïs séttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

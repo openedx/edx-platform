@@ -69,6 +69,7 @@
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # ClaudeCoulombe <claude.coulombe@gmail.com>, 2014
+# derthy <derthiamj@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
@@ -136,7 +137,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:24-0400\n"
+"POT-Creation-Date: 2014-06-19 00:16-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -473,15 +474,23 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -960,11 +969,9 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"Votre/vos fichier(s) ont été soumis. Dès que votre soumission sera évaluée, "
-"ce message sera remplacé par le commentaire de votre évaluateur."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -984,6 +991,26 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -3010,18 +3037,64 @@ msgstr ""
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
-msgstr "Échec dans l'authentification {0}, erreur {1}\n"
+#: cms/templates/login.html cms/templates/register.html
+msgid "Email Address"
+msgstr "Adresse email"
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "Échec lors de l’authentification {0}\n"
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "ID de Cours"
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr ""
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "mot de passe fixé"
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
 msgstr "Tout est ok!"
@@ -3034,13 +3107,14 @@ msgstr "Vous devez fournir un nom d'utilisateur"
 msgid "Must provide full name"
 msgstr "Vous devez fournir un nom complet"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "L'e-mail doit se terminer par"
+msgid "Email address must end in {domain}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "Echec - l'e-mail {0} existe déjà en tant que external_id"
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -3052,25 +3126,24 @@ msgid "email address required (not username)"
 msgstr "adresse email requise (pas de nom d'utilisateur)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "Oups, impossible de créer l'utilisateur {0}, IntegrityError"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "Utilisateur {0} créé avec succès !"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "Impossible de trouver l’utilisateur avec l’adresse e-mail {0}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
+msgid "Oops, failed to create user {user}, {error}"
 msgstr ""
-"Impossible de trouver l’utilisateur avec le nom d’utilisateur {0} - {1}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "Utilisateur {0} supprimé"
+msgid "User {user} created successfully!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Cannot find user with username {username} - {error}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Deleted user {username}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -3123,6 +3196,9 @@ msgstr ""
 msgid "Added Course"
 msgstr "Cours ajouté"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -3153,16 +3229,16 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "Échec lors du clonage du répertoire vers {0}"
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "Cours chargé {0} {1}<br/>Erreurs :"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
@@ -3178,6 +3254,8 @@ msgstr ""
 msgid "Directory/ID"
 msgstr "Dossier/ID"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Git Commit"
@@ -3414,6 +3492,10 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "Analyses"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "Métriques"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -4658,6 +4740,51 @@ msgstr ""
 msgid "Skip to this view's content"
 msgstr "Passer au contenu de cette vue"
 
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -4670,8 +4797,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"Votre mot de passe a été enregistré. Vous devriez continuer et vous %(link_start)sconnecter%(link_end)s maintenant.\n"
-"      "
+"Votre mot de passe a été enregistré. Vous pouvez vous %(link_start)sconnecter%(link_end)s maintenant."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -5371,7 +5497,6 @@ msgid "Video"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr ""
 
@@ -5696,10 +5821,8 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
 msgstr ""
-"Pourquoi dois-je payer ? Que se passe-t-il si je n'ai pas tous les prérequis"
-" ?"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5742,34 +5865,19 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
-"Si vous ne pouvez offrir la somme minimum requise ou vous ne remplissez pas "
-"les pré-requis, vous pouvez suivre le cours, et obtenir une Attestation "
-"d'Honneur gratuitement. Si vous voulez obtenir l'Attestation d'Honneur, "
-"merci de cocher la case Attestation d'Honneur, nous indiquer pourquoi vous "
-"ne souhaitez pas l'Attestation Vérifiée en dessous, et cliquez sur le bouton"
-" \"Choisissez l'Attestation\" pour compléter votre inscription."
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "Choisir l'Attestation d'Honneur"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "Expliquez votre situation :"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"Merci d'expliquer en quelques phrases pourquoi vous souhaitez vous inscrire "
-"pour l'Attestation d'honneur au lieu de l'Attestation vérifiée payante :"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -5961,6 +6069,12 @@ msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "Veuillez vérifier votre nouvelle adresse email"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7361,11 +7475,6 @@ msgstr "Version de la plateforme"
 msgid "Date"
 msgstr "Date"
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "ID de Cours"
-
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7992,7 +8101,7 @@ msgstr "Rechercher des étudiants"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
-msgstr "Infos sur le {course_number}"
+msgstr "Infos du cours {course_number}"
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -8064,10 +8173,6 @@ msgstr "Données Brutes"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
 msgstr "Gestion des groupes"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "Métriques"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -8437,11 +8542,9 @@ msgstr "Nombre d'étudiants"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-"Répartition des étudiants par pays, tous les cours, 12 Sept au 17 Oct, 1 "
-"serveur (montré ici en tant qu'exemple) :"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9901,10 +10004,6 @@ msgid ""
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "section_affichage_nom"
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -10736,15 +10835,12 @@ msgstr "Éléments commandés :"
 msgid "Qty"
 msgstr "Qté"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "Attention: les éléments soulignés tel que"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "ont été remboursés."
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -10914,10 +11010,6 @@ msgstr "Commande N°"
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "Total"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "Ceci"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -13440,10 +13532,6 @@ msgstr "Pas de compte Studio ? Inscrivez vous !"
 #: cms/templates/login.html
 msgid "Required Information to Sign In to edX Studio"
 msgstr "Information requise pour se connecter à edX Studio"
-
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr "Adresse email"
 
 #: cms/templates/login.html
 msgid "Studio Support"
