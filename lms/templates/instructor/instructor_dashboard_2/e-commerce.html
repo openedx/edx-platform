@@ -5,8 +5,10 @@
 
 <div class="ecommerce-wrapper">
   <h2>${_("Coupons List")}</h2>
-   <h3 class="coupon-errors" id="coupon-error"></h3>
-  <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"  class="add blue-button">${_("+ Add Coupon")}</a></span>
+
+  <h3 class="coupon-errors" id="coupon-error"></h3>
+  <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
+                                                   class="add blue-button">${_("+ Add Coupon")}</a></span>
 </div>
 <div class="wrapper-content wrapper">
   <section class="content">
@@ -18,20 +20,26 @@
         <th class="c_dsc">${_("Description")}</th>
         <th class="c_course_id">${_("Course_id")}</th>
         <th class="c_discount">${_("Percentage Discount")}</th>
-        <!--<th class="cur">${_("Is Active")}</th>-->
         <th class="c_action">${_("Actions")}</th>
       </tr>
       </thead>
 
       <tbody>
       %for coupon in section_data['coupons']:
+      %if coupon.is_active == False:
+      <tr class="coupons-items inactive_coupon">
+      %else:
       <tr class="coupons-items">
+      %endif
         <td>${coupon.code}</td>
+
         <td>${coupon.description}</td>
         <td>${coupon.course_id.to_deprecated_string()}</td>
         <td>${coupon.percentage_discount}</td>
-        <!--<td>${coupon.is_active}</td>-->
-        <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a></td>
+        <td>
+          <a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a>
+          <a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a>
+        </td>
       </tr>
       %endfor
       </tbody>
@@ -43,22 +51,36 @@
 
 
 <script>
-  $(function() {
+  $(function () {
     $('a[rel*=leanModal]').leanModal();
-    $('a.edit-right').click(function(event){
+    $.each($("a.edit-right"), function () {
+      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+        $(this).removeAttr('href')
+      }
+    });
+    $.each($("a.remove_coupon"), function () {
+      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+        $(this).removeAttr('href')
+      }
+    });
+    $('a.edit-right').click(function (event) {
       $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
       $('#edit_coupon_form #coupon_form_error').text();
-      $(this).attr('disabled', true);
       event.preventDefault();
       event.stopPropagation();
       var coupon_id = $(this).data('item-id');
-      $('#coupon_id').val(coupon_id)
+      $('#coupon_id').val(coupon_id);
+      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+        return false;
+      }
       $.ajax({
         type: "POST",
-        data:{id:coupon_id},
+        data: {id: coupon_id},
         url: "${section_data['ajax_edit_coupon_info']}",
         success: function (resp) {
           if (resp.success) {
+            $('#coupon-error').val('');
+            $('#coupon-error').attr('style', 'display: none');
             $('input#edit_coupon_code').val(resp.coupon_code);
             $('input#edit_coupon_discount').val(resp.coupon_discount);
             $('textarea#edit_coupon_description').val(resp.coupon_description);
@@ -71,36 +93,41 @@
         }
       });
     });
-    $('a.remove_coupon').click(function(event) {
+    $('a.remove_coupon').click(function (event) {
       var anchor = $(this);
       if (anchor.data("disabled")) {
-          return false;
+        return false;
       }
       anchor.data("disabled", "disabled");
       event.preventDefault();
+      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+        return false;
+      }
       $.ajax({
         type: "POST",
-        data:{id:$(this).data('item-id')},
+        data: {id: $(this).data('item-id')},
         url: "${section_data['ajax_remove_coupon_url']}",
         success: function (resp) {
           if (resp.success) {
             location.reload(true);
           }
           else {
+            $('#coupon-error').val('');
+            $('#coupon-error').attr('style', 'display: none');
             $('#coupon-error').html(resp.message).show();
             anchor.removeData("disabled");
           }
         }
       });
     });
-    $('#edit_coupon_form').submit(function(){
+    $('#edit_coupon_form').submit(function () {
       $("#update_coupon_button").attr('disabled', true);
       // Get the Code and Discount value and trim it
       var code = $.trim($('#edit_coupon_code').val());
       var coupon_discount = $.trim($('#edit_coupon_discount').val());
 
       // Check if empty of not
-      if (code  === '') {
+      if (code === '') {
         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
         $("#update_coupon_button").removeAttr('disabled');
@@ -112,14 +139,14 @@
         $("#update_coupon_button").removeAttr('disabled');
         return false;
       }
-      if(!$.isNumeric(coupon_discount)) {
+      if (!$.isNumeric(coupon_discount)) {
         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
         $("#update_coupon_button").removeAttr('disabled');
         return false;
       }
     });
-    $('#add_coupon_link').click(function(){
+    $('#add_coupon_link').click(function () {
       reset_input_fields();
     });
     $('#add_coupon_form').submit(function () {
@@ -129,7 +156,7 @@
       var coupon_discount = $.trim($('#coupon_discount').val());
 
       // Check if empty of not
-      if (code  === '') {
+      if (code === '') {
         $("#add_coupon_button").removeAttr('disabled');
         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
@@ -141,7 +168,7 @@
         $("#add_coupon_button").removeAttr('disabled');
         return false;
       }
-      if(!$.isNumeric(coupon_discount)) {
+      if (!$.isNumeric(coupon_discount)) {
         $("#add_coupon_button").removeAttr('disabled');
         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Numeric value for Discount')}");
@@ -149,9 +176,9 @@
       }
     });
 
-    $('#add_coupon_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
-         location.reload(true);
+    $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
+      if (xhr.status == 200) {
+        location.reload(true);
       } else {
         $("#add_coupon_button").removeAttr('disabled');
         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
@@ -159,24 +186,24 @@
       }
     });
 
-    $('#edit_coupon_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
+    $('#edit_coupon_form').on('ajax:complete', function (event, xhr) {
+      if (xhr.status == 200) {
         location.reload(true);
       } else {
         $("#update_coupon_button").removeAttr('disabled');
         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#edit_coupon_form #coupon_form_error').text(xhr.responseText);
-        }
+      }
     });
     // removing close link's default behavior
-    $('.close-modal').click(function(e) {
+    $('.close-modal').click(function (e) {
       $("#update_coupon_button").removeAttr('disabled');
       $("#add_coupon_button").removeAttr('disabled');
       reset_input_fields();
       e.preventDefault();
     });
 
-    var onModalClose = function() {
+    var onModalClose = function () {
       $("#add-coupon-modal").attr("aria-hidden", "true");
       $(".remove_coupon").focus();
       $("#edit-coupon-modal").attr("aria-hidden", "true");
@@ -186,8 +213,8 @@
       reset_input_fields();
     };
 
-    var cycle_modal_tab = function(from_element_name, to_element_name) {
-      $(from_element_name).on('keydown', function(e) {
+    var cycle_modal_tab = function (from_element_name, to_element_name) {
+      $(from_element_name).on('keydown', function (e) {
         var keyCode = e.keyCode || e.which;
         var TAB_KEY = 9;  // 9 corresponds to the tab key
         if (keyCode === TAB_KEY) {
@@ -203,7 +230,7 @@
 
 
     // Hitting the ESC key will exit the modal
-    $("#add-coupon-modal, #edit-coupon-modal").on("keydown", function(e) {
+    $("#add-coupon-modal, #edit-coupon-modal").on("keydown", function (e) {
       var keyCode = e.keyCode || e.which;
       // 27 is the ESC key
       if (keyCode === 27) {
@@ -213,7 +240,9 @@
       }
     });
   });
-  var reset_input_fields = function(){
+  var reset_input_fields = function () {
+    $('#coupon-error').val('');
+    $('#coupon-error').attr('style', 'display: none');
     $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
     $('#add_coupon_form #coupon_form_error').text();
     $('input#coupon_code').val('');
