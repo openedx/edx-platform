@@ -604,7 +604,7 @@ def course_about(request, course_id):
     # 2) course specifies it's okay
     # 3) request.user is not a registered user.
     sneakpeek_allowed = (has_access(request.user, 'within_enrollment_period', course) and
-                         CoursePreference.course_allows_nonregistered_access(course.id.to_deprecated_string()) and
+                         CoursePreference.course_allows_nonregistered_access(course_key) and
                          not UserProfile.has_registered(request.user))
 
     # see if we have already filled up all allowed enrollments

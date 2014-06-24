@@ -25,7 +25,7 @@ def url_class(is_active):
   <p class="unauth-warning">
   <%
   if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
-    reg_url = reverse('course-specific-register', args=[course.id])
+    reg_url = reverse('course-specific-register', args=[course.id.to_deprecated_string()])
   else:
     reg_url = reverse('register_user')
   %>

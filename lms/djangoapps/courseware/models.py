@@ -267,7 +267,7 @@ class CoursePreference(models.Model):
     of the course xmodule (advanced settings).
     A good example is whether this course allows nonregistered users to access it.
     """
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     pref_key = models.CharField(max_length=255)
     pref_value = models.CharField(max_length=255, null=True)
 
