@@ -86,14 +86,14 @@ def perform_request(method, url, data_or_params=None, raw=False,
         )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
-    if response.status_code > 200:
-        metric_tags.append(u'result:failure')
-    else:
+    if 200 <= response.status_code < 300:
         metric_tags.append(u'result:success')
+    else:
+        metric_tags.append(u'result:failure')
 
     dog_stats_api.increment('comment_client.request.count', tags=metric_tags)
 
-    if 200 < response.status_code < 500:
+    if 300 <= response.status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
     elif response.status_code == 503:
