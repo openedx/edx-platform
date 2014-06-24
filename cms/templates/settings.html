@@ -226,8 +226,19 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 % endif
 
                 <li class="field text" id="field-enable-enrollment-email">
+                  <label for="course-email">${_("Course Enrollment Email")}</label>
                   <input type="checkbox" id="enable-enrollment-email"/>
                   <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
+                </li>
+
+                <li class="field text" id="field-enable-default-enrollment-email">
+                  <input type="checkbox" id="enable-default-enrollment-email"/>
+                  <label for="enable-enrollment-email">${_("Use default enrollment emails")}</label>
+                </li>
+
+                <li class="field text" id="field-pre-enrollment-email-subject">
+                  <label for="pre-enrollment-email-subject">${_("Subject of the Email sent to students who enroll before the course starts")}</label>
+                  <textarea class = 'text' id="pre-enrollment-email-subject"></textarea>
                 </li>
 
                 <li class="field text" id="field-pre-enrollment-email">
@@ -241,6 +252,10 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                           ${_("Send me a test email")}</a>
                     </li>
                   </ul>
+                </li>
+                <li class="field text" id="field-post-enrollment-email-subject">
+                  <label for="post-enrollment-email-subject">${_("Subject of the Email sent to students who enroll after the course starts")}</label>
+                  <textarea class = 'text' id="post-enrollment-email-subject"></textarea>
                 </li>
 
                 <li class="field text" id="field-post-enrollment-email">

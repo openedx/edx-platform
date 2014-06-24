@@ -3,7 +3,7 @@ import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-from student.views import reactivation_email_for_user, change_email_request, confirm_email_change
+from student.views import reactivation_email_for_user, change_email_request, confirm_email_change, notify_enrollment_by_email
 from student.models import UserProfile, PendingEmailChange
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
@@ -14,7 +14,8 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from util.request import safe_get_host
 from textwrap import dedent
-
+from microsite_configuration import microsite
+from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestException(Exception):
     """Exception used for testing that nothing will catch explicitly"""
@@ -57,6 +58,48 @@ class EmailTestMixin(object):
         """ Append hostname to settings.ALLOWED_HOSTS """
         settings.ALLOWED_HOSTS.append(hostname)
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
+
+class EnrollmentEmailTests(TestCase):
+    """ Test senging automated emails to users upon course enrollment. """
+
+    def setUp(self):
+        # Test Contstants
+        COURSE_SLUG = "100"
+        COURSE_NAME = "test_course"
+        COURSE_ORG = "EDX"
+
+        self.user = UserFactory.create(username="tester", email="tester@gmail.com", password="test")
+        self.course = CourseFactory.create(org=COURSE_ORG, display_name=COURSE_NAME, number=COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.request = RequestFactory().post('random_url')
+        self.request.user = self.user
+
+    def send_enrollment_email(self):
+        """ Send enrollment email to the user and return the Json response data. """
+        return json.loads(notify_enrollment_by_email(self.course, self.user, self.request).content)
+
+    def test_disabled_email_case(self):
+        """ Make sure emails don't fire when enable_enrollment_email setting is disabled. """
+        self.course.enable_enrollment_email = False
+        email_result = self.send_enrollment_email()
+        self.assertIn('email_did_fire', email_result)
+        self.assertFalse(email_result['email_did_fire'])
+
+    def test_custom_enrollment_email_sent(self):
+        """ Test sending of enrollment emails when enable_default_enrollment_email setting is disabled. """
+        self.course.enable_enrollment_email = True
+        self.course.enable_default_enrollment_email = False
+        email_result = self.send_enrollment_email()
+        self.assertNotIn('email_did_fire', email_result)
+        self.assertIn('is_success', email_result)
+
+    def test_default_enrollment_email_sent(self):
+        """ Test sending of enrollment emails when enable_default_enrollment_email setting is enabled. """
+        self.course.enable_enrollment_email = True
+        self.course.enable_default_enrollment_email = True
+        email_result = self.send_enrollment_email()
+        self.assertNotIn('email_did_fire', email_result)
+        self.assertIn('is_success', email_result)
 
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))

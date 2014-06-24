@@ -26,10 +26,14 @@ class CourseDetails(object):
         self.overview = ""  # html to render as the overview
         self.pre_enrollment_email = ""  # html to render as the pre-enrollment email
         self.post_enrollment_email = ""  # html to render as the post-enrollment email
+        self.pre_enrollment_email_subject = "" # header of the pre_enrollment_email
+        self.post_enrollment_email_subject = "" # header of the post_enrollment_email
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.enable_enrollment_email = False
+        self.enable_default_enrollment_email = True
 
     @classmethod
     def fetch(cls, course_key):
@@ -45,6 +49,8 @@ class CourseDetails(object):
         course_details.enrollment_end = descriptor.enrollment_end
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.enable_enrollment_email = descriptor.enable_enrollment_email
+        course_details.enable_default_enrollment_email = descriptor.enable_default_enrollment_email
 
         temploc = course_key.make_usage_key('about', 'syllabus')
         try:
@@ -63,16 +69,26 @@ class CourseDetails(object):
             course_details.overview = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
+        temploc = course_key.make_usage_key('about', 'pre_enrollment_email_subject')
+        try:
+            course_details.pre_enrollment_email_subject = modulestore().get_item(temploc).data
+        except ItemNotFoundError:
+            pass
+        temploc = course_key.make_usage_key('about', 'post_enrollment_email_subject')
+        try:
+            course_details.post_enrollment_email_subject = modulestore().get_item(temploc).data
+        except ItemNotFoundError:
+            pass
 
         temploc = course_key.make_usage_key('about', 'pre_enrollment_email')
         try:
-            course.pre_enrollment_email = get_modulestore(temploc).get_item(temploc).data
+            course_details.pre_enrollment_email = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = course_key.make_usage_key('about', 'post_enrollment_email')
         try:
-            course.post_enrollment_email = get_modulestore(temploc).get_item(temploc).data
+            course_details.post_enrollment_email = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
@@ -124,6 +140,16 @@ class CourseDetails(object):
         # into the model is nasty, convert the JSON Date to a Python date, which is what the
         # setter expects as input.
         date = Date()
+        
+        # Added to allow admins to enable/disable default enrollment emails
+        if 'enable_default_enrollment_email' in jsondict:
+            descriptor.enable_default_enrollment_email = jsondict['enable_default_enrollment_email']
+            dirty = True
+
+        # Added to allow admins to enable/disable enrollment emails
+        if 'enable_enrollment_email' in jsondict:
+            descriptor.enable_enrollment_email = jsondict['enable_enrollment_email']
+            dirty=True
 
         if 'start_date' in jsondict:
             converted = date.from_json(jsondict['start_date'])
@@ -169,7 +195,9 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        for about_type in ['syllabus', 'overview', 'effort', 'short_description', 'pre_enrollment_email', 'post_enrollment_email']:
+        for about_type in ['syllabus', 'overview', 'effort', 'short_description', 
+                           'pre_enrollment_email', 'post_enrollment_email', 'pre_enrollment_email_subject', 
+                           'post_enrollment_email_subject']:
             cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)
 
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])

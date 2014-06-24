@@ -13,6 +13,7 @@ var DetailsView = ValidatingView.extend({
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
         'click #enable-enrollment-email' : "toggleEnrollmentEmails",
+        'click #enable-default-enrollment-email' : "toggleDefaultEnrollmentEmails",
         'focus #pre-enrollment-email' : "codeMirrorize",
         'focus #post-enrollment-email' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
@@ -43,6 +44,21 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+
+        /* Memoize html elements for enrollment emails */
+
+        this.pre_enrollment_email_elem = this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email']);
+        this.pre_enrollment_email_subject_elem = this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email_subject']);
+        this.pre_enrollment_email_field = this.$el.find('#field-pre-enrollment-email');
+        this.pre_enrollment_email_subject_field = this.$el.find('#field-pre-enrollment-email-subject');
+
+        this.post_enrollment_email_elem = this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email']);
+        this.post_enrollment_email_subject_elem = this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email_subject']);
+        this.post_enrollment_email_field = this.$el.find('#field-post-enrollment-email');
+        this.post_enrollment_email_subject_field = this.$el.find('#field-post-enrollment-email-subject');
+
+        this.enable_enrollment_email_box = this.$el.find('#' + this.fieldToSelectorMap['enable_enrollment_email'])[0];
+        this.enable_default_enrollment_email_box = this.$el.find('#' + this.fieldToSelectorMap['enable_default_enrollment_email'])[0];
     },
 
     render: function() {
@@ -54,11 +70,30 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
-        this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email']).val(this.model.get('pre_enrollment_email'));
+        this.pre_enrollment_email_subject_elem.val(this.model.get('pre_enrollment_email_subject'));
+        this.post_enrollment_email_subject_elem.val(this.model.get('post_enrollment_email_subject'));
+
+        this.pre_enrollment_email_elem.val(this.model.get('pre_enrollment_email'));
         this.codeMirrorize(null, $('#pre-enrollment-email')[0]);
 
-        this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email']).val(this.model.get('post_enrollment_email'));
+        this.post_enrollment_email_elem.val(this.model.get('post_enrollment_email'));
         this.codeMirrorize(null, $('#post-enrollment-email')[0]);
+
+        this.enable_enrollment_email_box.checked = this.model.get('enable_enrollment_email');
+
+        this.enable_default_enrollment_email_box.checked = this.model.get('enable_default_enrollment_email');
+
+        if (this.model.get('enable_enrollment_email')) {
+            this.pre_enrollment_email_field.show();
+            this.post_enrollment_email_field.show();
+            this.pre_enrollment_email_subject_field.show();
+            this.post_enrollment_email_subject_field.show();
+        } else {
+            this.pre_enrollment_email_field.hide();
+            this.post_enrollment_email_field.hide();
+            this.pre_enrollment_email_subject_field.hide();
+            this.post_enrollment_email_subject_field.hide();
+        }
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
@@ -88,7 +123,11 @@ var DetailsView = ValidatingView.extend({
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
-        'course_image_asset_path': 'course-image-url'
+        'course_image_asset_path': 'course-image-url',
+        'enable_enrollment_email': 'enable-enrollment-email',
+        'pre_enrollment_email_subject' :'pre-enrollment-email-subject',
+        'post_enrollment_email_subject':'post-enrollment-email-subject',
+        'enable_default_enrollment_email':'enable-default-enrollment-email'
     },
 
     updateTime : function(e) {
@@ -163,6 +202,12 @@ var DetailsView = ValidatingView.extend({
         case 'course-effort':
             this.setField(event);
             break;
+        case 'pre-enrollment-email-subject':
+            this.setField(event);
+            break; 
+        case 'post-enrollment-email-subject':
+            this.setField(event);
+            break;
         case 'course-short-description':
             this.setField(event);
             break;
@@ -198,13 +243,36 @@ var DetailsView = ValidatingView.extend({
     },
 
     toggleEnrollmentEmails: function(event) {
-        var isChecked = this.$el.find("#enable-enrollment-email").is(':checked');
+        var isChecked = this.enable_enrollment_email_box.checked;
+
         if(isChecked) {
-            this.$el.find('#field-pre-enrollment-email').show();
-            this.$el.find('#field-post-enrollment-email').show();
+            this.pre_enrollment_email_field.show();
+            this.post_enrollment_email_field.show();
+            this.pre_enrollment_email_subject_field.show();
+            this.post_enrollment_email_subject_field.show();
+
         } else {
-            this.$el.find('#field-pre-enrollment-email').hide();
-            this.$el.find('#field-post-enrollment-email').hide();
+            this.pre_enrollment_email_field.hide();
+            this.post_enrollment_email_field.hide();
+            this.pre_enrollment_email_subject_field.hide();
+            this.post_enrollment_email_subject_field.hide();
+
+            /* If enrollment email sending option is turned off, default email option should be turned off as well. */
+            this.enable_default_enrollment_email_box.checked = false;
+            this.setAndValidate(this.selectorToField['enable-default-enrollment-email'], false);
+        }
+
+        var field = this.selectorToField['enable-enrollment-email'];
+        if (this.model.get(field) != isChecked) {
+            this.setAndValidate(field, isChecked);
+        }
+    },
+
+    toggleDefaultEnrollmentEmails: function(event) {
+        var isChecked = this.enable_default_enrollment_email_box.checked;
+        var field = this.selectorToField['enable-default-enrollment-email'];
+        if (this.model.get(field) != isChecked) {
+            this.setAndValidate(field, isChecked);
         }
     },
 
