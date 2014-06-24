@@ -1025,3 +1025,47 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(len(response.data['results']), 0)
+
+    def test_user_completions_list(self):
+        user_id = self.user.id
+        another_user_id = UserFactory().id
+        completion_uri = '/api/courses/{}/completions/'.format(self.course.id)
+
+        for i in xrange(1, 17):
+            if i > 7:
+                course_user_id = another_user_id
+            else:
+                course_user_id = user_id
+            completions_data = {'content_id': '{}_{}'.format(self.course_content.id, i), 'user_id': course_user_id}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        # Get course module completion by user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?page_size=5'.format(user_id, self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(response.data['results'][0]['user_id'], user_id)
+        self.assertEqual(response.data['results'][0]['course_id'], self.course.id)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # Get course module completion by other user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format(another_user_id, self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 9)
+
+        # Get course module completion by other user and course module id
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?content_id={}'.format(
+            another_user_id,
+            self.course.id,
+            '{}_{}'.format(self.course_content.id, 10))
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
+        # Get course module completion by bogus user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 404)
