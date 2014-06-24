@@ -73,7 +73,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             print workgroup.groups.all()
             return Response({}, status=status.HTTP_201_CREATED)
 
-    @action(methods=['get', 'post'])
+    @action(methods=['get', 'post', 'delete'])
     def users(self, request, pk):
         """
         Add a User to a Workgroup
@@ -86,7 +86,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
                     serializer = UserSerializer(user)
                     response_data.append(serializer.data)
             return Response(response_data, status=status.HTTP_200_OK)
-        else:
+        elif request.method == 'POST':
             user_id = request.DATA.get('id')
             try:
                 user = User.objects.get(id=user_id)
@@ -97,6 +97,16 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             workgroup.users.add(user)
             workgroup.save()
             return Response({}, status=status.HTTP_201_CREATED)
+        else:
+            user_id = request.DATA.get('id')
+            try:
+                user = User.objects.get(id=user_id)
+            except ObjectDoesNotExist:
+                message = 'User {} does not exist'.format(user_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            workgroup = self.get_object()
+            workgroup.users.remove(user)
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     @link()
     def peer_reviews(self, request, pk):
