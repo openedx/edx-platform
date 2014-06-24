@@ -11,6 +11,7 @@ urlpatterns = patterns(
     url(r'^(?P<group_id>[0-9]+)$', groups_views.GroupsDetail.as_view()),
     url(r'^(?P<group_id>[0-9]+)/courses/*$', groups_views.GroupsCoursesList.as_view()),
     url(r'^(?P<group_id>[0-9]+)/courses/(?P<course_id>[a-zA-Z0-9/_:]+)$', groups_views.GroupsCoursesDetail.as_view()),
+    url(r'^(?P<group_id>[0-9]+)/organizations/*$', groups_views.GroupsOrganizationsList.as_view()),
     url(r'^(?P<group_id>[0-9]+)/users/*$', groups_views.GroupsUsersList.as_view()),
     url(r'^(?P<group_id>[0-9]+)/users/(?P<user_id>[0-9]+)$', groups_views.GroupsUsersDetail.as_view()),
     url(r'^(?P<group_id>[0-9]+)/groups/*$', groups_views.GroupsGroupsList.as_view()),
