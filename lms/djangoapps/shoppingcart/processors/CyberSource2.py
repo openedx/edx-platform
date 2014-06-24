@@ -19,7 +19,23 @@ from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
+from microsite_configuration import microsite
 
+def get_cybersource_config():
+    """
+    This method will return any microsite specific cybersource configuration, otherwise
+    we return the default configuration
+    """
+    config_key = microsite.get_value('cybersource_config_key')
+    config = {}
+    if config_key:
+        # The microsite CyberSource configuration will be subkeys inside of the normal default
+        # CyberSource configuration
+        config = settings.CC_PROCESSOR['CyberSource2']['microsites'][config_key]
+    else:
+        config = settings.CC_PROCESSOR['CyberSource2']
+
+    return config
 
 def process_postpay_callback(params):
     """
@@ -55,7 +71,7 @@ def processor_hash(value):
     """
     Performs the base64(HMAC_SHA1(key, value)) used by CyberSource Hosted Order Page
     """
-    secret_key = settings.CC_PROCESSOR['CyberSource2'].get('SECRET_KEY', '')
+    secret_key = get_cybersource_config().get('SECRET_KEY', '')
     hash_obj = hmac.new(secret_key, value, sha256)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
@@ -98,8 +114,8 @@ def get_purchase_params(cart):
     params['currency'] = cart.currency
     params['orderNumber'] = "OrderId: {0:d}".format(cart.id)
 
-    params['access_key'] = settings.CC_PROCESSOR['CyberSource2'].get('ACCESS_KEY', '')
-    params['profile_id'] = settings.CC_PROCESSOR['CyberSource2'].get('PROFILE_ID', '')
+    params['access_key'] = get_cybersource_config().get('ACCESS_KEY', '')
+    params['profile_id'] = get_cybersource_config().get('PROFILE_ID', '')
     params['reference_number'] = cart.id
     params['transaction_type'] = 'sale'
 
@@ -115,7 +131,7 @@ def get_purchase_params(cart):
 
 
 def get_purchase_endpoint():
-    return settings.CC_PROCESSOR['CyberSource2'].get('PURCHASE_ENDPOINT', '')
+    return get_cybersource_config().get('PURCHASE_ENDPOINT', '')
 
 def payment_accepted(params):
     """
@@ -207,7 +223,7 @@ def record_purchase(params, order):
 
 def get_processor_decline_html(params):
     """Have to parse through the error codes to return a helpful message"""
-    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
+    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
 
     msg = dedent(_(
             """
@@ -230,7 +246,7 @@ def get_processor_decline_html(params):
 def get_processor_exception_html(exception):
     """Return error HTML associated with exception"""
 
-    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
+    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     if isinstance(exception, CCProcessorDataException):
         msg = dedent(_(
                 """
