@@ -42,6 +42,8 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
+        self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
+        self.assertTrue(details.enable_default_enrollment_email, "Default Template option for enrollment email should be initialized as true")
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
