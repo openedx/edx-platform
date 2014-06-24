@@ -14,7 +14,8 @@ from django.contrib.auth.models import User
 from optparse import make_option
 import datetime
 from django.core.handlers.base import BaseHandler
-import csv
+#import csv
+import unicodecsv as csv
 
 
 class RequestMock(RequestFactory):

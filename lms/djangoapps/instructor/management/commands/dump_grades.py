@@ -3,7 +3,8 @@
 django management command: dump grades to csv files
 for use by batch processes
 """
-import csv
+#import csv
+import unicodecsv as csv
 
 from instructor.views.legacy import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
