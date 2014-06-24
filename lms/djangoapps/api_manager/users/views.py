@@ -5,6 +5,7 @@ import logging
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.db.models import Count
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.http import Http404
@@ -20,7 +21,7 @@ from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
 from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserCountByCitySerializer
 
 from courseware import module_render
 from courseware.model_data import FieldDataCache
@@ -978,3 +979,26 @@ class UsersSocialMetrics(SecureListAPIView):
             http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(data, http_status)
+
+
+class UsersMetricsCitiesList(SecureListAPIView):
+    """
+    ### The UsersMetricsCitiesList view allows clients to retrieve ordered list of user
+    count by city
+    - URI: ```/api/users/metrics/cities/```
+    - GET: Provides paginated list of user count
+    To get user count a particular city filter can be applied
+    GET ```/api/users/metrics/cities/?city={city}```
+    """
+
+    serializer_class = UserCountByCitySerializer
+
+    def get_queryset(self):
+        city = self.request.QUERY_PARAMS.get('city', None)
+        queryset = User.objects.all()
+        if city:
+            queryset = queryset.filter(profile__city__iexact=city)
+
+        queryset = queryset.values('profile__city').annotate(count=Count('profile__city'))\
+            .filter(count__gt=0).order_by('-count')
+        return queryset

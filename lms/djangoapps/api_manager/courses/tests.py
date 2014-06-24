@@ -1357,3 +1357,32 @@ class CoursesApiTests(TestCase):
 
         response = self.do_get('{}/{}/projects/'.format(self.base_courses_uri, self.test_bogus_course_id))
         self.assertEqual(response.status_code, 404)
+
+    def test_courses_data_metrics(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        test_user_uri = '/api/users'
+        users_to_add = 5
+        for i in xrange(0, users_to_add):
+            data = {
+                'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
+                'password': 'test_password'
+            }
+            # create a new user
+            response = self.do_post(test_user_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+
+            # now enroll this user in the course
+            post_data = {'user_id': created_user_id}
+            response = self.do_post(test_uri, post_data)
+            self.assertEqual(response.status_code, 201)
+
+        # get course metrics
+        course_metrics_uri = '/api/courses/{}/metrics/'
+        response = self.do_get(course_metrics_uri.format(self.test_course_id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
+
+        # test with bogus course
+        response = self.do_get(course_metrics_uri.format(self.test_bogus_course_id))
+        self.assertEqual(response.status_code, 404)
