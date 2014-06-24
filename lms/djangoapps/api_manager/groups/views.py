@@ -11,10 +11,12 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
-from xmodule.modulestore.django import modulestore
 from api_manager.permissions import SecureAPIView
-from xmodule.modulestore import Location, InvalidLocationError
 from api_manager.utils import str2bool, generate_base_uri
+from api_manager.organizations import serializers
+from xmodule.modulestore import Location, InvalidLocationError
+from xmodule.modulestore.django import modulestore
+
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
@@ -547,7 +549,7 @@ class GroupsCoursesList(SecureAPIView):
 
     def get(self, request, group_id):
         """
-        GET /api/groups/{group_id}/courses/{course_id}
+        GET /api/groups/{group_id}/courses/
         """
         response_data = {}
         try:
@@ -614,3 +616,29 @@ class GroupsCoursesDetail(SecureAPIView):
         except ObjectDoesNotExist:
             pass
         return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+class GroupsOrganizationsList(SecureAPIView):
+    """
+    ### The GroupsOrganizationsList view allows clients to interact with the set of Organizations related to the specified Group
+    - URI: ```/api/groups/{group_id}/organizations/```
+    - GET: Returns a JSON representation (array) of the set of related Organization entities
+
+    ### Use Cases/Notes:
+    * View all of the Organizations related to a particular Program (currently modeled as a Group entity)
+    """
+
+    def get(self, request, group_id):
+        """
+        GET /api/groups/{group_id}/organizations/
+        """
+        response_data = {}
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        response_data = []
+        for org in existing_group.organizations.all():
+            serializer = serializers.OrganizationSerializer(org)
+            response_data.append(serializer.data)
+        return Response(response_data, status=status.HTTP_200_OK)

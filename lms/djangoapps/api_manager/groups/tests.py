@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 
 from api_manager.models import GroupRelationship, GroupProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from api_manager.models import GroupRelationship, GroupProfile, Organization
 from xmodule.modulestore.tests.factories import CourseFactory
 
 TEST_API_KEY = str(uuid.uuid4())
@@ -44,6 +45,14 @@ class GroupsApiTests(ModuleStoreTestCase):
 
         self.course = CourseFactory.create()
         self.test_course_id = self.course.id
+
+        self.test_organization = Organization.objects.create(
+            name="Test Organization",
+            display_name = 'Test Org',
+            contact_name = 'John Org',
+            contact_email = 'john@test.org',
+            contact_phone = '+1 332 232 24234'
+        )
 
         self.client = SecureClient()
         cache.clear()
@@ -909,5 +918,24 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/courses/{}'.format(response.data['uri'], self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_group_organizations_list_get(self):
+        data = {'name': self.test_group_name, 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        self.test_organization.groups.add(group_id)
+        test_uri = response.data['uri'] + '/organizations/'
+        confirm_uri = test_uri + '/' + str(self.test_organization.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.test_organization.id)
+        self.assertEqual(response.data[0]['name'], self.test_organization.name)
+
+    def test_group_courses_list_get_invalid_group(self):
+        test_uri = self.base_groups_uri + '/1231241/organizations/'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
