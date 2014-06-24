@@ -226,6 +226,9 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Log out sneakpeek users
+    'sneakpeek.middleware.SneakPeekLogoutMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
