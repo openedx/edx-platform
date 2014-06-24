@@ -1398,3 +1398,29 @@ class CoursesProjectList(SecureListAPIView):
             raise Http404
 
         return Project.objects.filter(course_id=course_id)
+
+
+class CourseMetrics(SecureAPIView):
+    """
+    ### The CourseMetrics view allows clients to retrieve a list of Metrics for the specified Course
+    - URI: ```/api/courses/{course_id}/metrics/```
+    - GET: Returns a JSON representation (array) of the set of course metrics
+    ### Use Cases/Notes:
+    * Example: Display number of users enrolled in a given course
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        users_enrolled = CourseEnrollment.num_enrolled_in(course_id)
+        data = {
+            'users_enrolled': users_enrolled
+        }
+        return Response(data, status=status.HTTP_200_OK)
