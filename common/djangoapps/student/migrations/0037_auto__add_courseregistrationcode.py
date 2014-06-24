@@ -12,12 +12,12 @@ class Migration(SchemaMigration):
         db.create_table('student_courseregistrationcode', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('code', self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=256, db_index=True)),
-            ('transaction_group_name', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=256, null=True, blank=True)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+            ('transaction_group_name', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
             ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='created_by_user', to=orm['auth.User'])),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 24, 0, 0))),
             ('redeemed_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='redeemed_by_user', null=True, to=orm['auth.User'])),
-            ('redeemed_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, null=True)),
+            ('redeemed_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 24, 0, 0), null=True)),
         ))
         db.send_create_signal('student', ['CourseRegistrationCode'])
 
@@ -99,13 +99,13 @@ class Migration(SchemaMigration):
         'student.courseregistrationcode': {
             'Meta': {'object_name': 'CourseRegistrationCode'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '256', 'db_index': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 24, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_by_user'", 'to': "orm['auth.User']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'null': 'True'}),
+            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 24, 0, 0)', 'null': 'True'}),
             'redeemed_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'redeemed_by_user'", 'null': 'True', 'to': "orm['auth.User']"}),
-            'transaction_group_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '256', 'null': 'True', 'blank': 'True'})
+            'transaction_group_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'student.loginfailures': {
             'Meta': {'object_name': 'LoginFailures'},

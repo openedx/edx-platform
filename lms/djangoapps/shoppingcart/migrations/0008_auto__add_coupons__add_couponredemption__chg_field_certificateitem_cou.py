@@ -12,12 +12,12 @@ class Migration(SchemaMigration):
         db.create_table('shoppingcart_coupons', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('code', self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=256, null=True, blank=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=256)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255)),
             ('percentage_discount', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('is_active', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 24, 0, 0))),
+            ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal('shoppingcart', ['Coupons'])
 
@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('order', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Order'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('Coupon', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Coupons'])),
+            ('coupon', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Coupons'])),
         ))
         db.send_create_signal('shoppingcart', ['CouponRedemption'])
 
@@ -39,6 +39,11 @@ class Migration(SchemaMigration):
 
         # Changing field 'PaidCourseRegistration.course_id'
         db.alter_column('shoppingcart_paidcourseregistration', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=128))
+        # Adding field 'OrderItem.discount_price'
+        db.add_column('shoppingcart_orderitem', 'discount_price',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=30, decimal_places=2),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         # Deleting model 'Coupons'
@@ -56,6 +61,9 @@ class Migration(SchemaMigration):
 
         # Changing field 'PaidCourseRegistration.course_id'
         db.alter_column('shoppingcart_paidcourseregistration', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=128))
+        # Deleting field 'OrderItem.discount_price'
+        db.delete_column('shoppingcart_orderitem', 'discount_price')
+
 
     models = {
         'auth.group': {
@@ -102,8 +110,8 @@ class Migration(SchemaMigration):
             'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
         },
         'shoppingcart.couponredemption': {
-            'Coupon': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Coupons']"}),
             'Meta': {'object_name': 'CouponRedemption'},
+            'coupon': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Coupons']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
@@ -111,12 +119,12 @@ class Migration(SchemaMigration):
         'shoppingcart.coupons': {
             'Meta': {'object_name': 'Coupons'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 24, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'percentage_discount': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'shoppingcart.order': {
@@ -142,6 +150,7 @@ class Migration(SchemaMigration):
         'shoppingcart.orderitem': {
             'Meta': {'object_name': 'OrderItem'},
             'currency': ('django.db.models.fields.CharField', [], {'default': "'usd'", 'max_length': '8'}),
+            'discount_price': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '30', 'decimal_places': '2'}),
             'fulfilled_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'line_desc': ('django.db.models.fields.CharField', [], {'default': "'Misc. Item'", 'max_length': '1024'}),
