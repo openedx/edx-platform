@@ -47,6 +47,7 @@ urlpatterns = patterns('',  # nopep8
         name='show_unit_extensions'),
     url(r'^show_student_extensions$', 'instructor.views.api.show_student_extensions',
         name='show_student_extensions'),
+    url(r'^irc_instructor_auth_token$', 'instructor.views.api.irc_instructor_auth_token'),
 
     # Grade downloads...
     url(r'^list_report_downloads$',

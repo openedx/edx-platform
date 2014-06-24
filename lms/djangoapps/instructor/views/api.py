@@ -6,6 +6,7 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
+import hashlib
 import json
 import logging
 import re
@@ -1306,3 +1307,16 @@ def _split_input_list(str_list):
     new_list = [s for s in new_list if s != '']
 
     return new_list
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def irc_instructor_auth_token(request, course_id):
+    # Note: course_id is assumed to be deprecated crappy SSCK value
+    #       in future, hashing it below will need to convert from course_key
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key, depth=None)
+    is_instructor_here = has_access(request.user, 'staff', course)
+    if is_instructor_here:
+        extras_key = hashlib.sha1(course_id+"happy fish").hexdigest()
+        return JsonResponse({'extras': extras_key, 'error': ''})
+    return JsonResponse({'extras': '', 'error': 'NotInstructor'})
