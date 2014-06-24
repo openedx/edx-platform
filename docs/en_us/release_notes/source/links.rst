@@ -24,9 +24,9 @@
 
 .. _Creating Peer Assessments: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
 
-.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
+.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 
-.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 

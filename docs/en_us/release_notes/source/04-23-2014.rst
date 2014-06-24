@@ -36,9 +36,9 @@ The following documentation is available:
   * Updated the `Enrollment`_ section to reflect feature changes.
       
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 *************

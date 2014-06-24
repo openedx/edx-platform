@@ -66,10 +66,10 @@ The following documentation is available:
   * Updated `Working with Video Components`_ with information about adding a transcript that serves as a table of contents for a video.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
  
 * `edX XBlock Documentation`_
