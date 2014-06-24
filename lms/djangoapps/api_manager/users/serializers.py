@@ -14,3 +14,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = APIUser
         fields = ("id", "email", "username", "first_name", "last_name", "organizations")
         read_only_fields = ("id", "email", "username")
+
+
+class UserCountByCitySerializer(serializers.Serializer):
+    """ Serializer for user count by city """
+    city = serializers.CharField(source='profile__city')
+    count = serializers.IntegerField()
