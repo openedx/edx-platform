@@ -1087,3 +1087,43 @@ class UsersApiTests(TestCase):
         completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', self.course.id)
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_user_count_by_city(self):
+        test_uri = '/api/users'
+
+        # create a 25 new users
+        for i in xrange(1, 26):
+            if i < 10:
+                city = 'San Francisco'
+            elif i < 15:
+                city = 'Denver'
+            elif i < 20:
+                city = 'Dallas'
+            else:
+                city = 'New York City'
+            data = {
+                'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
+                'password': self.test_password,
+                'first_name': self.test_first_name, 'last_name': self.test_last_name, 'city': city,
+                'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', 'gender': 'male',
+                'title': 'Software Engineer', 'avatar_url': 'http://example.com/avatar.png'
+            }
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+            response = self.do_get(response.data['uri'])
+            self.assertEqual(response.status_code, 200)
+            self.is_user_profile_created_updated(response, data)
+
+        response = self.do_get('/api/users/metrics/cities/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
+        self.assertEqual(response.data['results'][0]['count'], 9)
+
+        # filter counts by city
+        response = self.do_get('/api/users/metrics/cities/?city=new york city')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['city'], 'New York City')
+        self.assertEqual(response.data['results'][0]['count'], 6)
