@@ -8,6 +8,7 @@ from api_manager.users import views as users_views
 urlpatterns = patterns(
     '',
     url(r'/*$^', users_views.UsersList.as_view(), name='apimgr-users-list'),
+    url(r'^metrics/cities/$', users_views.UsersMetricsCitiesList.as_view(), name='apimgr-users-metrics-cities-list'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)$', users_views.UsersDetail.as_view(), name='apimgr-users-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/*$', users_views.UsersCoursesList.as_view(), name='users-courses-list'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)$', users_views.UsersCoursesDetail.as_view(), name='users-courses-detail'),
