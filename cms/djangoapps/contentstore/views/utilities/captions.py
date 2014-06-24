@@ -82,8 +82,6 @@ def json_update_videos(request, locations):
             #update transcripts
             item = modulestore().get_item(key)
             download_youtube_subs({1.0: item.youtube_id_1_0}, item, settings)
-            item.sub = item.youtube_id_1_0
-            item.save_with_metadata(request.user)
 
             #get new status
             videos = {'youtube': item.youtube_id_1_0}
