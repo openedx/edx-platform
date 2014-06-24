@@ -17,6 +17,7 @@ from django.db.models import Q
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
+from api_manager.courses.serializers import CourseModuleCompletionSerializer
 from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer
@@ -915,6 +916,37 @@ class UsersWorkgroupsList(SecureListAPIView):
 
         if course_id:
             queryset = queryset.filter(project__course_id=course_id)
+        return queryset
+
+
+class UsersCoursesCompletionsList(SecureListAPIView):
+    """
+    ### The UsersCoursesCompletionsList view allows clients to retrieve a list of course completions
+    for a user
+    - URI: ```/api/users/{user_id}/courses/{course_id}/completions/```
+    - GET: Provides paginated list of course completions a user
+    To filter the user's course completions by course content
+    GET ```/api/users/{user_id}/courses/{course_id}/completions/?content_id={content_id}```
+    """
+
+    serializer_class = CourseModuleCompletionSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        course_id = self.kwargs.get('course_id', None)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        queryset = user.course_completions.all()
+
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+        if content_id:
+            queryset = queryset.filter(content_id=content_id)
+
         return queryset
 
 

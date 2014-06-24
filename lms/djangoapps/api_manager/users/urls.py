@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)$', users_views.UsersCoursesDetail.as_view(), name='users-courses-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grades$', users_views.UsersCoursesGradesDetail.as_view(), name='users-courses-grades-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/metrics/social/$', users_views.UsersSocialMetrics.as_view(), name='users-social-metrics'),
+    url(r'^(?P<user_id>[a-zA-Z0-9]+)/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/completions/$', users_views.UsersCoursesCompletionsList.as_view(), name='users-courses-completions-list'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/groups/*$', users_views.UsersGroupsList.as_view(), name='users-groups-list'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/groups/(?P<group_id>[0-9]+)$', users_views.UsersGroupsDetail.as_view(), name='users-groups-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/preferences$', users_views.UsersPreferences.as_view(), name='users-preferences-list'),
