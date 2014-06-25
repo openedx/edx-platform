@@ -575,6 +575,7 @@ def setup_sneakpeek(request, course_id):
 
     if not CoursePreference.course_allows_nonregistered_access(course_key):
         return HttpResponseForbidden("Cannot access the course")
+
     if not request.user.is_authenticated():
         # if there's no user, create a nonregistered user
         _create_and_login_nonregistered_user(request)
@@ -582,6 +583,7 @@ def setup_sneakpeek(request, course_id):
         # registered users can't sneakpeek, so log them out and create a new nonregistered user
         logout(request)
         _create_and_login_nonregistered_user(request)
+        # fall-through case is a sneakpeek user that's already logged in
 
     can_enroll, error_msg = _check_can_enroll_in_course(request.user,
                                                         course_key,
