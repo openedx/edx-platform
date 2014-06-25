@@ -11,8 +11,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
-from shoppingcart.models import Coupons
+from shoppingcart.models import Coupons, PaidCourseRegistration
 from mock import patch
+from student.roles import CourseFinanceAdminRole
 
 
 # pylint: disable=E1101
@@ -36,6 +37,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 
     def tearDown(self):
         """
@@ -49,6 +51,23 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         response = self.client.get(self.url)
         self.assertTrue(self.e_commerce_link in response.content)
+
+    def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
+        response = self.client.get(self.url)
+        self.assertTrue(self.e_commerce_link in response.content)
+
+        # Total amount html should render in e-commerce page, total amount will be 0
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        self.assertTrue('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
+
+        # removing the course finance_admin role of login user
+        CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
+
+        # total amount should not be visible in e-commerce page if the user is not finance admin
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url)
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        self.assertFalse('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
 
     def test_add_coupon(self):
         """

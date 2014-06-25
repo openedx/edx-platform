@@ -4,7 +4,11 @@
 <%include file="edit_coupon_modal.html" />
 
 <div class="ecommerce-wrapper">
-  <h2>${_("Coupons List")}</h2>
+  <h2>${_("Coupons List")}
+      %if section_data['total_amount'] is not None:
+           <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+      %endif
+  </h2>
 
   <h3 class="coupon-errors" id="coupon-error"></h3>
   <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
