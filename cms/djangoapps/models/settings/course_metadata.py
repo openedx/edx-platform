@@ -10,6 +10,7 @@ class CourseMetadata(object):
     The objects have no predefined attrs but instead are obj encodings of the
     editable metadata.
     '''
+    # The list of fields that wouldn't be shown in Advanced Settings.
     FILTERED_LIST = ['xml_attributes',
                      'start',
                      'end',
@@ -21,6 +22,7 @@ class CourseMetadata(object):
                      'show_timezone',
                      'format',
                      'graded',
+                     'video_speed_optimizations',
     ]
 
     @classmethod

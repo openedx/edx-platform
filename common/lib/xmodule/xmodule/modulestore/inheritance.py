@@ -113,6 +113,11 @@ class InheritanceMixin(XBlockMixin):
         default=[],
         scope=Scope.settings
     )
+    video_speed_optimizations = Boolean(
+        help="Enable Video CDN.",
+        default=True,
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

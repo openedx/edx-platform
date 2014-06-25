@@ -16,8 +16,10 @@ locales:
     - da  # Danish
     - de_DE  # German (Germany)
     - el  # Greek
-    - en@lolcat  # LOLCAT English
-    - en@pirate  # Pirate English
+    # Don't pull these until we figure out why pages randomly display in these locales,
+    # when the user's browser is in English and the user is not logged in.
+#    - en@lolcat  # LOLCAT English
+#    - en@pirate  # Pirate English
     - es_419  # Spanish (Latin America)
     - es_AR  # Spanish (Argentina)
     - es_EC  # Spanish (Ecuador)

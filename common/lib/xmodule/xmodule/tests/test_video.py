@@ -14,12 +14,12 @@ the course, section, subsection, unit, etc.
 """
 import unittest
 import datetime
-from mock import Mock
+from mock import Mock, patch
 
 from . import LogicTest
 from lxml import etree
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.video_module import VideoDescriptor, create_youtube_string
+from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -551,3 +551,33 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         xml = self.descriptor.definition_to_xml(None)
         expected = '<video url_name="SampleProblem"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+
+
+class VideoCdnTest(unittest.TestCase):
+    """
+    Tests for Video CDN.
+    """
+    @patch('requests.get')
+    def test_get_video_success(self, cdn_response):
+        """
+        Test successful CDN request.
+        """
+        original_video_url = "http://www.original_video.com/original_video.mp4"
+        cdn_response_video_url = "http://www.cdn_video.com/cdn_video.mp4"
+        cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
+        cdn_response.return_value=Mock(status_code=200, content=cdn_response_content)
+        fake_cdn_url = 'http://fake_cdn.com/'
+        self.assertEqual(
+            get_video_from_cdn(fake_cdn_url, original_video_url),
+            cdn_response_video_url
+        )
+
+    @patch('requests.get')
+    def test_get_no_video_exists(self, cdn_response):
+        """
+        Test if no alternative video in CDN exists.
+        """
+        original_video_url = "http://www.original_video.com/original_video.mp4"
+        cdn_response.return_value=Mock(status_code=404)
+        fake_cdn_url = 'http://fake_cdn.com/'
+        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
