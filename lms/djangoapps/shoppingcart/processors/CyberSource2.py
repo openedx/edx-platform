@@ -20,6 +20,7 @@ from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from microsite_configuration import microsite
+from django.core.urlresolvers import reverse
 
 def get_cybersource_config():
     """
@@ -107,7 +108,6 @@ def get_signed_purchase_params(cart):
 def get_purchase_params(cart):
     total_cost = cart.total_cost
     amount = "{0:0.2f}".format(total_cost)
-    cart_items = cart.orderitem_set.all()
     params = OrderedDict()
 
     params['amount'] = amount
@@ -125,7 +125,11 @@ def get_purchase_params(cart):
     params['unsigned_field_names'] = ''
     params['transaction_uuid'] = uuid.uuid4()
     params['payment_method'] = 'card'
-    params['override_custom_receipt_page'] = 'http://localhost:8000/shoppingcart/postpay_callback/'
+
+    if hasattr(cart, 'context') and 'request_domain' in cart.context:
+        params['override_custom_receipt_page'] = '{0}{1}'.format(cart.context['request_domain'],
+            reverse('shoppingcart.views.postpay_callback')
+        )
 
     return params
 
