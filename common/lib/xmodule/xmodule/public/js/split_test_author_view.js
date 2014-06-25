@@ -2,7 +2,7 @@
 window.SplitTestAuthorView = function (runtime, element) {
     var $element = $(element);
 
-    $element.find('.add-missing-groups-button').click(function () {
+    $element.find('.add-missing-groups-button').show().click(function () {
         runtime.notify('save', {
             state: 'start',
             element: element,

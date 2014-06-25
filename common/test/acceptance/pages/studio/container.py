@@ -126,6 +126,10 @@ class ContainerPage(PageObject):
         """
         Click the "add missing groups" link.
         """
+        EmptyPromise(
+            lambda: self.q(css='.add-missing-groups-button')[0].is_displayed(),
+            'Add missing groups button should be visible.'
+        ).fulfill()
         click_css(self, '.add-missing-groups-button')
 
     def missing_groups_button_present(self):
