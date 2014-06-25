@@ -23,7 +23,7 @@ The following documentation is available:
   * `Establishing a Grading Policy`_
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
    Recent changes include:
 
@@ -31,7 +31,7 @@ The following documentation is available:
    * `Wiki Data`_
    * `Discussion Forum Data`_
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 

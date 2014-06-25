@@ -24,7 +24,7 @@ The following documentation is available:
   * Updated the sections on `Beta Testing a Course`_, `Discussions`_, `Grade and Answer Data`_, and `Student Data`_ with changes to the new Instructor Dashboard.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
   Recent changes include:
 
@@ -34,7 +34,7 @@ The following documentation is available:
 
   * Alternative formatting for the examples in the `Discussion Forums Data`_ chapter.
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 

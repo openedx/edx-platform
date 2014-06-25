@@ -20,7 +20,7 @@ The following documentation is available:
 * `edX Data Documentation`_
 
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 .. include:: links.rst
 

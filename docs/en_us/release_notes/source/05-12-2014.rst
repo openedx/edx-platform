@@ -33,7 +33,7 @@ The following documentation is available:
 
   * Added documentation for the `IFrame Tool`_
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
   
   Recent changes include: 
   
@@ -45,7 +45,7 @@ The following documentation is available:
   * Removed obsolete information about XML formats for problems.
   
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
   
   
 * `edX XBlock Documentation`_
