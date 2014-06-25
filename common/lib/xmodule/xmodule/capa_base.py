@@ -131,6 +131,7 @@ class CapaFields(object):
             {"display_name": _("Attempted"), "value": "attempted"},
             {"display_name": _("Closed"), "value": "closed"},
             {"display_name": _("Finished"), "value": "finished"},
+            {"display_name": _("Correct or Past Due"), "value": "correct_or_past_due"},
             {"display_name": _("Past Due"), "value": "past_due"},
             {"display_name": _("Never"), "value": "never"}]
     )
@@ -712,6 +713,8 @@ class CapaMixin(CapaFields):
         elif self.showanswer == 'finished':
             return self.closed() or self.is_correct()
 
+        elif self.showanswer == 'correct_or_past_due':
+            return self.is_correct() or self.is_past_due()
         elif self.showanswer == 'past_due':
             return self.is_past_due()
         elif self.showanswer == 'always':

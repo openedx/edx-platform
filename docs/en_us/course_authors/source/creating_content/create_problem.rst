@@ -360,7 +360,7 @@ Show Answer
 ===============
 
 This setting defines when the problem shows the answer to the student.
-This setting has seven options.
+This setting has the following options.
 
 +-------------------+--------------------------------------+
 | **Always**        | Always show the answer when the      |
@@ -384,6 +384,10 @@ This setting has seven options.
 |                   | has answered the problem correctly,  |
 |                   | the student has no attempts left, or |
 |                   | the problem due date has passed.     |
++-------------------+--------------------------------------+
+| **Correct or      | Show the answer after the student    |
+| Past Due**        | has answered the problem correctly   |
+|                   | or the problem due date has passed.  |
 +-------------------+--------------------------------------+
 | **Past Due**      | Show the answer after the due date   |
 |                   | for the problem has passed.          |
