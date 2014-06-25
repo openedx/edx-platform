@@ -24,7 +24,7 @@ class LTIModuleTest(LogicTest):
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
         self.request_body_xml_template = textwrap.dedent("""
             <?xml version = "1.0" encoding = "UTF-8"?>
-                <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                <imsx_POXEnvelopeRequest xmlns = "{namespace}">
                   <imsx_POXHeader>
                     <imsx_POXRequestHeaderInfo>
                       <imsx_version>V1.0</imsx_version>
@@ -59,9 +59,10 @@ class LTIModuleTest(LogicTest):
         sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
         self.DEFAULTS = {
+            'namespace' : "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0",
             'sourcedId': sourcedId,
             'action': 'replaceResultRequest',
-            'grade': '0.5',
+            'grade': 0.5,
             'messageIdentifier': '528243ba5241b',
         }
 
@@ -327,8 +328,31 @@ class LTIModuleTest(LogicTest):
         """
         try:
             self.xmodule.verify_oauth_body_sign(self.get_signed_grade_mock_request())
-        except LTIError:
-            self.fail("verify_oauth_body_sign() raised LTIError unexpectedly!")
+        except LTIError as err:
+            self.fail("verify_oauth_body_sign() raised LTIError: " + err.message)
+
+    def test_wrong_xml_namespace(self):
+        """
+        Test wrong XML Namespace.
+
+        Tests that tool provider returned grade back with wrong XML Namespace.
+        """
+        with self.assertRaises(IndexError):
+            mocked_request = self.get_signed_grade_mock_request(namespace_lti_v1p1=False)
+            self.xmodule.parse_grade_xml_body(mocked_request.body)
+
+    def test_parse_grade_xml_body(self):
+        """
+        Test XML request body parsing.
+
+        Tests that xml body was parsed successfully.
+        """
+        mocked_request = self.get_signed_grade_mock_request()
+        messageIdentifier, sourcedId, grade, action = self.xmodule.parse_grade_xml_body(mocked_request.body)
+        self.assertEqual(self.DEFAULTS['messageIdentifier'], messageIdentifier)
+        self.assertEqual(self.DEFAULTS['sourcedId'], sourcedId)
+        self.assertEqual(self.DEFAULTS['grade'], grade)
+        self.assertEqual(self.DEFAULTS['action'], action)
 
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=False))
     @patch('xmodule.lti_module.LTIModule.get_client_key_secret', Mock(return_value=('test_client_key', u'test_client_secret')))
@@ -340,28 +364,34 @@ class LTIModuleTest(LogicTest):
             req = self.get_signed_grade_mock_request()
             self.xmodule.verify_oauth_body_sign(req)
 
-    def get_signed_grade_mock_request(self):
+    def get_signed_grade_mock_request(self, namespace_lti_v1p1=True):
         """
         Example of signed request from LTI Provider.
+
+        When `namespace_v1p0` is set to True then the default namespase from
+        LTI 1.1 will be used. Otherwise fake namespace will be added to XML.
         """
         mock_request = Mock()
         mock_request.headers = {
             'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/xml',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': u'OAuth oauth_nonce="135685044251684026041377608307", \
                 oauth_timestamp="1234567890", oauth_version="1.0", \
                 oauth_signature_method="HMAC-SHA1", \
                 oauth_consumer_key="test_client_key", \
                 oauth_signature="my_signature%3D", \
-                oauth_body_hash="gz+PeJZuF2//n9hNUnDj2v5kN70="'
+                oauth_body_hash="JEpIArlNCeV4ceXxric8gJQCnBw="'
         }
         mock_request.url = u'http://testurl'
         mock_request.http_method = u'POST'
-        mock_request.body = textwrap.dedent("""
-            <?xml version = "1.0" encoding = "UTF-8"?>
-                <imsx_POXEnvelopeRequest  xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-                </imsx_POXEnvelopeRequest>
-        """)
+
+        params = {}
+        if not namespace_lti_v1p1:
+            params = {
+                'namespace': "http://www.fakenamespace.com/fake"
+            }
+        mock_request.body = self.get_request_body(params)
+
         return mock_request
 
     def test_good_custom_params(self):
