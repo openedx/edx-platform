@@ -1,3 +1,96 @@
+.forum-nav {
+  @include box-sizing(border-box);
+  float: left;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+}
+
+// ------
+// Header
+// ------
+.forum-nav-header {
+  @include box-sizing(border-box);
+  display: table;
+  border-bottom: 1px solid $gray-l2;
+  background-color: $gray-l3;
+}
+
+.forum-nav-browse {
+  @include box-sizing(border-box);
+  display: table-cell;
+  vertical-align: middle;
+  width: 50%;
+  padding: ($baseline/4);
+
+  &:hover, &:focus, &.is-active {
+    background-color: $gray-l5;
+  }
+
+  .icon {
+    margin-right: ($baseline/4);
+  }
+}
+
+.forum-nav-browse-current {
+  @include font-size(12);
+}
+
+.forum-nav-browse-drop-arrow {
+  margin-left: ($baseline/4);
+}
+
+.forum-nav-search {
+  @include box-sizing(border-box);
+  display: table-cell;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+  padding: ($baseline/4);
+}
+
+.forum-nav-search .icon {
+  @include font-size(12);
+  position: absolute;
+  margin-top: -6px;
+  top: 50%;
+  right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+}
+
+.forum-nav-search-input {
+  width: 100%;
+}
+
+// -----------
+// Browse menu
+// -----------
+.forum-nav-browse-menu-wrapper {
+  overflow-y: scroll;
+  border-bottom: 1px solid $gray-l3;
+  background: $gray-l5;
+}
+
+.forum-nav-browse-filter {
+  position: relative;
+  border-bottom: 1px solid $gray-l2;
+  padding: ($baseline/4);
+}
+
+.forum-nav-browse-filter .icon {
+  @include font-size(12);
+  position: absolute;
+  margin-top: -6px;
+  top: 50%;
+  right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+}
+
+.forum-nav-browse-filter-input {
+  width: 100%;
+}
+
+.forum-nav-browse-title .icon {
+  margin-right: ($baseline/2);
+}
+
 // -------------------
 // Sort and filter bar
 // -------------------

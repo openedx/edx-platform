@@ -59,24 +59,79 @@ describe "DiscussionThreadListView", ->
           </li>
         </script>
         <script type="text/template" id="thread-list-template">
-            <div class="browse-search">
-                <div class="home"></div>
-                <div class="browse is-open"></div>
-                <div class="search">
-                    <form class="post-search">
-                        <label class="sr" for="search-discussions">Search</label>
-                        <input type="text" id="search-discussions" placeholder="Search all discussions" class="post-search-field">
-                    </form>
-                </div>
+            <div class="forum-nav-header">
+                <a href="#" class="forum-nav-browse" aria-haspopup="true">
+                    <i class="icon icon-reorder"></i>
+                    <span class="sr">Discussion topics; current selection is: </span>
+                    <span class="forum-nav-browse-current">All Discussions</span>
+                    ▾
+                </a>
+                <form class="forum-nav-search">
+                    <label>
+                        <span class="sr">Search</span>
+                        <input class="forum-nav-search-input" type="text" placeholder="Search all posts">
+                    </label>
+                </form>
             </div>
-            <div class="forum-nav-refine-bar">
-                <span class="forum-nav-sort">
-                    <select class="forum-nav-sort-control">
-                        <option value="date">by recent activity</option>
-                        <option value="comments">by most activity</option>
-                        <option value="votes">by most votes</option>
-                    </select>
-                </span>
+            <div class="forum-nav-browse-menu-wrapper" style="display: none">
+                <form class="forum-nav-browse-filter">
+                    <label>
+                        <span class="sr">Filter Topics</span>
+                        <input type="text" class="forum-nav-browse-filter-input" placeholder="filter topics">
+                    </label>
+                </form>
+                <ul class="forum-nav-browse-menu">
+                    <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
+                        <a href="#" class="forum-nav-browse-title">All Discussions</a>
+                    </li>
+                    <li class="forum-nav-browse-menu-item forum-nav-browse-menu-flagged">
+                        <a href="#" class="forum-nav-browse-title"><i class="icon icon-flag"></i>Flagged Discussions</a>
+                    </li>
+                    <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
+                        <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>Posts I'm Following</a>
+                    </li>
+                    <li class="forum-nav-browse-menu-item">
+                        <a href="#" class="forum-nav-browse-title">Parent</a>
+                        <ul class="forum-nav-browse-submenu">
+                            <li class="forum-nav-browse-menu-item">
+                                <a href="#" class="forum-nav-browse-title">Target</a>
+                                <ul class="forum-nav-browse-submenu">
+                                    <li
+                                        class="forum-nav-browse-menu-item"
+                                        data-discussion-id='{"sort_key": null, "id": "child"}'
+                                        data-cohorted="false"
+                                    >
+                                        <a href="#" class="forum-nav-browse-title">Child</a>
+                                    </li>
+                                </ul>
+                            <li
+                                class="forum-nav-browse-menu-item"
+                                data-discussion-id='{"sort_key": null, "id": "sibling"}'
+                                data-cohorted="false"
+                            >
+                                <a href="#" class="forum-nav-browse-title">Sibling</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        class="forum-nav-browse-menu-item"
+                        data-discussion-id='{"sort_key": null, "id": "other"}'
+                        data-cohorted="false"
+                    >
+                        <a href="#" class="forum-nav-browse-title">Other Category</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="forum-nav-thread-list-wrapper">
+                <div class="forum-nav-refine-bar">
+                    <span class="forum-nav-sort">
+                        <select class="forum-nav-sort-control">
+                            <option value="date">by recent activity</option>
+                            <option value="comments">by most activity</option>
+                            <option value="votes">by most votes</option>
+                        </select>
+                    </span>
+                </div>
             </div>
             <div class="search-alerts"></div>
             <ul class="forum-nav-thread-list"></ul>
@@ -372,3 +427,135 @@ describe "DiscussionThreadListView", ->
       it "when none should be present", ->
         renderSingleThreadWithProps({})
         expect($(".forum-nav-thread-labels").length).toEqual(0)
+
+    describe "browse menu", ->
+      setupAjax = (callback) ->
+        $.ajax.andCallFake(
+          (params) =>
+            if callback
+              callback(params)
+            params.success({discussion_data: [], page: 1, num_pages: 1})
+            {always: ->}
+        )
+
+      afterEach ->
+        # Remove handler added to make browse menu disappear
+        $("body").unbind("click")
+
+      expectBrowseMenuVisible = (isVisible) ->
+        expect($(".forum-nav-browse-menu:visible").length).toEqual(if isVisible then 1 else 0)
+        expect($(".forum-nav-thread-list-wrapper:visible").length).toEqual(if isVisible then 0 else 1)
+
+      it "should not be visible by default", ->
+        expectBrowseMenuVisible(false)
+
+      it "should show when header button is clicked", ->
+        $(".forum-nav-browse").click()
+        expectBrowseMenuVisible(true)
+
+      describe "when shown", ->
+        beforeEach ->
+          $(".forum-nav-browse").click()
+
+        it "should hide when header button is clicked", ->
+          $(".forum-nav-browse").click()
+          expectBrowseMenuVisible(false)
+
+        it "should hide when a click outside the menu occurs", ->
+          $(".forum-nav-search-input").click()
+          expectBrowseMenuVisible(false)
+
+        it "should hide when a search is executed", ->
+          setupAjax()
+          $(".forum-nav-search-input").trigger($.Event("keydown", {which: 13}))
+          expectBrowseMenuVisible(false)
+
+        it "should hide when a category is clicked", ->
+          $(".forum-nav-browse-title")[0].click()
+          expectBrowseMenuVisible(false)
+
+        it "should still be shown when filter input is clicked", ->
+          $(".forum-nav-browse-filter-input").click()
+          expectBrowseMenuVisible(true)
+
+        describe "filtering", ->
+          checkFilter = (filterText, expectedItems) ->
+            $(".forum-nav-browse-filter-input").val(filterText).keyup()
+            visibleItems = $(".forum-nav-browse-title:visible").map(
+              (i, elem) -> $(elem).text()
+            ).get()
+            expect(visibleItems).toEqual(expectedItems)
+
+          it "should be case-insensitive", ->
+            checkFilter("flagged", ["Flagged Discussions"])
+
+          it "should match partial words", ->
+            checkFilter("ateg", ["Other Category"])
+
+          it "should show ancestors and descendants of matches", ->
+            checkFilter("Target", ["Parent", "Target", "Child"])
+
+          it "should handle multiple words regardless of order", ->
+            checkFilter("Following Posts", ["Posts I'm Following"])
+
+          it "should handle multiple words in different depths", ->
+            checkFilter("Parent Child", ["Parent", "Target", "Child"])
+
+      describe "selecting an item", ->
+        it "should clear the search box", ->
+          setupAjax()
+          $(".forum-nav-search-input").val("foobar")
+          $(".forum-nav-browse-menu-following .forum-nav-browse-title").click()
+          expect($(".forum-nav-search-input").val()).toEqual("")
+
+        it "should change the button text", ->
+          setupAjax()
+          $(".forum-nav-browse-menu-following .forum-nav-browse-title").click()
+          expect($(".forum-nav-browse-current").text()).toEqual("Posts I'm Following")
+
+        testSelectionRequest = (callback, itemText) ->
+          setupAjax(callback)
+          $(".forum-nav-browse-title:contains(#{itemText})").click()
+
+        it "should get all discussions", ->
+          testSelectionRequest(
+            (params) -> expect(params.url.path()).toEqual(DiscussionUtil.urlFor("threads")),
+            "All"
+          )
+
+        it "should get flagged threads", ->
+          testSelectionRequest(
+            (params) ->
+              expect(params.url.path()).toEqual(DiscussionUtil.urlFor("search"))
+              expect(params.data.flagged).toEqual(true)
+            ,
+            "Flagged"
+          )
+
+        it "should get followed threads", ->
+          testSelectionRequest(
+            (params) ->
+              expect(params.url.path()).toEqual(
+                DiscussionUtil.urlFor("followed_threads", window.user.id)
+              )
+            ,
+            "Following"
+          )
+
+        it "should get threads for the selected leaf", ->
+          testSelectionRequest(
+            (params) ->
+              expect(params.url.path()).toEqual(DiscussionUtil.urlFor("search"))
+              expect(params.data.commentable_ids).toEqual("child")
+            ,
+            "Child"
+          )
+
+        it "should get threads for children of the selected intermediate node", ->
+          testSelectionRequest(
+            (params) ->
+              expect(params.url.path()).toEqual(DiscussionUtil.urlFor("search"))
+              expect(params.data.commentable_ids).toEqual("child,sibling")
+            ,
+            "Parent"
+          )

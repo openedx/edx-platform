@@ -93,6 +93,10 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status/"
     }[name]
 
+  @ignoreEnterKey: (event) =>
+    if event.which == 13
+      event.preventDefault()
+
   @activateOnSpace: (event, func) ->
     if event.which == 32
       event.preventDefault()
