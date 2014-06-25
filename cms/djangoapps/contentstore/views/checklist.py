@@ -119,6 +119,7 @@ def expand_checklist_action_url(course_module, checklist):
         "SettingsDetails": "settings_handler",
         "SettingsGrading": "grading_handler",
         "SettingsAdvanced": "advanced_settings_handler",
+        "CaptionUtility": "utility_captions_handler",
     }
     lms_urlconf_map = {
         "Wiki": "course_wiki",
