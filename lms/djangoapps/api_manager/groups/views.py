@@ -5,15 +5,17 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.response import Response
 
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
-from api_manager.permissions import SecureAPIView
+from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import str2bool, generate_base_uri
 from api_manager.organizations import serializers
+from projects.serializers import BasicWorkgroupSerializer
 from xmodule.modulestore import Location, InvalidLocationError
 from xmodule.modulestore.django import modulestore
 
@@ -642,3 +644,29 @@ class GroupsOrganizationsList(SecureAPIView):
             serializer = serializers.OrganizationSerializer(org)
             response_data.append(serializer.data)
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class GroupsWorkgroupsList(SecureListAPIView):
+    """
+    ### The GroupsWorkgroupsList view allows clients to retrieve a list of workgroups a group has
+    - URI: ```/api/groups/{group_id}/workgroups/```
+    - GET: Provides paginated list of workgroups for a group
+    To filter the group's workgroup set by course
+    GET ```/api/groups/{group_id}/workgroups/?course_id={course_id}```
+    """
+
+    serializer_class = BasicWorkgroupSerializer
+
+    def get_queryset(self):
+        group_id = self.kwargs['group_id']
+        course_id = self.request.QUERY_PARAMS.get('course_id', None)
+        try:
+            group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        queryset = group.workgroups.all()
+
+        if course_id:
+            queryset = queryset.filter(project__course_id=course_id)
+        return queryset
