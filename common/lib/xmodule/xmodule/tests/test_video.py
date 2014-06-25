@@ -12,20 +12,33 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
-
 import unittest
 import datetime
 from mock import Mock
 
 from . import LogicTest
 from lxml import etree
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.video_module import VideoDescriptor, create_youtube_string
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
+
+
+def instantiate_descriptor(**field_data):
+    """
+    Instantiate descriptor with most properties.
+    """
+    system = get_test_descriptor_system()
+    course_key = SlashSeparatedCourseKey('org', 'course', 'run')
+    usage_key = course_key.make_usage_key('video', 'SampleProblem')
+    return system.construct_xblock_from_class(
+        VideoDescriptor,
+        scope_ids=ScopeIds(None, None, usage_key, usage_key),
+        field_data=DictFieldData(field_data),
+    )
 
 
 class VideoModuleTest(LogicTest):
@@ -108,59 +121,48 @@ class VideoModuleTest(LogicTest):
         )
 
 
-class VideoDescriptorTest(unittest.TestCase):
-    """Test for VideoDescriptor"""
+class VideoDescriptorTestBase(unittest.TestCase):
+    """
+    Base class for tests for VideoDescriptor
+    """
 
     def setUp(self):
-        system = get_test_descriptor_system()
-        location = Location('org', 'course', 'run', 'video', 'name', None)
-        self.descriptor = system.construct_xblock_from_class(
-            VideoDescriptor,
-            scope_ids=ScopeIds(None, None, location, location),
-            field_data=DictFieldData({}),
-        )
+        self.descriptor = instantiate_descriptor()
 
+
+class TestCreateYoutubeString(VideoDescriptorTestBase):
+    """
+    Checks that create_youtube_string correcty extracts information from Video descriptor.
+    """
     def test_create_youtube_string(self):
         """
-        Test that Youtube ID strings are correctly created when writing
-        back out to XML.
+        Test that Youtube ID strings are correctly created when writing back out to XML.
         """
-        system = DummySystem(load_error_modules=True)
-        location = Location("edX", 'course', 'run', "video", 'SampleProblem1', None)
-        field_data = DictFieldData({'location': location})
-        descriptor = VideoDescriptor(system, field_data, Mock())
-        descriptor.youtube_id_0_75 = 'izygArpw-Qo'
-        descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
-        descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
-        descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
+        self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
+        self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
-        self.assertEqual(create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(self.descriptor), expected)
 
     def test_create_youtube_string_missing(self):
         """
-        Test that Youtube IDs which aren't explicitly set aren't included
-        in the output string.
+        Test that Youtube IDs which aren't explicitly set aren't included in the output string.
         """
-        system = DummySystem(load_error_modules=True)
-        location = Location("edX", 'course', 'run', "video", "SampleProblem1", None)
-        field_data = DictFieldData({'location': location})
-        descriptor = VideoDescriptor(system, field_data, Mock())
-        descriptor.youtube_id_0_75 = 'izygArpw-Qo'
-        descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
-        descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
+        self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
-        self.assertEqual(create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(self.descriptor), expected)
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
     """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
     """
-
     def assert_attributes_equal(self, video, attrs):
         """
-        Assert that `video` has the correct attributes. `attrs` is a map
-        of {metadata_field: value}.
+        Assert that `video` has the correct attributes. `attrs` is a map of {metadata_field: value}.
         """
         for key, value in attrs.items():
             self.assertEquals(getattr(video, key), value)
@@ -182,13 +184,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <transcript language="ge" src="german_translation.srt" />
             </video>
         '''
-        location = Location("edX", 'course', 'run', "video", "SampleProblem1", None)
-        field_data = DictFieldData({
-            'data': sample_xml,
-            'location': location
-        })
-        system = DummySystem(load_error_modules=True)
-        descriptor = VideoDescriptor(system, field_data, Mock())
+        descriptor = instantiate_descriptor(data=sample_xml)
         self.assert_attributes_equal(descriptor, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -480,14 +476,10 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         })
 
 
-class VideoExportTestCase(unittest.TestCase):
+class VideoExportTestCase(VideoDescriptorTestBase):
     """
-    Make sure that VideoDescriptor can export itself to XML
-    correctly.
+    Make sure that VideoDescriptor can export itself to XML correctly.
     """
-    def setUp(self):
-        self.location = Location("edX", 'course', 'run', "video", "SampleProblem1", None)
-
     def assertXmlEqual(self, expected, xml):
         for attr in ['tag', 'attrib', 'text', 'tail']:
             self.assertEqual(getattr(expected, attr), getattr(xml, attr))
@@ -495,27 +487,26 @@ class VideoExportTestCase(unittest.TestCase):
             self.assertXmlEqual(left, right)
 
     def test_export_to_xml(self):
-        """Test that we write the correct XML on export."""
-        module_system = DummySystem(load_error_modules=True)
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
+        """
+        Test that we write the correct XML on export.
+        """
+        self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
+        self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
+        self.descriptor.show_captions = False
+        self.descriptor.start_time = datetime.timedelta(seconds=1.0)
+        self.descriptor.end_time = datetime.timedelta(seconds=60)
+        self.descriptor.track = 'http://www.example.com/track'
+        self.descriptor.handout = 'http://www.example.com/handout'
+        self.descriptor.download_track = True
+        self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
+        self.descriptor.download_video = True
+        self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
 
-        desc.youtube_id_0_75 = 'izygArpw-Qo'
-        desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
-        desc.youtube_id_1_25 = '1EeWXzPdhSA'
-        desc.youtube_id_1_5 = 'rABDYkeK0x8'
-        desc.show_captions = False
-        desc.start_time = datetime.timedelta(seconds=1.0)
-        desc.end_time = datetime.timedelta(seconds=60)
-        desc.track = 'http://www.example.com/track'
-        desc.handout = 'http://www.example.com/handout'
-        desc.download_track = True
-        desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
-        desc.download_video = True
-        desc.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
-
-        xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
+        xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = etree.fromstring('''\
-         <video url_name="SampleProblem1" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
+         <video url_name="SampleProblem" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
@@ -527,25 +518,24 @@ class VideoExportTestCase(unittest.TestCase):
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_end_time(self):
-        """Test that we write the correct XML on export."""
-        module_system = DummySystem(load_error_modules=True)
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
+        """
+        Test that we write the correct XML on export.
+        """
+        self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
+        self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
+        self.descriptor.show_captions = False
+        self.descriptor.start_time = datetime.timedelta(seconds=5.0)
+        self.descriptor.end_time = datetime.timedelta(seconds=0.0)
+        self.descriptor.track = 'http://www.example.com/track'
+        self.descriptor.download_track = True
+        self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
+        self.descriptor.download_video = True
 
-        desc.youtube_id_0_75 = 'izygArpw-Qo'
-        desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
-        desc.youtube_id_1_25 = '1EeWXzPdhSA'
-        desc.youtube_id_1_5 = 'rABDYkeK0x8'
-        desc.show_captions = False
-        desc.start_time = datetime.timedelta(seconds=5.0)
-        desc.end_time = datetime.timedelta(seconds=0.0)
-        desc.track = 'http://www.example.com/track'
-        desc.download_track = True
-        desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
-        desc.download_video = True
-
-        xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
+        xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = etree.fromstring('''\
-         <video url_name="SampleProblem1" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
+         <video url_name="SampleProblem" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
@@ -555,11 +545,9 @@ class VideoExportTestCase(unittest.TestCase):
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_parameters(self):
-        """Test XML export with defaults."""
-        module_system = DummySystem(load_error_modules=True)
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
-
-        xml = desc.definition_to_xml(None)
-        expected = '<video url_name="SampleProblem1"/>\n'
-
+        """
+        Test XML export with defaults.
+        """
+        xml = self.descriptor.definition_to_xml(None)
+        expected = '<video url_name="SampleProblem"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
