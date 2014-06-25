@@ -34,7 +34,7 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 
 from .serializers import CourseModuleCompletionSerializer
-from .serializers import GradeSerializer
+from .serializers import GradeSerializer, CourseLeadersSerializer
 
 log = logging.getLogger(__name__)
 
@@ -1424,3 +1424,46 @@ class CourseMetrics(SecureAPIView):
             'users_enrolled': users_enrolled
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursesLeadersList(SecureListAPIView):
+    """
+    ### The CoursesLeadersList view allows clients to retrieve ordered list of users who are leading
+    in terms of points_scored for the specified Course
+    - URI: ```/api/courses/{course_id}/metrics/proficiency/leaders/```
+    - GET: Returns a JSON representation (array) of the users with points scored
+    Filters can also be applied
+    ```/api/courses/{course_id}/metrics/proficiency/leaders/?content_id={content_id}```
+    To get top 3 users use count parameter
+    ```/api/courses/{course_id}/metrics/proficiency/leaders/?count=3```
+    ### Use Cases/Notes:
+    * Example: Display leaderboard of a given course
+    * Example: Display top 3 users of a given course
+    """
+
+    serializer_class = CourseLeadersSerializer
+
+    def get_queryset(self):
+        """
+        GET /api/courses/{course_id}/leaders/
+        """
+        course_id = self.kwargs['course_id']
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        count = self.request.QUERY_PARAMS.get('count', getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100))
+        try:
+            get_course(course_id)
+        except ValueError:
+            raise Http404
+        queryset = StudentModule.objects.filter(
+            course_id__exact=course_id,
+            grade__isnull=False,
+            max_grade__isnull=False,
+            max_grade__gt=0
+        )
+
+        if content_id:
+            queryset = queryset.filter(module_state_key=content_id)
+
+        queryset = queryset.values('student__id', 'student__username', 'student__profile__title',
+                                   'student__profile__avatar_url').annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
+        return queryset
