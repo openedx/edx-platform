@@ -291,23 +291,23 @@ To run all the acceptance tests:
 
 To run only for lms or cms:
 
-    rake test:acceptance:lms
-    rake test:acceptance:cms
+    paver test_acceptance -s lms
+    paver test_acceptance -s cms
 
 To test only a specific feature:
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature"
 
 To test only a specific scenario
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature -s 3"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature -s 3"
 
-To start the debugger on failure, add the `--pdb` option:
+To start the debugger on failure, add the `--pdb` option to extra_args:
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature --pdb"
 
 To run tests faster by not collecting static files, you can use
-`rake test:acceptance:lms:fast` and `rake test:acceptance:cms:fast`.
+`paver test_acceptance -s lms --fasttest` and `paver test_acceptance -s cms --fasttest`.
 
 Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
