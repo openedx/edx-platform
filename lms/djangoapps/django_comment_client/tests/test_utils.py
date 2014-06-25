@@ -152,7 +152,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
-        ItemFactory.create(
+        return ItemFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion{}".format(self.discussion_num),
@@ -179,17 +179,38 @@ class CategoryMapTestCase(ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B"},
             "Topic C": {"id": "Topic_C"}
         }
-        self.assertCategoryMapEquals(
-            {
-                "entries": {
-                    "Topic A": {"id": "Topic_A", "sort_key": "Topic A"},
-                    "Topic B": {"id": "Topic_B", "sort_key": "Topic B"},
-                    "Topic C": {"id": "Topic_C", "sort_key": "Topic C"},
-                },
-                "subcategories": {},
-                "children": ["Topic A", "Topic B", "Topic C"]
-            }
-        )
+
+        def check_cohorted_topics(expected_ids):
+            self.assertCategoryMapEquals(
+                {
+                    "entries": {
+                        "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_cohorted": "Topic_A" in expected_ids},
+                        "Topic B": {"id": "Topic_B", "sort_key": "Topic B", "is_cohorted": "Topic_B" in expected_ids},
+                        "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_cohorted": "Topic_C" in expected_ids},
+                    },
+                    "subcategories": {},
+                    "children": ["Topic A", "Topic B", "Topic C"]
+                }
+            )
+
+        check_cohorted_topics([]) # default (empty) cohort config
+
+        self.course.cohort_config = {"cohorted": False, "cohorted_discussions": []}
+        check_cohorted_topics([])
+
+        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": []}
+        check_cohorted_topics([])
+
+        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": ["Topic_B", "Topic_C"]}
+        check_cohorted_topics(["Topic_B", "Topic_C"])
+
+        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": ["Topic_A", "Some_Other_Topic"]}
+        check_cohorted_topics(["Topic_A"])
+
+        # unlikely case, but make sure it works.
+        self.course.cohort_config = {"cohorted": False, "cohorted_discussions": ["Topic_A"]}
+        check_cohorted_topics([])
+
 
     def test_single_inline(self):
         self.create_discussion("Chapter", "Discussion")
@@ -201,7 +222,8 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion": {
                                 "id": "discussion1",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -220,81 +242,101 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
-        self.assertCategoryMapEquals(
-            {
-                "entries": {},
-                "subcategories": {
-                    "Chapter 1": {
-                        "entries": {
-                            "Discussion 1": {
-                                "id": "discussion1",
-                                "sort_key": None
+        def check_cohorted(is_cohorted):
+
+            self.assertCategoryMapEquals(
+                {
+                    "entries": {},
+                    "subcategories": {
+                        "Chapter 1": {
+                            "entries": {
+                                "Discussion 1": {
+                                    "id": "discussion1",
+                                    "sort_key": None,
+                                    "is_cohorted": is_cohorted,
+                                },
+                                "Discussion 2": {
+                                    "id": "discussion2",
+                                    "sort_key": None,
+                                    "is_cohorted": is_cohorted,
+                                }
                             },
-                            "Discussion 2": {
-                                "id": "discussion2",
-                                "sort_key": None
-                            }
+                            "subcategories": {},
+                            "children": ["Discussion 1", "Discussion 2"]
                         },
-                        "subcategories": {},
-                        "children": ["Discussion 1", "Discussion 2"]
-                    },
-                    "Chapter 2": {
-                        "entries": {
-                            "Discussion": {
-                                "id": "discussion3",
-                                "sort_key": None
-                            }
-                        },
-                        "subcategories": {
-                            "Section 1": {
-                                "entries": {},
-                                "subcategories": {
-                                    "Subsection 1": {
-                                        "entries": {
-                                            "Discussion": {
-                                                "id": "discussion4",
-                                                "sort_key": None
-                                            }
+                        "Chapter 2": {
+                            "entries": {
+                                "Discussion": {
+                                    "id": "discussion3",
+                                    "sort_key": None,
+                                    "is_cohorted": is_cohorted,
+                                }
+                            },
+                            "subcategories": {
+                                "Section 1": {
+                                    "entries": {},
+                                    "subcategories": {
+                                        "Subsection 1": {
+                                            "entries": {
+                                                "Discussion": {
+                                                    "id": "discussion4",
+                                                    "sort_key": None,
+                                                    "is_cohorted": is_cohorted,
+                                                }
+                                            },
+                                            "subcategories": {},
+                                            "children": ["Discussion"]
                                         },
-                                        "subcategories": {},
-                                        "children": ["Discussion"]
+                                        "Subsection 2": {
+                                            "entries": {
+                                                "Discussion": {
+                                                    "id": "discussion5",
+                                                    "sort_key": None,
+                                                    "is_cohorted": is_cohorted,
+                                                }
+                                            },
+                                            "subcategories": {},
+                                            "children": ["Discussion"]
+                                        }
                                     },
-                                    "Subsection 2": {
-                                        "entries": {
-                                            "Discussion": {
-                                                "id": "discussion5",
-                                                "sort_key": None
-                                            }
-                                        },
-                                        "subcategories": {},
-                                        "children": ["Discussion"]
-                                    }
-                                },
-                                "children": ["Subsection 1", "Subsection 2"]
-                            }
+                                    "children": ["Subsection 1", "Subsection 2"]
+                                }
+                            },
+                            "children": ["Discussion", "Section 1"]
                         },
-                        "children": ["Discussion", "Section 1"]
+                        "Chapter 3": {
+                            "entries": {},
+                            "subcategories": {
+                                "Section 1": {
+                                    "entries": {
+                                        "Discussion": {
+                                            "id": "discussion6",
+                                            "sort_key": None,
+                                            "is_cohorted": is_cohorted,
+                                        }
+                                    },
+                                    "subcategories": {},
+                                    "children": ["Discussion"]
+                                }
+                            },
+                            "children": ["Section 1"]
+                        }
                     },
-                    "Chapter 3": {
-                        "entries": {},
-                        "subcategories": {
-                            "Section 1": {
-                                "entries": {
-                                    "Discussion": {
-                                        "id": "discussion6",
-                                        "sort_key": None
-                                    }
-                                },
-                                "subcategories": {},
-                                "children": ["Discussion"]
-                            }
-                        },
-                        "children": ["Section 1"]
-                    }
-                },
-                "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
-            }
-        )
+                    "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
+                }
+            )
+
+        # empty / default config
+        check_cohorted(False)
+
+        # explicitly disabled cohorting
+        self.course.cohort_config = {"cohorted": False}
+        check_cohorted(False)
+
+        # explicitly enabled cohorting
+        self.course.cohort_config = {"cohorted": True}
+        check_cohorted(True)
+
 
     def test_start_date_filter(self):
         now = datetime.now()
@@ -314,7 +356,8 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion 1": {
                                 "id": "discussion1",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -324,7 +367,8 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion": {
                                 "id": "discussion3",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -350,23 +394,28 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion 1": {
                                 "id": "discussion1",
-                                "sort_key": "D"
+                                "sort_key": "D",
+                                "is_cohorted": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion2",
-                                "sort_key": "A"
+                                "sort_key": "A",
+                                "is_cohorted": False,
                             },
                             "Discussion 3": {
                                 "id": "discussion3",
-                                "sort_key": "E"
+                                "sort_key": "E",
+                                "is_cohorted": False,
                             },
                             "Discussion 4": {
                                 "id": "discussion4",
-                                "sort_key": "C"
+                                "sort_key": "C",
+                                "is_cohorted": False,
                             },
                             "Discussion 5": {
                                 "id": "discussion5",
-                                "sort_key": "B"
+                                "sort_key": "B",
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -392,9 +441,9 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.assertCategoryMapEquals(
             {
                 "entries": {
-                    "Topic A": {"id": "Topic_A", "sort_key": "B"},
-                    "Topic B": {"id": "Topic_B", "sort_key": "C"},
-                    "Topic C": {"id": "Topic_C", "sort_key": "A"},
+                    "Topic A": {"id": "Topic_A", "sort_key": "B", "is_cohorted": False},
+                    "Topic B": {"id": "Topic_B", "sort_key": "C", "is_cohorted": False},
+                    "Topic C": {"id": "Topic_C", "sort_key": "A", "is_cohorted": False},
                 },
                 "subcategories": {},
                 "children": ["Topic C", "Topic A", "Topic B"]
@@ -418,23 +467,28 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion D": {
                                 "id": "discussion1",
-                                "sort_key": "Discussion D"
+                                "sort_key": "Discussion D",
+                                "is_cohorted": False,
                             },
                             "Discussion A": {
                                 "id": "discussion2",
-                                "sort_key": "Discussion A"
+                                "sort_key": "Discussion A",
+                                "is_cohorted": False,
                             },
                             "Discussion E": {
                                 "id": "discussion3",
-                                "sort_key": "Discussion E"
+                                "sort_key": "Discussion E",
+                                "is_cohorted": False,
                             },
                             "Discussion C": {
                                 "id": "discussion4",
-                                "sort_key": "Discussion C"
+                                "sort_key": "Discussion C",
+                                "is_cohorted": False,
                             },
                             "Discussion B": {
                                 "id": "discussion5",
-                                "sort_key": "Discussion B"
+                                "sort_key": "Discussion B",
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -466,11 +520,13 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion 1": {
                                 "id": "discussion3",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion5",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -480,11 +536,13 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion 1": {
                                 "id": "discussion4",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion1",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
@@ -494,7 +552,8 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                         "entries": {
                             "Discussion": {
                                 "id": "discussion2",
-                                "sort_key": None
+                                "sort_key": None,
+                                "is_cohorted": False,
                             }
                         },
                         "subcategories": {},
