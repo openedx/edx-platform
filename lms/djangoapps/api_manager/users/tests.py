@@ -156,6 +156,7 @@ class UsersApiTests(TestCase):
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
+        self.assertIsNotNone(response.data['results'][0]['created'])
         # fetch user data by multiple ids
         response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
         self.assertEqual(response.status_code, 200)
@@ -193,6 +194,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['username'], local_username)
         self.assertEqual(response.data['first_name'], self.test_first_name)
         self.assertEqual(response.data['last_name'], self.test_last_name)
+        self.assertIsNotNone(response.data['created'])
 
     def test_user_list_post_inactive(self):
         test_uri = '/api/users'
@@ -264,6 +266,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['last_name'], self.test_last_name)
         self.assertEqual(response.data['full_name'], '{} {}'.format(self.test_first_name, self.test_last_name))
         self.assertEqual(response.data['is_active'], False)
+        self.assertIsNotNone(response.data['created'])
 
     def test_user_detail_post_duplicate_username(self):
         """
