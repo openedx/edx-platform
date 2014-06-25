@@ -69,6 +69,7 @@ if Backbone?
       current_el = @$(".forum-nav-thread[data-id=#{thread_id}]")
       active = current_el.has(".forum-nav-thread-link.is-active").length != 0
       current_el.replaceWith(content)
+      @showMetadataAccordingToSort()
       if active
         @setActiveThread(thread_id)
 
@@ -142,7 +143,13 @@ if Backbone?
         rendered.append content
 
       @$(".forum-nav-thread-list").html(rendered.html())
+      @showMetadataAccordingToSort()
 
+      @renderMorePages()
+      @updateSidebar()
+      @trigger "threads:rendered"
+
+    showMetadataAccordingToSort: () =>
       # Ensure that threads display metadata appropriate for the current sort
       voteCounts = @$(".forum-nav-thread-votes-count")
       commentCounts = @$(".forum-nav-thread-comments-count")
@@ -153,10 +160,6 @@ if Backbone?
           commentCounts.show()
         when "votes"
           voteCounts.show()
-
-      @renderMorePages()
-      @updateSidebar()
-      @trigger "threads:rendered"
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
