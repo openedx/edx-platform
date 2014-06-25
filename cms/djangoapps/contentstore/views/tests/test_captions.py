@@ -18,11 +18,11 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locator import BlockUsageLocator
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -205,15 +205,16 @@ class TestCheckcaptions(Basetranscripts):
             'video': '',
         }
         resp = self.client.get(link, data, HTTP_ACCEPT='application/json')
-        print resp.content
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('message'), "Invalid location.")
 
     def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
+        # Test for raising `InvalidKeyError` exception.
         link = self.captions_url
         data = {
-            'video': json.dumps({'location': ''}),
+            'video': json.dumps({
+                'location': '',
+            }),
         }
         resp = self.client.get(link, data)
         self.assertEqual(resp.status_code, 400)
@@ -221,7 +222,9 @@ class TestCheckcaptions(Basetranscripts):
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
-            'video': json.dumps({'location': '{0}_{1}'.format(self.item_location_string, 'BAD_LOCATION')}),
+            'video': json.dumps({
+                'location': '{0}_{1}'.format(self.item_location_string, 'BAD_LOCATION')
+            }),
         }
         resp = self.client.get(link, data)
         self.assertEqual(resp.status_code, 400)

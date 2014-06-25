@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import logging
 import os
+
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,18 +12,18 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response
-from models.settings.course_grading import CourseGradingModel
+
+from opaque_keys import InvalidKeyError
 from util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.keys import UsageKey
-from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.video_module.transcripts_utils import (
                                     GetTranscriptsFromYouTubeException,
                                     TranscriptsRequestValidationException,
                                     download_youtube_subs)
-from ..access import has_course_access
+
 from ..transcripts_ajax import get_transcripts_presence
 from ..course import _get_course_module
 
@@ -187,10 +188,10 @@ def _validate_captions_data_update(request, course_key):
 
 
 def _validate_location(location, course_key):
-    location = UsageKey.from_string(location)
     try:
+        location = UsageKey.from_string(location)
         item = modulestore().get_item(location)
-    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+    except (ItemNotFoundError, InvalidKeyError, InsufficientSpecificationError):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':
