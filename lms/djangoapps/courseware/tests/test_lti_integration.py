@@ -86,6 +86,9 @@ class TestLTI(BaseTestXmodule):
             'module_score': None,
             'comment': u'',
             'weight': 1.0,
+            'grader_feedback_label': 'Feedback on your work from the grader:',
+            'instruction_text': '',
+            'title_postscript': '(External Resource)',
         }
 
         def mocked_sign(self, *args, **kwargs):
