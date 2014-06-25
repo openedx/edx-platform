@@ -303,8 +303,12 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                                  self.context)
 
             # Expect to see the message
-            self.assert_has_text(xml, "//div[@class='capa_alert']",
-                                 self.context['submitted_message'])
+            if self.context['value']:
+                self.assert_has_text(
+                    xml,
+                    "//div[@class='capa_alert']",
+                    self.context['submitted_message'],
+                 )
 
     def test_no_message_before_submission(self):
         """
