@@ -18,3 +18,12 @@ class CourseModuleCompletionSerializer(serializers.ModelSerializer):
 class GradeSerializer(serializers.Serializer):
     """ Serializer for model interactions """
     grade = serializers.Field()
+
+
+class CourseLeadersSerializer(serializers.Serializer):
+    """ Serializer for course leaderboard """
+    id = serializers.IntegerField(source='student__id')
+    username = serializers.CharField(source='student__username')
+    title = serializers.CharField(source='student__profile__title')
+    avatar_url = serializers.CharField(source='student__profile__avatar_url')
+    points_scored = serializers.IntegerField()
