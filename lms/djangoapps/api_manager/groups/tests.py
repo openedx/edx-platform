@@ -9,13 +9,13 @@ import uuid
 import json
 
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
-from api_manager.models import GroupRelationship, GroupProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from api_manager.models import GroupRelationship, GroupProfile, Organization
-from xmodule.modulestore.tests.factories import CourseFactory
+from projects.models import Project
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -43,8 +43,16 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.base_users_uri = '/api/users'
         self.base_groups_uri = '/api/groups'
 
+        self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
         self.test_course_id = self.course.id
+        self.course_content = ItemFactory.create(
+            category="videosequence",
+            parent_location=self.course.location,
+            data=self.test_course_data,
+            due="2016-05-16T14:30:00Z",
+            display_name="View_Sequence"
+        )
 
         self.test_organization = Organization.objects.create(
             name="Test Organization",
@@ -52,6 +60,11 @@ class GroupsApiTests(ModuleStoreTestCase):
             contact_name = 'John Org',
             contact_email = 'john@test.org',
             contact_phone = '+1 332 232 24234'
+        )
+
+        self.test_project = Project.objects.create(
+            course_id=self.course.id,
+            content_id=self.course_content.id
         )
 
         self.client = SecureClient()
@@ -938,4 +951,42 @@ class GroupsApiTests(ModuleStoreTestCase):
     def test_group_courses_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/organizations/'
         response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_groups_workgroups_list(self):
+        data = {'name': self.test_group_name, 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_workgroups_uri = '/api/workgroups/'
+        for i in xrange(1, 12):
+            project_id = self.test_project.id
+            data = {
+                'name': 'Workgroup ' + str(i),
+                'project': project_id
+            }
+            response = self.do_post(test_workgroups_uri, data)
+            self.assertEqual(response.status_code, 201)
+            test_uri = '{}{}/'.format(test_workgroups_uri, str(response.data['id']))
+            users_uri = '{}groups/'.format(test_uri)
+            data = {"id": group_id}
+            response = self.do_post(users_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # test to get list of workgroups
+        test_uri = '/api/groups/{}/workgroups/?page_size=10'.format(group_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 11)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # test with course_id filter
+        response = self.do_get('/api/groups/{}/workgroups/?course_id={}'.format(group_id, self.course.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 11)
+        self.assertIsNotNone(response.data['results'][0]['name'])
+        self.assertIsNotNone(response.data['results'][0]['project'])
+
+        # test with invalid group id
+        response = self.do_get('/api/groups/4356340/workgroups/')
         self.assertEqual(response.status_code, 404)
