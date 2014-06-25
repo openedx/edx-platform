@@ -164,6 +164,10 @@ LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
 LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
 USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
+# Additional installed apps
+for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
+    INSTALLED_APPS += (app,)
+
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
