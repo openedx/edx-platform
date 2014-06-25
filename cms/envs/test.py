@@ -20,6 +20,12 @@ from warnings import filterwarnings
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (WIKI_ENABLED)
 
+# Remove sneakpeek during tests to prevent unwanted redirect
+MIDDLEWARE_CLASSES = tuple([
+    mwc for mwc in MIDDLEWARE_CLASSES
+        if mwc != 'sneakpeek.middleware.SneakPeekLogoutMiddleware'
+])
+
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
