@@ -487,11 +487,6 @@ def course_info(request, course_id):
         'reverifications': reverifications,
     }
 
-    try:
-        if settings.FEATURES["USE_CUSTOM_THEME"]:
-            return render_to_response("courseware/theme-info.html", context)
-    except TopLevelLookupException:
-        pass
     return render_to_response('courseware/info.html', context)
 
 
@@ -624,11 +619,6 @@ def course_about(request, course_id):
         'is_course_full': is_course_full
     }
 
-    try:
-        if settings.FEATURES["USE_CUSTOM_THEME"]:
-            return render_to_response("courseware/theme-course_about.html", context)
-    except TopLevelLookupException:
-        pass
     return render_to_response('courseware/course_about.html', context)
 
 

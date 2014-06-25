@@ -38,6 +38,7 @@ $(document).ready(function(){
       % endif
       
       <h1>${_("Course Updates &amp; News")}</h1>
+      <%include file="theme-info_research.html" />
       ${get_course_info_section(request, course, 'updates')}
     </section>
     <section aria-label="Handout Navigation" class="handouts">
