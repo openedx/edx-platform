@@ -1,3 +1,85 @@
+// -------------------
+// navigation - header
+// -------------------
+
+// Override global a rules
+.forum-nav-browse {
+  color: $black !important;
+}
+
+// Override global label rules
+.forum-nav-search label {
+  margin-bottom: 0;
+}
+
+// Override global input rules
+.forum-nav-search-input {
+  box-shadow: none !important;
+  border: 1px solid $gray-l2 !important;
+  border-radius: 3px !important;
+  height: auto !important;
+  padding-left: ($baseline/4) !important;
+  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
+  font-size: 12px !important;
+}
+
+// Firefox does not compute the correct containing box for absolute positioning
+// of .forum-nav-search .icon, so there's an extra div to make it happy
+.forum-nav-search-ff-position-fix {
+  position: relative;
+}
+
+// The sidebar class does a lot of things that we don't want in the thread list;
+// the following rules contain styling that is necessary and would otherwise
+// reside in elements/_navigation.scss if the sidebar styling did not make the
+// !important directive necessary.
+
+.forum-nav {
+  width: 31% !important;
+}
+
+// ------------------------
+// navigation - browse menu
+// ------------------------
+
+// Override global a rules
+.forum-nav-browse-title {
+  color: inherit !important;
+}
+
+// Override global label rules
+.forum-nav-browse-filter label {
+  margin-bottom: 0;
+}
+
+// Override global input rules
+.forum-nav-browse-filter-input {
+  box-shadow: none !important;
+  border-radius: 3px !important;
+  height: auto !important;
+  padding-left: ($baseline/4) !important;
+  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
+  font-size: 12px !important;
+}
+
+// The sidebar class does a lot of things that we don't want in the thread list;
+// the following rules contain styling that is necessary and would otherwise
+// reside in elements/_navigation.scss if the sidebar styling did not make the
+// !important directive necessary.
+
+.forum-nav-browse-title {
+  border-bottom: 1px solid $gray-l3 !important;
+  padding: ($baseline/2) ($baseline/2) !important;
+
+  &:hover, &:focus {
+    background: $forum-color-active-thread !important;
+  }
+}
+
+.forum-nav-browse-submenu {
+  padding-left: $baseline !important;
+}
+
 // --------------------------------
 // navigation - sort and filter bar
 // --------------------------------
