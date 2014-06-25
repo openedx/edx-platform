@@ -269,6 +269,15 @@ class UserProfile(models.Model):
         self.save()
 
 
+class UserSignupSource(models.Model):
+    """
+    This table contains information about users registering
+    via Micro-Sites
+    """
+    user_id = models.ForeignKey(User, db_index=True)
+    site = models.CharField(max_length=255, db_index=True)
+
+
 class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
