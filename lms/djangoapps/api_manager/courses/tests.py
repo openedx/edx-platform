@@ -129,10 +129,14 @@ class CoursesApiTests(TestCase):
             display_name=u"test unit",
         )
 
-        self.users = [UserFactory.create(username="testuser" + str(__)) for __ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            user_profile = user.profile
+            user_profile.avatar_url = 'http://example.com/{}.png'.format(user.id)
+            user_profile.title = 'Software Engineer {}'.format(user.id)
+            user_profile.save()
 
         for i in xrange(USER_COUNT - 1):
             category = 'mentoring'
@@ -1293,6 +1297,24 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(len(response.data['results']), 1)
+
+    def test_courses_leaders_list_get(self):
+        test_uri = '{}/{}/metrics/proficiency/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=3')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)
+
+        # Filter by content_id
+        content_filter_uri = '{}/{}/metrics/proficiency/leaders/?content_id={}'\
+            .format(self.base_courses_uri, self.test_course_id, Location(self.item.location).url())
+        response = self.do_get(content_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        # test with bogus course
+        test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
 
     def test_courses_grades_list_get(self):
         # Retrieve the list of grades for this course
