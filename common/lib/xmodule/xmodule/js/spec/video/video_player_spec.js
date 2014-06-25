@@ -335,6 +335,7 @@ function (VideoPlayer) {
 
                     state.videoEl = $('video, iframe');
 
+                    spyOn(state.videoPlayer, 'log').andCallThrough();
                     spyOn(state.videoControl, 'pause').andCallThrough();
                     spyOn($.fn, 'trigger').andCallThrough();
 
@@ -349,6 +350,15 @@ function (VideoPlayer) {
 
                 it('pause the video caption', function () {
                     expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                });
+
+                it('log stop_video event', function () {
+                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
+                        'stop_video',
+                        {
+                            currentTime: state.videoPlayer.currentTime
+                        }
+                    );
                 });
             });
         });
