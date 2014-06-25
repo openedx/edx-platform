@@ -286,8 +286,9 @@
 
       </ul>
     </section>
-
-    <%include file='theme-dashboard-research.html' />
+    % if self.stanford_theme_enabled():
+        <%include file='theme-dashboard-research.html' />
+    % endif
   </section>
 
   <section class="my-courses" id="my-courses">

@@ -323,9 +323,9 @@
           % endif
         </ol>
       </div>
-
-      <%include file='theme-register-research.html' />
-
+      % if self.stanford_theme_enabled():
+          <%include file='theme-register-research.html' />
+      % endif
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
 

@@ -356,7 +356,9 @@
               <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
             % endif
         </ol>
-      <%include file="theme-course_about_research.html" />
+      % if self.stanford_theme_enabled():
+          <%include file="theme-course_about_research.html" />
+      % endif
       </section>
   
   
