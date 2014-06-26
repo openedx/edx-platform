@@ -230,7 +230,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                 # migrate published_by and published_date if edit_info isn't present
                 if not edit_info:
-                    module.edited_by = module.edited_on = module.published_date = None
+                    module.edited_by = module.edited_on = module.subtree_edited_on = \
+                        module.subtree_edited_by = module.published_date = None
                     # published_date was previously stored as a list of time components instead of a datetime
                     if metadata.get('published_date'):
                         module.published_date = datetime(*metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
@@ -239,6 +240,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 else:
                     module.edited_by = edit_info.get('edited_by')
                     module.edited_on = edit_info.get('edited_on')
+                    module.subtree_edited_on = edit_info.get('subtree_edited_on')
+                    module.subtree_edited_by = edit_info.get('subtree_edited_by')
                     module.published_date = edit_info.get('published_date')
                     module.published_by = edit_info.get('published_by')
 
@@ -981,7 +984,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False):
+    def _update_ancestors(self, location, update):
+        """
+        Recursively applies update to all the ancestors of location
+        """
+        parent = self._get_raw_parent_location(as_published(location), ModuleStoreEnum.RevisionOption.draft_preferred)
+        if parent:
+            self._update_single_item(parent, update)
+            self._update_ancestors(parent, update)
+
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False,
+                    is_publish_root=True):
         """
         Update the persisted version of xblock to reflect its current values.
 
@@ -991,29 +1004,41 @@ class MongoModuleStore(ModuleStoreWriteBase):
         force: force is meaningless for this modulestore
         isPublish: an internal parameter that indicates whether this update is due to a Publish operation, and
           thus whether the item's published information should be updated.
+        is_publish_root: when publishing, this indicates whether xblock is the root of the publish and should
+          therefore propagate subtree edit info up the tree
         """
         try:
             definition_data = self._convert_reference_fields_to_strings(
                 xblock,
                 xblock.get_explicitly_set_fields_by_scope()
             )
+            now = datetime.now(UTC)
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
-                'edit_info': {
-                    'edited_on': datetime.now(UTC),
-                    'edited_by': user_id,
-                }
+                'edit_info.edited_on': now,
+                'edit_info.edited_by': user_id,
+                'edit_info.subtree_edited_on': now,
+                'edit_info.subtree_edited_by': user_id,
             }
 
             if isPublish:
-                payload['edit_info']['published_date'] = datetime.now(UTC)
-                payload['edit_info']['published_by'] = user_id
+                payload['edit_info.published_date'] = now
+                payload['edit_info.published_by'] = user_id
 
             if xblock.has_children:
                 children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
+
+            # update subtree edited info for ancestors
+            # don't update the subtree info for descendants of the publish root for efficiency
+            if (not isPublish) or (isPublish and is_publish_root):
+                ancestor_payload = {
+                    'edit_info.subtree_edited_on': now,
+                    'edit_info.subtree_edited_by': user_id
+                }
+                self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
@@ -1045,20 +1070,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
                         value[key] = subvalue.to_deprecated_string()
         return jsonfields
 
-    def get_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs):
+    def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):
         '''
-        Find the location that is the parent of this location in this course.
-
-        Returns: version agnostic location (revision always None) as per the rest of mongo.
-
-        Args:
-            revision:
-                ModuleStoreEnum.RevisionOption.published_only
-                    - return only the PUBLISHED parent if it exists, else returns None
-                ModuleStoreEnum.RevisionOption.draft_preferred
-                    - return either the DRAFT or PUBLISHED parent,
-                        preferring DRAFT, if parent(s) exists,
-                        else returns None
+        Helper for get_parent_location that finds the location that is the parent of this location in this course,
+        but does NOT return a version agnostic location.
         '''
         assert location.revision is None
         assert revision == ModuleStoreEnum.RevisionOption.published_only \
@@ -1096,7 +1111,27 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # since we sorted by SORT_REVISION_FAVOR_DRAFT, the 0'th parent is the one we want
             found_id = parents[0]['_id']
             # don't disclose revision outside modulestore
-            return as_published(Location._from_deprecated_son(found_id, location.course_key.run))
+            return Location._from_deprecated_son(found_id, location.course_key.run)
+
+    def get_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs):
+        '''
+        Find the location that is the parent of this location in this course.
+
+        Returns: version agnostic location (revision always None) as per the rest of mongo.
+
+        Args:
+            revision:
+                ModuleStoreEnum.RevisionOption.published_only
+                    - return only the PUBLISHED parent if it exists, else returns None
+                ModuleStoreEnum.RevisionOption.draft_preferred
+                    - return either the DRAFT or PUBLISHED parent,
+                        preferring DRAFT, if parent(s) exists,
+                        else returns None
+        '''
+        parent = self._get_raw_parent_location(location, revision)
+        if parent:
+            return as_published(parent)
+        return None
 
     def get_modulestore_type(self, course_key=None):
         """
