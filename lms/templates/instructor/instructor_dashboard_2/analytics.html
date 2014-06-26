@@ -59,3 +59,13 @@
   data-feature="level_of_education"
   data-endpoint="${ section_data['get_distribution_url'] }"
 ></div>
+
+%if settings.FEATURES.get('ENABLE_ANALYTICS_DATA', False):
+
+  <h2 class="title"> Analytics Data Connection Status </h2>
+  <ul>
+    <li>Connected: ${ section_data['analytics_data_status'].alive }</li>
+    <li>Authenticated: ${ section_data['analytics_data_status'].authenticated }</li>
+    <li>Healthy: ${ section_data['analytics_data_status'].healthy }</li>
+  </ul>
+%endif

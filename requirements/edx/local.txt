@@ -6,3 +6,4 @@
 -e common/lib/sandbox-packages
 -e common/lib/symmath
 -e common/lib/xmodule
+-e /edx/app/analytics/edx-analytics-data-api
