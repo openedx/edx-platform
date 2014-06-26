@@ -33,8 +33,8 @@ def wait_for_notification(page):
         num_notifications = len(page.q(css='.wrapper-notification-mini.is-hiding'))
         return (num_notifications == 1, num_notifications)
 
-    Promise(_is_saving, 'Notification should have been shown.').fulfill()
-    Promise(_is_saving_done, 'Notification should have been hidden.').fulfill()
+    Promise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
+    Promise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
 
 
 def add_discussion(page, menu_index):
