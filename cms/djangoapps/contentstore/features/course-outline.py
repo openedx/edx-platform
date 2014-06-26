@@ -48,75 +48,83 @@ def have_a_course_with_two_sections(step):
         display_name='Subsection Beta',)
 
 
-@step(u'I navigate to the course overview page$')
-def navigate_to_the_course_overview_page(step):
+@step(u'I navigate to the course outline page$')
+def navigate_to_the_course_outline_page(step):
     create_studio_user(is_staff=True)
     log_into_studio()
     course_locator = 'a.course-link'
     world.css_click(course_locator)
 
 
-@step(u'I navigate to the courseware page of a course with multiple sections')
-def nav_to_the_courseware_page_of_a_course_with_multiple_sections(step):
+@step(u'I navigate to the outline page of a course with multiple sections')
+def nav_to_the_outline_page_of_a_course_with_multiple_sections(step):
     step.given('I have a course with multiple sections')
-    step.given('I navigate to the course overview page')
+    step.given('I navigate to the course outline page')
 
 
 @step(u'I add a section')
 def i_add_a_section(step):
-    add_section(name='My New Section That I Just Added')
+    add_section()
 
 
-@step(u'I click the "([^"]*)" link$')
-def i_click_the_text_span(step, text):
-    span_locator = '.toggle-button-sections span'
-    assert_true(world.browser.is_element_present_by_css(span_locator))
-    # first make sure that the expand/collapse text is the one you expected
-    assert_true(world.css_has_value(span_locator, text))
-    world.css_click(span_locator)
+@step(u'I press the "section" delete icon')
+def i_press_the_section_delete_icon(step):
+    delete_locator = 'section .outline-item-section > .wrapper-xblock-header a.delete-button'
+    world.css_click(delete_locator)
 
 
-@step(u'I collapse the first section$')
-def i_collapse_a_section(step):
-    collapse_locator = 'section.courseware-section a.collapse'
-    world.css_click(collapse_locator)
+@step(u'I will confirm all alerts')
+def i_confirm_all_alerts(step):
+    confirm_locator = '.prompt .nav-actions a.action-primary'
+    world.css_click(confirm_locator)
 
 
-@step(u'I expand the first section$')
-def i_expand_a_section(step):
-    expand_locator = 'section.courseware-section a.expand'
-    world.css_click(expand_locator)
-
-
-@step(u'I see the "([^"]*)" link$')
-def i_see_the_span_with_text(step, text):
-    span_locator = '.toggle-button-sections span'
-    assert_true(world.css_has_value(span_locator, text))
+@step(u'I see the "([^"]*) All Sections" link$')
+def i_see_the_collapse_expand_all_span(step, text):
+    if text == "Collapse":
+        span_locator = '.toggle-button-expand-collapse .collapse-all .label'
+    elif text == "Expand":
+        span_locator = '.toggle-button-expand-collapse .expand-all .label'
     assert_true(world.css_visible(span_locator))
 
 
-@step(u'I do not see the "([^"]*)" link$')
-def i_do_not_see_the_span_with_text(step, text):
-    # Note that the span will exist on the page but not be visible
-    span_locator = '.toggle-button-sections span'
-    assert_true(world.is_css_present(span_locator))
+@step(u'I do not see the "([^"]*) All Sections" link$')
+def i_do_not_see_the_collapse_expand_all_span(step, text):
+    if text == "Collapse":
+        span_locator = '.toggle-button-expand-collapse .collapse-all .label'
+    elif text == "Expand":
+        span_locator = '.toggle-button-expand-collapse .expand-all .label'
     assert_false(world.css_visible(span_locator))
 
 
-@step(u'all sections are expanded$')
-def all_sections_are_expanded(step):
+@step(u'I click the "([^"]*) All Sections" link$')
+def i_click_the_collapse_expand_all_span(step, text):
+    if text == "Collapse":
+        span_locator = '.toggle-button-expand-collapse .collapse-all .label'
+    elif text == "Expand":
+        span_locator = '.toggle-button-expand-collapse .expand-all .label'
+    assert_true(world.browser.is_element_present_by_css(span_locator))
+    world.css_click(span_locator)
+
+
+@step(u'I ([^"]*) the first section$')
+def i_collapse_expand_a_section(step, text):
+    if text == "collapse":
+        locator = 'section .outline-item-section .ui-toggle-expansion'
+    elif text == "expand":
+        locator = 'section .outline-item-section .ui-toggle-expansion'
+    world.css_click(locator)
+
+
+@step(u'all sections are ([^"]*)$')
+def all_sections_are_collapsed_or_expanded(step, text):
     subsection_locator = 'div.subsection-list'
     subsections = world.css_find(subsection_locator)
     for index in range(len(subsections)):
-        assert_true(world.css_visible(subsection_locator, index=index))
-
-
-@step(u'all sections are collapsed$')
-def all_sections_are_collapsed(step):
-    subsection_locator = 'div.subsection-list'
-    subsections = world.css_find(subsection_locator)
-    for index in range(len(subsections)):
-        assert_false(world.css_visible(subsection_locator, index=index))
+        if text == "collapsed":
+            assert_false(world.css_visible(subsection_locator, index=index))
+        elif text == "expanded":
+            assert_true(world.css_visible(subsection_locator, index=index))
 
 
 @step(u"I change an assignment's grading status")

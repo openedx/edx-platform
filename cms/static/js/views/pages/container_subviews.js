@@ -1,8 +1,8 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview"],
-    function ($, _, gettext, BaseView) {
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils"],
+    function ($, _, gettext, BaseView, ViewUtils) {
 
         var disabledCss = "is-disabled";
 
@@ -17,37 +17,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 this.model.on('sync', this.onSync, this);
             },
 
-            onSync: function(e) {
-                if (e.changedAttributes() &&
-                    (('has_changes' in e.changedAttributes()) || ('published' in e.changedAttributes()))) {
+            onSync: function(model) {
+                if (ViewUtils.hasChangedAttributes(model, ['has_changes', 'published'])) {
                    this.render();
                 }
             },
 
             render: function() {}
-        });
-
-        /**
-         * A controller for updating the visibility status of the unit on the RHS navigation tree.
-         */
-        var VisibilityStateController = UnitStateListenerView.extend({
-
-            render: function() {
-                var computeState = function(published, has_changes) {
-                    if (!published) {
-                        return "private";
-                    }
-                    else if (has_changes) {
-                        return "draft";
-                    }
-                    else {
-                        return "public";
-                    }
-                };
-                var state = computeState(this.model.get('published'), this.model.get('has_changes'));
-                this.$el.removeClass("private-item public-item draft-item");
-                this.$el.addClass(state + "-item");
-            }
         });
 
         /**
@@ -95,10 +71,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 this.renderPage = this.options.renderPage;
             },
 
-            onSync: function(e) {
-                if (e.changedAttributes() &&
-                    (('has_changes' in e.changedAttributes()) || ('published' in e.changedAttributes()) ||
-                    ('edited_on' in e.changedAttributes()) || ('edited_by' in e.changedAttributes()))) {
+            onSync: function(model) {
+                if (ViewUtils.hasChangedAttributes(model, ['has_changes', 'published', 'edited_on', 'edited_by'])) {
                    this.render();
                 }
             },
@@ -121,7 +95,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                this.runOperationShowingMessage(gettext('Publishing&hellip;'),
+                ViewUtils.runOperationShowingMessage(gettext('Publishing&hellip;'),
                     function () {
                         return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
@@ -136,11 +110,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                this.confirmThenRunOperation(gettext("Discard Changes"),
+                ViewUtils.confirmThenRunOperation(gettext("Discard Changes"),
                     gettext("Are you sure you want to discard changes and revert to the last published version?"),
                     gettext("Discard Changes"),
                     function () {
-                        that.runOperationShowingMessage(gettext('Discarding Changes&hellip;'),
+                        ViewUtils.runOperationShowingMessage(gettext('Discarding Changes&hellip;'),
                             function () {
                                 return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
                             }).always(function() {
@@ -166,9 +140,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 this.model.on('sync', this.onSync, this);
             },
 
-            onSync: function(e) {
-                if (e.changedAttributes() && (('published' in e.changedAttributes()) ||
-                    ('published_on' in e.changedAttributes()) || ('published_by' in e.changedAttributes()))) {
+            onSync: function(model) {
+                if (ViewUtils.hasChangedAttributes(model, ['published', 'published_on', 'published_by'])) {
                    this.render();
                 }
             },
@@ -185,7 +158,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
         });
 
         return {
-            'VisibilityStateController': VisibilityStateController,
             'PreviewActionController': PreviewActionController,
             'Publisher': Publisher,
             'PublishHistory': PublishHistory

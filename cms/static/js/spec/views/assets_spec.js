@@ -1,6 +1,6 @@
 define([ "jquery", "js/spec_helpers/create_sinon", "js/views/asset", "js/views/assets",
-    "js/models/asset", "js/collections/asset" ],
-    function ($, create_sinon, AssetView, AssetsView, AssetModel, AssetCollection) {
+    "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers" ],
+    function ($, create_sinon, AssetView, AssetsView, AssetModel, AssetCollection, view_helpers) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse,
@@ -71,13 +71,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/views/asset", "js/views/a
                 };
 
                 beforeEach(function () {
-                    window.analytics = jasmine.createSpyObj('analytics', ['track']);
-                    window.course_location_analytics = jasmine.createSpy();
+                    view_helpers.installMockAnalytics();
                 });
 
                 afterEach(function () {
-                    delete window.analytics;
-                    delete window.course_location_analytics;
+                    view_helpers.removeMockAnalytics();
                 });
 
                 it('shows the upload modal when clicked on "Upload your first asset" button', function () {

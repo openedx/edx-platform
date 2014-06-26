@@ -1,10 +1,11 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "js/views/feedback_notification"],
-    function($, NotificationView) {
+define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
+    function($, NotificationView, Prompt) {
         var installTemplate, installViewTemplates, createNotificationSpy, verifyNotificationShowing,
-            verifyNotificationHidden;
+            verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
+            installMockAnalytics, removeMockAnalytics;
 
         installTemplate = function(templateName, isFirst, templateId) {
             var template = readFixtures(templateName + '.underscore');
@@ -41,11 +42,64 @@ define(["jquery", "js/views/feedback_notification"],
             expect(notificationSpy.hide).toHaveBeenCalled();
         };
 
+        createPromptSpy = function() {
+            var promptSpy = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
+            promptSpy.show.andReturn(this.promptSpies);
+            return promptSpy;
+        };
+
+        confirmPrompt = function(promptSpy, pressSecondaryButton) {
+            expect(promptSpy.constructor).toHaveBeenCalled();
+            if (pressSecondaryButton) {
+                promptSpy.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpy);
+            } else {
+                promptSpy.constructor.mostRecentCall.args[0].actions.primary.click(promptSpy);
+            }
+        };
+
+        installMockAnalytics = function() {
+            window.analytics = jasmine.createSpyObj('analytics', ['track']);
+            window.course_location_analytics = jasmine.createSpy();
+        };
+
+        removeMockAnalytics = function() {
+            delete window.analytics;
+            delete window.course_location_analytics;
+        };
+
+        inlineEdit = function(element, newValue) {
+            var inputField;
+            element.click();
+            expect(element).toHaveClass('is-hidden');
+            inputField = element.next().find('.xblock-field-input');
+            expect(inputField).not.toHaveClass('is-hidden');
+            inputField.val(newValue);
+            return inputField;
+        };
+
+        verifyInlineEditChange = function(element, expectedValue, failedValue) {
+            var inputField = element.next().find('.xblock-field-input');
+            expect(element.text()).toBe(expectedValue);
+            if (failedValue) {
+                expect(element).toHaveClass('is-hidden');
+                expect(inputField).not.toHaveClass('is-hidden');
+            } else {
+                expect(element).not.toHaveClass('is-hidden');
+                expect(inputField).toHaveClass('is-hidden');
+            }
+        };
+
         return {
             'installTemplate': installTemplate,
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
             'verifyNotificationShowing': verifyNotificationShowing,
-            'verifyNotificationHidden': verifyNotificationHidden
+            'verifyNotificationHidden': verifyNotificationHidden,
+            'createPromptSpy': createPromptSpy,
+            'confirmPrompt': confirmPrompt,
+            'inlineEdit': inlineEdit,
+            'verifyInlineEditChange': verifyInlineEditChange,
+            'installMockAnalytics': installMockAnalytics,
+            'removeMockAnalytics': removeMockAnalytics
         };
     });

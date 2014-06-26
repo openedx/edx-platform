@@ -1,47 +1,42 @@
-define([
-    'jquery', 'underscore', 'gettext', 'js/views/baseview',
-    'js/views/group_configurations_list'
-],
-function ($, _, gettext, BaseView, GroupConfigurationsList) {
-    'use strict';
-    var GroupConfigurationsPage = BaseView.extend({
-        initialize: function() {
-            BaseView.prototype.initialize.call(this);
-            this.listView = new GroupConfigurationsList({
-                collection: this.collection
-            });
-        },
+define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
+        'js/views/group_configurations_list'],
+    function ($, _, gettext, BasePage, GroupConfigurationsList) {
+        'use strict';
+        var GroupConfigurationsPage = BasePage.extend({
+            initialize: function() {
+                BasePage.prototype.initialize.call(this);
+                this.listView = new GroupConfigurationsList({
+                    collection: this.collection
+                });
+            },
 
-        render: function() {
-            this.hideLoadingIndicator();
-            this.$('.content-primary').append(this.listView.render().el);
-            this.addButtonActions();
-            this.addWindowActions();
-        },
+            renderPage: function() {
+                this.$el.append(this.listView.render().el);
+                this.addButtonActions();
+                this.addWindowActions();
+                return $.Deferred().resolve().promise();
+            },
 
-        addButtonActions: function () {
-            this.$('.nav-actions .new-button').click(function (event) {
-                this.listView.addOne(event);
-            }.bind(this));
-        },
+            addButtonActions: function () {
+                this.$('.nav-actions .new-button').click(function (event) {
+                    this.listView.addOne(event);
+                }.bind(this));
+            },
 
-        addWindowActions: function () {
-            $(window).on('beforeunload', this.onBeforeUnload.bind(this));
-        },
+            addWindowActions: function () {
+                $(window).on('beforeunload', this.onBeforeUnload.bind(this));
+            },
 
-        onBeforeUnload: function () {
-            var dirty = this.collection.find(function(configuration) {
-                return configuration.isDirty();
-            });
+            onBeforeUnload: function () {
+                var dirty = this.collection.find(function(configuration) {
+                    return configuration.isDirty();
+                });
 
-            if(dirty) {
-                return gettext(
-                    'You have unsaved changes. Do you really want to ' +
-                    'leave this page?'
-                );
+                if(dirty) {
+                    return gettext('You have unsaved changes. Do you really want to leave this page?');
+                }
             }
-        }
-    });
+        });
 
-    return GroupConfigurationsPage;
-}); // end define();
+        return GroupConfigurationsPage;
+    }); // end define();

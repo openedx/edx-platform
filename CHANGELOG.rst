@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Backbone version of the course outline page. STUD-1726.
+
 Studio: New advanced setting "invitation_only" for courses. This setting overrides the enrollment start/end dates
   if set. LMS-2670
 
