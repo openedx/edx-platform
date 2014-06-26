@@ -1315,6 +1315,54 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_courses_completions_leaders_list_get(self):
+        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
+        users = []
+        for i in xrange(1, 5):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        for i in xrange(1, 26):
+            if i < 3:
+                user_id = users[0]
+            elif i < 8:
+                user_id = users[1]
+            elif i < 16:
+                user_id = users[2]
+            else:
+                user_id = users[3]
+            content_id = self.course_content.id + str(i)
+            completions_data = {'content_id': content_id, 'user_id': user_id}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        test_uri = '{}/{}/metrics/completions/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=6')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['leaders']), 4)
+        self.assertEqual(response.data['course_avg'], 6.3)
+
+        # without count filter and user_id
+        test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
+                                                                          users[3])
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['leaders']), 3)
+        self.assertEqual(response.data['position'], 1)
+        self.assertEqual(response.data['completions'], 10)
+
+        # test with bogus course
+        test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
 
     def test_courses_grades_list_get(self):
         # Retrieve the list of grades for this course

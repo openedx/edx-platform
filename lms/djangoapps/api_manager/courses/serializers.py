@@ -27,3 +27,12 @@ class CourseLeadersSerializer(serializers.Serializer):
     title = serializers.CharField(source='student__profile__title')
     avatar_url = serializers.CharField(source='student__profile__avatar_url')
     points_scored = serializers.IntegerField()
+
+
+class CourseCompletionsLeadersSerializer(serializers.Serializer):
+    """ Serializer for course completions leaderboard """
+    id = serializers.IntegerField(source='user__id')
+    username = serializers.CharField(source='user__username')
+    title = serializers.CharField(source='user__profile__title')
+    avatar_url = serializers.CharField(source='user__profile__avatar_url')
+    completions = serializers.IntegerField()
