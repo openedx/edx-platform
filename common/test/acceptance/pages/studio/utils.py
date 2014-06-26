@@ -26,11 +26,11 @@ def wait_for_notification(page):
     Waits for the "mini-notification" to appear and disappear on the given page (subclass of PageObject).
     """
     def _is_saving():
-        num_notifications = len(page.q(css='.wrapper-notification-mini.is-shown'))
+        num_notifications = page.q(css='.wrapper-notification-mini.is-shown').present
         return (num_notifications == 1, num_notifications)
 
     def _is_saving_done():
-        num_notifications = len(page.q(css='.wrapper-notification-mini.is-hiding'))
+        num_notifications = page.q(css='.wrapper-notification-mini.is-hiding').present
         return (num_notifications == 1, num_notifications)
 
     Promise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
