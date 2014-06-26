@@ -193,23 +193,12 @@ def coverage(options):
         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
-
-        sh("diff-cover {xml_report_str}".format(xml_report_str=xml_report_str))
-
         sh(
             "diff-cover {xml_report_str} --compare-branch={compare_branch} "
             "--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,
                 diff_html_path=diff_html_path,
-            )
-        )
-
-        sh(
-            "diff-cover {xml_report_str} --compare-branch="
-            "{compare_branch}".format(
-                xml_report_str=xml_report_str,
-                compare_branch=compare_branch,
             )
         )
 
