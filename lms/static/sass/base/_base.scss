@@ -98,6 +98,20 @@ a:focus {
    **/
 }
 
+a.backToTop{
+  width: 80px;
+  height: 40px;
+  border: 1px solid #ddd;
+  color: $blue;
+  text-align: center;
+  line-height: 40px;
+  background-color: #fff;
+  font-size: 14px;
+}
+
+a.backToTop:hover{
+}
+
 .content-wrapper {
   width: flex-grid(12);
   margin: 0 auto;

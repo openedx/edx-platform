@@ -47,6 +47,7 @@
     })(this);
   </script>
 
+
   <script type="text/javascript" src="/jsi18n/"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
@@ -103,6 +104,18 @@
 </head>
 
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+  <script type="text/javascript">
+    $(function(){
+        // get current body width
+        var set_width = $(document.body).width();
+        $(window).bind('scroll resize', function(){
+            $('.backToTop').goToTop({
+                pageWidth: set_width,
+                duration: 300
+            });
+        });
+    });
+  </script>
   <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />
