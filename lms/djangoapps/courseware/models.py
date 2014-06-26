@@ -224,6 +224,37 @@ class XModuleStudentInfoField(models.Model):
         return unicode(repr(self))
 
 
+class XModuleGlobalBlockField(models.Model):
+    """
+    Stores data set in the BlockScope.TYPE/UserScope.NONE scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('module_type', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The type of the module for these preferences
+    module_type = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleGlobalBlockField<%r>' % ({
+            'field_name': self.field_name,
+            'module_type': self.module_type,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
 class OfflineComputedGrade(models.Model):
     """
     Table of grades computed offline for a given user and course.

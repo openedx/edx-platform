@@ -12,7 +12,7 @@ from student.tests.factories import UserFactory  # Imported to re-export
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField, XModuleGlobalBlockField
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -157,3 +157,11 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
+
+
+class GlobalBlockFactory(DjangoModelFactory):
+    FACTORY_FOR = XModuleGlobalBlockField
+
+    field_name = 'existing_field'
+    value = json.dumps('old_value')
+    module_type = 'mock_problem'

@@ -8,14 +8,14 @@ from functools import partial
 from courseware.model_data import DjangoKeyValueStore
 from courseware.model_data import InvalidScopeError, FieldDataCache
 from courseware.models import StudentModule
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField, XModuleGlobalBlockField
 
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory, location, course_id
 from courseware.tests.factories import UserStateSummaryFactory
-from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
+from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory, GlobalBlockFactory
 
-from xblock.fields import Scope, BlockScope, ScopeIds
+from xblock.fields import Scope, BlockScope, ScopeIds, UserScope
 from django.test import TestCase
 from django.db import DatabaseError
 from xblock.core import KeyValueMultiSaveError
@@ -44,6 +44,7 @@ settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('
 user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, location('usage_id'))
 prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 1, 'mock_problem')
 user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 1, None)
+global_block_key = partial(DjangoKeyValueStore.Key, Scope(UserScope.NONE, BlockScope.TYPE), None, 'mock_problem')
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
@@ -338,4 +339,13 @@ class TestStudentInfoStorage(OtherUserFailureTestMixin, StorageTestBase, TestCas
     key_factory = user_info_key
     storage_class = XModuleStudentInfoField
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_info, 2, 'mock_problem')  # user_id=2, not 1
+    existing_field_name = "existing_field"
+
+
+class TestGlobalBlockStorage(StorageTestBase, TestCase):
+    """Tests for StudentInfoStorage"""
+    factory = GlobalBlockFactory
+    scope = Scope(UserScope.NONE, BlockScope.TYPE)
+    key_factory = global_block_key
+    storage_class = XModuleGlobalBlockField
     existing_field_name = "existing_field"
