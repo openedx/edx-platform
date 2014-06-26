@@ -1,13 +1,12 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(['jquery', 'js/views/feedback_notification', 'js/views/feedback_prompt'],
+define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
     function($, NotificationView, Prompt) {
-        'use strict';
         var installTemplate, installTemplates, installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
-            verifyNotificationHidden, createPromptSpy, confirmPrompt, verifyPromptShowing,
-            verifyPromptHidden;
+            verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
+            installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden;
 
         installTemplate = function(templateName, isFirst, templateId) {
             var template = readFixtures(templateName + '.underscore');
@@ -70,11 +69,11 @@ define(['jquery', 'js/views/feedback_notification', 'js/views/feedback_prompt'],
         verifyNotificationHidden = function(notificationSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
-
+        
         createPromptSpy = function(type) {
             return createFeedbackSpy(Prompt, type || 'Warning');
         };
-
+        
         confirmPrompt = function(promptSpy, pressSecondaryButton) {
             expect(promptSpy.constructor).toHaveBeenCalled();
             if (pressSecondaryButton) {
@@ -91,6 +90,38 @@ define(['jquery', 'js/views/feedback_notification', 'js/views/feedback_prompt'],
         verifyPromptHidden = function(promptSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
+        
+        installMockAnalytics = function() {
+            window.analytics = jasmine.createSpyObj('analytics', ['track']);
+            window.course_location_analytics = jasmine.createSpy();
+        };
+
+        removeMockAnalytics = function() {
+            delete window.analytics;
+            delete window.course_location_analytics;
+        };
+
+        inlineEdit = function(element, newValue) {
+            var inputField;
+            element.click();
+            expect(element).toHaveClass('is-hidden');
+            inputField = element.next().find('.xblock-field-input');
+            expect(inputField).not.toHaveClass('is-hidden');
+            inputField.val(newValue);
+            return inputField;
+        };
+
+        verifyInlineEditChange = function(element, expectedValue, failedValue) {
+            var inputField = element.next().find('.xblock-field-input');
+            expect(element.text()).toBe(expectedValue);
+            if (failedValue) {
+                expect(element).toHaveClass('is-hidden');
+                expect(inputField).not.toHaveClass('is-hidden');
+            } else {
+                expect(element).not.toHaveClass('is-hidden');
+                expect(inputField).toHaveClass('is-hidden');
+            }
+        };
 
         return {
             'installTemplate': installTemplate,
@@ -102,6 +133,10 @@ define(['jquery', 'js/views/feedback_notification', 'js/views/feedback_prompt'],
             'confirmPrompt': confirmPrompt,
             'createPromptSpy': createPromptSpy,
             'verifyPromptShowing': verifyPromptShowing,
-            'verifyPromptHidden': verifyPromptHidden
+            'verifyPromptHidden': verifyPromptHidden,
+            'inlineEdit': inlineEdit,
+            'verifyInlineEditChange': verifyInlineEditChange,
+            'installMockAnalytics': installMockAnalytics,
+            'removeMockAnalytics': removeMockAnalytics
         };
     });
