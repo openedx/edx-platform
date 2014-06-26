@@ -34,14 +34,15 @@ from util.date_utils import get_default_time_display
 from util.json_request import expect_json, JsonResponse
 
 from .access import has_course_access
-from contentstore.views.helpers import is_unit
+from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
+    xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
-__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
+__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ def hash_resource(resource):
 
 
 # pylint: disable=unused-argument
-@require_http_methods(("DELETE", "GET", "PUT", "POST"))
+@require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
 def xblock_handler(request, usage_key_string):
@@ -78,7 +79,7 @@ def xblock_handler(request, usage_key_string):
         json: returns representation of the xblock (locator id, data, and metadata).
               if ?fields=graderType, it returns the graderType for the unit instead of the above.
         html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
-    PUT or POST
+    PUT or POST or PATCH
         json: if xblock locator is specified, update the xblock instance. The json payload can contain
               these fields, all optional:
                 :data: the new value for the data.
@@ -134,7 +135,7 @@ def xblock_handler(request, usage_key_string):
                 grader_type=request.json.get('graderType'),
                 publish=request.json.get('publish'),
             )
-    elif request.method in ('PUT', 'POST'):
+    elif request.method in ('PUT', 'POST', 'PATCH'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
             duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
@@ -238,6 +239,32 @@ def xblock_view_handler(request, usage_key_string, view_name):
             'resources': hashed_resources.items()
         })
 
+    else:
+        return HttpResponse(status=406)
+
+
+# pylint: disable=unused-argument
+@require_http_methods(("GET"))
+@login_required
+@expect_json
+def xblock_outline_handler(request, usage_key_string):
+    """
+    The restful handler for requests for rendered xblock views.
+
+    Returns a json object containing two keys:
+        html: The rendered html of the view
+        resources: A list of tuples where the first element is the resource hash, and
+            the second is the resource description
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    if not has_course_access(request.user, usage_key.course_key):
+        raise PermissionDenied()
+
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        store = modulestore()
+        xblock = store.get_item(usage_key)
+        return JsonResponse(create_xblock_info(xblock, include_child_info=True, recurse_child_info=True))
     else:
         return HttpResponse(status=406)
 
@@ -525,30 +552,84 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
         )
 
     # Note that children aren't being returned until we have a use case.
-    return create_xblock_info(usage_key, module, data, own_metadata(module))
+    return create_xblock_info(module, data=data, metadata=own_metadata(module), include_ancestor_info=True)
 
 
-def create_xblock_info(usage_key, xblock, data=None, metadata=None):
+def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False,
+                       include_child_info=False, recurse_child_info=False):
     """
     Creates the information needed for client-side XBlockInfo.
 
     If data or metadata are not specified, their information will not be added
     (regardless of whether or not the xblock actually has data or metadata).
     """
-    publish_state = compute_publish_state(xblock) if xblock else None
+    publish_state = compute_publish_state(xblock)
+    is_container = xblock.has_children
+
+    # TODO: remove this once the fake **replace_user** has been refactored away
+    try:
+        edited_by = User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None
+    except ValueError:
+        edited_by = "Invalid username"
 
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
-        "has_changes": modulestore().has_changes(usage_key),
+        "has_changes": modulestore().has_changes(xblock.location),
         "published": publish_state in (PublishState.public, PublishState.draft),
         "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
-        "edited_by": User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None
+        "edited_by": edited_by,
+        'is_container': is_container,
+        'studio_url': xblock_studio_url(xblock),
     }
     if data is not None:
         xblock_info["data"] = data
     if metadata is not None:
         xblock_info["metadata"] = metadata
-
+    if include_ancestor_info:
+        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
+    if include_child_info and is_container:
+        xblock_info['child_info'] = _create_xblock_child_info(xblock, recurse_child_info=recurse_child_info)
     return xblock_info
+
+
+def _create_xblock_ancestor_info(xblock):
+    """
+    Returns information about the ancestors of an xblock. Note that the direct parent will also return
+    information about all of its children.
+    """
+    ancestors = []
+
+    def collect_ancestor_info(ancestor, include_child_info=False):
+        """
+        Collect xblock info regarding the specified xblock and its ancestors.
+        """
+        if ancestor:
+            ancestors.append(create_xblock_info(ancestor, include_child_info=include_child_info))
+            collect_ancestor_info(get_parent_xblock(ancestor))
+    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=True)
+    return {
+        'ancestors': ancestors
+    }
+
+
+def _create_xblock_child_info(xblock, recurse_child_info=True):
+    """
+    Returns information about the children of an xblock, as well as about the primary category
+    of xblock expected as children.
+    """
+    child_info = {}
+    child_category = xblock_primary_child_category(xblock)
+    if child_category:
+        child_info = {
+            'category': child_category,
+            'display_name': xblock_type_display_name(child_category, default_display_name=child_category),
+        }
+    if xblock.has_children:
+        child_info['children'] = [
+            create_xblock_info(
+                child, include_child_info=recurse_child_info, recurse_child_info=True
+            ) for child in xblock.get_children()
+        ]
+    return child_info

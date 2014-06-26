@@ -183,23 +183,14 @@ def create_a_course():
 
 
 def add_section(name='My Section'):
-    link_css = 'a.new-courseware-section-button'
-    world.css_click(link_css)
-    name_css = 'input.new-section-name'
-    save_css = 'input.new-section-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
-    span_css = 'span.section-name-span'
-    assert_true(world.is_css_present(span_css))
+    world.css_click('.course-outline .add-button')
+    set_element_value('.xblock-field-input', name, Keys.ENTER)
+    assert_true(world.is_css_present('.outline-item-section .xblock-field-value'))
 
 
 def add_subsection(name='Subsection One'):
-    css = 'a.new-subsection-item'
-    world.css_click(css)
-    name_css = 'input.new-subsection-name-input'
-    save_css = 'input.new-subsection-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
+    world.css_click('.outline-item-section .add-button')
+    set_element_value('.xblock-field-input', name, Keys.ENTER)
 
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time, key=None):
@@ -259,7 +250,7 @@ def create_course_with_unit():
 
     world.wait_for_js_to_load()
     css_selectors = [
-        'div.section-item a.expand-collapse', 'a.new-unit-item'
+        '.outline-item-subsection .expand-collapse', '.outline-item-subsection .add-button'
     ]
     for selector in css_selectors:
         world.css_click(selector)

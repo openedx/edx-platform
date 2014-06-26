@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging", "js/views/asset",
-    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal"],
-    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils) {
+    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils"],
+    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils) {
 
         var AssetsView = PagingView.extend({
             // takes AssetCollection as model
@@ -18,7 +18,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
                 this.setInitialSortColumn('js-asset-date-col');
-                this.showLoadingIndicator();
+                ViewUtils.showLoadingIndicator();
                 this.setPage(0);
                 assetsView = this;
             },
@@ -39,7 +39,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             getTableBody: function() {
                 var tableBody = this.tableBody;
                 if (!tableBody) {
-                    this.hideLoadingIndicator();
+                    ViewUtils.hideLoadingIndicator();
 
                     // Create the table
                     this.$el.html(this.template());
@@ -77,7 +77,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             },
 
             onError: function() {
-                this.hideLoadingIndicator();
+                ViewUtils.hideLoadingIndicator();
             },
 
             handleDestroy: function(model) {

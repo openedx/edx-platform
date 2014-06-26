@@ -1,8 +1,8 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedback_prompt"],
-    function ($, _, gettext, BaseView, PromptView) {
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils", "js/views/feedback_prompt"],
+    function ($, _, gettext, BaseView, ViewUtils, PromptView) {
 
         var disabledCss = "is-disabled";
 
@@ -25,29 +25,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
             },
 
             render: function() {}
-        });
-
-        /**
-         * A controller for updating the visibility status of the unit on the RHS navigation tree.
-         */
-        var VisibilityStateController = UnitStateListenerView.extend({
-
-            render: function() {
-                var computeState = function(published, has_changes) {
-                    if (!published) {
-                        return "private";
-                    }
-                    else if (has_changes) {
-                        return "draft";
-                    }
-                    else {
-                        return "public";
-                    }
-                };
-                var state = computeState(this.model.get('published'), this.model.get('has_changes'));
-                this.$el.removeClass("private-item public-item draft-item");
-                this.$el.addClass(state + "-item");
-            }
         });
 
         /**
@@ -119,7 +96,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                this.runOperationShowingMessage(gettext('Publishing&hellip;'),
+                ViewUtils.runOperationShowingMessage(gettext('Publishing&hellip;'),
                     function () {
                         return xblockInfo.save({publish: 'make_public'});
                     }).always(function() {
@@ -175,7 +152,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
         });
 
         return {
-            'VisibilityStateController': VisibilityStateController,
             'PreviewActionController': PreviewActionController,
             'Publisher': Publisher
         };

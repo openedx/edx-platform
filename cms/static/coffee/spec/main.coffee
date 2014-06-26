@@ -205,7 +205,6 @@ define([
     "coffee/spec/views/section_spec",
     "coffee/spec/views/course_info_spec", "coffee/spec/views/feedback_spec",
     "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
 
     "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
@@ -231,6 +230,7 @@ define([
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
+    "js/spec/views/pages/course_outline_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",

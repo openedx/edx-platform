@@ -28,7 +28,7 @@ def i_have_opened_a_new_subsection(step):
 
 @step('I click the New Subsection link')
 def i_click_the_new_subsection_link(step):
-    world.css_click('a.new-subsection-item')
+    world.css_click('.outline-item-section .add-button')
 
 
 @step('I enter the subsection name and click save$')
@@ -140,6 +140,7 @@ def save_subsection_name(name):
     save_css = 'input.new-subsection-name-save'
     world.css_fill(name_css, name)
     world.css_click(save_css)
+    set_element_value('.xblock-field-input', name, Keys.ENTER)
 
 
 def see_subsection_name(name):
