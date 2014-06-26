@@ -330,6 +330,23 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        Sets up source_course_id to point a course with the same content as the desct_course_id. This
+        operation may be cheap or expensive. It may have to copy all assets and all xblock content or
+        merely setup new pointers.
+
+        Backward compatibility: this method used to require in some modulestores that dest_course_id
+        pointed to an empty but already created course. Implementers should support this or should
+        enable creating the course from scratch.
+
+        Raises:
+            ItemNotFoundError: if the source course doesn't exist (or any of its xblocks aren't found)
+            DuplicateItemError: if the destination course already exists (with content in some cases)
+        """
+        pass
+
+    @abstractmethod
     def delete_course(self, course_key, user_id=None):
         """
         Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
@@ -434,8 +451,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, contentstore, **kwargs):
         super(ModuleStoreWriteBase, self).__init__(**kwargs)
+
+        self.contentstore = contentstore
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by partition_fields_by_scope, which is only needed because
         # the split mongo store is used for item creation as well as item persistence
@@ -500,6 +519,16 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
         self.update_item(new_object, user_id, allow_not_found=True)
         return new_object
+
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        This base method just copies the assets. The lower level impls must do the actual cloning of
+        content.
+        """
+        # copy the assets
+        self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+        super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
+        return dest_course_id
 
 
 def only_xmodules(identifier, entry_points):

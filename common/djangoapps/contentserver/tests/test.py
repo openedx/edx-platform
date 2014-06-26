@@ -4,8 +4,6 @@ Tests for StaticContentServer
 import copy
 import logging
 from uuid import uuid4
-from path import path
-from pymongo import MongoClient
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -74,7 +72,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def tearDown(self):
 
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
     def test_unlocked_asset(self):

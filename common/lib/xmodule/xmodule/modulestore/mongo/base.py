@@ -332,12 +332,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
-    reference_type = Location
+    reference_type = SlashSeparatedCourseKey
 
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
-    def __init__(self, doc_store_config, fs_root, render_template,
+    def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None,
@@ -346,7 +346,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(MongoModuleStore, self).__init__(**kwargs)
+        super(MongoModuleStore, self).__init__(contentstore, **kwargs)
 
         def do_connection(
             db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
@@ -857,7 +857,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Raises:
             InvalidLocationError: If a course with the same org and offering already exists
         """
-
         course, _, run = offering.partition('/')
         course_id = SlashSeparatedCourseKey(org, course, run)
 

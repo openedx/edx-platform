@@ -15,10 +15,9 @@ class SplitMigrator(object):
     Copies courses from old mongo to split mongo and sets up location mapping so any references to the old
     name will be able to find the new elements.
     """
-    def __init__(self, split_modulestore, direct_modulestore, draft_modulestore, loc_mapper):
+    def __init__(self, split_modulestore, draft_modulestore, loc_mapper):
         super(SplitMigrator, self).__init__()
         self.split_modulestore = split_modulestore
-        self.direct_modulestore = direct_modulestore
         self.draft_modulestore = draft_modulestore
         self.loc_mapper = loc_mapper
 
@@ -43,7 +42,7 @@ class SplitMigrator(object):
         # locations are in location, children, conditionals, course.tab
 
         # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
-        original_course = self.direct_modulestore.get_course(course_key)
+        original_course = self.draft_modulestore.get_course(course_key)
         new_course_root_locator = self.loc_mapper.translate_location(original_course.location)
         new_course = self.split_modulestore.create_course(
             new_course_root_locator.org, new_course_root_locator.offering, user.id,
@@ -65,7 +64,7 @@ class SplitMigrator(object):
 
         # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)
-        for module in self.direct_modulestore.get_items(course_key):
+        for module in self.draft_modulestore.get_items(course_key, revision=ModuleStoreEnum.RevisionOption.published_only):
             # don't copy the course again. No drafts should get here
             if module.location != old_course_loc:
                 # create split_xblock using split.create_item

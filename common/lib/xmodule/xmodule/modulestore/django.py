@@ -17,6 +17,7 @@ import threading
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
+from xmodule.contentstore.django import contentstore
 
 # We may not always have the request_cache module available
 try:
@@ -37,7 +38,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, content_store, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -62,6 +63,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         metadata_inheritance_cache = get_cache('default')
 
     return class_(
+        contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
@@ -85,6 +87,7 @@ def modulestore():
     if _MIXED_MODULESTORE is None:
         _MIXED_MODULESTORE = create_modulestore_instance(
             settings.MODULESTORE['default']['ENGINE'],
+            contentstore(),
             settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
             settings.MODULESTORE['default'].get('OPTIONS', {})
         )
