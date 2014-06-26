@@ -24,7 +24,8 @@ from django.utils.translation import ugettext as _
 templates = ["basic-modal", "modal-button", "edit-xblock-modal",
     "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history"]
+    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
+    "unit-outline"]
 %>
 <%block name="header_extras">
 % for template_name in templates:
@@ -40,13 +41,14 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
             function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
                 var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
-                var mainXBlockInfo = new XBlockInfo(${json.dumps(xblock_info) | n});
+                var mainXBlockInfo = new XBlockInfo(${json.dumps(xblock_info) | n}, {parse: true});
                 var isUnitPage = ${json.dumps(is_unit_page)}
 
                 xmoduleLoader.done(function () {
                     var view = new ContainerPage({
                         el: $('#content'),
                         model: mainXBlockInfo,
+                        action: "${action}",
                         templates: templates,
                         isUnitPage: isUnitPage
                     });
@@ -69,9 +71,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">
-                            ${ancestor.display_name_with_default | h}
-                        </a>
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
                     % else:
                         <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
                     % endif
@@ -153,21 +153,8 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                         </div>
                         <div class="wrapper-unit-tree-location bar-mod-content">
                             <h5 class="title">Unit Tree Location</h5>
-                            <ol>
-                                <li class="section">
-                                    <a href="${xblock_studio_url(section)}" class="section-item section-name">
-                                        <span class="section-name">${section.display_name_with_default}</span>
-                                    </a>
-                                    <ol>
-                                        <li class="subsection">
-                                            <div class="section-item">
-                                                <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
-                                            </div>
-                                            ${units.enum_units(subsection, actions=False, selected=unit.location)}
-                                        </li>
-                                    </ol>
-                                </li>
-                            </ol>
+                            <div class="wrapper-unit-overview">
+                            </div>
                         </div>
                     </div>
                 % endif

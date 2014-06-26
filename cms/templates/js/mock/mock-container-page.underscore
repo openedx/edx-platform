@@ -6,8 +6,8 @@
                 <small class="navigation navigation-parents subtitle">
                     <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
                 </small>
-                <div class="wrapper-xblock-field is-editable" data-field="display_name">
-                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
+                <div class="wrapper-xblock-field" data-field="display_name">
+                    <h1 class="page-header-title is-editable xblock-field-value">Test Container</h1>
                 </div>
             </div>
 
@@ -62,31 +62,10 @@
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
                             </p>
                         </div>
-                        <div class="wrapper-unit-tree-location content-bit">
+                        <div class="wrapper-unit-tree-location bar-mod-content">
                             <h5 class="title">Unit Tree Location</h5>
-                            <ol>
-                                <li class="section">
-                                    <a href="course-overview-url" class="section-item section-name">
-                                        <span class="section-name">Test Section</span>
-                                    </a>
-                                    <ol>
-                                        <li class="subsection">
-                                            <div class="section-item">
-                                                <span class="subsection-name"><span class="subsection-name-value">Test Subsection</span></span>
-                                            </div>
-                                            <ol class="sortable-unit-list">
-                                                <li class="courseware-unit unit is-draggable" data-locator="locator-container"
-                                                    data-parent="" data-course-key="">
-                                                <div class="section-item editing">
-                                                    <a href="unit-url" class="private-item">
-                                                        <span class="unit-name">Test Container</span>
-                                                    </a>
-                                                </div>
-                                            </ol>
-                                        </li>
-                                    </ol>
-                                </li>
-                            </ol>
+                            <div class="wrapper-unit-overview">
+                            </div>
                         </div>
                     </div>
             </section>

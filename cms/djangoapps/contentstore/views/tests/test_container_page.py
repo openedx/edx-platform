@@ -52,12 +52,15 @@ class ContainerPageTestCase(StudioPageTestCase):
                 'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
-                r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
-                r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>'
+                r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
                 course=re.escape(unicode(self.course.id)),
                 unit=re.escape(unicode(self.vertical.location)),
+                classes='navigation-item navigation-link navigation-parent',
+                section_parameters=re.escape(u'?show=i4x%3A//MITx/999/chapter/Week_1'),
+                subsection_parameters=re.escape(u'?show=i4x%3A//MITx/999/sequential/Lesson_1'),
             ),
         )
 
@@ -77,14 +80,17 @@ class ContainerPageTestCase(StudioPageTestCase):
                     'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
-                    r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
-                    r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>\s*'
-                    r'<a href="/container/{split_test}" class="navigation-item navigation-link navigation-parent">\s*Split Test\s*</a>'
+                    r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                    r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                    r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
+                    r'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
                     course=re.escape(unicode(self.course.id)),
                     unit=re.escape(unicode(self.vertical.location)),
-                    split_test=re.escape(unicode(self.child_container.location))
+                    split_test=re.escape(unicode(self.child_container.location)),
+                    classes='navigation-item navigation-link navigation-parent',
+                    section_parameters=re.escape(u'?show=i4x%3A//MITx/999/chapter/Week_1'),
+                    subsection_parameters=re.escape(u'?show=i4x%3A//MITx/999/sequential/Lesson_1'),
                 ),
             )
 

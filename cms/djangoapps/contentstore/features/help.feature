@@ -51,11 +51,3 @@ Feature: CMS.Help
     Scenario: Users can access online help on the unit page
         Given I am in Studio editing a new unit
         Then I should see online help for "units"
-
-
-    Scenario: Users can access online help on the subsection page
-        Given I have opened a new course section in Studio
-        And I have added a new subsection
-        And I click on the subsection
-        Then I should see online help for "subsections"
-
