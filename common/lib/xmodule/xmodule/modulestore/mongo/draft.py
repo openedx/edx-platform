@@ -7,15 +7,21 @@ and otherwise returns i4x://org/course/cat/name).
 """
 
 import pymongo
+import logging
 
+from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import PublishState, ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError, InvalidBranchSetting
+from xmodule.modulestore.exceptions import (
+    ItemNotFoundError, DuplicateItemError, InvalidBranchSetting, DuplicateCourseError
+)
 from xmodule.modulestore.mongo.base import (
     MongoModuleStore, MongoRevisionKey, as_draft, as_published,
     DIRECT_ONLY_CATEGORIES, SORT_REVISION_FAVOR_DRAFT
 )
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
+
+log = logging.getLogger(__name__)
 
 
 def wrap_draft(item):
@@ -137,6 +143,73 @@ class DraftModuleStore(MongoModuleStore):
             key = usage_key.to_deprecated_son(prefix='_id.')
             del key['_id.revision']
             return self.collection.find(key).count() > 0
+
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        Only called if cloning within this store or if env doesn't set up mixed.
+        * copy the courseware
+        """
+        # check to see if the source course is actually there
+        if not self.has_course(source_course_id):
+            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
+
+        # verify that the dest_location really is an empty course
+        # b/c we don't want the payload, I'm copying the guts of get_items here
+        query = self._course_key_to_son(dest_course_id)
+        query['_id.category'] = {'$nin': ['course', 'about']}
+        if self.collection.find(query).limit(1).count() > 0:
+            raise DuplicateCourseError(
+                dest_course_id,
+                "Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(
+                    dest_course_id
+                )
+            )
+
+        # clone the assets
+        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+
+        # get the whole old course
+        new_course = self.get_course(dest_course_id)
+        if new_course is None:
+            # create_course creates the about overview
+            new_course = self.create_course(dest_course_id.org, dest_course_id.offering, user_id)
+
+        # Get all modules under this namespace which is (tag, org, course) tuple
+        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+        self._clone_modules(modules, dest_course_id, user_id)
+        course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
+        self.publish(course_location, user_id)
+
+        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
+        self._clone_modules(modules, dest_course_id, user_id)
+
+        return True
+
+    def _clone_modules(self, modules, dest_course_id, user_id):
+        """Clones each module into the given course"""
+        for module in modules:
+            original_loc = module.location
+            module.location = module.location.map_into_course(dest_course_id)
+            if module.location.category == 'course':
+                module.location = module.location.replace(name=module.location.run)
+
+            log.info("Cloning module %s to %s....", original_loc, module.location)
+
+            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+                module.data = rewrite_nonportable_content_links(
+                    original_loc.course_key, dest_course_id, module.data
+                )
+
+            # repoint children
+            if module.has_children:
+                new_children = []
+                for child_loc in module.children:
+                    child_loc = child_loc.map_into_course(dest_course_id)
+                    new_children.append(child_loc)
+
+                module.children = new_children
+
+            self.update_item(module, user_id, allow_not_found=True)
 
     def _get_raw_parent_locations(self, location, key_revision):
         """

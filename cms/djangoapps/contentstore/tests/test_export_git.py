@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.test.utils import override_settings
-from pymongo import MongoClient
 
 from .utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
@@ -37,7 +36,7 @@ class TestExportGit(CourseTestCase):
         self.test_url = reverse_course_url('export_git', self.course.id)
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        modulestore().contentstore.drop_database()
         _CONTENTSTORE.clear()
 
     def test_giturl_missing(self):
