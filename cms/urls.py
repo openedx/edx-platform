@@ -82,6 +82,7 @@ urlpatterns += patterns(
     url(r'^import/{}$'.format(settings.COURSE_KEY_PATTERN), 'import_handler'),
     url(r'^import_status/{}/(?P<filename>.+)$'.format(settings.COURSE_KEY_PATTERN), 'import_status_handler'),
     url(r'^export/{}$'.format(settings.COURSE_KEY_PATTERN), 'export_handler'),
+    url(r'^xblock/outline/{}$'.format(settings.USAGE_KEY_PATTERN), 'xblock_outline_handler'),
     url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(settings.USAGE_KEY_PATTERN), 'xblock_view_handler'),
     url(r'^xblock/{}?$'.format(settings.USAGE_KEY_PATTERN), 'xblock_handler'),
     url(r'^tabs/{}$'.format(settings.COURSE_KEY_PATTERN), 'tabs_handler'),

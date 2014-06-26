@@ -156,6 +156,7 @@ def container_handler(request, usage_key_string):
         component_templates = get_component_templates(course)
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
+        action = request.REQUEST.get('action', 'view')
 
         is_unit_page = is_unit(xblock)
         unit = xblock if is_unit_page else None
@@ -172,7 +173,10 @@ def container_handler(request, usage_key_string):
         assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
         section = get_parent_xblock(subsection)
         assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
-        xblock_info = create_xblock_info(usage_key, xblock)
+
+        # Fetch the XBlock info for use by the container page. Note that it includes information
+        # about the block's ancestors and siblings for use by the Unit Outline.
+        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
@@ -198,6 +202,7 @@ def container_handler(request, usage_key_string):
 
         return render_to_response('container.html', {
             'context_course': course,  # Needed only for display of menus at top of page.
+            'action': action,
             'xblock': xblock,
             'xblock_locator': xblock.location,
             'unit': unit,
