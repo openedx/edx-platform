@@ -40,6 +40,7 @@ from contentstore.utils import (
     reverse_url,
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
+
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
@@ -53,6 +54,7 @@ from .component import (
     SPLIT_TEST_COMPONENT_TYPE,
 )
 from .tasks import rerun_course
+from .item import create_xblock_info
 
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
@@ -122,7 +124,7 @@ def course_handler(request, course_key_string=None):
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            return JsonResponse(_course_json(request, CourseKey.from_string(course_key_string)))
+            return JsonResponse(_course_outline_json(request, CourseKey.from_string(course_key_string)))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return _create_or_rerun_course(request)
         elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
@@ -142,30 +144,16 @@ def course_handler(request, course_key_string=None):
         return HttpResponseNotFound()
 
 
-@login_required
-def _course_json(request, course_key):
+def _course_outline_json(request, course_key):
     """
-    Returns a JSON overview of a course
+    Returns a JSON representation of the course module and recursively all of its children.
     """
     course_module = _get_course_module(course_key, request.user, depth=None)
-    return _xmodule_json(course_module, course_module.id)
-
-
-def _xmodule_json(xmodule, course_id):
-    """
-    Returns a JSON overview of an XModule
-    """
-    is_container = xmodule.has_children
-    result = {
-        'display_name': xmodule.display_name,
-        'id': unicode(xmodule.location),
-        'category': xmodule.category,
-        'is_draft': getattr(xmodule, 'is_draft', False),
-        'is_container': is_container,
-    }
-    if is_container:
-        result['children'] = [_xmodule_json(child, course_id) for child in xmodule.get_children()]
-    return result
+    return create_xblock_info(
+        course_module,
+        include_child_info=True,
+        include_children_predicate=lambda xblock: not xblock.category == 'vertical'
+    )
 
 
 def _accessible_courses_list(request):
@@ -296,19 +284,59 @@ def course_index(request, course_key):
     course_module = _get_course_module(course_key, request.user, depth=3)
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
-
-    return render_to_response('overview.html', {
+    course_structure = _course_outline_json(request, course_key)
+    locator_to_show = request.REQUEST.get('show', None)
+    return render_to_response('course_outline.html', {
         'context_course': course_module,
         'lms_link': lms_link,
         'sections': sections,
+        'course_structure': course_structure,
+        'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
         'course_graders': json.dumps(
             CourseGradingModel.fetch(course_key).graders
         ),
-        'new_section_category': 'chapter',
-        'new_subsection_category': 'sequential',
-        'new_unit_category': 'vertical',
-        'category': 'vertical'
     })
+
+
+def course_outline_initial_state(locator_to_show, course_structure):
+    """
+    Returns the desired initial state for the course outline view. If the 'show' request parameter
+    was provided, then the view's initial state will be to have the desired item fully expanded
+    and to scroll to see the new item.
+    """
+    def find_xblock_info(xblock_info, locator):
+        """
+        Finds the xblock info for the specified locator.
+        """
+        if xblock_info['id'] == locator:
+            return xblock_info
+        children = xblock_info['child_info']['children'] if xblock_info['child_info'] else None
+        if children:
+            for child_xblock_info in children:
+                result = find_xblock_info(child_xblock_info, locator)
+                if result:
+                    return result
+        return None
+
+    def collect_all_locators(locators, xblock_info):
+        """
+        Collect all the locators for an xblock and its children.
+        """
+        locators.append(xblock_info['id'])
+        children = xblock_info['child_info']['children'] if xblock_info['child_info'] else None
+        if children:
+            for child_xblock_info in children:
+                collect_all_locators(locators, child_xblock_info)
+
+    selected_xblock_info = find_xblock_info(course_structure, locator_to_show)
+    if not selected_xblock_info:
+        return None
+    expanded_locators = []
+    collect_all_locators(expanded_locators, selected_xblock_info)
+    return {
+        'locator_to_show': locator_to_show,
+        'expanded_locators': expanded_locators
+    }
 
 
 @expect_json

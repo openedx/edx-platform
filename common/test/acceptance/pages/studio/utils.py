@@ -1,7 +1,10 @@
 """
 Utility methods useful for Studio page tests.
 """
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from bok_choy.promise import EmptyPromise
+
 from ...tests.helpers import disable_animations
 
 
@@ -111,3 +114,17 @@ def get_codemirror_value(page, index=0, find_prefix="$"):
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
         """.format(index=index, find_prefix=find_prefix)
     )
+
+
+def set_input_value_and_save(page, css, value):
+    """
+    Sets the text field with given label (display name) to the specified value, and presses Save.
+    """
+    input_element = page.q(css=css).results[0]
+    # Click in the input to give it the focus
+    action = ActionChains(page.browser).click(input_element)
+    # Delete all of the characters that are currently there
+    for _x in range(0, len(input_element.get_attribute('value'))):
+        action = action.send_keys(Keys.BACKSPACE)
+    # Send the new text, then hit the enter key so that the change event is triggered).
+    action.send_keys(value).send_keys(Keys.ENTER).perform()

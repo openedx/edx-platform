@@ -37,6 +37,11 @@ REQUIREJS_WAIT = {
         "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
+    # Unit page
+    re.compile('^Unit \|'): [
+        "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
+        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile('^Course Outline \|'): [

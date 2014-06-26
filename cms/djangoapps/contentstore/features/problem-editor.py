@@ -19,13 +19,13 @@ MATLAB_API_KEY = "Matlab API key"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
     step.given("I have created another Blank Common Problem")
 
 
 @step('I have created a unit with advanced module "(.*)"$')
 def i_created_unit_with_advanced_module(step, advanced_module):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
 
     url = world.browser.url
     step.given("I select the Advanced Settings")
@@ -239,7 +239,7 @@ def enable_latex_compiler(step):
 
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
     step.given('I have enabled latex compiler')
     world.create_component_instance(
         step=step,

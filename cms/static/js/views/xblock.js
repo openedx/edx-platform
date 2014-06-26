@@ -67,7 +67,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
              * represents this process.
              * @param fragment The fragment returned from the xblock_handler
              * @param element The element into which to render the fragment (defaults to this.$el)
-             * @returns {*} A promise representing the rendering process
+             * @returns {jQuery promise} A promise representing the rendering process
              */
             renderXBlockFragment: function(fragment, element) {
                 var html = fragment.html,
@@ -96,7 +96,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
              * Dynamically loads all of an XBlock's dependent resources. This is an asynchronous
              * process so a promise is returned.
              * @param resources The resources to be rendered
-             * @returns {*} A promise representing the rendering process
+             * @returns {jQuery promise} A promise representing the rendering process
              */
             addXBlockFragmentResources: function(resources) {
                 var self = this,
@@ -136,7 +136,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             /**
              * Loads the specified resource into the page.
              * @param resource The resource to be loaded.
-             * @returns {*} A promise representing the loading of the resource.
+             * @returns {jQuery promise} A promise representing the loading of the resource.
              */
             loadResource: function(resource) {
                 var head = $('head'),
