@@ -5,8 +5,8 @@ Keys and Credentials for Data Transfers
 ####################################################
 
 EdX transfers course data to the data czars at our partner institutions in
-regularly generated data packages. Data packages are delivered to a single
-contact at each university, referred to as the "data czar".
+regularly generated data packages. Data packages can only be accessed by a
+single contact at each university, referred to as the "data czar".
 
 The data czar who is selected at each institution sets up encryption "keys"
 for securely transferring files from edX to the partner institution. Meanwhile,
@@ -23,12 +23,12 @@ After these steps for setting up credentials are complete, the data czar can
 download data packages.
 
 ****************************************************************
-Keys Created by Data Czars for Encryption and Decryption
+Data Czar: Create Keys for Encryption and Decryption
 ****************************************************************
 
 To assure the security of data packages, the edX Analytics team encrypts all
 files before transferring them to a partner institution. As a result, when you
-receive a data package (or any other file from the edX Analytics team) you must
+receive a data package (or any other file from the edX Analytics team), you must
 decrypt the data before it can be used in any way.
 
 To create the keys needed for this encryption and decryption process, you use
@@ -43,7 +43,7 @@ with edX files.
 .. note:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
 
 Creating these keys is a one-time process that you coordinate with your edX
-Program Manager. Instructions for creating the keys on Windows or Macintosh
+program manager. Instructions for creating the keys on Windows or Macintosh
 follow.
 
 For more information about GPG encryption and creating key pairs, see the
@@ -51,8 +51,9 @@ For more information about GPG encryption and creating key pairs, see the
 
 .. _Gpg4win Compendium: http://www.gpg4win.org/doc/en/gpg4win-compendium.html
 
+=====================
 Create Keys: Windows
------------------------------------------
+=====================
 
 #. Go to the Gpg4win_ website and download the most recent version of Gpg4win.
 
@@ -72,9 +73,9 @@ Create Keys: Windows
       sure to remember your passphrase: you will use it to decrypt your data
       packages.
 
-3. When Kleopatra presents the Key Pair Successfully Created dialog box,
+3. When Kleopatra presents the **Key Pair Successfully Created** dialog box,
    click **Send Certificate by EMail** to send the public key (and only the
-   public key) to your edX Program Manager.
+   public key) to your edX program manager.
 
 #. Optionally, click **Make a Backup Copy of Your Key Pair** to store both of
    the keys on a removable data storage device.
@@ -83,8 +84,9 @@ Create Keys: Windows
 
 .. _Gpg4win: http://gpg4win.org/
 
+=======================
 Create Keys: Macintosh
---------------------------------------------
+=======================
 
 #. Go to the `GPG Tools`_ website. Scroll down to the **GPG Suite** section of
    the page and click **Download GPG Suite**.
@@ -104,7 +106,7 @@ Create Keys: Macintosh
 #. Enter a strong passphrase. Be sure to remember your passphrase: you will use
    it to decrypt your data packages.
 
-#. To send only your public key to your edX Program Manager, click the key and
+#. To send only your public key to your edX program manager, click the key and
    then click **Export**. A dialog box opens.
 
   a. Specify a file name and location to save the file. 
@@ -121,7 +123,7 @@ Create Keys: Macintosh
 .. _First Steps: http://support.gpgtools.org/kb/how-to/first-steps-where-do-i-start-where-do-i-begin#setupkey
 
 ****************************************************************
-Credentials Created by edX for Accessing Data Storage
+edX: Create and Deliver Credentials for Accessing Data Storage
 ****************************************************************
 
 The data packages that edX prepares for each partner organization are uploaded
@@ -131,9 +133,9 @@ czar. The credentials for accessing this account are called an Access Key
 and a Secret Key.
 
 After the edX Analytics team creates these access credentials for you, they are
-encrypted (using the public encryption key that you sent your Program Manager)
-into a **credentials.csv.gpg** file. This file is then sent to you, securely,
-as an email attachment. 
+encrypted (using the public encryption key that you sent your program manager)
+into a **credentials.csv.gpg** file. This file is then sent to you as an email
+attachment.
 
 The **credentials.csv.gpg** file is likely to be the first file that you
 decrypt with your private GPG key. You use the same process to decrypt the data
@@ -147,8 +149,9 @@ package files that you retrieve from Amazon S3.
 
 .. _Decrypt an Encrypted File:
 
+==========================================
 Decrypt an Encrypted File
---------------------------
+==========================================
 
 To work with an encrypted .gpg file, you use the same GNU Privacy Guard program
 that you used to create your public/private key pair. You use your private key
@@ -173,8 +176,9 @@ email address, your Access Key, and your Secret Key.
  .. image:: ../Images/AWS_Credentials.png
   :alt: A csv file, open in Notepad, with the access key value and the secret key value underlined
 
+============================================
 Access Amazon S3 and Download Data Packages
---------------------------------------------
+============================================
 
 To connect to Amazon S3, you must have your decrypted credentials. You may want
 to have a third-party tool that gives you a user interface for managing files
