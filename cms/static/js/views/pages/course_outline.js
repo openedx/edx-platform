@@ -1,8 +1,8 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/xblock_outline"],
-    function ($, _, gettext, BasePage, XBlockOutlineView) {
+define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/course_outline"],
+    function ($, _, gettext, BasePage, CourseOutlineView) {
         var CourseOutlinePage = BasePage.extend({
             // takes XBlockInfo as a model
 
@@ -14,7 +14,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             renderPage: function() {
                 if (this.hasContent()) {
-                    this.outlineView = new XBlockOutlineView({
+                    this.outlineView = new CourseOutlineView({
                         el: this.$('.courseware-overview'),
                         model: this.model
                     });

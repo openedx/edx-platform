@@ -8,3 +8,41 @@
 // }
 
 // --------------------
+
+.outline-item {
+  padding: 6px 8px 8px 16px;
+  text-wrap: avoid;
+
+  .wrapper-xblock-header-secondary {
+    padding: 0px 8px 0px 26px;
+
+    .meta-info {
+      font-size: 12px;
+    }
+  }
+
+  .actions-list {
+    .action-item {
+      display: inline-block;
+    }
+  }
+}
+
+.outline-item-section,
+.outline-item-subsection {
+  border: 1px rgb(178, 178, 178);
+}
+
+.outline-item.collapsed {
+  .sortable-list {
+    display: none;
+  }
+}
+
+.item-actions {
+  .configure-button {
+    float: left;
+    margin-right: 13px;
+    color: #a4aab7;
+  }
+}

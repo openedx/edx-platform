@@ -1,38 +1,62 @@
-<section class="courseware-<%= xblockType %> is-collapsible is-draggable" data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
+<li class="outline-item outline-item-<%= xblockType %> is-collapsible is-draggable" data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
     <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon-caret-right"></i></span>
 
-    <header class="<%= xblockType %> <%= parentType %>-item">
-        <a href="#" data-tooltip="Expand/collapse this section" class="action expand-collapse collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">Expand/collapse this section</span></a>
+    <div class="wrapper-xblock-header">
+        <div class="wrapper-xblock-header-primary">
+            <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
+                <i class="icon-caret-down ui-toggle-expansion"></i>
 
-        <div class="item-details" data-locator="<%= xblockInfo.get('id') %>">
-            <h3 class="<%= xblockType %>-name">
-                <%= xblockInfo.get('display_name') %>
+                <% if (xblockInfo.get('studio_url')) { %>
+                    <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                <% } else { %>
+                    <%= xblockInfo.get('display_name') %>
+                <% } %>
             </h3>
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
+                            <i class="icon-gear"></i>
+                            <span class="sr"><%= gettext('Configure') %></span>
+                        </a>
+                    </li>
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
+                            <i class="icon-remove"></i>
+                            <span class="sr"><%= gettext('Delete') %></span>
+                        </a>
+                    </li>
+                    <li class="actions-item drag">
+                    <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle">
+                        <span class="sr"><%= gettext('Drag to reorder') %></span>
+                    </span>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="item-actions">
-            <ul class="actions-list">
-                <li class="action-item action-delete">
-                    <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                    <i class="icon-trash"></i>
-                    <span class="sr">${_("Delete")}</span>
-                    </a>
-                </li>
-                <li class="actions-item drag">
-                    <span data-tooltip="Drag to reorder" class="drag-handle <%= xblockType %>-drag-handle"><span class="sr"> Drag to reorder section</span></span>
-                </li>
-            </ul>
+        <div class="wrapper-xblock-header-secondary">
+            <div class="meta-info">
+                <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
+            </div>
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                </ul>
+            </div>
         </div>
-    </header>
+    </div>
 
     <ol class="sortable-list sortable-<%= xblockType %>-list">
     </ol>
+
     <% if (childType) { %>
-        <div class="courseware-<%= childType %> add-new-<%= childType %>">
-            <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
-            <a href="#" class="new-<%= childType %>-item" data-category="<%= childCategory %>" data-parent="<%= xblockType.id %>">
-                <i class="icon-plus"></i> New Thingy
-            </a>
-        </div>
+    <div class="add-xblock-component">
+        <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+        <a href="#" class="add-xblock" data-category="<%= childCategory %>" data-parent="<%= xblockType.id %>">
+            <i class="icon-plus"></i><%= childTypeDisplayName %>
+        </a>
+    </div>
     <% } %>
     <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon-caret-right"></i></span>
-</section>
+</li>

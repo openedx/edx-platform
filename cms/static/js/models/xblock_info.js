@@ -11,7 +11,9 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "is_container": null,
             "data": null,
             "metadata" : null,
-            "children": null
+            "children": null,
+            "studio_url": null,
+            "child_info": null
         },
 
         parse: function (response) {
