@@ -57,7 +57,7 @@ define([
                 expect(view.$('.ui-loading')).toBeVisible();
                 view.render();
                 expect(view.$('.no-group-configurations-content')).toBeTruthy();
-                expect(view.$('.ui-loading')).toBeHidden();
+                expect(view.$('.ui-loading')).toHaveClass('is-hidden');
             });
         });
 

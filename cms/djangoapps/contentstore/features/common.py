@@ -57,6 +57,26 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('I have populated a new course in Studio$')
+def i_have_populated_a_new_course(_step):
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    world.scenario_dict['COURSE'] = course
+    section = world.ItemFactory.create(parent_location=course.location)
+    world.ItemFactory.create(
+        parent_location=section.location,
+        category='sequential',
+        display_name='Subsection One',
+    )
+    user = create_studio_user(is_staff=False)
+    add_course_author(user, course)
+
+    log_into_studio()
+
+    world.css_click('a.course-link')
+    world.wait_for_js_to_load()
+
+
 @step('(I select|s?he selects) the new course')
 def select_new_course(_step, whom):
     course_link_css = 'a.course-link'
@@ -182,24 +202,9 @@ def create_a_course():
     assert_true(world.is_css_present(course_title_css))
 
 
-def add_section(name='My Section'):
-    link_css = 'a.new-courseware-section-button'
-    world.css_click(link_css)
-    name_css = 'input.new-section-name'
-    save_css = 'input.new-section-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
-    span_css = 'span.section-name-span'
-    assert_true(world.is_css_present(span_css))
-
-
-def add_subsection(name='Subsection One'):
-    css = 'a.new-subsection-item'
-    world.css_click(css)
-    name_css = 'input.new-subsection-name-input'
-    save_css = 'input.new-subsection-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
+def add_section():
+    world.css_click('.course-outline .add-button')
+    assert_true(world.is_css_present('.outline-item-section .xblock-field-value'))
 
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time, key=None):
@@ -230,36 +235,13 @@ def i_enabled_the_advanced_module(step, module):
 
 
 @world.absorb
-def create_course_with_unit():
+def create_unit_from_course_outline():
     """
-    Prepare for tests by creating a course with a section, subsection, and unit.
-    Performs the following:
-        Clear out all courseware
-        Create a course with a section, subsection, and unit
-        Create a user and make that user a course author
-        Log the user into studio
-        Open the course from the dashboard
-        Expand the section and click on the New Unit link
-    The end result is the page where the user is editing the new unit
+    Expands the section and clicks on the New Unit link.
+    The end result is the page where the user is editing the new unit.
     """
-    world.clear_courses()
-    course = world.CourseFactory.create()
-    world.scenario_dict['COURSE'] = course
-    section = world.ItemFactory.create(parent_location=course.location)
-    world.ItemFactory.create(
-        parent_location=section.location,
-        category='sequential',
-        display_name='Subsection One',
-    )
-    user = create_studio_user(is_staff=False)
-    add_course_author(user, course)
-
-    log_into_studio()
-    world.css_click('a.course-link')
-
-    world.wait_for_js_to_load()
     css_selectors = [
-        'div.section-item a.expand-collapse', 'a.new-unit-item'
+        '.outline-item-subsection .expand-collapse', '.outline-item-subsection .add-button'
     ]
     for selector in css_selectors:
         world.css_click(selector)
@@ -273,7 +255,8 @@ def create_course_with_unit():
 @step('I have clicked the new unit button$')
 @step(u'I am in Studio editing a new unit$')
 def edit_new_unit(step):
-    create_course_with_unit()
+    step.given('I have populated a new course in Studio')
+    create_unit_from_course_outline()
 
 
 @step('the save notification button is disabled')

@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 
 
 # Things w/ these categories should never be marked as version=DRAFT
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+DIRECT_ONLY_CATEGORIES = {'course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info'}
 
 # sort order that returns DRAFT items first
 SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
