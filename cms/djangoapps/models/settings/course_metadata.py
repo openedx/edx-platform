@@ -1,6 +1,7 @@
 from xblock.fields import Scope
 
 from contentstore.utils import get_modulestore
+from django.utils.translation import ugettext as _
 
 
 class CourseMetadata(object):
@@ -22,6 +23,10 @@ class CourseMetadata(object):
                      'show_timezone',
                      'format',
                      'graded',
+                     'hide_from_toc',
+                     'pdf_textbooks',
+                     'name',  # from xblock
+                     'tags',  # from xblock
                      'video_speed_optimizations',
     ]
 
@@ -40,7 +45,12 @@ class CourseMetadata(object):
             if field.name in cls.FILTERED_LIST:
                 continue
 
-            result[field.name] = field.read_json(descriptor)
+            result[field.name] = {
+                'value': field.read_json(descriptor),
+                'display_name': field.display_name,
+                'help': field.help,
+                'deprecated': field.runtime_options.get('deprecated', False)
+            }
 
         return result
 
@@ -51,30 +61,31 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        dirty = False
-
         # Copy the filtered list to avoid permanently changing the class attribute.
         filtered_list = list(cls.FILTERED_LIST)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
             filtered_list.remove("tabs")
 
-        for key, val in jsondict.iteritems():
+        # Validate the values before actually setting them.
+        key_values = {}
+
+        for key, model in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
             if key in filtered_list:
                 continue
+            try:
+                val = model['value']
+                if hasattr(descriptor, key) and getattr(descriptor, key) != val:
+                    key_values[key] = descriptor.fields[key].from_json(val)
+            except (TypeError, ValueError) as err:
+                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}".format(
+                    name=model['display_name'], detailed_message=err.message)))
 
-            if key == "unsetKeys":
-                dirty = True
-                for unset in val:
-                    descriptor.fields[unset].delete_from(descriptor)
+        for key, value in key_values.iteritems():
+            setattr(descriptor, key, value)
 
-            if hasattr(descriptor, key) and getattr(descriptor, key) != val:
-                dirty = True
-                value = descriptor.fields[key].from_json(val)
-                setattr(descriptor, key, value)
-
-        if dirty:
+        if len(key_values) > 0:
             get_modulestore(descriptor.location).update_item(descriptor, user.id if user else None)
 
         return cls.fetch(descriptor)

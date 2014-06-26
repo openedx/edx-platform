@@ -20,6 +20,9 @@ log = logging.getLogger(__name__)
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class SequenceFields(object):
     has_children = True
@@ -27,7 +30,11 @@ class SequenceFields(object):
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(
+        display_name=_("Due Date"),
+        help=_("Enter the date by which problems are due."),
+        scope=Scope.settings,
+    )
     extended_due = Date(
         help="Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
