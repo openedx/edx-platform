@@ -8,16 +8,13 @@ import shutil
 import tempfile
 
 from django.core.management import call_command
-from django.test.utils import override_settings
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestImport(ModuleStoreTestCase):
     """
     Unit tests for importing a course from command line

@@ -39,34 +39,16 @@ def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
 
 
-def _xmodule_recurse(item, action, ignore_exception=()):
-    """
-    Recursively apply provided action on item and its children
-
-    ignore_exception (Exception Object): A optional argument; when passed ignores the corresponding
-        exception raised during xmodule recursion,
-    """
-    for child in item.get_children():
-        _xmodule_recurse(child, action, ignore_exception)
-
-    try:
-        return action(item)
-    except ignore_exception:
-        return
-
-
 def get_parent_xblock(xblock):
     """
     Returns the xblock that is the parent of the specified xblock, or None if it has no parent.
     """
     locator = xblock.location
-    parent_locations = modulestore().get_parent_locations(locator,)
+    parent_location = modulestore().get_parent_location(locator)
 
-    if len(parent_locations) == 0:
+    if parent_location is None:
         return None
-    elif len(parent_locations) > 1:
-        logging.error('Multiple parents have been found for %s', unicode(locator))
-    return modulestore().get_item(parent_locations[0])
+    return modulestore().get_item(parent_location)
 
 
 def is_unit(xblock):

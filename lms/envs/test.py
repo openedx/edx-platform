@@ -16,6 +16,7 @@ from .common import *
 import os
 from path import path
 from warnings import filterwarnings
+from uuid import uuid4
 
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
@@ -108,17 +109,20 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-# point tests at the test courses by default
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': COMMON_TEST_DATA_ROOT,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
+MODULESTORE_BRANCH = 'draft'
+update_module_store_settings(
+    MODULESTORE,
+    module_store_options={
+        'fs_root': TEST_ROOT / "data",
+    },
+    xml_store_options={
+        'data_dir': COMMON_TEST_DATA_ROOT,
+    },
+    doc_store_settings={
+        'db': 'test_xmodule',
+        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+    },
+)
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -126,12 +130,6 @@ CONTENTSTORE = {
         'host': 'localhost',
         'db': 'xcontent',
     }
-}
-
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'test_xmodule',
-    'collection': 'test_modulestore',
 }
 
 DATABASES = {

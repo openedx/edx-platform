@@ -420,7 +420,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             if selected_partition is not None:
                 self.group_id_mapping = {}  # pylint: disable=attribute-defined-outside-init
                 for group in selected_partition.groups:
-                    self._create_vertical_for_group(group)
+                    self._create_vertical_for_group(group, user.id)
                 # Don't need to call update_item in the modulestore because the caller of this method will do it.
         else:
             # If children referenced in group_id_to_child have been deleted, remove them from the map.
@@ -553,7 +553,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         for group in user_partition.groups:
             str_group_id = unicode(group.id)
             if str_group_id not in self.group_id_to_child:
-                self._create_vertical_for_group(group)
+                self._create_vertical_for_group(group, request.user.id)
                 changed = True
 
         if changed:
@@ -561,7 +561,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             self.system.modulestore.update_item(self, None)
         return Response()
 
-    def _create_vertical_for_group(self, group):
+    def _create_vertical_for_group(self, group, user_id):
         """
         Creates a vertical to associate with the group.
 
@@ -576,9 +576,10 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         metadata = {'display_name': group.name}
         modulestore.create_and_save_xmodule(
             dest_usage_key,
+            user_id,
             definition_data=None,
             metadata=metadata,
-            system=self.system,
+            runtime=self.system,
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[unicode(group.id)] = dest_usage_key

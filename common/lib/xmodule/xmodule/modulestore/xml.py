@@ -19,6 +19,7 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
+from xmodule.modulestore import REVISION_OPTION_PUBLISHED_ONLY
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -67,6 +68,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
+        self.modulestore = xmlstore
 
         def process_xml(xml):
             """Takes an xml string, and returns a XBlock created from
@@ -332,7 +334,7 @@ class ParentTracker(object):
         """
         Init
         """
-        # location -> set(parents).  Not using defaultdict because we care about the empty case.
+        # location -> parent.  Not using defaultdict because we care about the empty case.
         self._parents = dict()
 
     def add_parent(self, child, parent):
@@ -341,8 +343,7 @@ class ParentTracker(object):
 
         child and parent must be :class:`.Location` instances.
         """
-        setp = self._parents.setdefault(child, set())
-        setp.add(parent)
+        self._parents[child] = parent
 
     def is_known(self, child):
         """
@@ -353,13 +354,13 @@ class ParentTracker(object):
     def make_known(self, location):
         """Tell the parent tracker about an object, without registering any
         parents for it.  Used for the top level course descriptor locations."""
-        self._parents.setdefault(location, set())
+        self._parents.setdefault(location, None)
 
-    def parents(self, child):
+    def parent(self, child):
         """
-        Return a list of the parents of this child.  If not is_known(child), will throw a KeyError
+        Return the parent of this child.  If not is_known(child), will throw a KeyError
         """
-        return list(self._parents[child])
+        return self._parents[child]
 
 
 class XMLModuleStore(ModuleStoreReadBase):
@@ -408,6 +409,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
+
+        # The XML Module Store is a read-only store and only handles published content
+        self.branch_setting_func = lambda: REVISION_OPTION_PUBLISHED_ONLY
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -785,25 +789,25 @@ class XMLModuleStore(ModuleStoreReadBase):
         # here just to quell the abstractmethod. someone could write the impl if needed
         raise NotImplementedError
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location in this
+    def get_parent_location(self, location, **kwargs):
+        '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
-
-        returns an iterable of things that can be passed to Location.  This may
-        be empty if there are no parents.
         '''
         if not self.parent_trackers[location.course_key].is_known(location):
             raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
 
-        return self.parent_trackers[location.course_key].parents(location)
+        return self.parent_trackers[location.course_key].parent(location)
 
-    def get_modulestore_type(self, course_id):
+    def get_modulestore_type(self, course_key=None):
         """
         Returns an enumeration-like type reflecting the type of this modulestore
         The return can be one of:
         "xml" (for XML based courses),
         "mongo" for old-style MongoDB backed courses,
         "split" for new-style split MongoDB backed courses.
+
+        Args:
+            course_key: just for signature compatibility
         """
         return XML_MODULESTORE_TYPE
 

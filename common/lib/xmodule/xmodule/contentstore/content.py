@@ -48,7 +48,7 @@ class StaticContent(object):
         - course_key: the course that this asset belongs to
         - path: is the name of the static asset
         - revision: is the object's revision information
-        - is_tumbnail: is whether or not we want the thumbnail version of this
+        - is_thumbnail: is whether or not we want the thumbnail version of this
             asset
         """
         path = path.replace('/', '_')

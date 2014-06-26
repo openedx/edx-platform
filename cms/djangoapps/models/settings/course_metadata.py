@@ -1,8 +1,6 @@
 from xblock.fields import Scope
-
-from contentstore.utils import get_modulestore
+from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
-
 
 class CourseMetadata(object):
     '''
@@ -86,6 +84,6 @@ class CourseMetadata(object):
             setattr(descriptor, key, value)
 
         if len(key_values) > 0:
-            get_modulestore(descriptor.location).update_item(descriptor, user.id if user else None)
+            modulestore().update_item(descriptor, user.id if user else None)
 
         return cls.fetch(descriptor)
