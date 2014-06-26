@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Backbone version of the course outline page. STUD-1726.
+
 Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
 
 Studio: Show display names and help text in Advanced Settings. Also hide deprecated settings
