@@ -129,6 +129,15 @@
         padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
       }
     }
+
+    // location widget
+    .unit-location {
+
+      .draggable-drop-indicator {
+        display: none;
+      }
+    }
+
   }
 }
 
