@@ -10,8 +10,8 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
-from .django import contentstore
+from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
 
@@ -63,7 +63,7 @@ class StaticContent(object):
         return self.location
 
     def get_url_path(self):
-        return self.location.to_deprecated_string()
+        return self._key_to_string(self.location)
 
     @property
     def data(self):
@@ -103,14 +103,16 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
-        return course_key.make_asset_key('asset', '').to_deprecated_string()
+        assert(isinstance(course_key, CourseKey))
+        return StaticContent._key_to_string(course_key.make_asset_key('asset', ''))
 
     @staticmethod
     def get_location_from_path(path):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
+        # TODO OpaqueKey - change to from_string once opaque keys lands
+        # return AssetLocation.from_string(path)
         return AssetLocation.from_deprecated_string(path)
 
     @staticmethod
@@ -122,7 +124,7 @@ class StaticContent(object):
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
         loc = StaticContent.compute_location(course_id, orig_path)
-        loc_url = loc.to_deprecated_string()
+        loc_url = StaticContent._key_to_string(loc)
 
         # parse the query params for "^/static/" and replace with the location url
         orig_query = parse_qsl(query)
@@ -133,7 +135,7 @@ class StaticContent(object):
                     course_id,
                     query_value[len('/static/'):],
                 )
-                new_query_url = new_query.to_deprecated_string()
+                new_query_url = StaticContent._key_to_string(new_query)
                 new_query_list.append((query_name, new_query_url))
             else:
                 new_query_list.append((query_name, query_value))
@@ -143,6 +145,15 @@ class StaticContent(object):
 
     def stream_data(self):
         yield self._data
+
+    @staticmethod
+    def _key_to_string(key):
+        """Converts the given key to a string, honoring the deprecated flag."""
+        # TODO OpaqueKey - remove deprecated check once opaque keys lands
+        if getattr(key, 'deprecated', False):
+            return key.to_deprecated_string()
+        else:
+            return unicode(key)
 
 
 class StaticContentStream(StaticContent):
@@ -213,6 +224,12 @@ class ContentStore(object):
         """
         raise NotImplementedError
 
+    def copy_all_course_assets(self, source_course_key, dest_course_key):
+        """
+        Copy all the course assets from source_course_key to dest_course_key
+        """
+        raise NotImplementedError
+
     def generate_thumbnail(self, content, tempfile_path=None):
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
@@ -248,7 +265,7 @@ class ContentStore(object):
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/jpeg', thumbnail_file)
 
-                contentstore().save(thumbnail_content)
+                self.save(thumbnail_content)
 
             except Exception, e:
                 # log and continue as thumbnails are generally considered as optional

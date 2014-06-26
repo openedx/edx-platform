@@ -23,7 +23,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # pylint: disable=W0142
         self.loc_mapper = LocMapperStore(test_location_mapper.TrivialCache(), **self.db_config)
         self.split_mongo.loc_mapper = self.loc_mapper
-        self.migrator = SplitMigrator(self.split_mongo, self.old_mongo, self.draft_mongo, self.loc_mapper)
+        self.migrator = SplitMigrator(self.split_mongo, self.draft_mongo, self.loc_mapper)
 
     def tearDown(self):
         dbref = self.loc_mapper.db
