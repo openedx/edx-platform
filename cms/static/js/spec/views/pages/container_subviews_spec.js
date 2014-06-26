@@ -12,6 +12,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             beforeEach(function () {
                 edit_helpers.installTemplate('xblock-string-field-editor');
                 edit_helpers.installTemplate('publish-xblock');
+                edit_helpers.installTemplate('unit-outline');
                 appendSetFixtures(mockContainerPage);
 
                 model = new XBlockInfo({
@@ -20,6 +21,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     category: 'vertical',
                     published: false,
                     has_changes: false
+                }, {
+                    parse: true
                 });
                 containerPage = new ContainerPage({
                     model: model,
@@ -87,39 +90,6 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     // If published is false, preview is always enabled.
                     fetch({"id": "locator-container", "published": false, "has_changes": false});
                     expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
-                });
-            });
-
-            describe("VisibilityStateController", function () {
-                var unitVisibilityCss = '.section-item.editing a';
-
-                it('renders initially as private with unpublished content', function () {
-                    renderContainerPage(mockContainerXBlockHtml, this);
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('private-item');
-                });
-
-                it('renders as public when published and no changes', function () {
-                    renderContainerPage(mockContainerXBlockHtml, this);
-                    fetch({"id": "locator-container", "published": true, "has_changes": false});
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('public-item');
-                });
-
-                it('renders as draft when published and changes', function () {
-                    renderContainerPage(mockContainerXBlockHtml, this);
-                    fetch({"id": "locator-container", "published": true, "has_changes": true});
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('draft-item');
-                });
-
-                it('renders as private when not published', function () {
-                    renderContainerPage(mockContainerXBlockHtml, this);
-                    fetch({"id": "locator-container", "published": false, "has_changes": true});
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('private-item');
-
-                    fetch({"id": "locator-container", "published": false, "has_changes": false});
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('private-item');
-
-                    fetch({"id": "locator-container", "published": false});
-                    expect(containerPage.$(unitVisibilityCss)).toHaveClass('private-item');
                 });
             });
 

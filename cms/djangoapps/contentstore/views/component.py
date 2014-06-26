@@ -193,7 +193,7 @@ def container_handler(request, usage_key_string):
         assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
         section = get_parent_xblock(subsection)
         assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
-        xblock_info = create_xblock_info(usage_key, xblock)
+        xblock_info = create_xblock_info(xblock, include_ancestor_info=True)
 
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')

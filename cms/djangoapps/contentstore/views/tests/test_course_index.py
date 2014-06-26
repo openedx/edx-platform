@@ -99,18 +99,18 @@ class TestCourseIndex(CourseTestCase):
         self.assertEqual(json_response['id'], 'location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
         self.assertTrue(json_response['is_container'])
-        self.assertFalse(json_response['is_draft'])
+        self.assertTrue(json_response['published'])
 
         # Now verify the first child
-        children = json_response['children']
+        children = json_response['child_info']['children']
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], 'location:MITx+999+Robot_Super_Course+chapter+Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(first_child_response['is_container'])
-        self.assertFalse(first_child_response['is_draft'])
-        self.assertTrue(len(first_child_response['children']) > 0)
+        self.assertTrue(first_child_response['published'])
+        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
@@ -122,10 +122,10 @@ class TestCourseIndex(CourseTestCase):
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        self.assertIsNotNone(json_response['is_draft'])
+        self.assertIsNotNone(json_response['published'])
         self.assertIsNotNone(json_response['is_container'])
         if json_response['is_container']:
-            for child_response in json_response['children']:
+            for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response)
         else:
-            self.assertFalse('children' in json_response)
+            self.assertFalse('child_info' in json_response)

@@ -152,7 +152,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
             });
             describe("onDragMove", function () {
                 beforeEach(function () {
-                    this.scrollSpy = spyOn(window, 'scrollBy').andCallThrough();
+                    this.redirectSpy = spyOn(window, 'scrollBy').andCallThrough();
                 });
                 it("adds the correct CSS class to the drop destination", function () {
                     var $ele, dragX, dragY;
@@ -199,7 +199,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, '', {
                         clientY: 2
                     });
-                    expect(this.scrollSpy).toHaveBeenCalledWith(0, -10);
+                    expect(this.redirectSpy).toHaveBeenCalledWith(0, -10);
                 });
                 it("scrolls down if necessary", function () {
                     ContentDragger.onDragMove({
@@ -207,7 +207,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, '', {
                         clientY: window.innerHeight - 5
                     });
-                    expect(this.scrollSpy).toHaveBeenCalledWith(0, 10);
+                    expect(this.redirectSpy).toHaveBeenCalledWith(0, 10);
                 });
             });
             describe("onDragEnd", function () {

@@ -1498,7 +1498,10 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-locator="location:MITx+999+Robot_Super_Course+course+Robot_Super_Course" data-course-key="slashes:MITx+999+Robot_Super_Course">',
+            '<article class="course-outline" data-locator="{locator}" data-course-key="{course_key}">'.format(
+                locator='location:MITx+999+Robot_Super_Course+course+Robot_Super_Course',
+                course_key='slashes:MITx+999+Robot_Super_Course',
+            ),
             status_code=200,
             html=True
         )

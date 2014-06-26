@@ -113,7 +113,7 @@ def i_see_a_release_date_for_my_section(_step):
 
 @step('I see a link to create a new subsection$')
 def i_see_a_link_to_create_a_new_subsection(_step):
-    css = 'a.new-subsection-item'
+    css = '.outline-item-section .add-button'
     assert world.is_css_present(css)
 
 
@@ -131,10 +131,7 @@ def the_section_release_date_is_updated(_step):
 
 
 def save_section_name(name):
-    name_css = '.new-section-name'
-    save_css = '.new-section-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
+    set_element_value('.xblock-field-input', name, Keys.ENTER)
 
 
 def see_my_section_on_the_courseware_page(name):

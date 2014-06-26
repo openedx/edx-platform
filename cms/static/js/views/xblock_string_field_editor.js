@@ -5,8 +5,8 @@
  * XBlock field's value if it has been changed. If the user presses Escape, then any changes will
  * be removed and the input hidden again.
  */
-define(["jquery", "gettext", "js/views/baseview"],
-    function ($, gettext, BaseView) {
+define(["js/views/baseview", "js/views/utils/xblock_utils"],
+    function (BaseView, XBlockViewUtils) {
 
         var XBlockStringFieldEditor = BaseView.extend({
             events: {
@@ -69,25 +69,8 @@ define(["jquery", "gettext", "js/views/baseview"],
             },
 
             updateField: function() {
-                var xblockInfo = this.model,
-                    newValue = this.getInput().val(),
-                    requestData = this.createUpdateRequestData(newValue),
-                    fieldName = this.fieldName;
-                this.runOperationShowingMessage(gettext('Saving&hellip;'),
-                    function() {
-                        return xblockInfo.save(requestData);
-                    }).done(function() {
-                        // Update publish and last modified information from the server.
-                        xblockInfo.fetch();
-                    });
-            },
-
-            createUpdateRequestData: function(newValue) {
-                var metadata = {};
-                metadata[this.fieldName] = newValue;
-                return {
-                    metadata: metadata
-                };
+                var newValue = this.getInput().val();
+                XBlockViewUtils.updateXBlockField(this.model, this.fieldName, newValue);
             },
 
             handleKeyUp: function(event) {

@@ -3,6 +3,8 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
 
         urlRoot: ModuleUtils.urlRoot,
 
+        // NOTE: 'publish' is not an attribute on XBlockInfo, but it is used to signal the publish
+        // and discard changes actions. Therefore 'publish' cannot be introduced as an attribute.
         defaults: {
             "id": null,
             "display_name": null,
@@ -10,7 +12,16 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "is_container": null,
             "data": null,
             "metadata" : null,
-            "children": null,
+            "studio_url": null,
+            /**
+             * An optional object with information about the children as well as about
+             * the primary xblock type that is supported as a child.
+             */
+            "child_info": null,
+            /**
+             * An optional object with information about each of the ancestors.
+             */
+            "ancestor_info": null,
             /**
              * True iff:
              * 1) Edits have been made to the xblock and no published version exists.
@@ -49,10 +60,31 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
              * this will either be the parent subsection or the grandparent section.
              */
             "release_date_from":null
-        }
-        // NOTE: 'publish' is not an attribute on XBlockInfo, but it used to signal the publish
-        // and discard changes actions. Therefore 'publish' cannot be introduced as an attribute.
+        },
 
+        parse: function(response) {
+            if (response.ancestor_info) {
+                response.ancestor_info.ancestors = this.parseXBlockInfoList(response.ancestor_info.ancestors);
+            }
+            if (response.child_info) {
+                response.child_info.children = this.parseXBlockInfoList(response.child_info.children);
+            }
+            return response;
+        },
+
+        parseXBlockInfoList: function(list) {
+            var i, result = [];
+            if (list) {
+                for (i=0; i < list.length; i++) {
+                    result.push(this.createChild(list[i]));
+                }
+            }
+            return result;
+        },
+
+        createChild: function(response) {
+            return new XBlockInfo(response, { parse: true });
+        }
     });
     return XBlockInfo;
 });
