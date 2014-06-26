@@ -40,9 +40,13 @@
             </div>
         </div>
         <div class="wrapper-xblock-header-secondary">
-            <div class="meta-info">
-                <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
-            </div>
+            <% if (xblockInfo.get('release_date')) { %>
+                <div class="meta-info">
+                    <i class="icon-time"></i>
+                    <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
+                </div>
+            <% } %>
+
 
             <div class="item-actions">
                 <ul class="actions-list">
@@ -55,12 +59,12 @@
     </ol>
 
     <% if (childType) { %>
-    <div class="add-xblock-component">
-        <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
-        <a href="#" class="add-xblock" data-category="<%= childCategory %>" data-parent="<%= xblockType.id %>">
-            <i class="icon-plus"></i><%= childTypeDisplayName %>
-        </a>
-    </div>
+        <div class="add-xblock-component">
+            <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+            <a href="#" class="add-xblock" data-category="<%= childCategory %>" data-parent="<%= xblockType.id %>">
+                <i class="icon-plus"></i><%= addChildName %>
+            </a>
+        </div>
     <% } %>
     <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon-caret-right"></i></span>
 </li>

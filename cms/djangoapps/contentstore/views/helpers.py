@@ -1,8 +1,13 @@
+from __future__ import absolute_import
+
 import logging
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string, render_to_response
+from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url, reverse_usage_url
 
@@ -124,6 +129,29 @@ def xblock_studio_url(xblock):
         return reverse_usage_url('unit_handler', xblock.location)
     else:
         return reverse_usage_url('container_handler', xblock.location)
+
+
+def xblock_type_display_name(xblock, default_display_name=None):
+    """
+    Returns the display name for the specified type of xblock. Note that an instance can be passed in
+    for context dependent names, e.g. a vertical beneath a sequential is a Unit.
+
+    :param xblock: An xblock instance or the type of xblock.
+    :param default_display_name: The default value to return if no display name can be found.
+    :return:
+    """
+
+    if hasattr(xblock, 'category'):
+        if is_unit(xblock):
+            return _('Unit')
+        category = xblock.category
+    else:
+        category = xblock
+    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    if hasattr(component_class, 'display_name') and component_class.display_name.default:
+        return _(component_class.display_name.default)
+    else:
+        return default_display_name
 
 
 def xblock_primary_child_category(xblock):

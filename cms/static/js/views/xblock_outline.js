@@ -54,7 +54,7 @@ define(["jquery", "underscore", "js/views/baseview"],
                     parentType: parentType,
                     childType: childInfo ? this.getXBlockType(childInfo.category, xblockInfo) : null,
                     childCategory: childInfo ? childInfo.category : null,
-                    childTypeDisplayName: childInfo ? childInfo.display_name : null,
+                    addChildName: childInfo ? childInfo.display_name : null,
                     includesChildren: this.shouldRenderChildren()
                 }));
             },

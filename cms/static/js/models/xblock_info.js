@@ -13,7 +13,8 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "metadata" : null,
             "children": null,
             "studio_url": null,
-            "child_info": null
+            "child_info": null,
+            "release_date": null
         },
 
         parse: function (response) {

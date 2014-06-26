@@ -56,7 +56,7 @@ from student.roles import CourseRole, UserBasedRole
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
-from contentstore.views.helpers import xblock_studio_url, xblock_primary_child_category
+from contentstore.views.helpers import xblock_studio_url, xblock_primary_child_category, xblock_type_display_name
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
 
@@ -157,11 +157,13 @@ def _xblock_json(xblock, course_id):
         'is_draft': getattr(xblock, 'is_draft', False),
         'is_container': is_container,
         'studio_url': xblock_studio_url(xblock),
-        'child_info': {
-            'category': child_category,
-            'display_name': "Thingy"
-        },
+        'release_date': u'Jan 01, 2030 at 00:00 UTC' if xblock.category == 'chapter' else None,
     }
+    if child_category:
+        result['child_info'] = {
+            'category': child_category,
+            'display_name': xblock_type_display_name(child_category),
+        }
     if is_container:
         result['children'] = [_xblock_json(child, course_id) for child in xblock.get_children()]
     return result
