@@ -30,6 +30,8 @@ from student.views import (process_survey_link, _cert_info,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
 
+from certificates.models import CertificateStatuses
+from certificates.tests.factories import GeneratedCertificateFactory
 import shoppingcart
 
 log = logging.getLogger(__name__)
@@ -212,6 +214,7 @@ class DashboardTest(TestCase):
         self.assertFalse(course_mode_info['show_upsell'])
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_refundable(self):
         verified_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -227,6 +230,26 @@ class DashboardTest(TestCase):
         verified_mode.save()
         self.assertFalse(enrollment.refundable())
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_refundable_when_certificate_exists(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+
+        self.assertTrue(enrollment.refundable())
+
+        generated_certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
+        self.assertFalse(enrollment.refundable())
 
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""

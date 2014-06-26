@@ -36,12 +36,14 @@ from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
+
+from certificates.models import GeneratedCertificate
+from course_modes.models import CourseMode
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -953,6 +955,11 @@ class CourseEnrollment(models.Model):
         # (side-effects are bad)
         if getattr(self, 'can_refund', None) is not None:
             return True
+
+        # If the student has already been given a certificate they should not be refunded
+        if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
+            return False
+
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:
             return False
