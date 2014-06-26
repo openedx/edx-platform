@@ -139,7 +139,11 @@ The **credentials.csv.gpg** file is likely to be the first file that you
 decrypt with your private GPG key. You use the same process to decrypt the data
 package files that you retrieve from Amazon S3.
 
-.. image
+ .. image:: ../Images/Access_AmazonS3.png
+  :alt: Flowchart of edX collecting files for the data package and then
+      encrypting, compressing, and uploading them to Amazon S3 and of data czar
+      decrypting access credentials, accessing S3 bucket, and then downloading,
+      extracting, and decrypting data package files
 
 .. _Decrypt an Encrypted File:
 
