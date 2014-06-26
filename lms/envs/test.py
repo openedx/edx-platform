@@ -318,6 +318,12 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
 FEATURES['USE_MICROSITES'] = True
 
+# add extra template directory for test-only templates
+MAKO_TEMPLATES['main'].extend([
+    COMMON_ROOT / 'test' / 'templates'
+])
+
+
 ######### LinkedIn ########
 LINKEDIN_API['COMPANY_ID'] = '0000000'
 
