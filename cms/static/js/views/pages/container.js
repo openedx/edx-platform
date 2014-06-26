@@ -4,15 +4,15 @@
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/container",
         "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info",
-        "js/views/xblock_string_field_editor"],
+        "js/views/xblock_string_field_editor", "js/views/publish_xblock"],
     function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo,
-                XBlockStringFieldEditor) {
+                XBlockStringFieldEditor, XBlockPublisher) {
         var XBlockContainerPage = BaseView.extend({
             // takes XBlockInfo as a model
 
             view: 'container_preview',
 
-            initialize: function() {
+            initialize: function(options) {
                 BaseView.prototype.initialize.call(this);
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
@@ -24,6 +24,26 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                     model: this.model,
                     view: this.view
                 });
+                this.isUnitPage = this.options.isUnitPage;
+                if (this.isUnitPage) {
+                    this.xblockPublisher = new XBlockPublisher({
+                        el: this.$('#publish-unit'),
+                        model: this.model
+                    });
+                    this.xblockPublisher.render();
+
+                    // No need to render initially. This is only used for updating state
+                    // when the unit changes visibility.
+                    this.visibilityState = new VisibilityState({
+                        el: this.$('.section-item.editing a'),
+                        model: this.model
+                    });
+                    this.previewActions = new PreviewActions({
+                        el: this.$('#preview-actions'),
+                        model: this.model
+                    });
+                    this.previewActions.render();
+                }
             },
 
             render: function(options) {
@@ -71,6 +91,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
             onXBlockRefresh: function(xblockView) {
                 this.addButtonActions(xblockView.$el);
                 this.xblockView.refresh();
+                // Update publish and last modified information from the server.
+                this.model.fetch();
             },
 
             renderAddXBlockComponents: function() {
@@ -182,6 +204,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 xblockElement.remove();
                 xblockView.updateChildren(parent);
                 xblock.runtime.notify('deleted-child', parent.data('locator'));
+                // Update publish and last modified information from the server.
+                this.model.fetch();
             },
 
             onNewXBlock: function(xblockElement, scrollOffset, data) {
@@ -245,6 +269,78 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                         temporaryView.unbind();  // Remove the temporary view
                     }
                 });
+            }
+        });
+
+        /**
+         * A controller for updating the visibility status of the unit on the RHS navigation tree.
+         */
+        var VisibilityState = BaseView.extend({
+
+            // takes XBlockInfo as a model
+            initialize: function() {
+                this.model.on('sync', this.onSync, this);
+            },
+
+            onSync: function(e) {
+                if (('has_changes' in e.changedAttributes()) || ('published' in e.changedAttributes())) {
+                   this.render();
+                }
+            },
+
+            render: function() {
+                var computeState = function(published, has_changes) {
+                    if (!published) {
+                        return "private";
+                    }
+                    else if (has_changes) {
+                        return "draft";
+                    }
+                    else {
+                        return "public";
+                    }
+
+                };
+                var oldState = computeState(this.model.previous('published'), this.model.previous('has_changes'));
+                var state = computeState(this.model.get('published'), this.model.get('has_changes'));
+                this.$el.toggleClass(oldState + "-item " + state + "-item");
+            }
+        });
+
+        /**
+         * A controller for updating the "View Live" and "Preview" buttons.
+         */
+        var PreviewActions = BaseView.extend({
+
+            // takes XBlockInfo as a model
+            initialize: function() {
+                this.model.on('sync', this.onSync, this);
+            },
+
+            onSync: function(e) {
+                if (('has_changes' in e.changedAttributes()) || ('published' in e.changedAttributes())) {
+                   this.render();
+                }
+            },
+
+            render: function() {
+                var previewAction = this.$el.find('.preview-draft-button'),
+                    viewLiveAction = this.$el.find('.view-published-button');
+                if (this.model.get('published')) {
+                    previewAction.text(gettext('Preview Changes'));
+                    viewLiveAction.removeClass('is-hidden');
+                }
+                else {
+                    previewAction.text("Preview");
+                    viewLiveAction.addClass('is-hidden');
+                }
+
+                if (this.model.get('has_changes')) {
+                    previewAction.removeClass('is-disabled');
+                }
+                else {
+                    previewAction.addClass('is-disabled');
+                }
             }
         });
 

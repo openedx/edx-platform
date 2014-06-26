@@ -26,29 +26,28 @@ from django.utils.translation import ugettext as _
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
+
+<script type="text/template" id="publish-xblock-tpl">
+    <%static:include path="js/publish-xblock.underscore" />
+</script>
 % endfor
 </%block>
 
 <%block name="jsextra">
-<%
-main_xblock_info = {
-    'id': str(xblock_locator),
-    'display_name': xblock.display_name_with_default,
-    'category': xblock.category,
-};
-%>
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
             function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
                 var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
-                var mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
+                var mainXBlockInfo = new XBlockInfo(${json.dumps(xblock_info) | n});
+                var isUnitPage = ${json.dumps(is_unit_page)}
 
                 xmoduleLoader.done(function () {
                     var view = new ContainerPage({
                         el: $('#content'),
                         model: mainXBlockInfo,
-                        templates: templates
+                        templates: templates,
+                        isUnitPage: isUnitPage
                     });
                     view.render();
                 });
@@ -80,12 +79,20 @@ main_xblock_info = {
             <div class="wrapper-xblock-field is-editable" data-field="display_name">
                 <div class="page-header-title xblock-field-value">${xblock.display_name_with_default | h}</div>
             </div>
+            % if is_unit_page:
+                <div id="preview-actions">
+                    <a href="${published_preview_link}" target="_blank"
+                       class="alert-action secondary view-published-button is-hidden">${_("View Published Version")}</a>
+                    <a href="${draft_preview_link}" target="_blank"
+                       class="alert-action secondary preview-draft-button is-disabled"></a>
+                </div>
+            % endif
         </h1>
 
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
-                % if not is_unit_page and not unit_publish_state == 'public':
+                % if not is_unit_page:
                 <li class="action-item action-edit nav-item">
                     <a href="#" class="button edit-button action-button">
                         <i class="icon-pencil"></i>
@@ -119,6 +126,7 @@ main_xblock_info = {
                     </div>
                 % endif
                 % if is_unit_page:
+                    <div id="publish-unit" class="window"></div>
                     <div class="window unit-location">
                         <h4 class="header">${_("Unit Location")}</h4>
                         <div class="window-contents">

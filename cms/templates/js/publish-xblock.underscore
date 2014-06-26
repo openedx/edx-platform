@@ -1,0 +1,30 @@
+<h4 class="header">
+    <% if (published && !has_changes) { %>
+       <%= gettext("Published") %>
+    <% } else if (published && has_changes) { %>
+       <%= gettext("Draft (Unpublished changes)") %>
+    <% } else { %>
+       <%= gettext("Draft (Unpublished)") %>
+    <% } %>
+</h4>
+<div class="window-contents">
+    <!-- If not changed since we started storing last edited information, we will not have edited_on and edited_by -->
+    <% if (edited_on && edited_by) { %>
+        <div class="last-updated">
+            <span>Lasted edited on </span>
+            <span><%= edited_on %></span>
+            <span> by </span>
+            <span><%= edited_by %></span>
+        </div>
+    <% } %>
+    <a href="#" class="button action-button publish-button <% if (!has_changes) { %>is-disabled<% } %>">
+        <span class="action-button-text">Publish</span>
+    </a>
+    <% if (published) { %>
+        <a href="#" class="button action-button discard-changes-button <% if (!has_changes) { %>is-disabled<% } %>">
+            <span class="action-button-text">Discard Changes</span>
+        </a>
+    <% } %>
+</div>
+
+

@@ -31,10 +31,11 @@ from util.string_utils import str_to_bool
 from ..utils import get_modulestore
 
 from .access import has_course_access
-from .helpers import _xmodule_recurse, xblock_has_own_studio_page
+from .helpers import _xmodule_recurse
 from contentstore.utils import compute_publish_state, PublishState
+from django.contrib.auth.models import User
+from util.date_utils import get_default_time_display
 from contentstore.views.helpers import is_unit
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -88,7 +89,7 @@ def xblock_handler(request, usage_key_string):
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
+                :publish: can be one of three values, 'make_public, 'make_private' TODO: delete all "create_draft" code
               The JSON representation on the updated xblock (minus children) is returned.
 
               if usage_key_string is not specified, create a new xblock instance, either by duplicating
@@ -286,22 +287,6 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
     old_metadata = own_metadata(existing_item)
     old_content = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
-    if publish:
-        if publish == 'make_private':
-            _xmodule_recurse(
-                existing_item,
-                lambda i: modulestore().unpublish(i.location),
-                ignore_exception=ItemNotFoundError
-            )
-        elif publish == 'create_draft':
-            # This recursively clones the existing item location to a draft location (the draft is
-            # implicit, because modulestore is a Draft modulestore)
-            _xmodule_recurse(
-                existing_item,
-                lambda i: modulestore().convert_to_draft(i.location),
-                ignore_exception=DuplicateItemError
-            )
-
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
         existing_item.data = data
@@ -411,6 +396,7 @@ def _create_item(request):
         definition_data=data,
         metadata=metadata,
         system=parent.runtime,
+        user_id=request.user.id
     )
 
     # TODO replace w/ nicer accessor
@@ -553,8 +539,35 @@ def _get_module_info(usage_key, rewrite_static_links=True):
         )
 
     # Note that children aren't being returned until we have a use case.
-    return {
-        'id': unicode(usage_key),
-        'data': data,
-        'metadata': own_metadata(module)
+    return create_xblock_info(usage_key, module, data, own_metadata(module))
+    # return {
+    #     'id': unicode(usage_key),
+    #     'data': data,
+    #     'metadata': own_metadata(module)
+    # }
+
+
+def create_xblock_info(usage_key, xblock, data=None, metadata=None):
+    """
+    Creates the information needed for client-side XBlockInfo.
+
+    If data or metadata are not specified, their information will not be added
+    (regardless of whether or not the xblock actually has data or metadata).
+    """
+    publish_state = compute_publish_state(xblock) if xblock else None
+
+    xblock_info = {
+        "id": str(usage_key),
+        "display_name": xblock.display_name_with_default,
+        "category": xblock.category,
+        "has_changes": get_modulestore(usage_key).has_changes(usage_key),
+        "published": publish_state in (PublishState.public, PublishState.draft),
+        "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
+        "edited_by": User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None
     }
+    if data is not None:
+        xblock_info["data"] = data
+    if metadata is not None:
+        xblock_info["metadata"] = metadata
+
+    return xblock_info
