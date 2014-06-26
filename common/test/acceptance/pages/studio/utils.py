@@ -1,7 +1,10 @@
 """
 Utility methods useful for Studio page tests.
 """
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from bok_choy.promise import EmptyPromise
+
 from ...tests.helpers import disable_animations
 
 
@@ -122,3 +125,17 @@ def confirm_prompt(page, cancel=False):
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     click_css(page, confirmation_button_css, require_notification=(not cancel))
+
+
+def set_input_value_and_save(page, css, value):
+    """
+    Sets the text field with given label (display name) to the specified value, and presses Save.
+    """
+    input_element = page.q(css=css).results[0]
+    # Click in the input to give it the focus
+    action = ActionChains(page.browser).click(input_element)
+    # Delete all of the characters that are currently there
+    for _x in range(0, len(input_element.get_attribute('value'))):
+        action = action.send_keys(Keys.BACKSPACE)
+    # Send the new text, then hit the enter key so that the change event is triggered).
+    action.send_keys(value).send_keys(Keys.ENTER).perform()

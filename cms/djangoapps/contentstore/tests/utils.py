@@ -102,10 +102,11 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
         """
+        user_id = self.user.id
         def descend(parent, stack):
             xblock_type = stack.pop(0)
             for _ in range(2):
-                child = ItemFactory.create(category=xblock_type, parent_location=parent.location)
+                child = ItemFactory.create(category=xblock_type, parent_location=parent.location, user_id=user_id)
                 if stack:
                     descend(child, stack)
 

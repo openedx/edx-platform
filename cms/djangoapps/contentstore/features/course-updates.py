@@ -130,3 +130,9 @@ def verify_text_in_editor_and_update(button_css, before, after):
     text = get_codemirror_value()
     assert_in(before, text)
     change_text(after)
+
+
+@step('I see a "(saving|deleting)" notification')
+def i_see_a_mini_notification(_step, _type):
+    saving_css = '.wrapper-notification-mini'
+    assert world.is_css_present(saving_css)
