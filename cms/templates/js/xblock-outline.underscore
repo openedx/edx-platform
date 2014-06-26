@@ -3,8 +3,12 @@
 
     <div class="wrapper-xblock-header">
         <div class="wrapper-xblock-header-primary">
-            <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
-                <i class="icon-caret-down ui-toggle-expansion"></i>
+            <% if (includesChildren) { %>
+                <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
+                    <i class="icon-caret-down ui-toggle-expansion"></i>
+            <% } else { %>
+                <h3 class="xblock-title">
+            <% } %>
 
                 <% if (xblockInfo.get('studio_url')) { %>
                     <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
