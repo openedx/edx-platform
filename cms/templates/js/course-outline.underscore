@@ -1,0 +1,81 @@
+<% if (parentInfo) { %>
+<li class="outline-item outline-item-<%= xblockType %> <%= includesChildren ? 'is-collapsible' : '' %> is-draggable <%= isCollapsed ? 'collapsed' : '' %>"
+    data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
+
+    <div class="wrapper-xblock-header">
+        <div class="wrapper-xblock-header-primary">
+            <% if (includesChildren) { %>
+                <h3 class="xblock-title expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %>" title="<%= gettext('Collapse/Expand this Checklist') %>">
+                    <i class="icon-caret-down ui-toggle-expansion"></i>
+            <% } else { %>
+                <h3 class="xblock-title">
+            <% } %>
+
+                <% if (xblockInfo.get('category') === 'vertical') { %>
+                    <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                <% } else { %>
+                    <span class="wrapper-xblock-field" data-field="display_name">
+                        <span class="is-editable xblock-field-value"><%= xblockInfo.get('display_name') %></span>
+                    </span>
+                <% } %>
+            </h3>
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
+                            <i class="icon-remove"></i>
+                            <span class="sr"><%= gettext('Delete') %></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="wrapper-xblock-header-secondary">
+            <% if (xblockInfo.get('edited_on')) { %>
+                <div class="meta-info">
+                    <% if (xblockInfo.get('published')) { %>
+                        <i class="icon-check"></i>
+                        <%= gettext('Released:') %> Dec 31, 2015 at 21:00 UTC
+                    <% } else { %>
+                        <i class="icon-time"></i>
+                        <%= gettext('Scheduled:') %> Dec 31, 2015 at 21:00 UTC
+                    <% } %>
+                </div>
+            <% } %>
+
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                </ul>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+    <% if (!parentInfo && xblockInfo.get('child_info') && xblockInfo.get('child_info').children.length === 0) { %>
+        <div class="no-content add-xblock-component">
+            <p><%= gettext("You haven't added any content to this course yet.") %>
+                <a href="#" class="add-button" data-category="<%= childCategory %>"
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                    <i class="icon-plus"></i><%= addChildLabel %>
+                </a>
+            </p>
+        </div>
+    <% } else { %>
+        <ol class="sortable-list sortable-<%= xblockType %>-list">
+        </ol>
+
+        <% if (childType) { %>
+            <div class="add-xblock-component">
+                <a href="#" class="add-button" data-category="<%= childCategory %>"
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                    <i class="icon-plus"></i><%= addChildLabel %>
+                </a>
+            </div>
+        <% } %>
+    <% } %>
+
+<% if (parentInfo) { %>
+</li>
+<% } %>

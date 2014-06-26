@@ -142,23 +142,25 @@ class CourseSectionTest(StudioCourseTest):
         """
         Check that section name is editable on course outline page.
         """
-        section_name = self.course_outline_page.get_section_name()[0]
-        self.assertEqual(section_name, "Test Section")
-        self.course_outline_page.change_section_name("Test Section New")
-        section_name = self.course_outline_page.get_section_name(page_refresh=True)[0]
-        self.assertEqual(section_name, "Test Section New")
+        new_name = u"Test Section New"
+        section = self.course_outline_page.section_at(0)
+        self.assertEqual(section.name, u"Test Section")
+        section.change_name(new_name)
+        self.browser.refresh()
+        self.assertEqual(section.name, new_name)
 
-    def test_section_name_not_editable_inside_modal(self):
-        """
-        Check that section name is not editable inside "Section Release Date" modal on course outline page.
-        """
-        parent_css='div.modal-window'
-        self.course_outline_page.click_release_date()
-        section_name = self.course_outline_page.get_section_name(parent_css)[0]
-        self.assertEqual(section_name, '"Test Section"')
-        self.course_outline_page.click_section_name(parent_css)
-        section_name_edit_form = self.course_outline_page.section_name_edit_form_present(parent_css)
-        self.assertFalse(section_name_edit_form)
+    # TODO: re-enable when release date support is added back
+    # def test_section_name_not_editable_inside_modal(self):
+    #     """
+    #     Check that section name is not editable inside "Section Release Date" modal on course outline page.
+    #     """
+    #     parent_css='div.modal-window'
+    #     self.course_outline_page.click_release_date()
+    #     section_name = self.course_outline_page.get_section_name(parent_css)[0]
+    #     self.assertEqual(section_name, '"Test Section"')
+    #     self.course_outline_page.click_section_name(parent_css)
+    #     section_name_edit_form = self.course_outline_page.section_name_edit_form_present(parent_css)
+    #     self.assertFalse(section_name_edit_form)
 
 
 @attr('shard_1')

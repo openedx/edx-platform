@@ -7,6 +7,8 @@ the top.  Include a label indicating the component affected.
 
 LMS: Instructors can request and see content of previous bulk emails sent in the instructor dashboard. 
 
+Studio: Backbone version of the course outline page. STUD-1726.
+
 Studio: New advanced setting "invitation_only" for courses. This setting overrides the enrollment start/end dates
   if set. LMS-2670
 
