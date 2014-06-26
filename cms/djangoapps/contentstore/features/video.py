@@ -31,11 +31,10 @@ def configure_youtube_api(_step, action):
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
 
 @step('I have created a Video component$')
-def i_created_a_video_component(_step):
-
-    world.create_course_with_unit()
+def i_created_a_video_component(step):
+    step.given('I am in Studio editing a new unit')
     world.create_component_instance(
-        step=_step,
+        step=step,
         category='video',
     )
 

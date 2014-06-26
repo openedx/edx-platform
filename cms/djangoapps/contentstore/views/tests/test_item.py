@@ -21,12 +21,14 @@ from contentstore.views.component import (
     SPLIT_TEST_COMPONENT_TYPE
 )
 
+from contentstore.views.item import create_xblock_info, ALWAYS
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import PublishState
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from opaque_keys.edx.keys import UsageKey, CourseKey
@@ -1030,3 +1032,170 @@ class TestComponentTemplates(CourseTestCase):
         self.assertIsNotNone(ora_template)
         self.assertEqual(ora_template.get('category'), 'openassessment')
         self.assertIsNone(ora_template.get('boilerplate_name', None))
+
+
+class TestXBlockInfo(ItemTest):
+    """
+    Unit tests for XBlock's outline handling.
+    """
+    def setUp(self):
+        super(TestXBlockInfo, self).setUp()
+        user_id = self.user.id
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Unit 1', user_id=user_id
+        )
+        self.video = ItemFactory.create(
+            parent_location=self.vertical.location, category='video', display_name='My Video', user_id=user_id
+        )
+
+    def test_json_responses(self):
+        outline_url = reverse_usage_url('xblock_outline_handler', self.usage_key)
+        resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        self.validate_course_xblock_info(json_response)
+
+    def test_chapter_xblock_info(self):
+        chapter = modulestore().get_item(self.chapter.location)
+        xblock_info = create_xblock_info(
+            chapter,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_chapter_xblock_info(xblock_info)
+
+    def test_sequential_xblock_info(self):
+        sequential = modulestore().get_item(self.sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_sequential_xblock_info(xblock_info)
+
+    def test_vertical_xblock_info(self):
+        vertical = modulestore().get_item(self.vertical.location)
+        xblock_info = create_xblock_info(
+            vertical,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            include_ancestor_info=True
+        )
+        self.validate_vertical_xblock_info(xblock_info)
+
+    def test_component_xblock_info(self):
+        video = modulestore().get_item(self.video.location)
+        xblock_info = create_xblock_info(
+            video,
+            include_child_info=True,
+            include_children_predicate=ALWAYS
+        )
+        self.validate_component_xblock_info(xblock_info)
+
+    def validate_course_xblock_info(self, xblock_info, has_child_info=True):
+        """
+        Validate that the xblock info is correct for the test course.
+        """
+        self.assertEqual(xblock_info['category'], 'course')
+        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(xblock_info['display_name'], 'Robot Super Course')
+        self.assertTrue(xblock_info['published'])
+
+        # Finally, validate the entire response for consistency
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
+
+    def validate_chapter_xblock_info(self, xblock_info, has_child_info=True):
+        """
+        Validate that the xblock info is correct for the test chapter.
+        """
+        self.assertEqual(xblock_info['category'], 'chapter')
+        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(xblock_info['display_name'], 'Week 1')
+        self.assertTrue(xblock_info['published'])
+        self.assertEqual(xblock_info['edited_by'], 'testuser')
+
+        # Finally, validate the entire response for consistency
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
+
+    def validate_sequential_xblock_info(self, xblock_info, has_child_info=True):
+        """
+        Validate that the xblock info is correct for the test chapter.
+        """
+        self.assertEqual(xblock_info['category'], 'sequential')
+        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
+        self.assertEqual(xblock_info['display_name'], 'Lesson 1')
+        self.assertTrue(xblock_info['published'])
+        self.assertEqual(xblock_info['edited_by'], 'testuser')
+
+        # Finally, validate the entire response for consistency
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
+
+    def validate_vertical_xblock_info(self, xblock_info):
+        """
+        Validate that the xblock info is correct for the test vertical.
+        """
+        self.assertEqual(xblock_info['category'], 'vertical')
+        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/vertical/Unit_1')
+        self.assertEqual(xblock_info['display_name'], 'Unit 1')
+        self.assertTrue(xblock_info['published'])
+        self.assertEqual(xblock_info['edited_by'], 'testuser')
+
+        # Validate that the correct ancestor info has been included
+        ancestor_info = xblock_info.get('ancestor_info', None)
+        self.assertIsNotNone(ancestor_info)
+        ancestors = ancestor_info['ancestors']
+        self.assertEqual(len(ancestors), 3)
+        self.validate_sequential_xblock_info(ancestors[0], has_child_info=True)
+        self.validate_chapter_xblock_info(ancestors[1], has_child_info=False)
+        self.validate_course_xblock_info(ancestors[2], has_child_info=False)
+
+        # Finally, validate the entire response for consistency
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True)
+
+    def validate_component_xblock_info(self, xblock_info):
+        """
+        Validate that the xblock info is correct for the test component.
+        """
+        self.assertEqual(xblock_info['category'], 'video')
+        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
+        self.assertEqual(xblock_info['display_name'], 'My Video')
+        self.assertTrue(xblock_info['published'])
+        self.assertEqual(xblock_info['edited_by'], 'testuser')
+
+        # Finally, validate the entire response for consistency
+        self.validate_xblock_info_consistency(xblock_info)
+
+    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False):
+        """
+        Validate that the xblock info is internally consistent.
+        """
+        self.assertIsNotNone(xblock_info['display_name'])
+        self.assertIsNotNone(xblock_info['id'])
+        self.assertIsNotNone(xblock_info['category'])
+        self.assertIsNotNone(xblock_info['published'])
+        self.assertEqual(xblock_info['edited_by'], 'testuser')
+        if has_ancestor_info:
+            self.assertIsNotNone(xblock_info.get('ancestor_info', None))
+            ancestors = xblock_info['ancestor_info']['ancestors']
+            for ancestor in xblock_info['ancestor_info']['ancestors']:
+                self.validate_xblock_info_consistency(
+                    ancestor,
+                    has_child_info=(ancestor == ancestors[0])    # Only the direct ancestor includes children
+                )
+        else:
+            self.assertIsNone(xblock_info.get('ancestor_info', None))
+        if has_child_info:
+            self.assertIsNotNone(xblock_info.get('child_info', None))
+            if xblock_info['child_info'].get('children', None):
+                for child_response in xblock_info['child_info']['children']:
+                    self.validate_xblock_info_consistency(
+                        child_response,
+                        has_child_info=(not child_response.get('child_info', None) == None)
+                    )
+        else:
+            self.assertIsNone(xblock_info.get('child_info', None))

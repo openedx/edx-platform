@@ -4,6 +4,8 @@ Helper methods for Studio views.
 
 from __future__ import absolute_import
 
+import urllib
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -74,9 +76,7 @@ def xblock_has_own_studio_page(xblock):
       2. Verticals that are either:
         - themselves treated as units
         - a direct child of a unit
-      3. XBlocks with children, except for:
-        - sequentials (aka subsections)
-        - chapters (aka sections)
+      3. XBlocks that support children
     """
     category = xblock.category
 
@@ -85,8 +85,6 @@ def xblock_has_own_studio_page(xblock):
     elif category == 'vertical':
         parent_xblock = get_parent_xblock(xblock)
         return is_unit(parent_xblock) if parent_xblock else False
-    elif category == 'sequential':
-        return False
 
     # All other xblocks with children have their own page
     return xblock.has_children
@@ -99,8 +97,13 @@ def xblock_studio_url(xblock):
     if not xblock_has_own_studio_page(xblock):
         return None
     category = xblock.category
-    if category in ('course', 'chapter'):
+    if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)
+    elif category in ('chapter', 'sequential'):
+        return u'{url}?show={usage_key}'.format(
+            url=reverse_course_url('course_handler', xblock.location.course_key),
+            usage_key=urllib.quote(unicode(xblock.location))
+        )
     else:
         return reverse_usage_url('container_handler', xblock.location)
 
@@ -116,13 +119,33 @@ def xblock_type_display_name(xblock, default_display_name=None):
     """
 
     if hasattr(xblock, 'category'):
-        if is_unit(xblock):
-            return _('Unit')
         category = xblock.category
+        if category == 'vertical' and not is_unit(xblock):
+            return _('Vertical')
     else:
         category = xblock
+    if category == 'chapter':
+        return _('Section')
+    elif category == 'sequential':
+        return _('Subsection')
+    elif category == 'vertical':
+        return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)
     else:
         return default_display_name
+
+
+def xblock_primary_child_category(xblock):
+    """
+    Returns the primary child category for the specified xblock, or None if there is not a primary category.
+    """
+    category = xblock.category
+    if category == 'course':
+        return 'chapter'
+    elif category == 'chapter':
+        return 'sequential'
+    elif category == 'sequential':
+        return 'vertical'
+    return None
