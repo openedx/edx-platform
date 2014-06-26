@@ -9,7 +9,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, Count
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,7 +34,7 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 
 from .serializers import CourseModuleCompletionSerializer
-from .serializers import GradeSerializer, CourseLeadersSerializer
+from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
 log = logging.getLogger(__name__)
 
@@ -1445,7 +1445,7 @@ class CoursesLeadersList(SecureListAPIView):
 
     def get_queryset(self):
         """
-        GET /api/courses/{course_id}/leaders/
+        GET /api/courses/{course_id}/metrics/proficiency/leaders/
         """
         course_id = self.kwargs['course_id']
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
@@ -1467,3 +1467,56 @@ class CoursesLeadersList(SecureListAPIView):
         queryset = queryset.values('student__id', 'student__username', 'student__profile__title',
                                    'student__profile__avatar_url').annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
         return queryset
+
+
+class CoursesCompletionsLeadersList(SecureAPIView):
+    """
+    ### The CoursesCompletionsLeadersList view allows clients to retrieve top 3 users who are leading
+    in terms of course module completions and course average for the specified Course, if user_id parameter is given
+    position of user is returned
+    - URI: ```/api/courses/{course_id}/metrics/completions/leaders/```
+    - GET: Returns a JSON representation (array) of the users with points scored
+    Filters can also be applied
+    ```/api/courses/{course_id}/metrics/completions/leaders/?content_id={content_id}```
+    To get more than 3 users use count parameter
+    ```/api/courses/{course_id}/metrics/completions/leaders/?count=6```
+    ### Use Cases/Notes:
+    * Example: Display leaders in terms of completions in a given course
+    * Example: Display top 3 users leading in terms of completions in a given course
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/completions/leaders/
+        """
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        count = self.request.QUERY_PARAMS.get('count', 3)
+        data = {}
+        course_avg = 0
+        try:
+            get_course(course_id)
+        except ValueError:
+            raise Http404
+        queryset = CourseModuleCompletion.objects.filter(course_id=course_id)
+
+        if user_id:
+            user_completions = queryset.filter(user__id=user_id).count()
+            completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
+                .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
+            data['position'] = completions_above_user + 1
+            data['completions'] = user_completions
+
+        total_completions = queryset.filter(user__is_active=True).count()
+        users = CourseModuleCompletion.objects.filter(user__is_active=True)\
+            .aggregate(total=Count('user__id', distinct=True))
+
+        if users and users['total'] > 0:
+            course_avg = round(total_completions / float(users['total']), 1)
+        data['course_avg'] = course_avg
+
+        queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
+                                                                'user__profile__avatar_url')\
+            .annotate(completions=Count('content_id')).order_by('-completions')[:count]
+        serializer = CourseCompletionsLeadersSerializer(queryset, many=True)
+        data['leaders'] = serializer.data  # pylint: disable=E1101
+        return Response(data, status=status.HTTP_200_OK)
