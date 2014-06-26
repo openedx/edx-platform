@@ -26,9 +26,15 @@ fs.files:
 Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
 which can be `uploadDate`, `display_name`, 
 
+Replace existing index which leaves out `run` with this one:
 ```
-ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1})
+ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1, '_id.run': 1})
+ensureIndex({'content_son.tag': 1, 'content_son.org': 1, 'content_son.course': 1, 'content_son.category': 1, 'content_son.run': 1})
 ```
+
+Note: I'm not advocating adding one which leaves out `category` for now because that would only be
+used for `delete_all_course_assets` which in the future should not actually delete the assets except
+when doing garbage collection.
 
 Remove index on `displayname`
 

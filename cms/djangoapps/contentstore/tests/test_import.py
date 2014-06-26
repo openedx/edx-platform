@@ -7,7 +7,6 @@ Tests for import_from_xml using the mongo modulestore.
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
-from path import path
 import copy
 
 from django.contrib.auth.models import User

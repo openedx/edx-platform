@@ -4,7 +4,6 @@ Tests for StaticContentServer
 import copy
 import logging
 from uuid import uuid4
-from path import path
 from pymongo import MongoClient
 
 from django.contrib.auth.models import User
@@ -16,7 +15,7 @@ from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
 
