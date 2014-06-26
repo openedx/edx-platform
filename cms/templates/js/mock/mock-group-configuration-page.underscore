@@ -1,11 +1,18 @@
 <div id="content">
-
     <div class="wrapper-mast wrapper">
         <header class="mast has-actions has-subtitle">
             <h1 class="page-header">
                 <small class="subtitle">${_("Settings")}</small>
                 <span class="sr">&gt; </span>${_("Group Configurations")}
             </h1>
+            <nav class="nav-actions">
+                <h3 class="sr">${_("Page Actions")}</h3>
+                <ul>
+                    <li class="nav-item">
+                        <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Group Configuration")}</a>
+                    </li>
+                </ul>
+            </nav>
         </header>
     </div>
 

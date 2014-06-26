@@ -19,8 +19,14 @@ class GroupConfigurationsPage(CoursePage):
         """
         Returns list of the group configurations for the course.
         """
-        css = '.wrapper-group-configuration'
+        css = '.group-configurations-list-item'
         return [GroupConfiguration(self, index) for index in xrange(len(self.q(css=css)))]
+
+    def create(self):
+        """
+        Creates new group configuration.
+        """
+        self.q(css=".new-button").first.click()
 
 
 class GroupConfiguration(object):
@@ -30,7 +36,7 @@ class GroupConfiguration(object):
 
     def __init__(self, page, index):
         self.page = page
-        self.SELECTOR = '.view-group-configuration-{}'.format(index)
+        self.SELECTOR = '.group-configurations-list-item-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
@@ -49,12 +55,45 @@ class GroupConfiguration(object):
         css = 'a.group-toggle'
         self.find_css(css).first.click()
 
+    def save(self):
+        """
+        Save group configuration.
+        """
+        css = '.action-primary'
+        self.find_css(css).first.click()
+        self.page.wait_for_ajax()
+
+    def cancel(self):
+        """
+        Cancel group configuration.
+        """
+        css = '.action-secondary'
+        self.find_css(css).first.click()
+
+    @property
+    def mode(self):
+        """
+        Returns group configuration mode.
+        """
+        if self.find_css('.group-configuration-edit').present:
+            return 'edit'
+        elif self.find_css('.group-configuration-details').present:
+            return 'details'
+
     @property
     def id(self):
         """
         Returns group configuration id.
         """
         css = '.group-configuration-id .group-configuration-value'
+        return self.find_css(css).first.text[0]
+
+    @property
+    def validation_message(self):
+        """
+        Returns validation message.
+        """
+        css = '.message-status.error'
         return self.find_css(css).first.text[0]
 
     @property
@@ -65,6 +104,14 @@ class GroupConfiguration(object):
         css = '.group-configuration-title'
         return self.find_css(css).first.text[0]
 
+    @name.setter
+    def name(self, value):
+        """
+        Sets group configuration name.
+        """
+        css = '.group-configuration-name-input'
+        self.find_css(css).first.fill(value)
+
     @property
     def description(self):
         """
@@ -72,6 +119,14 @@ class GroupConfiguration(object):
         """
         css = '.group-configuration-description'
         return self.find_css(css).first.text[0]
+
+    @description.setter
+    def description(self, value):
+        """
+        Sets group configuration description.
+        """
+        css = '.group-configuration-description-input'
+        self.find_css(css).first.fill(value)
 
     @property
     def groups(self):

@@ -1,3 +1,3 @@
 <div class="no-group-configurations-content">
-    <p><%= gettext("You haven't created any group configurations yet.") %></p>
+    <p><%= gettext("You haven't created any group configurations yet.") %><a href="#" class="button new-button"><i class="icon-plus"></i><%= gettext("Add your first Group Configuration") %></a></p>
 </div>

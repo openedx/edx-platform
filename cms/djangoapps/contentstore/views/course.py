@@ -13,7 +13,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
@@ -21,6 +21,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
+from xmodule.partitions.partitions import UserPartition, Group
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
@@ -67,7 +68,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'grading_handler',
            'advanced_settings_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
-           'group_configurations_list_handler']
+           'group_configurations_list_handler', 'group_configurations_detail_handler']
 
 
 class AccessListFallback(Exception):
@@ -855,7 +856,56 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
         return JsonResponse()
 
 
-@require_http_methods(("GET"))
+class GroupConfigurationsValidationError(Exception):
+    """
+    An error thrown when a group configurations input is invalid.
+    """
+    pass
+
+
+class GroupConfiguration(object):
+    """
+    Prepare Group Configuration for the course.
+    """
+    @staticmethod
+    def parse(configuration_json):
+        """
+        Parse given string that represents group configuration.
+        """
+        try:
+            group_configuration = json.loads(configuration_json)
+        except ValueError:
+            raise GroupConfigurationsValidationError(_("invalid JSON"))
+
+        if not group_configuration.get('version'):
+            group_configuration['version'] = UserPartition.VERSION
+
+        # this is temporary logic, we are going to build default groups on front-end
+        if not group_configuration.get('groups'):
+            group_configuration['groups'] = [
+                {'name': 'Group A'}, {'name': 'Group B'},
+            ]
+
+        for group in group_configuration['groups']:
+            group['version'] = Group.VERSION
+        return group_configuration
+
+    @staticmethod
+    def validate(group_configuration):
+        """
+        Validate group configuration representation.
+        """
+        if not group_configuration.get("name"):
+            raise GroupConfigurationsValidationError(_("must have name of the configuration"))
+        if not isinstance(group_configuration.get("description"), basestring):
+            raise GroupConfigurationsValidationError(_("must have description of the configuration"))
+        if len(group_configuration.get('groups')) < 2:
+            raise GroupConfigurationsValidationError(_("must have at least two groups"))
+        group_id = unicode(group_configuration.get("id", ""))
+        if group_id and not group_id.isdigit():
+            raise GroupConfigurationsValidationError(_("group configuration ID must be numeric"))
+
+@require_http_methods(("GET", "POST"))
 @login_required
 @ensure_csrf_cookie
 def group_configurations_list_handler(request, course_key_string):
@@ -864,17 +914,56 @@ def group_configurations_list_handler(request, course_key_string):
 
     GET
         html: return Group Configurations list page (Backbone application)
+    POST
+        json: create new group configuration
     """
     course_key = CourseKey.from_string(course_key_string)
     course = _get_course_module(course_key, request.user)
-    group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
-    splite_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+    store = modulestore()
 
-    return render_to_response('group_configurations.html', {
-        'context_course': course,
-        'group_configuration_url': group_configuration_url,
-        'configurations': [u.to_json() for u in course.user_partitions] if splite_test_enabled else None,
-    })
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+        return render_to_response('group_configurations.html', {
+            'context_course': course,
+            'group_configuration_url': group_configuration_url,
+            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
+        })
+    elif "application/json" in request.META.get('HTTP_ACCEPT') and request.method == 'POST':
+        # create a new group configuration for the course
+        try:
+            configuration = GroupConfiguration.parse(request.body)
+            GroupConfiguration.validate(configuration)
+        except GroupConfigurationsValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
+
+        if not configuration.get("id"):
+            configuration["id"] = random.randint(100, 10**12)
+
+        # Assign ids to every group in configuration.
+        for index, group in enumerate(configuration.get('groups', [])):
+            group["id"] = index
+
+        course.user_partitions.append(UserPartition.from_json(configuration))
+        store.update_item(course, request.user.id)
+        response = JsonResponse(configuration, status=201)
+
+        response["Location"] = reverse_course_url(
+            'group_configurations_detail_handler',
+            course.id,
+            kwargs={'group_configuration_id': configuration["id"]}
+        )
+        return response
+    else:
+        return HttpResponse(status=406)
+
+
+@require_http_methods(("GET", "POST"))
+@login_required
+@ensure_csrf_cookie
+def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
+    return JsonResponse(status=404)
 
 
 def _get_course_creator_status(user):
