@@ -5,7 +5,7 @@
         <span class="component-name"></span>
         <ul class="${'editor-tabs' if (len(tabs) != 1) else 'editor-single-tab-name' }">
         % for tab in tabs:
-            <li class="inner_tab_wrap"><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if tab.get('current', False) else ''}">${_(tab['name'])}</a></li>
+            <li class="inner_tab_wrap"><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if tab.get('current', False) else ''}" data-tab_name="${tab['name']}">${_(tab['name'])}</a></li>
         % endfor
         </ul>
       </div>
