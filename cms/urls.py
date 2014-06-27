@@ -90,8 +90,11 @@ urlpatterns += patterns(
     url(r'^settings/advanced/(?P<course_key_string>[^/]+)$', 'advanced_settings_handler'),
     url(r'^textbooks/(?P<course_key_string>[^/]+)$', 'textbooks_list_handler'),
     url(r'^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
-    url(r'^group_configurations/(?P<course_key_string>[^/]+)$', 'group_configurations_list_handler'),
 )
+
+if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
+    urlpatterns += (url(r'^group_configurations/(?P<course_key_string>[^/]+)$',
+                        'contentstore.views.group_configurations_list_handler'),)
 
 js_info_dict = {
     'domain': 'djangojs',

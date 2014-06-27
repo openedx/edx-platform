@@ -6,8 +6,10 @@ import ddt
 
 from mock import patch
 from pytz import UTC
+from unittest import skipUnless
 from webob import Response
 
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -773,6 +775,7 @@ class TestEditItem(ItemTest):
         self.verify_publish_state(html_usage_key, PublishState.draft)
 
 
+@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
