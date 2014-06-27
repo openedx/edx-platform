@@ -24,27 +24,11 @@ class Migration(DataMigration):
         """
         Converts group table entries for write access and beta_test roles to course access roles table.
         """
-        def get_modulestore(ms_type, key):
-            """
-            Find the modulestore of the given type trying the key first
-            """
-            try:
-                store = modulestore(key)
-                if isinstance(store, MixedModuleStore):
-                    store = store.modulestores[key]
-                if store.get_modulestore_type(None) == ms_type:
-                    return store
-                else:
-                    return None
-            except KeyError:
-                return None
-
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
         loc_map_collection = loc_mapper().location_map
-        xml_ms = get_modulestore(XML_MODULESTORE_TYPE, 'xml')
-        mongo_ms = get_modulestore(MONGO_MODULESTORE_TYPE, 'default')
-        if mongo_ms is None:
-            mongo_ms = get_modulestore(MONGO_MODULESTORE_TYPE, 'direct')
+        mixed_ms = modulestore()
+        xml_ms = mixed_ms._get_modulestore_by_type(XML_MODULESTORE_TYPE)
+        mongo_ms = mixed_ms._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
 
         query = Q(name__startswith='staff') | Q(name__startswith='instructor') | Q(name__startswith='beta_testers')
         for group in orm['auth.Group'].objects.filter(query).exclude(name__contains="/").all():

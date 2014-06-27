@@ -7,6 +7,7 @@ In general, it's strategy is to treat the other modulestores as read-only and to
 manipulate storage but use existing api's.
 '''
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+from xmodule.modulestore import BRANCH_NAME_DRAFT, BRANCH_NAME_PUBLISHED, REVISION_OPTION_DRAFT_ONLY
 
 
 class SplitMigrator(object):
@@ -65,8 +66,8 @@ class SplitMigrator(object):
         # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)
         for module in self.direct_modulestore.get_items(course_key):
-            # don't copy the course again. No drafts should get here but check
-            if module.location != old_course_loc and not getattr(module, 'is_draft', False):
+            # don't copy the course again. No drafts should get here
+            if module.location != old_course_loc:
                 # create split_xblock using split.create_item
                 # where block_id is computed by translate_location_to_locator
                 new_locator = self.loc_mapper.translate_location(
@@ -81,10 +82,10 @@ class SplitMigrator(object):
                     fields=self._get_json_fields_translate_references(module, course_key, True),
                     continue_version=True
                 )
-        # after done w/ published items, add version for 'draft' pointing to the published structure
+        # after done w/ published items, add version for DRAFT pointing to the published structure
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
-        versions['draft'] = versions['published']
+        versions[BRANCH_NAME_DRAFT] = versions[BRANCH_NAME_PUBLISHED]
         self.split_modulestore.update_course_index(index_info)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
@@ -97,63 +98,62 @@ class SplitMigrator(object):
         """
         # each true update below will trigger a new version of the structure. We may want to just have one new version
         # but that's for a later date.
-        new_draft_course_loc = published_course_key.for_branch('draft')
+        new_draft_course_loc = published_course_key.for_branch(BRANCH_NAME_DRAFT)
         # to prevent race conditions of grandchilden being added before their parents and thus having no parent to
         # add to
         awaiting_adoption = {}
-        for module in self.draft_modulestore.get_items(course_key):
-            if getattr(module, 'is_draft', False):
-                new_locator = self.loc_mapper.translate_location(
-                    module.location, False, add_entry_if_missing=True
-                )
-                if self.split_modulestore.has_item(new_locator):
-                    # was in 'direct' so draft is a new version
-                    split_module = self.split_modulestore.get_item(new_locator)
-                    # need to remove any no-longer-explicitly-set values and add/update any now set values.
-                    for name, field in split_module.fields.iteritems():
-                        if field.is_set_on(split_module) and not module.fields[name].is_set_on(module):
-                            field.delete_from(split_module)
-                    for name, field in module.fields.iteritems():
-                        # draft children will insert themselves and the others are here already; so, don't do it 2x
-                        if name != 'children' and field.is_set_on(module):
-                            field.write_to(split_module, field.read_from(module))
+        for module in self.draft_modulestore.get_items(course_key, revision=REVISION_OPTION_DRAFT_ONLY):
+            new_locator = self.loc_mapper.translate_location(
+                module.location, False, add_entry_if_missing=True
+            )
+            if self.split_modulestore.has_item(new_locator):
+                # was in 'direct' so draft is a new version
+                split_module = self.split_modulestore.get_item(new_locator)
+                # need to remove any no-longer-explicitly-set values and add/update any now set values.
+                for name, field in split_module.fields.iteritems():
+                    if field.is_set_on(split_module) and not module.fields[name].is_set_on(module):
+                        field.delete_from(split_module)
+                for field, value in self._get_fields_translate_references(module, course_key, True).iteritems():
+                    # draft children will insert themselves and the others are here already; so, don't do it 2x
+                    if field.name != 'children':
+                        field.write_to(split_module, value)
 
-                    _new_module = self.split_modulestore.update_item(split_module, user.id)
-                else:
-                    # only a draft version (aka, 'private'). parent needs updated too.
-                    # create a new course version just in case the current head is also the prod head
-                    _new_module = self.split_modulestore.create_item(
-                        new_draft_course_loc, module.category, user.id,
-                        block_id=new_locator.block_id,
-                        fields=self._get_json_fields_translate_references(module, course_key, True)
-                    )
-                    awaiting_adoption[module.location] = new_locator
-        for draft_location, new_locator in awaiting_adoption.iteritems():
-            for parent_loc in self.draft_modulestore.get_parent_locations(draft_location):
-                old_parent = self.draft_modulestore.get_item(parent_loc)
-                new_parent = self.split_modulestore.get_item(
-                    self.loc_mapper.translate_location(old_parent.location, False)
+                _new_module = self.split_modulestore.update_item(split_module, user.id)
+            else:
+                # only a draft version (aka, 'private'). parent needs updated too.
+                # create a new course version just in case the current head is also the prod head
+                _new_module = self.split_modulestore.create_item(
+                    new_draft_course_loc, module.category, user.id,
+                    block_id=new_locator.block_id,
+                    fields=self._get_json_fields_translate_references(module, course_key, True)
                 )
-                # this only occurs if the parent was also awaiting adoption
-                if any(new_locator == child.version_agnostic() for child in new_parent.children):
-                    break
-                # find index for module: new_parent may be missing quite a few of old_parent's children
-                new_parent_cursor = 0
-                for old_child_loc in old_parent.children:
-                    if old_child_loc == draft_location:
-                        break
-                    sibling_loc = self.loc_mapper.translate_location(old_child_loc, False)
-                    # sibling may move cursor
-                    for idx in range(new_parent_cursor, len(new_parent.children)):
-                        if new_parent.children[idx].version_agnostic() == sibling_loc:
-                            new_parent_cursor = idx + 1
-                            break
-                new_parent.children.insert(new_parent_cursor, new_locator)
-                new_parent = self.split_modulestore.update_item(new_parent, user.id)
+                awaiting_adoption[module.location] = new_locator
+        for draft_location, new_locator in awaiting_adoption.iteritems():
+            parent_loc = self.draft_modulestore.get_parent_location(draft_location)
+            old_parent = self.draft_modulestore.get_item(parent_loc)
+            new_parent = self.split_modulestore.get_item(
+                self.loc_mapper.translate_location(old_parent.location, False)
+            )
+            # this only occurs if the parent was also awaiting adoption: skip this one, go to next
+            if any(new_locator == child.version_agnostic() for child in new_parent.children):
+                continue
+            # find index for module: new_parent may be missing quite a few of old_parent's children
+            new_parent_cursor = 0
+            for old_child_loc in old_parent.children:
+                if old_child_loc == draft_location:
+                    break  # moved cursor enough, insert it here
+                sibling_loc = self.loc_mapper.translate_location(old_child_loc, False)
+                # sibling may move cursor
+                for idx in range(new_parent_cursor, len(new_parent.children)):
+                    if new_parent.children[idx].version_agnostic() == sibling_loc:
+                        new_parent_cursor = idx + 1
+                        break  # skipped sibs enough, pick back up scan
+            new_parent.children.insert(new_parent_cursor, new_locator)
+            new_parent = self.split_modulestore.update_item(new_parent, user.id)
 
     def _get_json_fields_translate_references(self, xblock, old_course_id, published):
         """
-        Return the json repr for explicitly set fields but convert all references to their block_id's
+        Return the json repr for explicitly set fields but convert all references to their Locators
         """
         def get_translation(location):
             """
@@ -178,5 +178,36 @@ class SplitMigrator(object):
                     }
                 else:
                     result[field_name] = field.read_json(xblock)
+
+        return result
+
+    def _get_fields_translate_references(self, xblock, old_course_id, published):
+        """
+        Return a dictionary of field: value pairs for explicitly set fields
+        but convert all references to their BlockUsageLocators
+        """
+        def get_translation(location):
+            """
+            Convert the location and add to loc mapper
+            """
+            return self.loc_mapper.translate_location(location, published, add_entry_if_missing=True)
+
+        result = {}
+        for field_name, field in xblock.fields.iteritems():
+            if field.is_set_on(xblock):
+                field_value = getattr(xblock, field_name)
+                if isinstance(field, Reference) and field_value is not None:
+                    result[field] = get_translation(field_value)
+                elif isinstance(field, ReferenceList):
+                    result[field] = [
+                        get_translation(ele) for ele in field_value
+                    ]
+                elif isinstance(field, ReferenceValueDict):
+                    result[field] = {
+                        key: get_translation(subvalue)
+                        for key, subvalue in field_value.iteritems()
+                    }
+                else:
+                    result[field] = field_value
 
         return result

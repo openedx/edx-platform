@@ -3,10 +3,14 @@ from uuid import uuid4
 import ddt
 from mock import patch, Mock
 from importlib import import_module
+from collections import namedtuple
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
+from xmodule.modulestore import (
+    MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE,
+    REVISION_OPTION_DRAFT_PREFERRED, REVISION_OPTION_PUBLISHED_ONLY, BRANCH_DRAFT_PREFERRED
+)
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -15,7 +19,6 @@ from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDja
 # before importing the module
 from django.conf import settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-import bson.son
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -55,32 +58,29 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             XML_COURSEID1: 'xml',
             XML_COURSEID2: 'xml',
             BAD_COURSE_ID: 'xml',
-            MONGO_COURSEID: 'default',
         },
-        'stores': {
-            'xml': {
+        'stores': [
+            {
+                'NAME': 'draft',
+                'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
+                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                'OPTIONS': modulestore_options
+            },
+            {
+                'NAME': 'split',
+                'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                'OPTIONS': modulestore_options
+            },
+            {
+                'NAME': 'xml',
                 'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
                 'OPTIONS': {
                     'data_dir': DATA_DIR,
                     'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                 }
             },
-            'direct': {
-                'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                'OPTIONS': modulestore_options
-            },
-            'draft': {
-                'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                'OPTIONS': modulestore_options
-            },
-            'split': {
-                'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                'OPTIONS': modulestore_options
-            }
-        }
+        ]
     }
 
     def _compareIgnoreVersion(self, loc1, loc2, msg=None):
@@ -115,8 +115,10 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
         self.addTypeEqualityFunc(CourseLocator, '_compareIgnoreVersion')
         # define attrs which get set in initdb to quell pylint
-        self.import_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
+        self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
         self.course_locations = []
+
+        self.user_id = 0
 
     # pylint: disable=invalid-name
     def _create_course(self, default, course_key):
@@ -127,19 +129,72 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             offering = course_key.offering.replace('/', '.')
         else:
             offering = course_key.offering
-        course = self.store.create_course(course_key.org, offering, store_name=default)
-        category = self.import_chapter_location.category
-        block_id = self.import_chapter_location.name
+        course = self.store.create_course(course_key.org, offering)
+        category = self.writable_chapter_location.category
+        block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
-            course.location, category, location=self.import_chapter_location, block_id=block_id
+            course.location, category, location=self.writable_chapter_location, block_id=block_id
         )
         if isinstance(course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
-            self.import_chapter_location = chapter.location.version_agnostic()
+            self.writable_chapter_location = chapter.location.version_agnostic()
         else:
             self.assertEqual(course.id, course_key)
-            self.assertEqual(chapter.location, self.import_chapter_location)
+            self.assertEqual(chapter.location, self.writable_chapter_location)
+
+        self.course = course
+
+    def _create_block_hierarchy(self):
+        """
+        Creates a hierarchy of blocks for testing
+        Each block is assigned as a field of the class and can be easily accessed
+        """
+        BlockInfo = namedtuple('BlockInfo', 'field_name, category, display_name, sub_tree')
+
+        trees = [
+            BlockInfo(
+                'chapter_x', 'chapter', 'Chapter_x', [
+                    BlockInfo(
+                        'sequential_x1', 'sequential', 'Sequential_x1', [
+                            BlockInfo(
+                                'vertical_x1a', 'vertical', 'Vertical_x1a', [
+                                    BlockInfo('problem_x1a_1', 'problem', 'Problem_x1a_1', []),
+                                    BlockInfo('problem_x1a_2', 'problem', 'Problem_x1a_2', []),
+                                    BlockInfo('problem_x1a_3', 'problem', 'Problem_x1a_3', []),
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            ),
+            BlockInfo(
+                'chapter_y', 'chapter', 'Chapter_y', [
+                    BlockInfo(
+                        'sequential_y1', 'sequential', 'Sequential_y1', [
+                            BlockInfo(
+                                'vertical_y1a', 'vertical', 'Vertical_y1a', [
+                                    BlockInfo('problem_y1a_1', 'problem', 'Problem_y1a_1', []),
+                                    BlockInfo('problem_y1a_2', 'problem', 'Problem_y1a_2', []),
+                                    BlockInfo('problem_y1a_3', 'problem', 'Problem_y1a_3', []),
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
+        ]
+
+        def create_sub_tree(parent, block_info):
+            block = self.store.create_item(parent.location, category=block_info.category, block_id=block_info.display_name)
+            for tree in block_info.sub_tree:
+                create_sub_tree(block, tree)
+            # reload the block to update its children field
+            block = self.store.get_item(block.location)
+            setattr(self, block_info.field_name, block)
+
+        for tree in trees:
+            create_sub_tree(self.course, tree)
 
     def _course_key_from_string(self, string):
         """
@@ -152,7 +207,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         Initialize the database and create one test course in it
         """
         # set the default modulestore
-        self.options['stores']['default'] = self.options['stores'][default]
+        store_configs = self.options['stores']
+        for index in range(len(store_configs)):
+            if store_configs[index]['NAME'] == default:
+                if index > 0:
+                    store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
+                break
         self.store = MixedModuleStore(**self.options)
         self.addCleanup(self.store.close_all_connections)
 
@@ -167,19 +227,20 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
         self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
-        self.import_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
+        self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
+
         # get Locators and set up the loc mapper if app is Locator based
         if default == 'split':
             self.fake_location = loc_mapper().translate_location(self.fake_location)
 
         self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_modulestore_type(self, default_ms):
         """
         Make sure we get back the store type we expect for given mappings
@@ -191,7 +252,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertEqual(self.store.get_modulestore_type(
             self._course_key_from_string(self.XML_COURSEID2)), XML_MODULESTORE_TYPE
         )
-        mongo_ms_type = MONGO_MODULESTORE_TYPE if default_ms == 'direct' else SPLIT_MONGO_MODULESTORE_TYPE
+        mongo_ms_type = MONGO_MODULESTORE_TYPE if default_ms == 'draft' else SPLIT_MONGO_MODULESTORE_TYPE
         self.assertEqual(self.store.get_modulestore_type(
             self._course_key_from_string(self.MONGO_COURSEID)), mongo_ms_type
         )
@@ -200,7 +261,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_has_item(self, default_ms):
         self.initdb(default_ms)
         for course_locn in self.course_locations.itervalues():  # pylint: disable=maybe-no-member
@@ -212,7 +273,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         ))
         self.assertFalse(self.store.has_item(self.fake_location))
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_item(self, default_ms):
         self.initdb(default_ms)
         for course_locn in self.course_locations.itervalues():  # pylint: disable=maybe-no-member
@@ -226,7 +287,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.fake_location)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_items(self, default_ms):
         self.initdb(default_ms)
         for course_locn in self.course_locations.itervalues():  # pylint: disable=maybe-no-member
@@ -236,7 +297,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.assertEqual(len(modules), 1)
             self.assertEqual(modules[0].location, course_locn)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_update_item(self, default_ms):
         """
         Update should fail for r/o dbs and succeed for r/w ones
@@ -246,7 +307,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
-        with self.assertRaises(AttributeError):  # ensure it doesn't allow writing
+        with self.assertRaises(NotImplementedError):  # ensure it doesn't allow writing
             self.store.update_item(course, None)
         # now do it for a r/w db
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
@@ -257,21 +318,21 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertTrue(course.show_calculator)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_delete_item(self, default_ms):
         """
         Delete should reject on r/o db and work on r/w one
         """
         self.initdb(default_ms)
         # r/o try deleting the course (is here to ensure it can't be deleted)
-        with self.assertRaises(AttributeError):
-            self.store.delete_item(self.xml_chapter_location)
-        self.store.delete_item(self.import_chapter_location, '**replace_user**')
+        with self.assertRaises(NotImplementedError):
+            self.store.delete_item(self.xml_chapter_location, 13)
+        self.store.delete_item(self.writable_chapter_location, 9)
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.import_chapter_location)
+            self.store.get_item(self.writable_chapter_location)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_courses(self, default_ms):
         self.initdb(default_ms)
         # we should have 3 total courses across all stores
@@ -290,8 +351,9 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         Test that the xml modulestore only loaded the courses from the maps.
         """
-        self.initdb('direct')
-        courses = self.store.modulestores['xml'].get_courses()
+        self.initdb('draft')
+        xml_store = self.store._get_modulestore_by_type(XML_MODULESTORE_TYPE)
+        courses = xml_store.get_courses()
         self.assertEqual(len(courses), 2)
         course_ids = [course.id for course in courses]
         self.assertIn(self.course_locations[self.XML_COURSEID1].course_key, course_ids)
@@ -303,11 +365,13 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         Test that the xml modulestore doesn't allow write ops.
         """
-        self.initdb('direct')
-        with self.assertRaises(NotImplementedError):
-            self.store.create_course("org", "course/run", store_name='xml')
+        self.initdb('draft')
+        xml_store = self.store._get_modulestore_by_type(XML_MODULESTORE_TYPE)
+        # the important thing is not which exception it raises but that it raises an exception
+        with self.assertRaises(AttributeError):
+            xml_store.create_course("org", "course/run", 999)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):
         self.initdb(default_ms)
         for course_location in self.course_locations.itervalues():  # pylint: disable=maybe-no-member
@@ -316,18 +380,90 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.assertIsNotNone(course)
             self.assertEqual(course.id, course_location.course_key)
 
-    @ddt.data('direct', 'split')
+    @ddt.data('draft', 'split')
     def test_get_parent_locations(self, default_ms):
         self.initdb(default_ms)
-        parents = self.store.get_parent_locations(self.import_chapter_location)
-        self.assertEqual(len(parents), 1)
-        self.assertEqual(parents[0], self.course_locations[self.MONGO_COURSEID])
+        parent = self.store.get_parent_location(self.writable_chapter_location)
+        self.assertEqual(parent, self.course_locations[self.MONGO_COURSEID])
 
-        parents = self.store.get_parent_locations(self.xml_chapter_location)
-        self.assertEqual(len(parents), 1)
-        self.assertEqual(parents[0], self.course_locations[self.XML_COURSEID1])
+        parent = self.store.get_parent_location(self.xml_chapter_location)
+        self.assertEqual(parent, self.course_locations[self.XML_COURSEID1])
 
-    @ddt.data('direct', 'split')
+    def verify_get_parent_locations_results(self, expected_results):
+        # expected_results should be a list of (child, parent, revision)
+        for test in expected_results:
+            self.assertEqual(
+                test[1].location if test[1] else None,
+                self.store.get_parent_location(test[0].location, revision=test[2])
+            )
+
+    @ddt.data('draft')
+    def test_get_parent_locations_moved_child(self, default_ms):
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        # publish the course
+        self.store.publish(self.course.location, self.user_id)
+
+        # make drafts of verticals
+        self.store.convert_to_draft(self.vertical_x1a.location, self.user_id)
+        self.store.convert_to_draft(self.vertical_y1a.location, self.user_id)
+
+        # move child problem_x1a_1 to vertical_y1a
+        child_to_move = self.problem_x1a_1
+        old_parent = self.vertical_x1a
+        new_parent = self.vertical_y1a
+        old_parent.children.remove(child_to_move.location)
+        new_parent.children.append(child_to_move.location)
+        self.store.update_item(old_parent, self.user_id)
+        self.store.update_item(new_parent, self.user_id)
+
+        self.verify_get_parent_locations_results([
+            (child_to_move, new_parent, None),
+            (child_to_move, new_parent, REVISION_OPTION_DRAFT_PREFERRED),
+            (child_to_move, old_parent, REVISION_OPTION_PUBLISHED_ONLY),
+        ])
+
+        # publish the course again
+        self.store.publish(self.course.location, self.user_id)
+        self.verify_get_parent_locations_results([
+            (child_to_move, new_parent, None),
+            (child_to_move, new_parent, REVISION_OPTION_DRAFT_PREFERRED),
+            (child_to_move, new_parent, REVISION_OPTION_PUBLISHED_ONLY),
+        ])
+
+    @ddt.data('draft')
+    def test_get_parent_locations_deleted_child(self, default_ms):
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        # publish the course
+        self.store.publish(self.course.location, self.user_id)
+
+        # make draft of vertical
+        self.store.convert_to_draft(self.vertical_y1a.location, self.user_id)
+
+        # delete child problem_y1a_1
+        child_to_delete = self.problem_y1a_1
+        old_parent = self.vertical_y1a
+        self.store.delete_item(child_to_delete.location, self.user_id)
+
+        self.verify_get_parent_locations_results([
+            (child_to_delete, old_parent, None),
+            # Note: The following could be an unexpected result, but we want to avoid an extra database call
+            (child_to_delete, old_parent, REVISION_OPTION_DRAFT_PREFERRED),
+            (child_to_delete, old_parent, REVISION_OPTION_PUBLISHED_ONLY),
+        ])
+
+        # publish the course again
+        self.store.publish(self.course.location, self.user_id)
+        self.verify_get_parent_locations_results([
+            (child_to_delete, None, None),
+            (child_to_delete, None, REVISION_OPTION_DRAFT_PREFERRED),
+            (child_to_delete, None, REVISION_OPTION_PUBLISHED_ONLY),
+        ])
+
+    @ddt.data('draft', 'split')
     def test_get_orphans(self, default_ms):
         self.initdb(default_ms)
         # create an orphan
@@ -339,7 +475,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         else:
             self.assertEqual(found_orphans, [orphan.location.to_deprecated_string()])
 
-    @ddt.data('direct')
+    @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
         """
         Test a code path missed by the above: passing an old-style location as parent but no
@@ -350,7 +486,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 
-    @ddt.data('direct')
+    @ddt.data('draft')
     def test_get_courses_for_wiki(self, default_ms):
         """
         Test the get_courses_for_wiki method
@@ -393,5 +529,6 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
 
     return class_(
         doc_store_config=doc_store_config,
+        branch_setting_func=lambda: BRANCH_DRAFT_PREFERRED,
         **options
     )

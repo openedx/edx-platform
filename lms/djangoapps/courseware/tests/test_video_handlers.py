@@ -11,7 +11,7 @@ from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -407,7 +407,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         """
         self.course.static_asset_path = 'dummy/static'
         self.course.save()
-        store = editable_modulestore()
+        store = modulestore()
         store.update_item(self.course, 'OEoXaMPEzfM')
 
         # Test youtube style en

@@ -30,13 +30,16 @@ INSTALLED_APPS += ('django_extensions',)
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
-# Configure Mongo modulestore to use the test folder within the repo
-MONGO_MODULESTORE = MODULESTORE['default']['OPTIONS']['stores']['default']
-MONGO_MODULESTORE['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()
-
-# Configure XML modulestore to use test root data dir
-XML_MODULESTORE = MODULESTORE['default']['OPTIONS']['stores']['xml']
-XML_MODULESTORE['OPTIONS']['data_dir'] = (TEST_ROOT / "data").abspath()
+# Configure modulestore to use the test folder within the repo
+update_module_store_settings(
+    MODULESTORE,
+    module_store_options={
+        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
+    },
+    xml_store_options={
+        'data_dir': (TEST_ROOT / "data").abspath(),
+    },
+)
 
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'

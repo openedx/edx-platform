@@ -34,35 +34,17 @@ logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
 # use, so these are not set up for TOS and PRIVACY
 logging.getLogger('edxmako.shortcuts').setLevel(logging.ERROR)
 
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'acceptance_xmodule',
-    'collection': 'acceptance_modulestore_%s' % seed(),
-}
-
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
-    'fs_root': TEST_ROOT / "data",
-    'render_template': 'edxmako.shortcuts.render_to_string',
-}
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
+update_module_store_settings(
+    MODULESTORE,
+    doc_store_settings={
+        'db': 'acceptance_xmodule',
+        'collection': 'acceptance_modulestore_%s' % seed(),
     },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    },
-    'draft': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
+    module_store_options={
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'fs_root': TEST_ROOT / "data",
     }
-}
+)
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',

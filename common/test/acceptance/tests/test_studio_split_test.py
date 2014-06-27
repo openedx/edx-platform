@@ -29,11 +29,11 @@ class SplitTest(ContainerBase):
 
         course_fix.add_advanced_settings(
             {
-                u"advanced_modules": ["split_test"],
-                u"user_partitions": [
+                u"advanced_modules": {"value": ["split_test"]},
+                u"user_partitions": {"value": [
                     UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
                     UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
-                ]
+                ]}
             }
         )
 
@@ -100,10 +100,10 @@ class SplitTest(ContainerBase):
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
         self.course_fix.add_advanced_settings(
             {
-                u"user_partitions": [
+                u"user_partitions": {"value": [
                     UserPartition(0, 'Configuration alpha,beta', 'first',
                                   [Group("0", 'alpha'), Group("2", 'gamma')]).to_json()
-                ]
+                ]}
             }
         )
         self.course_fix._add_advanced_settings()
