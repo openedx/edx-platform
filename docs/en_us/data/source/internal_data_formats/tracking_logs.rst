@@ -540,9 +540,12 @@ The browser emits these events when a user works with a video.
 ``play_video``, ``pause_video``
 ---------------------------------
 
-* The browser emits ``play_video`` events on video play. 
+* The browser emits ``play_video`` events when the user clicks the video
+  **play** control.
 
-* The browser emits  ``pause_video`` events on video pause. 
+* The browser emits  ``pause_video`` events when the user clicks the video
+  **pause** control. The browser also emits these events when the video player
+  reaches the end of the video file and play automatically stops.
 
 ``event`` **Member Fields**: These events have the same ``event`` fields.
 
@@ -566,6 +569,27 @@ The browser emits these events when a user works with a video.
    * - ``speed``
      - string
      - Video speed in use: '0.75', '1.0', '1.25', '1.50'.
+
+``stop_video``
+--------------------
+
+The browser emits  ``stop_video`` events when the video player reaches the end
+of the video file and play automatically stops.
+
+**History**: Added 25 June 2014.
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``currentTime``
+     - float
+     - Time the video ended, in seconds. 
 
 ``seek_video``
 -----------------

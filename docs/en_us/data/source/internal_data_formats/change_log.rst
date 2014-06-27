@@ -14,6 +14,8 @@ Change Log
    * - 06/27/14
      - Made a correction to the ``edx.forum.searched`` event name in the
        :ref:`Tracking Logs` chapter.
+   * - 
+     - Added the ``stop_video`` event to the :ref:`Tracking Logs` chapter.
    * - 06/23/14
      - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
    * - 05/23/14
