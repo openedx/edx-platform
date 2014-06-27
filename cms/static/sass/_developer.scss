@@ -8,3 +8,61 @@
 // }
 
 // --------------------
+
+//.wrapper-xblock-header {
+.outline-item {
+  border: 1px solid $gray;
+  margin: 5px;
+  background-color: $white;
+}
+
+.add-xblock-component .add-xblock {
+  padding: 5px 10px;
+  background-color: $blue;
+  color: $white;
+  text-align: center;
+}
+
+
+.draggable-drop-indicator {
+  left: 0;
+}
+
+
+.outline-item {
+  padding: 6px 8px 8px 16px;
+  text-wrap: avoid;
+
+  .wrapper-xblock-header-secondary {
+    padding: 0px 8px 0px 26px;
+
+    .meta-info {
+      font-size: 12px;
+    }
+  }
+
+  .add-xblock-component {
+    text-align: center;
+  }
+
+  .actions-list {
+    .action-item {
+      display: inline-block;
+    }
+  }
+}
+
+
+.outline-item.collapsed {
+  .sortable-list {
+    display: none;
+  }
+}
+
+.item-actions {
+  .configure-button {
+    float: left;
+    margin-right: 13px;
+    color: #a4aab7;
+  }
+}

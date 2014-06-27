@@ -56,6 +56,7 @@ from student.roles import CourseRole, UserBasedRole
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
+from contentstore.views.helpers import xblock_studio_url, xblock_primary_child_category, xblock_type_display_name
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
 
@@ -140,23 +141,31 @@ def _course_json(request, course_key):
     Returns a JSON overview of a course
     """
     course_module = _get_course_module(course_key, request.user, depth=None)
-    return _xmodule_json(course_module, course_module.id)
+    return _xblock_json(course_module, course_module.id)
 
 
-def _xmodule_json(xmodule, course_id):
+def _xblock_json(xblock, course_id):
     """
     Returns a JSON overview of an XModule
     """
-    is_container = xmodule.has_children
+    is_container = xblock.has_children
+    child_category = xblock_primary_child_category(xblock)
     result = {
-        'display_name': xmodule.display_name,
-        'id': unicode(xmodule.location),
-        'category': xmodule.category,
-        'is_draft': getattr(xmodule, 'is_draft', False),
+        'display_name': xblock.display_name,
+        'id': unicode(xblock.location),
+        'category': xblock.category,
+        'is_draft': getattr(xblock, 'is_draft', False),
         'is_container': is_container,
+        'studio_url': xblock_studio_url(xblock),
+        'release_date': u'Jan 01, 2030 at 00:00 UTC' if xblock.category == 'chapter' else None,
     }
+    if child_category:
+        result['child_info'] = {
+            'category': child_category,
+            'display_name': xblock_type_display_name(child_category),
+        }
     if is_container:
-        result['children'] = [_xmodule_json(child, course_id) for child in xmodule.get_children()]
+        result['children'] = [_xblock_json(child, course_id) for child in xblock.get_children()]
     return result
 
 
@@ -266,12 +275,13 @@ def course_index(request, course_key):
     course_module = _get_course_module(course_key, request.user, depth=3)
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
+    course_structure = _course_json(request, course_key)
 
-
-    return render_to_response('overview.html', {
+    return render_to_response('course_outline.html', {
         'context_course': course_module,
         'lms_link': lms_link,
         'sections': sections,
+        'course_structure': course_structure,
         'course_graders': json.dumps(
             CourseGradingModel.fetch(course_key).graders
         ),

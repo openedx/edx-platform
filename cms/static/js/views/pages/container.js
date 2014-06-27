@@ -2,16 +2,16 @@
  * XBlockContainerPage is used to display Studio's container page for an xblock which has children.
  * This page allows the user to understand and manipulate the xblock and its children.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/container",
+define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/container",
         "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo) {
-        var XBlockContainerPage = BaseView.extend({
+    function ($, _, gettext, BasePage, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo) {
+        var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
 
             view: 'container_preview',
 
             initialize: function() {
-                BaseView.prototype.initialize.call(this);
+                BasePage.prototype.initialize.call(this);
                 this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
