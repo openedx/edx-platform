@@ -1,6 +1,6 @@
 // studio - views - container
 // ==========================
-// The container view renders xblocks three levels deep: Page Level, Nesting Level, and Element Level.
+// The container view renders xblocks at three levels: Page Level, Nesting Level, and Element Level.
 
 // For containers rendered at the element level, the container is rendered in a way that allows the user to navigate to a separate container page for that container making its children populate the nesting and element levels.
 
@@ -8,68 +8,58 @@
 
 // UI: container page view
 .view-container {
+  @extend %two-col-1;
 
-  .mast {
-    border-bottom: none;
-    padding-bottom: 0;
+  .wrapper-mast {
 
-    .page-header-title {
-      @extend %t-title;
-      @include font-size(28);
-      @include line-height(32);
-      font-weight: 600;
-    }
+    .mast {
+      border-bottom: none;
+      padding-bottom: 0;
 
-    .page-header-title-edit {
-      @extend %t-title4;
-      background: none repeat scroll 0 0 $white;
-      border: 0;
-      box-shadow: 0 0 2px 2px $shadow inset;
-      font-weight: 600;
-    }
-  }
+      .page-header-title {
+        @extend %t-title;
+        @include font-size(28);
+        @include line-height(32);
+        font-weight: 600;
+      }
 
-  .wrapper-mast .mast.has-navigation .nav-actions {
+      .page-header-title-edit {
+        @extend %t-title4;
+        background: none repeat scroll 0 0 white;
+        border: 0;
+        box-shadow: 0 0 2px 2px $shadow inset;
+        font-weight: 600;
+      }
 
-    .nav-item {
+      &.has-actions {
 
-      .edit-button {
-        @include blue-button;
-        @extend %t-action4;
-        padding: ($baseline/4) ($baseline/2);
-        text-align: center;
+        .nav-actions {
 
-        .action-button-text {
-          display: inline-block;
-          vertical-align: baseline;
-        }
+          .button {
+            @extend %btn-primary-blue;
+            @extend %t-action3;
+            box-shadow: none;
+            padding: ($baseline/4) ($baseline*.75);
+            font-weight: 400;
 
-        [class^="icon-"] {
-          display: inline-block;
-          vertical-align: baseline;
+            &.is-disabled {
+              // TO-DO: will review styling before merge to master
+              // background-color: $gray-l2;
+              // border-color: $gray-l2;
+            }
+          }
+
         }
       }
     }
   }
 
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
-    float: left;
-  }
-
   .content-primary {
-    margin-right: flex-gutter();
-    width: flex-grid(9,12);
-    box-shadow: none;
-    border: 0;
 
     .no-container-content {
-      @extend %ui-well;
-      padding: $baseline;
-      background-color: $gray-l4;
-      text-align: center;
-      color: $gray;
+      @extend %no-content;
 
+      // custom rules to reuse xblock validation styling in ui-well context
       .icon-warning-sign {
         display: none;
       }
@@ -80,83 +70,123 @@
         padding: 8px 20px 10px;
         text-align: center;
         margin: ($baseline/2) 0 ($baseline/2) $baseline;
-
-        [class^="icon-"] {
-          margin-right: ($baseline/2);
-        }
       }
+    }
+
+    // dragging bits
+    .ui-sortable-helper {
+
+      article {
+        display: none;
+      }
+    }
+
+    // drop target
+    .component-placeholder {
+      height: ($baseline*2.5);
+      opacity: .5;
+      margin: $baseline;
+      background-color: $gray-l5;
+      border-radius: ($baseline/2);
+      border: 2px dashed $gray-l2;
     }
   }
 
   .content-supplementary {
-    width: flex-grid(3,12);
 
     label {
       @extend %t-title8;
     }
 
     .bit-publishing {
-      margin-bottom: $baseline;
-      border-top: 5px solid $blue;
-      background-color: $white;
-
-      .pub-status {
-        @extend %t-title6;
-        display: block;
-        background-color: $blue-l2;
-        padding: ($baseline/2) ($baseline*.75);
-        font-weight: 600;
-      }
+      @extend %bar-module;
 
       &.published {
-        border-top: 5px solid $blue;
-
-        .pub-status {
-          background-color: $blue-t0;
-        }
-
+        @extend %bar-module-green;
       }
 
       &.draft {
-        border-top: 5px solid $gray-l1;
+        @extend %bar-module-yellow;
+      }
 
-        .pub-status {
-          background-color: $gray-l4;
+      &.staff-only {
+        @extend %bar-module;
+      }
+
+      .bar-mod-content {
+        border: 0;
+        padding: ($baseline/2) ($baseline*.75) ($baseline*.75) ($baseline*.75);
+
+        .title {
+          @extend %t-title8;
+          margin-bottom: ($baseline/10);
+          text-transform: uppercase;
+          color: $gray-l3;
+        }
+
+        .meta {
+          @extend %t-copy-sub2;
+          color: $gray-l1;
         }
       }
 
-      .copy {
-        @extend %t-copy-sub1;
-        padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
+      .wrapper-last-draft {
+        padding: ($baseline*.75) ($baseline*.75) ($baseline/4) ($baseline*.75);
       }
+
+      .wrapper-release {
+
+        .release-date {
+          font-weight: 600;
+        }
+      }
+
+      .wrapper-visibility {
+
+        .copy {
+          font-weight: 600;
+        }
+      }
+
+      .wrapper-pub-actions {
+        padding: ($baseline*.75);
+
+        .action-publish {
+          @extend %btn-primary-blue;
+          display: block;
+          padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
+
+          &.is-disabled {
+            border: 1px solid $gray-l2;
+            background-color: $gray-l2;
+          }
+        }
+
+        .action-discard {
+          @extend %t-copy-sub1;
+          display: block;
+          margin-top: ($baseline/2);
+          text-align: right;
+
+          &.is-disabled {
+            pointer-events: none;
+            color: $gray-l1;
+          }
+        }
+      }
+
     }
 
     // location widget
     .unit-location {
-      border-top: 5px solid $gray-l1;
-      background-color: $white;
+      @extend %bar-module;
 
-      .header {
-        @extend %t-title6;
-        padding: ($baseline/2) ($baseline*.75);
-        background-color: $gray-l4;
-        font-weight: 600;
-      }
+      .wrapper-unit-id {
 
-      .content-bit {
-        margin: ($baseline*.75);
-        border-bottom: 1px solid $gray-l4;
-        padding-bottom: ($baseline/2);
-
-        &:last-child {
-          border-bottom: 0;
-        }
-
-        .title {
-         @extend %t-title7;
-         margin-bottom: ($baseline/2);
-         font-weight: 600;
-         color: $gray-d1;
+        .unit-id-value {
+          @extend %t-copy-sub1;
+          display: inline-block;
+          margin: ($baseline/4) 0;
         }
 
         .tip {
@@ -167,28 +197,16 @@
         }
       }
 
-      .wrapper-unit-id {
-
-        .unit-id-value {
-          @extend %t-copy-sub1;
-          display: inline-block;
-          margin: ($baseline/4) 0;
-        }
-      }
-
       .wrapper-unit-tree-location {
 
         .draggable-drop-indicator {
           display: none;
         }
 
-        .section-name {
-          @extend %t-title8;
-
-          &:hover {
-            background: $blue-l5;
-            color: $blue;
-          }
+        // need to explicitly set this since the html sturcture is different than the others
+        .section-name:hover {
+          background: $blue-l5;
+          color: $blue;
         }
 
         .subsection,
@@ -223,6 +241,7 @@
             background-color: $orange-l3;
           }
 
+          // TODO: update these once we have different pub states
           .public-item {
             color: $black;
           }
@@ -285,252 +304,4 @@
   }
 }
 
-// UI: xblock rendering
-body.view-container .content-primary {
-
-  // dragging bits
-  .ui-sortable-helper {
-
-    article {
-      display: none;
-    }
-  }
-
-  .component-placeholder {
-    height: ($baseline*2.5);
-    opacity: .5;
-    margin: $baseline;
-    background-color: $gray-l5;
-    border-radius: ($baseline/2);
-    border: 2px dashed $gray-l2;
-  }
-
-  .wrapper-xblock {
-    @extend %wrap-xblock;
-
-    // CASE: page level xblock rendering
-    &.level-page {
-      margin: 0;
-      box-shadow: none;
-      border: 0;
-
-      .xblock-header {
-        display: none;
-      }
-
-      .xblock-message {
-        border-radius: 3px 3px 0 0;
-
-        &.validation {
-          padding-top: ($baseline*.75);
-        }
-
-        .xblock-message-list {
-          margin: ($baseline/5) ($baseline*2.5);
-          list-style-type: disc;
-          color: $gray-l3;
-        }
-
-        .xblock-message-item {
-          padding-bottom: ($baseline/4);
-        }
-
-        &.information {
-          padding: 0 0 ($baseline/2) 0;
-          background-color: $gray-l5;
-          color: $gray-d1;
-        }
-      }
-
-      .no-container-content {
-
-        .xblock-message-list {
-          margin: 0;
-          list-style-type: none;
-          color: $gray-d2;
-        }
-      }
-
-    }
-
-    // CASE: nesting level xblock rendering
-    &.level-nesting {
-      @include transition(all $tmg-f2 linear 0s);
-      border: 1px solid $gray-l3;
-      padding-bottom: $baseline;
-
-      // min-height to allow drop when empty
-      .reorderable-container {
-        min-height: $baseline;
-      }
-
-      .xblock-header {
-        display: block;
-      }
-
-      .xblock-header-primary {
-        @include ui-flexbox();
-        margin-bottom: 0;
-        border-bottom: none;
-        background: none;
-      }
-
-      .xblock-render {
-        margin: ($baseline/2);
-      }
-
-      // STATE: nesting level xblock is collapsed
-      &.collapsed {
-        padding-bottom: 0;
-        background-color: $gray-l7;
-        box-shadow: 0 0 1px $shadow-d2 inset;
-      }
-    }
-
-    // CASE: element level xblock rendering
-    &.level-element {
-      @include transition(all $tmg-f2 linear 0s);
-      box-shadow: none;
-
-      &:hover {
-        border-color: $blue;
-      }
-
-      .xblock-header {
-        display: block;
-      }
-
-      .xblock-header-primary {
-        display: flex;
-        margin-bottom: 0;
-        border-bottom: 1px solid $gray-l4;
-        background-color: $gray-l6;
-        font-weight: 300;
-      }
-
-      .xblock-render {
-        margin: ($baseline/2);
-        padding: ($baseline/2);
-      }
-
-      // STATE: xBlock containers styled as rows.
-      &.xblock-type-container {
-
-        .xblock-header-primary {
-          margin-bottom: 0;
-          border-bottom: 0;
-          border-radius: ($baseline/5);
-        }
-
-        .xblock-render {
-          display: none;
-        }
-      }
-
-      .wrapper-xblock-message {
-
-        .xblock-message {
-          border-radius: 0 0 3px 3px;
-
-          .xblock-message-list {
-            margin: 0;
-            list-style-type: none;
-          }
-
-          &.information {
-            @extend %t-copy-sub2;
-            padding: 0 0 ($baseline/2) $baseline;
-            color: $gray-l1;
-          }
-
-          &.validation.has-warnings {
-            border: 0;
-            border-top: 3px solid $orange;
-          }
-
-          &.validation.has-errors {
-            border: 0;
-            border-top: 3px solid $red-l2;
-          }
-        }
-      }
-    }
-  }
-
-  // groups in experiments
-  .wrapper-groups {
-
-    .title {
-      @extend %t-title7;
-      margin-left: ($baseline/2);
-      color: $gray-l1;
-    }
-
-    &.is-active {
-
-      // Don't show delete buttons on active groups
-      .wrapper-xblock.level-nesting > .xblock-header .action-delete {
-        display: none;
-      }
-
-
-    }
-
-    &.is-inactive {
-      margin: ($baseline*1.5) 0 0 0;
-      border-top: 2px dotted $gray-l2;
-      padding: ($baseline*.75) 0;
-      background-color: $gray-l4;
-
-      .wrapper-xblock.level-nesting {
-        @include transition(all $tmg-f2 linear 0s);
-        opacity: .7;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-
-      .new-component-item {
-        display: none;
-      }
-    }
-  }
-
-  // add a new component menu override - most styles currently live in _unit.scss
-  .new-component-item {
-    margin: $baseline ($baseline/2);
-    border: 1px solid $gray-l3;
-    border-radius: ($baseline/4);
-    box-shadow: 0 1px 3px $shadow inset;
-    background-color: $gray-l5;
-    padding: ($baseline/2);
-
-    h5 {
-      margin-bottom: ($baseline*.75);
-    }
-
-    .new-component-type a {
-      margin-bottom: ($baseline/2);
-    }
-  }
-}
-
-// ====================
-
-// UI: xblocks - internal styling
-
-// In order to ensure visual consistency across the unit and container pages, certain styles need to be applied to render on the container page until they are also cleaned up and applied differently on the unit page.
-.wrapper-xblock {
-
-    // UI: xblocks - internal headings for problems and video components
-    h2 {
-    margin: 30px 40px 30px 0;
-    color: #646464;
-    font-size: 19px;
-    font-weight: 300;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-}
 
