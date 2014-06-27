@@ -92,18 +92,18 @@ body.course.unit,
           }
         }
 
-      .wrapper-alert-error {
-        margin-top: ($baseline*1.25);
-        box-shadow: none;
-        border-top: 5px solid $red-l1;
+        .wrapper-alert-error {
+          margin-top: ($baseline*1.25);
+          box-shadow: none;
+          border-top: 5px solid $red-l1;
 
-        .copy,
-        .title {
-          color: $white;
+          .copy,
+          .title {
+            color: $white;
+          }
         }
       }
     }
-  }
 
     // ====================
 
@@ -300,440 +300,414 @@ body.course.unit,
       }
     }
   }
-}
 
-// Edit Header (Component Name, Mode-Editor, Mode-Settings)
-.component-edit-header {
-  @include box-sizing(border-box);
-  padding: 18px 0 18px $baseline;
-  top: 0;
-  right: 0;
-  background-color: $blue;
-  border-bottom: 1px solid $blue-d2;
-  color: $white;
 
-  //Component Name
-  .component-name {
-    @extend %t-copy-sub1;
-    width: 50%;
-    color: $white;
-    font-weight: 600;
-
-    em {
-      display: inline-block;
-      margin-right: ($baseline/4);
-      font-weight: 400;
-      color: $white;
-    }
-  }
-
-  //Nav-Edit Modes
-  .nav-edit-modes {
-    list-style: none;
-    right: 0;
+  // Edit Header (Component Name, Mode-Editor, Mode-Settings)
+  .component-edit-header {
+    @include box-sizing(border-box);
+    padding: 18px 0 18px $baseline;
     top: 0;
-    position: absolute;
-    padding: 12px ($baseline*0.75);
+    right: 0;
+    background-color: $blue;
+    border-bottom: 1px solid $blue-d2;
+    color: $white;
 
-    .mode {
-      display: inline-block;
-      margin-left: 8px;
+    //Component Name
+    .component-name {
+      @extend %t-copy-sub1;
+      width: 50%;
+      color: $white;
+      font-weight: 600;
 
-      &.inactive-mode{
-        display: none;
+      em {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        font-weight: 400;
+        color: $white;
       }
+    }
 
-      &.active-mode a {
+    //Nav-Edit Modes
+    .nav-edit-modes {
+      list-style: none;
+      right: 0;
+      top: 0;
+      position: absolute;
+      padding: 12px ($baseline*0.75);
 
-        @include blue-button;
+      .mode {
+        display: inline-block;
+        margin-left: 8px;
 
-        &.is-set {
-          @include linear-gradient($blue, $blue);
-          color: $blue-d1;
-          box-shadow: inset 0 1px 2px 1px $shadow-l1;
-          background-color: $blue-d4;
-          cursor: default;
+        &.inactive-mode{
+          display: none;
+        }
 
-          &:hover {
-            box-shadow: inset 0 1px 2px 1px  $shadow;
+        &.active-mode a {
+
+          @include blue-button;
+
+          &.is-set {
+            @include linear-gradient($blue, $blue);
+            color: $blue-d1;
+            box-shadow: inset 0 1px 2px 1px $shadow-l1;
+            background-color: $blue-d4;
+            cursor: default;
+
+            &:hover {
+              box-shadow: inset 0 1px 2px 1px  $shadow;
+            }
           }
         }
       }
     }
   }
-}
 
-// Editor Wrapper
-.wrapper-comp-editor {
-  display: block;
-
-  // Because the editor may be a CodeMirror editor (which must be visible at the time it is created
-  // in order for it to properly initialize), we must toggle "is-inactive" instead of the more common "is-active".
-  &.is-inactive {
-    display: none;
-  }
-}
-
-// Settings Wrapper
-.wrapper-comp-settings {
-  display: none;
-
-  &.is-active {
+  // xblock Editor tab wrapper
+  .wrapper-comp-editor {
     display: block;
-  }
 
-  .file-uploader {
-    .upload-setting {
-      @extend %ui-btn-flat-outline;
-      @extend %t-action3;
-      @include box-sizing(border-box);
-      display: inline-block;
-      padding: ($baseline/2);
-      font-weight: 600;
-      width: 49%;
-      margin-right: 2%;
-    }
-
-    .download-setting {
-      @extend %ui-btn-non;
-      @extend %t-action4;
-      @include box-sizing(border-box);
-      display: inline-block;
-      padding: ($baseline/2);
-      font-weight: 600;
-      width: 49%;
-      text-align: center;
-      color: $blue;
-
-      &:hover {
-        background-color: $blue;
-      }
-    }
-
-    .wrapper-uploader-actions {
-      width: 45%;
-      display: inline-block;
-      min-width: ($baseline*5);
+    // Because the editor may be a CodeMirror editor (which must be visible at the time it is created
+    // in order for it to properly initialize), we must toggle "is-inactive" instead of the more common "is-active"
+    &.is-inactive {
+      display: none;
     }
   }
 
-  //settings-list
-  .list-input.settings-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  // xblock Settings tab wrapper
+  .wrapper-comp-settings {
+    display: none;
 
-    overflow: auto;
-    max-height: 400px;
-
-    //chrome scrollbar visibility correction
-    &::-webkit-scrollbar {
-      -webkit-appearance: none;
-      width: 11px;
-      height: 11px;
+    &.is-active {
+      display: block;
     }
 
-    &::-webkit-scrollbar-thumb {
-      border-radius: 8px;
-      border: 2px solid $gray-l2;
-      background-color: rgba(0, 0, 0, .5);
-    }
-
-    //component-setting-entry
-    .field.comp-setting-entry {
-      opacity: 0.7;
-      margin: 0 $baseline;
-      border-top: 1px solid $gray-l4;
-      background-color: $white;
-      padding: $baseline ($baseline/2);
-
-      &:first-child {
-        border-top: 0;
-      }
-
-      //no required component settings currently
-      &.required {
-        label {
-          //font-weight: 600;
-        }
-        label:after {
-          //margin-left: ($baseline/4);
-          //content: "*";
-        }
-      }
-
-      &:hover {
-        opacity: 1.0;
-      }
-
-      &.is-set {
-        opacity: 1.0;
-        background-color: $white;
-
-        .setting-input {
-          color: $blue-l1;
-        }
-      }
-
-      .wrapper-comp-setting {
-        min-width: 300px;
-        top: 0;
-        vertical-align: top;
-        margin-bottom:5px;
-        position: relative;
-      }
-
-      .setting-label {
-        @extend %t-copy-sub1;
-        @include transition(color $tmg-f2 ease-in-out 0s);
-        vertical-align: middle;
+    .file-uploader {
+      .upload-setting {
+        @extend %ui-btn-flat-outline;
+        @extend %t-action3;
+        @include box-sizing(border-box);
         display: inline-block;
-        position: relative;
-        left: 0;
-        width: 25%;
-        min-width: 100px;
-        margin-right: ($baseline/2);
-        font-weight: 600;
-
-        &.is-focused {
-          color: $blue;
-        }
-      }
-
-      input, select, input[type="number"] {
-        @include placeholder($gray-l4);
-        @include font-size(16);
-        @include size(100%,100%);
         padding: ($baseline/2);
-        min-width: 100px;
-        width: 45%;
-
-        //&.long {
-          //
-        //}
-
-        //&.short {
-        //}
-
-        //&.error {
-        // border-color: $red;
-        //}
-
-        //&:focus {
-        //  + .tip {
-        //    color: $gray;
-        //  }
-        border-radius: 3px;
-        border: 1px solid $gray-l2;
-        text-overflow: ellipsis;
+        font-weight: 600;
+        width: 49%;
+        margin-right: 2%;
       }
 
-      //Allows users to copy full value of disabled inputs.
-      input.is-disabled{
-        text-overflow: clip;
-        opacity: .5;
-      }
-
-      input[type="number"] {
-        width: 42%;
-        box-shadow: 0 1px 2px $shadow-l1 inset;
-        //For webkit browsers which render number fields differently, make input wider.
-        -moz-column-width: {
-          width: 32%;
-        }
-
-        &:active {
-          background-color: #FFFCF1;
-        }
-      }
-
-      select {
-        //box-shadow: 0 1px 2px $shadow-l1 inset;
-
-        &:focus {
-          box-shadow: 0 0 1px $shadow;
-          @include transition(opacity $tmg-f2 ease-in-out 0s);
-          background-color: $yellow;
-        }
-
-        &:active {
-          background-color: $yellow;
-        }
-      }
-
-      .action.setting-clear {
-        @include font-size(11);
-        color: $gray;
-        width: 25px;
-        height: 25px;
-        vertical-align: middle;
-        padding: 5px;
-        border-radius: 50%;
-        margin: 0 $baseline/2;
-        box-shadow: none;
-        text-shadow: none;
-        border: 1px solid $gray-l1;
-        background-color: $gray-l4;
+      .download-setting {
+        @extend %ui-btn-non;
+        @extend %t-action4;
+        @include box-sizing(border-box);
+        display: inline-block;
+        padding: ($baseline/2);
+        font-weight: 600;
+        width: 49%;
+        text-align: center;
+        color: $blue;
 
         &:hover {
-          box-shadow: 0 1px 1px $shadow;
-          @include transition(opacity $tmg-f2 ease-in-out 0s);
-          background-color: $blue-s3;
-          border: 1px solid $blue-s3;
-          color: $white;
-        }
-
-        &.inactive {
-          visibility: hidden;
+          background-color: $blue;
         }
       }
 
-      .setting-help {
-        @include font-size(12);
+      .wrapper-uploader-actions {
+        width: 45%;
         display: inline-block;
-        font-color: $gray-l6;
-        min-width: ($baseline*10);
-        vertical-align: top;
+        min-width: ($baseline*5);
+      }
+    }
+
+    //settings-list
+    .list-input.settings-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      overflow: auto;
+      max-height: 400px;
+
+      //chrome scrollbar visibility correction
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 11px;
+        height: 11px;
       }
 
+      &::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        border: 2px solid $gray-l2;
+        background-color: rgba(0, 0, 0, .5);
+      }
 
+      //component-setting-entry
+      .field.comp-setting-entry {
+        opacity: 0.7;
+        margin: 0 $baseline;
+        border-top: 1px solid $gray-l4;
+        background-color: $white;
+        padding: $baseline ($baseline/2);
 
-      // TYPE: enumerated lists of metadata sets
-      .metadata-list-enum {
-
-        * {
-          @include box-sizing(border-box);
-        }
-
-        // label
-        .setting-label {
-          vertical-align: top;
-          margin-top: ($baseline/2);
-        }
-
-        // inputs and labels
-        .wrapper-list-settings {
-          @include size(45%,100%);
-          display: inline-block;
-          min-width: ($baseline*5);
-
-          // enumerated fields
-          .list-settings {
-            margin: 0;
-
-            .list-settings-item {
-              margin-bottom: ($baseline/2);
-            }
-
-            // inputs
-            .input {
-              width: 80%;
-              margin-right: ($baseline/2);
-              vertical-align: middle;
-            }
+          &:first-child {
+            border-top: 0;
           }
         }
 
-        .setting-clear {
-          vertical-align: top;
-          margin-top: ($baseline/4);
+        &:hover {
+          opacity: 1.0;
         }
 
-        .create-setting {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action3;
-          display: block;
-          width: 100%;
-          padding: ($baseline/2);
+        &.is-set {
+          opacity: 1.0;
+          background-color: $white;
+
+          .setting-input {
+            color: $blue-l1;
+          }
+        }
+
+        .wrapper-comp-setting {
+          min-width: 300px;
+          top: 0;
+          vertical-align: top;
+          margin-bottom:5px;
+          position: relative;
+        }
+
+        .setting-label {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f2 ease-in-out 0s);
+          vertical-align: middle;
+          display: inline-block;
+          position: relative;
+          left: 0;
+          width: 25%;
+          min-width: 100px;
+          margin-right: ($baseline/2);
           font-weight: 600;
 
-          *[class^="icon-"] {
-            margin-right: ($baseline/4);
-          }
-        }
-
-        .remove-setting {
-          @include transition(color 0.25s ease-in-out);
-          @include font-size(20);
-          display: inline-block;
-          background: transparent;
-          color: $blue-l3;
-
-          &:hover {
+          &.is-focused {
             color: $blue;
           }
         }
-      }
 
-      // TYPE: Dict
-      .metadata-dict {
-        * {
-          @include box-sizing(border-box);
+        input, select, input[type="number"] {
+          @include placeholder($gray-l4);
+          @include font-size(16);
+          @include size(100%,100%);
+          width: 45%;
+          min-width: 100px;
+          padding: ($baseline/2);
+          border-radius: 3px;
+          border: 1px solid $gray-l2;
+          text-overflow: ellipsis;
         }
 
-        // label
-        .setting-label {
-            vertical-align: top;
-            margin-top: ($baseline*.75);
+        //Allows users to copy full value of disabled inputs.
+        input.is-disabled {
+          text-overflow: clip;
+          opacity: .5;
         }
 
-        // inputs and labels
-        .wrapper-dict-settings {
-          width: 55%;
+        input[type="number"] {
+          width: 42%;
+          box-shadow: 0 1px 2px $shadow-l1 inset;
+          //For webkit browsers which render number fields differently, make input wider.
+          -moz-column-width: {
+            width: 32%;
+          }
+
+          &:active {
+            background-color: #FFFCF1;
+          }
+        }
+
+        select {
+
+          &:focus {
+            box-shadow: 0 0 1px $shadow;
+            @include transition(opacity $tmg-f2 ease-in-out 0s);
+            background-color: $yellow;
+          }
+
+          &:active {
+            background-color: $yellow;
+          }
+        }
+
+        .action.setting-clear {
+          @include font-size(11);
+          color: $gray;
+          width: 25px;
+          height: 25px;
+          vertical-align: middle;
+          padding: 5px;
+          border-radius: 50%;
+          margin: 0 $baseline/2;
+          box-shadow: none;
+          text-shadow: none;
+          border: 1px solid $gray-l1;
+          background-color: $gray-l4;
+
+          &:hover {
+            box-shadow: 0 1px 1px $shadow;
+            @include transition(opacity $tmg-f2 ease-in-out 0s);
+            background-color: $blue-s3;
+            border: 1px solid $blue-s3;
+            color: $white;
+          }
+
+          &.inactive {
+            visibility: hidden;
+          }
+        }
+
+        .setting-help {
+          @include font-size(12);
           display: inline-block;
-          min-width: 240px;
+          font-color: $gray-l6;
+          min-width: ($baseline*10);
+          vertical-align: top;
+        }
 
-          // enumerated fields
-          .list-settings {
-            margin: ($baseline/2) 0 0;
 
-            .list-settings-item {
-              margin-bottom: ($baseline/2);
-            }
 
-            // inputs
-            .input {
-              width: 43%;
-              margin-right: ($baseline/4);
-              vertical-align: middle;
-              display: inline-block;
+        // TYPE: enumerated lists of metadata sets
+        .metadata-list-enum {
 
-              &.input-value {
+          * {
+            @include box-sizing(border-box);
+          }
+
+          // label
+          .setting-label {
+            vertical-align: top;
+            margin-top: ($baseline/2);
+          }
+
+          // inputs and labels
+          .wrapper-list-settings {
+            @include size(45%,100%);
+            display: inline-block;
+            min-width: ($baseline*5);
+
+            // enumerated fields
+            .list-settings {
+              margin: 0;
+
+              .list-settings-item {
+                margin-bottom: ($baseline/2);
+              }
+
+              // inputs
+              .input {
+                width: 80%;
                 margin-right: ($baseline/2);
+                vertical-align: middle;
               }
             }
           }
-        }
 
-        .setting-clear {
-          vertical-align: top;
-          margin: ($baseline*.75) 0 0 0;
-        }
+          .setting-clear {
+            vertical-align: top;
+            margin-top: ($baseline/4);
+          }
 
-        .create-setting {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action3;
-          display: block;
-          width: 88%;
-          padding: ($baseline/2);
-          font-weight: 600;
+          .create-setting {
+            @extend %ui-btn-flat-outline;
+            @extend %t-action3;
+            display: block;
+            width: 100%;
+            padding: ($baseline/2);
+            font-weight: 600;
 
-          *[class^="icon-"] {
-            margin-right: ($baseline/4);
+            *[class^="icon-"] {
+              margin-right: ($baseline/4);
+            }
+          }
+
+          .remove-setting {
+            @include transition(color 0.25s ease-in-out);
+            @include font-size(20);
+            display: inline-block;
+            background: transparent;
+            color: $blue-l3;
+
+            &:hover {
+              color: $blue;
+            }
           }
         }
 
-        .remove-setting {
-          @include transition(color 0.25s ease-in-out);
-          @include font-size(20);
-          display: inline-block;
-          background: transparent;
-          color: $blue-l3;
-
-          &:hover {
-            color: $blue;
+        // TYPE: Dict
+        .metadata-dict {
+          * {
+            @include box-sizing(border-box);
           }
-        }
+
+          // label
+          .setting-label {
+              vertical-align: top;
+              margin-top: ($baseline*.75);
+          }
+
+          // inputs and labels
+          .wrapper-dict-settings {
+            width: 55%;
+            display: inline-block;
+            min-width: 240px;
+
+            // enumerated fields
+            .list-settings {
+              margin: ($baseline/2) 0 0;
+
+              .list-settings-item {
+                margin-bottom: ($baseline/2);
+              }
+
+              // inputs
+              .input {
+                width: 43%;
+                margin-right: ($baseline/4);
+                vertical-align: middle;
+                display: inline-block;
+
+                &.input-value {
+                  margin-right: ($baseline/2);
+                }
+              }
+            }
+          }
+
+          .setting-clear {
+            vertical-align: top;
+            margin: ($baseline*.75) 0 0 0;
+          }
+
+          .create-setting {
+            @extend %ui-btn-flat-outline;
+            @extend %t-action3;
+            display: block;
+            width: 88%;
+            padding: ($baseline/2);
+            font-weight: 600;
+
+            *[class^="icon-"] {
+              margin-right: ($baseline/4);
+            }
+          }
+
+          .remove-setting {
+            @include transition(color 0.25s ease-in-out);
+            @include font-size(20);
+            display: inline-block;
+            background: transparent;
+            color: $blue-l3;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+
       }
     }
   }
@@ -829,306 +803,307 @@ body.unit {
       }
     }
   }
-}
 
-// ====================
+  // ====================
 
-// Unit Page Sidebar
+  // Unit Page Sidebar
 
-.sidebar {
+  .sidebar {
 
-  label {
-    @extend %t-title8;
-  }
-}
-
-.unit-settings {
-
-  .window-contents {
-    padding: $baseline/2 $baseline;
-  }
-
-
-  .unit-actions {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .published-alert {
-    display: none;
-    padding: $baseline/2;
-    border: 1px solid #edbd3c;
-    border-radius: 3px;
-    background: #fbf6e1;
-    font-size: 14px;
-    line-height: 1.4;
-
-    div {
-      margin-top: 15px;
-    }
-
-    // actions - publish/edit
-    .publish-draft {
-      @extend %action;
-    }
-
-    .create-draft {
-      @extend %action;
+    label {
+      @extend %t-title8;
     }
   }
 
-
-  input[type="radio"] {
-      margin-right: 7px;
-  }
-
-  .status {
-    @extend %t-copy-sub2;
-
-    strong {
-      font-weight: 700;
-    }
-  }
-
-  .preview-button, .view-button {
-    @include white-button;
-    margin-bottom: $baseline/2;
-  }
-
-  .publish-button {
-    @include orange-button;
-  }
-
-  .delete-button {
-    @include blue-button;
-  }
-
-  .delete-draft {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  .delete-button,
-  .preview-button,
-  .publish-button,
-  .view-button {
-    font-size: 11px;
-    margin-top: $baseline/2;
-    padding: 6px 15px 8px;
-  }
-}
-
-.unit-history {
-  &.collapsed {
-    h4 {
-      border-bottom: none;
-      border-radius: 3px;
-    }
+  .unit-settings {
 
     .window-contents {
+      padding: $baseline/2 $baseline;
+    }
+
+
+    .unit-actions {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .published-alert {
       display: none;
+      padding: $baseline/2;
+      border: 1px solid #edbd3c;
+      border-radius: 3px;
+      background: #fbf6e1;
+      font-size: 14px;
+      line-height: 1.4;
+
+      div {
+        margin-top: 15px;
+      }
+
+      // actions - publish/edit
+      .publish-draft {
+        @extend %action;
+      }
+
+      .create-draft {
+        @extend %action;
+      }
+    }
+
+
+    input[type="radio"] {
+        margin-right: 7px;
+    }
+
+    .status {
+      @extend %t-copy-sub2;
+
+      strong {
+        font-weight: 700;
+      }
+    }
+
+    .preview-button, .view-button {
+      @include white-button;
+      margin-bottom: $baseline/2;
+    }
+
+    .publish-button {
+      @include orange-button;
+    }
+
+    .delete-button {
+      @include blue-button;
+    }
+
+    .delete-draft {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .delete-button,
+    .preview-button,
+    .publish-button,
+    .view-button {
+      font-size: 11px;
+      margin-top: $baseline/2;
+      padding: 6px 15px 8px;
     }
   }
 
-  ol {
-    border: 1px solid #ced2db;
+  .unit-history {
+    &.collapsed {
+      h4 {
+        border-bottom: none;
+        border-radius: 3px;
+      }
 
-    li {
-      display: block;
-      padding: 6px 8px 8px $baseline/2;
-      background: #edf1f5;
-      font-size: 12px;
+      .window-contents {
+        display: none;
+      }
+    }
 
-      &:hover {
-        background: #fffcf1;
+    ol {
+      border: 1px solid #ced2db;
+
+      li {
+        display: block;
+        padding: 6px 8px 8px $baseline/2;
+        background: #edf1f5;
+        font-size: 12px;
+
+        &:hover {
+          background: #fffcf1;
+
+          .item-actions {
+            display: block;
+          }
+        }
+
+        &.checked {
+          background: #d1dae3;
+        }
 
         .item-actions {
-          display: block;
+          display: none;
+        }
+
+        input[type="radio"] {
+          margin-right: 7px;
+        }
+      }
+    }
+  }
+
+  .unit-location {
+
+    // unit id
+    .wrapper-unit-id {
+
+      .unit-id {
+
+        .label {
+          @extend %t-title7;
+          margin-bottom: ($baseline/4);
+          color: $gray-d1;
+        }
+
+        .value {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .url {
+      box-shadow: none;
+      width: 100%;
+      margin-bottom: $baseline/2;
+    }
+
+    .draft-tag,
+    .hidden-tag,
+    .private-tag,
+    .has-new-draft-tag {
+      font-size: 8px;
+    }
+
+    .unit-tree-location {
+
+      .section-name {
+        @extend %t-title8;
+      }
+
+
+      .subsection,
+      .courseware-unit {
+        margin: ($baseline/4) 0 0 ($baseline);
+      }
+
+      .courseware-unit .section-item {
+        background-color: transparent;
+      }
+
+      .section-item {
+        @include transition(background $tmg-avg ease-in-out 0);
+        @include box-sizing(border-box);
+        @extend %t-copy-sub2;
+        display: inline-block;
+        width: 100%;
+        background: $gray-l5;
+        padding: 6px 8px 8px 16px;
+        vertical-align: top;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        color: $gray;
+
+        &:hover {
+          background: $blue-l5;
+          color: $blue;
+        }
+
+        &.editing {
+          background-color: $orange-l3;
+        }
+
+        .public-item {
+          color: $black;
+        }
+
+        .private-item {
+          color: $gray-l1;
+        }
+
+        .draft-item {
+          color: $yellow-d1;
+        }
+
+        .public-item:hover,
+        .private-item:hover,
+        .draft-item:hover {
+          color: $blue;
+        }
+
+        .draft-item:after,
+        .public-item:after,
+        .private-item:after {
+          @include font-size(9);
+          margin-left: 3px;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        .draft-item:after {
+          content: "- draft";
+        }
+
+        .private-item:after {
+          content: "- private";
         }
       }
 
-      &.checked {
-        background: #d1dae3;
-      }
+      .new-unit-item {
+        @extend %ui-btn-flat-outline;
+        @extend %t-action4;
+        width: 90%;
+        margin: 0 0 ($baseline/2) ($baseline/4);
+        border: 1px solid transparent;
+        padding: ($baseline/4) ($baseline/2);
+        font-weight: normal;
+        color: $gray-l2;
+        text-align: left;
 
-      .item-actions {
-        display: none;
+        &:hover {
+          box-shadow: none;
+          background-image: none;
+        }
       }
+    }
+  }
 
-      input[type="radio"] {
-        margin-right: 7px;
-      }
+  .edit-state-draft {
+    .visibility,
+
+    .edit-draft-message,
+    .view-button {
+      display: none;
+    }
+
+    .published-alert {
+      display: block;
+    }
+  }
+
+  .edit-state-public {
+    .delete-draft,
+    .wrapper-component-action-header,
+    .new-component-item,
+    .editing-draft-alert,
+    .publish-draft-message,
+    .preview-button {
+      display: none;
+    }
+
+    .published-alert {
+      display: block;
+    }
+
+    .drag-handle {
+      display: none !important;
+    }
+  }
+
+  .edit-state-private {
+    .delete-draft,
+    .publish-draft,
+    .editing-draft-alert,
+    .create-draft,
+    .view-button {
+      display: none;
     }
   }
 }
 
-.unit-location {
-
-  // unit id
-  .wrapper-unit-id {
-
-    .unit-id {
-
-      .label {
-        @extend %t-title7;
-        margin-bottom: ($baseline/4);
-        color: $gray-d1;
-      }
-
-      .value {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .url {
-    box-shadow: none;
-    width: 100%;
-    margin-bottom: $baseline/2;
-  }
-
-  .draft-tag,
-  .hidden-tag,
-  .private-tag,
-  .has-new-draft-tag {
-    font-size: 8px;
-  }
-
-  .unit-tree-location {
-
-    .section-name {
-      @extend %t-title8;
-    }
-
-
-    .subsection,
-    .courseware-unit {
-      margin: ($baseline/4) 0 0 ($baseline);
-    }
-
-    .courseware-unit .section-item {
-      background-color: transparent;
-    }
-
-    .section-item {
-      @include transition(background $tmg-avg ease-in-out 0);
-      @include box-sizing(border-box);
-      @extend %t-copy-sub2;
-      display: inline-block;
-      width: 100%;
-      background: $gray-l5;
-      padding: 6px 8px 8px 16px;
-      vertical-align: top;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-      color: $gray;
-
-      &:hover {
-        background: $blue-l5;
-        color: $blue;
-      }
-
-      &.editing {
-        background-color: $orange-l3;
-      }
-
-      .public-item {
-        color: $black;
-      }
-
-      .private-item {
-        color: $gray-l1;
-      }
-
-      .draft-item {
-        color: $yellow-d1;
-      }
-
-      .public-item:hover,
-      .private-item:hover,
-      .draft-item:hover {
-        color: $blue;
-      }
-
-      .draft-item:after,
-      .public-item:after,
-      .private-item:after {
-        @include font-size(9);
-        margin-left: 3px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .draft-item:after {
-        content: "- draft";
-      }
-
-      .private-item:after {
-        content: "- private";
-      }
-    }
-
-    .new-unit-item {
-      @extend %ui-btn-flat-outline;
-      @extend %t-action4;
-      width: 90%;
-      margin: 0 0 ($baseline/2) ($baseline/4);
-      border: 1px solid transparent;
-      padding: ($baseline/4) ($baseline/2);
-      font-weight: normal;
-      color: $gray-l2;
-      text-align: left;
-
-      &:hover {
-        box-shadow: none;
-        background-image: none;
-      }
-    }
-  }
-}
-
-.edit-state-draft {
-  .visibility,
-
-  .edit-draft-message,
-  .view-button {
-    display: none;
-  }
-
-  .published-alert {
-    display: block;
-  }
-}
-
-.edit-state-public {
-  .delete-draft,
-  .wrapper-component-action-header,
-  .new-component-item,
-  .editing-draft-alert,
-  .publish-draft-message,
-  .preview-button {
-    display: none;
-  }
-
-  .published-alert {
-    display: block;
-  }
-
-  .drag-handle {
-    display: none !important;
-  }
-}
-
-.edit-state-private {
-  .delete-draft,
-  .publish-draft,
-  .editing-draft-alert,
-  .create-draft,
-  .view-button {
-    display: none;
-  }
-}
 // ====================
 
 // Latex Compiler
@@ -1156,7 +1131,6 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 // xblock - unit page container
 
 body.unit .xblock-type-container {
-  @extend %wrap-xblock;
   margin: 0;
   border: none;
   box-shadow: none;
@@ -1259,8 +1233,7 @@ body.unit .component {
 
 
 
-body.view-unit .main-column .unit-body,
-body.view-container {
+body.view-unit .main-column .unit-body {
 
   // New Components
   .new-component-item {

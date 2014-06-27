@@ -16,6 +16,14 @@
 
 // ====================
 
+// general type and size
+%sizing {
+  @extend %t-action4;
+  padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
+}
+
+// ====================
+
 // gray primary button
 %btn-primary-gray {
   @extend %ui-btn-primary;
@@ -219,15 +227,16 @@
 // ====================
 
 // UI: element actions list
-%actions-header {
-  .actions-list {
-    display: inline-block;
-    margin-bottom: 0;
-  }
+
+%actions-list {
+  display: inline-block;
+  margin-bottom: 0;
 
   .action-item {
+    position: relative;
     display: inline-block;
     vertical-align: middle;
+    margin: ($baseline/10) 0 ($baseline/10) ($baseline/10);
 
     .action-button {
       @include transition(all $tmg-f3 linear 0s);
@@ -249,6 +258,10 @@
       &.delete-button:hover {
         background-color: $gray-l1;
       }
+
+      [class^="icon-"] {
+        font-style: normal;
+      }
     }
 
     .drag-handle {
@@ -258,6 +271,10 @@
       width: ($baseline);
       margin: 0;
       background: transparent url("../img/drag-handles.png") no-repeat right center;
+    }
+
+    &.toggle-action {
+      // TODO: generalize and move checkbox styling in from static-pages and assets sass
     }
   }
 }
