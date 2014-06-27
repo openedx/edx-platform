@@ -266,6 +266,14 @@
   padding: ($baseline*0.75) $baseline;
 }
 
+%no-content {
+  @extend %ui-well;
+  padding: $baseline;
+  background-color: $gray-l4;
+  text-align: center;
+  color: $gray;
+}
+
 .ui-loading {
   @include animation(fadeIn $tmg-f2 linear 1);
   @extend %ui-well;
