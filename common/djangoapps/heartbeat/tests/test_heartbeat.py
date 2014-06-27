@@ -6,14 +6,8 @@ from django.core.urlresolvers import reverse
 import json
 from django.db.utils import DatabaseError
 import mock
-from django.test.utils import override_settings
-from django.conf import settings
 from django.test.testcases import TestCase
-from xmodule.modulestore.tests.django_utils import draft_mongo_store_config
 
-TEST_MODULESTORE = draft_mongo_store_config(settings.TEST_ROOT / "data")
-
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class HeartbeatTestCase(TestCase):
     """
     Test the heartbeat
