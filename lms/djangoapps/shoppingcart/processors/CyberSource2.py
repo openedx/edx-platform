@@ -1,4 +1,9 @@
-### Implementation of support for the Cybersource Credit card processor
+### Implementation of support for the Cybersource Credit card processor using the new
+### Secure Acceptance API. The previous Hosted Order Page API is being deprecated as of 9/14
+### It is mostly the same as the CyberSource.py file, but we have a new file so that we can
+### maintain some backwards-compatibility in case of a need to quickly roll back (i.e.
+### configuration change rather than code rollback )
+
 ### The name of this file should be used as the key of the dict in the CC_PROCESSOR setting
 ### Implementes interface as specified by __init__.py
 
