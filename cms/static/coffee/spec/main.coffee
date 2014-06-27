@@ -18,6 +18,7 @@ requirejs.config({
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
+        "jquery.simulate": "xmodule_js/common_static/js/vendor/jquery.simulate",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
@@ -99,6 +100,10 @@ requirejs.config({
         "jquery.inputnumber": {
             deps: ["jquery"],
             exports: "jQuery.fn.inputNumber"
+        },
+        "jquery.simulate": {
+            deps: ["jquery"],
+            exports: "jQuery.fn.simulate"
         },
         "jquery.tinymce": {
             deps: ["jquery", "tinymce"],
@@ -215,7 +220,9 @@ define([
 
     "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
+    "js/spec/views/assets_spec",
 
+    "js/spec/views/container_spec",
     "js/spec/views/unit_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",

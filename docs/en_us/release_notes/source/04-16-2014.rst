@@ -9,36 +9,34 @@ The following information reflects what is new in the edX Platform as of April
 edX Documentation
 **************************
 
-You can now access the `edX Status <http://status.edx.org/>`_ page to get an up-
+You can access the `edX Status`_ page to get an up-
 to-date status for all services on edx.org and edX Edge. The page also includes
 the Twitter feed for @edXstatus, which the edX Operations team uses to post
 updates.
 
-You can access the public edX `roadmap <https://edx-
-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for
+You can access the public `edX roadmap`_ for
 details about the currently planned product direction.
 
 The following documentation is available:
 
-* `Building and Running an edX Course.
-  <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download
-  the guide as a PDF from the edX Studio user interface.
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
 
   Recent changes include: 
 
-  * In support of new features, added the following sections to `Multiple Choice <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#multiple-choice>`_ problems:
+  * In support of new features, added the following sections to `Multiple Choice`_ problems:
     
-    * `Shuffle Answers in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#shuffle-answers-in-a-multiple-choice-problem>`_
-    * `Targeted Feedback in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#targeted-feedback-in-a-multiple-choice-problem>`_
-    * `Answer Pools in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#answer-pools-in-a-multiple-choice-problem>`_
+    * `Shuffle Answers in a Multiple Choice Problem`_
+    * `Targeted Feedback in a Multiple Choice Problem`_
+    * `Answer Pools in a Multiple Choice Problem`_
       
+
   * Expanded the `Grade and Answer Data <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_grades.html#grades>`_ section to include a topic on interpreting the Student Answer Distribution report.
 
-* `edX Data Documentation
-  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+* `edX Data Documentation`_
 
-* `edX Platform Developer Documentation
-  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+* `edX Platform Developer Documentation`_
 
 
 *************
@@ -51,9 +49,9 @@ edX Studio
   feedback, and answer pools. See the following documentation for more
   information:
 
-  * `Shuffle Answers in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#shuffle-answers-in-a-multiple-choice-problem>`_
-  * `Targeted Feedback in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#targeted-feedback-in-a-multiple-choice-problem>`_
-  * `Answer Pools in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#answer-pools-in-a-multiple-choice-problem>`_
+    * `Shuffle Answers in a Multiple Choice Problem`_
+    * `Targeted Feedback in a Multiple Choice Problem`_
+    * `Answer Pools in a Multiple Choice Problem`_
 
 * When you import a large course, your browser may time out while the course is
   being imported.  In this situation, the following message is now displayed on
@@ -81,3 +79,6 @@ Accessibility Improvements
 
 * The PDF viewer used for textbooks was updated and is now accessible to screen
   readers. (LMS-2276)
+
+
+.. include:: links.rst

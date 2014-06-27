@@ -229,6 +229,15 @@ $verified-color-lvl3: $m-green-l2;
 $verified-color-lvl4: $m-green-l3;
 $verified-color-lvl5: $m-green-l4;
 
+// STATE: honor code
+$honorcode-color-lvl1: rgb(50, 165, 217);
+$honorcode-color-lvl2: tint($honorcode-color-lvl1, 33%);
+
+// STATE: audit
+$audit-color-lvl1: $light-gray;
+$audit-color-lvl2: tint($audit-color-lvl1, 33%);
+
+
 // ====================
 
 // ACTIONS: general
@@ -309,6 +318,7 @@ $dashboard-profile-header-image: linear-gradient(-90deg, rgb(255,255,255), rgb(2
 $dashboard-profile-header-color: transparent;
 $dashboard-profile-color: rgb(252,252,252);
 $dot-color: $light-gray;
+$dashboard-course-cover-border: $light-gray;
 
 // MISC: course assets
 $content-wrapper-bg: $white;
@@ -382,4 +392,3 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 // SPLINT: colors
 
 $msg-bg: $action-primary-bg;
-

@@ -6,26 +6,6 @@ from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise
 
 
-def wait_for_ajax(browser, try_limit=None, try_interval=0.5, timeout=60):
-    """
-    Make sure that all ajax requests are finished.
-    :param try_limit (int or None): Number of attempts to make to satisfy the `Promise`. Can be `None` to
-           disable the limit.
-    :param try_interval (float): Number of seconds to wait between attempts.
-    :param timeout (float): Maximum number of seconds to wait for the `Promise` to be satisfied before timing out.
-    :param browser: selenium.webdriver, The Selenium-controlled browser that this page is loaded in.
-    """
-    def _is_ajax_finished():
-        """
-        Check if all the ajax call on current page completed.
-        :return:
-        """
-        return browser.execute_script("return jQuery.active") == 0
-
-    EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.", try_limit=try_limit,
-                 try_interval=try_interval, timeout=timeout).fulfill()
-
-
 def load_data_str(rel_path):
     """
     Load a file from the "data" directory as a string.
@@ -47,14 +27,17 @@ class UniqueCourseTest(WebAppTest):
         """
         Create a unique course ID.
         """
+        super(UniqueCourseTest, self).__init__(*args, **kwargs)
+
+    def setUp(self):
+        super(UniqueCourseTest, self).setUp()
+
         self.course_info = {
             'org': 'test_org',
             'number': self.unique_id,
             'run': 'test_run',
             'display_name': 'Test Course' + self.unique_id
         }
-
-        super(UniqueCourseTest, self).__init__(*args, **kwargs)
 
     @property
     def course_id(self):

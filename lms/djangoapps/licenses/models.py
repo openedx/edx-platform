@@ -4,6 +4,8 @@ from django.db import models, transaction
 
 from student.models import User
 
+from xmodule_django.models import CourseKeyField
+
 log = logging.getLogger("edx.licenses")
 
 
@@ -11,7 +13,7 @@ class CourseSoftware(models.Model):
     name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
-    course_id = models.CharField(max_length=255)
+    course_id = CourseKeyField(max_length=255)
 
     def __unicode__(self):
         return u'{0} for {1}'.format(self.name, self.course_id)

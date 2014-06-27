@@ -2,6 +2,8 @@
 """
 Unit tests for handling email sending errors
 """
+import json
+
 from itertools import cycle
 from mock import patch
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
@@ -17,6 +19,7 @@ from django.db import DatabaseError
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
@@ -38,6 +41,7 @@ class EmailTestException(Exception):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
@@ -51,7 +55,12 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.success_content = {
+            'course_id': self.course.id.to_deprecated_string(),
+            'success': True,
+        }
 
     def tearDown(self):
         patch.stopall()
@@ -65,15 +74,16 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.send_messages.side_effect = SMTPDataError(455, "Throttling: Sending rate exceeded")
         test_email = {
             'action': 'Send email',
-            'to_option': 'myself',
+            'send_to': 'myself',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
-        self.client.post(self.url, test_email)
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
 
         # Test that we retry upon hitting a 4xx error
         self.assertTrue(retry.called)
-        (_, kwargs) = retry.call_args
+        (__, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPDataError)
 
@@ -93,11 +103,12 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'to_option': 'all',
+            'send_to': 'all',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
-        self.client.post(self.url, test_email)
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
 
         # We shouldn't retry when hitting a 5xx error
         self.assertFalse(retry.called)
@@ -117,14 +128,15 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.open.side_effect = SMTPServerDisconnected(425, "Disconnecting")
         test_email = {
             'action': 'Send email',
-            'to_option': 'myself',
+            'send_to': 'myself',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
-        self.client.post(self.url, test_email)
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
 
         self.assertTrue(retry.called)
-        (_, kwargs) = retry.call_args
+        (__, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPServerDisconnected)
 
@@ -138,14 +150,15 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'to_option': 'myself',
+            'send_to': 'myself',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
-        self.client.post(self.url, test_email)
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
 
         self.assertTrue(retry.called)
-        (_, kwargs) = retry.call_args
+        (__, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPConnectError)
 
@@ -161,7 +174,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         task_input = {"email_id": -1}
         with self.assertRaises(CourseEmail.DoesNotExist):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")  # pylint: disable=E1101
-        ((log_str, _, email_id), _) = mock_log.warning.call_args
+        ((log_str, __, email_id), __) = mock_log.warning.call_args
         self.assertTrue(mock_log.warning.called)
         self.assertIn('Failed to get CourseEmail with id', log_str)
         self.assertEqual(email_id, -1)
@@ -171,12 +184,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = "I/DONT/EXIST"
+        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101
-        with self.assertRaisesRegexp(ValueError, "Course not found"):
+        # (?i) is a regex for ignore case
+        with self.assertRaisesRegexp(ValueError, r"(?i)course not found"):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")  # pylint: disable=E1101
 
     def test_nonexistent_to_option(self):
@@ -196,7 +210,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         email = CourseEmail(course_id=self.course.id, to_option=SEND_TO_ALL)
         email.save()
-        entry = InstructorTask.create("bogus_task_id", "task_type", "task_key", "task_input", self.instructor)
+        entry = InstructorTask.create("bogus/task/id", "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101
         with self.assertRaisesRegexp(ValueError, 'does not match task value'):
             perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")  # pylint: disable=E1101
@@ -205,7 +219,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
-        email = CourseEmail(course_id="bogus_course_id", to_option=SEND_TO_ALL)
+        email = CourseEmail(course_id=SlashSeparatedCourseKey("bogus", "course", "id"), to_option=SEND_TO_ALL)
         email.save()
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101

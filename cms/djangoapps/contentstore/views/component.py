@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import json
 import logging
-from collections import defaultdict
 
 from django.http import HttpResponseBadRequest, Http404
 from django.contrib.auth.decorators import login_required
@@ -14,8 +13,6 @@ from edxmako.shortcuts import render_to_response
 
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -24,12 +21,11 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from lms.lib.xblock.runtime import unquote_slashes
-
 from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
+from xmodule.modulestore.keys import UsageKey
 
 from .access import has_course_access
 
@@ -57,6 +53,7 @@ else:
         'annotatable',
         'textannotation',  # module for annotating text (with annotation table)
         'videoannotation',  # module for annotating video (with annotation table)
+        'imageannotation',  # module for annotating image (with annotation table)
         'word_cloud',
         'graphical_slider_tool',
         'lti',
@@ -70,7 +67,7 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 @require_GET
 @login_required
-def subsection_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def subsection_handler(request, usage_key_string):
     """
     The restful handler for subsection-specific requests.
 
@@ -79,13 +76,13 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            old_location, course, item, lms_link = _get_item_in_course(request, locator)
+            course, item, lms_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(old_location, course_id=course.location.course_id, preview=True)
+        preview_link = get_lms_link_for_item(usage_key, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -114,10 +111,6 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 can_view_live = True
                 break
 
-        course_locator = loc_mapper().translate_location(
-            course.location.course_id, course.location, False, True
-        )
-
         return render_to_response(
             'edit_subsection.html',
             {
@@ -126,9 +119,9 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 'new_unit_category': 'vertical',
                 'lms_link': lms_link,
                 'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
+                'course_graders': json.dumps(CourseGradingModel.fetch(usage_key.course_key).graders),
                 'parent_item': parent,
-                'locator': locator,
+                'locator': usage_key,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
                 'can_view_live': can_view_live
@@ -149,7 +142,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def unit_handler(request, usage_key_string):
     """
     The restful handler for unit-specific requests.
 
@@ -158,84 +151,15 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            old_location, course, item, lms_link = _get_item_in_course(request, locator)
+            course, item, lms_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = defaultdict(list)
-        for category in COMPONENT_TYPES:
-            component_class = _load_mixed_class(category)
-            # add the default template
-            # TODO: Once mixins are defined per-application, rather than per-runtime,
-            # this should use a cms mixed-in class. (cpennington)
-            if hasattr(component_class, 'display_name'):
-                display_name = component_class.display_name.default or 'Blank'
-            else:
-                display_name = 'Blank'
-            component_templates[category].append((
-                display_name,
-                category,
-                False,  # No defaults have markdown (hardcoded current default)
-                None  # no boilerplate for overrides
-            ))
-            # add boilerplates
-            if hasattr(component_class, 'templates'):
-                for template in component_class.templates():
-                    filter_templates = getattr(component_class, 'filter_templates', None)
-                    if not filter_templates or filter_templates(template, course):
-                        component_templates[category].append((
-                            template['metadata'].get('display_name'),
-                            category,
-                            template['metadata'].get('markdown') is not None,
-                            template.get('template_id')
-                        ))
-
-        # Check if there are any advanced modules specified in the course policy.
-        # These modules should be specified as a list of strings, where the strings
-        # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
-        # enabled for the course.
-        course_advanced_keys = course.advanced_modules
-
-        # Set component types according to course policy file
-        if isinstance(course_advanced_keys, list):
-            for category in course_advanced_keys:
-                if category in ADVANCED_COMPONENT_TYPES:
-                    # Do I need to allow for boilerplates or just defaults on the
-                    # class? i.e., can an advanced have more than one entry in the
-                    # menu? one for default and others for prefilled boilerplates?
-                    try:
-                        component_class = _load_mixed_class(category)
-
-                        component_templates['advanced'].append(
-                            (
-                                component_class.display_name.default or category,
-                                category,
-                                False,
-                                None  # don't override default data
-                            )
-                        )
-                    except PluginMissingError:
-                        # dhm: I got this once but it can happen any time the
-                        # course author configures an advanced component which does
-                        # not exist on the server. This code here merely
-                        # prevents any authors from trying to instantiate the
-                        # non-existent component type by not showing it in the menu
-                        pass
-        else:
-            log.error(
-                "Improper format for course advanced keys! %s",
-                course_advanced_keys
-            )
+        component_templates = _get_component_templates(course)
 
         xblocks = item.get_children()
-        locators = [
-            loc_mapper().translate_location(
-                course.location.course_id, xblock.location, False, True
-            )
-            for xblock in xblocks
-        ]
 
         # TODO (cpennington): If we share units between courses,
         # this will need to change to check permissions correctly so as
@@ -272,9 +196,9 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
-            'unit_locator': locator,
-            'locators': locators,
-            'component_templates': component_templates,
+            'unit_usage_key': usage_key,
+            'child_usage_keys': [block.scope_ids.usage_id for block in xblocks],
+            'component_templates': json.dumps(component_templates),
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
             'subsection': containing_subsection,
@@ -297,7 +221,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 # pylint: disable=unused-argument
 @require_GET
 @login_required
-def container_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def container_handler(request, usage_key_string):
     """
     The restful handler for container xblock requests.
 
@@ -306,12 +230,14 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            __, course, xblock, __ = _get_item_in_course(request, locator)
+            course, xblock, __ = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
+        component_templates = _get_component_templates(course)
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
         while parent and parent.category != 'sequential':
@@ -323,44 +249,139 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
-            'context_course': course,
+            'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
-            'xblock_locator': locator,
-            'unit': unit,
             'unit_publish_state': unit_publish_state,
+            'xblock_locator': usage_key,
+            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
             'ancestor_xblocks': ancestor_xblocks,
+            'component_templates': json.dumps(component_templates),
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")
 
 
+def _get_component_templates(course):
+    """
+    Returns the applicable component templates that can be used by the specified course.
+    """
+    def create_template_dict(name, cat, boilerplate_name=None, is_common=False):
+        """
+        Creates a component template dict.
+
+        Parameters
+            display_name: the user-visible name of the component
+            category: the type of component (problem, html, etc.)
+            boilerplate_name: name of boilerplate for filling in default values. May be None.
+            is_common: True if "common" problem, False if "advanced". May be None, as it is only used for problems.
+
+        """
+        return {
+            "display_name": name,
+            "category": cat,
+            "boilerplate_name": boilerplate_name,
+            "is_common": is_common
+        }
+
+    component_templates = []
+    # The component_templates array is in the order of "advanced" (if present), followed
+    # by the components in the order listed in COMPONENT_TYPES.
+    for category in COMPONENT_TYPES:
+        templates_for_category = []
+        component_class = _load_mixed_class(category)
+        # add the default template
+        # TODO: Once mixins are defined per-application, rather than per-runtime,
+        # this should use a cms mixed-in class. (cpennington)
+        if hasattr(component_class, 'display_name'):
+            display_name = component_class.display_name.default or 'Blank'
+        else:
+            display_name = 'Blank'
+        templates_for_category.append(create_template_dict(display_name, category))
+
+        # add boilerplates
+        if hasattr(component_class, 'templates'):
+            for template in component_class.templates():
+                filter_templates = getattr(component_class, 'filter_templates', None)
+                if not filter_templates or filter_templates(template, course):
+                    templates_for_category.append(
+                        create_template_dict(
+                            template['metadata'].get('display_name'),
+                            category,
+                            template.get('template_id'),
+                            template['metadata'].get('markdown') is not None
+                        )
+                    )
+        component_templates.append({"type": category, "templates": templates_for_category})
+
+    # Check if there are any advanced modules specified in the course policy.
+    # These modules should be specified as a list of strings, where the strings
+    # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
+    # enabled for the course.
+    course_advanced_keys = course.advanced_modules
+    advanced_component_templates = {"type": "advanced", "templates": []}
+    # Set component types according to course policy file
+    if isinstance(course_advanced_keys, list):
+        for category in course_advanced_keys:
+            if category in ADVANCED_COMPONENT_TYPES:
+                # boilerplates not supported for advanced components
+                try:
+                    component_class = _load_mixed_class(category)
+
+                    advanced_component_templates['templates'].append(
+                        create_template_dict(
+                            component_class.display_name.default or category,
+                            category
+                        )
+                    )
+                except PluginMissingError:
+                    # dhm: I got this once but it can happen any time the
+                    # course author configures an advanced component which does
+                    # not exist on the server. This code here merely
+                    # prevents any authors from trying to instantiate the
+                    # non-existent component type by not showing it in the menu
+                    log.warning(
+                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+                        category
+                    )
+                    pass
+    else:
+        log.error(
+            "Improper format for course advanced keys! %s",
+            course_advanced_keys
+        )
+    if len(advanced_component_templates['templates']) > 0:
+        component_templates.insert(0, advanced_component_templates)
+
+    return component_templates
+
+
 @login_required
-def _get_item_in_course(request, locator):
+def _get_item_in_course(request, usage_key):
     """
     Helper method for getting the old location, containing course,
     item, and lms_link for a given locator.
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_course_access(request.user, locator):
+    course_key = usage_key.course_key
+
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(locator)
-    course_location = loc_mapper().translate_locator_to_location(locator, True)
-    course = modulestore().get_item(course_location)
-    item = modulestore().get_item(old_location, depth=1)
-    lms_link = get_lms_link_for_item(old_location, course_id=course.location.course_id)
+    course = modulestore().get_course(course_key)
+    item = get_modulestore(usage_key).get_item(usage_key, depth=1)
+    lms_link = get_lms_link_for_item(usage_key)
 
-    return old_location, course, item, lms_link
+    return course, item, lms_link
 
 
 @login_required
-def component_handler(request, usage_id, handler, suffix=''):
+def component_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
 
     Args:
-        usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+        usage_id: The usage-id of the block to dispatch to
         handler (str): The handler to execute
         suffix (str): The remainder of the url to be passed to the handler
 
@@ -369,9 +390,9 @@ def component_handler(request, usage_id, handler, suffix=''):
             django response
     """
 
-    location = unquote_slashes(usage_id)
+    usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = get_modulestore(location).get_item(location)
+    descriptor = get_modulestore(usage_key).get_item(usage_key)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -384,6 +405,6 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call; so, request user didn't author
     # the change
-    get_modulestore(location).update_item(descriptor, None)
+    get_modulestore(usage_key).update_item(descriptor, None)
 
     return webob_to_django_response(resp)

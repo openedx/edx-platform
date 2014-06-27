@@ -4,16 +4,16 @@ Utilities for contentstore tests
 
 import json
 
-from student.models import Registration
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.test.utils import override_settings
 
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.utils import get_modulestore
-from xmodule.modulestore.django import loc_mapper
+from student.models import Registration
 
 
 def parse_json(response):
@@ -92,15 +92,11 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
-        self.course_location = self.course.location
-        self.course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
-        )
         self.store = get_modulestore(self.course.location)
 
-    def create_non_staff_authed_user_client(self):
+    def create_non_staff_authed_user_client(self, authenticate=True):
         """
-        Create a non-staff user, log them in, and return the client, user to use for testing.
+        Create a non-staff user, log them in (if authenticate=True), and return the client, user to use for testing.
         """
         uname = 'teststudent'
         password = 'foo'
@@ -113,7 +109,8 @@ class CourseTestCase(ModuleStoreTestCase):
         nonstaff.save()
 
         client = Client()
-        client.login(username=uname, password=password)
+        if authenticate:
+            client.login(username=uname, password=password)
         return client, nonstaff
 
     def populate_course(self):
@@ -133,7 +130,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         Reloads the course object from the database
         """
-        self.course = self.store.get_item(self.course.location)
+        self.course = self.store.get_course(self.course.id)
 
     def save_course(self):
         """

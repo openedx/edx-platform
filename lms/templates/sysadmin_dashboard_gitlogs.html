@@ -55,6 +55,7 @@ textarea {
 	  <a href="${reverse('sysadmin')}">${_('Users')}</a>
       <a href="${reverse('sysadmin_courses')}">${_('Courses')}</a>
       <a href="${reverse('sysadmin_staffing')}">${_('Staffing and Enrollment')}</a> 
+      ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}" class="active-section">${_('Git Logs')}</a>
     </h2>
 	<hr />
@@ -63,6 +64,7 @@ textarea {
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <input type="hidden" name="dash_mode" value="">
 
+      ## Translators: refers to http://git-scm.com/docs/git-log
     <h3>${_('Git Logs')}</h3>
 
 %if course_id is None:
@@ -71,14 +73,16 @@ textarea {
 		<tr>
 		  <th>${_('Date')}</th>
 		  <th>${_('Course ID')}</th>
+		  ## Translators: Git is a version-control system; see http://git-scm.com/about
 		  <th>${_('Git Action')}</th>
 		</tr>
 	  </thead>
 	  <tbody>
 		%for cil in cilset[:10]:
+        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 		%endfor
@@ -87,6 +91,7 @@ textarea {
 
 %else:
 
+    ## Translators: Git is a version-control system; see http://git-scm.com/about
     <h2>${_('Recent git load activity for')} ${course_id}</h2>
 	%if error_msg:
 	<h3>${_('Error')}:</h3>
@@ -98,14 +103,16 @@ textarea {
 		<tr>
 		  <th>${_('Date')}</th>
 		  <th>${_('Course ID')}</th>
-		  <th>${_('git action')}</th>
+		  ## Translators: Git is a version-control system; see http://git-scm.com/about
+		  <th>${_('Git Action')}</th>
 		</tr>
 	  </thead>
 	  <tbody>
 		% for cil in cilset[:2]:
+        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 	

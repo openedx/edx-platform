@@ -35,7 +35,7 @@ master_doc = 'index'
 # so a file named "default.css" will overwrite the builtin "default.css".
 #html_static_path.append('source/_static')
 
-project = u'edX Data Documentation'
+project = u'edX Research Guide'
 copyright = u'2014, edX'
 
 # The short X.Y version.

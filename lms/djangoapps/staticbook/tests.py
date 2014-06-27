@@ -72,7 +72,7 @@ class StaticBookTest(ModuleStoreTestCase):
         Automatically provides the course id.
 
         """
-        kwargs['course_id'] = self.course.id
+        kwargs['course_id'] = self.course.id.to_deprecated_string()
         url = reverse(url_name, kwargs=kwargs)
         return url
 
@@ -115,7 +115,7 @@ class StaticImageBookTest(StaticBookTest):
         self.assertEqual(response.status_code, 404)
 
     def test_bad_page_id(self):
-        # A bad page id will cause a 404.        
+        # A bad page id will cause a 404.
         self.make_course(textbooks=[IMAGE_BOOK])
         with self.assertRaises(NoReverseMatch):
             self.make_url('book', book_index=0, page='xyzzy')

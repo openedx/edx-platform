@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import logging
 import os
+
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,18 +12,20 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response
-from models.settings.course_grading import CourseGradingModel
+
+from opaque_keys import InvalidKeyError
 from util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import UsageKey
 from xmodule.video_module.transcripts_utils import (
                                     GetTranscriptsFromYouTubeException,
                                     TranscriptsRequestValidationException,
                                     download_youtube_subs)
-from ..access import has_course_access
+
 from ..transcripts_ajax import get_transcripts_presence
-from ..course import _get_locator_and_course
+from ..course import _get_course_module
 
 
 log = logging.getLogger(__name__)
@@ -32,7 +35,7 @@ __all__ = ['utility_captions_handler']
 
 # pylint: disable=unused-argument
 @login_required
-def utility_captions_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def utility_captions_handler(request, course_key_string):
     """
     The restful handler for captions requests in the utilities area.
     It provides the list of course videos as well as their status. It also lets
@@ -44,24 +47,25 @@ def utility_captions_handler(request, tag=None, package_id=None, branch=None, ve
     POST
         json: update the captions of a given video by copying the version of the captions hosted in youtube.
     """
+    course_key = CourseKey.from_string(course_key_string)
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'POST':  # update
             try:
-                locations = _validate_captions_data_update(request)
+                locations = _validate_captions_data_update(request, course_key)
             except TranscriptsRequestValidationException as e:
                 return error_response(e.message)
             return json_update_videos(request, locations)
         elif request.method == 'GET':  # get status
             try:
-                data, item = _validate_captions_data_get(request)
+                data, item = _validate_captions_data_get(request, course_key)
             except TranscriptsRequestValidationException as e:
                 return error_response(e.message)
             return json_get_video_status(data, item)
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        return captions_index(request, package_id, branch, version_guid, block)
+        return captions_index(request, course_key)
     else:
         return HttpResponseNotFound()
 
@@ -77,7 +81,8 @@ def json_update_videos(request, locations):
     locations: list of locations of videos to be updated
     """
     results = []
-    for key in locations:
+    for key_string in locations:
+        key = UsageKey.from_string(key_string)
         try:
             #update transcripts
             item = modulestore().get_item(key)
@@ -91,26 +96,28 @@ def json_update_videos(request, locations):
                 html5[name] = 'html5'
             videos['html5'] = html5
             captions_dict = get_transcripts_presence(videos, item)
-            captions_dict.update({'location': key})
+            captions_dict.update({'location': key_string})
             results.append(captions_dict)
 
         except GetTranscriptsFromYouTubeException as e:
             log.debug(e)
-            results.append({'location': key, 'command': e})
+            results.append({'location': key_string, 'command': e})
 
     return JsonResponse(results)
 
 
 @login_required
 @ensure_csrf_cookie
-def captions_index(request, package_id, branch, version_guid, block):
+def captions_index(request, course_key):
     """
     Display a list of course videos as well as their status (up to date, or out of date)
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    locator, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user, depth=3
+    course = _get_course_module(
+        course_key,
+        request.user,
+        depth=2,
     )
 
     return render_to_response('captions.html',
@@ -134,7 +141,7 @@ def error_response(message, response=None, status_code=400):
     return JsonResponse(response, status_code)
 
 
-def _validate_captions_data_get(request):
+def _validate_captions_data_get(request, course_key):
     """
     Happens on 'GET'. Validates, that request contains all proper data for transcripts processing.
 
@@ -154,11 +161,11 @@ def _validate_captions_data_get(request):
         raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
 
     location = data.get('location')
-    item = _validate_location(location)
+    item = _validate_location(location, course_key)
     return data, item
 
 
-def _validate_captions_data_update(request):
+def _validate_captions_data_update(request, course_key):
     """
     Happens on 'POST'. Validates, that request contains all proper data for transcripts processing.
 
@@ -176,14 +183,15 @@ def _validate_captions_data_update(request):
         raise TranscriptsRequestValidationException(_('Incoming update_array data is empty.'))
 
     for location in data:
-        _validate_location(location)
+        _validate_location(location, course_key)
     return data
 
 
-def _validate_location(location):
+def _validate_location(location, course_key):
     try:
+        location = UsageKey.from_string(location)
         item = modulestore().get_item(location)
-    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+    except (ItemNotFoundError, InvalidKeyError, InsufficientSpecificationError):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':

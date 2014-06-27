@@ -1,4 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -23,14 +26,14 @@
 				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="${poster}">
 					<source src="${sourceUrl}" type='${typeSource}' />
 				</video>
-			</div> 
+			</div>
 			<div id="catchDIV">
 				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
 			</div>
 		</div>
 	</div>
 </div>
-   
+
 <script>
 
 	function onClickHideInstructions(){
@@ -46,37 +49,35 @@
 		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
 	}
 	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-	
+
 	//Grab uri of the course
-    var parts = window.location.href.split("/"), 
-    	uri = '',
-	courseid;
+    var parts = window.location.href.split("/"),
+    	uri = '';
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
-	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
 	//Change uri in cms
 	var lms_location = $('.sidebar .preview-button').attr('href');
 	if (typeof lms_location!='undefined'){
-		courseid = parts[4].split(".").join("/");
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
-	
+	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+    uri += unit_id;
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
         optionsAnnotator: {
             permissions:{
                 user: {
-                    id:"${user.email}", 
+                    id:"${user.email}",
                     name:"${user.username}"
                 },
                 userString: function (user) {
-                    if (user && user.name) 
+                    if (user && user.name)
                         return user.name;
                     return user;
                 },
                 userId: function (user) {
-                    if (user && user.id) 
+                    if (user && user.id)
                         return user.id;
                     return user;
                 },
@@ -100,7 +101,7 @@
                       }
                       for (_i = 0, _len = tokens.length; _i < _len; _i++) {
                         token = tokens[_i];
-                        
+
                         if (this.userId(user) === token) {
 
                           return true;
@@ -119,7 +120,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
@@ -154,18 +155,17 @@
         optionsRichText: {
             tinymce:{
                 selector: "li.annotator-item textarea",
-                plugins: "media image insertdatetime link code",
+                plugins: "media image codemirror",
                 menubar: false,
                 toolbar_items_size: 'small',
                 extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
             }
         },
     };
-	
+
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	
+
 	//remove old instances
     if (Annotator._instances.length !== 0) {
       $('#videoHolder').annotator("destroy");
@@ -173,22 +173,26 @@
     delete ova;
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
-    
-    ova.annotator.addPlugin('Tags');
 
-    
-    
+    ova.annotator.addPlugin('Tags');
+    var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+            '${instructor_email}':
+            '${user.email}';
+
     //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
+    var annotator = ova.annotator;
+    var catchOptions = {
             media:'video',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	    userId:'${user.email}',
+	        userId:userId,
             pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            flags:is_staff,
+            default_tab: "${default_tab}",
+            instructor_email: "${instructor_email}",
+            annotation_mode: "${annotation_mode}",
+        };
+        var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>

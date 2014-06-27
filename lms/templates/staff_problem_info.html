@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
 
 ## The JS for this is defined in xqa_interface.html
 ${block_content}
@@ -52,9 +53,29 @@ ${block_content}
     <header>
       <h2>${_('Staff Debug')}</h2>
     </header>
+
+    <hr />
+    <div class="staff_actions">
+      <h3>${_('Actions')}</h3>
+      <div>
+        <label for="sd_fu_${location.name}">${_('Username')}:</label>
+        <input type="text" id="sd_fu_${location.name}" placeholder="${user.username}"/>
+      </div>
+      <div data-location="${location.to_deprecated_string()}" data-location-name="${location.name}">
+        [
+        <a href="#" id="staff-debug-reset" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
+        |
+        <a href="#" id="staff-debug-sdelete" class="staff-debug-sdelete">${_('Delete Student State')}</a>
+        |
+        <a href="#" id="staff-debug-rescore" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+        ]
+      </div>
+      <div id="result_${location.name}"/>
+    </div>
+
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
-location = ${location | h}
+location = ${location.to_deprecated_string() | h}
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
@@ -83,7 +104,7 @@ category = ${category | h}
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location}"/>
+      <input type="hidden" id="${element_id}_history_location" value="${location.to_deprecated_string()}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
@@ -106,7 +127,7 @@ $(function () {
         null,
         %endif
         {
-            'location': '${location}',
+            'location': '${location.to_deprecated_string()}',
             'xqa_key': '${xqa_key}',
             'category': '${category}',
             'user': '${user}'

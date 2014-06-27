@@ -13,6 +13,39 @@ In drag and drop problems, students respond to a question by dragging text or ob
 Create a Drag and Drop Problem
 *********************************
 
+To create a simple drag and drop problem in which students drag labels onto an image, you'll upload the image that you want students to drag labels onto, and then create a Problem component.
+
+#. On the **Files & Uploads** page, upload your image file. For more information about uploading files, see :ref:`Add Files to a Course`.
+#. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.
+#. Click **Drag and Drop**.
+#. In the component that appears, click **Edit**.
+#. In the component editor, replace the example text with the text of your problem.
+#. In the ``<drag_and_drop_input>`` tag, replace **https://studio.edx.org/c4x/edX/DemoX/asset/L9_buckets.png** with the URL of your image file on the **Files & Uploads** page (for example, **/static/Image.png**). 
+#. For at least one ``<draggable>`` tag, replace the text of the **label** attribute with the text of the label you want students to drag. For example, if you want students to drag the word "Iceland" onto your image, the new tag would resemble the following:
+   
+   ``<draggable id="1" label="Iceland"/>``
+
+8. Repeat the previous step for all the labels that you want to use. Make sure that the **id** attribute is different for each ``<draggable>`` tag.
+#. Determine the coordinates and radius of the correct area on the image.  
+#. Under ``correct_answer = {``, add an entry for each label, using the following format. These values are in pixels:
+
+    ``'id':    [[x coordinate, y coordinate], radius]``
+
+    For example, if your image is 600 pixels wide and 400 pixels high, and you want your students to drag the Iceland label to an area in the upper-left part of the image and drag a Sweden label near the lower-right part of your image, the code would resemble the following (where 2 is the ID for the Sweden label):
+
+    .. code-block:: xml
+
+        correct-answer = {
+                '1':    [[50, 50], 75]
+                '2':    [[550, 350], 75]}
+
+    .. note:: Make sure the code contains the closing curly brace (**}**). 
+#. Click **Save**.
+
+==========================================
+Sample Drag and Drop Problem Code
+==========================================
+
 To create the drag and drop problem that appears in the image above, you'll download two files from edX, upload these files to to the **Files & Uploads** page, and then add the code for the problem to a Problem component.
 
 #. Download the following files from edX:
@@ -50,7 +83,14 @@ To create the drag and drop problem that appears in the image above, you'll down
         <target id="0" h="53" w="66" y="55.100006103515625" x="131.5"/>
         <target id="1" h="113" w="55" y="140.10000610351562" x="181.5"/>
       </drag_and_drop_input>
-      <answer type="loncapa/python"> correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] if draganddrop.grade(submission[0], correct_answer): correct = ['correct'] else: correct = ['incorrect'] </answer>
+      <answer type="loncapa/python"> 
+  correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, 
+  {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] 
+  if draganddrop.grade(submission[0], correct_answer): 
+      correct = ['correct'] 
+  else: 
+      correct = ['incorrect'] 
+      </answer>
     </customresponse>
     <solution>
       <img src="/static/AllopurinolAnswer.gif"/>
@@ -64,33 +104,68 @@ To create the drag and drop problem that appears in the image above, you'll down
 Drag and Drop Problem XML
 *********************************
 
-========
-Template
-========
+================================
+Template for Simple Problem
+================================
 
 .. code-block:: xml
 
   <problem>
-    <p>Problem text</p>
-    <customresponse>
-      <drag_and_drop_input no_labels="false" one_per_target="true" target_outline="true" img="/static/TARGET_IMAGE.gif">
-        <draggable can_reuse="true" label="NAME 1" id="1"/>
-        <draggable can_reuse="true" label="NAME 2" id="2"/>
-        <target id="0" h="HEIGHT (in pixels)" w="WIDTH (in pixels)" y="Y-COORDINATE" x="X-COORDINATE"/>
-        <target id="1" h="HEIGHT (in pixels)" w="WIDTH (in pixels)" y="Y-COORDINATE" x="X-COORDINATE"/>
-      </drag_and_drop_input>
-      <answer type="loncapa/python"> correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] if draganddrop.grade(submission[0], correct_answer): correct = ['correct'] else: correct = ['incorrect'] </answer>
-    </customresponse>
-    <solution>
-      <img src="/static/ANSWER_IMAGE.gif"/>
-    </solution>
+  <p>PROBLEM TEXT</p>
+   <customresponse>
+        <drag_and_drop_input img="/static/TARGET_IMAGE.png">
+            <draggable id="1" label="LABEL 1"/>
+            <draggable id="2" label="LABEL 2"/>
+        </drag_and_drop_input>
+        <answer type="loncapa/python">
+  correct_answer = {
+          '1':      [[x, y], radius],
+          '2':      [[x, y], radius]}
+  if draganddrop.grade(submission[0], correct_answer):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+          </answer>
+      </customresponse>
+
+
+================================
+Template for Advanced Problem
+================================
+
+.. code-block:: xml
+
+  <problem>
+      <customresponse>
+          <text>
+              <p>PROBLEM TEXT</p>
+          </text>
+          <drag_and_drop_input img="/static/TARGET_IMAGE.png" target_outline="true" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
+              <draggable id="1" label="LABEL 1" />
+              <draggable id="2" label="LABEL 2" />
+              <target id="A" x="NUMBER" Y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
+              <target id="B" x="NUMBER" Y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
+          </drag_and_drop_input>
+          <answer type="loncapa/python">
+  correct_answer = [{
+      'draggables': ['1', '2'],
+      'targets': ['A', 'B' ],
+      'rule':'anyof'
+  }]
+  if draganddrop.grade(submission[0], correct_answer):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+          </answer>
+      </customresponse>
   </problem>
 
 ========
 Tags
 ========
 
-* ``<drag_and_drop_input/>``: Indicates the problem is a drag and drop problem.
+* ``<customresponse>``: Indicates that the problem is a custom response problem.
+* ``<drag_and_drop_input/>``: Indicates the custom response problem is a drag and drop problem.
 * ``<draggable/>``: Specifies a single object that a student will drag onto the base image.
 * ``<target>``: Specifies the location on the base image where a draggable must be dropped.
 

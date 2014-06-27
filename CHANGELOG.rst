@@ -5,12 +5,27 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix displaying transcripts on touch devices. BLD-1033.
+
+Blades: Tolerance expressed in percentage now computes correctly. BLD-522.
+
+Studio: Support add, delete and duplicate on the container page. STUD-1490.
+
+Studio: Add drag-and-drop support to the container page. STUD-1309.
+
 Common: Add extensible third-party auth module.
+
+Blades: Added new error message that displays when HTML5 video is not supported altogether. Make sure spinner gets hidden when error message is shown. BLD-638.
+
+LMS: Switch default instructor dashboard to the new (formerly "beta")
+  instructor dashboard. Puts the old (now "legacy") dash behind a feature flag.
+  LMS-1296
 
 Blades: Handle situation if no response were sent from XQueue to LMS in Matlab
 problem after Run Code button press. BLD-994.
 
-Blades: Set initial video quality to large instead of default to avoid automatic switch to HD when iframe resizes. BLD-981.
+Blades: Set initial video quality to large instead of default to avoid automatic
+switch to HD when iframe resizes. BLD-981.
 
 Blades: Add an upload button for authors to provide students with an option to
 download a handout associated with a video (of arbitrary file format). BLD-1000.
@@ -737,3 +752,5 @@ LMS: Option to email students when enroll/un-enroll them.
 
 Blades: Added WAI-ARIA markup to the video player controls. These are now fully
 accessible by screen readers.
+
+Common: Added advanced_module for annotating images to go with the ones for text and videos.

@@ -14,7 +14,7 @@ html.video-fullscreen{
 .wrap-instructor-info {
   margin: ($baseline/2) ($baseline/4) 0 0;
   overflow: hidden;
-  
+
   &.studio-view {
     position: relative;
     top: -($baseline/2);
@@ -191,6 +191,15 @@ div.course-wrapper {
       }
     }
 
+    div.staff_actions {
+      p.error {
+        color: $error-red
+      }
+      p.success {
+        color: $success-color;
+     }
+    }
+
     div.staff_info {
       display: none;
       @include clearfix();
@@ -317,4 +326,8 @@ section.foldit {
   background-color: $white;
   border-radius: 5px;
   font-weight: bold;
+}
+
+h4.problem-feedback-label{
+  margin-top: 1em;
 }

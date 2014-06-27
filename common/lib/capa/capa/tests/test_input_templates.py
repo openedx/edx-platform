@@ -9,7 +9,7 @@ import json
 from lxml import etree
 from mako.template import Template as MakoTemplate
 from mako import exceptions
-
+from capa.inputtypes import Status
 
 class TemplateError(Exception):
     """
@@ -123,9 +123,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {'id': '1',
                         'choices': choices,
-                        'status': 'correct',
-                        'status_class': 'correct',
-                        'status_display': u'correct',
+                        'status': Status('correct'),
                         'label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
@@ -138,7 +136,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked correct.
         """
 
-        self.context['status'] = self.context['status_class'] = self.context['status_display'] = 'correct'
+        self.context['status'] = Status('correct')
         self.context['input_type'] = 'checkbox'
         self.context['value'] = ['1', '2']
 
@@ -160,14 +158,14 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked incorrect.
         """
         conditions = [
-            {'status': 'incorrect', 'input_type': 'radio', 'value': '', 'status_class': 'incorrect'},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': [], 'status_class': 'incorrect'},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2'], 'status_class': 'incorrect'},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2', '3'], 'status_class': 'incorrect'},
-            {'status': 'incomplete', 'input_type': 'radio', 'value': '', 'status_class': 'incorrect'},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': [], 'status_class': 'incorrect'},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2'], 'status_class': 'incorrect'},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2', '3'], 'status_class': 'incorrect'}]
+            {'status': Status('incorrect'), 'input_type': 'radio', 'value': ''},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': []},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': ['2']},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': ['2', '3']},
+            {'status': Status('incomplete'), 'input_type': 'radio', 'value': ''},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': []},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': ['2']},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': ['2', '3']}]
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -190,16 +188,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked unanswered.
         """
         conditions = [
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': '', 'status_class': 'unanswered'},
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': [], 'status_class': 'unanswered'},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': [], 'status_class': 'unanswered'},
+            {'status': Status('unsubmitted'), 'input_type': 'radio', 'value': ''},
+            {'status': Status('unsubmitted'), 'input_type': 'radio', 'value': []},
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': []},
             {'input_type': 'radio', 'value': ''},
             {'input_type': 'radio', 'value': []},
             {'input_type': 'checkbox', 'value': []},
             {'input_type': 'checkbox', 'value': ['1']},
             {'input_type': 'checkbox', 'value': ['1', '2']}]
 
-        self.context['status'] = self.context['status_class'] = 'unanswered'
+        self.context['status'] = Status('unanswered')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -225,7 +223,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             {'input_type': 'radio', 'value': '2'},
             {'input_type': 'radio', 'value': ['2']}]
 
-        self.context['status'] = 'correct'
+        self.context['status'] = Status('correct')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -246,7 +244,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             {'input_type': 'radio', 'value': '2'},
             {'input_type': 'radio', 'value': ['2']}]
 
-        self.context['status'] = self.context['status_class'] = 'incorrect'
+        self.context['status'] = Status('incorrect')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -270,16 +268,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
 
         conditions = [
-            {'input_type': 'radio', 'status': 'correct', 'value': '', 'status_class': 'correct'},
-            {'input_type': 'radio', 'status': 'correct', 'value': '2', 'status_class': 'correct'},
-            {'input_type': 'radio', 'status': 'correct', 'value': ['2'], 'status_class': 'correct'},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': '2', 'status_class': 'incorrect'},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': [], 'status_class': 'incorrect'},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': ['2'], 'status_class': 'incorrect'},
-            {'input_type': 'checkbox', 'status': 'correct', 'value': [], 'status_class': 'correct'},
-            {'input_type': 'checkbox', 'status': 'correct', 'value': ['2'], 'status_class': 'correct'},
-            {'input_type': 'checkbox', 'status': 'incorrect', 'value': [], 'status_class': 'incorrect'},
-            {'input_type': 'checkbox', 'status': 'incorrect', 'value': ['2'], 'status_class': 'incorrect'}]
+            {'input_type': 'radio', 'status': Status('correct'), 'value': ''},
+            {'input_type': 'radio', 'status': Status('correct'), 'value': '2'},
+            {'input_type': 'radio', 'status': Status('correct'), 'value': ['2']},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'value': '2'},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'value': []},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'value': ['2']},
+            {'input_type': 'checkbox', 'status': Status('correct'), 'value': []},
+            {'input_type': 'checkbox', 'status': Status('correct'), 'value': ['2']},
+            {'input_type': 'checkbox', 'status': Status('incorrect'), 'value': []},
+            {'input_type': 'checkbox', 'status': Status('incorrect'), 'value': ['2']}]
 
         self.context['show_correctness'] = 'never'
         self.context['submitted_message'] = 'Test message'
@@ -305,8 +303,12 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                                  self.context)
 
             # Expect to see the message
-            self.assert_has_text(xml, "//div[@class='capa_alert']",
-                                 self.context['submitted_message'])
+            if self.context['value']:
+                self.assert_has_text(
+                    xml,
+                    "//div[@class='capa_alert']",
+                    self.context['submitted_message'],
+                 )
 
     def test_no_message_before_submission(self):
         """
@@ -315,9 +317,9 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
 
         conditions = [
-            {'input_type': 'radio', 'status': 'unsubmitted', 'value': ''},
-            {'input_type': 'radio', 'status': 'unsubmitted', 'value': []},
-            {'input_type': 'checkbox', 'status': 'unsubmitted', 'value': []},
+            {'input_type': 'radio', 'status': Status('unsubmitted'), 'value': ''},
+            {'input_type': 'radio', 'status': Status('unsubmitted'), 'value': []},
+            {'input_type': 'checkbox', 'status': Status('unsubmitted'), 'value': []},
 
             # These tests expose bug #365
             # When the bug is fixed, uncomment these cases.
@@ -354,9 +356,7 @@ class TextlineTemplateTest(TemplateTestCase):
 
     def setUp(self):
         self.context = {'id': '1',
-                        'status': 'correct',
-                        'status_class': 'correct',
-                        'status_display': u'correct',
+                        'status': Status('correct'),
                         'label': 'test',
                         'value': '3',
                         'preprocessor': None,
@@ -383,9 +383,7 @@ class TextlineTemplateTest(TemplateTestCase):
                  ('incomplete', 'incorrect', 'incomplete')]
 
         for (context_status, div_class, status_mark) in cases:
-            self.context['status'] = context_status
-            self.context['status_class'] = div_class
-            self.context['status_display'] = status_mark
+            self.context['status'] = Status(context_status)
             xml = self.render_to_xml(self.context)
 
             # Expect that we get a <div> with correct class
@@ -461,8 +459,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.context['inline'] = True
 
         for (context_status, div_class) in cases:
-            self.context['status'] = context_status
-            self.context['status_class'] = div_class
+            self.context['status'] = Status(context_status)
             xml = self.render_to_xml(self.context)
 
             # Expect that we get a <div> with correct class
@@ -487,9 +484,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         self.context = {
             'id': 2,
             'value': 'PREFILLED_VALUE',
-            'status': 'unsubmitted',
-            'status_class': 'unanswered',
-            'status_display': u'unsubmitted',
+            'status': Status('unsubmitted'),
             'label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
@@ -525,9 +520,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
                         'options': [],
                         'has_options_value': False,
                         'debug': False,
-                        'status': 'unsubmitted',
-                        'status_class': 'unanswered',
-                        'status_display': u'unsubmitted',
+                        'status': Status('unsubmitted'),
                         'return_to_annotation': False,
                         'msg': '<p>This is a test message</p>', }
         super(AnnotationInputTemplateTest, self).setUp()
@@ -587,16 +580,16 @@ class AnnotationInputTemplateTest(TemplateTestCase):
                       ('incorrect', 'incorrect')]
 
         for (input_status, expected_css_class) in test_cases:
-            self.context['status'] = input_status
+            self.context['status'] = Status(input_status)
             xml = self.render_to_xml(self.context)
 
-            xpath = "//span[@class='{0}']".format(expected_css_class)
+            xpath = "//span[@class='status {0}']".format(expected_css_class)
             self.assert_has_xpath(xml, xpath, self.context)
 
         # If individual options are being marked, then expect
         # just the option to be marked incorrect, not the whole problem
         self.context['has_options_value'] = True
-        self.context['status'] = 'incorrect'
+        self.context['status'] = Status('incorrect')
         xpath = "//span[@class='incorrect']"
         xml = self.render_to_xml(self.context)
         self.assert_no_xpath(xml, xpath, self.context)
@@ -687,9 +680,7 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.context = {
             'id': 2,
             'options': [],
-            'status': 'unsubmitted',
-            'status_class': 'unanswered',
-            'status_display': u'unanswered',
+            'status': Status('unsubmitted'),
             'label': 'test',
             'value': 0
         }
@@ -729,8 +720,7 @@ class OptionInputTemplateTest(TemplateTestCase):
                       ('incomplete', 'status incorrect')]
 
         for (input_status, expected_css_class) in test_cases:
-            self.context['status'] = input_status
-            self.context['status_class'] = expected_css_class.split(' ')[1]
+            self.context['status'] = Status(input_status)
             xml = self.render_to_xml(self.context)
 
             xpath = "//span[@class='{0}']".format(expected_css_class)
@@ -753,7 +743,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
         self.context = {'id': 2,
                         'drag_and_drop_json': '',
                         'value': 0,
-                        'status': 'unsubmitted',
+                        'status': Status('unsubmitted'),
                         'msg': ''}
         super(DragAndDropTemplateTest, self).setUp()
 
@@ -767,7 +757,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
                       ('incomplete', 'incorrect', 'incomplete')]
 
         for (input_status, expected_css_class, expected_text) in test_cases:
-            self.context['status'] = input_status
+            self.context['status'] = Status(input_status)
             xml = self.render_to_xml(self.context)
 
             # Expect a <div> with the status
@@ -814,9 +804,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                    {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_1_textinput_0'}])]
         self.context = {'id': '1',
                         'choices': choices,
-                        'status': 'correct',
-                        'status_class': 'correct',
-                        'status_display': u'correct',
+                        'status': Status('correct'),
                         'input_type': 'radio',
                         'label': 'choicetext label',
                         'value': self.VALUE_DICT}
@@ -829,7 +817,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         Section is used for checkbox, so inputting text does not deselect
         """
         input_tags = ('radio', 'checkbox')
-        self.context['status'] = 'correct'
+        self.context['status'] = Status('correct')
         xpath = "//section[@id='forinput1_choiceinput_0bc']"
 
         self.context['value'] = {}
@@ -842,7 +830,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         """Test conditions under which the entire problem
         (not a particular option) is marked correct"""
 
-        self.context['status'] = 'correct'
+        self.context['status'] = Status('correct')
         self.context['input_type'] = 'checkbox'
         self.context['value'] = self.VALUE_DICT
 
@@ -863,14 +851,14 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked incorrect"""
         grouping_tags = {'radio': 'label', 'checkbox': 'section'}
         conditions = [
-            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'radio', 'value': {}},
-            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
-            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
-            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
-            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'radio', 'value': {}},
-            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
-            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
-            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
+            {'status': Status('incorrect'), 'input_type': 'radio', 'value': {}},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': Status('incomplete'), 'input_type': 'radio', 'value': {}},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -894,15 +882,14 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         grouping_tags = {'radio': 'label', 'checkbox': 'section'}
 
         conditions = [
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': {}},
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': self.EMPTY_DICT},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': {}},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.EMPTY_DICT},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
+            {'status': Status('unsubmitted'), 'input_type': 'radio', 'value': {}},
+            {'status': Status('unsubmitted'), 'input_type': 'radio', 'value': self.EMPTY_DICT},
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': {}},
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.EMPTY_DICT},
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
 
-        self.context['status'] = 'unanswered'
-        self.context['status_class'] = 'unanswered'
+        self.context['status'] = Status('unanswered')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)

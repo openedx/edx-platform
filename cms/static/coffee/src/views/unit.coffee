@@ -1,311 +1,273 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/views/module_edit", "js/models/module_info"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel) ->
-  class UnitEditView extends Backbone.View
-    events:
-      'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
-      'click .new-component .new-component-type a.single-template': 'saveNewComponent'
-      'click .new-component .cancel-button': 'closeNewComponent'
-      'click .new-component-templates .new-component-template a': 'saveNewComponent'
-      'click .new-component-templates .cancel-button': 'closeNewComponent'
-      'click .delete-draft': 'deleteDraft'
-      'click .create-draft': 'createDraft'
-      'click .publish-draft': 'publishDraft'
-      'change .visibility-select': 'setVisibility'
-      "click .component-actions .duplicate-button": 'duplicateComponent'
+        "coffee/src/views/module_edit", "js/models/module_info",
+        "js/views/baseview", "js/views/components/add_xblock"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel, BaseView, AddXBlockComponent) ->
+    class UnitEditView extends BaseView
+        events:
+            'click .delete-draft': 'deleteDraft'
+            'click .create-draft': 'createDraft'
+            'click .publish-draft': 'publishDraft'
+            'change .visibility-select': 'setVisibility'
+            "click .component-actions .duplicate-button": 'duplicateComponent'
 
-    initialize: =>
-      @visibilityView = new UnitEditView.Visibility(
-        el: @$('.visibility-select')
-        model: @model
-      )
+        initialize: =>
+            @visibilityView = new UnitEditView.Visibility(
+                el: @$('.visibility-select')
+                model: @model
+            )
 
-      @locationView = new UnitEditView.LocationState(
-        el: @$('.section-item.editing a')
-        model: @model
-      )
+            @locationView = new UnitEditView.LocationState(
+                el: @$('.section-item.editing a')
+                model: @model
+            )
 
-      @nameView = new UnitEditView.NameEdit(
-        el: @$('.unit-name-input')
-        model: @model
-      )
+            @nameView = new UnitEditView.NameEdit(
+                el: @$('.unit-name-input')
+                model: @model
+            )
 
-      @model.on('change:state', @render)
+            @addXBlockComponent = new AddXBlockComponent(
+                collection: @options.templates
+                el: @$('.add-xblock-component')
+                createComponent: (template) =>
+                    return @createComponent(template, "Creating new component").done(
+                        (editor) ->
+                            listPanel = @$newComponentItem.prev()
+                            listPanel.append(editor.$el)
+                    ))
+            @addXBlockComponent.render()
 
-      @$newComponentItem = @$('.new-component-item')
-      @$newComponentTypePicker = @$('.new-component')
-      @$newComponentTemplatePickers = @$('.new-component-templates')
-      @$newComponentButton = @$('.new-component-button')
+            @model.on('change:state', @render)
 
-      @$('.components').sortable(
-        handle: '.drag-handle'
-        update: (event, ui) =>
-          analytics.track "Reordered Components",
-            course: course_location_analytics
-            id: unit_location_analytics
+            @$newComponentItem = @$('.new-component-item')
 
-          payload = children : @components()
-          saving = new NotificationView.Mini
-            title: gettext('Saving&hellip;')
-          saving.show()
-          options = success : =>
-            @model.unset('children')
-            saving.hide()
-          @model.save(payload, options)
-        helper: 'clone'
-        opacity: '0.5'
-        placeholder: 'component-placeholder'
-        forcePlaceholderSize: true
-        axis: 'y'
-        items: '> .component'
-      )
+            @$('.components').sortable(
+                handle: '.drag-handle'
+                update: (event, ui) =>
+                    analytics.track "Reordered Components",
+                        course: course_location_analytics
+                        id: unit_location_analytics
 
-      @$('.component').each (idx, element) =>
-        model = new ModuleModel
-            id: $(element).data('locator')
-        new ModuleEditView
-          el: element,
-          onDelete: @deleteComponent,
-          model: model
+                    payload = children : @components()
+                    saving = new NotificationView.Mini
+                        title: gettext('Saving&hellip;')
+                    saving.show()
+                    options = success : =>
+                        @model.unset('children')
+                        saving.hide()
+                    @model.save(payload, options)
+                helper: 'clone'
+                opacity: '0.5'
+                placeholder: 'component-placeholder'
+                forcePlaceholderSize: true
+                axis: 'y'
+                items: '> .component'
+            )
 
-    showComponentTemplates: (event) =>
-      event.preventDefault()
+            @$('.component').each (idx, element) =>
+                model = new ModuleModel
+                    id: $(element).data('locator')
+                new ModuleEditView
+                    el: element,
+                    onDelete: @deleteComponent,
+                    model: model
 
-      type = $(event.currentTarget).data('type')
-      @$newComponentTypePicker.slideUp(250)
-      @$(".new-component-#{type}").slideDown(250)
-      $('html, body').animate({
-        scrollTop: @$(".new-component-#{type}").offset().top
-      }, 500)
+        createComponent: (data, analytics_message) =>
+            self = this
+            operation = $.Deferred()
+            editor = new ModuleEditView(
+                onDelete: @deleteComponent
+                model: new ModuleModel()
+            )
 
-    closeNewComponent: (event) =>
-      event.preventDefault()
+            callback = ->
+                operation.resolveWith(self, [editor])
+                analytics.track analytics_message,
+                    course: course_location_analytics
+                    unit_id: unit_location_analytics
+                    type: editor.$el.data('locator')
 
-      @$newComponentTypePicker.slideDown(250)
-      @$newComponentTemplatePickers.slideUp(250)
-      @$newComponentItem.removeClass('adding')
-      @$newComponentItem.find('.rendered-component').remove()
+            editor.createItem(
+                @$el.data('locator'),
+                data,
+                callback
+            )
 
-    createComponent: (event, data, notification_message, analytics_message, success_callback) =>
-      event.preventDefault()
+            return operation.promise()
 
-      editor = new ModuleEditView(
-        onDelete: @deleteComponent
-        model: new ModuleModel()
-      )
+        duplicateComponent: (event) =>
+            self = this
+            event.preventDefault()
+            $component = $(event.currentTarget).parents('.component')
+            source_locator = $component.data('locator')
+            @runOperationShowingMessage(gettext('Duplicating&hellip;'), ->
+                operation = self.createComponent(
+                    {duplicate_source_locator: source_locator},
+                    "Duplicating " + source_locator);
+                operation.done(
+                    (editor) ->
+                        originalOffset = @getScrollOffset($component)
+                        $component.after(editor.$el)
+                        # Scroll the window so that the new component replaces the old one
+                        @setScrollOffset(editor.$el, originalOffset)
+                ))
 
-      notification = new NotificationView.Mini
-        title: notification_message
+        components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
 
-      notification.show()
+        wait: (value) =>
+            @$('.unit-body').toggleClass("waiting", value)
 
-      callback = ->
-        notification.hide()
-        success_callback()
-        analytics.track analytics_message,
-          course: course_location_analytics
-          unit_id: unit_location_analytics
-          type: editor.$el.data('locator')
+        render: =>
+            if @model.hasChanged('state')
+                @$el.toggleClass("edit-state-#{@model.previous('state')} edit-state-#{@model.get('state')}")
+                @wait(false)
 
-      editor.createItem(
-        @$el.data('locator'),
-        data,
-        callback
-      )
+        saveDraft: =>
+            @model.save()
 
-      return editor
+        deleteComponent: (event) =>
+            self = this
+            event.preventDefault()
+            @confirmThenRunOperation(gettext('Delete this component?'),
+                gettext('Deleting this component is permanent and cannot be undone.'),
+                gettext('Yes, delete this component'),
+            ->
+                self.runOperationShowingMessage(gettext('Deleting&hellip;'),
+                ->
+                    $component = $(event.currentTarget).parents('.component')
+                    return $.ajax({
+                        type: 'DELETE',
+                        url: self.model.urlRoot + "/" + $component.data('locator')
+                    }).success(=>
+                        analytics.track "Deleted a Component",
+                            course: course_location_analytics
+                            unit_id: unit_location_analytics
+                            id: $component.data('locator')
 
-    saveNewComponent: (event) =>
-      success_callback = =>
-        @$newComponentItem.before(editor.$el)
-      editor = @createComponent(
-        event, $(event.currentTarget).data(),
-        gettext('Adding&hellip;'),
-        "Creating new component",
-        success_callback
-      )
-      @closeNewComponent(event)
+                        $component.remove()
+                        # b/c we don't vigilantly keep children up to date
+                        # get rid of it before it hurts someone
+                        self.model.save({children: self.components()},
+                            {
+                                success: (model) ->
+                                    model.unset('children')
+                            })
+                    )))
 
-    duplicateComponent: (event) =>
-      $component = $(event.currentTarget).parents('.component')
-      source_locator = $component.data('locator')
-      success_callback = ->
-        $component.after(editor.$el)
-        $('html, body').animate({
-          scrollTop: editor.$el.offset().top
-        }, 500)
-      editor = @createComponent(
-        event,
-        {duplicate_source_locator: source_locator},
-        gettext('Duplicating&hellip;')
-        "Duplicating " + source_locator,
-        success_callback
-      )
-
-    components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
-
-    wait: (value) =>
-      @$('.unit-body').toggleClass("waiting", value)
-
-    render: =>
-      if @model.hasChanged('state')
-        @$el.toggleClass("edit-state-#{@model.previous('state')} edit-state-#{@model.get('state')}")
-        @wait(false)
-
-    saveDraft: =>
-      @model.save()
-
-    deleteComponent: (event) =>
-      event.preventDefault()
-      msg = new PromptView.Warning(
-        title: gettext('Delete this component?'),
-        message: gettext('Deleting this component is permanent and cannot be undone.'),
-        actions:
-          primary:
-            text: gettext('Yes, delete this component'),
-            click: (view) =>
-              view.hide()
-              deleting = new NotificationView.Mini
-                title: gettext('Deleting&hellip;'),
-              deleting.show()
-              $component = $(event.currentTarget).parents('.component')
-              $.ajax({
+        deleteDraft: (event) ->
+            @wait(true)
+            $.ajax({
                 type: 'DELETE',
-                url: @model.urlRoot + "/" + $component.data('locator')
-              }).success(=>
-                deleting.hide()
-                analytics.track "Deleted a Component",
-                  course: course_location_analytics
-                  unit_id: unit_location_analytics
-                  id: $component.data('locator')
+                url: @model.url() + "?" + $.param({recurse: true})
+            }).success(=>
 
-                $component.remove()
-                # b/c we don't vigilantly keep children up to date
-                # get rid of it before it hurts someone
-                # sorry for the js, i couldn't figure out the coffee equivalent
-                `_this.model.save({children: _this.components()},
-                  {success: function(model) {
-                  model.unset('children');
-                  }}
-                );`
-              )
-          secondary:
-            text: gettext('Cancel'),
-            click: (view) ->
-              view.hide()
-      )
-      msg.show()
+                analytics.track "Deleted Draft",
+                    course: course_location_analytics
+                    unit_id: unit_location_analytics
 
-    deleteDraft: (event) ->
-      @wait(true)
-      $.ajax({
-          type: 'DELETE',
-          url: @model.url() + "?" + $.param({recurse: true})
-      }).success(=>
+                window.location.reload()
+            )
 
-          analytics.track "Deleted Draft",
-              course: course_location_analytics
-              unit_id: unit_location_analytics
+        createDraft: (event) ->
+            self = this
+            @disableElementWhileRunning($(event.target), ->
+                self.wait(true)
+                $.postJSON(self.model.url(), {
+                        publish: 'create_draft'
+                    }, =>
+                    analytics.track "Created Draft",
+                        course: course_location_analytics
+                        unit_id: unit_location_analytics
 
-          window.location.reload()
-      )
+                    self.model.set('state', 'draft')
+                )
+            )
 
-    createDraft: (event) ->
-      @wait(true)
+        publishDraft: (event) ->
+            self = this
+            @disableElementWhileRunning($(event.target), ->
+                self.wait(true)
+                self.saveDraft()
 
-      $.postJSON(@model.url(), {
-        publish: 'create_draft'
-      }, =>
-        analytics.track "Created Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+                $.postJSON(self.model.url(), {
+                        publish: 'make_public'
+                    }, =>
+                    analytics.track "Published Draft",
+                        course: course_location_analytics
+                        unit_id: unit_location_analytics
 
-        @model.set('state', 'draft')
-      )
+                    self.model.set('state', 'public')
+                )
+            )
 
-    publishDraft: (event) ->
-      @wait(true)
-      @saveDraft()
+        setVisibility: (event) ->
+            if @$('.visibility-select').val() == 'private'
+                action = 'make_private'
+                visibility = "private"
+            else
+                action = 'make_public'
+                visibility = "public"
 
-      $.postJSON(@model.url(), {
-        publish: 'make_public'
-      }, =>
-        analytics.track "Published Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+            @wait(true)
 
-        @model.set('state', 'public')
-      )
+            $.postJSON(@model.url(), {
+                    publish: action
+                }, =>
+                analytics.track "Set Unit Visibility",
+                    course: course_location_analytics
+                    unit_id: unit_location_analytics
+                    visibility: visibility
 
-    setVisibility: (event) ->
-      if @$('.visibility-select').val() == 'private'
-        action = 'make_private'
-        visibility = "private"
-      else
-        action = 'make_public'
-        visibility = "public"
+                @model.set('state', @$('.visibility-select').val()))
 
-      @wait(true)
+    class UnitEditView.NameEdit extends BaseView
+        events:
+            'change .unit-display-name-input': 'saveName'
 
-      $.postJSON(@model.url(), {
-        publish: action
-      }, =>
-        analytics.track "Set Unit Visibility",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
-          visibility: visibility
+        initialize: =>
+            @model.on('change:metadata', @render)
+            @model.on('change:state', @setEnabled)
+            @setEnabled()
+            @saveName
+            @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
-        @model.set('state', @$('.visibility-select').val())
-      )
+        render: =>
+            @$('.unit-display-name-input').val(@model.get('metadata').display_name)
 
-  class UnitEditView.NameEdit extends Backbone.View
-    events:
-      'change .unit-display-name-input': 'saveName'
+        setEnabled: =>
+            disabled = @model.get('state') == 'public'
+            if disabled
+                @$('.unit-display-name-input').attr('disabled', true)
+            else
+                @$('.unit-display-name-input').removeAttr('disabled')
 
-    initialize: =>
-      @model.on('change:metadata', @render)
-      @model.on('change:state', @setEnabled)
-      @setEnabled()
-      @saveName
-      @$spinner = $('<span class="spinner-in-field-icon"></span>');
-
-    render: =>
-      @$('.unit-display-name-input').val(@model.get('metadata').display_name)
-
-    setEnabled: =>
-      disabled = @model.get('state') == 'public'
-      if disabled
-        @$('.unit-display-name-input').attr('disabled', true)
-      else
-        @$('.unit-display-name-input').removeAttr('disabled')
-
-    saveName: =>
-      # Treat the metadata dictionary as immutable
-      metadata = $.extend({}, @model.get('metadata'))
-      metadata.display_name = @$('.unit-display-name-input').val()
-      @model.save(metadata: metadata)
-      # Update name shown in the right-hand side location summary.
-      $('.unit-location .editing .unit-name').html(metadata.display_name)
-      analytics.track "Edited Unit Name",
-        course: course_location_analytics
-        unit_id: unit_location_analytics
-        display_name: metadata.display_name
+        saveName: =>
+            # Treat the metadata dictionary as immutable
+            metadata = $.extend({}, @model.get('metadata'))
+            metadata.display_name = @$('.unit-display-name-input').val()
+            @model.save(metadata: metadata)
+            # Update name shown in the right-hand side location summary.
+            $('.unit-location .editing .unit-name').html(metadata.display_name)
+            analytics.track "Edited Unit Name",
+                course: course_location_analytics
+                unit_id: unit_location_analytics
+                display_name: metadata.display_name
 
 
-  class UnitEditView.LocationState extends Backbone.View
-    initialize: =>
-      @model.on('change:state', @render)
+    class UnitEditView.LocationState extends BaseView
+        initialize: =>
+            @model.on('change:state', @render)
 
-    render: =>
-      @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
+        render: =>
+            @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 
-  class UnitEditView.Visibility extends Backbone.View
-    initialize: =>
-      @model.on('change:state', @render)
-      @render()
+    class UnitEditView.Visibility extends BaseView
+        initialize: =>
+            @model.on('change:state', @render)
+            @render()
 
-    render: =>
-      @$el.val(@model.get('state'))
+        render: =>
+            @$el.val(@model.get('state'))
 
-  return UnitEditView
+    return UnitEditView

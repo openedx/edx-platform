@@ -36,6 +36,7 @@ XMODULES = [
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "textannotation = xmodule.textannotation_module:TextAnnotationDescriptor",
     "videoannotation = xmodule.videoannotation_module:VideoAnnotationDescriptor",
+    "imageannotation = xmodule.imageannotation_module:ImageAnnotationDescriptor",
     "foldit = xmodule.foldit_module:FolditDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
@@ -66,6 +67,20 @@ setup(
         'xmodule.v1': XMODULES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
+        ],
+        'course_key': [
+            'slashes = xmodule.modulestore.locations:SlashSeparatedCourseKey',
+            'course-locator = xmodule.modulestore.locator:CourseLocator',
+        ],
+        'usage_key': [
+            'location = xmodule.modulestore.locations:Location',
+            'edx = xmodule.modulestore.locator:BlockUsageLocator',
+        ],
+        'asset_key': [
+            'asset-location = xmodule.modulestore.locations:AssetLocation',
+        ],
+        'definition_key': [
+            'defx = xmodule.modulestore.locator:DefinitionLocator',
         ],
     },
 )

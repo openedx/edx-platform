@@ -94,10 +94,10 @@ to set up a public/private key pair for GNU Privacy Guard (GNUPG).
 * When a data package is available, the data czar downloads it from S3 and
   decrypts it using the private key.
 
-For detailed information on this procedure, see the *How Do I get my Research
-Data Package?* article on the Open edX Analytics wiki_.
+For detailed information on this procedure, see the `How Do I Get My Research
+Data Package?`_ article on the Open edX Analytics wiki.
 
-.. _wiki: https://edx-wiki.atlassian.net/wiki/pages/viewpage.action?pageId=36044863
+.. _How Do I Get My Research Data Package?: https://edx-wiki.atlassian.net/wiki/pages/viewpage.action?pageId=36044863
 
 .. _Resources_Information:
 
@@ -110,11 +110,11 @@ list_ called course-data.
 
 .. _list: http://groups.google.com/a/edx.org/forum/#!forum/course-data
 
-EdX also hosts an **Open edX Analytics** wiki_ that is available to the
+EdX also hosts an `Open edX Analytics wiki`_ that is available to the
 public. The wiki provides links to the engineering roadmap, information about
 operational issues, and release notes describing past releases.
 
-.. _wiki: http://edx-wiki.atlassian.net/wiki/display/OA/Open+edX+Analytics+Home
+.. _Open edX Analytics wiki: http://edx-wiki.atlassian.net/wiki/display/OA/Open+edX+Analytics+Home
 
 .. _Skills_Experience_Contributors:
 

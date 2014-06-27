@@ -39,6 +39,9 @@ $(document).ready(function(){
       
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
+      % if self.stanford_theme_enabled():
+           <%include file="theme-info_research.html" />
+      % endif
     </section>
     <section aria-label="Handout Navigation" class="handouts">
       <h1>${course.info_sidebar_name}</h1>

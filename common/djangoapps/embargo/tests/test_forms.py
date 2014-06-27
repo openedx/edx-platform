@@ -22,8 +22,8 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.true_form_data = {'course_id': self.course.id, 'embargoed': True}
-        self.false_form_data = {'course_id': self.course.id, 'embargoed': False}
+        self.true_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': True}
+        self.false_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': False}
 
     def test_embargo_course(self):
         self.assertFalse(EmbargoedCourse.is_embargoed(self.course.id))
@@ -62,7 +62,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def test_form_typo(self):
         # Munge course id
-        bad_id = self.course.id + '_typo'
+        bad_id = self.course.id.to_deprecated_string() + '_typo'
 
         form_data = {'course_id': bad_id, 'embargoed': True}
         form = EmbargoedCourseForm(data=form_data)
@@ -79,7 +79,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def test_invalid_location(self):
         # Munge course id
-        bad_id = self.course.id.split('/')[-1]
+        bad_id = self.course.id.to_deprecated_string().split('/')[-1]
 
         form_data = {'course_id': bad_id, 'embargoed': True}
         form = EmbargoedCourseForm(data=form_data)
@@ -156,8 +156,8 @@ class IPFilterFormTest(TestCase):
         # should be able to do both ipv4 and ipv6
         # spacing should not matter
         form_data = {
-            'whitelist': '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101',
-            'blacklist': '  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1'
+            'whitelist': '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101, 1.1.0.1/32, 1.0.0.0/24',
+            'blacklist': '  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1, 1.0.0.0/16'
         }
         form = IPFilterForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -167,6 +167,20 @@ class IPFilterFormTest(TestCase):
         for addr in '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
             self.assertIn(addr.strip(), whitelist)
         for addr in '18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
+            self.assertIn(addr.strip(), blacklist)
+
+        # Network tests
+        # ips not in whitelist network
+        for addr in ['1.1.0.2', '1.0.1.0']:
+            self.assertNotIn(addr.strip(), whitelist)
+        # ips in whitelist network
+        for addr in ['1.1.0.1', '1.0.0.100']:
+            self.assertIn(addr.strip(), whitelist)
+        # ips not in blacklist network
+        for addr in ['2.0.0.0', '1.1.0.0']:
+            self.assertNotIn(addr.strip(), blacklist)
+        # ips in blacklist network
+        for addr in ['1.0.100.0', '1.0.0.10']:
             self.assertIn(addr.strip(), blacklist)
 
         # Test clearing by adding an empty list is OK too
@@ -183,15 +197,15 @@ class IPFilterFormTest(TestCase):
     def test_add_invalid_ips(self):
         # test adding invalid ip addresses
         form_data = {
-            'whitelist': '.0.0.1, :dead:beef:::',
-            'blacklist': '  18.244.*  ,  999999:c0a8:101::42'
+            'whitelist': '.0.0.1, :dead:beef:::, 1.0.0.0/55',
+            'blacklist': '  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
         }
         form = IPFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
 
-        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::'] Please fix the error(s) and try again."
+        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55'] Please fix the error(s) and try again."
         self.assertEquals(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
-        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42'] Please fix the error(s) and try again."
+        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/'] Please fix the error(s) and try again."
         self.assertEquals(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The IPFilter could not be created because the data didn't validate."):

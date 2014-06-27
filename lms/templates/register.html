@@ -15,8 +15,7 @@
 <%! from third_party_auth import pipeline, provider %>
 <%! import calendar %>
 
-<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
-
+<%block name="pagetitle">${_("Create your {platform_name} learning and research account!").format(platform_name=platform_name)}</%block>
 <%block name="bodyclass">view-register</%block>
 
 <%block name="js_extra">
@@ -95,8 +94,8 @@
 <section class="introduction">
   <header>
     <h1 class="title">
-      <span class="title-super">${_("Welcome!")}</span>
-      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
+      <span class="title-super">${_("Welcome to the {platform_name} Learning and Research Community").format(platform_name=platform_name)}</span>
+      <span class="title-sub">${_("Create your account")}</span>
     </h1>
   </header>
 </section>
@@ -193,7 +192,7 @@
             <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
             <span class="tip tip-input" id="name-tip">
               % if self.stanford_theme_enabled():
-                ${_("Needed for any Statements of Accomplishment you may earn <strong>(cannot be changed later)</strong>")}
+                ${_("Needed for any Statements of Accomplishment you may earn")}
               % else:
                 ${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")} 
               % endif
@@ -324,7 +323,9 @@
           % endif
         </ol>
       </div>
-
+      % if self.stanford_theme_enabled():
+          <%include file='theme-register-research.html' />
+      % endif
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
 
@@ -347,7 +348,7 @@
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
                 ## TODO: provide a better way to override these links
-                if self.theme_enabled():
+                if self.stanford_theme_enabled():
                   honor_code_path = marketing_link('TOS') + "#honor"
                 else:
                   honor_code_path = marketing_link('HONOR')

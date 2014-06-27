@@ -2,10 +2,8 @@
 Student Views
 """
 import datetime
-import json
 import logging
 import re
-import urllib
 import uuid
 import time
 from collections import defaultdict
@@ -17,7 +15,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
-from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
@@ -29,6 +26,7 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
 from django.template.response import TemplateResponse
@@ -46,16 +44,15 @@ from student.models import (
     create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
-from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from dark_lang.models import DarkLangConfig
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -90,11 +87,11 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
+from xmodule.error_module import ErrorDescriptor
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-Article = namedtuple('Article', 'title url author image deck publication publish_date')
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
 def csrf_token(context):
@@ -146,25 +143,6 @@ def index(request, extra_context={}, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def course_from_id(course_id):
-    """Return the CourseDescriptor corresponding to this course_id"""
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    return modulestore().get_instance(course_id, course_loc)
-
-day_pattern = re.compile(r'\s\d+,\s')
-multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
-
-
-def _get_date_for_press(publish_date):
-    # strip off extra months, and just use the first:
-    date = re.sub(multimonth_pattern, ", ", publish_date)
-    if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y").replace(tzinfo=UTC)
-    else:
-        date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
-    return date
-
-
 def embargo(_request):
     """
     Render the embargo page.
@@ -181,18 +159,7 @@ def embargo(_request):
 
 
 def press(request):
-    json_articles = cache.get("student_press_json_articles")
-    if json_articles is None:
-        if hasattr(settings, 'RSS_URL'):
-            content = urllib.urlopen(settings.PRESS_URL).read()
-            json_articles = json.loads(content)
-        else:
-            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
-            json_articles = json.loads(content)
-        cache.set("student_press_json_articles", json_articles)
-    articles = [Article(**article) for article in json_articles]
-    articles.sort(key=lambda item: _get_date_for_press(item.publish_date), reverse=True)
-    return render_to_response('static_templates/press.html', {'articles': articles})
+    return render_to_response('static_templates/press.html')
 
 
 def process_survey_link(survey_link, user):
@@ -285,8 +252,8 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        try:
-            course = course_from_id(enrollment.course_id)
+        course = modulestore().get_course(enrollment.course_id)
+        if course and not isinstance(course, ErrorDescriptor):
 
             # if we are in a Microsite, then filter out anything that is not
             # attributed (by ORG) to that Microsite
@@ -298,15 +265,25 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
                 continue
 
             yield (course, enrollment)
-        except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+        else:
+            log.error("User {0} enrolled in {2} course {1}".format(
+                        user.username, enrollment.course_id, "broken" if course else "non-existent"
+                     ))
 
 
 def _cert_info(user, course, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
     """
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.regenerating: 'generating',
+        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.notpassing: 'notpassing',
+        CertificateStatuses.restricted: 'restricted',
+    }
+
     default_status = 'processing'
 
     default_info = {'status': default_status,
@@ -317,15 +294,6 @@ def _cert_info(user, course, cert_status):
 
     if cert_status is None:
         return default_info
-
-    # simplify the status for the template using this lookup table
-    template_state = {
-        CertificateStatuses.generating: 'generating',
-        CertificateStatuses.regenerating: 'generating',
-        CertificateStatuses.downloadable: 'ready',
-        CertificateStatuses.notpassing: 'notpassing',
-        CertificateStatuses.restricted: 'restricted',
-    }
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -372,7 +340,7 @@ def signin_user(request):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
@@ -408,7 +376,7 @@ def register_user(request, extra_context=None):
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
-        return redirect(reverse('root'))
+        return external_auth.views.redirect_with_get('root', request.GET)
 
     context = {
         'course_id': request.GET.get('course_id'),
@@ -501,13 +469,13 @@ def dashboard(request):
     # Global staff can see what courses errored on their dashboard
     staff_access = False
     errored_courses = {}
-    if has_access(user, 'global', 'staff'):
+    if has_access(user, 'staff', 'global'):
         # Show any courses that errored on load
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                          if has_access(request.user, course, 'load'))
+                                          if has_access(request.user, 'load', course))
 
     course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
@@ -603,8 +571,11 @@ def _create_and_login_nonregistered_user(request):
 
 @require_POST
 def setup_sneakpeek(request, course_id):
-    if not CoursePreference.course_allows_nonregistered_access(course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    if not CoursePreference.course_allows_nonregistered_access(course_key):
         return HttpResponseForbidden("Cannot access the course")
+
     if not request.user.is_authenticated():
         # if there's no user, create a nonregistered user
         _create_and_login_nonregistered_user(request)
@@ -612,15 +583,16 @@ def setup_sneakpeek(request, course_id):
         # registered users can't sneakpeek, so log them out and create a new nonregistered user
         logout(request)
         _create_and_login_nonregistered_user(request)
+        # fall-through case is a sneakpeek user that's already logged in
 
     can_enroll, error_msg = _check_can_enroll_in_course(request.user,
-                                                        course_id,
+                                                        course_key,
                                                         access_type='within_enrollment_period')
     if not can_enroll:
         log.error(error_msg)
         return HttpResponseBadRequest(error_msg)
 
-    CourseEnrollment.enroll(request.user, course_id)
+    CourseEnrollment.enroll(request.user, course_key)
     return HttpResponse("OK. Allowed sneakpeek")
 
 
@@ -670,9 +642,10 @@ def change_enrollment(request):
     user = request.user
 
     action = request.POST.get("enrollment_action")
-    course_id = request.POST.get("course_id")
-    if course_id is None:
+    if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
 
     if not UserProfile.has_registered(user):
         return HttpResponseForbidden()
@@ -681,7 +654,7 @@ def change_enrollment(request):
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         try:
-            course = course_from_id(course_id)
+            course = modulestore().get_course(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
@@ -703,7 +676,7 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': course_id})
+                reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()})
             )
 
         current_mode = available_modes[0]
@@ -719,7 +692,7 @@ def change_enrollment(request):
         # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
         # whether things got added, etc
 
-        shoppingcart.views.add_course_to_cart(request, course_id)
+        shoppingcart.views.add_course_to_cart(request, course_id.to_deprecated_string())
         return HttpResponse(
             reverse("shoppingcart.views.show_cart")
         )
@@ -733,19 +706,19 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
-def _check_can_enroll_in_course(user, course_id, access_type="enroll"):
+def _check_can_enroll_in_course(user, course_key, access_type="enroll"):
     """
     Refactored check for user being able to enroll in course
     Returns (bool, error_message), where error message is only applicable if bool == False
     """
     try:
-        course = course_from_id(course_id)
+        course = modulestore().get_course(course_key)
     except ItemNotFoundError:
         log.warning("User {0} tried to enroll in non-existent course {1}"
-                    .format(user.username, course_id))
+                    .format(user.username, course_key))
         return False, _("Course id is invalid")
 
-    if not has_access(user, course, access_type):
+    if not has_access(user, access_type, course):
         return False, _("Enrollment is closed")
 
     return True, ""
@@ -759,7 +732,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
-        return m_obj.group('course_id')
+        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
 
 
@@ -769,13 +742,14 @@ def _get_course_enrollment_domain(course_id):
     @param course_id:
     @return:
     """
-    try:
-        course = course_from_id(course_id)
-        return course.enrollment_domain
-    except ItemNotFoundError:
+    course = modulestore().get_course(course_id)
+    if course is None:
         return None
 
+    return course.enrollment_domain
 
+
+@never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
     """
@@ -785,9 +759,9 @@ def accounts_login(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so redirect
-        # to branding and allow that to process the login.
-        return redirect(reverse('root'))
+        # SSL login doesn't require a view, so login
+        # directly here
+        return external_auth.views.ssl_login(request)
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
@@ -1454,6 +1428,9 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
+    course_key = None
+    if course_id:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1489,12 +1466,12 @@ def auto_auth(request):
     reg.save()
 
     # Enroll the user in a course
-    if course_id is not None:
-        CourseEnrollment.enroll(user, course_id)
+    if course_key is not None:
+        CourseEnrollment.enroll(user, course_key)
 
     # Apply the roles
     for role_name in role_names:
-        role = Role.objects.get(name=role_name, course_id=course_id)
+        role = Role.objects.get(name=role_name, course_id=course_key)
         user.roles.add(role)
 
     # Log in as the user
@@ -1941,39 +1918,17 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
-        optout_object = Optout.objects.filter(user=user, course_id=course_id)
+        optout_object = Optout.objects.filter(user=user, course_id=course_key)
         if optout_object:
             optout_object.delete()
         log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
     else:
-        Optout.objects.get_or_create(user=user, course_id=course_id)
+        Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
-
-
-@login_required
-def token(request):
-    '''
-    Return a token for the backend of annotations.
-    It uses the course id to retrieve a variable that contains the secret
-    token found in inheritance.py. It also contains information of when
-    the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend.
-    '''
-    course_id = request.GET.get("course_id")
-    course = course_from_id(course_id)
-    dtnow = datetime.datetime.now()
-    dtutcnow = datetime.datetime.utcnow()
-    delta = dtnow - dtutcnow
-    newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
-    newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    secret = course.annotation_token_secret
-    custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": request.user.email, "ttl": 86400}
-    newtoken = create_token(secret, custom_data)
-    response = HttpResponse(newtoken, mimetype="text/plain")
-    return response

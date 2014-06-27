@@ -15,7 +15,7 @@ from verify_student.models import SoftwareSecurePhotoVerification
 import json
 import random
 import logging
-import lxml.html
+import lxml
 from lxml.etree import XMLSyntaxError, ParserError
 from xmodule.modulestore import Location
 
@@ -132,7 +132,7 @@ class XQueueCertInterface(object):
 
         Arguments:
           student   - User.object
-          course_id - courseenrollment.course_id (string)
+          course_id - courseenrollment.course_id (CourseKey)
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
@@ -179,23 +179,22 @@ class XQueueCertInterface(object):
             self.request.user = student
             self.request.session = {}
 
-            course_name = course.display_name or course_id
+            course_name = course.display_name or course_id.to_deprecated_string()
             is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
             grade = grades.grade(student, self.request, course)
-            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
+            enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
             mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
             user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
             user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)
-            course_id_dict = Location.parse_course_id(course_id)
             cert_mode = enrollment_mode
             if (mode_is_verified and user_is_verified and user_is_reverified):
-                template_pdf = "certificate-template-{org}-{course}-verified.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
             elif (mode_is_verified and not (user_is_verified and user_is_reverified)):
-                template_pdf = "certificate-template-{org}-{course}.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
                 cert_mode = GeneratedCertificate.MODES.honor
             else:
                 # honor code and audit students
-                template_pdf = "certificate-template-{org}-{course}.pdf".format(**course_id_dict)
+                template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
             if forced_grade:
                 grade['grade'] = forced_grade
 
@@ -207,14 +206,14 @@ class XQueueCertInterface(object):
             cert.course_id = course_id
             cert.name = profile_name
             # Strip HTML from grade range label
-            grade_text = grade.get('grade', None)
+            grade_contents = grade.get('grade', None)
             try:
-                grade_text = lxml.html.fromstring(grade_text).text_content()
+                grade_contents = lxml.html.fromstring(grade_contents).text_content()
             except (TypeError, XMLSyntaxError, ParserError) as e:
-                # Despite blowing up the xml parser, bad values here are fine
-                grade_text = None
+                #   Despite blowing up the xml parser, bad values here are fine
+                grade_contents = None
 
-            if is_whitelisted or grade_text is not None:
+            if is_whitelisted or grade_contents is not None:
 
                 # check to see whether the student is on the
                 # the embargoed country restricted list
@@ -231,10 +230,10 @@ class XQueueCertInterface(object):
                     contents = {
                         'action': 'create',
                         'username': student.username,
-                        'course_id': course_id,
+                        'course_id': course_id.to_deprecated_string(),
                         'course_name': course_name,
                         'name': profile_name,
-                        'grade': grade_text,
+                        'grade': grade_contents,
                         'template_pdf': template_pdf,
                         'designation':  profile_title,
                     }

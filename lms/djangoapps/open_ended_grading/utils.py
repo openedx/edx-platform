@@ -1,4 +1,3 @@
-import json
 import logging
 
 from xmodule.modulestore import search
@@ -50,20 +49,25 @@ def generate_problem_url(problem_url_parts, base_course_url):
     problem_url = base_course_url + "/"
     for i, part in enumerate(problem_url_parts):
         if part is not None:
+            # This is the course_key. We need to turn it into its deprecated
+            # form.
+            if i == 0:
+                part = part.to_deprecated_string()
+            # This is placed between the course id and the rest of the url.
             if i == 1:
                 problem_url += "courseware/"
             problem_url += part + "/"
     return problem_url
 
 
-def does_location_exist(course_id, location):
+def does_location_exist(usage_key):
     """
     Checks to see if a valid module exists at a given location (ie has not been deleted)
     course_id - string course id
     location - string location
     """
     try:
-        search.path_to_location(modulestore(), course_id, location)
+        search.path_to_location(modulestore(), usage_key)
         return True
     except ItemNotFoundError:
         # If the problem cannot be found at the location received from the grading controller server,
@@ -71,10 +75,9 @@ def does_location_exist(course_id, location):
         return False
     except NoPathToItem:
         # If the problem can be found, but there is no path to it, then we assume it is a draft.
-        # Log a warning if the problem is not a draft (location does not end in "draft").
-        if not location.endswith("draft"):
-            log.warn(("Got an unexpected NoPathToItem error in staff grading with a non-draft location {0}. "
-                      "Ensure that the location is valid.").format(location))
+        # Log a warning in any case.
+        log.warn("Got an unexpected NoPathToItem error in staff grading with location %s. "
+                 "This is ok if it is a draft; ensure that the location is valid.", usage_key)
         return False
 
 
@@ -156,7 +159,8 @@ class StudentProblemList(object):
         for problem in self.problem_list:
             try:
                 # Try to load the problem.
-                problem_url_parts = search.path_to_location(modulestore(), self.course_id, problem['location'])
+                usage_key = self.course_id.make_usage_key_from_deprecated_string(problem['location'])
+                problem_url_parts = search.path_to_location(modulestore(), usage_key)
             except (ItemNotFoundError, NoPathToItem):
                 # If the problem cannot be found at the location received from the grading controller server,
                 # it has been deleted by the course author. We should not display it.

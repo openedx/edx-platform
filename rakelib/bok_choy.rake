@@ -147,7 +147,7 @@ def run_bok_choy(test_spec)
     # Construct the nosetests command, specifying where to save screenshots and XUnit XML reports
     cmd = [
         "SCREENSHOT_DIR='#{BOK_CHOY_LOG_DIR}'", "nosetests", test_spec,
-        "--with-xunit", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}", "--verbosity=2"
+        "--with-xunit", "--with-flaky", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}", "--verbosity=2"
     ]
 
     # Configure parallel test execution, if specified
@@ -174,23 +174,32 @@ end
 
 namespace :'test:bok_choy' do
 
-    # Check that required services are running
-    task :check_services do
+    # Check that mongo is running
+    task :check_mongo do
         if not is_mongo_running()
             fail("Mongo is not running locally.")
         end
+    end
 
+    # Check that memcache is running
+    task :check_memcache do
         if not is_memcache_running()
             fail("Memcache is not running locally.")
         end
+    end
 
+    # Check that mysql is running
+    task :check_mysql do
         if not is_mysql_running()
             fail("MySQL is not running locally.")
         end
     end
 
+    # Check that all required services are running
+    task :check_services => [:check_mongo, :check_memcache, :check_mysql]
+
     desc "Process assets and set up database for bok-choy tests"
-    task :setup => [:check_services, :install_prereqs, BOK_CHOY_LOG_DIR] do
+    task :setup => [:check_mysql, :install_prereqs, BOK_CHOY_LOG_DIR] do
 
         # Reset the database
         sh("#{REPO_ROOT}/scripts/reset-test-db.sh")

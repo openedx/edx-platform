@@ -113,16 +113,15 @@ company that provides captioning services. EdX works with `3Play Media
 <http://www.3playmedia.com>`_. `YouTube <http://www.youtube.com/>`_ also
 provides captioning services.
 
-In addition to your .srt file, you can provide other transcripts with your
-video. For example, you can provide downloadable transcripts in a text format
-such as .txt or .pdf, and you can provide transcripts in different languages.
-For more information, see :ref:`Additional Transcripts`.
+When you upload an .srt file, a .txt file is created automatically. You can allow students to download either the .srt file or the .txt file. You can also provide transcripts in different formats, such as .pdf, and you can provide transcripts in different languages. For more information, see :ref:`Additional Transcripts`.
 
-If you provide transcripts for students to download, a **Download transcript**
+If you allow your students to download transcripts, a **Download transcript**
 button appears under the video. Students can then select either **SubRip (.srt)
 file** or **Text (.txt) file** to download the .srt or .txt transcript.
 
-.. image:: ../Images/transcript-download.png
+.. image:: /Images/Video_DownTrans_srt-txt.png
+   :width: 500
+   :alt: Video status bar showing srt and txt transcript download options
 
 .. note:: Some past courses have used .sjson files for video transcripts. If
  transcripts in your course uses this format, see :ref:`Steps for sjson
@@ -141,8 +140,8 @@ Because YouTube is not available in all locations, however, we recommend that
 you also post copies of your videos on a third-party site such as `Amazon S3
 <http://aws.amazon.com/s3/>`_. When a student views  a video in your course, if
 YouTube is not available in that student’s location or if the YouTube video
-doesn’t play, the video on the backup site starts playing automatically. The
-student can also click a link to download the video from the backup site.
+doesn’t play, the video on the backup site starts playing automatically. You can also allow the
+student to download the video from the backup site.
 
 After you post your video online, make sure you have the URL for the video. If
 you host copies of your video in more than one place, make sure you have the URL
@@ -171,8 +170,6 @@ site where you post the videos may have to handle a lot of traffic.
  .mp4, .mpeg, .ogg, or .webm. EdX can't support videos that you post on sites
  such as Vimeo.
 
-
-
 .. _Create a Video Component:
 
 ********************************
@@ -186,42 +183,44 @@ Step 4. Create a Video Component
 
    .. image:: ../Images/VideoComponentEditor.png
     :alt: Image of the video component editor
+    :width: 500
 
    You'll replace the default values with your own. 
    
-#. In the **Display Name** field, enter the name you want students to see when
+#. In the **Component Display Name** field, enter the name you want students to see when
    they hover the mouse over the unit in the course ribbon. This text also
    appears as a header for the video.
 
-#. In the **Video URL** field, enter the URL of the video. For example, the URL
+#. In the **Default Video URL** field, enter the URL of the video. For example, the URL
    may resemble one of the following.
 
    ::
    
       http://youtu.be/OEoXaMPEzfM
       http://www.youtube.com/watch?v=OEoXaMPEzfM
-      https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4	
+      https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4
+      https://s3.amazonaws.com/edx-videos/edx101/video4.webm	
 
+   .. note:: To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. To do this, you can post additional versions of your videos on the Internet, then add the URLs for these versions below the default video URL. **These URLs cannot be YouTube URLs**. To add a URL for another version, click **Add URLs for additional versions**. The first listed video that's compatible with the student's computer will play.
 
-#. Next to **Timed Transcript**, select an option.
+#. Next to **Default Timed Transcript**, select an option.
 
    - If edX already has a transcript for your video--for example, if you're
      using a video from an existing course--Studio automatically finds the
      transcript and associates the transcript with the video.
      
-     If you want to modify the transcript, click **Download to Edit**. You can
-     then make your changes and upload the new file by clicking **Upload New
-     Timed Transcript**.
+     If you want to modify the transcript, click **Download Transcript for Editing**. You can then make your changes and upload the new file by clicking **Upload New Transcript**.
 
-   - If your video has a transcript on YouTube, Studio automatically finds the
+   - If edX doesn't have a transcript for the video, but YouTube has a transcript, Studio automatically finds the YouTube
      transcript and asks if you want to import it. To use this YouTube
-     transcript, click **Import from YouTube**. (If you want to modify the
-     YouTube transcript, after Studio imports the transcript, click **Download
-     to Edit**. You can then make your changes and upload the new file by
-     clicking **Upload New Timed Transcript**.)
+     transcript, click **Import YouTube Transcript**. (If you want to modify the
+     YouTube transcript, import the YouTube transcript into Studio, and then click **Download Transcript for Editing**. You can then make your changes and upload the new file by
+     clicking **Upload New Transcript**.)
+
+   - If both edX and YouTube have a transcript for your video, but the edX transcript is out of date, you'll receive a message asking if you want to replace the edX transcript with the YouTube transcript. To use the YouTube transcript, click **Yes, replace the edX transcript with the YouTube transcript**.
 
    - If neither edX nor YouTube has a transcript for your video, and your
-     transcript uses the .srt format, click **Upload New Timed Transcript** to
+     transcript uses the .srt format, click **Upload New Transcript** to
      upload the transcript file from your computer.
 
      .. note:: 
@@ -229,13 +228,13 @@ Step 4. Create a Video Component
         * If your transcript uses the .sjson format, do not use this setting.
           For more information, see :ref:`Steps for sjson files`.
 
-        * If you want to provide a transcript in a format such as .txt or .pdf,
+        * If you want to provide a transcript in a format such as .pdf,
           do not use this setting to upload the transcript. For more
           information, see :ref:`Additional Transcripts`.
     
 
 #. Optionally, click **Advanced** to set more options for the video. For a
-   description of each option, see the list below.
+   description of each option, see :ref:`Video Advanced Options`.
 
 #. Click **Save.**
   
@@ -247,61 +246,39 @@ Advanced Options
 
 The following options appear on the **Advanced** tab in the Video component.
 
-* **Display Name**: The name that you want your students to see. This is the
-  same as the **Display Name** field on the **Basic** tab.
+.. list-table::
+    :widths: 30 70
 
-* **Download Transcript**: The URL for the transcript file for the video. This
-  file is usually an .srt file, but can also be a .txt or .pdf file. (For more
-  information about .txt and .pdf files, see :ref:`Additional Transcripts`.) The
-  URL can be an external URL, such as **http://example.org/transcript.srt**, or
-  the URL for a file that you've uploaded to your **Files & Uploads** page, such
-  as **/static/example.srt**.
+    * - **Component Display Name**
+      - The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
+    * - **Default Timed Transcript**
+      -  The name of the transcript file that's used in the **Default Timed Transcript** field on the **Basic** tab. This field is auto-populated. You don't have to change this setting.
+    * - **Download Transcript Allowed**
+      - Specifies whether you want to allow students to download the timed transcript. If you set this value to **True**, a link to download the file appears below the video. 
 
-  This setting is related to **Transcript Download Allowed**. 
+        By default, Studio creates a .txt transcript when you upload an .srt transcript. Students can download the .srt or .txt versions of the transcript when you set **Download Transcript Allowed** to **True**. If you want to provide the transcript for download in a different format as well, such as .pdf, upload a file to Studio by using the **Upload Handout** field. 
 
-  * If you set **Transcript Download Allowed** to **True**, and you specify a
-    file in the **Download Transcript** field, the file you've specified will be
-    available for students to download.
+    * - **Downloadable Transcript URL**
+      - The URL for a non-.srt version of the transcript file posted on the **Files & Uploads** page or on the Internet. Students see a link to download the non-.srt transcript below the video. 
 
-  * If you set **Transcript Download Allowed** to **True**, but you leave the
-    **Download Transcript** field blank, the .srt transcript that automatically
-    plays with the video will be available.
+        .. note:: When you add a transcript to this field, only the transcript that you add is available for download. The .srt and .txt transcripts become unavailable. If you want to provide a downloadable transcript in a format other than .srt, we recommend that you upload a handout for students by using the **Upload Handout** field. For more information, see :ref:`Additional Transcripts`.
 
-* **End Time**: The time, formatted as hours, minutes, and seconds (HH:MM:SS),
-  when you want the video to end.
-
-* **Start Time**: The time, formatted as hours, minutes, and seconds (HH:MM:SS),
-  when you want the video to begin.
-
-* **Transcript (primary)**: The name of the .srt file from the **Timed
-  Transcript** field on the **Basic** tab. This field is auto-populated. You
-  don't have to change this setting.
-  
-  If your transcript uses an .sjson file, see :ref:`Steps for sjson files`.
-
-* **Transcript Display**: Specifies whether you want the transcript to show by
-  default. Students can always turn transcripts on or off while they watch the
-  video.
-
-
-* **Transcript Download Allowed**: Specifies whether you want to allow your
-  students to download a copy of the transcript.
-
-* **Transcript Translations**: The transcript files for any additional
-  languages. For more information, see :ref:`Transcripts in Additional
-  Languages`.
-
-* **Video Download Allowed**: Specifies whether you want to allow your students
-  to download a copy of the video.
-
-* **Video Sources**: Additional locations where you've posted the video. This
-  field must contain a URL that ends in .mpeg, .mp4, .ogg, or .webm.
-
-* **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube
-  ID for 1.5x speed**: If you have uploaded separate videos to YouTube for
-  different speeds of your video, enter the YouTube IDs for these videos in
-  these fields.
-
+    * - **Show Transcript**
+      - Specifies whether the transcript plays along with the video by default.
+    * - **Transcript Languages**
+      - The transcript files for any additional languages. For more information, see :ref:`Transcripts in Additional Languages`.
+    * - **Upload Handout**
+      - Allows you to upload a handout to accompany this video. Your handout can be in any format. Students can download the handout by clicking **Download Handout** under the video.
+    * - **Video Download Allowed**
+      - Specifies whether students can download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. If you set this value to **True**, you must add at least one non-YouTube URL in the **Video File URLs** field. 
+    * - **Video File URLs**
+      - The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, you must set **Video Download Allowed** to **True**.
+    * - **Video Start Time**
+      - The time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59.
+    * - **Video Stop Time**
+      - The time you want the video to stop if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59.
+    * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
+      - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields. These settings are optional, for older browsers.
 
 .. _Additional Transcripts:
 
@@ -309,16 +286,35 @@ The following options appear on the **Advanced** tab in the Video component.
 Additional Transcripts
 **********************
 
-You can provide your students with a downloadable transcript in a format such as
-.txt or .pdf in addition to the .srt transcript that plays along with the video.
+By default, a .txt file is created when you upload an .srt file, and students can download an .srt or .txt transcript when you set **Download Transcript Allowed** to **True**. The **Download Transcript** button appears below the video, and students see the .srt and .txt options when they hover over the button.
 
-#. Upload the .txt or .pdf transcript to the **Files & Uploads** page or host it
-   on an external website.
+.. image:: /Images/Video_DownTrans_srt-txt.png
+   :width: 500
+   :alt: Video status bar showing srt and txt transcript download options
 
+If you want to provide a downloadable transcript in a format such as .pdf along with the .srt and .txt transcripts, we recommend that you use the **Upload Handout** field. When you do this, a **Download Handout** button appears to the right of the **Download Transcript** button, and students can download the .srt, .txt, or handout version of the transcript.
+
+.. image:: /Images/Video_DownTrans_srt-handout.png
+   :width: 500
+   :alt: Video status bar showing srt, txt, and handout transcript download options
+
+To add a downloadable transcript by using the **Upload Handout** field:
+
+#. Create or obtain your transcript as a .pdf or in another format.
 #. In the Video component, click the **Advanced** tab.
+#. Locate **Upload Handout**, and then click **Upload**.
+#. In the **Upload File** dialog box, click **Choose File**.
+#. In the dialog box, select the file on your computer, and then click **Open**.
+#. In the **Upload File** dialog box, click **Upload**.
 
-#. In the **Download Transcript** field, enter the URL for the transcript. For
-   more information, see :ref:`Video Advanced Options`.
+
+Before Studio added the **Upload Handout** feature, some courses posted transcript files on the **Files & Uploads** page or on the Internet, and then added a link to those files in the Video component. **We no longer recommend this method.**  When you use this method, the **Download Transcript** button appears, but only the transcript that you add is available for download. The .srt and .txt transcripts become unavailable. 
+
+.. image:: /Images/Video_DownTrans_other.png
+   :width: 500
+   :alt: Video status bar showing Download Transcript button without srt and txt options
+
+If you want to use this method, you can post your transcript online, and then add the URL to the transcript in the **Downloadable Transcript URL** field. However, bear in mind that students will not be able to download .srt or .txt transcripts.
 
 .. _Transcripts in Additional Languages:
 
@@ -381,7 +377,7 @@ the Video component.
 #. Upload the .sjson file for your video to the **Files & Uploads** page.
 #. Create a new video component.
 #. On the **Basic** tab, enter the name that you want students to see in the
-   **Display Name** field.
+   **Component Display Name** field.
 #. In the **Video URL** field, enter the URL of the video. For example, the URL
    may resemble one of the following.
 
@@ -392,7 +388,7 @@ the Video component.
       https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4
 
 #. Click the **Advanced** tab.
-#. In the **Transcript (primary)** field, enter the file name of your video. Do
+#. In the **Default Timed Transcript** field, enter the file name of your video. Do
    not include `subs_` or `.sjson`. For the example in step 2, you would only
    enter **Lecture1a**.
 #. Set the other options that you want.

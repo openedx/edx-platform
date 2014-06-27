@@ -86,18 +86,17 @@ To enroll students or staff members:
 
 #. View the live version of your course.
 
-#. Click **Instructor** then **Try New Beta Dashboard**.
+#. Click **Instructor**, then click **Membership**. 
 
-#. Click **Membership**. 
-
-#. In the **Batch Enrollment** section of the page, enter an email address or
-   multiple addresses separated by commas or line feeds.
+#. In the **Batch Enrollment** section of the page, enter the username or email
+   address of the student, or enter multiple names or addresses separated by
+   commas or new lines.
 
   You can copy and paste data from a CSV file of email addresses. However,
   note that this feature is better suited to courses with smaller enrollments,
   rather than courses with massive enrollments.
 
-5. To streamline the course enrollment process, leave **Auto Enroll** selected.
+4. To streamline the course enrollment process, leave **Auto Enroll** selected.
 
 #. To send students an email message, leave **Notify students by email**
    selected.
@@ -128,9 +127,7 @@ To view the enrollment count for a course:
 
 #. View the live version of your course.
 
-#. Click **Instructor** then **Try New Beta Dashboard**.
-
-#. Click **Course Info** if necessary. 
+#. Click **Instructor**, then click **Course Info** if necessary. 
 
   The **Enrollment Information** section of the page that opens shows the total
   number of people who are currently enrolled.
@@ -159,8 +156,8 @@ To unenroll students, you supply the email addresses of enrolled students.
 
 #. Click **Membership**. 
 
-#. In the **Batch Enrollment** section of the page, enter an email address or
-   multiple addresses separated by commas or line feeds.
+#. In the **Batch Enrollment** section of the page, enter a username or an email
+   address, or multiple names or addresses separated by commas or new lines.
 
 #. To send students an email message, leave **Notify students by email**
    selected.

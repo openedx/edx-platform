@@ -4,6 +4,7 @@ Tools for the instructor dashboard
 import dateutil
 import json
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import utc
@@ -11,6 +12,10 @@ from django.utils.translation import ugettext as _
 
 from courseware.models import StudentModule
 from xmodule.fields import Date
+from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore
+
+from bulk_email.models import CourseAuthorization
 
 DATE_FIELD = Date()
 
@@ -43,6 +48,24 @@ def handle_dashboard_error(view):
             return error.response()
 
     return wrapper
+
+
+def bulk_email_is_enabled_for_course(course_id):
+    """
+    Staff can only send bulk email for a course if all the following conditions are true:
+    1. Bulk email feature flag is on.
+    2. It is a studio course.
+    3. Bulk email is enabled for the course.
+    """
+
+    bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] == True)
+    is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
+    bulk_email_enabled_for_course = CourseAuthorization.instructor_email_enabled(course_id)
+
+    if bulk_email_enabled_globally and is_studio_course and bulk_email_enabled_for_course:
+        return True
+
+    return False
 
 
 def strip_if_string(value):
@@ -88,7 +111,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if node.location.url() == url:
+        if node.location.to_deprecated_string() == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -132,7 +155,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = node.location.url()
+        title = node.location.to_deprecated_string()
     return title
 
 
@@ -148,7 +171,7 @@ def set_due_date_extension(course, unit, student, due_date):
             student_module = StudentModule.objects.get(
                 student_id=student.id,
                 course_id=course.id,
-                module_state_key=node.location.url()
+                module_state_key=node.location
             )
 
             state = json.loads(student_module.state)
@@ -173,7 +196,7 @@ def dump_module_extensions(course, unit):
     header = [_("Username"), _("Full Name"), _("Extended Due Date")]
     query = StudentModule.objects.filter(
         course_id=course.id,
-        module_state_key=unit.location.url())
+        module_state_key=unit.location)
     for module in query:
         state = json.loads(module.state)
         extended_due = state.get("extended_due")
@@ -202,20 +225,22 @@ def dump_student_extensions(course, student):
     data = []
     header = [_("Unit"), _("Extended Due Date")]
     units = get_units_with_due_date(course)
-    units = dict([(u.location.url(), u) for u in units])
+    units = dict([(u.location, u) for u in units])
     query = StudentModule.objects.filter(
         course_id=course.id,
         student_id=student.id)
     for module in query:
         state = json.loads(module.state)
-        if module.module_state_key not in units:
+        # temporary hack: module_state_key is missing the run but units are not. fix module_state_key
+        module_loc = module.module_state_key.map_into_course(module.course_id)
+        if module_loc not in units:
             continue
         extended_due = state.get("extended_due")
         if not extended_due:
             continue
         extended_due = DATE_FIELD.from_json(extended_due)
         extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
-        title = title_or_url(units[module.module_state_key])
+        title = title_or_url(units[module_loc])
         data.append(dict(zip(header, (title, extended_due))))
     return {
         "header": header,

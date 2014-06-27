@@ -1,66 +1,68 @@
 # Configuration for i18n workflow.
 
-# All project are listed here, but ones that do not yet have any reviewed translations
-# we don't pull so are commented out.
-
 locales:
     - en  # English - Source Language
     - ar  # Arabic
-#    - az  # Azerbaijani
-#    - bg_BG  # Bulgarian (Bulgaria)
-#    - bn  # Bengali
-#    - bn_BD  # Bengali (Bangladesh)
-#    - bs  # Bosnian
+    - az  # Azerbaijani
+    - bg_BG  # Bulgarian (Bulgaria)
+    - bn_BD  # Bengali (Bangladesh)
+    - bn_IN  # Bengali (India)
+    - bs  # Bosnian
     - ca  # Catalan
-#    - ca@valencia  # Catalan (Valencia)
+    - ca@valencia  # Catalan (Valencia)
     - cs  # Czech
-#    - cy  # Welsh
+    - cy  # Welsh
+    - da  # Danish
     - de_DE  # German (Germany)
-#    - el  # Greek
+    - el  # Greek
     - en@lolcat  # LOLCAT English
     - en@pirate  # Pirate English
     - es_419  # Spanish (Latin America)
-#    - es_AR  # Spanish (Argentina)
-#    - es_EC  # Spanish (Ecuador)
+    - es_AR  # Spanish (Argentina)
+    - es_EC  # Spanish (Ecuador)
     - es_ES  # Spanish (Spain)
-#    - es_MX  # Spanish (Mexico)
-#    - es_PE  # Spanish (Peru)
-#    - es_US  # Spanish (United States)
-#    - et_EE  # Estonian (Estonia)
-#    - eu_ES  # Basque (Spain)
-#    - fa  # Persian
-#    - fa_IR  # Persian (Iran)
-#    - fi_FI  # Finnish (Finland)
+    - es_MX  # Spanish (Mexico)
+    - es_PE  # Spanish (Peru)
+    - et_EE  # Estonian (Estonia)
+    - eu_ES  # Basque (Spain)
+    - fa  # Persian
+    - fa_IR  # Persian (Iran)
+    - fi_FI  # Finnish (Finland)
     - fr  # French
-#    - gl  # Galician
-#    - he  # Hebrew
+    - gl  # Galician
+    - gu  # Gujarati
+    - he  # Hebrew
     - hi  # Hindi
-#    - hu  # Hungarian
+    - hr  # Croatian
+    - hu  # Hungarian
     - hy_AM  # Armenian (Armenia)
     - id  # Indonesian
     - it_IT  # Italian (Italy)
     - ja_JP  # Japanese (Japan)
-#    - kk_KZ  # Kazakh (Kazakhstan)
-#    - km_KH  # Khmer (Cambodia)
+    - kk_KZ  # Kazakh (Kazakhstan)
+    - km_KH  # Khmer (Cambodia)
+    - kn  # Kannada
     - ko_KR  # Korean (Korea)
     - lt_LT  # Lithuanian (Lithuania)
-#    - ml  # Malayalam
-#    - mn  # Mongolian
-#    - ms  # Malay
+    - ml  # Malayalam
+    - mn  # Mongolian
+    - ms  # Malay
     - nb  # Norwegian Bokmål
-#    - ne  # Nepali
+    - ne  # Nepali
     - nl_NL  # Dutch (Netherlands)
+    - or  # Oriya
     - pl  # Polish
     - pt_BR  # Portuguese (Brazil)
-#    - pt_PT  # Portuguese (Portugal)
-#    - ru  # Russian
-#    - si  # Sinhala
-#    - sk  # Slovak
+    - pt_PT  # Portuguese (Portugal)
+    - ro  # Romanian
+    - ru  # Russian
+    - si  # Sinhala
+    - sk  # Slovak
     - sl  # Slovenian
-#    - th  # Thai
+    - th  # Thai
     - tr_TR  # Turkish (Turkey)
     - uk  # Ukranian
-#    - ur  # Urdu
+    - ur  # Urdu
     - vi  # Vietnamese
     - zh_CN  # Chinese (China)
     - zh_TW  # Chinese (Taiwan)

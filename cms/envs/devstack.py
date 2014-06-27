@@ -4,6 +4,10 @@ Specific overrides to the base prod settings to make development easier.
 
 from .aws import * # pylint: disable=wildcard-import, unused-wildcard-import
 
+# Don't use S3 in devstack, fall back to filesystem
+del DEFAULT_FILE_STORAGE
+MEDIA_ROOT = "/edx/var/edxapp/uploads"
+
 DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
@@ -59,7 +63,8 @@ DEBUG_TOOLBAR_PANELS = (
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False
+    'INTERCEPT_REDIRECTS': False,
+    'SHOW_TOOLBAR_CALLBACK': lambda _: True,
 }
 
 # To see stacktraces for MongoDB queries, set this to True.

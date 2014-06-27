@@ -23,13 +23,6 @@
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
-    $(".email-settings").click(function(event) {
-      $("#email_settings_course_id").val( $(event.target).data("course-id") );
-      $("#email_settings_course_number").text( $(event.target).data("course-number") );
-      if($(event.target).data("optout") == "False") {
-        $("#receive_emails").prop('checked', true);
-      }
-    });
 
     $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
 
@@ -293,7 +286,9 @@
 
       </ul>
     </section>
-
+    % if self.stanford_theme_enabled():
+        <%include file='theme-dashboard-research.html' />
+    % endif
   </section>
 
   <section class="my-courses" id="my-courses">

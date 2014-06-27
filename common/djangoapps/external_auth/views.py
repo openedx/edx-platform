@@ -450,7 +450,10 @@ def ssl_login(request):
 
     (_user, email, fullname) = _ssl_dn_extract_info(cert)
 
-    retfun = functools.partial(redirect, '/')
+    redirect_to = request.GET.get('next')
+    if not redirect_to:
+        redirect_to = '/'
+    retfun = functools.partial(redirect, redirect_to)
     return _external_login_or_signup(
         request,
         external_id=email,
@@ -586,18 +589,17 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    try:
-        course = course_from_id(course_id)
-    except ItemNotFoundError:
+    course = modulestore().get_course(course_id)
+    if not course:
         # couldn't find the course, will just return vanilla signin page
-        return _redirect_with_get_querydict('signin_user', request.GET)
+        return redirect_with_get('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
-        return _redirect_with_get_querydict('shib-login', request.GET)
+        return redirect_with_get('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
-    return _redirect_with_get_querydict('signin_user', request.GET)
+    return redirect_with_get('signin_user', request.GET)
 
 
 def course_specific_register(request, course_id):
@@ -605,28 +607,32 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    try:
-        course = course_from_id(course_id)
-    except ItemNotFoundError:
+    course = modulestore().get_course(course_id)
+
+    if not course:
         # couldn't find the course, will just return vanilla registration page
-        return _redirect_with_get_querydict('register_user', request.GET)
+        return redirect_with_get('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
         # shib-login takes care of both registration and login flows
-        return _redirect_with_get_querydict('shib-login', request.GET)
+        return redirect_with_get('shib-login', request.GET)
 
     # Default fallthrough to normal registration page
-    return _redirect_with_get_querydict('register_user', request.GET)
+    return redirect_with_get('register_user', request.GET)
 
 
-def _redirect_with_get_querydict(view_name, get_querydict):
+def redirect_with_get(view_name, get_querydict, do_reverse=True):
     """
         Helper function to carry over get parameters across redirects
         Using urlencode(safe='/') because the @login_required decorator generates 'next' queryparams with '/' unencoded
     """
+    if do_reverse:
+        url = reverse(view_name)
+    else:
+        url = view_name
     if get_querydict:
-        return redirect("%s?%s" % (reverse(view_name), get_querydict.urlencode(safe='/')))
+        return redirect("%s?%s" % (url, get_querydict.urlencode(safe='/')))
     return redirect(view_name)
 
 
@@ -944,9 +950,3 @@ def provider_xrds(request):
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)
     return response
-
-
-def course_from_id(course_id):
-    """Return the CourseDescriptor corresponding to this course_id"""
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    return modulestore().get_instance(course_id, course_loc)

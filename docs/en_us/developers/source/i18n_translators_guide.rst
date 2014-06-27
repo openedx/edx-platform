@@ -18,6 +18,9 @@ For information on the Transifex process, see the following sections:
 * `Getting Started with Transifex`_
 * `Guidelines for Translators`_
 
+See also documentation on
+`public translation sandboxes <public_sandboxes.rst#language-sandboxes>`_.
+
 Getting Started with Transifex
 ******************************
 

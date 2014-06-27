@@ -11,15 +11,18 @@ from django.conf import settings
 
 from xmodule.video_module import transcripts_utils
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_course_url
+from contentstore.views.utilities.captions import get_videos
 from cache_toolbox.core import del_cached_content
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.keys import UsageKey
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -35,8 +38,7 @@ class Basetranscripts(CourseTestCase):
         """Remove, if transcripts content exists."""
         for youtube_id in self.get_youtube_ids().values():
             filename = 'subs_{0}.srt.sjson'.format(youtube_id)
-            content_location = StaticContent.compute_location(
-                self.org, self.number, filename)
+            content_location = StaticContent.compute_location(self.course.id, filename)
             try:
                 content = contentstore().find(content_location)
                 contentstore().delete(content.get_id())
@@ -46,20 +48,22 @@ class Basetranscripts(CourseTestCase):
     def setUp(self):
         """Create initial data."""
         super(Basetranscripts, self).setUp()
-        self.location = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
-        )
-        self.captions_url = self.location.url_reverse('utility/captions/', '')
+        self.location = self.course.id.make_usage_key('course', self.course.id.run)
+        self.captions_url = reverse_course_url('utility_captions_handler', self.course.id)
         self.unicode_locator = unicode(self.location)
 
         # Add video module
         data = {
+            # 'parent_locator': self.location.to_deprecated_string(),
             'parent_locator': self.unicode_locator,
             'category': 'video',
             'type': 'video'
         }
-        resp = self.client.ajax_post('/xblock', data)
-        self.item_locator, self.item_location = self._get_locator(resp)
+        resp = self.client.ajax_post('http://testserver/xblock/', data)
+        videos = get_videos(self.course)
+
+        self.item_location = self._get_locator(resp)
+        self.item_location_string = str(self.item_location)
         self.assertEqual(resp.status_code, 200)
 
         self.item = modulestore().get_item(self.item_location)
@@ -74,8 +78,10 @@ class Basetranscripts(CourseTestCase):
 
     def _get_locator(self, resp):
         """ Returns the locator and old-style location (as a string) from the response returned by a create operation. """
-        locator = json.loads(resp.content).get('locator')
-        return locator, loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).url()
+        locator_string = json.loads(resp.content).get('locator')
+        locator = UsageKey.from_string(locator_string)
+        # locator = self.course.id.make_usage_key('course', locator_string)
+        return locator
 
     def get_youtube_ids(self):
         """Return youtube speeds and ids."""
@@ -102,8 +108,7 @@ class TestCheckcaptions(Basetranscripts):
         mime_type = 'application/json'
         filename = 'subs_{0}.srt.sjson'.format(subs_id)
 
-        content_location = StaticContent.compute_location(
-            self.org, self.number, filename)
+        content_location = StaticContent.compute_location(self.course.id, filename)
         content = StaticContent(content_location, filename, mime_type, filedata)
         contentstore().save(content)
         del_cached_content(content_location)
@@ -133,7 +138,7 @@ class TestCheckcaptions(Basetranscripts):
 
         link = self.captions_url
         data = {
-            'video': json.dumps({'location': self.item_location}),
+            'video': json.dumps({'location': self.item_location_string}),
         }
         resp = self.client.get(link, data, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
@@ -141,7 +146,7 @@ class TestCheckcaptions(Basetranscripts):
             json.loads(resp.content),
             {
                 u'status': True,
-                u'location': self.item_location,
+                u'location': self.item_location_string,
                 u'command': u'use_existing',
                 u'current_item_subs': subs_id,
                 u'html5_equal': False,
@@ -173,7 +178,7 @@ class TestCheckcaptions(Basetranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
         link = self.captions_url
         data = {
-            'video': json.dumps({'location': self.item_location}),
+            'video': json.dumps({'location': self.item_location_string}),
         }
         resp = self.client.get(link, data, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
@@ -190,7 +195,7 @@ class TestCheckcaptions(Basetranscripts):
                 u'youtube_diff': True,
                 u'youtube_local': True,
                 u'youtube_server': False,
-                u'location': self.item_location
+                u'location': self.item_location_string,
             }
         )
 
@@ -200,15 +205,16 @@ class TestCheckcaptions(Basetranscripts):
             'video': '',
         }
         resp = self.client.get(link, data, HTTP_ACCEPT='application/json')
-        print resp.content
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('message'), "Invalid location.")
 
     def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
+        # Test for raising `InvalidKeyError` exception.
         link = self.captions_url
         data = {
-            'video': json.dumps({'location': ''}),
+            'video': json.dumps({
+                'location': '',
+            }),
         }
         resp = self.client.get(link, data)
         self.assertEqual(resp.status_code, 400)
@@ -216,7 +222,9 @@ class TestCheckcaptions(Basetranscripts):
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
-            'video': json.dumps({'location': '{0}_{1}'.format(self.item_location, 'BAD_LOCATION')}),
+            'video': json.dumps({
+                'location': '{0}_{1}'.format(self.item_location_string, 'BAD_LOCATION')
+            }),
         }
         resp = self.client.get(link, data)
         self.assertEqual(resp.status_code, 400)
@@ -229,8 +237,9 @@ class TestCheckcaptions(Basetranscripts):
             'category': 'not_video',
             'type': 'not_video'
         }
-        resp = self.client.ajax_post('/xblock', data)
-        item_locator, item_location = self._get_locator(resp)
+        resp = self.client.ajax_post('http://testserver/xblock/', data)
+        item_location = self._get_locator(resp)
+        item_location_string = str(item_location)
         subs_id = str(uuid4())
         item = modulestore().get_item(item_location)
         item.data = textwrap.dedent("""
@@ -255,7 +264,7 @@ class TestCheckcaptions(Basetranscripts):
 
         link = self.captions_url
         data = {
-            'video': json.dumps({'location': item_location}),
+            'video': json.dumps({'location': item_location_string}),
         }
         resp = self.client.get(link, data)
         self.assertEqual(resp.status_code, 400)

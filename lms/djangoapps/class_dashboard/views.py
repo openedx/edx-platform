@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from courseware.courses import get_course_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -19,8 +20,8 @@ def has_instructor_access_for_class(user, course_id):
     Returns true if the `user` is an instructor for the course.
     """
 
-    course = get_course_with_access(user, course_id, 'staff', depth=None)
-    return has_access(user, course, 'staff')
+    course = get_course_with_access(user, 'staff', course_id, depth=None)
+    return has_access(user, 'staff', course)
 
 
 def all_sequential_open_distrib(request, course_id):
@@ -37,9 +38,10 @@ def all_sequential_open_distrib(request, course_id):
     json = {}
 
     # Only instructor for this particular course can request this information
-    if has_instructor_access_for_class(request.user, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_sequential_open_distrib(course_id)
+            json = dashboard_data.get_d3_sequential_open_distrib(course_key)
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}
@@ -62,9 +64,10 @@ def all_problem_grade_distribution(request, course_id):
     json = {}
 
     # Only instructor for this particular course can request this information
-    if has_instructor_access_for_class(request.user, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_problem_grade_distrib(course_id)
+            json = dashboard_data.get_d3_problem_grade_distrib(course_key)
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}
@@ -92,9 +95,10 @@ def section_problem_grade_distrib(request, course_id, section):
     json = {}
 
     # Only instructor for this particular course can request this information
-    if has_instructor_access_for_class(request.user, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_section_grade_distrib(course_id, section)
+            json = dashboard_data.get_d3_section_grade_distrib(course_key, section)
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}

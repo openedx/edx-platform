@@ -6,6 +6,7 @@ from lettuce.django import django_url
 from course_modes.models import CourseMode
 from nose.tools import assert_equal
 
+
 UPSELL_LINK_CSS = '.message-upsell a.action-upgrade[href*="edx/999/Certificates"]'
 
 def create_cert_course():

@@ -22,13 +22,13 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def test_logged_in(self):
         self.setup_user()
-        url = reverse('info', args=[self.course.id])
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
 
     def test_anonymous_user(self):
-        url = reverse('info', args=[self.course.id])
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("OOGIE BLOOGIE", resp.content)

@@ -13,6 +13,7 @@ def i_select_checklists(step):
     world.click_tools()
     link_css = 'li.nav-course-tools-checklists a'
     world.css_click(link_css)
+    world.wait_for_ajax_complete()
 
 
 @step('I have opened Checklists$')
@@ -104,6 +105,7 @@ def verifyChecklist2Status(completed, total, percentage):
 
 def toggleTask(checklist, task):
     world.css_click('#course-checklist' + str(checklist) + '-task' + str(task))
+    world.wait_for_ajax_complete()
 
 
 # TODO: figure out a way to do this in phantom and firefox
@@ -121,3 +123,4 @@ def clickActionLink(checklist, task, actionText):
 
     world.wait_for(verify_action_link_text)
     world.css_click('#course-checklist' + str(checklist) + ' a', index=task)
+    world.wait_for_ajax_complete()

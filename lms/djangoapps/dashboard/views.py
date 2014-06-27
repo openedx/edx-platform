@@ -56,7 +56,7 @@ def dashboard(request):
     # table queries need not take the form of raw SQL, but do in this case since
     # the MySQL backend for django isn't very friendly with group by or distinct
     table_queries = {}
-    table_queries["course enrollments"] = """
+    table_queries["course registrations (current enrollments)"] = """
         select
         course_id as Course,
         count(user_id) as Students

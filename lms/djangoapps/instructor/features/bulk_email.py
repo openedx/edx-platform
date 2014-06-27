@@ -29,23 +29,23 @@ def make_populated_course(step):  # pylint: disable=unused-argument
         number='888',
         display_name='Bulk Email Test Course'
     )
-    world.bulk_email_course_id = 'edx/888/Bulk_Email_Test_Course'
+    world.bulk_email_course_key = course.id
 
     try:
         # See if we've defined the instructor & staff user yet
         world.bulk_email_instructor
     except AttributeError:
         # Make & register an instructor for the course
-        world.bulk_email_instructor = InstructorFactory(course=course.location)
-        world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_id)
+        world.bulk_email_instructor = InstructorFactory(course_key=world.bulk_email_course_key)
+        world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_key)
 
         # Make & register a staff member
-        world.bulk_email_staff = StaffFactory(course=course.location)
-        world.enroll_user(world.bulk_email_staff, world.bulk_email_course_id)
+        world.bulk_email_staff = StaffFactory(course_key=course.id)
+        world.enroll_user(world.bulk_email_staff, world.bulk_email_course_key)
 
     # Make & register a student
-    world.register_by_course_id(
-        'edx/888/Bulk_Email_Test_Course',
+    world.register_by_course_key(
+        course.id,
         username='student',
         password='test',
         is_staff=False
@@ -117,7 +117,6 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     # Go to the email section of the instructor dash
     world.visit('/courses/edx/888/Bulk_Email_Test_Course')
     world.css_click('a[href="/courses/edx/888/Bulk_Email_Test_Course/instructor"]')
-    world.css_click('div.beta-button-wrapper>a.beta-button')
     world.css_click('a[data-section="send_email"]')
 
     # Select the recipient

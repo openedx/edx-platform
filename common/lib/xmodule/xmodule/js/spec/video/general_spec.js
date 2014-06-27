@@ -177,59 +177,6 @@
             });
         });
 
-        describe('YouTube video in FireFox will cue first', function () {
-            var oldUserAgent;
-
-            beforeEach(function () {
-                oldUserAgent = window.navigator.userAgent;
-                window.navigator.userAgent = 'firefox';
-
-                state = jasmine.initializePlayer('video.html', {
-                  start: 10,
-                  end: 30
-                });
-            });
-
-            afterEach(function () {
-                window.navigator.userAgent = oldUserAgent;
-            });
-
-            it('cue is called, skipOnEndedStartEndReset is set', function () {
-                state.videoPlayer.updatePlayTime(10);
-                expect(state.videoPlayer.player.cueVideoById).toHaveBeenCalledWith('cogebirgzzM', 10);
-                expect(state.videoPlayer.skipOnEndedStartEndReset).toBe(true);
-            });
-
-            it('when position is not 0: cue is called with stored position value', function () {
-                state.config.savedVideoPosition = 15;
-
-                state.videoPlayer.updatePlayTime(10);
-                expect(state.videoPlayer.player.cueVideoById).toHaveBeenCalledWith('cogebirgzzM', 15);
-            });
-
-            it('Handling cue state', function () {
-                spyOn(state.videoPlayer, 'play');
-
-                state.videoPlayer.seekToTimeOnCued = 10;
-                state.videoPlayer.onStateChange({data: 5});
-
-                expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(10, true);
-                expect(state.videoPlayer.play).toHaveBeenCalled();
-            });
-
-            it('even when cued, onEnded does not resets start and end time', function () {
-                state.videoPlayer.skipOnEndedStartEndReset = true;
-                state.videoPlayer.onEnded();
-                expect(state.videoPlayer.startTime).toBe(10);
-                expect(state.videoPlayer.endTime).toBe(30);
-
-                state.videoPlayer.skipOnEndedStartEndReset = undefined;
-                state.videoPlayer.onEnded();
-                expect(state.videoPlayer.startTime).toBe(10);
-                expect(state.videoPlayer.endTime).toBe(30);
-            });
-        });
-
         describe('checking start and end times', function () {
             var miniTestSuite = [
                 {

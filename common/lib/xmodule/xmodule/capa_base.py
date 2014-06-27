@@ -32,6 +32,9 @@ from .util.duedate import get_extended_due_date
 
 log = logging.getLogger("edx.courseware")
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -86,101 +89,103 @@ class CapaFields(object):
     Define the possible fields for a Capa problem
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
         default="Blank Advanced Problem"
     )
-    attempts = Integer(help="Number of attempts taken by the student on this problem",
-                       default=0, scope=Scope.user_state)
+    attempts = Integer(
+        help=_("Number of attempts taken by the student on this problem"),
+        default=0,
+        scope=Scope.user_state)
     max_attempts = Integer(
-        display_name="Maximum Attempts",
-        help=("Defines the number of times a student can try to answer this problem. "
+        display_name=_("Maximum Attempts"),
+        help=_("Defines the number of times a student can try to answer this problem. "
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
+        help=_("Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
              "date if it is set to a date that is later than the global due "
-             "date.",
+             "date."),
         default=None,
         scope=Scope.user_state,
     )
     graceperiod = Timedelta(
-        help="Amount of time after the due date that submissions will be accepted",
+        help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
     )
     showanswer = String(
-        display_name="Show Answer",
-        help=("Defines when to show the answer to the problem. "
+        display_name=_("Show Answer"),
+        help=_("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
         default="finished",
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "Answered", "value": "answered"},
-            {"display_name": "Attempted", "value": "attempted"},
-            {"display_name": "Closed", "value": "closed"},
-            {"display_name": "Finished", "value": "finished"},
-            {"display_name": "Past Due", "value": "past_due"},
-            {"display_name": "Never", "value": "never"}]
+            {"display_name": _("Always"), "value": "always"},
+            {"display_name": _("Answered"), "value": "answered"},
+            {"display_name": _("Attempted"), "value": "attempted"},
+            {"display_name": _("Closed"), "value": "closed"},
+            {"display_name": _("Finished"), "value": "finished"},
+            {"display_name": _("Past Due"), "value": "past_due"},
+            {"display_name": _("Never"), "value": "never"}]
     )
     force_save_button = Boolean(
-        help="Whether to force the save button to appear on the page",
+        help=_("Whether to force the save button to appear on the page"),
         scope=Scope.settings,
         default=False
     )
     rerandomize = Randomization(
-        display_name="Randomization",
-        help="Defines how often inputs are randomized when a student loads the problem. "
+        display_name=_("Randomization"),
+        help=_("Defines how often inputs are randomized when a student loads the problem. "
              "This setting only applies to problems that can have randomly generated numeric values. "
-             "A default value can be set in Advanced Settings.",
+             "A default value can be set in Advanced Settings."),
         default="never",
         scope=Scope.settings,
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "On Reset", "value": "onreset"},
-            {"display_name": "Never", "value": "never"},
-            {"display_name": "Per Student", "value": "per_student"}
+            {"display_name": _("Always"), "value": "always"},
+            {"display_name": _("On Reset"), "value": "onreset"},
+            {"display_name": _("Never"), "value": "never"},
+            {"display_name": _("Per Student"), "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
-    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+    data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
+    correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
-    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
-    done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
-    last_submission_time = Date(help="Last submission time", scope=Scope.user_state)
+    input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
+    student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
+    done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
+    seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
+    last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
-        display_name="Timer Between Attempts",
-        help="Seconds a student must wait between submissions for a problem with multiple attempts.",
+        display_name=_("Timer Between Attempts"),
+        help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
         scope=Scope.settings,
         default=0)
     weight = Float(
-        display_name="Problem Weight",
-        help=("Defines the number of points each problem is worth. "
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. "
               "If the value is not set, each response field in the problem is worth one point."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
+    markdown = String(help=_("Markdown source of this module"), default=None, scope=Scope.settings)
     source_code = String(
-        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
         scope=Scope.settings
     )
     text_customization = Dict(
-        help="String customization substitutions for particular locations",
+        help=_("String customization substitutions for particular locations"),
         scope=Scope.settings
         # TODO: someday it should be possible to not duplicate this definition here
         # and in inheritance.py
     )
     use_latex_compiler = Boolean(
-        help="Enable LaTeX templates?",
+        help=_("Enable LaTeX templates?"),
         default=False,
         scope=Scope.settings
     )
@@ -207,7 +212,7 @@ class CapaMixin(CapaFields):
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
         # there.
-        self.runtime.set('location', self.location.url())
+        self.runtime.set('location', self.location.to_deprecated_string())
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
@@ -225,7 +230,7 @@ class CapaMixin(CapaFields):
 
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
-                loc=self.location.url(), err=err)
+                loc=self.location.to_deprecated_string(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
             if self.runtime.DEBUG:
@@ -239,7 +244,7 @@ class CapaMixin(CapaFields):
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                                    url=self.location.url(),
+                                    url=self.location.to_deprecated_string(),
                                     msg=msg)
                                 )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
@@ -259,7 +264,7 @@ class CapaMixin(CapaFields):
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, self.location.url)
+            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -377,7 +382,7 @@ class CapaMixin(CapaFields):
         progress = self.get_progress()
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.id,
+            'id': self.location.to_deprecated_string(),
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
@@ -517,7 +522,7 @@ class CapaMixin(CapaFields):
             msg = (
                 u'[courseware.capa.capa_module] <font size="+1" color="red">'
                 u'Failed to generate HTML for problem {url}</font>'.format(
-                    url=cgi.escape(self.location.url()))
+                    url=cgi.escape(self.location.to_deprecated_string()))
             )
             msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
             msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
@@ -605,7 +610,7 @@ class CapaMixin(CapaFields):
 
         context = {
             'problem': content,
-            'id': self.id,
+            'id': self.location.to_deprecated_string(),
             'check_button': check_button,
             'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
@@ -770,7 +775,7 @@ class CapaMixin(CapaFields):
         Returns the answers: {'answers' : answers}
         """
         event_info = dict()
-        event_info['problem_id'] = self.location.url()
+        event_info['problem_id'] = self.location.to_deprecated_string()
         self.track_function_unmask('showanswer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
@@ -913,7 +918,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+        event_info['problem_id'] = self.location.to_deprecated_string()
 
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
@@ -1225,7 +1230,7 @@ class CapaMixin(CapaFields):
         Returns the error messages for exceptions occurring while performing
         the rescoring, rather than throwing them.
         """
-        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.to_deprecated_string()}
 
         _ = self.runtime.service(self, "i18n").ugettext
 
@@ -1300,7 +1305,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+        event_info['problem_id'] = self.location.to_deprecated_string()
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
@@ -1353,7 +1358,7 @@ class CapaMixin(CapaFields):
         """
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+        event_info['problem_id'] = self.location.to_deprecated_string()
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.closed():

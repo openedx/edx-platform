@@ -23,10 +23,11 @@ ERROR_MESSAGES = {
 
 STATUSES = {
     'found': u'Timed Transcript Found',
+    'not found on edx': u'No EdX Timed Transcript',
     'not found': u'No Timed Transcript',
     'replace': u'Timed Transcript Conflict',
-    'uploaded_successfully': u'Timed Transcript uploaded successfully',
-    'use existing': u'Timed Transcript Not Updated',
+    'uploaded_successfully': u'Timed Transcript Uploaded Successfully',
+    'use existing': u'Confirm Timed Transcript',
 }
 
 SELECTORS = {
@@ -39,13 +40,13 @@ SELECTORS = {
 
 # button type , button css selector, button message
 TRANSCRIPTS_BUTTONS = {
-    'import': ('.setting-import',  'Import from YouTube'),
-    'download_to_edit': ('.setting-download', 'Download to Edit'),
-    'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download to Edit'),
-    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcript'),
-    'replace': ('.setting-replace', 'Yes, Replace EdX Timed Transcript with YouTube Timed Transcript'),
+    'import': ('.setting-import', 'Import YouTube Transcript'),
+    'download_to_edit': ('.setting-download', 'Download Transcript for Editing'),
+    'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download Transcript for Editing'),
+    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Transcript'),
+    'replace': ('.setting-replace', 'Yes, replace the edX transcript with the YouTube transcript'),
     'choose': ('.setting-choose', 'Timed Transcript from {}'),
-    'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcript'),
+    'use_existing': ('.setting-use-existing', 'Use Current Transcript'),
 }
 
 
@@ -165,13 +166,12 @@ def remove_transcripts_from_store(_step, subs_id):
     """Remove from store, if transcripts content exists."""
     filename = 'subs_{0}.srt.sjson'.format(subs_id.strip())
     content_location = StaticContent.compute_location(
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
+        world.scenario_dict['COURSE'].id,
         filename
     )
     try:
         content = contentstore().find(content_location)
-        contentstore().delete(content.get_id())
+        contentstore().delete(content.location)
         print('Transcript file was removed from store.')
     except NotFoundError:
         print('Transcript file was NOT found and not removed.')
@@ -210,7 +210,8 @@ def check_text_in_the_captions(_step, text):
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
     world.select_editor_tab('Advanced')
-    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
+    tab = world.css_find('#settings-tab').first;
+    field_id = '#' + tab.find_by_xpath('.//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
     assert any(values_list)
     world.select_editor_tab('Basic')
@@ -228,8 +229,9 @@ def open_tab(_step, tab_name):
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')
 def set_value_transcripts_field(_step, value, field_name):
-    XPATH = '//label[text()="{name}"]'.format(name=field_name)
-    SELECTOR = '#' + world.browser.find_by_xpath(XPATH)[0]['for']
+    tab = world.css_find('#settings-tab').first;
+    XPATH = './/label[text()="{name}"]'.format(name=field_name)
+    SELECTOR = '#' + tab.find_by_xpath(XPATH)[0]['for']
     element = world.css_find(SELECTOR).first
     if element['type'] == 'text':
         SCRIPT = '$("{selector}").val("{value}").change()'.format(
