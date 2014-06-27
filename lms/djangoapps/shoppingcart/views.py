@@ -107,6 +107,7 @@ def remove_item(request):
         item = OrderItem.objects.get(id=item_id, status='cart')
         if item.user == request.user:
             item.delete()
+            log.info('order item {0} removed for user {0}'.format(item.order.id, request.user))
             try:
                 coupon_redemption = CouponRedemption.objects.get(user=request.user, order=item.order_id)
                 coupon_redemption.delete()
