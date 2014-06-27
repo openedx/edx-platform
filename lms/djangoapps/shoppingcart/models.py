@@ -346,19 +346,20 @@ class CouponRedemption(models.Model):
         purchased_cart_items = order.orderitem_set.all().select_subclasses()
 
         for item in purchased_cart_items:
-            if item.course_id == coupon.course_id:
-                coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
-                if not created:
-                    log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
-                                  .format(coupon.code, order.user.username, order.id))
-                    raise CouponAlreadyExistException
+            if getattr(item, 'course_id'):
+                if item.course_id == coupon.course_id:
+                    coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
+                    if not created:
+                        log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
+                                      .format(coupon.code, order.user.username, order.id))
+                        raise CouponAlreadyExistException
 
-                discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
-                item.discount_price = discount_price
-                item.save()
-                log.info("Discount generated for user {0} against order id '{1}' "
-                         .format(order.user.username, order.id))
-                return coupon_redemption
+                    discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
+                    item.discount_price = discount_price
+                    item.save()
+                    log.info("Discount generated for user {0} against order id '{1}' "
+                             .format(order.user.username, order.id))
+                    return coupon_redemption
 
         log.warning("Course item does not exist for coupon '{0}'".format(coupon.code))
         raise ItemDoesNotExistAgainstCouponException

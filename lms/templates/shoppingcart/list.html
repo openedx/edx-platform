@@ -83,7 +83,7 @@
     });
 
     $('#cart-coupon').click(function(event){
-//      event.preventDefault();
+      event.preventDefault();
       var post_url = "${reverse('shoppingcart.views.use_coupon')}";
       $.post(post_url,{
                "coupon_code" :  $('#couponCode').val(),
