@@ -9,6 +9,26 @@
 
 // --------------------
 
+//.wrapper-xblock-header {
+.outline-item {
+  border: 1px solid $gray;
+  margin: 5px;
+  background-color: $white;
+}
+
+.add-xblock-component .add-xblock {
+  padding: 5px 10px;
+  background-color: $blue;
+  color: $white;
+  text-align: center;
+}
+
+
+.draggable-drop-indicator {
+  left: 0;
+}
+
+
 .outline-item {
   padding: 6px 8px 8px 16px;
   text-wrap: avoid;
@@ -32,10 +52,6 @@
   }
 }
 
-.outline-item-section,
-.outline-item-subsection {
-  border: 1px rgb(178, 178, 178);
-}
 
 .outline-item.collapsed {
   .sortable-list {
