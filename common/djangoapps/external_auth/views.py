@@ -49,6 +49,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger("edx.external_auth")
 AUDIT_LOG = logging.getLogger("audit")
@@ -589,7 +590,8 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    course = modulestore().get_course(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = modulestore().get_course(course_key)
     if not course:
         # couldn't find the course, will just return vanilla signin page
         return redirect_with_get('signin_user', request.GET)
@@ -607,7 +609,8 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    course = modulestore().get_course(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = modulestore().get_course(course_key)
 
     if not course:
         # couldn't find the course, will just return vanilla registration page
