@@ -368,7 +368,11 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         #     'acronym': ['title'],
         #
         # This lets all plaintext through.
-        sanitized_comment = bleach.clean(self.score_comment)
+        allowed_tags = bleach.ALLOWED_TAGS + [u'img']
+        allowed_attrs = bleach.ALLOWED_ATTRIBUTES.copy()
+        allowed_attrs[u'img'] = [u'src', u'height', u'width', u'alt', u'title']
+
+        sanitized_comment = bleach.clean(self.score_comment, tags=allowed_tags, attributes=allowed_attrs)
 
         return {
             'input_fields': self.get_input_fields(),
