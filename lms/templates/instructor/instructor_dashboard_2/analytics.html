@@ -15,6 +15,15 @@
   </div>
 </script>
 
+%if settings.FEATURES['ANALYTICS_ENROLLMENT_COUNT']:
+  <div class="enrollment-wrapper" style="margin-bottom: 40px;">
+    <h2>${_("Active Students")}</h2>
+    <span class="tip">${_("Count of students who visited the course in the past week")}</span>
+    <br/><br/>
+    <span class="count">${ section_data['active_student_count'] }</span>
+  </div>
+%endif
+
 %if settings.FEATURES['ENABLE_INSTRUCTOR_ANALYTICS']:
   <script type="text/template" id="grade-distributions-widget-template">
     <div class="grade-distributions-widget">

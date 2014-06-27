@@ -245,6 +245,19 @@ def _section_analytics(course_key, access):
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
+
+    if settings.FEATURES.get('ANALYTICS_ENROLLMENT_COUNT'):
+        from analyticsdataclient.client import RestClient
+        from analyticsdataclient.course import Course
+
+        auth_token = settings.ANALYTICS_DATA_TOKEN
+        base_url = settings.ANALYTICS_DATA_URL
+
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        course = Course(client, course_key)
+
+        section_data['active_student_count'] = course.active_users_last_week['count']
+
     return section_data
 
 
