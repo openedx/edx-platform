@@ -16,6 +16,7 @@ from .common import *
 import os
 from path import path
 from warnings import filterwarnings
+from uuid import uuid4
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME)
@@ -58,40 +59,29 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'test_xmodule',
-    'collection': 'test_modulestore',
-}
-
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
-    'fs_root': TEST_ROOT / "data",
-    'render_template': 'edxmako.shortcuts.render_to_string',
-}
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    },
-    'draft': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    },
-    'split': {
+# Add split as another store for testing
+MODULESTORE['default']['OPTIONS']['stores'].append(
+    {
+        'NAME': 'split',
         'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    }
-}
+        'OPTIONS': {
+            'render_template': 'edxmako.shortcuts.render_to_string',
+        }
+    },
+)
+# Update module store settings per defaults for tests
+update_module_store_settings(
+    MODULESTORE,
+    module_store_options={
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'fs_root': TEST_ROOT / "data",
+    },
+    doc_store_settings={
+        'db': 'test_xmodule',
+        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+    },
+)
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',

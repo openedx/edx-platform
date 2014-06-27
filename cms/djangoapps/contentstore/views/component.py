@@ -13,6 +13,7 @@ from edxmako.shortcuts import render_to_response
 
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import PublishState
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -21,7 +22,7 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
+from contentstore.utils import get_lms_link_for_item, compute_publish_state
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -413,7 +414,7 @@ def _get_item_in_course(request, usage_key):
         raise PermissionDenied()
 
     course = modulestore().get_course(course_key)
-    item = get_modulestore(usage_key).get_item(usage_key, depth=1)
+    item = modulestore().get_item(usage_key, depth=1)
     lms_link = get_lms_link_for_item(usage_key)
 
     return course, item, lms_link
@@ -436,7 +437,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = get_modulestore(usage_key).get_item(usage_key)
+    descriptor = modulestore().get_item(usage_key)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -449,6 +450,6 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call; so, request user didn't author
     # the change
-    get_modulestore(usage_key).update_item(descriptor, None)
+    modulestore().update_item(descriptor, None)
 
     return webob_to_django_response(resp)

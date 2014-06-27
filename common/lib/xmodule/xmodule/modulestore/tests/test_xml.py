@@ -43,7 +43,7 @@ class TestXMLModuleStore(unittest.TestCase):
 
     def test_xml_modulestore_type(self):
         store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
-        self.assertEqual(store.get_modulestore_type('foo/bar/baz'), XML_MODULESTORE_TYPE)
+        self.assertEqual(store.get_modulestore_type(), XML_MODULESTORE_TYPE)
 
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during

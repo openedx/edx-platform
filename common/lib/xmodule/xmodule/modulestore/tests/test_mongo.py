@@ -20,10 +20,9 @@ from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE, BRANCH_DRAFT_PREFERRED
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from xmodule.modulestore.mongo.draft import as_draft
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -34,6 +33,8 @@ from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.mongo.base import as_draft
+from xmodule.modulestore.tests.factories import check_mongo_calls
 
 
 log = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
 
-class ReferenceTestXBlock(XBlock):
+class ReferenceTestXBlock(XBlock, XModuleMixin):
     """
     Test xblock type to test the reference field types
     """
@@ -76,7 +77,7 @@ class TestMongoModuleStore(unittest.TestCase):
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
         # once and copy over to a tmp db for each test.
-        cls.store, cls.content_store, cls.draft_store = cls.initdb()
+        cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
     def teardownClass(cls):
@@ -93,22 +94,29 @@ class TestMongoModuleStore(unittest.TestCase):
             'db': DB,
             'collection': COLLECTION,
         }
-        store = MongoModuleStore(
-            doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS,
-            xblock_mixins=(XModuleMixin,)
-        )
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB)
         #
         # Also test draft store imports
         #
-        draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
-        import_from_xml(store, DATA_DIR, TestMongoModuleStore.courses, draft_store=draft_store, static_content_store=content_store)
+        draft_store = DraftModuleStore(
+            doc_store_config, FS_ROOT, RENDER_TEMPLATE,
+            default_class=DEFAULT_CLASS,
+            branch_setting_func=lambda: BRANCH_DRAFT_PREFERRED
+        )
+        import_from_xml(
+            draft_store,
+            999,
+            DATA_DIR,
+            TestMongoModuleStore.courses,
+            static_content_store=content_store
+        )
 
         # also test a course with no importing of static content
         import_from_xml(
-            store,
+            draft_store,
+            999,
             DATA_DIR,
             ['test_import_course'],
             static_content_store=content_store,
@@ -116,7 +124,7 @@ class TestMongoModuleStore(unittest.TestCase):
             verbose=True
         )
 
-        return store, content_store, draft_store
+        return content_store, draft_store
 
     @staticmethod
     def destroy_db(connection):
@@ -140,11 +148,11 @@ class TestMongoModuleStore(unittest.TestCase):
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
-        assert_equals(store.get_modulestore_type('foo/bar/baz'), MONGO_MODULESTORE_TYPE)
+        assert_equals(store.get_modulestore_type(''), MONGO_MODULESTORE_TYPE)
 
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
-        courses = self.store.get_courses()
+        courses = self.draft_store.get_courses()
         assert_equals(len(courses), 5)
         course_ids = [course.id for course in courses]
         for course_key in [
@@ -157,14 +165,14 @@ class TestMongoModuleStore(unittest.TestCase):
             ]
         ]:
             assert_in(course_key, course_ids)
-            course = self.store.get_course(course_key)
+            course = self.draft_store.get_course(course_key)
             assert_not_none(course)
-            assert_true(self.store.has_course(course_key))
+            assert_true(self.draft_store.has_course(course_key))
             mix_cased = SlashSeparatedCourseKey(
                 course_key.org.upper(), course_key.course.upper(), course_key.run.lower()
             )
-            assert_false(self.store.has_course(mix_cased))
-            assert_true(self.store.has_course(mix_cased, ignore_case=True))
+            assert_false(self.draft_store.has_course(mix_cased))
+            assert_true(self.draft_store.has_course(mix_cased, ignore_case=True))
 
     def test_no_such_course(self):
         """
@@ -178,26 +186,26 @@ class TestMongoModuleStore(unittest.TestCase):
                 ['NO_SUCH_COURSE', 'Test_iMport_courSe', '2012_Fall'],
             ]
         ]:
-            course = self.store.get_course(course_key)
+            course = self.draft_store.get_course(course_key)
             assert_is_none(course)
-            assert_false(self.store.has_course(course_key))
+            assert_false(self.draft_store.has_course(course_key))
             mix_cased = SlashSeparatedCourseKey(
                 course_key.org.lower(), course_key.course.upper(), course_key.run.upper()
             )
-            assert_false(self.store.has_course(mix_cased))
-            assert_false(self.store.has_course(mix_cased, ignore_case=True))
+            assert_false(self.draft_store.has_course(mix_cased))
+            assert_false(self.draft_store.has_course(mix_cased, ignore_case=True))
 
     def test_loads(self):
         assert_not_none(
-            self.store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
+            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
         )
 
         assert_not_none(
-            self.store.get_item(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store.get_item(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store.get_item(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
 
     def test_unicode_loads(self):
@@ -205,36 +213,37 @@ class TestMongoModuleStore(unittest.TestCase):
         Test that getting items from the test_unicode course works
         """
         assert_not_none(
-            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'course', '2012_Fall')),
         )
         # All items with ascii-only filenames should load properly.
         assert_not_none(
-            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
         )
         assert_not_none(
-            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
         )
         assert_not_none(
-            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
+            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
         )
 
 
     def test_find_one(self):
         assert_not_none(
-            self.store._find_one(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store._find_one(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store._find_one(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
 
     def test_path_to_location(self):
         '''Make sure that path_to_location works'''
-        check_path_to_location(self.store)
+        with check_mongo_calls(self.draft_store, 9):
+            check_path_to_location(self.draft_store)
 
     def test_xlinter(self):
         '''
@@ -244,7 +253,7 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
 
     def test_get_courses_has_no_templates(self):
-        courses = self.store.get_courses()
+        courses = self.draft_store.get_courses()
         for course in courses:
             assert_false(
                 course.location.org == 'edx' and course.location.course == 'templates',
@@ -259,7 +268,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
             Assumes the information is desired for courses[4] ('toy' course).
             """
-            course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+            course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
             return course.tabs[index]['name']
 
         # There was a bug where model.save was not getting called after the static tab name
@@ -332,34 +341,34 @@ class TestMongoModuleStore(unittest.TestCase):
         Test the get_courses_for_wiki method
         """
         for course_number in self.courses:
-            course_locations = self.store.get_courses_for_wiki(course_number)
+            course_locations = self.draft_store.get_courses_for_wiki(course_number)
             assert_equals(len(course_locations), 1)
             assert_equals(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations[0])
 
-        course_locations = self.store.get_courses_for_wiki('no_such_wiki')
+        course_locations = self.draft_store.get_courses_for_wiki('no_such_wiki')
         assert_equals(len(course_locations), 0)
 
         # set toy course to share the wiki with simple course
-        toy_course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        toy_course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         toy_course.wiki_slug = 'simple'
-        self.store.update_item(toy_course)
+        self.draft_store.update_item(toy_course)
 
         # now toy_course should not be retrievable with old wiki_slug
-        course_locations = self.store.get_courses_for_wiki('toy')
+        course_locations = self.draft_store.get_courses_for_wiki('toy')
         assert_equals(len(course_locations), 0)
 
         # but there should be two courses with wiki_slug 'simple'
-        course_locations = self.store.get_courses_for_wiki('simple')
+        course_locations = self.draft_store.get_courses_for_wiki('simple')
         assert_equals(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
             assert_in(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
 
         # configure simple course to use unique wiki_slug.
-        simple_course = self.store.get_course(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'))
+        simple_course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'))
         simple_course.wiki_slug = 'edX.simple.2012_Fall'
-        self.store.update_item(simple_course)
+        self.draft_store.update_item(simple_course)
         # it should be retrievable with its new wiki_slug
-        course_locations = self.store.get_courses_for_wiki('edX.simple.2012_Fall')
+        course_locations = self.draft_store.get_courses_for_wiki('edX.simple.2012_Fall')
         assert_equals(len(course_locations), 1)
         assert_in(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall'), course_locations)
 
@@ -371,13 +380,15 @@ class TestMongoModuleStore(unittest.TestCase):
         course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         def setup_test():
-            course = self.store.get_course(course_key)
+            course = self.draft_store.get_course(course_key)
             # can't use item factory as it depends on django settings
-            p1ele = self.store.create_and_save_xmodule(course.id.make_usage_key('problem', 'p1'))
-            p2ele = self.store.create_and_save_xmodule(course.id.make_usage_key('problem', 'p2'))
+            p1ele = self.draft_store.create_and_save_xmodule(
+                course.id.make_usage_key('problem', 'p1'), 99, runtime=course.runtime)
+            p2ele = self.draft_store.create_and_save_xmodule(
+                course.id.make_usage_key('problem', 'p2'), 99, runtime=course.runtime)
             self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
-            self.store.create_and_save_xmodule(
-                self.refloc, fields={
+            self.draft_store.create_and_save_xmodule(
+                self.refloc, 99, runtime=course.runtime, fields={
                     'reference_link': p1ele.location,
                     'reference_list': [p1ele.location, p2ele.location],
                     'reference_dict': {'p1': p1ele.location, 'p2': p2ele.location},
@@ -390,10 +401,10 @@ class TestMongoModuleStore(unittest.TestCase):
                 for child in xblock.children:
                     assert_is_instance(child, Location)
 
-            course = self.store.get_course(course_key)
+            course = self.draft_store.get_course(course_key)
             check_children(course)
 
-            refele = self.store.get_item(self.refloc)
+            refele = self.draft_store.get_item(self.refloc)
             check_children(refele)
             assert_is_instance(refele.reference_link, Location)
             assert_greater(len(refele.reference_list), 0)
@@ -405,7 +416,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
         def check_mongo_fields():
             def get_item(location):
-                return self.store._find_one(location)
+                return self.draft_store._find_one(as_draft(location))
 
             def check_children(payload):
                 for child in payload['definition']['children']:
@@ -438,7 +449,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course_key, root_dir, 'test_export')
+            export_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
@@ -449,12 +460,12 @@ class TestMongoModuleStore(unittest.TestCase):
         Make sure that if a non-default image path is specified that we
         don't export it to the static default location
         """
-        course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         assert_true(course.course_image, 'just_a_test.jpg')
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course.id, root_dir, 'test_export')
+            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         finally:
@@ -465,10 +476,10 @@ class TestMongoModuleStore(unittest.TestCase):
         Make sure we elegantly passover our code when there isn't a static
         image
         """
-        course = self.store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
+        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.store, self.content_store, course.id, root_dir, 'test_export')
+            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
@@ -570,7 +581,7 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'migration', '2012_Fall', 'html', 'test_html')
         published_date = datetime(1970, 1, 1, tzinfo=UTC)
         published_by = 123
-        self.store._update_single_item(
+        self.draft_store._update_single_item(
             as_draft(location),
             {
                 'definition.data': {},

@@ -21,7 +21,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.video_module import transcripts_utils
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -76,7 +75,7 @@ class TestGenerateSubs(unittest.TestCase):
         )
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestSaveSubsToStore(ModuleStoreTestCase):
     """Tests for `save_subs_to_store` function."""
 
@@ -156,7 +155,7 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
         _CONTENTSTORE.clear()
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     """Tests for `download_youtube_subs` function."""
 

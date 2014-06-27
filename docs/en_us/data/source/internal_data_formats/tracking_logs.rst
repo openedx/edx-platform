@@ -1927,13 +1927,14 @@ Forum Events
 ``edx.forum.searched``
 ----------------------------------
 
-After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.text_search`` event.
+After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.searched`` event.
 
 **Component**: Discussion Tab
 
 **Event Source**: Server
 
-**History**: Added 16 May 2014.  The ``corrected_text`` field was added on June 5 2014.
+**History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
+June 2014.
 
 ``event`` **Fields**:
 
@@ -1949,15 +1950,17 @@ After a user executes a text search in the navigation sidebar of the Discussion 
      - The text entered into the search box by the user.
    * - ``page``
      - integer
-     - Results are returned in sets of 20 per page. Identifies the page of results requested by the user.
+     - Results are returned in sets of 20 per page. Identifies the page of
+       results requested by the user.
    * - ``total_results``
      - integer
      - The total number of results matching the query.
    * - ``corrected_text``
      - string
-     - A re-spelling of the query, suggested by the search engine, which was automatically substituted for the original
-       one.  This happens only when there are no results for the original query, but the index contains matches for
-       a similar term or phrase.  Otherwise, this field is null.
+     - A re-spelling of the query, suggested by the search engine, which was
+       automatically substituted for the original one.  This happens only when
+       there are no results for the original query, but the index contains
+       matches for a similar term or phrase.  Otherwise, this field is null.
 
 .. _Instructor_Event_Types:
 

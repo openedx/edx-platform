@@ -7,6 +7,9 @@ the top.  Include a label indicating the component affected.
 
 Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
 
+Studio: Show display names and help text in Advanced Settings. Also hide deprecated settings
+by default.
+
 Studio: Move Peer Assessment into advanced problems menu.
 
 Studio: Support creation and editing of split_test instances (Content Experiments)
