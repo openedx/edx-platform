@@ -1428,28 +1428,29 @@ class CourseMetrics(SecureAPIView):
 
 class CoursesLeadersList(SecureListAPIView):
     """
-    ### The CoursesLeadersList view allows clients to retrieve ordered list of users who are leading
-    in terms of points_scored for the specified Course
-    - URI: ```/api/courses/{course_id}/metrics/proficiency/leaders/```
+    ### The CoursesLeadersList view allows clients to retrieve top 3 users who are leading
+    in terms of points_scored and course average for the specified Course. If user_id parameter is given
+    it would return user's position
+    - URI: ```/api/courses/{course_id}/metrics/proficiency/leaders/?user_id={user_id}```
     - GET: Returns a JSON representation (array) of the users with points scored
     Filters can also be applied
     ```/api/courses/{course_id}/metrics/proficiency/leaders/?content_id={content_id}```
-    To get top 3 users use count parameter
+    To get more than 3 users use count parameter
     ```/api/courses/{course_id}/metrics/proficiency/leaders/?count=3```
     ### Use Cases/Notes:
-    * Example: Display leaderboard of a given course
-    * Example: Display top 3 users of a given course
+    * Example: Display proficiency leaderboard of a given course
+    * Example: Display position of a users in a course in terms of proficiency points and course avg
     """
 
-    serializer_class = CourseLeadersSerializer
-
-    def get_queryset(self):
+    def get(self, request, course_id):  # pylint: disable=W0613
         """
         GET /api/courses/{course_id}/metrics/proficiency/leaders/
         """
-        course_id = self.kwargs['course_id']
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
-        count = self.request.QUERY_PARAMS.get('count', getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100))
+        count = self.request.QUERY_PARAMS.get('count', 3)
+        data = {}
+        course_avg = 0
         try:
             get_course(course_id)
         except ValueError:
@@ -1458,15 +1459,34 @@ class CoursesLeadersList(SecureListAPIView):
             course_id__exact=course_id,
             grade__isnull=False,
             max_grade__isnull=False,
-            max_grade__gt=0
+            max_grade__gt=0,
+            student__is_active=True
         )
 
         if content_id:
             queryset = queryset.filter(module_state_key=content_id)
 
-        queryset = queryset.values('student__id', 'student__username', 'student__profile__title',
-                                   'student__profile__avatar_url').annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
-        return queryset
+        if user_id:
+            user_points = StudentModule.objects.filter(course_id__exact=course_id,
+                                                       student__id=user_id).aggregate(points=Sum('grade'))
+            users_above = queryset.values('student__id').annotate(points=Sum('grade')).\
+                filter(points__gt=user_points['points']).count()
+            data['position'] = users_above + 1
+            data['points'] = user_points['points']
+
+        points = queryset.aggregate(total=Sum('grade'))
+        users = queryset.filter(student__is_active=True).aggregate(total=Count('student__id', distinct=True))
+        if users and users['total']:
+            course_avg = round(points['total'] / float(users['total']), 1)
+        data['course_avg'] = course_avg
+        queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
+                                                                   'student__profile__title',
+                                                                   'student__profile__avatar_url')\
+            .annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
+        serializer = CourseLeadersSerializer(queryset, many=True)
+
+        data['leaders'] = serializer.data  # pylint: disable=E1101
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class CoursesCompletionsLeadersList(SecureAPIView):
