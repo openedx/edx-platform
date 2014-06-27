@@ -21,7 +21,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import PublishState, REVISION_OPTION_ALL
+from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
@@ -527,7 +527,7 @@ def orphan_handler(request, course_key_string):
                 # get_orphans returns the deprecated string format w/o revision
                 usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
                 # need to delete all versions
-                store.delete_item(usage_key, request.user.id, revision=REVISION_OPTION_ALL)
+                store.delete_item(usage_key, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

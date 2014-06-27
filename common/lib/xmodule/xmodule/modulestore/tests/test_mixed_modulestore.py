@@ -7,10 +7,7 @@ from collections import namedtuple
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import (
-    MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE,
-    REVISION_OPTION_DRAFT_PREFERRED, REVISION_OPTION_PUBLISHED_ONLY, BRANCH_DRAFT_PREFERRED
-)
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -247,12 +244,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         self.initdb(default_ms)
         self.assertEqual(self.store.get_modulestore_type(
-            self._course_key_from_string(self.XML_COURSEID1)), XML_MODULESTORE_TYPE
+            self._course_key_from_string(self.XML_COURSEID1)), ModuleStoreEnum.Type.xml
         )
         self.assertEqual(self.store.get_modulestore_type(
-            self._course_key_from_string(self.XML_COURSEID2)), XML_MODULESTORE_TYPE
+            self._course_key_from_string(self.XML_COURSEID2)), ModuleStoreEnum.Type.xml
         )
-        mongo_ms_type = MONGO_MODULESTORE_TYPE if default_ms == 'draft' else SPLIT_MONGO_MODULESTORE_TYPE
+        mongo_ms_type = ModuleStoreEnum.Type.mongo if default_ms == 'draft' else ModuleStoreEnum.Type.split
         self.assertEqual(self.store.get_modulestore_type(
             self._course_key_from_string(self.MONGO_COURSEID)), mongo_ms_type
         )
@@ -352,7 +349,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         Test that the xml modulestore only loaded the courses from the maps.
         """
         self.initdb('draft')
-        xml_store = self.store._get_modulestore_by_type(XML_MODULESTORE_TYPE)
+        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         courses = xml_store.get_courses()
         self.assertEqual(len(courses), 2)
         course_ids = [course.id for course in courses]
@@ -366,7 +363,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         Test that the xml modulestore doesn't allow write ops.
         """
         self.initdb('draft')
-        xml_store = self.store._get_modulestore_by_type(XML_MODULESTORE_TYPE)
+        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
             xml_store.create_course("org", "course/run", 999)
@@ -420,16 +417,16 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         self.verify_get_parent_locations_results([
             (child_to_move, new_parent, None),
-            (child_to_move, new_parent, REVISION_OPTION_DRAFT_PREFERRED),
-            (child_to_move, old_parent, REVISION_OPTION_PUBLISHED_ONLY),
+            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_move, old_parent, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
             (child_to_move, new_parent, None),
-            (child_to_move, new_parent, REVISION_OPTION_DRAFT_PREFERRED),
-            (child_to_move, new_parent, REVISION_OPTION_PUBLISHED_ONLY),
+            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft')
@@ -451,16 +448,16 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.verify_get_parent_locations_results([
             (child_to_delete, old_parent, None),
             # Note: The following could be an unexpected result, but we want to avoid an extra database call
-            (child_to_delete, old_parent, REVISION_OPTION_DRAFT_PREFERRED),
-            (child_to_delete, old_parent, REVISION_OPTION_PUBLISHED_ONLY),
+            (child_to_delete, old_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_delete, old_parent, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
             (child_to_delete, None, None),
-            (child_to_delete, None, REVISION_OPTION_DRAFT_PREFERRED),
-            (child_to_delete, None, REVISION_OPTION_PUBLISHED_ONLY),
+            (child_to_delete, None, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_delete, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft', 'split')
@@ -529,6 +526,6 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
 
     return class_(
         doc_store_config=doc_store_config,
-        branch_setting_func=lambda: BRANCH_DRAFT_PREFERRED,
+        branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
         **options
     )

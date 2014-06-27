@@ -110,11 +110,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
     def _get_modulestore_by_type(self, modulestore_type):
         """
         This method should only really be used by tests and migration scripts when necessary.
-        Returns the module store as requested by type.  The type can be:
-
-            SPLIT_MONGO_MODULESTORE_TYPE
-            MONGO_MODULESTORE_TYPE
-            XML_MODULESTORE_TYPE
+        Returns the module store as requested by type.  The type can be a value from ModuleStoreEnum.Type.
         """
         for store in self.modulestores:
             if store.get_modulestore_type() == modulestore_type:
