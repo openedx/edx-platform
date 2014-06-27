@@ -73,3 +73,24 @@ body b {
     overflow: visible !important;
   }
 }
+
+// ====================
+
+// Latex Compiler
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
+.launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  background-color: $white;
+  padding: $baseline/2 0 $baseline/2 $baseline;
+  border-bottom: 1px solid $gray-l2;
+}
+
+//  hides latex compiler button if settings mode is-active
+div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
+ display: none;
+}

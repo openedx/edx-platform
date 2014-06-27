@@ -102,7 +102,7 @@ main_xblock_info = {
     <div class="inner-wrapper">
         <section class="content-area">
 
-            <article class="content-primary window">
+            <article class="content-primary">
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
@@ -120,15 +120,15 @@ main_xblock_info = {
                 % endif
                 % if is_unit_page:
                     <div class="unit-location">
-                        <h4 class="header">${_("Unit Location")}</h4>
-                        <div class="wrapper-unit-id content-bit">
+                        <h4 class="bar-mod-title">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">Unit Location ID</h5>
                             <p class="unit-id">
                                 <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
                             </p>
                         </div>
-                        <div class="wrapper-unit-tree-location content-bit">
+                        <div class="wrapper-unit-tree-location bar-mod-content">
                             <h5 class="title">Unit Tree Location</h5>
                             <ol>
                                 <li class="section">
