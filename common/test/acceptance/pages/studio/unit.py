@@ -62,6 +62,13 @@ class UnitPage(PageObject):
             'Wait for draft mode to be activated'
         ).fulfill()
 
+    def click_view_live_button(self):
+        """
+        Click on View Live button on Unit Page.
+        """
+        view_live_button_selector = '.view-button'
+        self.q(css=view_live_button_selector).first.click()
+
 
 class Component(PageObject):
     """
