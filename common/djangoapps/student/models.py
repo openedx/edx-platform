@@ -1045,6 +1045,9 @@ class CourseAccessRole(models.Model):
         """
         return self._key < other._key
 
+    def __unicode__(self):
+        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
+
 
 #### Helper methods for use from python manage.py shell and other classes.
 

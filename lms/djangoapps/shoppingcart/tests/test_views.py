@@ -23,6 +23,7 @@ from shoppingcart.processors import render_purchase_form_html
 from mock import patch, Mock
 from shoppingcart.views import initialize_report
 from decimal import Decimal
+from student.tests.factories import AdminFactory
 
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
@@ -45,6 +46,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
+        self.instructor = AdminFactory.create()
         self.cost = 40
         self.coupon_code = 'abcde'
         self.percentage_discount = 10
@@ -331,6 +333,27 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         resp2 = self.client.get(reverse('shoppingcart.views.show_receipt', args=[1000]))
         self.assertEqual(resp2.status_code, 404)
+
+    def test_total_amount_of_purchased_course(self):
+        self.add_course_to_user_cart()
+        self.assertEquals(self.cart.orderitem_set.count(), 1)
+        self.add_coupon(self.course_key, True)
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        # Total amount of a particular course that is purchased by different users
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course_key)
+        self.assertEqual(total_amount, 36)
+
+        self.client.login(username=self.instructor.username, password="test")
+        cart = Order.get_cart_for_user(self.instructor)
+        PaidCourseRegistration.add_to_order(cart, self.course_key)
+        cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course_key)
+        self.assertEqual(total_amount, 76)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_valid_coupon_code(self):
