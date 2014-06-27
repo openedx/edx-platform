@@ -597,6 +597,9 @@ of the video file and play automatically stops.
 The browser emits ``seek_video`` events when a user clicks the playback bar or
 transcript to go to a different point in the video file.
 
+**History**: Prior to 25 Jun 2014, the ``old_time`` and ``new_time`` were set
+to the same value.
+
 ``event`` **Member Fields**: 
 
 .. list-table::
@@ -607,16 +610,16 @@ transcript to go to a different point in the video file.
      - Type
      - Details
    * - ``old_time``
-     - 
-     - The time in the video that the user chose to go to a different point in the file.
+     - integer
+     - The time in the video, in seconds, at which the user chose to go to a
+       different point in the file.
    * - ``new_time``
-     - 
-     - The time in the video that the user selected as the destination point.
+     - integer
+     - The time in the video, in seconds, that the user selected as the
+       destination point.
    * - ``type``
-     - 
+     - string
      - The navigational method used to change position within the video.
-
-.. need types
 
 ``speed_change_video`` 
 ------------------------
@@ -1958,7 +1961,7 @@ After a user executes a text search in the navigation sidebar of the Discussion 
 **Event Source**: Server
 
 **History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
-June 2014.
+Jun 2014.
 
 ``event`` **Fields**:
 
