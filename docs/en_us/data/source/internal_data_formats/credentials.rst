@@ -118,7 +118,7 @@ Create Keys: Macintosh
   When you click **Save**, only the public key is saved in the resulting .asc
   file. Do not share your private key with edX or any third party.
 
-#. Compose an e-mail message to your edX program manager. Attach the .asc
+7. Compose an e-mail message to your edX program manager. Attach the .asc
    file that you saved in the previous step to the message, then send the
    message.
 
