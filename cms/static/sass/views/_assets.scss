@@ -327,85 +327,64 @@
 
   // UI: assets - calls-to-action
   .actions-list {
-    @extend %actions-header;
+    @extend %actions-list;
 
     .action-item {
-      display: inline-block;
-      margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
 
-      .action-button {
-        padding: 0;
-        display: block;
-        width: ($baseline*1.5);
-        height: ($baseline*1.5);
-        color: $gray-l3;
+      // special checkbox styling
+      &.action-lock {
+        position: relative;
+      }
+
+      &.action-lock label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 30px;
+        width: 30px;
+
+        &:hover {
+          background-color: $blue;
         }
       }
-  }
 
-  // UI: assets - specific action styling
-  // TODO: this uses similar styling as unit.scss, static-pages.scss
-  .action-item {
+      &.action-lock .lock-checkbox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 30px;
+        width: 30px;
+        opacity: 0;
+      }
 
-    [class^="icon-"] {
-      display: inline-block;
-      vertical-align: bottom;
-    }
-
-
-    &.action-lock {
-      position: relative;
-    }
-
-    &.action-lock label {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 30px;
-      width: 30px;
-
-      &:hover {
+      &.action-lock .lock-checkbox:hover ~ .action-button {
         background-color: $blue;
-      }
-    }
-
-    &.action-lock .lock-checkbox {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 30px;
-      width: 30px;
-      opacity: 0;
-    }
-
-    &.action-lock .lock-checkbox:hover ~ .action-button {
-      background-color: $blue;
-      color: $gray-l6;
-    }
-
-    &.action-lock .lock-checkbox ~ .action-button {
-      .icon-lock {
-        display: none;
+        color: $gray-l6;
       }
 
-      .icon-unlock-alt {
-        display: inline-block;
+      &.action-lock .lock-checkbox ~ .action-button {
+        .icon-lock {
+          display: none;
+        }
+
+        .icon-unlock-alt {
+          display: inline-block;
+        }
+      }
+
+      &.action-lock .lock-checkbox:checked ~ .action-button {
+        background-color: $gray;
+        color: $white;
+
+        .icon-lock {
+          display: inline-block;
+        }
+
+       .icon-unlock-alt {
+          display: none;
+        }
       }
     }
-
-    &.action-lock .lock-checkbox:checked ~ .action-button {
-      background-color: $gray;
-      color: $white;
-
-      .icon-lock {
-        display: inline-block;
-      }
-
-     .icon-unlock-alt {
-        display: none;
-      }
-    }
-
   }
 
   .show-xml {
