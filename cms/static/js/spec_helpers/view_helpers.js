@@ -1,14 +1,16 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "js/views/feedback_notification", "js/spec_helpers/create_sinon"],
-    function($, NotificationView, create_sinon) {
+define(["jquery", "js/views/feedback_notification"],
+    function($, NotificationView) {
         var installTemplate, installViewTemplates, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden;
 
-        installTemplate = function(templateName, isFirst) {
-            var template = readFixtures(templateName + '.underscore'),
+        installTemplate = function(templateName, isFirst, templateId) {
+            var template = readFixtures(templateName + '.underscore');
+            if (!templateId) {
                 templateId = templateName + '-tpl';
+            }
             if (isFirst) {
                 setFixtures($("<script>", { id: templateId, type: "text/template" }).text(template));
             } else {

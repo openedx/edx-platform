@@ -174,8 +174,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
 
         if is_studio_course and is_mongo_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            # reverse for contentstore.views.unit_handler
-            edit_link = "//" + settings.CMS_BASE + '/unit/' + unicode(block.location)
+            edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
 
             # return edit link in rendered HTML for display
             return wrap_fragment(frag, render_to_string("edit_unit_link.html", {'frag_content': frag.content, 'edit_link': edit_link}))
