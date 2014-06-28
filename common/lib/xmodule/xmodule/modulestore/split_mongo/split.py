@@ -492,7 +492,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def get_orphans(self, course_key):
         """
-        Return a dict of all of the orphans in the course.
+        Return an array of all of the orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         course = self._lookup_course(course_key)
@@ -1298,7 +1298,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self._update_head(index_entry, destination_course.branch, destination_structure['_id'])
 
     def unpublish(self, location, user_id):
-        published_location = location.replace(branch=ModuleStoreEnum.RevisionOption.published_only)
+        published_location = location.replace(branch=ModuleStoreEnum.BranchName.published)
         self.delete_item(published_location, user_id)
 
     def update_course_index(self, updated_index_entry):
@@ -1456,11 +1456,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def get_modulestore_type(self, course_key=None):
         """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
+        Returns an enumeration-like type reflecting the type of this modulestore, per ModuleStoreEnum.Type.
 
         Args:
             course_key: just for signature compatibility
