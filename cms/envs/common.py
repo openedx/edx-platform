@@ -53,7 +53,7 @@ FEATURES = {
     'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
-    'STUDIO_REQUEST_EMAIL': '',
+    'STUDIO_REQUEST_EMAIL': 'ufohost.edx@gmail.com',
 
     # Segment.io - must explicitly turn it on for production
     'SEGMENT_IO': False,
@@ -66,7 +66,7 @@ FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False,
+    'ENABLE_CREATOR_GROUP': True,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
