@@ -400,7 +400,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         return dict(
             itertools.chain.from_iterable(
                 store.heartbeat().iteritems()
-                for store in self.modulestores.itervalues()
+                for store in self.modulestores
             )
         )
 
