@@ -199,7 +199,7 @@ the way that the course is set up.
 
 -  Through the **Open Ended Console** page. This option is always
    available for every course. To access the **Open Ended Console** page,
-   click the **Open Ended Panel** tab at the top of any page in the course.
+   click the **Assessment Panel** tab at the top of any page in the course.
    When you see the list of problems that have responses available to grade,
    click the name of the problem that you want to open it.
 
@@ -356,7 +356,7 @@ the score.
 
 For *peer assessments* and *AI assessments*, you'll access your scores through the **Open Ended Console** page.
 
-#. In the EdX Demo course, click the **Open Ended Panel** tab at the top
+#. In the EdX Demo course, click the **Assessment Panel** tab at the top
    of the page.
 
 #. On the **Open Ended Console** page, click **Problems You Have
