@@ -12,7 +12,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="drop-menu-entry"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</span></a></li>
+    <li><a href="#" class="drop-menu-entry"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${str(entries[entry]['is_cohorted']).lower()}">${entry}</span></a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
