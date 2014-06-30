@@ -2,13 +2,17 @@
 import collections
 import copy
 import mock
+from datetime import datetime, timedelta
+from pytz import UTC
 
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+
+from xmodule.modulestore.django import modulestore
 
 
 class LMSLinksTestCase(TestCase):
@@ -183,3 +187,65 @@ class CourseImageTestCase(TestCase):
                 course=course.location.course
             )
         )
+
+
+class XBlockVisibilityTestCase(TestCase):
+    """Tests for xblock visibility for students."""
+
+    def setUp(self):
+        self.dummy_user = 123
+        self.past = datetime(1970, 1, 1)
+        self.future = datetime.now(UTC) + timedelta(days=1)
+
+    def test_private_unreleased_xblock(self):
+        """Verifies that a private unreleased xblock is not visible"""
+        vertical = self._create_xblock_with_start_date('private_unreleased', self.future)
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_private_released_xblock(self):
+        """Verifies that a private released xblock is not visible"""
+        vertical = self._create_xblock_with_start_date('private_released', self.past)
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_public_unreleased_xblock(self):
+        """Verifies that a public (published) unreleased xblock is not visible"""
+        vertical = self._create_xblock_with_start_date('public_unreleased', self.future, publish=True)
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_public_released_xblock(self):
+        """Verifies that public (published) released xblock is visible"""
+        vertical = self._create_xblock_with_start_date('public_released', self.past, publish=True)
+        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+
+    def test_private_no_start_xblock(self):
+        """Verifies that a private xblock with no start date is not visible"""
+        vertical = self._create_xblock_with_start_date('private_no_start', None)
+        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+
+    def test_public_no_start_xblock(self):
+        """Verifies that a public (published) xblock with no start date is visible"""
+        vertical = self._create_xblock_with_start_date('public_no_start', None, publish=True)
+        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+
+    def test_draft_released_xblock(self):
+        """Verifies that a xblock with an unreleased draft and a released published version is visible"""
+        vertical = self._create_xblock_with_start_date('draft_released', self.past, publish=True)
+
+        # Create an unreleased draft version of the xblock
+        vertical.start = self.future
+        modulestore().update_item(vertical, self.dummy_user)
+
+        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+
+    def _create_xblock_with_start_date(self, name, start_date, publish=False):
+        """Helper to create an xblock with a start date, optionally publishing it"""
+        location = Location('edX', 'visibility', '2012_Fall', 'vertical', name)
+
+        vertical = modulestore().create_xmodule(location)
+        vertical.start = start_date
+        modulestore().update_item(vertical, self.dummy_user, allow_not_found=True)
+
+        if publish:
+            modulestore().publish(location, self.dummy_user)
+
+        return vertical

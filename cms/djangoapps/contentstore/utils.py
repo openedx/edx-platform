@@ -3,6 +3,8 @@
 import copy
 import logging
 import re
+from datetime import datetime
+from pytz import UTC
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -10,8 +12,10 @@ from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import REVISION_OPTION_PUBLISHED_ONLY
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -127,6 +131,25 @@ def compute_publish_state(xblock):
     """
 
     return modulestore().compute_publish_state(xblock)
+
+
+def is_xblock_visible_to_students(xblock):
+    """
+    Returns true if there is a published version of the xblock that has been released.
+    """
+
+    try:
+        published = modulestore().get_item(xblock.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
+    # If there's no published version then the xblock is clearly not visible
+    except ItemNotFoundError:
+        return False
+
+    # Check start date
+    if 'detached' not in published._class_tags and published.start is not None:
+        return datetime.now(UTC) > published.start
+
+    # No start date, so it's always visible
+    return True
 
 
 def add_extra_panel_tab(tab_type, course):
