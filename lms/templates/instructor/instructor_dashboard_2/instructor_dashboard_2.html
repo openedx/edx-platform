@@ -81,7 +81,9 @@
   ## when the javascript loads, it clicks on the first section
   <ul class="instructor-nav">
     % for section_data in sections:
-      <li class="nav-item"><a href="" data-section="${ section_data['section_key'] }">${_(section_data['section_display_name'])}</a></li>
+      ## This is necessary so we don't scrape 'section_display_name' as a string.
+      <% dname = section_data['section_display_name'] %>
+      <li class="nav-item"><a href="" data-section="${ section_data['section_key'] }">${_(dname)}</a></li>
     % endfor
   </ul>
 

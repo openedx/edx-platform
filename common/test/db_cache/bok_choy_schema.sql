@@ -9,6 +9,239 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `assessment_assessment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_uuid` varchar(128) NOT NULL,
+  `rubric_id` int(11) NOT NULL,
+  `scored_at` datetime NOT NULL,
+  `scorer_id` varchar(40) NOT NULL,
+  `score_type` varchar(2) NOT NULL,
+  `feedback` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `assessment_assessment_39d020e6` (`submission_uuid`),
+  KEY `assessment_assessment_27cb9807` (`rubric_id`),
+  KEY `assessment_assessment_3227200` (`scored_at`),
+  KEY `assessment_assessment_9f54855a` (`scorer_id`),
+  CONSTRAINT `rubric_id_refs_id_287cd4a61ab6dbc4` FOREIGN KEY (`rubric_id`) REFERENCES `assessment_rubric` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_assessmentfeedback`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessmentfeedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_uuid` varchar(128) NOT NULL,
+  `feedback_text` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `submission_uuid` (`submission_uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_assessmentfeedback_assessments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessmentfeedback_assessments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `assessmentfeedback_id` int(11) NOT NULL,
+  `assessment_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `assessment_assessmen_assessmentfeedback_id_36925aaa1a839ac_uniq` (`assessmentfeedback_id`,`assessment_id`),
+  KEY `assessment_assessmentfeedback_assessments_58f1f0d` (`assessmentfeedback_id`),
+  KEY `assessment_assessmentfeedback_assessments_c168f2dc` (`assessment_id`),
+  CONSTRAINT `assessment_id_refs_id_170e92e6e7fd607e` FOREIGN KEY (`assessment_id`) REFERENCES `assessment_assessment` (`id`),
+  CONSTRAINT `assessmentfeedback_id_refs_id_226c8f1e91bbd347` FOREIGN KEY (`assessmentfeedback_id`) REFERENCES `assessment_assessmentfeedback` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_assessmentfeedback_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessmentfeedback_options` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `assessmentfeedback_id` int(11) NOT NULL,
+  `assessmentfeedbackoption_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `assessment_assessmen_assessmentfeedback_id_14efc9eea8f4c83_uniq` (`assessmentfeedback_id`,`assessmentfeedbackoption_id`),
+  KEY `assessment_assessmentfeedback_options_58f1f0d` (`assessmentfeedback_id`),
+  KEY `assessment_assessmentfeedback_options_4e523d64` (`assessmentfeedbackoption_id`),
+  CONSTRAINT `assessmentfeedbackoption_id_refs_id_597390b9cdf28acd` FOREIGN KEY (`assessmentfeedbackoption_id`) REFERENCES `assessment_assessmentfeedbackoption` (`id`),
+  CONSTRAINT `assessmentfeedback_id_refs_id_5383f6e95c27c412` FOREIGN KEY (`assessmentfeedback_id`) REFERENCES `assessment_assessmentfeedback` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_assessmentfeedbackoption`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessmentfeedbackoption` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `text` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `text` (`text`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_assessmentpart`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_assessmentpart` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `assessment_id` int(11) NOT NULL,
+  `option_id` int(11) NOT NULL,
+  `feedback` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `assessment_assessmentpart_c168f2dc` (`assessment_id`),
+  KEY `assessment_assessmentpart_2f3b0dc9` (`option_id`),
+  CONSTRAINT `assessment_id_refs_id_5cb07795bff26444` FOREIGN KEY (`assessment_id`) REFERENCES `assessment_assessment` (`id`),
+  CONSTRAINT `option_id_refs_id_5353f6b204439dd5` FOREIGN KEY (`option_id`) REFERENCES `assessment_criterionoption` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_criterion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_criterion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rubric_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `order_num` int(10) unsigned NOT NULL,
+  `prompt` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `assessment_criterion_27cb9807` (`rubric_id`),
+  CONSTRAINT `rubric_id_refs_id_48945684f2f4f3c4` FOREIGN KEY (`rubric_id`) REFERENCES `assessment_rubric` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_criterionoption`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_criterionoption` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `criterion_id` int(11) NOT NULL,
+  `order_num` int(10) unsigned NOT NULL,
+  `points` int(10) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `explanation` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `assessment_criterionoption_a36470e4` (`criterion_id`),
+  CONSTRAINT `criterion_id_refs_id_4aabcea0d2645232` FOREIGN KEY (`criterion_id`) REFERENCES `assessment_criterion` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_peerworkflow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_peerworkflow` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(40) NOT NULL,
+  `item_id` varchar(128) NOT NULL,
+  `course_id` varchar(40) NOT NULL,
+  `submission_uuid` varchar(128) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `grading_completed_at` datetime,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `submission_uuid` (`submission_uuid`),
+  KEY `assessment_peerworkflow_42ff452e` (`student_id`),
+  KEY `assessment_peerworkflow_67b70d25` (`item_id`),
+  KEY `assessment_peerworkflow_ff48d8e5` (`course_id`),
+  KEY `assessment_peerworkflow_3b1c9c31` (`created_at`),
+  KEY `assessment_peerworkflow_a2fd3af6` (`completed_at`),
+  KEY `assessment_peerworkflow_course_id_5ca23fddca9b630d` (`course_id`,`item_id`,`student_id`),
+  KEY `assessment_peerworkflow_dcd62131` (`grading_completed_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_peerworkflowitem`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_peerworkflowitem` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scorer_id` int(11) NOT NULL,
+  `author_id` int(11) NOT NULL,
+  `submission_uuid` varchar(128) NOT NULL,
+  `started_at` datetime NOT NULL,
+  `assessment_id` int(11) DEFAULT NULL,
+  `scored` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `assessment_peerworkflowitem_9f54855a` (`scorer_id`),
+  KEY `assessment_peerworkflowitem_cc846901` (`author_id`),
+  KEY `assessment_peerworkflowitem_39d020e6` (`submission_uuid`),
+  KEY `assessment_peerworkflowitem_d6e710e4` (`started_at`),
+  KEY `assessment_peerworkflowitem_c168f2dc` (`assessment_id`),
+  CONSTRAINT `assessment_id_refs_id_61929d36f69a86a1` FOREIGN KEY (`assessment_id`) REFERENCES `assessment_assessment` (`id`),
+  CONSTRAINT `author_id_refs_id_5b3f4e759547df0` FOREIGN KEY (`author_id`) REFERENCES `assessment_peerworkflow` (`id`),
+  CONSTRAINT `scorer_id_refs_id_5b3f4e759547df0` FOREIGN KEY (`scorer_id`) REFERENCES `assessment_peerworkflow` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_rubric`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_rubric` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_hash` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_hash` (`content_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_studenttrainingworkflow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_studenttrainingworkflow` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_uuid` varchar(128) NOT NULL,
+  `student_id` varchar(40) NOT NULL,
+  `item_id` varchar(128) NOT NULL,
+  `course_id` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `assessment_studenttrainin_submission_uuid_6d32c6477719d68f_uniq` (`submission_uuid`),
+  KEY `assessment_studenttrainingworkflow_39d020e6` (`submission_uuid`),
+  KEY `assessment_studenttrainingworkflow_42ff452e` (`student_id`),
+  KEY `assessment_studenttrainingworkflow_67b70d25` (`item_id`),
+  KEY `assessment_studenttrainingworkflow_ff48d8e5` (`course_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_studenttrainingworkflowitem`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_studenttrainingworkflowitem` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `workflow_id` int(11) NOT NULL,
+  `order_num` int(10) unsigned NOT NULL,
+  `started_at` datetime NOT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `training_example_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `assessment_studenttrainingworkf_order_num_1391289faa95b87c_uniq` (`order_num`,`workflow_id`),
+  KEY `assessment_studenttrainingworkflowitem_26cddbc7` (`workflow_id`),
+  KEY `assessment_studenttrainingworkflowitem_541d6663` (`training_example_id`),
+  CONSTRAINT `training_example_id_refs_id_21003d6e7d3f36e4` FOREIGN KEY (`training_example_id`) REFERENCES `assessment_trainingexample` (`id`),
+  CONSTRAINT `workflow_id_refs_id_5a3573250ce50a30` FOREIGN KEY (`workflow_id`) REFERENCES `assessment_studenttrainingworkflow` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_trainingexample`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_trainingexample` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `raw_answer` longtext NOT NULL,
+  `rubric_id` int(11) NOT NULL,
+  `content_hash` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_hash` (`content_hash`),
+  KEY `assessment_trainingexample_27cb9807` (`rubric_id`),
+  CONSTRAINT `rubric_id_refs_id_36f1317b7750db21` FOREIGN KEY (`rubric_id`) REFERENCES `assessment_rubric` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_trainingexample_options_selected`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_trainingexample_options_selected` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trainingexample_id` int(11) NOT NULL,
+  `criterionoption_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `assessment_trainingexa_trainingexample_id_60940991fb17d27d_uniq` (`trainingexample_id`,`criterionoption_id`),
+  KEY `assessment_trainingexample_options_selected_ea4da31f` (`trainingexample_id`),
+  KEY `assessment_trainingexample_options_selected_843fa247` (`criterionoption_id`),
+  CONSTRAINT `criterionoption_id_refs_id_16ecec54bed5a465` FOREIGN KEY (`criterionoption_id`) REFERENCES `assessment_criterionoption` (`id`),
+  CONSTRAINT `trainingexample_id_refs_id_797bc2db5f0faa8d` FOREIGN KEY (`trainingexample_id`) REFERENCES `assessment_trainingexample` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -46,7 +279,7 @@ CREATE TABLE `auth_permission` (
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   KEY `auth_permission_e4470c6e` (`content_type_id`),
   CONSTRAINT `content_type_id_refs_id_728de91f` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=259 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=322 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -490,8 +723,8 @@ CREATE TABLE `django_admin_log` (
   PRIMARY KEY (`id`),
   KEY `django_admin_log_fbfc09f1` (`user_id`),
   KEY `django_admin_log_e4470c6e` (`content_type_id`),
-  CONSTRAINT `content_type_id_refs_id_288599e6` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
-  CONSTRAINT `user_id_refs_id_c8665aa` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+  CONSTRAINT `user_id_refs_id_c8665aa` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
+  CONSTRAINT `content_type_id_refs_id_288599e6` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_comment_client_permission`;
@@ -553,7 +786,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `app_label` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -661,8 +894,8 @@ CREATE TABLE `djcelery_periodictask` (
   UNIQUE KEY `name` (`name`),
   KEY `djcelery_periodictask_17d2d99d` (`interval_id`),
   KEY `djcelery_periodictask_7aa5fda` (`crontab_id`),
-  CONSTRAINT `crontab_id_refs_id_ebff5e74` FOREIGN KEY (`crontab_id`) REFERENCES `djcelery_crontabschedule` (`id`),
-  CONSTRAINT `interval_id_refs_id_f2054349` FOREIGN KEY (`interval_id`) REFERENCES `djcelery_intervalschedule` (`id`)
+  CONSTRAINT `interval_id_refs_id_f2054349` FOREIGN KEY (`interval_id`) REFERENCES `djcelery_intervalschedule` (`id`),
+  CONSTRAINT `crontab_id_refs_id_ebff5e74` FOREIGN KEY (`crontab_id`) REFERENCES `djcelery_crontabschedule` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `djcelery_periodictasks`;
@@ -1103,7 +1336,7 @@ CREATE TABLE `south_migrationhistory` (
   `migration` varchar(255) NOT NULL,
   `applied` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `splash_splashconfig`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1136,6 +1369,24 @@ CREATE TABLE `student_anonymoususerid` (
   KEY `student_anonymoususerid_fbfc09f1` (`user_id`),
   KEY `student_anonymoususerid_ff48d8e5` (`course_id`),
   CONSTRAINT `user_id_refs_id_23effb36c38f7a2a` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `student_courseaccessrole`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `student_courseaccessrole` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `org` varchar(64) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `role` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `student_courseaccessrole_user_id_3203176c4f474414_uniq` (`user_id`,`org`,`course_id`,`role`),
+  KEY `student_courseaccessrole_fbfc09f1` (`user_id`),
+  KEY `student_courseaccessrole_4f5f82e2` (`org`),
+  KEY `student_courseaccessrole_ff48d8e5` (`course_id`),
+  KEY `student_courseaccessrole_e0b082a1` (`role`),
+  CONSTRAINT `user_id_refs_id_7460a3f36ac23885` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `student_courseenrollment`;
@@ -1183,6 +1434,19 @@ CREATE TABLE `student_loginfailures` (
   PRIMARY KEY (`id`),
   KEY `student_loginfailures_fbfc09f1` (`user_id`),
   CONSTRAINT `user_id_refs_id_50dcb1c1e6a71045` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `student_passwordhistory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `student_passwordhistory` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `time_set` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `student_passwordhistory_fbfc09f1` (`user_id`),
+  CONSTRAINT `user_id_refs_id_6110e7eaed0987da` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `student_pendingemailchange`;
@@ -1255,6 +1519,77 @@ CREATE TABLE `student_usertestgroup_users` (
   CONSTRAINT `user_id_refs_id_412b14bf8947584c` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `submissions_score`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `submissions_score` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_item_id` int(11) NOT NULL,
+  `submission_id` int(11) DEFAULT NULL,
+  `points_earned` int(10) unsigned NOT NULL,
+  `points_possible` int(10) unsigned NOT NULL,
+  `created_at` datetime NOT NULL,
+  `reset` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `submissions_score_fa84001` (`student_item_id`),
+  KEY `submissions_score_b3d6235a` (`submission_id`),
+  KEY `submissions_score_3b1c9c31` (`created_at`),
+  CONSTRAINT `student_item_id_refs_id_33922a7f8cd97385` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`),
+  CONSTRAINT `submission_id_refs_id_3b63d5ec9e39cf2e` FOREIGN KEY (`submission_id`) REFERENCES `submissions_submission` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `submissions_scoresummary`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `submissions_scoresummary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_item_id` int(11) NOT NULL,
+  `highest_id` int(11) NOT NULL,
+  `latest_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `student_item_id` (`student_item_id`),
+  KEY `submissions_scoresummary_d65f9365` (`highest_id`),
+  KEY `submissions_scoresummary_1efb24d9` (`latest_id`),
+  CONSTRAINT `latest_id_refs_id_37a2bc281bdc0a18` FOREIGN KEY (`latest_id`) REFERENCES `submissions_score` (`id`),
+  CONSTRAINT `highest_id_refs_id_37a2bc281bdc0a18` FOREIGN KEY (`highest_id`) REFERENCES `submissions_score` (`id`),
+  CONSTRAINT `student_item_id_refs_id_6183d6a8bd51e768` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `submissions_studentitem`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `submissions_studentitem` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(255) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  `item_type` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `submissions_studentitem_course_id_6a6eccbdec6ffd0b_uniq` (`course_id`,`student_id`,`item_id`),
+  KEY `submissions_studentitem_42ff452e` (`student_id`),
+  KEY `submissions_studentitem_ff48d8e5` (`course_id`),
+  KEY `submissions_studentitem_67b70d25` (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `submissions_submission`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `submissions_submission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `student_item_id` int(11) NOT NULL,
+  `attempt_number` int(10) unsigned NOT NULL,
+  `submitted_at` datetime NOT NULL,
+  `created_at` datetime NOT NULL,
+  `raw_answer` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `submissions_submission_2bbc74ae` (`uuid`),
+  KEY `submissions_submission_fa84001` (`student_item_id`),
+  KEY `submissions_submission_4452d192` (`submitted_at`),
+  KEY `submissions_submission_3b1c9c31` (`created_at`),
+  CONSTRAINT `student_item_id_refs_id_1df1d83e00b5cccc` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `track_trackinglog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1271,6 +1606,23 @@ CREATE TABLE `track_trackinglog` (
   `time` datetime NOT NULL,
   `host` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `user_api_usercoursetag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_api_usercoursetag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `value` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_api_usercoursetags_user_id_a734720a0483b08_uniq` (`user_id`,`course_id`,`key`),
+  KEY `user_api_usercoursetags_fbfc09f1` (`user_id`),
+  KEY `user_api_usercoursetags_45544485` (`key`),
+  KEY `user_api_usercoursetags_ff48d8e5` (`course_id`),
+  CONSTRAINT `user_id_refs_id_1d26ef6c47a9a367` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_api_userpreference`;
@@ -1659,6 +2011,42 @@ CREATE TABLE `wiki_urlpath` (
   CONSTRAINT `article_id_refs_id_23bd80e7971759c9` FOREIGN KEY (`article_id`) REFERENCES `wiki_article` (`id`),
   CONSTRAINT `parent_id_refs_id_62afe7c752d1e703` FOREIGN KEY (`parent_id`) REFERENCES `wiki_urlpath` (`id`),
   CONSTRAINT `site_id_refs_id_462d2bc7f4bbaaa2` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `workflow_assessmentworkflow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `workflow_assessmentworkflow` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `status` varchar(100) NOT NULL,
+  `status_changed` datetime NOT NULL,
+  `submission_uuid` varchar(36) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `submission_uuid` (`submission_uuid`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `workflow_assessmentworkflow_course_id_21b427c69fc666ad` (`course_id`,`item_id`,`status`),
+  KEY `workflow_assessmentworkflow_ff48d8e5` (`course_id`),
+  KEY `workflow_assessmentworkflow_67b70d25` (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `workflow_assessmentworkflowstep`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `workflow_assessmentworkflowstep` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `workflow_id` int(11) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `submitter_completed_at` datetime DEFAULT NULL,
+  `assessment_completed_at` datetime DEFAULT NULL,
+  `order_num` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `workflow_assessmentworkflowstep_26cddbc7` (`workflow_id`),
+  CONSTRAINT `workflow_id_refs_id_4e31588b69d0b483` FOREIGN KEY (`workflow_id`) REFERENCES `workflow_assessmentworkflow` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
     "js/views/feedback_prompt", "js/views/pages/container", "js/models/xblock_info"],
-    function ($, _, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
+    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
 
         describe("ContainerPage", function() {
             var lastRequest, renderContainerPage, expectComponents, respondWithHtml,
@@ -96,9 +96,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     editButtons.first().click();
 
                     // Expect a request to be made to show the studio view for the container
-                    expect(lastRequest().url).toBe(
-                        '/xblock/locator-container/studio_view'
-                    );
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-container/studio_view')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockContainerXBlockHtml,
                         resources: []
@@ -114,9 +112,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(edit_helpers.isShowingModal()).toBeFalsy();
 
                     // Expect the last request be to refresh the container page
-                    expect(lastRequest().url).toBe(
-                        '/xblock/locator-container/container_preview'
-                    );
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-container/container_preview')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockUpdatedContainerXBlockHtml,
                         resources: []
@@ -153,9 +149,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(editButtons.length).toBe(6);
                     editButtons[0].click();
                     // Make sure that the correct xblock is requested to be edited
-                    expect(lastRequest().url).toBe(
-                        '/xblock/locator-component-A1/studio_view'
-                    );
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/studio_view')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []
@@ -212,16 +206,6 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
                     // Verify that the xblock was updated
                     expect(containerPage.$('.mock-updated-content').text()).toBe('Mock Update');
-                });
-            });
-
-            describe("Empty container", function() {
-                var mockEmptyContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
-
-                it('shows the "no children" message', function() {
-                    renderContainerPage(mockEmptyContainerXBlockHtml, this);
-                    expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');
-                    expect(containerPage.$('.wrapper-xblock')).toHaveClass('is-hidden');
                 });
             });
 

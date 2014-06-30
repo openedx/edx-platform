@@ -15,14 +15,12 @@ from contentstore.tests.utils import parse_json, user, registration, AjaxEnabled
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 import datetime
 from pytz import UTC
 
 from freezegun import freeze_time
 
 
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTestCase(ModuleStoreTestCase):
     def _login(self, email, password):
         """

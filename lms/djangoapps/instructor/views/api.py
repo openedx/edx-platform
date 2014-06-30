@@ -52,9 +52,7 @@ import analytics.distributions
 import analytics.csvs
 import csv
 
-# Submissions is a Django app that is currently installed
-# from the edx-ora2 repo, although it will likely move in the future.
-from submissions import api as sub_api
+from submissions import api as sub_api # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
 
@@ -565,8 +563,9 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = [
-        'username', 'name', 'email', 'language', 'location', 'year_of_birth',
-        'gender', 'level_of_education', 'mailing_address', 'goals'
+        'id', 'username', 'name', 'email', 'language', 'location',
+        'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+        'goals',
     ]
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
@@ -575,6 +574,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
     # used as the header row in the CSV, but could be in the future.
     query_features_names = {
+        'id': _('User ID'),
         'username': _('Username'),
         'name': _('Name'),
         'email': _('Email'),

@@ -33,13 +33,13 @@ The following documentation is available:
     reflect the workflow of building a new course.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
   Recent changes include:
 
   *  Added the `Data Czar/Data Team Selection and Responsibilities`_ chapter.
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
   *  Added the `Custom JavaScript Applications`_ chapter.
 

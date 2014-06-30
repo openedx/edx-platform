@@ -19,7 +19,9 @@ _ = lambda text: text
 
 class AnnotatableFields(object):
     """ Fields for `ImageModule` and `ImageDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
+    data = String(help=_("XML data for the annotation"),
+        scope=Scope.content,
+        default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -63,6 +65,25 @@ class AnnotatableFields(object):
         default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         display_name=_("Secret Token String for Annotation")
     )
+    default_tab = String(
+        display_name=_("Default Annotations Tab"),
+        help=_("Select which tab will be the default in the annotations table: myNotes, Instructor, or Public."),
+        scope=Scope.settings,
+        default="myNotes",
+    )
+    # currently only supports one instructor, will build functionality for multiple later
+    instructor_email = String(
+        display_name=_("Email for 'Instructor' Annotations"),
+        help=_("Email of the user that will be attached to all annotations that will be found in 'Instructor' tab."),
+        scope=Scope.settings,
+        default="",
+    )
+    annotation_mode = String(
+        display_name=_("Mode for Annotation Tool"),
+        help=_("Type in number corresponding to following modes:  'instructor' or 'everyone'"),
+        scope=Scope.settings,
+        default="everyone",
+    )
 
 
 class ImageAnnotationModule(AnnotatableFields, XModule):
@@ -100,12 +121,14 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         context = {
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
-            'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user, self.annotation_token_secret),
             'tag': self.instructor_tags,
             'openseadragonjson': self.openseadragonjson,
+            'annotation_storage': self.annotation_storage_url,
+            'default_tab': self.default_tab,
+            'instructor_email': self.instructor_email,
+            'annotation_mode': self.annotation_mode,
         }
-
         fragment = Fragment(self.system.render_template('imageannotation.html', context))
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
         fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")

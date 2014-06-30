@@ -889,18 +889,15 @@ class CourseEnrollment(models.Model):
         `user` is a Django User object
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
-        Returns the mode for both inactive and active users.
-        Returns None if the courseenrollment record does not exist.
+        Returns (mode, is_active) where mode is the enrollment mode of the student
+            and is_active is whether the enrollment is active.
+        Returns (None, None) if the courseenrollment record does not exist.
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-
-            if hasattr(record, 'mode'):
-                return record.mode
-            else:
-                return None
+            return (record.mode, record.is_active)
         except cls.DoesNotExist:
-            return None
+            return (None, None)
 
     @classmethod
     def enrollments_for_user(cls, user):
@@ -946,9 +943,16 @@ class CourseEnrollment(models.Model):
 
     def refundable(self):
         """
-        For paid/verified certificates, students may receive a refund IFF they have
+        For paid/verified certificates, students may receive a refund if they have
         a verified certificate and the deadline for refunds has not yet passed.
         """
+        # In order to support manual refunds past the deadline, set can_refund on this object.
+        # On unenrolling, the "unenroll_done" signal calls CertificateItem.refund_cert_callback(),
+        # which calls this method to determine whether to refund the order.
+        # This can't be set directly because refunds currently happen as a side-effect of unenrolling.
+        # (side-effects are bad)
+        if getattr(self, 'can_refund', None) is not None:
+            return True
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:
             return False

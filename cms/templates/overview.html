@@ -36,7 +36,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       });
   });
 
-  $(".section-name").each(function() {
+  $(".section-name.is_editable").each(function() {
       var model = new SectionModel({
           id: $(this).parent(".item-details").data("locator"),
           name: $(this).data("name")
@@ -53,7 +53,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       <header class="section">
       <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
         <div class="item-details">
-          <h3 class="section-name">
+          <h3 class="section-name is_editable">
             <form class="section-name-form">
               <input type="text" value="${_('New Section Name')}" class="new-section-name" />
               <input type="submit" class="new-section-name-save" data-parent="${context_course.location}"
@@ -72,7 +72,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
     <header>
       <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
       <div class="item-details">
-        <h3 class="section-name">
+        <h3 class="section-name is_editable">
         <span class="section-name-span">${_('Add a new section name')}</span>
         <form class="section-name-form">
           <input type="text" value="${_('New Section Name')}" class="new-section-name" />
@@ -163,7 +163,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                   <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
 
                   <div class="item-details" data-locator="${section_locator}">
-                    <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
+                    <h3 class="section-name is_editable" data-name="${section.display_name_with_default | h}"></h3>
                   </div>
                   <div class="item-actions">
 

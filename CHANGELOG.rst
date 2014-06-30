@@ -5,6 +5,20 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
+
+Studio: Show display names and help text in Advanced Settings. Also hide deprecated settings
+by default.
+
+Studio: Move Peer Assessment into advanced problems menu.
+
+Studio: Support creation and editing of split_test instances (Content Experiments)
+entirely in Studio. STUD-1658.
+
+Blades: Add context-aware video index. BLD-933
+
+Blades: Fix bug with incorrect link format and redirection. BLD-1049
+
 Blades: Fix bug with incorrect RelativeTime value after XML serialization. BLD-1060
 
 LMS: Update bulk email implementation to lessen load on the database

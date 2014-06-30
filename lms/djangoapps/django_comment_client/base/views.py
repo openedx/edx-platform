@@ -1,31 +1,35 @@
-import time
-import random
-import os.path
-import logging
-import urlparse
 import functools
+import logging
+import os.path
+import random
+import time
+import urlparse
 
-import lms.lib.comment_client as cc
-import django_comment_client.utils as utils
-import django_comment_client.settings as cc_settings
-
-
-from django.core import exceptions
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.views.decorators import csrf
+from django.contrib.auth.models import User
+from django.core import exceptions
 from django.core.files.storage import get_storage_class
+from django.http import Http404
 from django.utils.translation import ugettext as _
+from django.views.decorators import csrf
+from django.views.decorators.http import require_GET, require_POST
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
-
-from django_comment_client.utils import JsonResponse, JsonError, extract, add_courseware_context
-
+import django_comment_client.settings as cc_settings
+from django_comment_client.utils import (
+    add_courseware_context,
+    get_annotated_content_info,
+    get_ability,
+    JsonError,
+    JsonResponse,
+    safe_content
+)
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
-from courseware.access import has_access
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.keys import CourseKey
+import lms.lib.comment_client as cc
 
 log = logging.getLogger(__name__)
 
@@ -51,9 +55,9 @@ def permitted(fn):
 
 def ajax_content_response(request, course_id, content):
     user_info = cc.User.from_django_user(request.user).to_dict()
-    annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
+    annotated_content_info = get_annotated_content_info(course_id, content, request.user, user_info)
     return JsonResponse({
-        'content': utils.safe_content(content),
+        'content': safe_content(content),
         'annotated_content_info': annotated_content_info,
     })
 
@@ -133,7 +137,7 @@ def create_thread(request, course_id, commentable_id):
     if request.is_ajax():
         return ajax_content_response(request, course_id, data)
     else:
-        return JsonResponse(utils.safe_content(data))
+        return JsonResponse(safe_content(data))
 
 
 @require_POST
@@ -154,7 +158,7 @@ def update_thread(request, course_id, thread_id):
     if request.is_ajax():
         return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread.to_dict())
     else:
-        return JsonResponse(utils.safe_content(thread.to_dict()))
+        return JsonResponse(safe_content(thread.to_dict()))
 
 
 def _create_comment(request, course_key, thread_id=None, parent_id=None):
@@ -195,7 +199,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
-        return JsonResponse(utils.safe_content(comment.to_dict()))
+        return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -222,7 +226,7 @@ def delete_thread(request, course_id, thread_id):
     """
     thread = cc.Thread.find(thread_id)
     thread.delete()
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -241,7 +245,7 @@ def update_comment(request, course_id, comment_id):
     if request.is_ajax():
         return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), comment.to_dict())
     else:
-        return JsonResponse(utils.safe_content(comment.to_dict()))
+        return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -255,7 +259,7 @@ def endorse_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
     comment.save()
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -271,8 +275,8 @@ def openclose_thread(request, course_id, thread_id):
     thread.save()
     thread = thread.to_dict()
     return JsonResponse({
-        'content': utils.safe_content(thread),
-        'ability': utils.get_ability(SlashSeparatedCourseKey.from_deprecated_string(course_id), thread, request.user),
+        'content': safe_content(thread),
+        'ability': get_ability(SlashSeparatedCourseKey.from_deprecated_string(course_id), thread, request.user),
     })
 
 
@@ -300,7 +304,7 @@ def delete_comment(request, course_id, comment_id):
     """
     comment = cc.Comment.find(comment_id)
     comment.delete()
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -313,7 +317,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.vote(comment, value)
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -327,7 +331,7 @@ def undo_vote_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.unvote(comment)
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -341,7 +345,7 @@ def vote_for_thread(request, course_id, thread_id, value):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -355,7 +359,7 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -372,7 +376,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     remove_all = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, 'staff', course)
     thread.unFlagAbuse(user, thread, remove_all)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -386,7 +390,7 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -403,7 +407,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
-    return JsonResponse(utils.safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict()))
 
 
 @require_POST
@@ -417,7 +421,7 @@ def undo_vote_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -431,7 +435,7 @@ def pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.pin(user, thread_id)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -445,7 +449,7 @@ def un_pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.un_pin(user, thread_id)
-    return JsonResponse(utils.safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict()))
 
 
 @require_POST
@@ -598,3 +602,40 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             'file_url': file_url,
         }
     })
+
+@require_GET
+@login_required
+def users(request, course_id):
+    """
+    Given a `username` query parameter, find matches for users in the forum for this course.
+
+    Only exact matches are supported here, so the length of the result set will either be 0 or 1.
+    """
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        course = get_course_with_access(request.user, 'load_forum', course_key)
+    except Http404:
+        # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+
+    try:
+        username = request.GET['username']
+    except KeyError:
+        # 400 is default status for JsonError
+        return JsonError(["username parameter is required"])
+
+    user_objs = []
+    try:
+        matched_user = User.objects.get(username=username)
+        cc_user = cc.User.from_django_user(matched_user)
+        cc_user.course_id=course_key
+        cc_user.retrieve(complete=False)
+        if (cc_user['threads_count'] + cc_user['comments_count']) > 0:
+            user_objs.append({
+                'id': matched_user.id,
+                'username': matched_user.username,
+            })
+    except User.DoesNotExist:
+        pass
+    return JsonResponse({"users": user_objs})

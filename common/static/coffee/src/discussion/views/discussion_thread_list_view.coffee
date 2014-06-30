@@ -36,7 +36,36 @@ if Backbone?
       @current_search = ""
       @mode = 'all'
 
+      @searchAlertCollection = new Backbone.Collection([], {model: Backbone.Model})
+
+      @searchAlertCollection.on "add", (searchAlert) =>
+        content = _.template(
+          $("#search-alert-template").html(),
+          {'message': searchAlert.attributes.message, 'cid': searchAlert.cid}
+          )
+        @$(".search-alerts").append(content)
+        @$("#search-alert-" + searchAlert.cid + " a.dismiss").bind "click", searchAlert, (event) =>
+          @removeSearchAlert(event.data.cid)
+
+      @searchAlertCollection.on "remove", (searchAlert) =>
+        @$("#search-alert-" + searchAlert.cid).remove()
+
+      @searchAlertCollection.on "reset", =>
+        @$(".search-alerts").empty()
+
+    addSearchAlert: (message) =>
+      m = new Backbone.Model({"message": message})
+      @searchAlertCollection.add(m)
+      m
+
+    removeSearchAlert: (searchAlert) =>
+      @searchAlertCollection.remove(searchAlert)
+
+    clearSearchAlerts: =>
+      @searchAlertCollection.reset()
+
     reloadDisplayedCollection: (thread) =>
+      @clearSearchAlerts()
       thread_id = thread.get('id')
       content = @renderThread(thread)
       current_el = @$("a[data-id=#{thread_id}]")
@@ -103,6 +132,9 @@ if Backbone?
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
       @renderThreads()
+      sort_element = @$('.sort-bar a[data-sort="' + this.collection.sort_preference + '"]')
+      sort_element.attr('aria-checked',true)
+      sort_element.addClass('active')
       @
 
     renderThreads: =>
@@ -384,18 +416,14 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      activeSort = @$(".sort-bar a[class='active']")
+      activeSort = @$(".sort-bar a.active")
       activeSort.removeClass("active")
       activeSort.attr("aria-checked", "false")
       newSort = $(event.target)
       newSort.addClass("active")
       newSort.attr("aria-checked", "true")
       @sortBy = newSort.data("sort")
-
-      @displayedCollection.comparator = switch @sortBy
-        when 'date' then @displayedCollection.sortByDateRecentFirst
-        when 'votes' then @displayedCollection.sortByVotes
-        when 'comments' then @displayedCollection.sortByComments
+      @displayedCollection.setSortComparator(@sortBy)
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
@@ -405,6 +433,7 @@ if Backbone?
         @searchFor(text)
 
     searchFor: (text, callback, value) ->
+      @clearSearchAlerts()
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
@@ -416,6 +445,7 @@ if Backbone?
         data: { text: text }
         url: url
         type: "GET"
+        dataType: 'json'
         $loading: $
         loadingCallback: =>
           @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">' + gettext('Loading thread list') + '</span></div></li>')
@@ -429,10 +459,43 @@ if Backbone?
             Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages
+            if !_.isNull response.corrected_text
+              message = interpolate(
+                _.escape(gettext('No results found for %(original_query)s. Showing results for %(suggested_query)s.')),
+                {"original_query": "<em>" + _.escape(text) + "</em>", "suggested_query": "<em>" + response.corrected_text + "</em>"},
+                true
+              )
+              @addSearchAlert(message)
+            else if response.discussion_data.length == 0
+              @addSearchAlert(gettext('No threads matched your query.'))
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway
             @displayedCollection.reset(@collection.models) # Don't think this is necessary
+            @searchForUser(text) if text
+
+
+    searchForUser: (text) ->
+      DiscussionUtil.safeAjax
+        data: { username: text }
+        url: DiscussionUtil.urlFor("users")
+        type: "GET"
+        dataType: 'json'
+        error: =>
+          return
+        success: (response) =>
+          if response.users.length > 0
+            message = interpolate(
+              _.escape(gettext('Show posts by %(username)s.')),
+              {"username":
+                _.template('<a class="link-jump" href="<%= url %>"><%- username %></a>', {
+                  url: DiscussionUtil.urlFor("user_profile", response.users[0].id),
+                  username: response.users[0].username
+                })
+              },
+              true
+            )
+            @addSearchAlert(message)
 
     clearSearch: (callback, value) ->
       @$(".post-search-field").val("")

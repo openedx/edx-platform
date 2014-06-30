@@ -7,7 +7,6 @@ from urlparse import urlparse
 from os.path import splitext, basename
 from HTMLParser import HTMLParser
 
-
 def get_instructions(xmltree):
     """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
     instructions = xmltree.find('instructions')

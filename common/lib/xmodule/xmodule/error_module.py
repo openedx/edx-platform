@@ -13,6 +13,7 @@ from xmodule.x_module import XModule, XModuleDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xblock.fields import String, Scope, ScopeIds
 from xblock.field_data import DictFieldData
+from xmodule.modulestore import EdxJSONEncoder
 
 
 log = logging.getLogger(__name__)
@@ -121,7 +122,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     def from_json(cls, json_data, system, location, error_msg='Error not available'):
         return cls._construct(
             system,
-            json.dumps(json_data, skipkeys=False, indent=4),
+            json.dumps(json_data, skipkeys=False, indent=4, cls=EdxJSONEncoder),
             error_msg,
             location=location
         )

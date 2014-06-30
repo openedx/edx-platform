@@ -127,7 +127,7 @@ section.tool-wrapper {
 
       p {
         font-weight: bold;
-        @include inline-block();
+        display: inline-block;
         margin: 0;
         text-shadow: 0 -1px 0 darken(#073642, 10%);
         -webkit-font-smoothing: antialiased;
@@ -135,11 +135,11 @@ section.tool-wrapper {
       }
 
       ul {
-        @include inline-block();
+        display: inline-block;
         margin-bottom: 0;
 
         li {
-          @include inline-block();
+          display: inline-block;
           margin-bottom: 0;
 
           input {
@@ -199,13 +199,13 @@ section.tool-wrapper {
 
         select#musicTypeSelect {
           font: 16px $body-font-family;
-          @include inline-block();
+          display: inline-block;
           margin-bottom: 0;
         }
 
         p {
           font-weight: bold;
-          @include inline-block();
+          display: inline-block;
           margin: 0 lh(.5) lh() 0;
           color: #839496;
           text-shadow: 0 -1px 0 darken(#073642, 10%);

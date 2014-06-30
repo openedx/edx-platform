@@ -64,6 +64,32 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_h
                 expect(@view.$el).toContain("#upload_error")
                 expect(@view.$(".action-upload")).toHaveClass("disabled")
 
+            it "should render an error with an invalid file type after a correct file type selected", ->
+                correctFile = {name: "fake.pdf", "type": "application/pdf"}
+                inCorrectFile = {name: "fake.png", "type": "image/png"}
+                event = {}
+                @view.render()
+
+                event.target = {"files": [correctFile]}
+                @view.selectFile(event)
+                expect(@view.$el).toContain("input[type=file]")
+                expect(@view.$el).not.toContain("#upload_error")
+                expect(@view.$(".action-upload")).not.toHaveClass("disabled")
+
+                realMethod = @model.set
+                spyOn(@model, "set").andCallFake (data) ->
+                  if data.selectedFile != undefined
+                    this.attributes.selectedFile = data.selectedFile
+                    this.changed = {}
+                  else
+                    realMethod.apply(this, arguments)
+
+                event.target = {"files": [inCorrectFile]}
+                @view.selectFile(event)
+                expect(@view.$el).toContain("input[type=file]")
+                expect(@view.$el).toContain("#upload_error")
+                expect(@view.$(".action-upload")).toHaveClass("disabled")
+
         describe "Uploads", ->
             beforeEach ->
                 @clock = sinon.useFakeTimers()

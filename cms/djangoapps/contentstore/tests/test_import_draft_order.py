@@ -1,24 +1,18 @@
-from django.test.utils import override_settings
-
 from xmodule.modulestore.xml_importer import import_from_xml
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
-
 
 # This test is in the CMS module because the test configuration to use a draft
 # modulestore is dependent on django.
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class DraftReorderTestCase(ModuleStoreTestCase):
 
     def test_order(self):
-        store = modulestore('direct')
-        draft_store = modulestore('default')
-        _, course_items = import_from_xml(store, 'common/test/data/', ['import_draft_order'], draft_store=draft_store)
+        store = modulestore()
+        _, course_items = import_from_xml(store, '**replace_user**', 'common/test/data/', ['import_draft_order'])
         course_key = course_items[0].id
-        sequential = draft_store.get_item(course_key.make_usage_key('sequential', '0f4f7649b10141b0bdc9922dcf94515a'))
+        sequential = store.get_item(course_key.make_usage_key('sequential', '0f4f7649b10141b0bdc9922dcf94515a'))
         verticals = sequential.children
 
         # The order that files are read in from the file system is not guaranteed (cannot rely on
@@ -39,7 +33,7 @@ class DraftReorderTestCase(ModuleStoreTestCase):
         self.assertEqual(course_key.make_usage_key('vertical', 'c'), verticals[6])
 
         # Now also test that the verticals in a second sequential are correct.
-        sequential = draft_store.get_item(course_key.make_usage_key('sequential', 'secondseq'))
+        sequential = store.get_item(course_key.make_usage_key('sequential', 'secondseq'))
         verticals = sequential.children
         # 'asecond' and 'zsecond' are drafts with 'index_in_children_list' 0 and 2, respectively.
         # 'secondsubsection' is a public vertical.

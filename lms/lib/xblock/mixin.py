@@ -3,6 +3,9 @@ Namespace that defines fields common to all blocks used in the LMS
 """
 from xblock.fields import Boolean, Scope, String, XBlockMixin
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class LmsBlockMixin(XBlockMixin):
     """
@@ -18,5 +21,31 @@ class LmsBlockMixin(XBlockMixin):
              "grader to apply, and what to show in the TOC)",
         scope=Scope.settings,
     )
-    source_file = String(help="source file name (eg for latex)", scope=Scope.settings)
-    ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)
+    chrome = String(
+        display_name=_("Courseware Chrome"),
+        help=_("Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
+             "\"chromeless\" -- to not use tabs or the accordion; \n"
+             "\"tabs\" -- to use tabs only; \n"
+             "\"accordion\" -- to use the accordion only; or \n"
+             "\"tabs,accordion\" -- to use tabs and the accordion."),
+        scope=Scope.settings,
+        default=None,
+    )
+    default_tab = String(
+        display_name=_("Default Tab"),
+        help=_("Enter the tab that is selected in the XBlock. If not set, the Courseware tab is selected."),
+        scope=Scope.settings,
+        default=None,
+    )
+    source_file = String(
+        display_name=_("LaTeX Source File Name"),
+        help=_("Enter the source file name for LaTeX."),
+        scope=Scope.settings,
+        deprecated=True
+    )
+    ispublic = Boolean(
+        display_name=_("Course Is Public"),
+        help=_("Enter true or false. If true, the course is open to the public. If false, the course is open only to admins."),
+        scope=Scope.settings,
+        deprecated=True
+    )

@@ -6,7 +6,6 @@ import re
 import urlparse
 from .http import StubHttpRequestHandler, StubHttpService
 
-
 class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     @property
@@ -17,24 +16,39 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
         pattern_handlers = {
             "/api/v1/users/(?P<user_id>\\d+)/active_threads$": self.do_user_profile,
             "/api/v1/users/(?P<user_id>\\d+)$": self.do_user,
+            "/api/v1/search/threads$": self.do_search_threads,
             "/api/v1/threads$": self.do_threads,
             "/api/v1/threads/(?P<thread_id>\\w+)$": self.do_thread,
             "/api/v1/comments/(?P<comment_id>\\w+)$": self.do_comment,
             "/api/v1/(?P<commentable_id>\\w+)/threads$": self.do_commentable,
         }
+        if self.match_pattern(pattern_handlers):
+            return
+
+        self.send_response(404, content="404 Not Found")
+
+    def match_pattern(self, pattern_handlers):
         path = urlparse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
             if match:
                 pattern_handlers[pattern](**match.groupdict())
-                return
-
-        self.send_response(404, content="404 Not Found")
+                return True
+        return None
 
     def do_PUT(self):
         if self.path.startswith('/set_config'):
             return StubHttpRequestHandler.do_PUT(self)
+        pattern_handlers = {
+            "/api/v1/users/(?P<user_id>\\d+)$": self.do_put_user,
+        }
+        if self.match_pattern(pattern_handlers):
+            return
         self.send_response(204, "")
+
+    def do_put_user(self, user_id):
+        self.server.config['default_sort_key'] = self.post_dict.get("default_sort_key", "date")
+        self.send_json_response({'username': self.post_dict.get("username"), 'external_id': self.post_dict.get("external_id")})
 
     def do_DELETE(self):
         self.send_json_response({})
@@ -42,6 +56,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
     def do_user(self, user_id):
         response = {
             "id": user_id,
+            "default_sort_key": self.server.config.get("default_sort_key", "date"),
             "upvoted_ids": [],
             "downvoted_ids": [],
             "subscribed_thread_ids": [],
@@ -85,6 +100,9 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     def do_threads(self):
         self.send_json_response({"collection": [], "page": 1, "num_pages": 1})
+
+    def do_search_threads(self):
+        self.send_json_response(self.server.config.get('search_result', {}))
 
     def do_comment(self, comment_id):
         # django_comment_client calls GET comment before doing a DELETE, so that's what this is here to support.

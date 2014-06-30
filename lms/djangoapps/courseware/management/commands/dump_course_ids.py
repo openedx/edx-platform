@@ -24,10 +24,16 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        try:
-            name = options['modulestore']
-            store = modulestore(name)
-        except KeyError:
+        store = modulestore()
+        name = options['modulestore']
+        if name != 'default':
+            # since a store type is given, get that specific store
+            if hasattr(store, '_get_modulestore_by_type'):
+                store = store._get_modulestore_by_type(name)
+            if store.get_modulestore_type() != name:
+                raise CommandError("Modulestore {} not found".format(name))
+
+        if store is None:
             raise CommandError("Unknown modulestore {}".format(name))
 
         output = u'\n'.join(course.id.to_deprecated_string() for course in store.get_courses()) + '\n'

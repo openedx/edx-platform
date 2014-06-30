@@ -1,6 +1,10 @@
+"""
+Utility functions for capa.
+"""
+import bleach
+
 from calc import evaluator
 from cmath import isinf
-
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
@@ -134,3 +138,27 @@ def find_with_default(node, path, default):
         return v.text
     else:
         return default
+
+
+def sanitize_html(html_code):
+    """
+    Sanitize html_code for safe embed on LMS pages.
+
+    Used to sanitize XQueue responses from Matlab.
+    """
+    attributes = bleach.ALLOWED_ATTRIBUTES.copy()
+    # Yuck! but bleach does not offer the option of passing in allowed_protocols,
+    # and matlab uses data urls for images
+    if u'data' not in bleach.BleachSanitizer.allowed_protocols:
+        bleach.BleachSanitizer.allowed_protocols.append(u'data')
+    attributes.update({
+        '*': ['class', 'style', 'id'],
+        'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
+        'img': ['src', 'width', 'height', 'class']
+    })
+    output = bleach.clean(html_code,
+        tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
+        styles=['white-space'],
+        attributes=attributes
+    )
+    return output

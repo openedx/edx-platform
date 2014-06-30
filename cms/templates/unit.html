@@ -21,25 +21,27 @@ from django.utils.translation import ugettext as _
 <%block name="jsextra">
   <script type='text/javascript'>
 require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "js/collections/component_template",
-    "jquery.ui", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function(doc, $, ModuleModel, UnitEditView, ComponentTemplates) {
+    "xmodule", "jquery.ui", "coffee/src/main", "xblock/cms.runtime.v1"],
+    function(doc, $, ModuleModel, UnitEditView, ComponentTemplates, xmoduleLoader) {
   window.unit_location_analytics = '${unit_usage_key}';
 
   var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
 
-  new UnitEditView({
-    el: $('.main-wrapper'),
-    view: 'unit',
-    model: new ModuleModel({
-      id: '${unit_usage_key}',
-      state: '${unit_state}'
-    }),
-    templates: templates
-  });
+  xmoduleLoader.done(function () {
+      new UnitEditView({
+        el: $('.main-wrapper'),
+        view: 'unit',
+        model: new ModuleModel({
+          id: '${unit_usage_key}',
+          state: '${unit_state}'
+        }),
+        templates: templates
+      });
 
-  $('.new-component-template').each(function(){
-      $emptyEditor = $(this).find('.empty');
-      $(this).prepend($emptyEditor);
+      $('.new-component-template').each(function(){
+          $emptyEditor = $(this).find('.empty');
+          $(this).prepend($emptyEditor);
+      });
   });
 });
   </script>

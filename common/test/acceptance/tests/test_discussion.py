@@ -11,10 +11,20 @@ from ..pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
-    DiscussionUserProfilePage
+    DiscussionUserProfilePage,
+    DiscussionTabHomePage,
+    DiscussionSortPreferencePage,
 )
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.discussion import SingleThreadViewFixture, UserProfileViewFixture, Thread, Response, Comment
+from ..fixtures.discussion import (
+    SingleThreadViewFixture,
+    UserProfileViewFixture,
+    SearchResultFixture,
+    Thread,
+    Response,
+    Comment,
+    SearchResult,
+)
 
 
 class DiscussionResponsePaginationTestMixin(object):
@@ -405,3 +415,124 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
     def test_151_threads(self):
         self.check_pages(151)
+
+class DiscussionSearchAlertTest(UniqueCourseTest):
+    """
+    Tests for spawning and dismissing alerts related to user search actions and their results.
+    """
+
+    SEARCHED_USERNAME = "gizmo"
+
+    def setUp(self):
+        super(DiscussionSearchAlertTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        # first auto auth call sets up a user that we will search for in some tests
+        self.searched_user_id = AutoAuthPage(
+            self.browser,
+            username=self.SEARCHED_USERNAME,
+            course_id=self.course_id
+        ).visit().get_user_id()
+        # this auto auth call creates the actual session user
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+
+    def setup_corrected_text(self, text):
+        SearchResultFixture(SearchResult(corrected_text=text)).push()
+
+    def check_search_alert_messages(self, expected):
+        actual = self.page.get_search_alert_messages()
+        self.assertTrue(all(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected)))
+
+    def test_no_rewrite(self):
+        self.setup_corrected_text(None)
+        self.page.perform_search()
+        self.check_search_alert_messages(["no threads"])
+
+    def test_rewrite_dismiss(self):
+        self.setup_corrected_text("foo")
+        self.page.perform_search()
+        self.check_search_alert_messages(["foo"])
+        self.page.dismiss_alert_message("foo")
+        self.check_search_alert_messages([])
+
+    def test_new_search(self):
+        self.setup_corrected_text("foo")
+        self.page.perform_search()
+        self.check_search_alert_messages(["foo"])
+
+        self.setup_corrected_text("bar")
+        self.page.perform_search()
+        self.check_search_alert_messages(["bar"])
+
+        self.setup_corrected_text(None)
+        self.page.perform_search()
+        self.check_search_alert_messages(["no threads"])
+
+    def test_rewrite_and_user(self):
+        self.setup_corrected_text("foo")
+        self.page.perform_search(self.SEARCHED_USERNAME)
+        self.check_search_alert_messages(["foo", self.SEARCHED_USERNAME])
+
+    def test_user_only(self):
+        self.setup_corrected_text(None)
+        self.page.perform_search(self.SEARCHED_USERNAME)
+        self.check_search_alert_messages(["no threads", self.SEARCHED_USERNAME])
+        # make sure clicking the link leads to the user profile page
+        UserProfileViewFixture([]).push()
+        self.page.get_search_alert_links().first.click()
+        DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.searched_user_id,
+            self.SEARCHED_USERNAME
+        ).wait_for_page()
+
+
+class DiscussionSortPreferenceTest(UniqueCourseTest):
+    """
+    Tests for the discussion page displaying a single thread.
+    """
+
+    def setUp(self):
+        super(DiscussionSortPreferenceTest, self).setUp()
+
+        # Create a course to register for.
+        CourseFixture(**self.course_info).install()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
+        self.sort_page.visit()
+
+    def test_default_sort_preference(self):
+        """
+        Test to check the default sorting preference of user. (Default = date )
+        """
+        selected_sort = self.sort_page.get_selected_sort_preference_text()
+        self.assertEqual(selected_sort, "date")
+
+    def test_change_sort_preference(self):
+        """
+        Test that if user sorting preference is changing properly.
+        """
+        selected_sort = ""
+        for sort_type in ["votes", "comments", "date"]:
+            self.assertNotEqual(selected_sort, sort_type)
+            self.sort_page.change_sort_preference(sort_type)
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)
+
+    def test_last_preference_saved(self):
+        """
+        Test that user last preference is saved.
+        """
+        selected_sort = ""
+        for sort_type in ["votes", "comments", "date"]:
+            self.assertNotEqual(selected_sort, sort_type)
+            self.sort_page.change_sort_preference(sort_type)
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)
+            self.sort_page.refresh_page()
+            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            self.assertEqual(selected_sort, sort_type)

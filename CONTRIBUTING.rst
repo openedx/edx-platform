@@ -101,13 +101,18 @@ If your pull request meets the requirements listed in the
 then it will be scheduled for code review by one or more core committers. This
 process sometimes takes awhile: currently, all core committers on the project
 are employees of edX, and they have to balance their time between code review
-and new development.
+and new development. Please also read our `code ownership page`_, which
+lists areas and concepts in the codebase that are "owned" by certain developers.
+If your change touches one of these areas or concepts, that developer should be
+one of the reviewers.
 
 Once the code review process has started, please be responsive to comments on
 the pull request, so we can keep the review process moving forward.
 If you are unable to respond for a few days, that's fine, but
 please add a comment informing us of that -- otherwise, it looks like you're
 abandoning your work!
+
+.. _code ownership page: https://github.com/edx/edx-platform/wiki/Code-Ownership
 
 Step 6: Merge!
 ==============

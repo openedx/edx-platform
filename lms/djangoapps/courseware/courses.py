@@ -15,6 +15,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.x_module import STUDENT_VIEW
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
@@ -187,7 +188,7 @@ def get_course_about_section(course, section_key):
                 loc,
                 field_data_cache,
                 course.id,
-                not_found_ok=True,
+                log_if_not_found=False,
                 wrap_xmodule_display=False,
                 static_asset_path=course.static_asset_path
             )
@@ -196,7 +197,7 @@ def get_course_about_section(course, section_key):
 
             if about_module is not None:
                 try:
-                    html = about_module.render('student_view').content
+                    html = about_module.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
@@ -241,6 +242,7 @@ def get_course_info_section(request, course, section_key):
         usage_key,
         field_data_cache,
         course.id,
+        log_if_not_found=False,
         wrap_xmodule_display=False,
         static_asset_path=course.static_asset_path
     )
@@ -249,7 +251,7 @@ def get_course_info_section(request, course, section_key):
 
     if info_module is not None:
         try:
-            html = info_module.render('student_view').content
+            html = info_module.render(STUDENT_VIEW).content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(

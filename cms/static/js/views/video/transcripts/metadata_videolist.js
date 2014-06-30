@@ -1,10 +1,11 @@
 define(
     [
-        "jquery", "backbone", "underscore", "js/views/abstract_editor",
-        "js/views/video/transcripts/utils", "js/views/video/transcripts/message_manager",
-        "js/views/metadata"
+        'jquery', 'backbone', 'underscore', 'js/views/abstract_editor',
+        'js/views/video/transcripts/utils',
+        'js/views/video/transcripts/message_manager'
     ],
-function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
+function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
+    'use strict';
     var VideoList = AbstractEditor.extend({
         // Time that we wait since the last time user typed.
         inputDelay: 300,
@@ -27,10 +28,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         initialize: function () {
             // Initialize MessageManager that is responsible for
             // status messages and errors.
+            var Messenger = this.options.MessageManager || MessageManager;
 
-
-            var messenger = this.options.MessageManager || MessageManager;
-            this.messenger = new messenger({
+            this.messenger = new Messenger({
                 el: this.$el,
                 parent: this
             });
@@ -46,7 +46,8 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
             );
 
-            this.component_locator = this.$el.closest('[data-locator]').data('locator');
+            this.component_locator = this.$el.closest('[data-locator]')
+                                                            .data('locator');
         },
 
         render: function () {
@@ -55,11 +56,14 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 .apply(this, arguments);
 
             var self = this,
-                component_locator =  this.$el.closest('[data-locator]').data('locator'),
+                component_locator =  this.$el.closest('[data-locator]')
+                                                            .data('locator'),
                 videoList = this.getVideoObjectsList(),
 
                 showServerError = function (response) {
-                    var errorMessage = response.status || 'Error: Connection with server failed.';
+                    var errorMessage = response.status ||
+                        'Error: Connection with server failed.';
+
                     self.messenger
                         .render('not_found')
                         .showError(
@@ -105,13 +109,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Returns the values currently displayed in the editor/view.
-        *
-        * @returns {array} List of non-empty values.
-        *
-        */
+         * Returns the values currently displayed in the editor/view.
+         * @return {Array} List of non-empty values.
+         */
         getValueFromEditor: function () {
             return _.map(
                 this.$el.find('.input'),
@@ -122,29 +122,25 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Returns list of objects with information about the values currently
-        * displayed in the editor/view.
-        *
-        * @returns {array} List of objects.
-        *
-        * @examples
-        * this.getValueFromEditor(); // =>
-        *     [
-        *          'http://youtu.be/OEoXaMPEzfM',
-        *          'video_name.mp4',
-        *          'video_name.webm'
-        *     ]
-        *
-        * this.getVideoObjectsList(); // =>
-        *     [
-        *       {mode: `youtube`, type: `youtube`, ...},
-        *       {mode: `html5`, type: `mp4`, ...},
-        *       {mode: `html5`, type: `webm`, ...}
-        *     ]
-        *
-        */
+         * Returns list of objects with information about the values currently
+         * displayed in the editor/view.
+         * @return {Array} List of objects.
+         * @examples
+         * this.getValueFromEditor(); // =>
+         *     [
+         *          'http://youtu.be/OEoXaMPEzfM',
+         *          'video_name.mp4',
+         *          'video_name.webm'
+         *     ]
+         *
+         * this.getVideoObjectsList(); // =>
+         *     [
+         *       {mode: `youtube`, type: `youtube`, ...},
+         *       {mode: `html5`, type: `mp4`, ...},
+         *       {mode: `html5`, type: `webm`, ...}
+         *     ]
+         *
+         */
         getVideoObjectsList: function () {
             var links = this.getValueFromEditor();
 
@@ -152,16 +148,11 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Sets the values currently displayed in the editor/view.
-        *
-        * @params {array} value List of values.
-        *
-        */
+         * Sets the values currently displayed in the editor/view.
+         * @param {Array} value List of values.
+         */
         setValueInEditor: function (value) {
-            var parseLink = Utils.parseLink,
-                list = this.$el.find('.input'),
+            var list = this.$el.find('.input'),
                 val = value.filter(_.identity),
                 placeholders = this.getPlaceholders(val);
 
@@ -174,19 +165,15 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
 
 
         /**
-        * @function
-        *
-        * Returns the placeholders for the values currently displayed in the
-        * editor/view.
-        *
-        * @returns {array} List of placeholders.
-        *
-        */
+         * Returns the placeholders for the values currently displayed in the
+         * editor/view.
+         * @return {Array} List of placeholders.
+         */
         getPlaceholders: function (value) {
             var parseLink = Utils.parseLink,
                 placeholders = _.clone(this.placeholders);
 
-            // Returned list should have the same size as a count of editors/views.
+            // Returned list should have the same size as a count of editors.
             return _.map(
                 this.$el.find('.input'),
                 function (element, index) {
@@ -214,13 +201,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Opens video sources box.
-        *
-        * @params {object} event Event object.
-        *
-        */
+         * Opens video sources box.
+         * @param {Object} event Event object.
+         */
         openExtraVideosBar: function (event) {
             if (event && event.preventDefault) {
                 event.preventDefault();
@@ -230,13 +213,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Closes video sources box.
-        *
-        * @params {object} event Event object.
-        *
-        */
+         * Closes video sources box.
+         * @param {Object} event Event object.
+         */
         closeExtraVideosBar: function (event) {
             if (event && event.preventDefault) {
                 event.preventDefault();
@@ -246,13 +225,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Toggles video sources box.
-        *
-        * @params {object} event Event object.
-        *
-        */
+         * Toggles video sources box.
+         * @param {Object} event Event object.
+         */
         toggleExtraVideosBar: function (event) {
             if (event && event.preventDefault) {
                 event.preventDefault();
@@ -266,13 +241,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Handle `input` event.
-        *
-        * @params {object} event Event object.
-        *
-        */
+         * Handle `input` event.
+         * @param {Object} event Event object.
+         */
         inputHandler: function (event) {
             if (event && event.preventDefault) {
                 event.preventDefault();
@@ -329,77 +300,108 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
         },
 
         /**
-        * @function
-        *
-        * Checks the values currently displayed in the editor/view have unique
-        * types (mp4 | webm | youtube).
-        *
-        * @param {object} videoList List of objects with information about the
-        *                           values currently displayed in the editor/view
-        *
-        * @returns {boolean} Boolean value that indicate if video types are unique.
-        *
-        */
+         * Checks the values currently displayed in the editor/view have unique
+         * types (mp4 | webm | youtube).
+         * @param {Object} videoList List of objects with information about the
+         * @return {Boolean} Boolean value that indicate if video types are
+         * unique.
+         */
         isUniqVideoTypes: function (videoList) {
             // Extract a list of "type" property values.
-            var arr = _.pluck(videoList, 'type'), // => ex: ['youtube', 'mp4', 'mp4']
-            // Produces a duplicate-free version of the array.
-                uniqArr = _.uniq(arr); // => ex: ['youtube', 'mp4']
+            // => ex: ['webm', 'mp4', 'mp4']
+            var arr = _.pluck(videoList, 'type').filter(function (item) {
+                    return item !== 'other';
+                }),
+                // Produces a duplicate-free version of the array.
+                uniqArr = _.uniq(arr); // => ex: ['webm', 'mp4']
 
             return arr.length === uniqArr.length;
         },
 
         /**
-        * @function
-        *
-        * Shows error message if the values currently displayed in the
-        * editor/view have duplicate types.
-        *
-        * @param {object} list List of objects with information about the
-        *                           values currently displayed in the editor/view
-        *
-        * @returns {boolean} Boolean value that indicate if video types are unique.
-        *
-        */
-        checkIsUniqVideoTypes: function (list) {
-            var videoList = list || this.getVideoObjectsList(),
-                isUnique = true;
+         * Checks that links without file format are unique.
+         * @param {Object} videoList List of objects with information about the
+         * @return {Boolean} Boolean value that indicate if video types are
+         * unique.
+         */
+        isUniqOtherVideos: function (videoList) {
+            // Returns list of video objects with "type" equal "other" or
+            // "youtube".
+            var otherLinksList = videoList.filter(function (item) {
+                    return item.type === 'other';
+                }),
+                // Extract a list of "video" property values.
+                namesList = _.pluck(otherLinksList, 'video'),
+                // Produces a duplicate-free version of the array.
+                uniqNamesList = _.uniq(namesList);
 
-            if (!this.isUniqVideoTypes(videoList)) {
-                this.messenger
-                    .showError('Link types should be unique.', true);
-
-                isUnique = false;
-            }
-
-            return isUnique;
+            return namesList.length === uniqNamesList.length;
         },
 
         /**
-        * @function
-        *
-        * Checks if the values currently displayed in the editor/view have
-        * valid values and show error messages.
-        *
-        * @param {object} data Objects with information about the  value
-        *                      currently displayed in the editor/view
-        *
-        * @param {boolean} showErrorModeMessage Disable mode validation
-        *
-        * @returns {boolean} Boolean value that indicate if value is valid.
-        *
-        */
-        checkValidity: function (data, showErrorModeMessage) {
-            var self = this,
-                videoList = this.getVideoObjectsList();
+         * Validates video list using provided validator.
+         * @param {Function} validator Function that validate provided list.
+         * @param {Object} list List of objects with information about the
+         * values currently displayed in the editor.
+         * @param {String} message Error message.
+         * @return {Boolean}
+         */
+        checkIsValid: function (validator, list, message) {
+            var videoList = list || this.getVideoObjectsList(),
+                isValid = true;
 
-             if (!this.checkIsUniqVideoTypes(videoList)) {
+            if (!validator(videoList)) {
+                this.messenger.showError(message, true);
+                isValid = false;
+            }
+
+            return isValid;
+        },
+
+        /**
+         * Validates if video types are unique.
+         * @param {Object} list List of objects with information about the
+         * values currently displayed in the editor.
+         * @return {Boolean}
+         */
+        checkIsUniqVideoTypes: function (list) {
+            return this.checkIsValid(
+                this.isUniqVideoTypes, list, 'Link types should be unique.'
+            );
+        },
+
+        /**
+         * Validates if other videos ids are unique.
+         * editor/view have duplicate types.
+         * @param {Object} list List of objects with information about the
+         * values currently displayed in the editor.
+         * @return {Boolean}
+         */
+        checkIsUniqOtherVideos: function (list) {
+            return this.checkIsValid(
+                this.isUniqOtherVideos, list, 'Links should be unique.'
+            );
+        },
+
+        /**
+         * Checks if the values currently displayed in the editor/view have
+         * valid values and show error messages.
+         * @param {Object} data Objects with information about the  value
+         * currently displayed in the editor/view
+         * @param {Boolean} showErrorModeMessage Disable mode validation
+         * @return {Boolean} Boolean value that indicate if value is valid.
+         */
+        checkValidity: function (data, showErrorModeMessage) {
+            var videoList = this.getVideoObjectsList(),
+                isUniqTypes = this.checkIsUniqVideoTypes.bind(this),
+                isUniqOtherVideos = this.checkIsUniqOtherVideos.bind(this);
+
+            if (!isUniqTypes(videoList) || !isUniqOtherVideos(videoList)) {
                 return false;
-             }
+            }
 
             if (data.mode === 'incorrect' && showErrorModeMessage) {
-                this.messenger
-                    .showError('Incorrect url format.', true);
+                this.messenger.showError('Incorrect url format.', true);
 
                 return false;
             }

@@ -118,6 +118,7 @@ def make_mock_request_impl(text, thread_id="dummy_thread_id"):
             data = make_mock_thread_data(text, thread_id, True)
         elif "/users/" in url:
             data = {
+                "default_sort_key": "date",
                 "upvoted_ids": [],
                 "downvoted_ids": [],
                 "subscribed_thread_ids": [],

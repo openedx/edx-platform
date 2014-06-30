@@ -32,6 +32,7 @@ import json
 from path import path
 
 from .discussionsettings import *
+from .modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
@@ -458,23 +459,6 @@ COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
-############################### XModule Store ##################################
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': DATA_DIR,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
-CONTENTSTORE = None
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'xmodule',
-    'collection': 'modulestore',
-}
-
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
@@ -488,6 +472,45 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+############# ModuleStore Configuration ##########
+
+MODULESTORE_BRANCH = 'published'
+CONTENTSTORE = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'mappings': {},
+            'reference_type': 'Location',
+            'stores': [
+                {
+                    'NAME': 'draft',
+                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': {
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'fs_root': DATA_DIR,
+                        'render_template': 'edxmako.shortcuts.render_to_string',
+                    }
+                },
+                {
+                    'NAME': 'xml',
+                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+                    'OPTIONS': {
+                        'data_dir': DATA_DIR,
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    }
+                },
+            ]
+        }
+    }
+}
 
 #################### Python sandbox ############################################
 
@@ -565,6 +588,7 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
+    ('am', u'አማርኛ'),  # Amharic
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
@@ -622,12 +646,14 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('ta', u'தமிழ்'),  # Tamil
     ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Ukranian
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
+    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
 )
 
@@ -781,6 +807,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
@@ -1358,6 +1385,12 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
+
+############################ ORA 2 ############################################
+
+# By default, don't use a file prefix
+ORA2_FILE_PREFIX = None
 
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
