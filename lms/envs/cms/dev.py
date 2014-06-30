@@ -44,5 +44,5 @@ DEBUG_TOOLBAR_PANELS += (
 # what the 'default' modulestore to use while processing the request
 # for example 'preview.edx.org' should use the draft modulestore
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
-    'preview\.': 'draft'
+    'preview\.': 'draft-preferred'
 }

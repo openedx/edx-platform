@@ -33,11 +33,7 @@ from xblock.runtime import KvsFieldData
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
-from xmodule.modulestore import (
-    ModuleStoreWriteBase, MONGO_MODULESTORE_TYPE,
-    REVISION_OPTION_PUBLISHED_ONLY, REVISION_OPTION_DRAFT_PREFERRED,
-    KEY_REVISION_DRAFT, KEY_REVISION_PUBLISHED
-)
+from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
@@ -56,6 +52,15 @@ SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
 
 # sort order that returns PUBLISHED items first
 SORT_REVISION_FAVOR_PUBLISHED = ('_id.revision', pymongo.ASCENDING)
+
+
+class MongoRevisionKey(object):
+    """
+    Key Revision constants to use for Location and Usage Keys in the Mongo modulestore
+    Note: These values are persisted in the database, so should not be changed without migrations
+    """
+    draft = 'draft'
+    published = None
 
 
 class InvalidWriteError(Exception):
@@ -303,14 +308,14 @@ def as_draft(location):
     """
     if location.category in DIRECT_ONLY_CATEGORIES:
         return location
-    return location.replace(revision=KEY_REVISION_DRAFT)
+    return location.replace(revision=MongoRevisionKey.draft)
 
 
 def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return location.replace(revision=KEY_REVISION_PUBLISHED)
+    return location.replace(revision=MongoRevisionKey.published)
 
 
 class MongoModuleStore(ModuleStoreWriteBase):
@@ -744,7 +749,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
-    def get_items(self, course_id, settings=None, content=None, key_revision=KEY_REVISION_PUBLISHED, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, key_revision=MongoRevisionKey.published, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -763,10 +768,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
             content (dict): fields to look for which have content scope. Follows same syntax and
                 rules as kwargs below.
             key_revision (str): the revision of the items you're looking for.
-                KEY_REVISION_DRAFT - only returns drafts
-                KEY_REVISION_PUBLISHED (equates to None) - only returns published
+                MongoRevisionKey.draft - only returns drafts
+                MongoRevisionKey.published (equates to None) - only returns published
                 If you want one of each matching xblock but preferring draft to published, call this same method
-                on the draft modulestore with REVISION_OPTION_DRAFT_PREFERRED.
+                on the draft modulestore with ModuleStoreEnum.RevisionOption.draft_preferred.
             kwargs (key=value): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
@@ -1003,7 +1008,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                         value[key] = subvalue.to_deprecated_string()
         return jsonfields
 
-    def get_parent_location(self, location, revision=REVISION_OPTION_PUBLISHED_ONLY, **kwargs):
+    def get_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs):
         '''
         Find the location that is the parent of this location in this course.
 
@@ -1011,21 +1016,24 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         Args:
             revision:
-                REVISION_OPTION_PUBLISHED_ONLY - return only the PUBLISHED parent if it exists, else returns None
-                REVISION_OPTION_DRAFT_PREFERRED - return either the DRAFT or PUBLISHED parent,
-                    preferring DRAFT, if parent(s) exists,
-                    else returns None
+                ModuleStoreEnum.RevisionOption.published_only
+                    - return only the PUBLISHED parent if it exists, else returns None
+                ModuleStoreEnum.RevisionOption.draft_preferred
+                    - return either the DRAFT or PUBLISHED parent,
+                        preferring DRAFT, if parent(s) exists,
+                        else returns None
         '''
         assert location.revision is None
-        assert revision == REVISION_OPTION_PUBLISHED_ONLY or revision == REVISION_OPTION_DRAFT_PREFERRED
+        assert revision == ModuleStoreEnum.RevisionOption.published_only \
+            or revision == ModuleStoreEnum.RevisionOption.draft_preferred
 
         # create a query with tag, org, course, and the children field set to the given location
         query = self._course_key_to_son(location.course_key)
         query['definition.children'] = location.to_deprecated_string()
 
         # if only looking for the PUBLISHED parent, set the revision in the query to None
-        if revision == REVISION_OPTION_PUBLISHED_ONLY:
-            query['_id.revision'] = KEY_REVISION_PUBLISHED
+        if revision == ModuleStoreEnum.RevisionOption.published_only:
+            query['_id.revision'] = MongoRevisionKey.published
 
         # query the collection, sorting by DRAFT first
         parents = self.collection.find(query, {'_id': True}, sort=[SORT_REVISION_FAVOR_DRAFT])
@@ -1034,7 +1042,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # no parents were found
             return None
 
-        if revision == REVISION_OPTION_PUBLISHED_ONLY:
+        if revision == ModuleStoreEnum.RevisionOption.published_only:
             if parents.count() > 1:
                 # should never have multiple PUBLISHED parents
                 raise ReferentialIntegrityError(
@@ -1055,16 +1063,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
     def get_modulestore_type(self, course_key=None):
         """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
-
+        Returns an enumeration-like type reflecting the type of this modulestore per ModuleStoreEnum.Type
         Args:
             course_key: just for signature compatibility
         """
-        return MONGO_MODULESTORE_TYPE
+        return ModuleStoreEnum.Type.mongo
 
     def get_orphans(self, course_key):
         """
@@ -1114,6 +1117,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Check that the db is reachable.
         """
         if self.database.connection.alive():
-            return {MONGO_MODULESTORE_TYPE: True}
+            return {ModuleStoreEnum.Type.mongo: True}
         else:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')

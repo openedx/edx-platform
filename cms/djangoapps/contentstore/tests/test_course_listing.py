@@ -17,7 +17,7 @@ from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, OrgInstructorRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
@@ -199,7 +199,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertGreaterEqual(iteration_over_courses_time_2.elapsed, iteration_over_groups_time_2.elapsed)
 
         # Now count the db queries
-        store = modulestore()._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         with check_mongo_calls(store.collection, USER_COURSES_COUNT):
             courses_list = _accessible_courses_list_from_groups(self.request)
 
@@ -262,7 +262,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        store = modulestore()._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         course_location = SlashSeparatedCourseKey('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)

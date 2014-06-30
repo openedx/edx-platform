@@ -7,7 +7,7 @@ import mock
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
 import xmodule.modulestore.django as store_django
-from xmodule.modulestore import BRANCH_DRAFT_PREFERRED
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests.xml import factories as xml
@@ -62,18 +62,18 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         mock.Mock(return_value='preview.localhost')
     )
     @override_settings(
-        HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': BRANCH_DRAFT_PREFERRED},
+        HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': ModuleStoreEnum.Branch.draft_preferred},
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_preview_mapping(self):
-        self.assertEqual(store_django._get_modulestore_branch_setting(), BRANCH_DRAFT_PREFERRED)
+        self.assertEqual(store_django._get_modulestore_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
 
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
         mock.Mock(return_value='localhost')
     )
     @override_settings(
-        HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': BRANCH_DRAFT_PREFERRED},
+        HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': ModuleStoreEnum.Branch.draft_preferred},
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_branch_mapping(self):

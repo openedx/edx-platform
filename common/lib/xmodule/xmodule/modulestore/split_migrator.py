@@ -7,7 +7,7 @@ In general, it's strategy is to treat the other modulestores as read-only and to
 manipulate storage but use existing api's.
 '''
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
-from xmodule.modulestore import BRANCH_NAME_DRAFT, BRANCH_NAME_PUBLISHED, REVISION_OPTION_DRAFT_ONLY
+from xmodule.modulestore import ModuleStoreEnum
 
 
 class SplitMigrator(object):
@@ -85,7 +85,7 @@ class SplitMigrator(object):
         # after done w/ published items, add version for DRAFT pointing to the published structure
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
-        versions[BRANCH_NAME_DRAFT] = versions[BRANCH_NAME_PUBLISHED]
+        versions[ModuleStoreEnum.BranchName.draft] = versions[ModuleStoreEnum.BranchName.published]
         self.split_modulestore.update_course_index(index_info)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
@@ -98,11 +98,11 @@ class SplitMigrator(object):
         """
         # each true update below will trigger a new version of the structure. We may want to just have one new version
         # but that's for a later date.
-        new_draft_course_loc = published_course_key.for_branch(BRANCH_NAME_DRAFT)
+        new_draft_course_loc = published_course_key.for_branch(ModuleStoreEnum.BranchName.draft)
         # to prevent race conditions of grandchilden being added before their parents and thus having no parent to
         # add to
         awaiting_adoption = {}
-        for module in self.draft_modulestore.get_items(course_key, revision=REVISION_OPTION_DRAFT_ONLY):
+        for module in self.draft_modulestore.get_items(course_key, revision=ModuleStoreEnum.RevisionOption.draft_only):
             new_locator = self.loc_mapper.translate_location(
                 module.location, False, add_entry_if_missing=True
             )

@@ -1,7 +1,7 @@
 import unittest
 
 from xmodule import templates
-from xmodule.modulestore import SPLIT_MONGO_MODULESTORE_TYPE, BRANCH_NAME_DRAFT
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores, _MIXED_MODULESTORE, \
@@ -21,9 +21,9 @@ class TemplateTests(unittest.TestCase):
 
     def setUp(self):
         clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, SPLIT_MONGO_MODULESTORE_TYPE)
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
         self.addCleanup(clear_existing_modulestores)
-        self.split_store = modulestore()._get_modulestore_by_type(SPLIT_MONGO_MODULESTORE_TYPE)
+        self.split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
     def test_get_templates(self):
         found = templates.all_templates()
@@ -156,7 +156,7 @@ class TemplateTests(unittest.TestCase):
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
-        id_locator = test_course.id.for_branch(BRANCH_NAME_DRAFT)
+        id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
         guid_locator = test_course.location.course_agnostic()
         # verify it can be retrieved by id
         self.assertIsInstance(self.split_store.get_course(id_locator), CourseDescriptor)
@@ -241,7 +241,7 @@ class SplitAndLocMapperTests(unittest.TestCase):
         mapper = loc_mapper()
 
         # instantiate mixed modulestore and thus split
-        split_store = modulestore()._get_modulestore_by_type(SPLIT_MONGO_MODULESTORE_TYPE)
+        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
         # split must inject the same location mapper object since the mapper existed before it did
         self.assertEqual(split_store.loc_mapper, mapper)
@@ -254,7 +254,7 @@ class SplitAndLocMapperTests(unittest.TestCase):
         self.assertIsNone(_loc_singleton)
 
         # instantiate split before location mapper
-        split_store = modulestore()._get_modulestore_by_type(SPLIT_MONGO_MODULESTORE_TYPE)
+        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
         # split must have instantiated loc_mapper
         mapper = loc_mapper()
