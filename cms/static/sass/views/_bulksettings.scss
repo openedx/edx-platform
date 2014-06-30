@@ -1,0 +1,374 @@
+// Studio - Course Utilities - Bulksettings
+// ====================
+
+.view-bulksettings {
+
+    .content-primary, .content-supplementary {
+        @include box-sizing(border-box);
+        float: left;
+    }
+
+    .content-primary {
+        width: flex-grid(9, 12);
+        margin-right: flex-gutter();
+    }
+
+    #settings-header {
+        position: relative;
+        display: block;
+        box-sizing: border-box;
+        z-index: 10;
+        background: white;
+
+        &.fixed-header {
+            position: fixed;
+            top: 0;
+        }
+    }
+    
+    .section-header {
+        border-bottom: 1px solid #b2b2b2;
+
+        .section-header-title {
+            display: block;
+            float: left;
+        }
+        .section-header-date {
+            font-size: .65em;
+            padding: 1px 25px;
+            color: #4c4c4c;
+            float: left;
+        }
+    }
+    
+    
+    .subsection-header {
+        background-color: #eee;
+
+        td > strong {
+            padding-left: 30px;
+        }
+    }
+    
+    .subsection-settings {
+        padding-right: 10px; 
+    }
+    
+    .unit-header {
+        td > strong {
+        padding-left: 50px;
+        }
+    }
+    .problem-header {
+        td > strong {
+            padding-left: 70px;
+        }
+    }
+
+    .course-utility .settings-table {
+        width: 100%;
+
+        tr td {
+            padding: 5px;
+        }
+    }
+
+    .key-box {
+        width: 100%;
+        margin: 10px;
+
+        &.fixed-sidebar {
+            position: fixed;
+            top: 0;
+        }
+
+        .key-list {
+            width:100%;
+            margin: 20px;
+        }
+    }
+
+    // utilities - general
+    .course-utility {
+        @extend %ui-window;
+        margin: 0 0 ($baseline*2) 0;
+
+        &:last-child {
+          margin-bottom: 0;
+    }
+
+    // visual status
+    .viz-utility-status {
+      @extend %cont-text-hide;
+      @include size(100%,($baseline/4));
+      position: relative;
+      display: block;
+      margin: 0;
+      background: $gray-l4;
+
+      .viz-utility-status-value {
+        @include transition(width $tmg-s2 ease-in-out .25s);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: ($baseline/4);
+        background: $green;
+
+        .int {
+          @extend %cont-text-sr;
+        }
+      }
+    }
+
+    // header/title
+    header {
+      @include clearfix();
+      box-shadow: inset 0 -1px 1px $shadow-l1;
+      margin-bottom: 0;
+      border-bottom: 1px solid $gray-l3;
+      padding: $baseline ($baseline*1.5);
+
+      .utility-title {
+        @include transition(color $tmg-f2 ease-in-out 0s);
+        width: flex-grid(6, 9);
+        margin: 0 flex-gutter() 0 0;
+        float: left;
+
+        .ui-toggle-expansion {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          @include font-size(21);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/2);
+          color: $gray-l4;
+        }
+
+        &.is-selectable {
+          cursor: pointer;
+
+          &:hover {
+            color: $blue;
+
+            .ui-toggle-expansion {
+              color: $blue;
+            }
+          }
+        }
+      }
+
+    }
+
+    // utility actions
+    .course-utility-actions {
+      @include clearfix();
+      @include transition(border $tmg-f2 ease-in-out .25s);
+      box-shadow: inset 0 1px 1px $shadow-l1;
+      border-top: 1px solid $gray-l2;
+      padding: $baseline ($baseline*1.5);
+      background: $gray-l4;
+
+      .action-primary {
+        @include green-button();
+        float: left;
+      }
+
+      .action-secondary {
+        @include grey-button();
+        @extend %t-action3;
+        font-weight: 400;
+        float: right;
+      }
+    }
+
+    // state - collapsed
+    &.is-collapsed {
+
+      header {
+        box-shadow: none;
+
+        .utility-title {
+
+          .ui-toggle-expansion {
+            @include transform(rotate(-90deg));
+            @include transform-origin(50% 50%);
+          }
+        }
+      }
+
+      .list-tasks {
+        height: 0;
+      }
+    }
+
+    // state - completed
+    &.is-completed {
+
+      .viz-utility-status {
+
+        .viz-utility-status-value {
+          width: 100%;
+        }
+      }
+
+      header {
+
+        .utility-title, {
+          color: $green;
+        }
+
+        .utility-status {
+
+          .status-count, .status-amount, {
+            color: $green;
+          }
+        }
+      }
+    }
+
+    // state - not available
+    .is-not-available {
+
+    }
+  }
+
+  // list of tasks
+  .list-tasks {
+    height: auto;
+    overflow: hidden;
+
+    .task {
+      @include transition(background $tmg-f2 ease-in-out 0s, border $tmg-f3 ease-in-out 0s);
+      @include clearfix();
+      position: relative;
+      border-top: 1px solid $white;
+      border-bottom: 1px solid $gray-l5;
+      padding: $baseline ($baseline*1.5);
+      background: $white;
+      opacity: 1.0;
+
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+
+      .task-input {
+        display: inline-block;
+        vertical-align: text-top;
+        float: left;
+        margin: ($baseline/2) flex-gutter() 0 0;
+      }
+
+      .task-details {
+        display: inline-block;
+        vertical-align: text-top;
+        float: left;
+        width: flex-grid(6,9);
+        font-weight: 500;
+
+        .task-name {
+          @include transition(color $tmg-f2 ease-in-out 0s);
+          vertical-align: baseline;
+          cursor: pointer;
+          margin-bottom: 0;
+        }
+
+        .task-description {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f2 ease-in-out 0s);
+          color: $gray-l2;
+        }
+
+        .task-support {
+          @extend %t-copy-sub2;
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
+          opacity: 0.0;
+          pointer-events: none;
+        }
+      }
+
+      .task-actions {
+        @include transition(opacity $tmg-f2 ease-in-out 0.25s);
+        @include clearfix();
+        display: inline-block;
+        vertical-align: middle;
+        float: right;
+        width: flex-grid(2,9);
+        margin: ($baseline/2) 0 0 flex-gutter();
+        opacity: 0.0;
+        pointer-events: none;
+        text-align: right;
+
+        .action-primary {
+          @include blue-button;
+          @extend %t-action4;
+          font-weight: 600;
+          text-align: center;
+        }
+
+        .action-secondary {
+          @extend %t-action4;
+          margin-top: ($baseline/2);
+        }
+      }
+
+      // state - hover
+      &:hover {
+        background: $blue-l5;
+        border-bottom-color: $blue-l4;
+        border-top-color: $blue-l4;
+        opacity: 1.0;
+
+        .task-details {
+
+          .task-support {
+            opacity: 1.0;
+            pointer-events: auto;
+          }
+        }
+
+        .task-actions {
+          opacity: 1.0;
+          pointer-events: auto;
+        }
+      }
+
+
+      // state - completed
+      &.is-completed {
+        background: $gray-l6;
+        border-top-color: $gray-l5;
+        border-bottom-color: $gray-l5;
+
+        .task-name {
+          color: $gray-l2;
+        }
+
+        .task-actions {
+
+          .action-primary {
+            @include grey-button;
+            @extend %t-action4;
+            font-weight: 600;
+            text-align: center;
+          }
+        }
+
+        &:hover {
+          background: $gray-l5;
+          border-bottom-color: $gray-l4;
+          border-top-color: $gray-l4;
+
+          .task-details {
+            opacity:1.0;
+          }
+        }
+      }
+    }
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+}

@@ -8,6 +8,7 @@ from .assets import *
 from .checklist import *
 from .utility import *
 from .utilities.captions import *
+from .utilities.bulksettings import *
 from .component import *
 from .course import *
 from .error import *

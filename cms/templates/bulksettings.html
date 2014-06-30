@@ -1,0 +1,151 @@
+<%inherit file="base.html" />
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">Utilities - Bulk Settings</%block>
+<%block name="bodyclass">is-signedin course view-bulksettings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">${_("Tools / Course Utilities")}</small>
+      <span class="sr">&gt; </span>${_("Bulk Settings")}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+            <!-- Static Bulk Settings Header Table -->
+            <section class="course-utility" id="settings-header">
+                <table width="100%" style="margin: 10px">
+                    <tr>
+                        <td width="52%"><strong>Problem Settings:</strong></td>
+                        <td width="8%" title="Attempts"><i class="icon-list-ol"></i></td>
+                        <td width="8%" title="Weight"><i class="icon-dashboard"></i></td>
+                        <td width="8%" title="Randomization"><i class="icon-random"></i></td>
+                        <td width="8%" title="Show Answer"><i class="icon-eye-open"></i></td>
+                        <td width="8%" title="Timer Between Attempts"><i class="icon-time"></i></td>
+                        <td width="8%" title="Status"><i class="icon-key"></i></td>
+
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Dynamic Bulk Settings Tables -->
+            % for section_settings in settings_data:
+            <section class="course-utility" id="course-utility0">
+
+                    <header class = "section-header">
+                        <h4 class = "section-header-title" title="Collapse/Expand this utility">
+                            <a href="${section_settings['url']}">${section_settings['name']}</a>
+                        </h4>
+                        <p class="section-header-date">
+                        % for setting_type in setting_type_list_map['section_setting_types']:
+                            <strong>${section_setting_map[setting_type]}:</strong> ${section_settings[setting_type]}
+                        % endfor
+                        </p>
+                    </header>
+                    <table class = "settings-table">
+                        % for subsection_settings in section_settings['children']:
+                            <tr class = "subsection-header">
+                                <td class = "subsection-header-cell" colspan = "7">
+                          <strong><a href="${subsection_settings['url']}">${subsection_settings['name']}</a></strong> -
+                          % for setting_type in setting_type_list_map['subsection_setting_types']:
+                              <span title=${setting_type} class="subsection-settings"><strong>${subsection_setting_map[setting_type]}:</strong> ${subsection_settings[setting_type]}</span>
+                          % endfor
+                        </td>
+                            </tr>
+
+                            % for unit_settings in subsection_settings['children']:
+                                <tr class = "unit-header">
+                                    <!-- TODO: dynamically allocate space ?-->
+                                    <td width = "92%" colspan="6"><strong><a href="${unit_settings['url']}">${unit_settings['name']}</a></strong></td>
+                                    <td width = "8%">${unit_settings['ispublic']}</td> <!--hard coded right now-->
+                                </tr>
+
+                                % for problem_settings in unit_settings['children']:
+                                    <tr class="problem-header">
+                                        <td width="52%"><strong><a href="${problem_settings['url']}">${problem_settings['name']}</a></strong></td>
+                                        % for setting_type in setting_type_list_map['problem_setting_types']:
+                                            <td width="8%">${problem_settings[setting_type]}</td>
+                                        % endfor
+                                        <td width="8%"></td> <!-- Padding-->
+                                    </tr>
+                                % endfor
+                            % endfor
+                        % endfor
+                    </table>
+                </section>
+                % endfor
+        </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">${_("What is bulk settings?")}</h3>
+        <p>
+          ${_("The bulk settings page provides a way to view all problem settings of the current course in one page.")}
+        </p>
+      </div>
+
+      <div class="bit">
+        <section class = "course-utility key-box">
+            <header>
+                <h3 class = "title title-3">${_("Settings Keys")}</h3>
+            </header>
+            <ul class = "key-list">
+                <li><i class="icon-list-ol"></i> - Max Attempts</li>
+                <li><i class="icon-dashboard"></i> - Weight</li>
+                <li><i class="icon-random"></i> - Randomize</li>
+                <li><i class="icon-eye-open"></i> - Show Answer</li>
+                <li><i class="icon-time"></i> - Time Between Submissions</li>
+                <li><i class="icon-key"></i> - Is Public</li>
+            </ul>
+        </section>
+      </div>
+
+    </aside>
+  </section>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+
+
+<script type = "text/javascript">
+    var position = window.pageYOffset;
+    var originalY = $('#settings-header').offset().top;
+    var originalY_keybox = $('.key-box').offset().top;
+    $(window).scroll(function () {
+        position = window.pageYOffset;
+
+        /* Position re-rendering for the headers table */
+        if(position > originalY) {
+            parentWidth = $('#settings-header').parent().width();
+            $('#settings-header').addClass('fixed-header').css({'width': parentWidth});
+            $('#course-utility0').css({'marginTop': '85px'});
+        } else {
+            $('#settings-header').removeClass('fixed-header').css({'width': 'auto'});
+            $('#course-utility0').css({'marginTop': '0'});
+        }
+
+        /* Position re-rendering for the key box */
+        if (position > originalY_keybox) {
+            parentWidth = $('.key-box').parent().width();
+            $('.key-box').addClass('fixed-sidebar').css({'width': parentWidth});
+        } else {
+            $('.key-box').removeClass('fixed-sidebar').css({'width': 'auto'});
+        }
+    });
+</script>
+
+</%block>
+
+
+

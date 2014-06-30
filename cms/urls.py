@@ -92,6 +92,7 @@ urlpatterns += patterns(
     url(r'^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
     url(r'^utilities/(?P<course_key_string>[^/]+)$', 'utility_handler'),
     url(r'^utility/captions/(?P<course_key_string>[^/]+)$', 'utility_captions_handler'),
+    url(r'^utility/bulksettings/(?P<course_key_string>[^/]+)$', 'utility_bulksettings_handler'),
 )
 
 js_info_dict = {
