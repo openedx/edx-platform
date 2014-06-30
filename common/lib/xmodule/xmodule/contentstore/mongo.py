@@ -12,7 +12,8 @@ from fs.osfs import OSFS
 import os
 import json
 from bson.son import SON
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import AssetLocator
+from opaque_keys.edx.locations import AssetLocation
 
 
 class MongoContentStore(ContentStore):
@@ -78,9 +79,8 @@ class MongoContentStore(ContentStore):
         return content
 
     def delete(self, location_or_id):
-        if isinstance(location_or_id, AssetLocation):
-            location_or_id, __ = self.asset_db_key(location_or_id)
-
+        if isinstance(location_or_id, AssetLocator):
+            location_or_id, _ = self.asset_db_key(location_or_id)
         # Deletes of non-existent files are considered successful
         self.fs.delete(location_or_id)
 
@@ -151,12 +151,12 @@ class MongoContentStore(ContentStore):
             # TODO: On 6/19/14, I had to put a try/except around this
             # to export a course. The course failed on JSON files in
             # the /static/ directory placed in it with an import.
-            # 
-            # If this hasn't been looked at in a while, remove this comment. 
+            #
+            # If this hasn't been looked at in a while, remove this comment.
             #
             # When debugging course exports, this might be a good place
             # to look. -- pmitros
-            self.export(asset_location, output_directory) 
+            self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
                     policy.setdefault(asset_location.name, {})[attr] = value

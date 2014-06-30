@@ -184,7 +184,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             for course in store.get_courses():
                 course_id = self._clean_course_id_for_mapping(course.id)
                 if course_id not in courses:
-                    if has_locators and isinstance(course_id, SlashSeparatedCourseKey):
+                    if has_locators and isinstance(course_id, CourseKey):
 
                         # see if a locator version of course is in the result
                         try:

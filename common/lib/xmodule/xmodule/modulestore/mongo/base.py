@@ -39,6 +39,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
 
 log = logging.getLogger(__name__)
@@ -174,7 +175,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         Return an XModule instance for the specified location
         """
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
@@ -263,6 +264,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         key = Location.from_deprecated_string(ref_string)
         return key.replace(run=self.modulestore._fill_in_run(key.course_key).run)
+
+    def __setattr__(self, name, value):
+        return super(CachingDescriptorSystem, self).__setattr__(name, value)
 
     def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
         """
@@ -693,7 +697,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''Look for a given location in the collection. If the item is not present, raise
         ItemNotFoundError.
         '''
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         item = self.collection.find_one(
             {'_id': location.to_deprecated_son()}
         )
@@ -705,7 +709,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Get the course with the given courseid (org/course/run)
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         course_key = self._fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:
@@ -722,7 +726,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If ignore_case is True, do a case insensitive search,
         otherwise, do a case sensitive search
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         course_key = self._fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
@@ -1056,7 +1060,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     ]
                 elif isinstance(xblock.fields[field_name], ReferenceValueDict):
                     for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, Location)
+                        assert isinstance(subvalue, UsageKey)
                         value[key] = subvalue.to_deprecated_string()
         return jsonfields
 

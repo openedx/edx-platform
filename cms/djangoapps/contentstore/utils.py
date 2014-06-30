@@ -14,7 +14,8 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from xmodule.modulestore.store_utilities import delete_course
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -54,7 +55,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, Location))
+    assert(isinstance(location, UsageKey))
 
     if settings.LMS_BASE is None:
         return None
@@ -76,7 +77,7 @@ def get_lms_link_for_about_page(course_id):
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(course_id, CourseKey))
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):

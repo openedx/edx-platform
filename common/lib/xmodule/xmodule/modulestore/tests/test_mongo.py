@@ -26,6 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
@@ -407,20 +408,20 @@ class TestMongoModuleStore(unittest.TestCase):
         def check_xblock_fields():
             def check_children(xblock):
                 for child in xblock.children:
-                    assert_is_instance(child, Location)
+                    assert_is_instance(child, UsageKey)
 
             course = self.draft_store.get_course(course_key)
             check_children(course)
 
             refele = self.draft_store.get_item(self.refloc)
             check_children(refele)
-            assert_is_instance(refele.reference_link, Location)
+            assert_is_instance(refele.reference_link, UsageKey)
             assert_greater(len(refele.reference_list), 0)
             for ref in refele.reference_list:
-                assert_is_instance(ref, Location)
+                assert_is_instance(ref, UsageKey)
             assert_greater(len(refele.reference_dict), 0)
             for ref in refele.reference_dict.itervalues():
-                assert_is_instance(ref, Location)
+                assert_is_instance(ref, UsageKey)
 
         def check_mongo_fields():
             def get_item(location):

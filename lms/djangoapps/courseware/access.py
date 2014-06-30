@@ -9,7 +9,6 @@ from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from opaque_keys.edx.locations import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
@@ -23,7 +22,7 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
 
-    if isinstance(obj, Location):
+    if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
