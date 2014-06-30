@@ -65,11 +65,11 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
-    has_course_mode = CourseMode.mode_for_course(course_key, 'honor')
-    course_mode_price = False
-    if has_course_mode:
-        if has_course_mode.min_price > 0:
-            course_mode_price = True
+    course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
+    course_mode_has_price = False
+    if course_honor_mode:
+        if course_honor_mode.min_price > 0:
+            course_mode_has_price = True
 
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
@@ -84,7 +84,7 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_metrics(course_key, access))
 
      # Gate access to Ecommerce tab
-    if course_mode_price:
+    if course_mode_has_price:
         sections.append(_section_e_commerce(course_key, access))
 
 
@@ -135,7 +135,7 @@ def _section_e_commerce(course_key, access):
         'access': access,
         'course_id': course_key.to_deprecated_string(),
         'ajax_remove_coupon_url': reverse('remove_coupon'),
-        'ajax_edit_coupon_info': reverse('edit_coupon_info'),
+        'ajax_get_coupon_info': reverse('get_coupon_info'),
         'ajax_update_coupon': reverse('update_coupon'),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
         'coupons': coupons,

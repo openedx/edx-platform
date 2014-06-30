@@ -281,8 +281,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.coupons.add_coupon', name="add_coupon"),
         url(r'^courses/update_coupon$',
             'instructor.views.coupons.update_coupon', name="update_coupon"),
-        url(r'^courses/edit_coupon_info$',
-            'instructor.views.coupons.edit_coupon_info', name="edit_coupon_info"),
+        url(r'^courses/get_coupon_info$',
+            'instructor.views.coupons.get_coupon_info', name="get_coupon_info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
             include('instructor.views.api_urls')),
 
