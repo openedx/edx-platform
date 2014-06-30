@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponse
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import _parse_course_id_from_string, _get_course_enrollment_domain
 
@@ -209,11 +209,10 @@ class LoginTest(TestCase):
 
     def test_change_enrollment_400(self):
         """
-        Tests that a 400 in change_enrollment doesn't lead to a 400
-        and in fact just redirects the user to the dashboard
-        without incident.
+        Tests that a 400 in change_enrollment doesn't lead to a 404
+        and in fact just logs in the user without incident
         """
-        # add these post params to trigger a call to change_enrollment
+        # add this post param to trigger a call to change_enrollment
         extra_post_params = {"enrollment_action": "enroll"}
         with patch('student.views.change_enrollment') as mock_change_enrollment:
             mock_change_enrollment.return_value = HttpResponseBadRequest("I am a 400")
@@ -224,6 +223,42 @@ class LoginTest(TestCase):
             )
         response_content = json.loads(response.content)
         self.assertIsNone(response_content["redirect_url"])
+        self._assert_response(response, success=True)
+
+    def test_change_enrollment_200_no_redirect(self):
+        """
+        Tests "redirect_url" is None if change_enrollment returns a HttpResponse
+        with no content
+        """
+        # add this post param to trigger a call to change_enrollment
+        extra_post_params = {"enrollment_action": "enroll"}
+        with patch('student.views.change_enrollment') as mock_change_enrollment:
+            mock_change_enrollment.return_value = HttpResponse()
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password',
+                extra_post_params=extra_post_params,
+            )
+        response_content = json.loads(response.content)
+        self.assertIsNone(response_content["redirect_url"])
+        self._assert_response(response, success=True)
+
+    def test_change_enrollment_200_redirect(self):
+        """
+        Tests that "redirect_url" is the content of the HttpResponse returned
+        by change_enrollment, if there is content
+        """
+        # add this post param to trigger a call to change_enrollment
+        extra_post_params = {"enrollment_action": "enroll"}
+        with patch('student.views.change_enrollment') as mock_change_enrollment:
+            mock_change_enrollment.return_value = HttpResponse("in/nature/there/is/nothing/melancholy")
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password',
+                extra_post_params=extra_post_params,
+            )
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content["redirect_url"], "in/nature/there/is/nothing/melancholy")
         self._assert_response(response, success=True)
 
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):

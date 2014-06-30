@@ -543,7 +543,7 @@ def dashboard(request):
 def try_change_enrollment(request):
     """
     This method calls change_enrollment if the necessary POST
-    parameters are present, but does not return anything. It
+    parameters are present, but does not return anything in most cases. It
     simply logs the result or exception. This is usually
     called after a registration or login, as secondary action.
     It should not interrupt a successful registration or login.
@@ -559,6 +559,11 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
+            # Hack: since change_enrollment delivers its redirect_url in the content
+            # of its response, we check here that only the 200 codes with content
+            # will return redirect_urls.
+            if enrollment_response.status_code == 200 and enrollment_response.content != '':
+                return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
