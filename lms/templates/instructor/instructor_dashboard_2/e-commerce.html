@@ -82,9 +82,8 @@
       $.ajax({
         type: "POST",
         data: {id: coupon_id},
-        url: "${section_data['ajax_edit_coupon_info']}",
-        success: function (resp) {
-          if (resp.success) {
+        url: "${section_data['ajax_get_coupon_info']}",
+        success: function (data) {
             $('#coupon-error').val('');
             $('#coupon-error').attr('style', 'display: none');
             $('input#edit_coupon_code').val(resp.coupon_code);
@@ -92,10 +91,10 @@
             $('textarea#edit_coupon_description').val(resp.coupon_description);
             $('input#edit_coupon_course_id').val(resp.coupon_course_id);
             $('#edit-modal-trigger').click();
-          }
-          else {
-            $('#coupon-error').html(resp.message).show();
-          }
+          },
+        error: function(jqXHR, textStatus, errorThrown) {
+          var data = $.parseJSON(jqXHR.responseText);
+          $('#coupon-error').html(data.message).show();
         }
       });
     });
