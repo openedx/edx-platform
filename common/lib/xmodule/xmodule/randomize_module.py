@@ -1,20 +1,23 @@
 import json
-import logging
 import random
+import logging
+from collections import OrderedDict
 
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 
 from lxml import etree
 
-from xblock.fields import Scope, Integer
+from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
 
 class RandomizeFields(object):
-    choice = Integer(help="Which random child was chosen",
+    choice = String(help="Which random child was chosen",
+                    scope=Scope.user_state)
+    history = String(help="History of choices (json)",
                      scope=Scope.user_state)
 
 
@@ -46,42 +49,66 @@ class RandomizeModule(RandomizeFields, XModule):
         # it calls get_child_descriptors() internally, but that doesn't work
         # until we've picked a choice
         # import pudb; pudb.set_trace()
-        children = self.descriptor.get_children()
         xml_attrs = self.descriptor.xml_attributes or []
         use_randrange = 'use_randrange' in xml_attrs
         # TODO: use this attr to toggle storing history and never showing the
         # same problem twice
         # no_repeats = xml_attrs.has_key('no_repeats')
-        num_choices = len(children)
+        no_repeats = use_randrange
+        self.pick_choice(use_randrange=use_randrange, no_repeats=no_repeats)
 
-        if self.choice > num_choices:
-            # Oops.  Children changed. Reset.
+    def pick_choice(self, use_randrange=None, no_repeats=None):
+        children = [c.location.url() for c in self.descriptor.get_children()]
+        choices = self.get_choices(no_repeats=no_repeats)
+        num_choices = len(choices)
+        if self.choice is not None and self.choice not in children:
+            # Children changed. Reset.
             self.choice = None
 
         if self.choice is None:
             # choose one based on the system seed, or randomly if that's not
             # available
             if num_choices > 0:
+                keys = choices.keys()
                 if self.system.seed is not None and not use_randrange:
-                    self.choice = self.system.seed % num_choices
+                    choice = keys[self.system.seed % num_choices]
                     log.debug('using seed for %s choice=%s' %
                               (str(self.location), self.choice))
                 else:
-                    self.choice = random.randrange(0, num_choices)
+                    choice = random.choice(keys)
                     log.debug('using randrange for %s' % str(self.location))
+                self.choice = choice
             else:
                 log.debug('error in randomize: num_choices = %s' % num_choices)
 
         if self.choice is not None:
-            self.child_descriptor = self.descriptor.get_children()[self.choice]
+            self.child_descriptor = choices[self.choice]
             # Now get_children() should return a list with one element
             log.debug("choice=%s in %s, children of randomize module "
                       "(should be only 1): %s", self.choice,
                       str(self.location), self.get_children())
             self.child = self.get_children()[0]
+            if no_repeats:
+                child_loc = self.child.location.url()
+                history = json.loads(self.history or '[]')
+                if child_loc not in history:
+                    history.append(child_loc)
+                self.history = json.dumps(history)
         else:
             self.child_descriptor = None
             self.child = None
+
+    def get_choices(self, no_repeats=None):
+        children = self.descriptor.get_children()
+        if self.choice is None and no_repeats:
+            history = json.loads(self.history or '[]')
+            children = [c for c in children if c.location.url() not in history]
+        return OrderedDict([(c.location.url(), c) for c in children])
+
+    def get_choice_index(self, choice=None, choices=None):
+        choice = choice or self.choice
+        choices = choices or self.get_choices().keys()
+        return choices.index(choice)
 
     def get_child_descriptors(self):
         """
@@ -97,30 +124,32 @@ class RandomizeModule(RandomizeFields, XModule):
             return Fragment(content=u"<div>Nothing to randomize between</div>")
         child_html = self.child.render('student_view', context)
         if self.system.user_is_staff:
+            choices = self.get_choices().keys()
             dishtml = self.system.render_template('randomize_control.html', {
                 'element_id': self.location.html_id(),
                 'is_staff': self.system.user_is_staff,
                 'ajax_url': self.system.ajax_url,
-                'choice': self.choice,
-                'num_choices': len(self.descriptor.get_children()),
+                'choice': self.get_choice_index(choices=choices),
+                'num_choices': len(choices),
             })
             # html = '<html><p>Welcome, staff.  Randomize loc=%s ;
             # Choice=%s</p><br/><hr/></br/>' % (str(self.location),
             # self.choice)
-            return Fragment(u"<html>" + dishtml + child_html.content +
-                            u"</html>")
+            return Fragment(
+                u"<html>" + dishtml + child_html.content + u"</html>")
         return child_html
 
     def handle_ajax(self, dispatch, data):
+        choices = self.get_choices().keys()
+        index = self.get_choice_index(choices=choices)
         if dispatch == 'next':
-            self.choice = self.choice + 1
+            self.choice = choices[index + 1]
         elif dispatch == 'jump':
             log.debug('jump, data=%s' % data)
-            self.choice = int(data['choice'])
-        num_choices = len(self.descriptor.get_children())
-        if self.choice >= num_choices:
-            self.choice = 0
-
+            self.choice = choices[int(data['choice'])]
+        #num_choices = len(choices)
+        #if self.choice >= num_choices:
+            #self.choice = 0
         result = {'ret': "choice=%s" % self.choice}
         return json.dumps(result)
 

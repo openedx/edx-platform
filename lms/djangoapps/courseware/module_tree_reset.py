@@ -75,11 +75,14 @@ class TreeNodeSet(list):
         msg = ("Resetting all <problem> and <randomize> in tree of parent "
                "module %s\n" % self.parent_module)
         for module in self.rset + self.pset:
-            old_state = (module.smstate.state if module.smstate is not None
-                         else {})
+            old_state = json.loads(module.smstate.state if module.smstate is
+                                   not None else '{}')
             msg += "    Resetting %s, old state=%s\n" % (module, old_state)
+            new_state = {}
+            if 'history' in old_state:
+                new_state['history'] = old_state['history']
             if module.smstate is not None:
-                module.smstate.state = '{}'
+                module.smstate.state = json.dumps(new_state)
                 module.smstate.grade = None
                 module.smstate.save()
         return msg
@@ -211,13 +214,13 @@ class ProctorModuleInfo(object):
             # started a problem base this on the "choice" from the randmize
             # module state
             try:
-                sm.choice = int(json.loads(sm.state)['choice'])
+                sm.choice = json.loads(sm.state)['choice']
             except Exception:
                 sm.choice = None
             if sm.choice is not None:
                 try:
                     sm.problem = self.ms.get_instance(
-                        self.course.id, rpmod.ra_rand.children[sm.choice])
+                        self.course.id, sm.choice)
                     sm.problem_name = sm.problem.display_name
                 except Exception:
                     log.exception("Failed to get rand child "
@@ -308,8 +311,9 @@ class ProctorModuleInfo(object):
 
     def get_assignments_attempted_and_failed(self, student, do_reset=False):
         status = self.get_student_status(student)
-        failed = [self._get_od_for_assignment(a) for a in status['assignments']
-                  if a['attempted'] and a['earned'] != a['possible']]
+        failed = [self._get_od_for_assignment(student, a)
+                  for a in status['assignments'] if a['attempted'] and
+                  a['earned'] != a['possible']]
         for f in failed:
             log.info(
                 "Student %s Assignment %s attempted '%s' but failed "
@@ -317,8 +321,8 @@ class ProctorModuleInfo(object):
                              f['earned'], f['possible']))
             if do_reset:
                 try:
-                    log.debug('resetting %s for student %s' %
-                              (f['assignment'], f['username']))
+                    log.info('resetting %s for student %s' %
+                             (f['assignment'], f['username']))
                     cloc = self.course.location
                     assi_url = Location(cloc.tag, cloc.org,
                                         cloc.course, 'proctor',
