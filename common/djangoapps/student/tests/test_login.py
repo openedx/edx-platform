@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.http import HttpResponseBadRequest
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import _parse_course_id_from_string, _get_course_enrollment_domain
 
@@ -206,9 +207,30 @@ class LoginTest(TestCase):
         # client1 will be logged out
         self.assertEqual(response.status_code, 302)
 
-    def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG'):
+    def test_change_enrollment_400(self):
+        """
+        Tests that a 400 in change_enrollment doesn't lead to a 400
+        and in fact just redirects the user to the dashboard
+        without incident.
+        """
+        # add these post params to trigger a call to change_enrollment
+        extra_post_params = {"enrollment_action": "enroll"}
+        with patch('student.views.change_enrollment') as mock_change_enrollment:
+            mock_change_enrollment.return_value = HttpResponseBadRequest("I am a 400")
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password',
+                extra_post_params=extra_post_params,
+            )
+        response_content = json.loads(response.content)
+        self.assertIsNone(response_content["redirect_url"])
+        self._assert_response(response, success=True)
+
+    def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):
         ''' Post the login info '''
         post_params = {'email': email, 'password': password}
+        if extra_post_params is not None:
+            post_params.update(extra_post_params)
         with patch(patched_audit_log) as mock_audit_log:
             result = self.client.post(self.url, post_params)
         return result, mock_audit_log

@@ -559,8 +559,6 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
-            if enrollment_response.content != '':
-                return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
