@@ -15,7 +15,7 @@ from django.conf import settings
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -37,7 +37,7 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,

@@ -6,7 +6,7 @@ from uuid import uuid4
 from django.test import TestCase
 from xmodule.modulestore.django import (
     modulestore, clear_existing_modulestores, loc_mapper)
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.django import contentstore
 
 
@@ -142,7 +142,7 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections(modulestore_type=MONGO_MODULESTORE_TYPE):
+    def drop_mongo_collections(modulestore_type=ModuleStoreEnum.Type.mongo):
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """

@@ -28,7 +28,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -968,7 +968,7 @@ def instructor_dashboard(request, course_id):
         instructor_tasks = None
 
     # determine if this is a studio-backed course so we can provide a link to edit this course in studio
-    is_studio_course = modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE
+    is_studio_course = modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)

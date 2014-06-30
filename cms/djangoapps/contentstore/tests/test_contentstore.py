@@ -27,10 +27,8 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 from xmodule.exceptions import NotFoundError, InvalidVersionError
-from xmodule.modulestore import (
-    mongo, MONGO_MODULESTORE_TYPE, PublishState,
-    REVISION_OPTION_PUBLISHED_ONLY, REVISION_OPTION_DRAFT_ONLY, KEY_REVISION_PUBLISHED, BRANCH_PUBLISHED_ONLY
-)
+from xmodule.modulestore import mongo, PublishState, ModuleStoreEnum
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.mixed import store_branch_setting
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -204,13 +202,13 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         store.convert_to_draft(html_module_from_draft_store.location, self.user.id)
 
         # Query get_items() and find the html item. This should just return back a single item (not 2).
-        direct_store_items = store.get_items(course_key, revision=REVISION_OPTION_PUBLISHED_ONLY)
+        direct_store_items = store.get_items(course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
         html_items_from_direct_store = [item for item in direct_store_items if (item.location == html_usage_key)]
         self.assertEqual(len(html_items_from_direct_store), 1)
         self.assertFalse(getattr(html_items_from_direct_store[0], 'is_draft', False))
 
         # Fetch from the draft store.
-        draft_store_items = store.get_items(course_key, revision=REVISION_OPTION_DRAFT_ONLY)
+        draft_store_items = store.get_items(course_key, revision=ModuleStoreEnum.RevisionOption.draft_only)
         html_items_from_draft_store = [item for item in draft_store_items if (item.location == html_usage_key)]
         self.assertEqual(len(html_items_from_draft_store), 1)
         self.assertTrue(getattr(html_items_from_draft_store[0], 'is_draft', False))
@@ -663,9 +661,9 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         clone_course(module_store, content_store, source_course_id, dest_course_id, self.user.id)
 
         # first assert that all draft content got cloned as well
-        draft_items = module_store.get_items(source_course_id, revision=REVISION_OPTION_DRAFT_ONLY)
+        draft_items = module_store.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
         self.assertGreater(len(draft_items), 0)
-        draft_clone_items = module_store.get_items(dest_course_id, revision=REVISION_OPTION_DRAFT_ONLY)
+        draft_clone_items = module_store.get_items(dest_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
         self.assertGreater(len(draft_clone_items), 0)
         self.assertEqual(len(draft_items), len(draft_clone_items))
 
@@ -868,7 +866,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         # add the new private and new public to list of children
         sequential = module_store.get_item(course_id.make_usage_key('sequential', 'vertical_sequential'))
-        private_location_no_draft = private_vertical.location.replace(revision=KEY_REVISION_PUBLISHED)
+        private_location_no_draft = private_vertical.location.replace(revision=MongoRevisionKey.published)
         sequential.children.append(private_location_no_draft)
         sequential.children.append(public_vertical_location)
         module_store.update_item(sequential, self.user.id)
@@ -939,7 +937,11 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
             target_course_id=course_id,
         )
 
-        items = module_store.get_items(course_id, category='vertical', revision=REVISION_OPTION_PUBLISHED_ONLY)
+        items = module_store.get_items(
+            course_id,
+            category='vertical',
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
         self._check_verticals(items)
 
         def verify_item_publish_state(item, publish_state):
@@ -1124,7 +1126,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertContains(resp, '/c4x/edX/toy/asset/handouts_sample_handout.txt')
 
     def test_prefetch_children(self):
-        mongo_store = modulestore()._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         import_from_xml(modulestore(), self.user.id, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
@@ -1132,7 +1134,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         mongo_store.collection.find = wrapper.find
 
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
-        with store_branch_setting(mongo_store, BRANCH_PUBLISHED_ONLY):
+        with store_branch_setting(mongo_store, ModuleStoreEnum.Branch.published_only):
             course = mongo_store.get_course(course_id, depth=2)
 
             # make sure we haven't done too many round trips to DB

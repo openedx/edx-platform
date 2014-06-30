@@ -19,7 +19,7 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import REVISION_OPTION_PUBLISHED_ONLY
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -27,7 +27,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
-from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
+from . import ModuleStoreReadBase, Location, ModuleStoreEnum
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
@@ -411,7 +411,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.i18n_service = i18n_service
 
         # The XML Module Store is a read-only store and only handles published content
-        self.branch_setting_func = lambda: REVISION_OPTION_PUBLISHED_ONLY
+        self.branch_setting_func = lambda: ModuleStoreEnum.RevisionOption.published_only
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -800,16 +800,11 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def get_modulestore_type(self, course_key=None):
         """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
-
+        Returns an enumeration-like type reflecting the type of this modulestore, per ModuleStoreEnum.Type
         Args:
             course_key: just for signature compatibility
         """
-        return XML_MODULESTORE_TYPE
+        return ModuleStoreEnum.Type.xml
 
     def get_courses_for_wiki(self, wiki_slug):
         """
@@ -827,5 +822,5 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         Returns the course count
         """
-        return {XML_MODULESTORE_TYPE: True}
+        return {ModuleStoreEnum.Type.xml: True}
 

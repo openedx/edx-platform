@@ -11,7 +11,7 @@ import random
 
 from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import BRANCH_NAME_PUBLISHED, BRANCH_NAME_DRAFT
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (InsufficientSpecificationError, ItemNotFoundError, VersionConflictError,
             DuplicateItemError, DuplicateCourseError)
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
@@ -20,6 +20,10 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+
+
+BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
+BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
 class SplitModuleTest(unittest.TestCase):

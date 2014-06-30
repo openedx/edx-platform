@@ -25,44 +25,51 @@ from xblock.core import XBlock
 
 log = logging.getLogger('edx.modulestore')
 
-# Modulestore Types
 
-SPLIT_MONGO_MODULESTORE_TYPE = 'split'
-MONGO_MODULESTORE_TYPE = 'mongo'
-XML_MODULESTORE_TYPE = 'xml'
+class ModuleStoreEnum(object):
+    """
+    A class to encapsulate common constants that are used with the various modulestores.
+    """
 
+    class Type(object):
+        """
+        The various types of modulestores provided
+        """
+        split = 'split'
+        mongo = 'mongo'
+        xml = 'xml'
 
-# Key Revision constants to use for Location and Usage Keys
-# Note: These values are persisted in the database, so should not be changed without migrations
-KEY_REVISION_DRAFT = 'draft'
-KEY_REVISION_PUBLISHED = None
+    class RevisionOption(object):
+        """
+        Revision constants to use for Module Store operations
+        Note: These values are passed into store APIs and only used at run time
+        """
+        # both DRAFT and PUBLISHED versions are queried, with preference to DRAFT versions
+        draft_preferred = 'rev-opt-draft-preferred'
 
+        # only DRAFT versions are queried and no PUBLISHED versions
+        draft_only = 'rev-opt-draft-only'
 
-# Revision constants to use for Module Store operations
-# Note: These values are passed into store APIs and only used at run time
+        # # only PUBLISHED versions are queried and no DRAFT versions
+        published_only = 'rev-opt-published-only'
 
-# both DRAFT and PUBLISHED versions are queried, with preference to DRAFT versions
-REVISION_OPTION_DRAFT_PREFERRED = 'rev-opt-draft-preferred'
+        # all revisions are queried
+        all = 'rev-opt-all'
 
-# only DRAFT versions are queried and no PUBLISHED versions
-REVISION_OPTION_DRAFT_ONLY = 'rev-opt-draft-only'
+    class Branch(object):
+        """
+        Branch constants to use for stores, such as Mongo, that have only 2 branches: DRAFT and PUBLISHED
+        Note: These values are taken from server configuration settings, so should not be changed without alerting DevOps
+        """
+        draft_preferred = 'draft-preferred'
+        published_only = 'published-only'
 
-# # only PUBLISHED versions are queried and no DRAFT versions
-REVISION_OPTION_PUBLISHED_ONLY = 'rev-opt-published-only'
-
-# all revisions are queried
-REVISION_OPTION_ALL = 'rev-opt-all'
-
-
-# Branch constants to use for stores, such as Mongo, that have only 2 branches: DRAFT and PUBLISHED
-# Note: These values are taken from server configuration settings, so should not be changed without alerting DevOps
-BRANCH_DRAFT_PREFERRED = 'draft'
-BRANCH_PUBLISHED_ONLY = 'published'
-
-
-# Branch constants to use for stores, such as Split, that have named branches
-BRANCH_NAME_DRAFT = 'draft'
-BRANCH_NAME_PUBLISHED = 'published'
+    class BranchName(object):
+        """
+        Branch constants to use for stores, such as Split, that have named branches
+        """
+        draft = 'draft-branch'
+        published = 'published-branch'
 
 
 class PublishState(object):

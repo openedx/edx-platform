@@ -5,7 +5,8 @@ import unittest
 import uuid
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import BRANCH_NAME_PUBLISHED, BRANCH_NAME_DRAFT, KEY_REVISION_PUBLISHED
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
@@ -63,8 +64,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['org'], org)
         self.assertEqual(entry['offering'], '{}.{}'.format(course1, run))
-        self.assertEqual(entry['draft_branch'], BRANCH_NAME_DRAFT)
-        self.assertEqual(entry['prod_branch'], BRANCH_NAME_PUBLISHED)
+        self.assertEqual(entry['draft_branch'], ModuleStoreEnum.BranchName.draft)
+        self.assertEqual(entry['prod_branch'], ModuleStoreEnum.BranchName.published)
         self.assertEqual(entry['block_map'], {})
 
         course2 = 'quux_course'
@@ -124,7 +125,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         """
         prob_locator = loc_mapper().translate_location(
             location,
-            published=(branch == BRANCH_NAME_PUBLISHED),
+            published=(branch == ModuleStoreEnum.BranchName.published),
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.org, org)
@@ -134,7 +135,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
 
         course_locator = loc_mapper().translate_location_to_course_locator(
             location.course_key,
-            published=(branch == BRANCH_NAME_PUBLISHED),
+            published=(branch == ModuleStoreEnum.BranchName.published),
         )
         self.assertEqual(course_locator.org, org)
         self.assertEqual(course_locator.offering, offering)
@@ -169,7 +170,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         )
         test_problem_locn = Location(org, course, run, 'problem', 'abc123')
 
-        self.translate_n_check(test_problem_locn, new_style_org, new_style_offering, 'problem2', BRANCH_NAME_PUBLISHED)
+        self.translate_n_check(test_problem_locn, new_style_org, new_style_offering, 'problem2',
+                               ModuleStoreEnum.BranchName.published)
         # look for non-existent problem
         with self.assertRaises(ItemNotFoundError):
             loc_mapper().translate_location(
@@ -184,7 +186,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         test_no_cat_locn = test_no_cat_locn.replace(name='def456')
 
         self.translate_n_check(
-            test_no_cat_locn, new_style_org, new_style_offering, 'problem4', BRANCH_NAME_PUBLISHED
+            test_no_cat_locn, new_style_org, new_style_offering, 'problem4', ModuleStoreEnum.BranchName.published
         )
 
         # add a distractor course (note that abc123 has a different translation in this one)
@@ -203,12 +205,12 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         )
         # test that old translation still works
         self.translate_n_check(
-            test_problem_locn, new_style_org, new_style_offering, 'problem2', BRANCH_NAME_PUBLISHED
+            test_problem_locn, new_style_org, new_style_offering, 'problem2', ModuleStoreEnum.BranchName.published
         )
         # and new returns new id
         self.translate_n_check(
             test_problem_locn.replace(run=run), test_delta_new_org, test_delta_new_offering,
-            'problem3', BRANCH_NAME_PUBLISHED
+            'problem3', ModuleStoreEnum.BranchName.published
         )
 
     def test_translate_location_dwim(self):
@@ -222,11 +224,11 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         problem_name = 'abc123abc123abc123abc123abc123f9'
         location = Location(org, course, run, 'problem', problem_name)
         new_offering = '{}.{}'.format(course, run)
-        self.translate_n_check(location, org, new_offering, 'problemabc', BRANCH_NAME_PUBLISHED, True)
+        self.translate_n_check(location, org, new_offering, 'problemabc', ModuleStoreEnum.BranchName.published, True)
 
         # create an entry w/o a guid name
         other_location = Location(org, course, run, 'chapter', 'intro')
-        self.translate_n_check(other_location, org, new_offering, 'intro', BRANCH_NAME_PUBLISHED, True)
+        self.translate_n_check(other_location, org, new_offering, 'intro', ModuleStoreEnum.BranchName.published, True)
 
         # add a distractor course
         delta_new_org = '{}.geek_dept'.format(org)
@@ -238,7 +240,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             delta_new_org, delta_new_offering,
             block_map={problem_name: {'problem': 'problem3'}}
         )
-        self.translate_n_check(location, org, new_offering, 'problemabc', BRANCH_NAME_PUBLISHED, True)
+        self.translate_n_check(location, org, new_offering, 'problemabc', ModuleStoreEnum.BranchName.published, True)
 
         # add a new one to both courses (ensure name doesn't have same beginning)
         new_prob_name = uuid.uuid4().hex
@@ -246,10 +248,10 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             new_prob_name = uuid.uuid4().hex
         new_prob_locn = location.replace(name=new_prob_name)
         new_usage_id = 'problem{}'.format(new_prob_name[:3])
-        self.translate_n_check(new_prob_locn, org, new_offering, new_usage_id, BRANCH_NAME_PUBLISHED, True)
+        self.translate_n_check(new_prob_locn, org, new_offering, new_usage_id, ModuleStoreEnum.BranchName.published, True)
         new_prob_locn = new_prob_locn.replace(run=run)
         self.translate_n_check(
-            new_prob_locn, delta_new_org, delta_new_offering, new_usage_id, BRANCH_NAME_PUBLISHED, True
+            new_prob_locn, delta_new_org, delta_new_offering, new_usage_id, ModuleStoreEnum.BranchName.published, True
         )
 
     def test_translate_locator(self):
@@ -264,7 +266,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         new_style_offering = '{}.{}'.format(course, run)
         prob_course_key = CourseLocator(
             org=new_style_org, offering=new_style_offering,
-            branch=BRANCH_NAME_PUBLISHED,
+            branch=ModuleStoreEnum.BranchName.published,
         )
         prob_locator = BlockUsageLocator(
             prob_course_key,
@@ -286,22 +288,22 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         # only one course matches
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # default branch
-        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', KEY_REVISION_PUBLISHED))
+        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
         # test get_course keyword
         prob_location = loc_mapper().translate_locator_to_location(prob_locator, get_course=True)
         self.assertEqual(prob_location, SlashSeparatedCourseKey(org, course, run))
         # explicit branch
-        prob_locator = prob_locator.for_branch(BRANCH_NAME_DRAFT)
+        prob_locator = prob_locator.for_branch(ModuleStoreEnum.BranchName.draft)
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
-        # Even though the problem was set as draft, we always return revision= KEY_REVISION_PUBLISHED to work
+        # Even though the problem was set as draft, we always return revision= MongoRevisionKey.published to work
         # with old mongo/draft modulestores.
-        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', KEY_REVISION_PUBLISHED))
+        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
         prob_locator = BlockUsageLocator(
             prob_course_key.for_branch('production'),
             block_type='problem', block_id='problem2'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
-        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', KEY_REVISION_PUBLISHED))
+        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
             prob_course_key.for_branch('production'),
@@ -310,7 +312,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location(org, course, run, 'chapter', '48f23a10395384929234'))
         # explicit branch
-        chap_locator = chap_locator.for_branch(BRANCH_NAME_DRAFT)
+        chap_locator = chap_locator.for_branch(ModuleStoreEnum.BranchName.draft)
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location(org, course, run, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
@@ -321,7 +323,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
 
         # look for non-existent problem
         prob_locator2 = BlockUsageLocator(
-            prob_course_key.for_branch(BRANCH_NAME_DRAFT),
+            prob_course_key.for_branch(ModuleStoreEnum.BranchName.draft),
             block_type='problem', block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator2)
@@ -336,7 +338,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             block_map={'abc123': {'problem': 'problem3'}}
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
-        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', KEY_REVISION_PUBLISHED))
+        self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
 
     def test_special_chars(self):
         """
