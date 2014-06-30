@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import REVISION_OPTION_PUBLISHED_ONLY
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -139,7 +139,7 @@ def is_xblock_visible_to_students(xblock):
     """
 
     try:
-        published = modulestore().get_item(xblock.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
+        published = modulestore().get_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     # If there's no published version then the xblock is clearly not visible
     except ItemNotFoundError:
         return False
