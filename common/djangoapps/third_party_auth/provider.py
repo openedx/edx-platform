@@ -139,6 +139,9 @@ class LinkedInOauth2(BaseProvider):
     SETTINGS = {
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY': None,
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET': None,
+        'SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE': None,
+        'SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS': None,
+        'SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA': None,
     }
 
     @classmethod
