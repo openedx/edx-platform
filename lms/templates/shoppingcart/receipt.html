@@ -52,24 +52,17 @@
                 <td>${item.qty}</td>
                 <td>${item.line_desc}</td>
                 <td><a href="${course_id}" class="enter-course">${_('View Course')}</a></td>
-                % if item.discount_price != None:
-                <td>
-                    ${"{0:0.2f}".format(item.discount_price)}
-                    <span class="old-price"> ${"{0:0.2f}".format(item.unit_cost)}</span>
-                </td>
-                % else:
-                    <td>${"{0:0.2f}".format(item.unit_cost)}</td>
-                % endif
+                <td>${"{0:0.2f}".format(item.unit_cost)}
+                    % if item.list_price != None:
+                        <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>
+                    % endif
+                    </td>
                 <td>${"{0:0.2f}".format(item.line_cost)}</td>
                 <td>${item.currency.upper()}</td></tr>
               % elif item.status == "refunded":
                 <td><del>${item.qty}</del></td>
                 <td><del>${item.line_desc}</del></td>
-                % if item.discount_price != None:
-                  <td><del>${"{0:0.2f}".format(item.discount_price)}</del></td>
-                % else:
-                    <td><del>${"{0:0.2f}".format(item.unit_cost)}</del></td>
-                % endif
+                <td><del>${"{0:0.2f}".format(item.unit_cost)}</del></td>
                 <td><del>${"{0:0.2f}".format(item.line_cost)}</del></td>
                 <td><del>${item.currency.upper()}</del></td></tr>
               % endif

@@ -25,15 +25,12 @@
         <tr class="cart-items">
           <td>${item.qty}</td>
           <td>${item.line_desc}</td>
-          % if item.discount_price != None:
-                <td>
-                    ${"{0:0.2f}".format(item.discount_price)}
-                    <span class="old-price"> ${"{0:0.2f}".format(item.unit_cost)}</span>
-                </td>
-          % else:
-                <td>${"{0:0.2f}".format(item.unit_cost)}</td>
-          % endif
-
+          <td>
+              ${"{0:0.2f}".format(item.unit_cost)}
+              % if item.list_price != None:
+                <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>
+              % endif
+          </td>
           <td>${"{0:0.2f}".format(item.line_cost)}</td>
           <td>${item.currency.upper()}</td>
           <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td>
