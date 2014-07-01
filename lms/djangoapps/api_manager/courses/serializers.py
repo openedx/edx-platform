@@ -1,6 +1,7 @@
 """ Django REST Framework Serializers """
 
 from api_manager.models import CourseModuleCompletion
+from api_manager.utils import generate_base_uri
 from rest_framework import serializers
 
 
@@ -43,3 +44,27 @@ class CourseCompletionsLeadersSerializer(serializers.Serializer):
     title = serializers.CharField(source='user__profile__title')
     avatar_url = serializers.CharField(source='user__profile__avatar_url')
     completions = serializers.IntegerField()
+
+
+class CourseSerializer(serializers.Serializer):
+    """ Serializer for Courses """
+    id = serializers.CharField(source='id')
+    name = serializers.CharField(source='display_name')
+    category = serializers.CharField(source='location.category')
+    number = serializers.CharField(source='location.course')
+    org = serializers.CharField(source='location.org')
+    uri = serializers.SerializerMethodField('get_uri')
+    due = serializers.DateTimeField()
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
+
+    def get_uri(self, course):
+        """
+        Builds course detail uri
+        """
+        return "{}/{}".format(generate_base_uri(self.context['request']), course.id)
+
+    class Meta:
+        """ Serializer/field specification """
+        #lookup_field = 'id'
+        #fields = ('id', 'name', 'category', 'number', 'org', 'uri', 'due', 'start', 'end')
