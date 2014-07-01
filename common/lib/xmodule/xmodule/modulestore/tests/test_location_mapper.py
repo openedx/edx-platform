@@ -3,6 +3,7 @@ Test the loc mapper store
 """
 import unittest
 import uuid
+from unittest import skip
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import MongoRevisionKey
@@ -13,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 import bson.son
 
 
+@skip("loc_mapper isn't used anymore")
 class LocMapperSetupSansDjango(unittest.TestCase):
     """
     Create and destroy a loc mapper for each test
