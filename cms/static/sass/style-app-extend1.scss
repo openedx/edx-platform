@@ -28,6 +28,8 @@
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
 @import 'elements/xblocks'; //  studio rendering chrome for xblocks
+@import 'elements/modules'; //  content module patterns
+@import 'elements/layout'; // various standard layouts
 
 // base - specific views
 @import 'views/account';
