@@ -15,7 +15,6 @@ from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from xmodule.errortracker import make_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.tabs import CourseTabList
-from xmodule.modulestore.exceptions import InvalidLocationError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 
 from .inheritance import own_metadata

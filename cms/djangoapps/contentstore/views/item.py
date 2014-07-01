@@ -523,7 +523,7 @@ def orphan_handler(request, course_key_string):
     if request.method == 'DELETE':
         if request.user.is_staff:
             store = modulestore()
-            items = store.get_orphans(course_usage_key)
+            items = store.get_orphans(course_key)
             for itemloc in items:
                 # get_orphans returns the deprecated string format w/o revision
                 usage_key = UsageKey.from_string(itemloc).map_into_course(course_key)

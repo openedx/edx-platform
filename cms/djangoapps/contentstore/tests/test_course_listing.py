@@ -213,8 +213,6 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
-        self._create_course_with_access_groups(course_location, self.user)
-
         course_location = CourseKey.from_string('testOrg/doomedCourse/RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)
         store.delete_course(course_location)

@@ -8,7 +8,7 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore import EdXJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.mixed import store_branch_setting
 from fs.osfs import OSFS
