@@ -50,7 +50,7 @@ The following documentation is available:
   
   Added new event types to `Tracking Logs`_ for interactions with PDF files.
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
   
   Recent changes include:
   
