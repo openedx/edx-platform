@@ -24,7 +24,7 @@ from courseware.courses import get_course_by_id, get_cms_course_link, get_course
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
-from shoppingcart.models import Coupons, PaidCourseRegistration
+from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
 
@@ -127,7 +127,7 @@ section_display_name will be used to generate link titles in the nav bar.
 
 def _section_e_commerce(course_key, access):
     """ Provide data for the corresponding dashboard section """
-    coupons = Coupons.objects.filter(course_id=course_key).order_by('-is_active')
+    coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
     total_amount = None
     if access['finance_admin']:
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)

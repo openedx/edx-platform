@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
-from shoppingcart.models import Coupons, PaidCourseRegistration
+from shoppingcart.models import Coupon, PaidCourseRegistration
 from mock import patch
 from student.roles import CourseFinanceAdminRole
 
@@ -96,7 +96,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         Test Delete Coupon Scenarios. Handle all the HttpResponses return by remove_coupon view
         """
-        coupon = Coupons(
+        coupon = Coupon(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
@@ -124,7 +124,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         Test Edit Coupon Info Scenarios. Handle all the HttpResponses return by edit_coupon_info view
         """
-        coupon = Coupons(
+        coupon = Coupon(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
@@ -146,7 +146,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         Test Update Coupon Info Scenarios. Handle all the HttpResponses return by update_coupon view
         """
-        coupon = Coupons(
+        coupon = Coupon(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=10, created_by=self.instructor
         )
@@ -170,7 +170,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('Coupon {0} not found'.format(1000)in response.content)
 
-        coupon1 = Coupons(
+        coupon1 = Coupon(
             code='11111', description='coupon', course_id=self.course.id.to_deprecated_string(),
             percentage_discount=20, created_by=self.instructor
         )

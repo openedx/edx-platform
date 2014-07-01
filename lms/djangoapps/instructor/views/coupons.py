@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseNotFound
-from shoppingcart.models import Coupons
+from shoppingcart.models import Coupon
 
 import json
 import logging
@@ -24,7 +24,7 @@ def remove_coupon(request):
     """
     coupon_id = request.REQUEST.get('id', '-1')
     try:
-        coupon = Coupons.objects.get(id=coupon_id)
+        coupon = Coupon.objects.get(id=coupon_id)
         if coupon.created_by == request.user and coupon.is_active:
             coupon.is_active = False
             coupon.save()
@@ -47,8 +47,8 @@ def add_coupon(request):
     """
     code = request.REQUEST.get('code')
     try:
-        coupon = Coupons.objects.filter(is_active=True).get(code=code)
-    except Coupons.DoesNotExist:
+        coupon = Coupon.objects.filter(is_active=True).get(code=code)
+    except Coupon.DoesNotExist:
         coupon = None
     if coupon:
         return HttpResponseNotFound(_("Coupon Already Exist").format(coupon.id))
@@ -56,7 +56,7 @@ def add_coupon(request):
         description = request.REQUEST.get('description')
         course_id = request.REQUEST.get('course_id')
         discount = request.REQUEST.get('discount')
-        coupon = Coupons(code=code, description=description, course_id=course_id, percentage_discount=discount,
+        coupon = Coupon(code=code, description=description, course_id=course_id, percentage_discount=discount,
                          created_by_id=request.user.id)
         coupon.save()
         return HttpResponse()
@@ -70,9 +70,9 @@ def update_coupon(request):
     """
     coupon_id = request.REQUEST.get('coupon_id')
     try:
-        coupon = Coupons.objects.get(pk=coupon_id)
+        coupon = Coupon.objects.get(pk=coupon_id)
         code = request.REQUEST.get('code')
-        filtered_coupons = Coupons.objects.filter(code=code).filter(is_active=True).filter(~Q(id=coupon_id))
+        filtered_coupons = Coupon.objects.filter(code=code).filter(is_active=True).filter(~Q(id=coupon_id))
         if filtered_coupons:
             return HttpResponseNotFound(_("Coupon {0} Already Exist").format(coupon_id))
         else:
@@ -97,7 +97,7 @@ def edit_coupon_info(request):
     """
     coupon_id = request.REQUEST.get('id', '-1')
     try:
-        coupon = Coupons.objects.get(id=coupon_id)
+        coupon = Coupon.objects.get(id=coupon_id)
         if coupon.created_by == request.user and coupon.is_active:
             context = {'coupon_code': coupon.code,
                        'coupon_description': coupon.description,
