@@ -29,7 +29,7 @@ DATA_DIR = 'common/test/data/'
 TEST_COURSE_ID = 'edX/simple/2012_Fall'
 
 
-class CommandsTestBase(TestCase):
+class CommandsTestBase(ModuleStoreTestCase):
     """
     Base class for testing different django commands.
 
