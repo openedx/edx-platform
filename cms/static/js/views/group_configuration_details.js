@@ -42,13 +42,13 @@ function(BaseView, _, gettext) {
             this.model.set('editing', true);
         },
 
-        showGroups: function(e) {
-            if(e && e.preventDefault) { e.preventDefault(); }
+        showGroups: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', true);
         },
 
-        hideGroups: function(e) {
-            if(e && e.preventDefault) { e.preventDefault(); }
+        hideGroups: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', false);
         },
 

@@ -901,12 +901,11 @@ class GroupConfiguration(object):
         if len(self.configuration.get('groups', [])) < 2:
             raise GroupConfigurationsValidationError(_("must have at least two groups"))
 
-    def generate_id(self):
+    def generate_id(self, used_ids):
         """
         Generate unique id for the group configuration.
         If this id is already used, we generate new one.
         """
-        used_ids = self.get_used_ids()
         cid = random.randint(100, 10 ** 12)
 
         while cid in used_ids:
@@ -918,21 +917,18 @@ class GroupConfiguration(object):
         """
         Assign id for the json representation of group configuration.
         """
-        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id()
+        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id(self.get_used_ids())
 
     def assign_group_ids(self):
         """
         Assign ids for the group_configuration's groups.
         """
-        # this is temporary logic, we are going to build default groups on front-end
-        if not self.configuration.get('groups'):
-            self.configuration['groups'] = [
-                {'name': 'Group A'}, {'name': 'Group B'},
-            ]
-
+        used_ids = [g.id for p in self.course.user_partitions for g in p.groups]
         # Assign ids to every group in configuration.
-        for index, group in enumerate(self.configuration.get('groups', [])):
-            group['id'] = index
+        for group in self.configuration.get('groups', []):
+            if group.get('id') is None:
+                group["id"] = self.generate_id(used_ids)
+                used_ids.append(group["id"])
 
     def get_used_ids(self):
         """

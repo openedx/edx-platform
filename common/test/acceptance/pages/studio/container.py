@@ -126,7 +126,7 @@ class ContainerPage(PageObject):
         """
         Click the "add missing groups" link.
         """
-        click_css(self, '.add-missing-groups-button')
+        self.q(css='.add-missing-groups-button').first.click()
 
     def missing_groups_button_present(self):
         """

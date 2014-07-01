@@ -11,7 +11,7 @@ from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.utils import add_discussion
 
 from unittest import skip
-from bok_choy.promise import Promise
+
 
 class ContainerBase(UniqueCourseTest):
     """
@@ -92,30 +92,6 @@ class ContainerBase(UniqueCourseTest):
                         blocks_checked.add(expected)
                     break
         self.assertEqual(len(blocks_checked), len(xblocks))
-
-    def verify_groups(self, container, active_groups, inactive_groups):
-        """
-        Check that the groups appear and are correctly categorized as to active and inactive.
-
-        Also checks that the "add missing groups" button/link is not present unless a value of False is passed
-        for verify_missing_groups_not_present.
-        """
-        def wait_for_xblocks_to_render():
-            # First xblock is the container for the page, subtract 1.
-            return (len(active_groups) + len(inactive_groups) == len(container.xblocks) - 1, len(active_groups))
-
-        Promise(wait_for_xblocks_to_render, "Number of xblocks on the page are incorrect").fulfill()
-
-        def check_xblock_names(expected_groups, actual_blocks):
-            self.assertEqual(len(expected_groups), len(actual_blocks))
-            for idx, expected in enumerate(expected_groups):
-                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
-
-        check_xblock_names(active_groups, container.active_xblocks)
-        check_xblock_names(inactive_groups, container.inactive_xblocks)
-
-        # Verify inactive xblocks appear after active xblocks
-        check_xblock_names(active_groups + inactive_groups, container.xblocks[1:])
 
     def do_action_and_verify(self, action, expected_ordering):
         """
