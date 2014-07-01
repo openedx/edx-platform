@@ -1562,3 +1562,34 @@ class CoursesApiTests(TestCase):
         # test with bogus course
         response = self.do_get(course_metrics_uri.format(self.test_bogus_course_id))
         self.assertEqual(response.status_code, 404)
+
+    def test_course_workgroups_list(self):
+        projects_uri = '/api/projects/'
+        data = {
+            'course_id': self.test_course_id,
+            'content_id': 'self.test_course_content_id'
+        }
+        response = self.do_post(projects_uri, data)
+        self.assertEqual(response.status_code, 201)
+        project_id = response.data['id']
+
+        test_workgroups_uri = '/api/workgroups/'
+        for i in xrange(1, 12):
+            data = {
+                'name': '{} {}'.format('Workgroup', i),
+                'project': project_id
+            }
+            response = self.do_post(test_workgroups_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # get workgroups associated to course
+        test_uri = '/api/courses/{}/workgroups/?page_size=10'.format(self.test_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 11)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # test with bogus course
+        test_uri = '/api/courses/{}/workgroups/'.format(self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
