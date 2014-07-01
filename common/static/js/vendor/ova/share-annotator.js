@@ -330,9 +330,10 @@ Annotator.Plugin.Share = (function(_super) {
 							}
 						}else if(self._isImage(an)){//It is a OpenSeaDragon Annotation
 							var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
-                			osda.viewer.viewport.fitBounds(bounds, false);
-							$('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
-                                        'slow');
+							setTimeout(function(){
+								osda.viewer.viewport.fitBounds(bounds, false);
+								$('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},'slow');},250
+							);
 						}else{//It is a text
 						    self._isImage(an);
 							var hasRanges = typeof an.ranges!='undefined' && typeof an.ranges[0] !='undefined',
