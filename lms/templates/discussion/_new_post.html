@@ -1,10 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%def name="render_form_filter_dropdown(map)">
     % for child in map["children"]:
-        % if child in map["entries"]:
-            ${render_entry(map["entries"], child)}
-        %else:
+        % if child in map["subcategories"]:
             ${render_category(map["subcategories"], child)}
+        %else:
+            ${render_entry(map["entries"], child)}
         %endif
     %endfor
 </%def>
