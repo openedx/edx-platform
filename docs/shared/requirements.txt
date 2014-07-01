@@ -35,7 +35,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 GitPython==0.3.2.RC1
 glob2==0.3
 lxml==3.3.6
-mako==0.7.3
+mako==1.0.1
 Markdown==2.2.1
 mock==1.0.1
 networkx==1.7
