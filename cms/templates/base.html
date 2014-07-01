@@ -260,9 +260,10 @@
       id: "${context_course.id}",
       name: "${context_course.display_name_with_default | h}",
       url_name: "${context_course.location.name | h}",
-      org: "${context_course.location.org | h}",
-      num: "${context_course.location.course | h}",
-      revision: "${context_course.location.revision | h}"
+      org: "${context_course.id.org | h}",
+      num: "${context_course.id.course | h}",
+      run: "${context_course.id.run | h}",
+      revision: "${context_course.location.course_key.branch | h}"
     });
   });
       </script>

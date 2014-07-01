@@ -346,7 +346,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     store.update_item(existing_item, user.id)
 
     # for static tabs, their containing course also records their display name
-    if usage_key.category == 'static_tab':
+    if usage_key.block_type == 'static_tab':
         course = store.get_course(usage_key.course_key)
         # find the course's reference to this tab and update the name.
         static_tab = CourseTabList.get_tab_by_slug(course.tabs, usage_key.name)
@@ -494,7 +494,7 @@ def _delete_item(usage_key, user):
     # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
-    if usage_key.category == 'static_tab':
+    if usage_key.block_type == 'static_tab':
         course = store.get_course(usage_key.course_key)
         existing_tabs = course.tabs or []
         course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
@@ -543,7 +543,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     try:
         module = store.get_item(usage_key)
     except ItemNotFoundError:
-        if usage_key.category in CREATE_IF_NOT_FOUND:
+        if usage_key.block_type in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
             module = store.create_and_save_xmodule(usage_key, user.id)
         else:

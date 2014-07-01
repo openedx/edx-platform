@@ -92,8 +92,8 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id, user_
     for module in modules:
         original_loc = module.location
         module.location = module.location.map_into_course(dest_course_id)
-        if module.location.category == 'course':
-            module.location = module.location.replace(name=module.location.run)
+        if module.location.block_type == 'course':
+            module.location = module.location.replace(block_id=module.location.run)
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 

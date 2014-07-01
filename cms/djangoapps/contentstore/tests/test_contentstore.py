@@ -673,8 +673,8 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         for descriptor in items:
             source_item = module_store.get_item(descriptor.location)
             new_loc = descriptor.location.map_into_course(dest_course_id)
-            if descriptor.location.category == 'course':
-                new_loc = new_loc.replace(name=new_loc.run)
+            if descriptor.location.block_type == 'course':
+                new_loc = new_loc.replace(block_id=new_loc.run)
             print "Checking {0} should now also be at {1}".format(descriptor.location, new_loc)
             lookup_item = module_store.get_item(new_loc)
 

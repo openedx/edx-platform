@@ -315,9 +315,9 @@ def as_draft(location):
     Returns the Location that is the draft for `location`
     If the location is in the DIRECT_ONLY_CATEGORIES, returns itself
     """
-    if location.category in DIRECT_ONLY_CATEGORIES:
+    if location.course_key.branch in DIRECT_ONLY_CATEGORIES:
         return location
-    return location.replace(revision=MongoRevisionKey.draft)
+    return location.for_branch(MongoRevisionKey.draft)
 
 
 def as_published(location):
@@ -491,7 +491,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # now go through the results and order them by the location url
         for result in resultset:
             # manually pick it apart b/c the db has tag and we want as_published revision regardless
-            location = as_published(Location._from_deprecated_son(result['_id'], course_id.run))
+            location = as_published(BlockUsageLocator._from_deprecated_son(result['_id'], course_id.run))
 
             location_url = unicode(location)
             if location_url in results_by_url:
@@ -767,7 +767,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course_query = {'_id': location.to_deprecated_son()}
         course = self.collection.find_one(course_query, fields={'_id': True})
         if course:
-            return SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+            return CourseLocator(course['_id']['org'], course['_id']['course'], course['_id']['name'], deprecated=True)
         else:
             return None
 
@@ -1151,7 +1151,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 )
             else:
                 # return the single PUBLISHED parent
-                return Location._from_deprecated_son(parents[0]['_id'], location.course_key.run)
+                return BlockUsageLocator._from_deprecated_son(parents[0]['_id'], location.course_key.run)
         else:
             # there could be 2 different parents if
             #   (1) the draft item was moved or
@@ -1160,7 +1160,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # since we sorted by SORT_REVISION_FAVOR_DRAFT, the 0'th parent is the one we want
             found_id = parents[0]['_id']
             # don't disclose revision outside modulestore
-            return as_published(Location._from_deprecated_son(found_id, location.course_key.run))
+            return as_published(BlockUsageLocator._from_deprecated_son(found_id, location.course_key.run))
 
     def get_modulestore_type(self, course_key=None):
         """
@@ -1188,7 +1188,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if item['_id']['category'] != 'course':
                 # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
-                    unicode(as_published(Location._from_deprecated_son(item['_id'], course_key.run)))
+                    unicode(as_published(BlockUsageLocator._from_deprecated_son(item['_id'], course_key.run)))
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable

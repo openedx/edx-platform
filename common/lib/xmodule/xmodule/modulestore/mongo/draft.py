@@ -417,8 +417,8 @@ class DraftModuleStore(MongoModuleStore):
             # don't remove from direct_only parent if other versions of this still exists
             if not is_item_direct_only and parent_location.block_type in DIRECT_ONLY_CATEGORIES:
                 # see if other version of root exists
-                alt_location = location.replace(
-                    revision=MongoRevisionKey.published
+                alt_location = location.for_branch(
+                    MongoRevisionKey.published
                     if location.course_key.branch == MongoRevisionKey.draft
                     else MongoRevisionKey.draft
                 )
@@ -451,7 +451,7 @@ class DraftModuleStore(MongoModuleStore):
             to_be_deleted.append(self._id_dict_to_son(current_entry['_id']))
             next_tier = []
             for child_loc in current_entry.get('definition', {}).get('children', []):
-                child_loc = course_key.make_usage_key_from_deprecated_string(child_loc)
+                child_loc = UsageKey.from_string(child_loc)
                 for rev_func in as_functions:
                     current_loc = rev_func(child_loc)
                     current_son = current_loc.to_deprecated_son()
@@ -607,7 +607,7 @@ class DraftModuleStore(MongoModuleStore):
             # now query all draft content in another round-trip
             query = []
             for item in items:
-                item_usage_key = course_key.make_usage_key_from_deprecated_string(item)
+                item_usage_key = UsageKey.from_string(item)
                 if item_usage_key.block_type not in DIRECT_ONLY_CATEGORIES:
                     query.append(as_draft(item_usage_key).to_deprecated_son())
             if query:
@@ -618,7 +618,7 @@ class DraftModuleStore(MongoModuleStore):
                 # with the draft. This is because the semantics of the DraftStore is to
                 # always return the draft - if available
                 for draft in to_process_drafts:
-                    draft_loc = Location._from_deprecated_son(draft["_id"], course_key.run)
+                    draft_loc = BlockUsageLocator._from_deprecated_son(draft["_id"], course_key.run)
                     draft_as_non_draft_loc = as_published(draft_loc)
 
                     # does non-draft exist in the collection

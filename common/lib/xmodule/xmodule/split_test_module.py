@@ -572,7 +572,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_and_save_xmodule'), \
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
-        dest_usage_key = self.location.replace(block_type="vertical", category=uuid4().hex)
+        dest_usage_key = self.location.replace(block_type="vertical", block_id=uuid4().hex)
         metadata = {'display_name': group.name}
         modulestore.create_and_save_xmodule(
             dest_usage_key,
