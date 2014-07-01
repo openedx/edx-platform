@@ -869,43 +869,90 @@ class GroupConfiguration(object):
     """
     Prepare Group Configuration for the course.
     """
-    @staticmethod
-    def parse(configuration_json):
+    def __init__(self, json_string, course, configuration_id=None):
         """
-        Parse given string that represents group configuration.
+        Receive group configuration as a json (`json_string`), deserialize it
+        and validate.
+        """
+        self.configuration = GroupConfiguration.parse(json_string)
+        self.course = course
+        self.assign_id(configuration_id)
+        self.assign_group_ids()
+        self.validate()
+
+    @staticmethod
+    def parse(json_string):
+        """
+        Deserialize given json that represents group configuration.
         """
         try:
-            group_configuration = json.loads(configuration_json)
+            configuration = json.loads(json_string)
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
 
-        if not group_configuration.get('version'):
-            group_configuration['version'] = UserPartition.VERSION
+        return configuration
 
-        # this is temporary logic, we are going to build default groups on front-end
-        if not group_configuration.get('groups'):
-            group_configuration['groups'] = [
-                {'name': 'Group A'}, {'name': 'Group B'},
-            ]
-
-        for group in group_configuration['groups']:
-            group['version'] = Group.VERSION
-        return group_configuration
-
-    @staticmethod
-    def validate(group_configuration):
+    def validate(self):
         """
         Validate group configuration representation.
         """
-        if not group_configuration.get("name"):
+        if not self.configuration.get("name"):
             raise GroupConfigurationsValidationError(_("must have name of the configuration"))
-        if not isinstance(group_configuration.get("description"), basestring):
-            raise GroupConfigurationsValidationError(_("must have description of the configuration"))
-        if len(group_configuration.get('groups')) < 2:
+        if len(self.configuration.get('groups', [])) < 2:
             raise GroupConfigurationsValidationError(_("must have at least two groups"))
-        group_id = unicode(group_configuration.get("id", ""))
-        if group_id and not group_id.isdigit():
-            raise GroupConfigurationsValidationError(_("group configuration ID must be numeric"))
+
+    def generate_id(self):
+        """
+        Generate unique id for the group configuration.
+        If this id is already used, we generate new one.
+        """
+        used_ids = self.get_used_ids()
+        cid = random.randint(100, 10 ** 12)
+
+        while cid in used_ids:
+            cid = random.randint(100, 10 ** 12)
+
+        return cid
+
+    def assign_id(self, configuration_id=None):
+        """
+        Assign id for the json representation of group configuration.
+        """
+        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id()
+
+    def assign_group_ids(self):
+        """
+        Assign ids for the group_configuration's groups.
+        """
+        # this is temporary logic, we are going to build default groups on front-end
+        if not self.configuration.get('groups'):
+            self.configuration['groups'] = [
+                {'name': 'Group A'}, {'name': 'Group B'},
+            ]
+
+        # Assign ids to every group in configuration.
+        for index, group in enumerate(self.configuration.get('groups', [])):
+            group['id'] = index
+
+    def get_used_ids(self):
+        """
+        Return a list of IDs that already in use.
+        """
+        return set([p.id for p in self.course.user_partitions])
+
+    def get_user_partition(self):
+        """
+        Get user partition for saving in course.
+        """
+        groups = [Group(g["id"], g["name"]) for g in self.configuration["groups"]]
+
+        return UserPartition(
+            self.configuration["id"],
+            self.configuration["name"],
+            self.configuration["description"],
+            groups
+        )
+
 
 @require_http_methods(("GET", "POST"))
 @login_required
@@ -932,40 +979,63 @@ def group_configurations_list_handler(request, course_key_string):
             'group_configuration_url': group_configuration_url,
             'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
         })
-    elif "application/json" in request.META.get('HTTP_ACCEPT') and request.method == 'POST':
+    elif "application/json" in request.META.get('HTTP_ACCEPT'):
+        if request.method == 'POST':
         # create a new group configuration for the course
-        try:
-            configuration = GroupConfiguration.parse(request.body)
-            GroupConfiguration.validate(configuration)
-        except GroupConfigurationsValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
+            try:
+                new_configuration = GroupConfiguration(request.body, course).get_user_partition()
+            except GroupConfigurationsValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
 
-        if not configuration.get("id"):
-            configuration["id"] = random.randint(100, 10**12)
+            course.user_partitions.append(new_configuration)
+            response = JsonResponse(new_configuration.to_json(), status=201)
 
-        # Assign ids to every group in configuration.
-        for index, group in enumerate(configuration.get('groups', [])):
-            group["id"] = index
-
-        course.user_partitions.append(UserPartition.from_json(configuration))
-        store.update_item(course, request.user.id)
-        response = JsonResponse(configuration, status=201)
-
-        response["Location"] = reverse_course_url(
-            'group_configurations_detail_handler',
-            course.id,
-            kwargs={'group_configuration_id': configuration["id"]}
-        )
-        return response
+            response["Location"] = reverse_course_url(
+                'group_configurations_detail_handler',
+                course.id,
+                kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
+            )
+            store.update_item(course, request.user.id)
+            return response
     else:
         return HttpResponse(status=406)
 
 
-@require_http_methods(("GET", "POST"))
 @login_required
 @ensure_csrf_cookie
+@require_http_methods(("POST", "PUT"))
 def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
-    return JsonResponse(status=404)
+    """
+    JSON API endpoint for manipulating a group configuration via its internal ID.
+    Used by the Backbone application.
+
+    POST or PUT
+        json: update group configuration based on provided information
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
+    store = modulestore()
+    matching_id = [p for p in course.user_partitions
+                   if unicode(p.id) == unicode(group_configuration_id)]
+    if matching_id:
+        configuration = matching_id[0]
+    else:
+        configuration = None
+
+    if request.method in ('POST', 'PUT'):  # can be either and sometimes
+                                        # django is rewriting one to the other
+        try:
+            new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
+        except GroupConfigurationsValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
+
+        if configuration:
+            index = course.user_partitions.index(configuration)
+            course.user_partitions[index] = new_configuration
+        else:
+            course.user_partitions.append(new_configuration)
+        store.update_item(course, request.user.id)
+        return JsonResponse(new_configuration.to_json(), status=201)
 
 
 def _get_course_creator_status(user):

@@ -4,7 +4,10 @@ define([
     'use strict';
     var Group = Backbone.AssociatedModel.extend({
         defaults: function() {
-            return { name: '' };
+            return {
+                name: '',
+                version: null
+            };
         },
 
         isEmpty: function() {
@@ -12,7 +15,10 @@ define([
         },
 
         toJSON: function() {
-            return { name: this.get('name') };
+            return {
+                name: this.get('name'),
+                version: this.get('version')
+             };
         },
 
         validate: function(attrs) {

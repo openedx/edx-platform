@@ -10,6 +10,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
             return {
                 name: '',
                 description: '',
+                version: null,
                 groups: new GroupCollection([]),
                 showGroups: false,
                 editing: false
@@ -51,6 +52,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 id: this.get('id'),
                 name: this.get('name'),
                 description: this.get('description'),
+                version: this.get('version'),
                 groups: this.get('groups').toJSON()
             };
         },

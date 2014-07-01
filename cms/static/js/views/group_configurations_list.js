@@ -34,6 +34,7 @@ define([
 
                 this.$el.html([frag]);
             }
+
             return this;
         },
 

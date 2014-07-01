@@ -157,6 +157,24 @@
             }
           }
         }
+
+        .actions {
+          @include transition(opacity .15s .25s ease-in-out);
+          opacity: 0.0;
+          position: absolute;
+          top: $baseline;
+          right: $baseline;
+
+          .action {
+            display: inline-block;
+            margin-right: ($baseline/4);
+
+            .edit {
+              @include blue-button;
+              @extend %t-action4;
+            }
+          }
+        }
       }
 
       &:hover .actions {
@@ -322,6 +340,26 @@
 
           &.add-group-configuration-name label {
             @extend %t-title5;
+            display: inline-block;
+            width: 50%;
+            padding-right: 5%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+          }
+
+          .group-configuration-id {
+            display: inline-block;
+            width: 45%;
+            text-align: right;
+            vertical-align: top;
+            color: $gray-l1;
+
+            .group-configuration-value {
+              font-weight: 600;
+              white-space: nowrap;
+              margin-left: ($baseline*0.5);
+            }
           }
         }
 
