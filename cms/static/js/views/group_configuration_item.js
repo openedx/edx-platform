@@ -44,6 +44,7 @@ define([
             }
 
             this.$el.html(this.view.render().el);
+            this.$el.focus();
 
             return this;
         }
