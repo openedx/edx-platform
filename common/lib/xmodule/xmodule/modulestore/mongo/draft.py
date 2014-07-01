@@ -400,6 +400,11 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
 
+        if not self._validate_usage_key(location):
+            raise ItemNotFoundError(location)
+
+        location = location.replace(course_key=self._fill_in_run(location.course_key))
+
         is_item_direct_only = location.block_type in DIRECT_ONLY_CATEGORIES
         if is_item_direct_only or revision == ModuleStoreEnum.RevisionOption.published_only:
             parent_revision = MongoRevisionKey.published
