@@ -21,6 +21,7 @@ from .processors import process_postpay_callback, render_purchase_form_html
 log = logging.getLogger("shoppingcart")
 
 EVENT_NAME_USER_UPGRADED = 'edx.course.enrollment.upgrade.succeeded'
+EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 REPORT_TYPES = [
     ("refund_report", RefundReport),
@@ -152,6 +153,7 @@ def show_receipt(request, ordernum):
     if attempting_upgrade:
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
+        course_enrollment.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
         request.session['attempting_upgrade'] = False
 
     return render_to_response(receipt_template, context)

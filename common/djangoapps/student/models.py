@@ -326,6 +326,7 @@ class PendingEmailChange(models.Model):
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
 class PasswordHistory(models.Model):
@@ -714,6 +715,8 @@ class CourseEnrollment(models.Model):
                           u"offering:{}".format(self.course_id.offering),
                           u"mode:{}".format(self.mode)]
                 )
+        if mode_changed:
+            self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
 
     def emit_event(self, event_name):
         """
