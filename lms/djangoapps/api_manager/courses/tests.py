@@ -255,9 +255,11 @@ class CoursesApiTests(TestCase):
         test_uri = self.base_courses_uri
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.data), 0)
+        self.assertGreater(len(response.data['results']), 0)
+        self.assertIsNotNone(response.data['count'])
+        self.assertIsNotNone(response.data['num_pages'])
         matched_course = False
-        for course in response.data:
+        for course in response.data['results']:
             if matched_course is False and course['id'] == self.test_course_id:
                 self.assertEqual(course['name'], self.test_course_name)
                 self.assertEqual(course['number'], self.test_course_number)
