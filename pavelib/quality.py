@@ -42,8 +42,10 @@ def find_fixme(options):
 
         sh(
             "{pythonpath_prefix} pylint --disable R,C,W,E --enable=fixme "
-            "-f parseable {apps} | tee {report_dir}/pylint_fixme.report".format(
+            "--msg-template={msg_template} {apps} "
+            "| tee {report_dir}/pylint_fixme.report".format(
                 pythonpath_prefix=pythonpath_prefix,
+                msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
                 apps=apps_list,
                 report_dir=report_dir
             )
@@ -97,10 +99,11 @@ def run_pylint(options):
         )
 
         sh(
-            "{pythonpath_prefix} pylint {flags} -f parseable {apps} | "
+            "{pythonpath_prefix} pylint {flags} --msg-template={msg_template} {apps} | "
             "tee {report_dir}/pylint.report".format(
                 pythonpath_prefix=pythonpath_prefix,
                 flags=" ".join(flags),
+                msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
                 apps=apps_list,
                 report_dir=report_dir
             )
