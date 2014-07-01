@@ -217,7 +217,7 @@ class OrderItem(models.Model):
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    discount_price = models.DecimalField(decimal_places=2, max_digits=30, null=True)
+    list_price = models.DecimalField(decimal_places=2, max_digits=30, null=True)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True, db_index=True)
@@ -229,10 +229,7 @@ class OrderItem(models.Model):
     @property
     def line_cost(self):
         """ Return the total cost of this OrderItem """
-        if self.discount_price is not None:
-            return self.qty * self.discount_price
-        else:
-            return self.qty * self.unit_cost
+        return self.qty * self.unit_cost
 
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
@@ -308,7 +305,21 @@ class OrderItem(models.Model):
         return ''
 
 
-class Coupons(models.Model):
+class CourseRegistrationCode(models.Model):
+    """
+    This table contains registration codes
+    With registration code, a user can register for a course for free
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_by_user')
+    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    redeemed_by = models.ForeignKey(User, null=True, related_name='redeemed_by_user')
+    redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
+
+
+class Coupon(models.Model):
     """
     This table contains coupon codes
     A user can get a discount offer on course if provide coupon code
@@ -328,7 +339,7 @@ class CouponRedemption(models.Model):
     """
     order = models.ForeignKey(Order, db_index=True)
     user = models.ForeignKey(User, db_index=True)
-    coupon = models.ForeignKey(Coupons, db_index=True)
+    coupon = models.ForeignKey(Coupon, db_index=True)
 
     @classmethod
     def get_discount_price(cls, percentage_discount, value):
@@ -343,9 +354,9 @@ class CouponRedemption(models.Model):
         """
         add coupon info into coupon_redemption model
         """
-        purchased_cart_items = order.orderitem_set.all().select_subclasses()
+        cart_items = order.orderitem_set.all().select_subclasses()
 
-        for item in purchased_cart_items:
+        for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == coupon.course_id:
                     coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
@@ -355,7 +366,8 @@ class CouponRedemption(models.Model):
                         raise CouponAlreadyExistException
 
                     discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
-                    item.discount_price = discount_price
+                    item.list_price = item.unit_cost
+                    item.unit_cost = discount_price
                     item.save()
                     log.info("Discount generated for user {0} against order id '{1}' "
                              .format(order.user.username, order.id))
@@ -386,12 +398,10 @@ class PaidCourseRegistration(OrderItem):
         This will return the total amount of money that a purchased course generated
         """
         total_cost = 0
-        result = cls.objects.filter(course_id=course_key).filter(status='purchased').extra(select={
-            'total': 'sum(case when discount_price is null then qty * unit_cost else qty * discount_price end)'
-        },)  # pylint: disable=E1101
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
 
-        if result and result[0].total is not None:
-            total_cost = result[0].total
+        if result['total'] is not None:
+            total_cost = result['total']
 
         return total_cost
 
