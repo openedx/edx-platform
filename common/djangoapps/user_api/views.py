@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference
 from django_comment_common.models import Role
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -58,7 +58,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
         course_id_string = self.request.QUERY_PARAMS.get('course_id')
         if not course_id_string:
             raise ParseError('course_id must be specified')
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
+        course_id = CourseKey.from_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
         users = role.users.all()
         return users

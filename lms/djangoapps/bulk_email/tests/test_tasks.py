@@ -35,7 +35,7 @@ from instructor_task.subtasks import update_subtask_status, SubtaskStatus
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class TestTaskFailure(Exception):
@@ -120,7 +120,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
-        task_entry = self._create_input_entry(course_id=SlashSeparatedCourseKey("bogus", "course", "id"))
+        task_entry = self._create_input_entry(course_id=CourseKey.from_string("bogus/course/id"))
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 

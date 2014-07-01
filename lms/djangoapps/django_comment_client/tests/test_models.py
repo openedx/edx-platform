@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -12,7 +12,7 @@ class RoleClassTestCase(TestCase):
         # For course ID, syntax edx/classname/classdate is important
         # because xmodel.course_module.id_to_location looks for a string to split
 
-        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.student_role = models.Role.objects.get_or_create(name="Student",
                                                               course_id=self.course_id)[0]
         self.student_role.add_permission("delete_thread")
@@ -20,7 +20,7 @@ class RoleClassTestCase(TestCase):
                                                                 course_id=self.course_id)[0]
         self.TA_role = models.Role.objects.get_or_create(name="Community TA",
                                                          course_id=self.course_id)[0]
-        self.course_id_2 = SlashSeparatedCourseKey("edx", "6.002x", "2012_Fall")
+        self.course_id_2 = CourseKey.from_string("edx/6.002x/2012_Fall")
         self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",
                                                            course_id=self.course_id_2)[0]
 

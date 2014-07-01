@@ -204,11 +204,11 @@ function goto( mode)
     % endif
 
     <p>
-    <a href="${reverse('spoc_gradebook', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    <a href="${reverse('spoc_gradebook', kwargs=dict(course_id=unicode(course.id)))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
-    <a href="${reverse('grade_summary_legacy', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
+    <a href="${reverse('grade_summary_legacy', kwargs=dict(course_id=unicode(course.id)))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
     </p>
 
     <p>

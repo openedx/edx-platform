@@ -52,8 +52,8 @@ from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
+from opaque_keys.edx.keys import CourseKey
 
 from collections import namedtuple
 
@@ -592,7 +592,7 @@ def change_enrollment(request):
     if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
 
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+    course_id = CourseKey.from_string(request.POST.get("course_id"))
 
     if not user.is_authenticated():
         return HttpResponseForbidden()
@@ -627,7 +627,7 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()})
+                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )
 
         current_mode = available_modes[0]
@@ -643,7 +643,7 @@ def change_enrollment(request):
         # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
         # whether things got added, etc
 
-        shoppingcart.views.add_course_to_cart(request, course_id.to_deprecated_string())
+        shoppingcart.views.add_course_to_cart(request, unicode(course_id))
         return HttpResponse(
             reverse("shoppingcart.views.show_cart")
         )
@@ -665,7 +665,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
-        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
+        return CourseKey.from_string(m_obj.group('course_id'))
     return None
 
 
@@ -1360,7 +1360,7 @@ def auto_auth(request):
     course_id = request.GET.get('course_id', None)
     course_key = None
     if course_id:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1860,7 +1860,7 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
         optout_object = Optout.objects.filter(user=user, course_id=course_key)

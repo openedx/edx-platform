@@ -19,7 +19,6 @@ import mongoengine
 from dashboard.models import CourseImportLog
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -232,10 +231,7 @@ def add_repo(repo, rdir_in, branch=None):
     match = re.search(r'(?ms)===> IMPORTING course (\S+)', ret_import)
     if match:
         course_id = match.group(1)
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_key.course)
         log.debug('Studio course dir = {0}'.format(cdir))
 

@@ -4,6 +4,7 @@ Unit tests for getting the list of courses and the course outline.
 import json
 import lxml
 
+from cms.urls import COURSE_KEY_PATTERN
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -38,7 +39,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/slashes:{0}'.format(Locator.ALLOWED_ID_CHARS)
+                'course/{}'.format(COURSE_KEY_PATTERN)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
@@ -95,7 +96,7 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
+        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
         self.assertTrue(json_response['is_container'])
         self.assertFalse(json_response['is_draft'])
@@ -105,7 +106,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'location:MITx+999+Robot_Super_Course+chapter+Week_1')
+        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(first_child_response['is_container'])
         self.assertFalse(first_child_response['is_draft'])

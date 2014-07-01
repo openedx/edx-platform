@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from courseware.courses import get_course_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def all_sequential_open_distrib(request, course_id):
     json = {}
 
     # Only instructor for this particular course can request this information
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
             json = dashboard_data.get_d3_sequential_open_distrib(course_key)
@@ -64,7 +64,7 @@ def all_problem_grade_distribution(request, course_id):
     json = {}
 
     # Only instructor for this particular course can request this information
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
             json = dashboard_data.get_d3_problem_grade_distrib(course_key)
@@ -95,7 +95,7 @@ def section_problem_grade_distrib(request, course_id, section):
     json = {}
 
     # Only instructor for this particular course can request this information
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
             json = dashboard_data.get_d3_section_grade_distrib(course_key, section)

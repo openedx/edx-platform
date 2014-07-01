@@ -1,10 +1,11 @@
 import sys
 from StringIO import StringIO
-from django.test import TestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.management import call_command
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import ItemFactory
+from opaque_keys.edx.keys import UsageKey, CourseKey
 
-class ClashIdTestCase(TestCase):
+class ClashIdTestCase(ModuleStoreTestCase):
     """
     Test for course_id_clash.
     """
@@ -13,20 +14,22 @@ class ClashIdTestCase(TestCase):
         Test for course_id_clash.
         """
         expected = []
+        # CourseFactory doesn't let you create clashing courses. Use ItemFactory to work around this
+
         # clashing courses
-        course = CourseFactory.create(org="test", course="courseid", display_name="run1")
+        course = ItemFactory.create(location=CourseKey.from_string('test/courseid/run1').make_usage_key('course', 'run1'), parent_location=None, category='course')
         expected.append(course.id)
-        course = CourseFactory.create(org="TEST", course="courseid", display_name="RUN12")
+        course = ItemFactory.create(location=CourseKey.from_string('TEST/courseid/RUN12').make_usage_key('course', 'RUN12'), parent_location=None, category='course')
         expected.append(course.id)
-        course = CourseFactory.create(org="test", course="CourseId", display_name="aRUN123")
+        course = ItemFactory.create(location=CourseKey.from_string('test/CourseId/aRUN123').make_usage_key('course', 'aRUN123'), parent_location=None, category='course')
         expected.append(course.id)
         # not clashing courses
         not_expected = []
-        course = CourseFactory.create(org="test", course="course2", display_name="run1")
+        course = ItemFactory.create(location=CourseKey.from_string('test/course2/run1').make_usage_key('course', 'run1'), parent_location=None, category='course')
         not_expected.append(course.id)
-        course = CourseFactory.create(org="test1", course="courseid", display_name="run1")
+        course = ItemFactory.create(location=CourseKey.from_string('test1/courseid/run1').make_usage_key('course', 'run1'), parent_location=None, category='course')
         not_expected.append(course.id)
-        course = CourseFactory.create(org="test", course="courseid0", display_name="run1")
+        course = ItemFactory.create(location=CourseKey.from_string('test/courseid0/run1').make_usage_key('course', 'run1'), parent_location=None, category='course')
         not_expected.append(course.id)
 
         old_stdout = sys.stdout
@@ -35,6 +38,6 @@ class ClashIdTestCase(TestCase):
         sys.stdout = old_stdout
         result = mystdout.getvalue()
         for courseid in expected:
-            self.assertIn(courseid.to_deprecated_string(), result)
+            self.assertIn(unicode(courseid), result)
         for courseid in not_expected:
-            self.assertNotIn(courseid.to_deprecated_string(), result)
+            self.assertNotIn(unicode(courseid), result)

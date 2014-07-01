@@ -5,10 +5,10 @@ Tests of the LMS XBlock Runtime and associated utilities
 from django.contrib.auth.models import User
 from django.conf import settings
 from ddt import ddt, data
-from mock import Mock
+from mock import Mock, MagicMock
 from unittest import TestCase
 from urlparse import urlparse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 
 TEST_STRINGS = [
@@ -42,9 +42,9 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        self.block = Mock()
-        self.block.scope_ids.usage_id.to_deprecated_string.return_value.encode.return_value = 'dummy'
-        self.course_key = SlashSeparatedCourseKey("org", "course", "run")
+        self.block = MagicMock()
+        self.block.scope_ids.usage_id.__unicode__ = Mock(return_value=u'dummy')
+        self.course_key = CourseKey.from_string("org/course/run")
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
@@ -107,7 +107,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey("org", "course", "run")
+        self.course_id = CourseKey.from_string("org/course/run")
 
         self.user = User(username='runtime_robot', email='runtime_robot@edx.org', password='test', first_name='Robot')
         self.user.save()

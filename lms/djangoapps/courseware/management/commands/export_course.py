@@ -18,7 +18,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -41,7 +41,7 @@ class Command(BaseCommand):
     def _parse_arguments(self, args):
         """Parse command line arguments"""
         try:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+            course_id = CourseKey.from_string(args[0])
             filename = args[1]
         except InvalidKeyError:
             raise CommandError("Unparsable course_id")
@@ -81,7 +81,7 @@ def export_course_to_directory(course_id, root_dir):
     if course is None:
         raise CommandError("Invalid course_id")
 
-    course_name = course.id.to_deprecated_string().replace('/', '-')
+    course_name = unicode(course.id).replace('/', '-')
     export_to_xml(store, None, course.id, root_dir, course_name)
 
     course_dir = path(root_dir) / course_name

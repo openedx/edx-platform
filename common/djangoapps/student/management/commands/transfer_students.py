@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from shoppingcart.models import CertificateItem
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -31,8 +31,8 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        source_key = SlashSeparatedCourseKey.from_deprecated_string(options['source_course'])
-        dest_key = SlashSeparatedCourseKey.from_deprecated_string(options['dest_course'])
+        source_key = CourseKey.from_string(options['source_course'])
+        dest_key = CourseKey.from_string(options['dest_course'])
 
         source_students = User.objects.filter(
             courseenrollment__course_id=source_key
@@ -43,9 +43,9 @@ class Command(BaseCommand):
                 # Un Enroll from source course but don't mess
                 # with the enrollment in the destination course.
                 CourseEnrollment.unenroll(user, source_key)
-                print("Unenrolled {} from {}".format(user.username, source_key.to_deprecated_string()))
+                print("Unenrolled {} from {}".format(user.username, unicode(source_key)))
                 msg = "Skipping {}, already enrolled in destination course {}"
-                print(msg.format(user.username, dest_key.to_deprecated_string()))
+                print(msg.format(user.username, unicode(dest_key)))
                 continue
 
             print("Moving {}.".format(user.username))

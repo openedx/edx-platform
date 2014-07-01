@@ -157,7 +157,7 @@ class OpenEndedChild(object):
 
         self.location_string = location
         try:
-            self.location_string = self.location_string.to_deprecated_string()
+            self.location_string = unicode(self.location_string)
         except:
             pass
 

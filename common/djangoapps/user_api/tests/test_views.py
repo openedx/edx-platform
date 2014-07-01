@@ -9,7 +9,7 @@ from unittest import SkipTest
 from user_api.models import UserPreference
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 TEST_API_KEY = "test_api_key"
@@ -109,8 +109,8 @@ class EmptyUserTestCase(ApiTestCase):
 
 class EmptyRoleTestCase(ApiTestCase):
     """Test that the endpoint supports empty result sets"""
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
+    course_id = CourseKey.from_string("org/course/run")
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -139,8 +139,8 @@ class UserApiTestCase(ApiTestCase):
 
 
 class RoleTestCase(UserApiTestCase):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
+    course_id = CourseKey.from_string("org/course/run")
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
 
     def setUp(self):
         super(RoleTestCase, self).setUp()
@@ -201,7 +201,7 @@ class RoleTestCase(UserApiTestCase):
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={
             "page_size": 3,
-            "course_id": self.course_id.to_deprecated_string(),
+            "course_id": unicode(self.course_id),
         })
         self.assertEqual(first_page["count"], 5)
         first_page_next_uri = first_page["next"]

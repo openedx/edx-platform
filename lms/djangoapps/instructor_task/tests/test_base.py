@@ -16,7 +16,8 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
@@ -31,7 +32,7 @@ from instructor_task.views import instructor_task_status
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-TEST_COURSE_KEY = SlashSeparatedCourseKey(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
+TEST_COURSE_KEY = CourseKey.from_string("/".join([TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME]))
 TEST_SECTION_NAME = "Problem"
 
 TEST_FAILURE_MESSAGE = 'task failed horribly'
@@ -178,9 +179,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         """
         Create an internal location for a test problem.
         """
-        if "i4x:" in problem_url_name:
-            return Location.from_deprecated_string(problem_url_name)
-        else:
+        try:
+            return UsageKey.from_string(problem_url_name)
+        except InvalidKeyError:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
     def define_option_problem(self, problem_url_name):
@@ -214,6 +215,6 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
         return StudentModule.objects.get(course_id=self.course.id,
                                          student=User.objects.get(username=username),
-                                         module_type=descriptor.location.category,
+                                         module_type=descriptor.location.block_type,
                                          module_state_key=descriptor.location,
                                          )

@@ -1,19 +1,20 @@
 import pymongo
 import gridfs
 from gridfs.errors import NoFile
+from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.locator import AssetLocator
 
 from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
 import logging
 
-from .content import StaticContent, ContentStore, StaticContentStream
+from .content import StaticContent, ContentStore, StaticContentStream, XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
 import os
 import json
 from bson.son import SON
-from opaque_keys.edx.locations import AssetLocation
 
 
 class MongoContentStore(ContentStore):
@@ -64,7 +65,7 @@ class MongoContentStore(ContentStore):
         return content
 
     def delete(self, location_or_id):
-        if isinstance(location_or_id, AssetLocation):
+        if isinstance(location_or_id, AssetKey):
             location_or_id = self.asset_db_key(location_or_id)
         # Deletes of non-existent files are considered successful
         self.fs.delete(location_or_id)
@@ -145,16 +146,16 @@ class MongoContentStore(ContentStore):
         assets, __ = self.get_all_content_for_course(course_key)
 
         for asset in assets:
-            asset_location = AssetLocation._from_deprecated_son(asset['_id'], course_key.run)  # pylint: disable=protected-access
+            asset_location = AssetLocator._from_deprecated_son(asset['_id'], course_key.run)  # pylint: disable=protected-access
             # TODO: On 6/19/14, I had to put a try/except around this
             # to export a course. The course failed on JSON files in
             # the /static/ directory placed in it with an import.
-            # 
-            # If this hasn't been looked at in a while, remove this comment. 
+            #
+            # If this hasn't been looked at in a while, remove this comment.
             #
             # When debugging course exports, this might be a good place
             # to look. -- pmitros
-            self.export(asset_location, output_directory) 
+            self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
                     policy.setdefault(asset_location.name, {})[attr] = value
@@ -284,5 +285,11 @@ class MongoContentStore(ContentStore):
         # codifying the original order which pymongo used for the dicts coming out of location_to_dict
         # stability of order is more important than sanity of order as any changes to order make things
         # unfindable
-        ordered_key_fields = ['category', 'name', 'course', 'tag', 'org', 'revision']
-        return SON((field_name, getattr(location, field_name)) for field_name in ordered_key_fields)
+        return SON([
+            ('category', location.asset_type),
+            ('name', location.path),
+            ('course', location.course_key.course),
+            ('tag', XASSET_LOCATION_TAG),
+            ('org', location.course_key.org),
+            ('revision', location.course_key.branch),
+        ])

@@ -12,7 +12,6 @@ import ipaddr
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
@@ -28,17 +27,14 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
         try:
             course_key = CourseKey.from_string(cleaned_id)
         except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
-            except InvalidKeyError:
-                msg = 'COURSE NOT FOUND'
-                msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
-                msg += 'Please recheck that you have supplied a valid course id.'
-                raise forms.ValidationError(msg)
+            msg = 'COURSE NOT FOUND'
+            msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
+            msg += 'Please recheck that you have supplied a valid course id.'
+            raise forms.ValidationError(msg)
 
         if not modulestore().has_course(course_key):
             msg = 'COURSE NOT FOUND'
-            msg += u' --- Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
+            msg += u' --- Entered course id was: "{0}". '.format(unicode(course_key))
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 

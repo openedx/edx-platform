@@ -20,11 +20,10 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
 from unittest.case import SkipTest, TestCase
+from opaque_keys.edx.keys import UsageKey
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-
-from opaque_keys.edx.locations import Location
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
@@ -190,7 +189,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def location(self):
-        return Location('org', 'course', 'run', 'category', self.url_name, None)
+        return UsageKey.from_string('i4x://org/course/category/{}'.format(self.url_name))
 
     @lazy_attribute
     def block_type(self):

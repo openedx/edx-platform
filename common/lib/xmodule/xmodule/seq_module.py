@@ -103,7 +103,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
-                'id': child.scope_ids.usage_id.to_deprecated_string(),
+                'id': unicode(child.scope_ids.usage_id),
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
@@ -111,9 +111,9 @@ class SequenceModule(SequenceFields, XModule):
 
         params = {'items': contents,
                   'element_id': self.location.html_id(),
-                  'item_id': self.location.to_deprecated_string(),
+                  'item_id': unicode(self.location),
                   'position': self.position,
-                  'tag': self.location.category,
+                  'tag': self.location.block_type,
                   'ajax_url': self.system.ajax_url,
                   }
 

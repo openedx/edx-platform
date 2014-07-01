@@ -14,7 +14,9 @@ from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
+from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
+
 
 from xmodule.modulestore.django import modulestore
 from track.views import task_track
@@ -244,7 +246,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     # get start time for task:
     start_time = time()
 
-    usage_key = course_id.make_usage_key_from_deprecated_string(task_input.get('problem_url'))
+    usage_key = UsageKey.from_string(task_input.get('problem_url')).map_into_course(course_id)
     student_identifier = task_input.get('student')
 
     # find the problem descriptor:
@@ -551,7 +553,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
+    course_id_prefix = urllib.quote(unicode(course_id).replace("/", "_"))
 
     # Perform the actual upload
     report_store = ReportStore.from_config()

@@ -150,7 +150,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
             metadata = {'display_name': str(uuid.uuid4()), 'graded': True}
             data = {}
             self._create_item(
-                location.category, location.name, data, metadata, parent_loc.category, parent_loc.name,
+                location.block_type, location.name, data, metadata, parent_loc.category, parent_loc.name,
                 draft=draft, split=False
             )
 
@@ -177,9 +177,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # check that locations match
         self.assertEqual(
             presplit_dag_root.location,
-            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(
-                revision=MongoRevisionKey.published
-            )
+            self.loc_mapper.translate_locator_to_location(split_dag_root.location).for_branch(MongoRevisionKey.published)
         )
         # compare all fields but children
         for name, field in presplit_dag_root.fields.iteritems():

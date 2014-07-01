@@ -31,14 +31,14 @@ class TestOrphan(CourseTestCase):
         self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
-        location = self.course.location.replace(category=category, name=name)
+        location = self.course.id.make_usage_key(category, name)
         store = modulestore()
         store.create_and_save_xmodule(
             location, self.user.id, definition_data=data, metadata=metadata, runtime=runtime
         )
         if parent_name:
             # add child to parent in mongo
-            parent_location = self.course.location.replace(category=parent_category, name=parent_name)
+            parent_location = self.course.id.make_usage_key(parent_category, parent_name)
             parent = store.get_item(parent_location)
             parent.children.append(location)
             store.update_item(parent, self.user.id)
@@ -54,12 +54,12 @@ class TestOrphan(CourseTestCase):
             ).content
         )
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
-        location = self.course.location.replace(category='chapter', name='OrphanChapter')
-        self.assertIn(location.to_deprecated_string(), orphans)
-        location = self.course.location.replace(category='vertical', name='OrphanVert')
-        self.assertIn(location.to_deprecated_string(), orphans)
-        location = self.course.location.replace(category='html', name='OrphanHtml')
-        self.assertIn(location.to_deprecated_string(), orphans)
+        location = self.course.location.replace(block_type='chapter', block_id='OrphanChapter')
+        self.assertIn(unicode(location), orphans)
+        location = self.course.location.replace(block_type='vertical', block_id='OrphanVert')
+        self.assertIn(unicode(location), orphans)
+        location = self.course.location.replace(block_type='html', block_id='OrphanHtml')
+        self.assertIn(unicode(location), orphans)
 
     def test_mongo_orphan_delete(self):
         """

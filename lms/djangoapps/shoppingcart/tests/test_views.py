@@ -62,22 +62,22 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password="password")
 
     def test_add_course_to_cart_anon(self):
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[unicode(self.course_key)]))
         self.assertEqual(resp.status_code, 403)
 
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[unicode(self.course_key)]))
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
+        self.assertIn('The course {0} is already in your cart.'.format(unicode(self.course_key)), resp.content)
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[unicode(self.course_key)]))
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('You are already registered in course {0}.'.format(self.course_key.to_deprecated_string()), resp.content)
+        self.assertIn('You are already registered in course {0}.'.format(unicode(self.course_key)), resp.content)
 
     def test_add_nonexistent_course_to_cart(self):
         self.login_user()
@@ -87,8 +87,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def test_add_course_to_cart_success(self):
         self.login_user()
-        reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        reverse('shoppingcart.views.add_course_to_cart', args=[unicode(self.course_key)])
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[unicode(self.course_key)]))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
@@ -250,7 +250,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             'edx.course.enrollment.upgrade.succeeded',
             {
                 'user_id': course_enrollment.user.id,
-                'course_id': course_enrollment.course_id.to_deprecated_string(),
+                'course_id': unicode(course_enrollment.course_id),
                 'mode': course_enrollment.mode
             }
         )

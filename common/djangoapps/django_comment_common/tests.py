@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from django_comment_common.models import Role
 from student.models import CourseEnrollment, User
 
@@ -22,7 +22,7 @@ class RoleAssignmentTest(TestCase):
             "hacky",
             "hacky@fake.edx.org"
         )
-        self.course_key = SlashSeparatedCourseKey("edX", "Fake101", "2012")
+        self.course_key = CourseKey.from_string("edX/Fake101/2012")
         CourseEnrollment.enroll(self.staff_user, self.course_key)
         CourseEnrollment.enroll(self.student_user, self.course_key)
 

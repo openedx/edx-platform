@@ -22,14 +22,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 DATA_DIR = 'common/test/data/'
 
 TEST_COURSE_ID = 'edX/simple/2012_Fall'
 
 
-class CommandsTestBase(TestCase):
+class CommandsTestBase(ModuleStoreTestCase):
     """
     Base class for testing different django commands.
 
@@ -55,7 +55,7 @@ class CommandsTestBase(TestCase):
 
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
-        if SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID) not in [c.id for c in courses]:
+        if CourseKey.from_string(TEST_COURSE_ID) not in [c.id for c in courses]:
             import_from_xml(store, "**replace_user**", DATA_DIR, ['toy', 'simple'])
 
         return [course.id for course in store.get_courses()]
@@ -72,7 +72,7 @@ class CommandsTestBase(TestCase):
         output = self.call_command('dump_course_ids', **kwargs)
         dumped_courses = output.decode('utf-8').strip().split('\n')
 
-        course_ids = {course_id.to_deprecated_string() for course_id in self.loaded_courses}
+        course_ids = {unicode(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
 
@@ -92,8 +92,8 @@ class CommandsTestBase(TestCase):
             self.assertNotIn('inherited_metadata', element)
 
         # Check a few elements in the course dump
-        test_course_key = SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID)
-        parent_id = test_course_key.make_usage_key('chapter', 'Overview').to_deprecated_string()
+        test_course_key = CourseKey.from_string(TEST_COURSE_ID)
+        parent_id = unicode(test_course_key.make_usage_key('chapter', 'Overview'))
         self.assertEqual(dump[parent_id]['category'], 'chapter')
         self.assertEqual(len(dump[parent_id]['children']), 3)
 
@@ -101,7 +101,7 @@ class CommandsTestBase(TestCase):
         self.assertEqual(dump[child_id]['category'], 'videosequence')
         self.assertEqual(len(dump[child_id]['children']), 2)
 
-        video_id = test_course_key.make_usage_key('video', 'Welcome').to_deprecated_string()
+        video_id = unicode(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
         self.assertEqual(len(dump[video_id]['metadata']), 4)
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])

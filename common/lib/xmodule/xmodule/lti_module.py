@@ -428,7 +428,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         First part of location is tag-org-course-category, i4x-2-3-lti.
 
-        Location.name itself does not change on import to another course,
+        self.location.name itself does not change on import to another course,
         but org and course_id change.
 
         So together with org and course_id in a form of
@@ -466,7 +466,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
         that contains the link being launched.
         """
-        return self.course_id.to_deprecated_string()
+        return unicode(self.course_id)
 
     @property
     def role(self):

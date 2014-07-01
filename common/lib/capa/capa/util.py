@@ -156,9 +156,10 @@ def sanitize_html(html_code):
         'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
         'img': ['src', 'width', 'height', 'class']
     })
-    output = bleach.clean(html_code,
+    output = bleach.clean(
+        html_code,
         tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
         styles=['white-space'],
-        attributes=attributes
+        attributes=attributes,
     )
     return output

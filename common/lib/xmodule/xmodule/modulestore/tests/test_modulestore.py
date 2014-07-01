@@ -2,7 +2,7 @@ from nose.tools import assert_equals, assert_raises, assert_true, assert_false  
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 def check_path_to_location(modulestore):
@@ -10,7 +10,7 @@ def check_path_to_location(modulestore):
     Make sure that path_to_location works: should be passed a modulestore
     with the toy and simple courses loaded.
     """
-    course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+    course_id = CourseKey.from_string("edX/toy/2012_Fall")
 
     should_work = (
         (course_id.make_usage_key('video', 'Welcome'),

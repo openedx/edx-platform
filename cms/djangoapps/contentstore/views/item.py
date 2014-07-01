@@ -24,7 +24,7 @@ from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
 
@@ -38,6 +38,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys import InvalidKeyError
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 
@@ -144,7 +145,7 @@ def xblock_handler(request, usage_key_string):
                 request.user,
             )
 
-            return JsonResponse({"locator": unicode(dest_usage_key)})
+            return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
         else:
             return _create_item(request)
     else:
@@ -272,13 +273,13 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     try:
         existing_item = store.get_item(usage_key)
     except ItemNotFoundError:
-        if usage_key.category in CREATE_IF_NOT_FOUND:
+        if usage_key.block_type in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
             existing_item = store.create_and_save_xmodule(usage_key, user.id)
         else:
             raise
-    except InvalidLocationError:
+    except InvalidKeyError:
         log.error("Can't find item by location.")
         return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
@@ -345,7 +346,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     store.update_item(existing_item, user.id)
 
     # for static tabs, their containing course also records their display name
-    if usage_key.category == 'static_tab':
+    if usage_key.block_type == 'static_tab':
         course = store.get_course(usage_key.course_key)
         # find the course's reference to this tab and update the name.
         static_tab = CourseTabList.get_tab_by_slug(course.tabs, usage_key.name)
@@ -386,7 +387,7 @@ def _create_item(request):
 
     store = modulestore()
     parent = store.get_item(usage_key)
-    dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
+    dest_usage_key = usage_key.replace(block_type=category, block_id=uuid4().hex)
 
     # get the metadata, display_name, and definition from the request
     metadata = {}
@@ -403,7 +404,7 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    store.create_and_save_xmodule(
+    created_block = store.create_and_save_xmodule(
         dest_usage_key,
         request.user.id,
         definition_data=data,
@@ -426,10 +427,10 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(dest_usage_key)
+        parent.children.append(created_block.location)
         store.update_item(parent, request.user.id)
 
-    return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
+    return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
@@ -439,8 +440,8 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
     store = modulestore()
     source_item = store.get_item(duplicate_source_usage_key)
     # Change the blockID to be unique.
-    dest_usage_key = duplicate_source_usage_key.replace(name=uuid4().hex)
-    category = dest_usage_key.category
+    dest_usage_key = source_item.location.replace(block_id=uuid4().hex)
+    category = dest_usage_key.block_type
 
     # Update the display name to indicate this is a duplicate (unless display name provided).
     duplicate_metadata = own_metadata(source_item)
@@ -465,7 +466,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dupe = _duplicate_item(dest_usage_key, child, user=user)
+            dupe = _duplicate_item(dest_module.location, child, user=user)
             dest_module.children.append(dupe)
         store.update_item(dest_module, user.id if user else None)
 
@@ -473,14 +474,14 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
         parent = store.get_item(parent_usage_key)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
-        if duplicate_source_usage_key in parent.children:
-            source_index = parent.children.index(duplicate_source_usage_key)
-            parent.children.insert(source_index + 1, dest_usage_key)
+        if source_item.location in parent.children:
+            source_index = parent.children.index(source_item.location)
+            parent.children.insert(source_index + 1, dest_module.location)
         else:
-            parent.children.append(dest_usage_key)
+            parent.children.append(dest_module.location)
         store.update_item(parent, user.id if user else None)
 
-    return dest_usage_key
+    return dest_module.location
 
 
 def _delete_item(usage_key, user):
@@ -493,7 +494,7 @@ def _delete_item(usage_key, user):
     # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
-    if usage_key.category == 'static_tab':
+    if usage_key.block_type == 'static_tab':
         course = store.get_course(usage_key.course_key)
         existing_tabs = course.tabs or []
         course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
@@ -513,19 +514,19 @@ def orphan_handler(request, course_key_string):
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
     """
-    course_usage_key = CourseKey.from_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
-        if has_course_access(request.user, course_usage_key):
-            return JsonResponse(modulestore().get_orphans(course_usage_key))
+        if has_course_access(request.user, course_key):
+            return JsonResponse(modulestore().get_orphans(course_key))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
             store = modulestore()
-            items = store.get_orphans(course_usage_key)
+            items = store.get_orphans(course_key)
             for itemloc in items:
                 # get_orphans returns the deprecated string format w/o revision
-                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
+                usage_key = UsageKey.from_string(itemloc).map_into_course(course_key)
                 # need to delete all versions
                 store.delete_item(usage_key, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
             return JsonResponse({'deleted': items})
@@ -542,7 +543,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     try:
         module = store.get_item(usage_key)
     except ItemNotFoundError:
-        if usage_key.category in CREATE_IF_NOT_FOUND:
+        if usage_key.block_type in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
             module = store.create_and_save_xmodule(usage_key, user.id)
         else:
@@ -553,12 +554,12 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
         data = replace_static_urls(
             data,
             None,
-            course_id=usage_key.course_key
+            course_id=module.location.course_key
         )
 
     # Note that children aren't being returned until we have a use case.
     return {
-        'id': unicode(usage_key),
+        'id': unicode(module.location),
         'data': data,
         'metadata': own_metadata(module)
     }

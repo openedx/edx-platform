@@ -116,7 +116,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         parsed_grader_payload.update({
             'location': self.location_string,
-            'course_id': system.course_id.to_deprecated_string(),
+            'course_id': unicode(system.course_id),
             'prompt': prompt_string,
             'rubric': rubric_string,
             'initial_display': self.initial_display,

@@ -8,6 +8,7 @@ from django.db.utils import DatabaseError
 import mock
 from django.test.testcases import TestCase
 
+
 class HeartbeatTestCase(TestCase):
     """
     Test the heartbeat

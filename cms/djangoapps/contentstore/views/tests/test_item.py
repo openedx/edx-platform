@@ -23,8 +23,7 @@ from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.partitions.partitions import Group, UserPartition
 
 
@@ -53,7 +52,10 @@ class ItemTest(CourseTestCase):
         """
         parsed = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        return UsageKey.from_string(parsed['locator'])
+        key = UsageKey.from_string(parsed['locator'])
+        if key.course_key.run is None:
+            key = key.map_into_course(CourseKey.from_string(parsed['courseKey']))
+        return key
 
     def create_xblock(self, parent_usage_key=None, display_name=None, category=None, boilerplate=None):
         data = {
@@ -152,7 +154,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/location:MITx\+999\+Robot_Super_Course\+wrapper\+\w+" class="action-button">\s*'
+            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -996,9 +998,7 @@ class TestComponentHandler(TestCase):
         # of the xBlock descriptor.
         self.descriptor = self.modulestore.return_value.get_item.return_value
 
-        self.usage_key_string = unicode(
-            Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
-        )
+        self.usage_key_string = u'i4x://dummy_org/dummy_course/dummy_category/dummy_name'
 
         self.user = UserFactory()
 

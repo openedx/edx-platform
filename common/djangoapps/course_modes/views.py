@@ -17,7 +17,7 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from verify_student.models import SoftwareSecurePhotoVerification
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 
@@ -34,7 +34,7 @@ class ChooseModeView(View):
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
 
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
@@ -52,7 +52,7 @@ class ChooseModeView(View):
 
         course = modulestore().get_course(course_key)
         context = {
-            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
+            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': unicode(course_key)}),
             "modes": modes,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
@@ -75,7 +75,7 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def post(self, request, course_id):
         """ Takes the form submission from the page and parses it """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollment,
@@ -121,12 +121,12 @@ class ChooseModeView(View):
             if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
                 return redirect(
                     reverse('verify_student_verified',
-                            kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
+                            kwargs={'course_id': unicode(course_key)}) + "?upgrade={}".format(upgrade)
                 )
 
             return redirect(
                 reverse('verify_student_show_requirements',
-                        kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade))
+                        kwargs={'course_id': unicode(course_key)}) + "?upgrade={}".format(upgrade))
 
     def get_requested_mode(self, request_dict):
         """

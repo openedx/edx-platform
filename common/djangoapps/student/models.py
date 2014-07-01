@@ -34,8 +34,6 @@ from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
@@ -90,7 +88,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
     if course_id:
-        hasher.update(course_id.to_deprecated_string())
+        hasher.update(unicode(course_id))
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
@@ -699,7 +697,8 @@ class CourseEnrollment(models.Model):
                 dog_stats_api.increment(
                     "common.student.enrollment",
                     tags=[u"org:{}".format(self.course_id.org),
-                          u"offering:{}".format(self.course_id.offering),
+                          u"course:{}".format(self.course_id.course),
+                          u"run:{}".format(self.course_id.run),
                           u"mode:{}".format(self.mode)]
                 )
 
@@ -711,7 +710,8 @@ class CourseEnrollment(models.Model):
                 dog_stats_api.increment(
                     "common.student.unenrollment",
                     tags=[u"org:{}".format(self.course_id.org),
-                          u"offering:{}".format(self.course_id.offering),
+                          u"course:{}".format(self.course_id.course),
+                          u"run:{}".format(self.course_id.run),
                           u"mode:{}".format(self.mode)]
                 )
 
@@ -722,10 +722,10 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
+            assert(isinstance(self.course_id, CourseKey))
             data = {
                 'user_id': self.user.id,
-                'course_id': self.course_id.to_deprecated_string(),
+                'course_id': unicode(self.course_id),
                 'mode': self.mode,
             }
 
@@ -868,10 +868,10 @@ class CourseEnrollment(models.Model):
 
         `course_id_partial` (CourseKey) is missing the run component
         """
-        assert isinstance(course_id_partial, SlashSeparatedCourseKey)
+        assert isinstance(course_id_partial, CourseKey)
         assert not course_id_partial.run  # None or empty string
-        course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
-        querystring = unicode(course_key.to_deprecated_string())
+        course_key = course_id_partial.replace(run='')
+        querystring = unicode(course_key)
         try:
             return CourseEnrollment.objects.filter(
                 user=user,

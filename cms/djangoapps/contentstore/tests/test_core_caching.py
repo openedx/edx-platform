@@ -1,5 +1,5 @@
 from cache_toolbox.core import get_cached_content, set_cached_content, del_cached_content
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.content import StaticContent
 from django.test import TestCase
 
@@ -14,10 +14,11 @@ class Content:
 
 
 class CachingTestCase(TestCase):
+    course = CourseKey.from_string(u'mitX/800/run')
 #   Tests for https://edx.lighthouseapp.com/projects/102637/tickets/112-updating-asset-does-not-refresh-the-cached-copy
-    unicodeLocation = Location(u'c4x', u'mitX', u'800', u'run', u'thumbnail', u'monsters.jpg')
+    unicodeLocation = course.make_asset_key(u'thumbnail', u'monsters.jpg')
     # Note that some of the parts are strings instead of unicode strings
-    nonUnicodeLocation = Location('c4x', u'mitX', u'800', u'run', 'thumbnail', 'monsters.jpg')
+    nonUnicodeLocation = course.make_asset_key('thumbnail', 'monsters.jpg')
     mockAsset = Content(unicodeLocation, 'my content')
 
     def test_put_and_get(self):

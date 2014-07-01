@@ -1,10 +1,13 @@
+import warnings
+
 from django.db import models
 from django.core.exceptions import ValidationError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^xmodule_django\.models\.CourseKeyField"])
-add_introspection_rules([], ["^xmodule_django\.models\.LocationKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.CourseKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.LocationKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.UsageKeyField"])
 
 
 class NoneToEmptyManager(models.Manager):
@@ -44,7 +47,7 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
 
 
 class CourseKeyField(models.CharField):
-    description = "A SlashSeparatedCourseKey object, saved to the DB in the form of a string"
+    description = "A CourseKey object, saved to the DB in the form of a string"
 
     __metaclass__ = models.SubfieldBase
 
@@ -54,13 +57,13 @@ class CourseKeyField(models.CharField):
         if value is self.Empty or value is None:
             return None
 
-        assert isinstance(value, (basestring, SlashSeparatedCourseKey))
+        assert isinstance(value, (basestring, CourseKey))
         if value == '':
             # handle empty string for models being created w/o fields populated
             return None
 
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(value)
+            return CourseKey.from_string(value)
         else:
             return value
 
@@ -74,8 +77,8 @@ class CourseKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, SlashSeparatedCourseKey)
-        return value.to_deprecated_string()
+        assert isinstance(value, CourseKey)
+        return unicode(value)
 
     def validate(self, value, model_instance):
         """Validate Empty values, otherwise defer to the parent"""
@@ -93,8 +96,8 @@ class CourseKeyField(models.CharField):
         return super(CourseKeyField, self).run_validators(value)
 
 
-class LocationKeyField(models.CharField):
-    description = "A Location object, saved to the DB in the form of a string"
+class UsageKeyField(models.CharField):
+    description = "A UsageKey object, saved to the DB in the form of a string"
 
     __metaclass__ = models.SubfieldBase
 
@@ -104,28 +107,28 @@ class LocationKeyField(models.CharField):
         if value is self.Empty or value is None:
             return value
 
-        assert isinstance(value, (basestring, Location))
+        assert isinstance(value, (basestring, UsageKey))
 
         if value == '':
             return None
 
         if isinstance(value, basestring):
-            return Location.from_deprecated_string(value)
+            return UsageKey.from_string(value)
         else:
             return value
 
     def get_prep_lookup(self, lookup, value):
         if lookup == 'isnull':
-            raise TypeError('Use LocationKeyField.Empty rather than None to query for a missing LocationKeyField')
+            raise TypeError('Use UsageKeyField.Empty rather than None to query for a missing UsageKeyField')
 
-        return super(LocationKeyField, self).get_prep_lookup(lookup, value)
+        return super(UsageKeyField, self).get_prep_lookup(lookup, value)
 
     def get_prep_value(self, value):
         if value is self.Empty:
             return ''
 
-        assert isinstance(value, Location)
-        return value.to_deprecated_string()
+        assert isinstance(value, UsageKey)
+        return unicode(value)
 
     def validate(self, value, model_instance):
         """Validate Empty values, otherwise defer to the parent"""
@@ -133,11 +136,17 @@ class LocationKeyField(models.CharField):
         if not self.blank and value is self.Empty:
             raise ValidationError(self.error_messages['blank'])
         else:
-            return super(LocationKeyField, self).validate(value, model_instance)
+            return super(UsageKeyField, self).validate(value, model_instance)
 
     def run_validators(self, value):
         """Validate Empty values, otherwise defer to the parent"""
         if value is self.Empty:
             return
 
-        return super(LocationKeyField, self).run_validators(value)
+        return super(UsageKeyField, self).run_validators(value)
+
+
+class LocationKeyField(UsageKeyField):
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Use USageKeyField instead of LocationKeyField", DeprecationWarning)
+        super(LocationKeyField, self).__init__(*args, **kwargs)

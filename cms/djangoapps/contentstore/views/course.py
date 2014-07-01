@@ -16,15 +16,15 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
+from opaque_keys.edx.locator import BlockUsageLocator
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -107,7 +107,7 @@ def course_handler(request, course_key_string=None):
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        offering. Return same json as above.
+        course, and run. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -261,7 +261,8 @@ def course_index(request, course_key):
     """
     Display an editable course overview.
 
-    org, course, name: Attributes of the Location for the item to edit
+    Args:
+        course_key (:class:`opaque_keys.edx.keys.CourseKey`): The course_key of the course to edit
     """
     course_module = _get_course_module(course_key, request.user, depth=3)
     lms_link = get_lms_link_for_item(course_module.location)
@@ -306,7 +307,6 @@ def create_new_course(request):
             )
 
     try:
-        course_key = SlashSeparatedCourseKey(org, number, run)
 
         # instantiate the CourseDescriptor and then persist it
         # note: no system to pass
@@ -319,14 +319,8 @@ def create_new_course(request):
         # existing xml courses this cannot be changed in CourseDescriptor.
         # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
         # w/ xmodule.course_module.CourseDescriptor.__init__
-        wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+        wiki_slug = u"{0}.{1}.{2}".format(org, number, run)
         definition_data = {'wiki_slug': wiki_slug}
-
-        # Create the course then fetch it from the modulestore
-        # Check if role permissions group for a course named like this already exists
-        # Important because role groups are case insensitive
-        if CourseRole.course_group_already_exists(course_key):
-            raise InvalidLocationError()
 
         fields = {}
         fields.update(definition_data)
@@ -334,8 +328,9 @@ def create_new_course(request):
 
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
         new_course = modulestore().create_course(
-            course_key.org,
-            course_key.offering,
+            org,
+            number,
+            run,
             fields=fields,
         )
 
@@ -356,7 +351,7 @@ def create_new_course(request):
             'url': reverse_course_url('course_handler', new_course.id)
         })
 
-    except InvalidLocationError:
+    except InvalidKeyError:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
@@ -712,7 +707,7 @@ def assign_textbook_id(textbook, used_ids=()):
     Return an ID that can be assigned to a textbook
     and doesn't match the used_ids
     """
-    tid = Location.clean(textbook["tab_title"])
+    tid = BlockUsageLocator.clean(textbook["tab_title"])
     if not tid[0].isdigit():
         # stick a random digit in front
         tid = random.choice(string.digits) + tid

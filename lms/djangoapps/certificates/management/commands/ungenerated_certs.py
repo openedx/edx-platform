@@ -10,7 +10,6 @@ from optparse import make_option
 from django.conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.models import CertificateStatuses
@@ -74,11 +73,7 @@ class Command(BaseCommand):
 
         if options['course']:
             # try to parse out the course from the serialized form
-            try:
-                course = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
-                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course = CourseKey.from_string(options['course'])
             ended_courses = [course]
         else:
             raise CommandError("You must specify a course")
@@ -87,7 +82,7 @@ class Command(BaseCommand):
             # prefetch all chapters/sequentials by saying depth=2
             course = modulestore().get_course(course_key, depth=2)
 
-            print "Fetching enrolled students for {0}".format(course_key.to_deprecated_string())
+            print "Fetching enrolled students for {0}".format(unicode(course_key))
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_key)
 

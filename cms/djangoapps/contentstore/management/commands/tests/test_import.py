@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class TestImport(ModuleStoreTestCase):
@@ -20,9 +20,9 @@ class TestImport(ModuleStoreTestCase):
     Unit tests for importing a course from command line
     """
 
-    BASE_COURSE_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2013_Spring')
-    DIFF_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2014_Spring')
-    TRUNCATED_KEY = SlashSeparatedCourseKey(u'edX', u'test_import', u'2014_Spring')
+    BASE_COURSE_KEY = CourseKey.from_string(u'edX/test_import_course/2013_Spring')
+    DIFF_KEY = CourseKey.from_string(u'edX/test_import_course/2014_Spring')
+    TRUNCATED_KEY = CourseKey.from_string(u'edX/test_import/2014_Spring')
 
     def create_course_xml(self, content_dir, course_id):
         directory = tempfile.mkdtemp(dir=content_dir)

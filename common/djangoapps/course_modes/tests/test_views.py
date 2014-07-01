@@ -7,14 +7,14 @@ from mock import patch, Mock
 
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 @ddt.ddt
 class CourseModeViewTest(TestCase):
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.course_id = CourseKey.from_string('org/course/run')
 
         for mode in ('audit', 'verified', 'honor'):
             CourseModeFactory(mode_slug=mode, course_id=self.course_id)
@@ -55,7 +55,7 @@ class CourseModeViewTest(TestCase):
             get_params = {}
 
         response = self.client.get(
-            reverse('course_modes_choose', args=[self.course_id.to_deprecated_string()]),
+            reverse('course_modes_choose', args=[unicode(self.course_id)]),
             get_params,
             follow=False,
         )
@@ -77,7 +77,7 @@ class CourseModeViewTest(TestCase):
     )
     @patch('course_modes.views.modulestore', Mock())
     def test_suggested_prices(self, price_list):
-        course_id = SlashSeparatedCourseKey('org', 'course', 'price_course')
+        course_id = CourseKey.from_string('org/course/price_course')
         user = UserFactory()
 
         for mode in ('audit', 'honor'):
@@ -91,7 +91,7 @@ class CourseModeViewTest(TestCase):
         )
 
         response = self.client.get(
-            reverse('course_modes_choose', args=[self.course_id.to_deprecated_string()]),
+            reverse('course_modes_choose', args=[unicode(self.course_id)]),
             follow=False,
         )
 

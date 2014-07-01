@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
 
@@ -57,11 +56,7 @@ class Command(BaseCommand):
             raise CommandError("You must specify a course-id")
 
         # try to parse the serialized course key into a CourseKey
-        try:
-            course = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(course_id))
-            course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course = CourseKey.from_string(course_id)
 
         if options['add'] and options['del']:
             raise CommandError("Either remove or add a user, not both")

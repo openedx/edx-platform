@@ -73,16 +73,16 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         # Pull up email view on instructor dashboard
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
         response = self.client.get(self.url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
         self.assertTrue(email_section in response.content)
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': unicode(self.course.id)})
         self.success_content = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': unicode(self.course.id),
             'success': True,
         }
 

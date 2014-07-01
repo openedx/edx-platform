@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course
 
@@ -16,10 +15,7 @@ class Command(BaseCommand):
             raise CommandError("Only one course id may be specifiied")
         course_id = args[0]
 
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
 
         course = get_course(course_key)
         if not course:

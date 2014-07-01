@@ -12,10 +12,10 @@ import textwrap
 import datetime
 
 from mock import Mock
+from opaque_keys.edx.keys import UsageKey
 
 import xmodule
 from xmodule.capa_module import CapaModule
-from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -84,7 +84,7 @@ class CapaFactoryWithDelay(object):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
         """
-        location = Location("edX", "capa_test", "run", "problem", "SampleProblem{0}".format(cls.next_num()))
+        location = UsageKey.from_string('i4x://edX/capa_test/problem/SampleProblem{}'.format(cls.next_num()))
         field_data = {'data': cls.sample_problem_xml}
 
         if max_attempts is not None:

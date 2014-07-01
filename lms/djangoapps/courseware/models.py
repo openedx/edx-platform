@@ -18,7 +18,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from xmodule_django.models import CourseKeyField, UsageKeyField
 
 
 class StudentModule(models.Model):
@@ -40,7 +40,7 @@ class StudentModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = UsageKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -141,7 +141,7 @@ class XModuleUserStateSummaryField(models.Model):
     field_name = models.CharField(max_length=64, db_index=True)
 
     # The definition id for the module
-    usage_id = LocationKeyField(max_length=255, db_index=True)
+    usage_id = UsageKeyField(max_length=255, db_index=True)
 
     # The value of the field. Defaults to None dumped as json
     value = models.TextField(default='null')
@@ -258,4 +258,4 @@ class OfflineComputedGradeLog(models.Model):
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
+        return "[OCGLog] %s: %s" % (unicode(self.course_id), self.created)  # pylint: disable=no-member

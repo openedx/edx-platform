@@ -14,7 +14,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.exceptions import NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -42,7 +42,7 @@ def _reverse_with_slash(url_name, course_key):
 
 
 def _reverse_without_slash(url_name, course_key):
-    course_id = course_key.to_deprecated_string()
+    course_id = unicode(course_key)
     ajax_url = reverse(url_name, kwargs={'course_id': course_id})
     return ajax_url
 
@@ -66,7 +66,7 @@ def staff_grading(request, course_id):
     """
     Show the instructor grading interface.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key)
 
     ajax_url = _reverse_with_slash('staff_grading', course_key)
@@ -117,7 +117,7 @@ def peer_grading(request, course_id):
     When a student clicks on the "peer grading" button in the open ended interface, link them to a peer grading
     xmodule in the course.
     '''
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     #Get the current course
     course = get_course_with_access(request.user, 'load', course_key)
 
@@ -143,7 +143,7 @@ def student_problem_list(request, course_id):
     @return: Renders an HTML problem list table.
     """
     assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     # Load the course.  Don't catch any errors here, as we want them to be loud.
     course = get_course_with_access(request.user, 'load', course_key)
 
@@ -168,7 +168,7 @@ def student_problem_list(request, course_id):
 
     context = {
         'course': course,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': unicode(course_key),
         'ajax_url': ajax_url,
         'success': success,
         'problem_list': valid_problems,
@@ -184,7 +184,7 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key)
 
     # call problem list service
@@ -236,7 +236,7 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
@@ -299,7 +299,7 @@ def take_action_on_flags(request, course_id):
     Takes action on student flagged submissions.
     Currently, only support unflag and ban actions.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     if request.method != 'POST':
         raise Http404
 

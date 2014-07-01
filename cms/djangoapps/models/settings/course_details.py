@@ -4,7 +4,6 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import course_image_url
 from models.settings import course_grading
@@ -204,8 +203,6 @@ class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (CourseDetails, course_grading.CourseGradingModel)):
             return obj.__dict__
-        elif isinstance(obj, Location):
-            return obj.dict()
         elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
         else:

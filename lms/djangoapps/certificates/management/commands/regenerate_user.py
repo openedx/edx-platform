@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.queue import XQueueCertInterface
@@ -50,12 +49,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['course']:
-            # try to parse out the course from the serialized form
-            try:
-                course_id = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
-                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_id = CourseKey.from_string(options['course'])
         else:
             raise CommandError("You must specify a course")
 

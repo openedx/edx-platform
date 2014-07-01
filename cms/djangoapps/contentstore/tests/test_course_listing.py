@@ -18,7 +18,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, Or
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
 
@@ -72,7 +72,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test getting courses with new access group format e.g. 'instructor_edx.course.run'
         """
-        course_location = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_location = CourseKey.from_string('Org1/Course1/Run1')
         self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
@@ -91,7 +91,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         GlobalStaff().add_users(self.user)
 
-        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_key = CourseKey.from_string('Org1/Course1/Run1')
         self._create_course_with_access_groups(course_key, self.user)
 
         with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
@@ -110,9 +110,9 @@ class TestCourseListing(ModuleStoreTestCase):
         Test the course list for regular staff when get_course returns an ErrorDescriptor
         """
         GlobalStaff().remove_users(self.user)
-        CourseStaffRole(SlashSeparatedCourseKey('Non', 'Existent', 'Course')).add_users(self.user)
+        CourseStaffRole(CourseKey.from_string('Non/Existent/Course')).add_users(self.user)
 
-        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_key = CourseKey.from_string('Org1/Course1/Run1')
         self._create_course_with_access_groups(course_key, self.user)
 
         with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
@@ -131,7 +131,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test getting courses with invalid course location (course deleted from modulestore).
         """
-        course_key = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        course_key = CourseKey.from_string('Org/Course/Run')
         self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
@@ -167,7 +167,7 @@ class TestCourseListing(ModuleStoreTestCase):
             org = 'Org{0}'.format(number)
             course = 'Course{0}'.format(number)
             run = 'Run{0}'.format(number)
-            course_location = SlashSeparatedCourseKey(org, course, run)
+            course_location = CourseKey.from_string("/".join([org, course, run]))
             if number in user_course_ids:
                 self._create_course_with_access_groups(course_location, self.user)
             else:
@@ -206,57 +206,6 @@ class TestCourseListing(ModuleStoreTestCase):
         with check_mongo_calls(store.collection, 1):
             courses_list = _accessible_courses_list(self.request)
 
-    def test_get_course_list_with_same_course_id(self):
-        """
-        Test getting courses with same id but with different name case. Then try to delete one of them and
-        check that it is properly deleted and other one is accessible
-        """
-        course_location_caps = SlashSeparatedCourseKey('Org', 'COURSE', 'Run')
-        self._create_course_with_access_groups(course_location_caps, self.user)
-
-        # get courses through iterating all courses
-        courses_list = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), 1)
-
-        # get courses by reversing group name formats
-        courses_list_by_groups = _accessible_courses_list_from_groups(self.request)
-        self.assertEqual(len(courses_list_by_groups), 1)
-        # check both course lists have same courses
-        self.assertEqual(courses_list, courses_list_by_groups)
-
-        # now create another course with same course_id but different name case
-        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
-        self._create_course_with_access_groups(course_location_camel, self.user)
-
-        # test that get courses through iterating all courses returns both courses
-        courses_list = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), 2)
-
-        # test that get courses by reversing group name formats returns both courses
-        courses_list_by_groups = _accessible_courses_list_from_groups(self.request)
-        self.assertEqual(len(courses_list_by_groups), 2)
-
-        # now delete first course (course_location_caps) and check that it is no longer accessible
-        delete_course_and_groups(course_location_caps, commit=True)
-
-        # test that get courses through iterating all courses now returns one course
-        courses_list = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), 1)
-
-        # test that get courses by reversing group name formats also returns one course
-        courses_list_by_groups = _accessible_courses_list_from_groups(self.request)
-        self.assertEqual(len(courses_list_by_groups), 1)
-
-        # now check that deleted course is not accessible
-        outline_url = reverse_course_url('course_handler', course_location_caps)
-        response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 403)
-
-        # now check that other course is accessible
-        outline_url = reverse_course_url('course_handler', course_location_camel)
-        response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 200)
-
     def test_course_listing_errored_deleted_courses(self):
         """
         Create good courses, courses that won't load, and deleted courses which still have
@@ -264,14 +213,11 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
-        course_location = SlashSeparatedCourseKey('testOrg', 'testCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(course_location, self.user)
-
-        course_location = SlashSeparatedCourseKey('testOrg', 'doomedCourse', 'RunBabyRun')
+        course_location = CourseKey.from_string('testOrg/doomedCourse/RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)
         store.delete_course(course_location)
 
-        course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
+        course_location = CourseKey.from_string('testOrg/erroredCourse/RunBabyRun')
         course = self._create_course_with_access_groups(course_location, self.user)
         course_db_record = store._find_one(course.location)
         course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki" })
@@ -291,14 +237,14 @@ class TestCourseListing(ModuleStoreTestCase):
         Create multiple courses within the same org.  Verify that someone with org-wide permissions can access
         all of them.
         """
-        org_course_one = SlashSeparatedCourseKey('AwesomeOrg', 'Course1', 'RunBabyRun')
+        org_course_one = CourseKey.from_string('AwesomeOrg/Course1/RunBabyRun')
         CourseFactory.create(
             org=org_course_one.org,
             number=org_course_one.course,
             run=org_course_one.run
         )
 
-        org_course_two = SlashSeparatedCourseKey('AwesomeOrg', 'Course2', 'RunRunRun')
+        org_course_two = CourseKey.from_string('AwesomeOrg/Course2/RunRunRun')
         CourseFactory.create(
             org=org_course_two.org,
             number=org_course_two.course,

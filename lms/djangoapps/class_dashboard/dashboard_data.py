@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from analytics.csvs import create_csv_response
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import UsageKey
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
@@ -43,7 +43,9 @@ def get_problem_grade_distribution(course_id):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        curr_problem = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        # As per https://code.djangoproject.com/ticket/9619, this doesn't convert the values to
+        # python objects, so we need to manually convert module_state_key to a UsageKey
+        curr_problem = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
 
         # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
@@ -83,7 +85,10 @@ def get_sequential_open_distrib(course_id):
     # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+
+        # As per https://code.djangoproject.com/ticket/9619, this doesn't convert the values to
+        # python objects, so we need to manually convert module_state_key to a UsageKey
+        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
         sequential_open_distrib[row_loc] = row['count_sequential']
 
     return sequential_open_distrib
@@ -120,7 +125,9 @@ def get_problem_set_grade_distrib(course_id, problem_set):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        # As per https://code.djangoproject.com/ticket/9619, this doesn't convert the values to
+        # python objects, so we need to manually convert module_state_key to a UsageKey
+        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
         if row_loc not in prob_grade_distrib:
             prob_grade_distrib[row_loc] = {
                 'max_grade': 0,
@@ -168,7 +175,7 @@ def get_d3_problem_grade_distrib(course_id):
                 for child in unit.get_children():
 
                     # Student data is at the problem level
-                    if child.location.category == 'problem':
+                    if child.location.block_type == 'problem':
                         c_problem += 1
                         stack_data = []
 
@@ -213,7 +220,7 @@ def get_d3_problem_grade_distrib(course_id):
                                     'color': percent,
                                     'value': count_grade,
                                     'tooltip': tooltip,
-                                    'module_url': child.location.to_deprecated_string(),
+                                    'module_url': unicode(child.location),
                                 })
 
                         problem = {
@@ -275,7 +282,7 @@ def get_d3_sequential_open_distrib(course_id):
                 'color': 0,
                 'value': num_students,
                 'tooltip': tooltip,
-                'module_url': subsection.location.to_deprecated_string(),
+                'module_url': unicode(subsection.location),
             })
             subsection = {
                 'xValue': "SS {0}".format(c_subsection),
@@ -325,11 +332,11 @@ def get_d3_section_grade_distrib(course_id, section):
             c_unit += 1
             c_problem = 0
             for child in unit.get_children():
-                if (child.location.category == 'problem'):
+                if (child.location.block_type == 'problem'):
                     c_problem += 1
                     problem_set.append(child.location)
                     problem_info[child.location] = {
-                        'id': child.location.to_deprecated_string(),
+                        'id': unicode(child.location),
                         'x_value': "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem),
                         'display_name': own_metadata(child).get('display_name', ''),
                     }
@@ -412,7 +419,7 @@ def get_array_section_has_problem(course_id):
         for subsection in section.get_children():
             for unit in subsection.get_children():
                 for child in unit.get_children():
-                    if child.location.category == 'problem':
+                    if child.location.block_type == 'problem':
                         b_section_has_problem[i] = True
                         break  # out of child loop
                 if b_section_has_problem[i]:
@@ -433,7 +440,7 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = UsageKey.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students
@@ -485,7 +492,7 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = UsageKey.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "problem grades" students

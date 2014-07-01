@@ -189,8 +189,8 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     if delete_module:
         sub_api.reset_score(
             anonymous_id_for_user(student, course_id),
-            course_id.to_deprecated_string(),
-            module_state_key.to_deprecated_string(),
+            unicode(course_id),
+            unicode(module_state_key),
         )
 
     module_to_reset = StudentModule.objects.get(
@@ -245,7 +245,7 @@ def get_email_params(course, auto_enroll, secure=True):
     course_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
-        path=reverse('course_root', kwargs={'course_id': course.id.to_deprecated_string()})
+        path=reverse('course_root', kwargs={'course_id': unicode(course.id)})
     )
 
     # We can't get the url to the course's About page if the marketing site is enabled.
@@ -254,7 +254,7 @@ def get_email_params(course, auto_enroll, secure=True):
         course_about_url = u'{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('about_course', kwargs={'course_id': course.id.to_deprecated_string()})
+            path=reverse('about_course', kwargs={'course_id': unicode(course.id)})
         )
 
     is_shib_course = uses_shib(course)

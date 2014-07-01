@@ -5,7 +5,7 @@ from reverification.models import MidcourseReverificationWindow
 from factory.django import DjangoModelFactory
 import pytz
 from datetime import timedelta, datetime
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting
@@ -14,7 +14,7 @@ class MidcourseReverificationWindowFactory(DjangoModelFactory):
     """ Creates a generic MidcourseReverificationWindow. """
     FACTORY_FOR = MidcourseReverificationWindow
 
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(u'MITx/999/Robot_Super_Course')
+    course_id = CourseKey.from_string(u'MITx/999/Robot_Super_Course')
     # By default this factory creates a window that is currently open
     start_date = datetime.now(pytz.UTC) - timedelta(days=100)
     end_date = datetime.now(pytz.UTC) + timedelta(days=100)

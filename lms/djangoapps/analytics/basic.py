@@ -70,7 +70,7 @@ def dump_grading_context(course):
             subgrader.index = 1
             graders[subgrader.type] = subgrader
     msg += hbar
-    msg += "Listing grading context for course %s\n" % course.id.to_deprecated_string()
+    msg += "Listing grading context for course %s\n" % unicode(course.id)
 
     gcontext = course.grading_context
     msg += "graded sections:\n"

@@ -18,7 +18,7 @@ from mock import Mock, patch
 
 from . import LogicTest
 from lxml import etree
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
@@ -32,8 +32,7 @@ def instantiate_descriptor(**field_data):
     Instantiate descriptor with most properties.
     """
     system = get_test_descriptor_system()
-    course_key = SlashSeparatedCourseKey('org', 'course', 'run')
-    usage_key = course_key.make_usage_key('video', 'SampleProblem')
+    usage_key = UsageKey.from_string('i4x://org/course/video/name')
     return system.construct_xblock_from_class(
         VideoDescriptor,
         scope_ids=ScopeIds(None, None, usage_key, usage_key),

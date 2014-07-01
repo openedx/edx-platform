@@ -7,7 +7,6 @@ from django.utils import translation
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, Registration, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand
@@ -73,12 +72,7 @@ class Command(TrackedCommand):
 
         # parse out the course into a coursekey
         if options['course']:
-            try:
-                course = CourseKey.from_string(options['course'])
-            # if it's not a new-style course key, parse it from an old-style
-            # course key
-            except InvalidKeyError:
-                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course = CourseKey.from_string(options['course'])
 
         post_data = {
             'username': username,

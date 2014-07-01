@@ -62,7 +62,7 @@ class Role(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return self.name + " for " + (self.course_id.to_deprecated_string() if self.course_id else "all courses")
+        return self.name + " for " + (unicode(self.course_id) if self.course_id else "all courses")
 
     def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later

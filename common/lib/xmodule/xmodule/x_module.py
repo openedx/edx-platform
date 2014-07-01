@@ -605,7 +605,7 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    return '{cat}/{name}'.format(cat=location.category, name=location.name)
+    return '{cat}/{name}'.format(cat=location.block_type, name=location.block_id)
 
 
 Template = namedtuple("Template", "metadata data children")
@@ -1072,7 +1072,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         self, load_item, resources_fs, error_tracker, get_policy=None, **kwargs
     ):
         """
-        load_item: Takes a Location and returns an XModuleDescriptor
+        load_item: Takes a UsageKey and returns an XModuleDescriptor
 
         resources_fs: A Filesystem object that contains all of the
             resources needed for the course

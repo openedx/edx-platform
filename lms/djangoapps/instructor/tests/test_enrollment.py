@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -22,7 +23,7 @@ from instructor.enrollment import (
     send_beta_role_email,
     unenroll_email
 )
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
@@ -31,7 +32,7 @@ from student.models import anonymous_id_for_user
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
+        self.course_key = CourseKey.from_string('Robot/fAKE/C-%-se-%-ID')
 
     def test_mes_create(self):
         """
@@ -61,7 +62,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
+        self.course_key = CourseKey.from_string('Robot/fAKE/C-%-se-%-ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
         """
@@ -289,7 +290,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('fake', 'course', 'id')
+        self.course_key = CourseKey.from_string('fake/course/id')
 
     def test_reset_student_attempts(self):
         user = UserFactory()
@@ -326,8 +327,8 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(user, self.course_key),
-            'course_id': self.course_key.to_deprecated_string(),
-            'item_id': problem_location.to_deprecated_string(),
+            'course_id': unicode(self.course_key),
+            'item_id': unicode(problem_location),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
@@ -431,7 +432,7 @@ class TestSendBetaRoleEmail(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestGetEmailParams(TestCase):
+class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.
@@ -443,7 +444,7 @@ class TestGetEmailParams(TestCase):
         site = settings.SITE_NAME
         self.course_url = u'https://{}/courses/{}/'.format(
             site,
-            self.course.id.to_deprecated_string()
+            unicode(self.course.id)
         )
         self.course_about_url = self.course_url + 'about'
         self.registration_url = u'https://{}/register'.format(

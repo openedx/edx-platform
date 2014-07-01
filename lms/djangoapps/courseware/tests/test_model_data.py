@@ -200,7 +200,7 @@ class TestMissingStudentModule(TestCase):
         student_module = StudentModule.objects.all()[0]
         self.assertEquals({'a_field': 'a_value'}, json.loads(student_module.state))
         self.assertEquals(self.user, student_module.student)
-        self.assertEquals(location('usage_id').replace(run=None), student_module.module_state_key)
+        self.assertEquals(unicode(location('usage_id')), unicode(student_module.module_state_key))
         self.assertEquals(course_id, student_module.course_id)
 
     def test_delete_field_from_missing_student_module(self):

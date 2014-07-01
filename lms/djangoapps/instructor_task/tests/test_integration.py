@@ -59,8 +59,8 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+            'course_id': unicode(self.course.id),
+            'usage_id': quote_slashes(unicode(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
             'handler': 'xmodule_handler',
             'suffix': 'problem_check',
         })
@@ -80,7 +80,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
+        self.assertEqual(task_input['problem_url'], unicode(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -114,8 +114,8 @@ class TestRescoringTask(TestIntegrationTask):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+            'course_id': unicode(self.course.id),
+            'usage_id': quote_slashes(unicode(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
             'handler': 'xmodule_handler',
             'suffix': 'problem_get',
         })
@@ -229,7 +229,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
+        self.assertEqual(task_input['problem_url'], unicode(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
         self.assertEqual(status['succeeded'], 0)

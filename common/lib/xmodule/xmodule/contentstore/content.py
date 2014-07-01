@@ -10,7 +10,8 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.locator import AssetLocator
 from .django import contentstore
 from PIL import Image
 
@@ -32,7 +33,7 @@ class StaticContent(object):
 
     @property
     def is_thumbnail(self):
-        return self.location.category == 'thumbnail'
+        return self.location.block_type == 'thumbnail'
 
     @staticmethod
     def generate_thumbnail_name(original_name):
@@ -52,18 +53,16 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
-        return AssetLocation(
-            course_key.org, course_key.course, course_key.run,
+        return course_key.replace(branch=revision).make_asset_key(
             'asset' if not is_thumbnail else 'thumbnail',
-            AssetLocation.clean_keeping_underscores(path),
-            revision
+            AssetLocator.clean_keeping_underscores(path),
         )
 
     def get_id(self):
         return self.location
 
     def get_url_path(self):
-        return self.location.to_deprecated_string()
+        return unicode(self.location)
 
     @property
     def data(self):
@@ -103,15 +102,15 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
-        return course_key.make_asset_key('asset', '').to_deprecated_string()
+        assert(isinstance(course_key, CourseKey))
+        return unicode(course_key.make_asset_key('asset', ''))
 
     @staticmethod
     def get_location_from_path(path):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        return AssetLocation.from_deprecated_string(path)
+        return AssetKey.from_string(path)
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
@@ -122,7 +121,7 @@ class StaticContent(object):
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
         loc = StaticContent.compute_location(course_id, orig_path)
-        loc_url = loc.to_deprecated_string()
+        loc_url = unicode(loc)
 
         # parse the query params for "^/static/" and replace with the location url
         orig_query = parse_qsl(query)
@@ -133,7 +132,7 @@ class StaticContent(object):
                     course_id,
                     query_value[len('/static/'):],
                 )
-                new_query_url = new_query.to_deprecated_string()
+                new_query_url = unicode(new_query)
                 new_query_list.append((query_name, new_query_url))
             else:
                 new_query_list.append((query_name, query_value))

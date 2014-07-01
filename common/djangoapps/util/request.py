@@ -3,7 +3,7 @@ import re
 
 from django.conf import settings
 from microsite_configuration import microsite
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
 
@@ -40,4 +40,4 @@ def course_id_from_url(url):
     if course_id is None:
         return None
 
-    return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    return CourseKey.from_string(course_id)

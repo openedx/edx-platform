@@ -5,8 +5,8 @@ import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore.xml import CourseLocationGenerator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
 from xblock.field_data import FieldData
@@ -17,7 +17,7 @@ from xblock.test.tools import unabc
 class SetupTestErrorModules():
     def setUp(self):
         self.system = get_test_system()
-        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.course_id = CourseKey.from_string('org/course/run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
@@ -129,7 +129,7 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
-            ScopeIds(None, None, None, Location('org', 'course', 'run', 'broken', 'name', None))
+            ScopeIds(None, None, None, UsageKey.from_string('i4x://org/course/broken/name'))
         )
         self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor

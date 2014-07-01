@@ -254,7 +254,7 @@ class S3ReportStore(ReportStore):
     def key_for(self, course_id, filename):
         """Return the S3 key we would use to store and retrieve the data for the
         given filename."""
-        hashed_course_id = hashlib.sha1(course_id.to_deprecated_string())
+        hashed_course_id = hashlib.sha1(unicode(course_id))
 
         key = Key(self.bucket)
         key.key = "{}/{}/{}".format(
@@ -361,7 +361,7 @@ class LocalFSReportStore(ReportStore):
 
     def path_to(self, course_id, filename):
         """Return the full path to a given file for a given course."""
-        return os.path.join(self.root_path, urllib.quote(course_id.to_deprecated_string(), safe=''), filename)
+        return os.path.join(self.root_path, urllib.quote(unicode(course_id), safe=''), filename)
 
     def store(self, course_id, filename, buff):
         """

@@ -8,7 +8,7 @@ import json
 import logging
 import re
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
@@ -43,7 +43,7 @@ def list_cohorts(request, course_key):
     """
 
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
 
     get_course_with_access(request.user, 'staff', course_key)
 
@@ -69,7 +69,7 @@ def add_cohort(request, course_key):
      'msg': error_msg} if there's an error
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
 
     get_course_with_access(request.user, 'staff', course_key)
 
@@ -106,7 +106,7 @@ def users_in_cohort(request, course_key, cohort_id):
     }
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
 
     get_course_with_access(request.user, 'staff', course_key)
 
@@ -156,7 +156,7 @@ def add_users_to_cohort(request, course_key, cohort_id):
      'unknown': [str1, str2, ...]}
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
     get_course_with_access(request.user, 'staff', course_key)
 
     cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
@@ -207,7 +207,7 @@ def remove_user_from_cohort(request, course_key, cohort_id):
      'msg': error_msg}
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
     get_course_with_access(request.user, 'staff', course_key)
 
     username = request.POST.get('username')
@@ -231,12 +231,12 @@ def debug_cohort_mgmt(request, course_key):
     Debugging view for dev.
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key)
+    course_key = CourseKey.from_string(course_key)
     # add staff check to make sure it's safe if it's accidentally deployed.
     get_course_with_access(request.user, 'staff', course_key)
 
     context = {'cohorts_ajax_url': reverse(
         'cohorts',
-        kwargs={'course_key': course_key.to_deprecated_string()}
+        kwargs={'course_key': unicode(course_key)}
     )}
     return render_to_response('/course_groups/debug.html', context)

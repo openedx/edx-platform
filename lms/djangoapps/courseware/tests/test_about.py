@@ -9,7 +9,7 @@ from .helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -23,13 +23,13 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def test_logged_in(self):
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[unicode(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
 
     def test_anonymous_user(self):
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[unicode(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -40,7 +40,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that an about page still appears when
     # the course is already closed
-    xml_course_id = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    xml_course_id = CourseKey.from_string('edx/detached_pages/2014')
 
     # this text appears in that course's about page
     # common/test/data/2014/about/overview.html
@@ -49,14 +49,14 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
+        url = reverse('about_course', args=[unicode(self.xml_course_id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
+        url = reverse('about_course', args=[unicode(self.xml_course_id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
@@ -83,7 +83,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
         This test will make sure that enrollment caps are enforced
         """
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[unicode(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('<a href="#" class="register">', resp.content)

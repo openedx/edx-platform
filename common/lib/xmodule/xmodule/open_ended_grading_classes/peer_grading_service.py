@@ -31,7 +31,7 @@ class PeerGradingService(GradingService):
 
     def get_data_for_location(self, problem_location, student_id):
         if isinstance(problem_location, UsageKey):
-            problem_location = problem_location.to_deprecated_string()
+            problem_location = unicode(problem_location)
         params = {'location': problem_location, 'student_id': student_id}
         result = self.get(self.get_data_for_location_url, params)
         self._record_result('get_data_for_location', result)
@@ -47,7 +47,7 @@ class PeerGradingService(GradingService):
 
     def get_next_submission(self, problem_location, grader_id):
         if isinstance(problem_location, UsageKey):
-            problem_location = problem_location.to_deprecated_string()
+            problem_location = unicode(problem_location)
         result = self._render_rubric(self.get(
             self.get_next_submission_url,
             {
@@ -67,7 +67,7 @@ class PeerGradingService(GradingService):
 
     def is_student_calibrated(self, problem_location, grader_id):
         if isinstance(problem_location, UsageKey):
-            problem_location = problem_location.to_deprecated_string()
+            problem_location = unicode(problem_location)
         params = {'problem_id': problem_location, 'student_id': grader_id}
         result = self.get(self.is_student_calibrated_url, params)
         self._record_result(
@@ -79,7 +79,7 @@ class PeerGradingService(GradingService):
 
     def show_calibration_essay(self, problem_location, grader_id):
         if isinstance(problem_location, UsageKey):
-            problem_location = problem_location.to_deprecated_string()
+            problem_location = unicode(problem_location)
         params = {'problem_id': problem_location, 'student_id': grader_id}
         result = self._render_rubric(self.get(self.show_calibration_essay_url, params))
         self._record_result('show_calibration_essay', result)
@@ -93,12 +93,12 @@ class PeerGradingService(GradingService):
         return result
 
     def get_problem_list(self, course_id, grader_id):
-        params = {'course_id': course_id.to_deprecated_string(), 'student_id': grader_id}
+        params = {'course_id': unicode(course_id), 'student_id': grader_id}
         result = self.get(self.get_problem_list_url, params)
 
         if 'problem_list' in result:
             for problem in result['problem_list']:
-                problem['location'] = course_id.make_usage_key_from_deprecated_string(problem['location'])
+                problem['location'] = UsageKey.from_string(problem['location']).map_into_course(course_id)
 
         self._record_result('get_problem_list', result)
         dog_stats_api.histogram(
@@ -108,7 +108,7 @@ class PeerGradingService(GradingService):
         return result
 
     def get_notifications(self, course_id, grader_id):
-        params = {'course_id': course_id.to_deprecated_string(), 'student_id': grader_id}
+        params = {'course_id': unicode(course_id), 'student_id': grader_id}
         result = self.get(self.get_notifications_url, params)
         self._record_result(
             'get_notifications',
