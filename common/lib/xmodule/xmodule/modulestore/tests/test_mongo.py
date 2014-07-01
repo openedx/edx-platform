@@ -168,7 +168,7 @@ class TestMongoModuleStore(unittest.TestCase):
             course = self.draft_store.get_course(course_key)
             assert_not_none(course)
             assert_true(self.draft_store.has_course(course_key))
-            mix_cased = CourseKey(
+            mix_cased = CourseLocator(
                 course_key.org.upper(),
                 course_key.course.upper(),
                 course_key.run.lower(),
@@ -192,7 +192,7 @@ class TestMongoModuleStore(unittest.TestCase):
             course = self.draft_store.get_course(course_key)
             assert_is_none(course)
             assert_false(self.draft_store.has_course(course_key))
-            mix_cased = CourseKey(
+            mix_cased = CourseLocator(
                 course_key.org.lower(), course_key.course.upper(), course_key.run.upper(), deprecated=True
             )
             assert_false(self.draft_store.has_course(mix_cased))
@@ -204,11 +204,11 @@ class TestMongoModuleStore(unittest.TestCase):
         )
 
         assert_not_none(
-            self.draft_storestore.get_item(UsageKey.from_string('i4x://edX/simple/course/2012_Fall')),
+            self.draft_store.get_item(UsageKey.from_string('i4x://edX/simple/course/2012_Fall')),
         )
 
         assert_not_none(
-            self.draft_storestore.get_item(UsageKey.from_string('i4x://edX/toy/video/Welcome')),
+            self.draft_store.get_item(UsageKey.from_string('i4x://edX/toy/video/Welcome')),
         )
 
     def test_unicode_loads(self):
@@ -220,13 +220,13 @@ class TestMongoModuleStore(unittest.TestCase):
         )
         # All items with ascii-only filenames should load properly.
         assert_not_none(
-            self.draft_storestore.get_item(UsageKey.from_string('i4x://edX/test_unicode/video/Welcome')),
+            self.draft_store.get_item(UsageKey.from_string('i4x://edX/test_unicode/video/Welcome')),
         )
         assert_not_none(
-            self.draft_storestore.get_item(UsageKey.from_string('i4x://edX/test_unicode/video/Welcome')),
+            self.draft_store.get_item(UsageKey.from_string('i4x://edX/test_unicode/video/Welcome')),
         )
         assert_not_none(
-            self.draft_storestore.get_item(UsageKey.from_string('i4x://edX/test_unicode/chapter/Overview')),
+            self.draft_store.get_item(UsageKey.from_string('i4x://edX/test_unicode/chapter/Overview')),
         )
 
 
@@ -240,7 +240,7 @@ class TestMongoModuleStore(unittest.TestCase):
         )
 
         assert_not_none(
-            self.draft_store_find_one(UsageKey.from_string('i4x://edX/toy/video/Welcome')),
+            self.draft_store._find_one(UsageKey.from_string('i4x://edX/toy/video/Welcome')),
         )
 
     def test_path_to_location(self):

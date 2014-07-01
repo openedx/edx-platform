@@ -220,7 +220,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         }
         self.fake_location = BlockUsageLocator(CourseLocator('foo', 'bar', 'slowly', branch='published'), 'vertical', 'baz')
         self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
-            category='chapter', name='Overview'
+            block_type='chapter', block_id='Overview'
         )
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             block_type='chapter', block_id='Overview'

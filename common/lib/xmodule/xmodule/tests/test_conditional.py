@@ -78,7 +78,7 @@ class ConditionalFactory(object):
         child_descriptor.runtime = descriptor_system
         child_descriptor.xmodule_runtime = get_test_system()
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
-        child_descriptor.location = source_location.replace(category='html', name='child')
+        child_descriptor.location = source_location.replace(block_type='html', block_id='child')
 
         descriptor_system.load_item = {
             child_descriptor.location: child_descriptor,

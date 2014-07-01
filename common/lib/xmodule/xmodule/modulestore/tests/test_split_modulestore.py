@@ -485,11 +485,11 @@ class SplitModuleTest(unittest.TestCase):
                 course = split_store.persist_xblock_dag(course, revision['user_id'])
         # publish "testx.wonderful"
         to_publish = BlockUsageLocator(
-            CourseLocator(org="testx", course="wonderful", run="run" branch=BRANCH_NAME_DRAFT),
+            CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_DRAFT),
             block_type='course',
             block_id="head23456"
         )
-        destination = CourseLocator(org="testx", course="wonderful", run="run" branch=BRANCH_NAME_PUBLISHED)
+        destination = CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
         split_store.xblock_publish("test@edx.org", to_publish, destination, [to_publish], None)
 
     def tearDown(self):
@@ -723,7 +723,7 @@ class SplitModuleItemTests(SplitModuleTest):
         org = 'testx'
         course = 'GreekHero'
         run = 'run'
-        course_locator = CourseLocator(org=org, offering=offering, branch=BRANCH_NAME_DRAFT)
+        course_locator = CourseLocator(org=org, offering=course, run=run, branch=BRANCH_NAME_DRAFT)
         course = modulestore().get_course(course_locator)
         previous_version = course.previous_version
         # positive tests of various forms
@@ -768,7 +768,7 @@ class SplitModuleItemTests(SplitModuleTest):
         # negative tests--not found
         # no such course or block
         locator = BlockUsageLocator(
-            CourseLocator(org="foo", course="doesnotexist", run="run" branch=BRANCH_NAME_DRAFT),
+            CourseLocator(org="foo", course="doesnotexist", run="run", branch=BRANCH_NAME_DRAFT),
             block_type="course",
             block_id="head23456"
         )
@@ -868,7 +868,7 @@ class SplitModuleItemTests(SplitModuleTest):
         # negative tests--not found
         # no such course or block
         locator = BlockUsageLocator(
-            CourseLocator(org='doesnotexist', course='doesnotexist', run="run" branch=BRANCH_NAME_DRAFT), 'course', 'head23456'
+            CourseLocator(org='doesnotexist', course='doesnotexist', run="run", branch=BRANCH_NAME_DRAFT), 'course', 'head23456'
         )
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
@@ -1295,13 +1295,13 @@ class TestItemCrud(SplitModuleTest):
         Test updating metadata, children, and definition in a single call ensuring all the versioning occurs
         """
         locator = BlockUsageLocator(
-            CourseLocator('testx', 'GreekHero', branch=BRANCH_NAME_DRAFT),
+            CourseLocator('testx', 'GreekHero', 'run', branch=BRANCH_NAME_DRAFT),
             'problem', block_id='problem1'
         )
         original = modulestore().get_item(locator)
         # first add 2 children to the course for the update to manipulate
         locator = BlockUsageLocator(
-            CourseLocator('guestx', 'contender', branch=BRANCH_NAME_DRAFT),
+            CourseLocator('guestx', 'contender', 'run', branch=BRANCH_NAME_DRAFT),
             'course', block_id="head345679"
         )
         category = 'problem'
@@ -1649,7 +1649,7 @@ class TestPublish(SplitModuleTest):
         """
         source_course = CourseLocator(org='testx', course="GreekHero", run="run", branch=BRANCH_NAME_DRAFT)
         # destination does not exist
-        destination_course = CourseLocator(org='fake', offering='Unknown', branch=BRANCH_NAME_PUBLISHED)
+        destination_course = CourseLocator(org='fake', course='Unknown', run="run", branch=BRANCH_NAME_PUBLISHED)
         head = source_course.make_usage_key('course', "head12345")
         chapter3 = source_course.make_usage_key('chapter', 'chapter3')
         problem1 = source_course.make_usage_key('problem', 'problem1')
