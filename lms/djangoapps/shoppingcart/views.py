@@ -153,7 +153,6 @@ def show_receipt(request, ordernum):
     if attempting_upgrade:
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
-        course_enrollment.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
         request.session['attempting_upgrade'] = False
 
     return render_to_response(receipt_template, context)
