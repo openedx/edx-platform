@@ -44,8 +44,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 );
             };
 
-            respondWithJson = function(json) {
-                var requestIndex = requests.length - 1;
+            respondWithJson = function(json, requestIndex) {
                 create_sinon.respondWithJson(
                     requests,
                     json,
@@ -131,9 +130,28 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     draftBit = "draft",
                     publishButtonCss = ".action-publish",
                     discardChangesButtonCss = ".action-discard",
-                    request, lastRequest, promptSpies;
+                    request, lastRequest, promptSpies, sendDiscardChangesToServer;
 
                 lastRequest = function() { return requests[requests.length - 1]; };
+
+                sendDiscardChangesToServer = function(test) {
+                    // Helper function to do the discard operation, up until the server response.
+                    renderContainerPage(mockContainerXBlockHtml, test);
+                    fetch({"id": "locator-container", "published": true, "has_changes": true});
+                    expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
+                    // Click discard changes
+                    containerPage.$(discardChangesButtonCss).click();
+
+                    // Confirm the discard.
+                    expect(promptSpies.constructor).toHaveBeenCalled();
+                    promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
+
+                    request = lastRequest();
+                    expect(request.url).toEqual("/xblock/locator-container");
+                    expect(request.method).toEqual("DELETE");
+                    expect(request.requestBody).toEqual(null);
+                };
 
                 beforeEach(function() {
                     promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
@@ -199,6 +217,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify updates displayed
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                    // Verify that the "published" value has been cleared out of the model.
+                    expect(containerPage.model.get("publish")).toBeNull();
                 });
 
                 it('can does not fetch if publish fails', function () {
@@ -217,27 +237,26 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify still in draft state.
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
+                    // Verify that the "published" value has been cleared out of the model.
+                    expect(containerPage.model.get("publish")).toBeNull();
                 });
 
+                /* STUD-1860
                 it('can discard changes', function () {
-                    renderContainerPage(mockContainerXBlockHtml, this);
-                    fetch({"id": "locator-container", "published": true, "has_changes": true});
-                    expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
-                    // Click discard changes
-                    containerPage.$(discardChangesButtonCss).click();
+                    sendDiscardChangesToServer(this);
 
-                    // Confirm the discard.
-                    expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
+                    var numRequests = requests.length;
+                    create_sinon.respondToDelete(requests);
+                    // Response to fetch, specifying the very next request (as multiple requests will be sent to server)
+                    respondWithJson({"id": "locator-container", "published": true, "has_changes": false}, numRequests);
+                    expect(containerPage.$(discardChangesButtonCss)).toHaveClass('is-disabled');
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                });
+                */
 
-                    request = lastRequest();
-                    expect(request.url).toEqual("/xblock/locator-container");
-                    expect(request.method).toEqual("DELETE");
-                    expect(request.requestBody).toEqual(null);
+                it('does not fetch if discard changes fails', function () {
+                    sendDiscardChangesToServer(this);
 
-                    // Respond with failure because code does window.location.reload (which will
-                    // put tests into an infinite loop) on success.
                     var numRequests = requests.length;
                     // Respond with failure
                     create_sinon.respondWithError(requests);
@@ -249,8 +268,6 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('does not discard changes on cancel', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     fetch({"id": "locator-container", "published": true, "has_changes": true});
-                    expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
                     var numRequests = requests.length;
 
                     // Click discard changes
