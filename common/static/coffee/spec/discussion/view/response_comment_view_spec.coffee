@@ -1,8 +1,6 @@
 describe 'ResponseCommentView', ->
     beforeEach ->
-        window.$$course_id = 'edX/999/test'
-        window.user = new DiscussionUser {id: '567'}
-        DiscussionUtil.loadRoles []
+        DiscussionSpecHelper.setUpGlobals()
         @comment = new Comment {
                 id: '01234567',
                 user_id: user.id,

@@ -20,6 +20,8 @@ if Backbone?
       Backbone.history.start({pushState: true, root: "/courses/#{$$course_id}/discussion/forum/"})
   DiscussionProfileApp =
     start: (elem) ->
+      # Roles are not included in user profile page, but they are not used for anything
+      DiscussionUtil.loadRoles({"Moderator": [], "Administrator": [], "Community TA": []})
       element = $(elem)
       window.$$course_id = element.data("course-id")
       threads = element.data("threads")

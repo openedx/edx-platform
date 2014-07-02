@@ -179,19 +179,20 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         Return true if the browser is on the right page else false.
         """
-        return self.q(css="body.discussion .sort-bar").present
+        return self.q(css="body.discussion .forum-nav-sort-control").present
 
-    def get_selected_sort_preference_text(self):
+    def get_selected_sort_preference(self):
         """
         Return the text of option that is selected for sorting.
         """
-        return self.q(css="body.discussion .sort-bar a.active").text[0].lower()
+        options = self.q(css="body.discussion .forum-nav-sort-control option")
+        return options.filter(lambda el: el.is_selected())[0].get_attribute("value")
 
     def change_sort_preference(self, sort_by):
         """
         Change the option of sorting by clicking on new option.
         """
-        self.q(css="body.discussion .sort-bar a[data-sort='{0}']".format(sort_by)).click()
+        self.q(css="body.discussion .forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
 
     def refresh_page(self):
         """
@@ -352,12 +353,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         return self.q(css=".discussion-body section.home-header").present
 
     def perform_search(self, text="dummy"):
-        self.q(css=".discussion-body .sidebar .search").first.click()
-        EmptyPromise(
-            lambda: self.q(css=".discussion-body .sidebar .search.is-open").present,
-            "waiting for search input to be available"
-        ).fulfill()
-        self.q(css="#search-discussions").fill(text + chr(10))
+        self.q(css=".forum-nav-search-input").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"

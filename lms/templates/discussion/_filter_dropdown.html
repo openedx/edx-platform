@@ -12,41 +12,43 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="drop-menu-entry"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${str(entries[entry]['is_cohorted']).lower()}">${entry}</span></a></li>
+    <li
+        class="forum-nav-browse-menu-item"
+        data-discussion-id='${json.dumps(entries[entry])}'
+        data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
+    >
+        <a href="#" class="forum-nav-browse-title">${entry}</a>
+    </li>
 </%def>
 
 <%def name="render_category(categories, category)">
-    <li>
-        <a href="#" class="drop-menu-parent-category"><span class="board-name">${category}</span></a>
-        <ul>
+    <li class="forum-nav-browse-menu-item">
+        <a href="#" class="forum-nav-browse-title">${category}</a>
+        <ul class="forum-nav-browse-submenu">
             ${render_dropdown(categories[category])}
         </ul>
     </li>
 </%def>
 
-<div class="browse-topic-drop-menu-wrapper">
-    <div class="browse-topic-drop-search">
-        <label class="sr" for="browse-topic">${_("Filter Topics")}</label>
-        <input type="text" id="browse-topic" class="browse-topic-drop-search-input" placeholder="${_('filter topics')}">
-    </div>
-    <ul class="browse-topic-drop-menu">
-        <li>
-            <a href="#" class="drop-menu-meta-category">
-                <span class="board-name" data-discussion_id='#all'>${_("Show All Discussions")}</span>
-            </a>
+<div class="forum-nav-browse-menu-wrapper" style="display: none">
+    <form class="forum-nav-browse-filter">
+        <label>
+            <span class="sr">${_("Filter Topics")}</span>
+            <input type="text" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
+            <i class="icon icon-filter"></i>
+        </label>
+    </form>
+    <ul class="forum-nav-browse-menu">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
+            <a href="#" class="forum-nav-browse-title">${_("All Discussions")}</a>
         </li>
         %if flag_moderator:
-        <li>
-            <a href="#">
-                <span class="board-name" data-discussion_id='#flagged'><i class="icon-flag" style="padding-right:5px;"></i>${_("Show Flagged Discussions")}</span>
-            </a>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-flagged">
+            <a href="#" class="forum-nav-browse-title"><i class="icon icon-flag"></i>${_("Flagged Discussions")}</a>
         </li>
-        
         %endif
-        <li>
-            <a href="#" class="drop-menu-meta-category">
-                <span class="board-name" data-discussion_id='#following'><i class="icon-star" style="padding-right:5px;"></i>${_("Posts I'm Following")}</span>
-            </a>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
+            <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>${_("Posts I'm Following")}</a>
         </li>
         ${render_dropdown(category_map)}
     </ul>

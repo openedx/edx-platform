@@ -32,12 +32,12 @@ class @DiscussionUtil
     @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
-    user_id ?= @user.id
+    user_id ?= @user?.id
     staff = _.union(@roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @isTA: (user_id) ->
-    user_id ?= @user.id
+    user_id ?= @user?.id
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
 
@@ -92,6 +92,10 @@ class @DiscussionUtil
       "disable_notifications" : "/notification_prefs/disable/"
       "notifications_status" : "/notification_prefs/status/"
     }[name]
+
+  @ignoreEnterKey: (event) =>
+    if event.which == 13
+      event.preventDefault()
 
   @activateOnSpace: (event, func) ->
     if event.which == 32

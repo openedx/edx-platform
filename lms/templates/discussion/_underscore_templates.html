@@ -205,16 +205,67 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
-    <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
-        <span class="title">${"<%- title %>"}</span>
+  <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
+    <a href="#" class="forum-nav-thread-link">
+      <div class="forum-nav-thread-wrapper-1">
+        <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
+        js_block = u"""
+        var labels = "";
+        if (pinned) {{
+            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+        }}
+        if (typeof(subscribed) != "undefined" && subscribed) {{
+            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+        }}
+        if (staff_authored) {{
+            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+        }}
+        if (community_ta_authored) {{
+            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+        }}
+        if (labels != "") {{
+            print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
+        }}
+        """.format(
+            ## Translators: This is a label for a forum thread that has been pinned
+            pinned_text=escapejs(_("Pinned")),
+            ## Translators: This is a label for a forum thread that the user is subscribed to
+            following_text=escapejs(_("Following")),
+            ## Translators: This is a label for a forum thread that was authored by a member of the course staff
+            staff_text=escapejs(_("By: Staff")),
+            ## Translators: This is a label for a forum thread that was authored by a community TA
+            community_ta_text=escapejs(_("By: Community TA"))
+        )
+         %>
+        ${"<%"}${js_block}${"%>"}
+      </div><div class="forum-nav-thread-wrapper-2">
+        ${"<% if (endorsed) { %>"}
+          ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
+          <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">${_("Endorsed response")}</span></span>
+        ${"<% } %>"}
+        <%
+        js_block = u"""
+            interpolate(
+                '{}',
+                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
+                true
+                )
+        """.format(
+                ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
+                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
+            )
+        %>
+        <span class="forum-nav-thread-votes-count">+${'<%='}${js_block}${'%>'}</span>
+        <% 
         js_block =  u"""
         var fmt;
+        // Counts in data do not include the post itself, but the UI should
         var data = {{
             'span_sr_open': '<span class=\"sr\">',
             'span_close': '</span>',
-            'unread_comments_count': unread_comments_count,
-            'comments_count': comments_count
+            'unread_comments_count': unread_comments_count + (read ? 0 : 1),
+            'comments_count': comments_count + 1
             }};
         if (unread_comments_count > 0) {{
             fmt = '{markup_with_unread}';
@@ -229,24 +280,14 @@
                 markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
             )
         %>
-        <span class="comments-count">
+        <span class="forum-nav-thread-comments-count ${'<% if (unread_comments_count > 0) { %>is-unread<% } %>'}">
             ${'<%'}${js_block}${'%>'}
         </span>
-        <%
-        js_block = u"""
-            interpolate(
-                '{}',
-                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
-                true
-                )
-        """.format(
-                ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
-                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
-            )
-        %>
-        <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
+      </div>
     </a>
+  </li>
 </script>
+
 <script aria-hidden="true" type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
     <section class="home-header">
