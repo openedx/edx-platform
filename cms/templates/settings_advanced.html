@@ -40,12 +40,12 @@ require(["domReady!", "jquery", "gettext", "js/models/settings/advanced", "js/vi
       var deprecatedSettingsLabel = $('.deprecated-settings-label');
       if ($this.is(':checked')) {
           wrapperDeprecatedSetting.addClass('is-set');
-          deprecatedSettingsLabel.text(gettext('Hide Deprecated Settings'));
+          deprecatedSettingsLabel.text('${_('Hide Deprecated Settings')}');
           editor.render_deprecated = true;
       }
       else {
           wrapperDeprecatedSetting.removeClass('is-set');
-          deprecatedSettingsLabel.text(gettext('Show Deprecated Settings'));
+          deprecatedSettingsLabel.text('${_('Show Deprecated Settings')}');
           editor.render_deprecated = false;
       }
 
