@@ -2,8 +2,8 @@
 Tests course_creators.views.py.
 """
 
-from django.test import TestCase
-from django.contrib.auth.models import User
+from django.test import TestCase, RequestFactory
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
 
 from course_creators.views import add_user_with_status_unrequested, add_user_with_status_granted
@@ -11,6 +11,7 @@ from course_creators.views import get_course_creator_status, update_course_creat
 import mock
 from student.roles import CourseCreatorRole
 from student import auth
+from edxmako.tests import mako_middleware_process_request
 
 
 class CourseCreatorView(TestCase):
@@ -70,6 +71,7 @@ class CourseCreatorView(TestCase):
     def test_user_requested_access(self):
         add_user_with_status_unrequested(self.user)
         self.assertEqual('unrequested', get_course_creator_status(self.user))
+
         user_requested_access(self.user)
         self.assertEqual('pending', get_course_creator_status(self.user))
 
