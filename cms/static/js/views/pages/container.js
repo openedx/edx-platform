@@ -28,7 +28,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 if (this.isUnitPage) {
                     this.xblockPublisher = new ContainerSubviews.Publisher({
                         el: this.$('#publish-unit'),
-                        model: this.model
+                        model: this.model,
+                        // When "Discard Changes" is clicked, the whole page must be re-rendered.
+                        renderPage: this.render
                     });
                     this.xblockPublisher.render();
 
