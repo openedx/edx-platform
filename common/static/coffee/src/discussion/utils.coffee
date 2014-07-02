@@ -18,6 +18,9 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
+  @setUser: (user) ->
+    @user = user
+
   @loadRoles: (roles)->
     @roleIds = roles
 
@@ -29,10 +32,12 @@ class @DiscussionUtil
     @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
+    user_id ?= @user.id
     staff = _.union(@roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @isTA: (user_id) ->
+    user_id ?= @user.id
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
 

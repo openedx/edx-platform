@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from xmodule.modulestore import KEY_REVISION_DRAFT
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
@@ -160,7 +160,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             parent_location=self.section2.location,
             display_name="lti draft",
             category="lti",
-            location=self.course.id.make_usage_key('lti', 'lti_published').replace(revision=KEY_REVISION_DRAFT),
+            location=self.course.id.make_usage_key('lti', 'lti_published').replace(revision=MongoRevisionKey.draft),
         )
 
     def expected_handler_url(self, handler):

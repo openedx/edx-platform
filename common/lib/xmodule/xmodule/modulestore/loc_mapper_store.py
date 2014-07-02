@@ -7,7 +7,7 @@ import pymongo
 import bson.son
 import urllib
 
-from xmodule.modulestore import BRANCH_NAME_PUBLISHED, BRANCH_NAME_DRAFT
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -55,7 +55,9 @@ class LocMapperStore(object):
 
     # location_map functions
     def create_map_entry(self, course_key, org=None, offering=None,
-                         draft_branch=BRANCH_NAME_DRAFT, prod_branch=BRANCH_NAME_PUBLISHED, block_map=None):
+                         draft_branch=ModuleStoreEnum.BranchName.draft,
+                         prod_branch=ModuleStoreEnum.BranchName.published,
+                         block_map=None):
         """
         Add a new entry to map this SlashSeparatedCourseKey to the new style CourseLocator.org & offering. If
         org and offering are not provided, it defaults them based on course_key.
@@ -245,7 +247,7 @@ class LocMapperStore(object):
         for old_name, cat_to_usage in entry['block_map'].iteritems():
             for category, block_id in cat_to_usage.iteritems():
                 # cache all entries and then figure out if we have the one we want
-                # Always return revision=KEY_REVISION_PUBLISHED because the
+                # Always return revision=MongoRevisionKey.published because the
                 # old draft module store wraps locations as draft before
                 # trying to access things.
                 location = old_course_id.make_usage_key(

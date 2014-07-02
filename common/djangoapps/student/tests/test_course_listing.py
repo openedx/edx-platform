@@ -6,7 +6,7 @@ from mock import patch, Mock
 
 from student.tests.factories import UserFactory
 from student.roles import GlobalStaff
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -90,7 +90,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        mongo_store = modulestore()._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         good_location = SlashSeparatedCourseKey('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(good_location)

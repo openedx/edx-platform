@@ -15,7 +15,7 @@ from django.conf import settings
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -27,6 +27,9 @@ from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
+from analyticsclient.client import RestClient
+from analyticsclient.course import Course
+
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -37,7 +40,7 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,
@@ -245,6 +248,25 @@ def _section_analytics(course_key, access):
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
+
+    if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
+        auth_token = settings.ANALYTICS_DATA_TOKEN
+        base_url = settings.ANALYTICS_DATA_URL
+
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        course = Course(client, course_key)
+
+        section_data['active_student_count'] = course.recent_active_user_count['count']
+
+        def format_date(value):
+            return value.split('T')[0]
+
+        start = course.recent_active_user_count['interval_start']
+        end = course.recent_active_user_count['interval_end']
+
+        section_data['active_student_count_start'] = format_date(start)
+        section_data['active_student_count_end'] = format_date(end)
+
     return section_data
 
 

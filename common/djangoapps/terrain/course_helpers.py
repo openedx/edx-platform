@@ -6,7 +6,7 @@ from lettuce import world
 from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.django import contentstore
 
 
@@ -72,6 +72,6 @@ def clear_courses():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    store = modulestore()._get_modulestore_by_type(MONGO_MODULESTORE_TYPE)
+    store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
     store.collection.drop()
     contentstore().fs_files.drop()

@@ -39,7 +39,7 @@ from external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
@@ -573,7 +573,7 @@ class Courses(SysadminDashboardView):
                         escape(str(err))
                     )
 
-            is_xml_course = (modulestore().get_modulestore_type(course_key) == XML_MODULESTORE_TYPE)
+            is_xml_course = (modulestore().get_modulestore_type(course_key) == ModuleStoreEnum.Type.xml)
             if course_found and is_xml_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)

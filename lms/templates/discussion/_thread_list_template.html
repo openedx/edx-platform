@@ -34,13 +34,12 @@
             <li><a href="#" role="radio" aria-checked="false" data-sort="comments">${_("comments")}</a></li>
         </ul>
 
-
         %if is_course_cohorted and is_moderator:
         <span class="group-filter-label cohort">${_("Show:")}</span>
             <select class="group-filter-select cohort-options cohort">
                 <option value="all">${_("View All")}</option>
                     %for c in cohorts:
-                        <option value="${c.id}">${_("View as {name}").format(name=c.name)}</option>
+                        <option value="${c['id']}">${_("View as {name}").format(name=c['name'])}</option>
                     %endfor
             </select>
         %endif

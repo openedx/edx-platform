@@ -475,7 +475,7 @@ XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############# ModuleStore Configuration ##########
 
-MODULESTORE_BRANCH = 'published'
+MODULESTORE_BRANCH = 'published-only'
 CONTENTSTORE = None
 DOC_STORE_CONFIG = {
     'host': 'localhost',
@@ -854,6 +854,7 @@ courseware_js = (
         'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
+    ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 

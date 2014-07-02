@@ -61,7 +61,7 @@ from opaque_keys.edx.locator import (
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, SPLIT_MONGO_MODULESTORE_TYPE, BRANCH_NAME_DRAFT, BRANCH_NAME_PUBLISHED
+    inheritance, ModuleStoreWriteBase, ModuleStoreEnum
 )
 
 from ..exceptions import ItemNotFoundError
@@ -296,7 +296,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         }
         return envelope
 
-    def get_courses(self, branch=BRANCH_NAME_DRAFT, qualifiers=None):
+    def get_courses(self, branch=ModuleStoreEnum.BranchName.draft, qualifiers=None):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
@@ -304,9 +304,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         legal query for mongo to use against the active_versions collection.
 
         Note, this is to find the current head of the named branch type
-        (e.g., BRANCH_NAME_DRAFT). To get specific versions via guid use get_course.
+        (e.g., ModuleStoreEnum.BranchName.draft). To get specific versions via guid use get_course.
 
-        :param branch: the branch for which to return courses. Default value is BRANCH_NAME_DRAFT.
+        :param branch: the branch for which to return courses. Default value is ModuleStoreEnum.BranchName.draft.
         :param qualifiers: an optional dict restricting which elements should match
         '''
         if qualifiers is None:
@@ -385,9 +385,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param usage_key: the block to check
         :return: True if the draft and published versions differ
         """
-        draft = self.get_item(usage_key.for_branch(BRANCH_NAME_DRAFT))
+        draft = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.draft))
         try:
-            published = self.get_item(usage_key.for_branch(BRANCH_NAME_PUBLISHED))
+            published = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.published))
         except ItemNotFoundError:
             return True
 
@@ -492,7 +492,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def get_orphans(self, course_key):
         """
-        Return a dict of all of the orphans in the course.
+        Return an array of all of the orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         course = self._lookup_course(course_key)
@@ -872,7 +872,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def create_course(
         self, org, offering, user_id, fields=None,
-        master_branch=BRANCH_NAME_DRAFT, versions_dict=None, root_category='course',
+        master_branch=ModuleStoreEnum.BranchName.draft, versions_dict=None, root_category='course',
         root_block_id='course', **kwargs
     ):
         """
@@ -908,7 +908,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         master_branch: the tag (key) for the version name in the dict which is the DRAFT version. Not the actual
         version guid, but what to call it.
 
-        versions_dict: the starting version ids where the keys are the tags such as DRAFT and REVISION_OPTION_PUBLISHED_ONLY
+        versions_dict: the starting version ids where the keys are the tags such as DRAFT and PUBLISHED
         and the values are structure guids. If provided, the new course will reuse this version (unless you also
         provide any fields overrides, see above). if not provided, will create a mostly empty course
         structure with just a category course root xblock.
@@ -1298,7 +1298,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self._update_head(index_entry, destination_course.branch, destination_structure['_id'])
 
     def unpublish(self, location, user_id):
-        published_location = location.replace(branch=REVISION_OPTION_PUBLISHED_ONLY)
+        published_location = location.replace(branch=ModuleStoreEnum.BranchName.published)
         self.delete_item(published_location, user_id)
 
     def update_course_index(self, updated_index_entry):
@@ -1456,16 +1456,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def get_modulestore_type(self, course_key=None):
         """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
+        Returns an enumeration-like type reflecting the type of this modulestore, per ModuleStoreEnum.Type.
 
         Args:
             course_key: just for signature compatibility
         """
-        return SPLIT_MONGO_MODULESTORE_TYPE
+        return ModuleStoreEnum.Type.split
 
     def internal_clean_children(self, course_locator):
         """
@@ -1797,7 +1793,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         Check that the db is reachable.
         """
-        return {SPLIT_MONGO_MODULESTORE_TYPE: self.db_connection.heartbeat()}
+        return {ModuleStoreEnum.Type.split: self.db_connection.heartbeat()}
 
     def compute_publish_state(self, xblock):
         """

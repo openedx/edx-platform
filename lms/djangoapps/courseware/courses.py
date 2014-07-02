@@ -8,13 +8,13 @@ from django.http import Http404
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 
 from courseware.access import has_access
@@ -106,7 +106,7 @@ def get_opt_course_with_access(user, action, course_key):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
+    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
         # If we are a static course with the course_image attribute
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
@@ -369,7 +369,7 @@ def get_studio_url(course_key, page):
     assert(isinstance(course_key, CourseKey))
     course = get_course_by_id(course_key)
     is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course_key) == MONGO_MODULESTORE_TYPE
+    is_mongo_course = modulestore().get_modulestore_type(course_key) == ModuleStoreEnum.Type.mongo
     studio_link = None
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_course_link(course, page)

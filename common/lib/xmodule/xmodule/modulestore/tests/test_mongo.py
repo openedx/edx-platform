@@ -20,7 +20,7 @@ from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE, BRANCH_DRAFT_PREFERRED
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
@@ -103,7 +103,7 @@ class TestMongoModuleStore(unittest.TestCase):
         draft_store = DraftModuleStore(
             doc_store_config, FS_ROOT, RENDER_TEMPLATE,
             default_class=DEFAULT_CLASS,
-            branch_setting_func=lambda: BRANCH_DRAFT_PREFERRED
+            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred
         )
         import_from_xml(
             draft_store,
@@ -148,7 +148,7 @@ class TestMongoModuleStore(unittest.TestCase):
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
-        assert_equals(store.get_modulestore_type(''), MONGO_MODULESTORE_TYPE)
+        assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
 
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
