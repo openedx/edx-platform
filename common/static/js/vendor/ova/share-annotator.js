@@ -60,7 +60,6 @@ Annotator.Plugin.Share = (function(_super) {
 	Share.prototype.input = null;
 
 	Share.prototype.pluginInit = function() {
-		console.log("Share-pluginInit");
 		//Check that annotator is working
 		if (!Annotator.supported()) {
 			return;
@@ -136,22 +135,22 @@ Annotator.Plugin.Share = (function(_super) {
 		});
 		// Share button
 		$(field).find('.share-button-annotator.share-button').click(function(event) {
-		    event.preventDefault(); // disable normal link function so that it doesn't refresh the page
-		    annotation = share.getAnnotationFromId(event.currentTarget.attributes.annotationid);
-		    var _field = this,
-		    	ovaId = annotation.id,
-		    	title = method == 1?'Share':'Share without saving';
-		    
-		    // share.uri will be useful for buildHTMLPopup functions
-		    share.uri = share.createAPIURL(method,ovaId,url, annotation); 
-		    
-		    //display your popup
-		    $(this).parent().find('.share-popup-overlay-bg').show(); 
-		    
-		    //build buttons
-		    $(this).parent().find('.share-popup-items').html(share.buildHTMLPopup(title)); 
-		    
-		    //buttons actions
+			event.preventDefault(); // disable normal link function so that it doesn't refresh the page
+			annotation = share.getAnnotationFromId(event.currentTarget.attributes.annotationid);
+			var _field = this,
+				ovaId = annotation.id,
+				title = method == 1?'Share':'Share without saving';
+			
+			// share.uri will be useful for buildHTMLPopup functions
+			share.uri = share.createAPIURL(method,ovaId,url, annotation); 
+			
+			//display your popup
+			$(this).parent().find('.share-popup-overlay-bg').show(); 
+			
+			//build buttons
+			$(this).parent().find('.share-popup-items').html(share.buildHTMLPopup(title)); 
+			
+			//buttons actions
 			if (typeof share.options.shareIn!='undefined'){
 				share.options.shareIn.forEach(function(item) {
 					$(_field).parent().find('.share-'+item+'-annotator.share-button').click(function() {
@@ -245,7 +244,6 @@ Annotator.Plugin.Share = (function(_super) {
 	};
 	
 	Share.prototype.initAPI = function() {
-		console.log("initAPI");
 		// -- Detect API in the URL -- //
 		/*
 		The first option is to give a known id of an annotation
@@ -293,7 +291,6 @@ Annotator.Plugin.Share = (function(_super) {
 		return API;
 	}
 	Share.prototype.runningAPI =  function (annotations,API){
-		console.log("runningAPI");
 		var wrapper = $('.annotator-wrapper').parent()[0],
 			mplayer,
 			osda,
@@ -332,10 +329,11 @@ Annotator.Plugin.Share = (function(_super) {
 							var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
 							setTimeout(function(){
 								osda.viewer.viewport.fitBounds(bounds, false);
-								$('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},'slow');},250
-							);
+								$('html,body').animate({
+									scrollTop: $("#"+an.target.container).offset().top
+								},'slow');
+							},250);
 						}else{//It is a text
-						    self._isImage(an);
 							var hasRanges = typeof an.ranges!='undefined' && typeof an.ranges[0] !='undefined',
 								startOffset = hasRanges?an.ranges[0].startOffset:'',
 								endOffset = hasRanges?an.ranges[0].endOffset:'';
@@ -452,14 +450,14 @@ Annotator.Plugin.Share = (function(_super) {
 	}
 	
 	Share.prototype._isImage = function(annotation){
-		return annotation.media == 'image';
+		return annotation.media === 'image';
 	}
 	
 	Share.prototype.getParameterByName = function(name) {
 		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
 			//results = regex.exec(location.search),
-        	results = regex.exec('?'+window.location.href.split('?')[1]);
+			results = regex.exec('?'+window.location.href.split('?')[1]);
 		return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	};
 	
@@ -476,13 +474,9 @@ Annotator.Plugin.Share = (function(_super) {
 	
 	Share.prototype.getAnnotationFromId = function(ovaId){
 		var annotationList = this.annotator.plugins.Store.annotations;
-		var value = undefined;
-		$.each(annotationList, function(key, val){
-			if(val.id == ovaId.nodeValue){
-				value = val;
-			}
-		});
-		return value;
+		return $.grep(annotationList, function(elementOfArray, indexInArray){
+			return parseInt(elementOfArray.id) === parseInt(ovaId.nodeValue);
+		})[0];
 	}
 
 	Share.prototype.updateViewer = function(field, annotation) {
