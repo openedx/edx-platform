@@ -31,9 +31,9 @@ class TestOrphan(SplitWMongoCourseBoostrapper):
         """
         orphans = self.old_mongo.get_orphans(self.old_course_key)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
-        location = self.old_course_key.make_usage_key('chapter', name='OrphanChapter')
+        location = self.old_course_key.make_usage_key('chapter', 'OrphanChapter')
         self.assertIn(location.to_deprecated_string(), orphans)
-        location = self.old_course_key.make_usage_key('vertical', name='OrphanVert')
+        location = self.old_course_key.make_usage_key('vertical', 'OrphanVert')
         self.assertIn(location.to_deprecated_string(), orphans)
         location = self.old_course_key.make_usage_key('html', 'OrphanHtml')
         self.assertIn(location.to_deprecated_string(), orphans)

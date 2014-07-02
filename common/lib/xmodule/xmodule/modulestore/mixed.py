@@ -273,13 +273,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, org, offering, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -287,7 +288,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
         """
         store = self._get_modulestore_for_courseid(None)
-        return store.create_course(org, offering, user_id, fields, **kwargs)
+        if not hasattr(store, 'create_course'):
+            raise NotImplementedError(u"Cannot create a course on store {}".format(store))
+
+        return store.create_course(org, course, run, user_id, fields, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """

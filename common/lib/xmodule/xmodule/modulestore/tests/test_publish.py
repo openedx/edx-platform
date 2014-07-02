@@ -63,7 +63,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         To reproduce a bug (STUD-811) publish a vertical, convert to draft, delete a child, move a child, publish.
         See if deleted and moved children still is connected or exists in db (bug was disconnected but existed)
         """
-        vert_location = self.old_course_key.make_usage_key('vertical', name='Vert1')
+        vert_location = self.old_course_key.make_usage_key('vertical', block_id='Vert1')
         item = self.draft_mongo.get_item(vert_location, 2)
         # Vert1 has 3 children; so, publishes 4 nodes which may mean 4 inserts & 1 bulk remove
         # 25-June-2014 find calls are 19. Probably due to inheritance recomputation?
@@ -78,16 +78,16 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # however, children are still draft, but I'm not sure that's by design
 
         # delete the draft version of the discussion
-        location = self.old_course_key.make_usage_key('discussion', name='Discussion1')
+        location = self.old_course_key.make_usage_key('discussion', block_id='Discussion1')
         self.draft_mongo.delete_item(location, self.userid)
 
         draft_vert = self.draft_mongo.get_item(vert_location, 0)
         self.assertTrue(getattr(draft_vert, 'is_draft', False), "Deletion didn't convert parent to draft")
         self.assertNotIn(location, draft_vert.children)
         # move the other child
-        other_child_loc = self.old_course_key.make_usage_key('html', name='Html2')
+        other_child_loc = self.old_course_key.make_usage_key('html', block_id='Html2')
         draft_vert.children.remove(other_child_loc)
-        other_vert = self.draft_mongo.get_item(self.old_course_key.make_usage_key('vertical', name='Vert2'), 0)
+        other_vert = self.draft_mongo.get_item(self.old_course_key.make_usage_key('vertical', block_id='Vert2'), 0)
         other_vert.children.append(other_child_loc)
         self.draft_mongo.update_item(draft_vert, self.userid)
         self.draft_mongo.update_item(other_vert, self.userid)

@@ -84,7 +84,7 @@ class MongoConnection(object):
         return self.course_index.find_one(
             son.SON([
                 (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
-                for key_attr in ('org', 'offering')
+                for key_attr in ('org', 'course', 'run')
             ])
         )
 
@@ -106,7 +106,7 @@ class MongoConnection(object):
         Update the db record for course_index
         """
         self.course_index.update(
-            son.SON([('org', course_index['org']), ('offering', course_index['offering'])]),
+            son.SON([('org', course_index['org']), ('course', course_index['course']), ('run', course_index['run'])]),
             course_index
         )
 
@@ -114,7 +114,11 @@ class MongoConnection(object):
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        return self.course_index.remove(son.SON([('org', course_index['org']), ('offering', course_index['offering'])]))
+        return self.course_index.remove(son.SON([
+            ('org', course_index['org']),
+            ('course', course_index['course']),
+            ('run', course_index['run'])
+        ]))
 
     def get_definition(self, key):
         """

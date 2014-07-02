@@ -845,13 +845,18 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
+<<<<<<< HEAD
     def create_course(self, org, offering, user_id, fields=None, **kwargs):
+=======
+    def create_course(self, org, course, run, user_id=None, fields=None, **kwargs):
+>>>>>>> Fix up the signature to use course and run instead of just offering
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -859,9 +864,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
 
         Raises:
-            InvalidLocationError: If a course with the same org and offering already exists
+            InvalidLocationError: If a course with the same org, course, and run already exists
         """
-        course, _, run = offering.partition('/')
         course_id = SlashSeparatedCourseKey(org, course, run)
 
         # Check if a course with this org/course has been defined before (case-insensitive)

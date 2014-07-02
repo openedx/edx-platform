@@ -172,7 +172,7 @@ def import_from_xml(
             # Creates a new course if it doesn't already exist
             if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
                 try:
-                    store.create_course(dest_course_id.org, dest_course_id.offering, user_id)
+                    store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
                 except InvalidLocationError:
                     # course w/ same org and course exists
                     log.debug(
