@@ -40,6 +40,8 @@ from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from student.models import anonymous_id_for_user
 from lms.lib.xblock.runtime import quote_slashes
 
+FEATURES_WITH_PSYCHOMETRICS = settings.FEATURES.copy()
+FEATURES_WITH_PSYCHOMETRICS['ENABLE_PSYCHOMETRICS'] = True
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -1000,3 +1002,14 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertEqual(module.system.anonymous_student_id, anonymous_id_for_user(user2, self.course.id))
         self.assertEqual(module.scope_ids.user_id, user2.id)
         self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
+
+    @patch('courseware.module_render.make_psychometrics_data_update_handler')
+    @override_settings(FEATURES=FEATURES_WITH_PSYCHOMETRICS)
+    def test_psychometrics_anonymous(self, psycho_handler):
+        """
+        Make sure that noauth modules with anonymous users don't have
+        the psychometrics callback bound.
+        """
+        module = self.get_module_for_user(self.anon_user)
+        module.system.rebind_noauth_module_to_user(module, self.anon_user)
+        self.assertFalse(psycho_handler.called)
