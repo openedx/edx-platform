@@ -7,14 +7,14 @@
         <% } %>
     </h3>
 
-    <!--To be added in STUDIO-1708-->
+    <!--To be added in STUDIO-1826-->
     <!--<div class="wrapper-last-draft bar-mod-content">-->
         <!--<p class="copy meta">-->
             <!--Draft saved on 6/15/2014 at 12:45pm by amako-->
         <!--</p>-->
     <!--</div>-->
 
-    <!--To be added in STUD-1712-->
+    <!--To be added in STUD-1829-->
     <!--<div class="wrapper-release bar-mod-content">-->
         <!--<h5 class="title">Will Release:</h5>-->
         <!--<p class="copy">-->
@@ -23,7 +23,7 @@
         <!--</p>-->
     <!--</div>-->
 
-    <!--To be added in STUD-1713-->
+    <!--To be added in STUD-1830-->
     <!--<div class="wrapper-visibility bar-mod-content">-->
         <!--<h5 class="title">Will be Visible to:</h5>-->
         <!--<p class="copy">Staff and Students</p>-->

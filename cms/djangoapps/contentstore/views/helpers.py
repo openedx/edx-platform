@@ -1,6 +1,8 @@
-from __future__ import absolute_import
+"""
+Helper methods for Studio views.
+"""
 
-import logging
+from __future__ import absolute_import
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -13,11 +15,6 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 
 __all__ = ['edge', 'event', 'landing']
 
-EDITING_TEMPLATES = [
-    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal",
-    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem", "xblock-string-field-editor",
-]
 
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):

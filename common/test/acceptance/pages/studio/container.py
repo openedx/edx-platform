@@ -70,6 +70,64 @@ class ContainerPage(PageObject):
         """
         return self._get_xblocks(".is-active ")
 
+    @property
+    def publish_title(self):
+        """
+        Returns the title as displayed on the publishing sidebar component.
+        """
+        return self.q(css='.pub-status').first.text[0]
+
+    @property
+    def publish_action(self):
+        """
+        Returns the link for publishing a unit.
+        """
+        return self.q(css='.action-publish').first
+
+    # def discard_changes(self):
+    #     """
+    #     Discards draft changes and reloads the page.
+    #     NOT YET IMPLEMENTED-- part of future story
+    #     """
+    #
+    #     self.q(css='.action-discard').first.click()
+    #
+    #     # TODO: work with Jay/Christine on this. I can't find something to wait on
+    #     # that guarantees the button will be clickable.
+    #     time.sleep(2)
+    #
+    #     self.q(css='a.button.action-primary').first.click()
+    #     self.wait_for_ajax()
+    #
+    #     return ContainerPage(self.browser, self.locator).visit()
+
+    def view_published_version(self):
+        """
+        Clicks "View Published Version", which will open the published version of the unit page in the LMS.
+
+        Switches the browser to the newly opened LMS window.
+        """
+        self.q(css='.view-button').first.click()
+        self._switch_to_lms()
+
+    def preview(self):
+        """
+        Clicks "Preview Changes", which will open the draft version of the unit page in the LMS.
+
+        Switches the browser to the newly opened LMS window.
+        """
+        self.q(css='.preview-button').first.click()
+        self._switch_to_lms()
+
+    def _switch_to_lms(self):
+        """
+        Assumes LMS has opened-- switches to that window.
+        """
+        browser_window_handles = self.browser.window_handles
+        # Switch to browser window that shows HTML Unit in LMS
+        # The last handle represents the latest windows opened
+        self.browser.switch_to_window(browser_window_handles[-1])
+
     def _get_xblocks(self, prefix=""):
         return self.q(css=prefix + XBlockWrapper.BODY_SELECTOR).map(
             lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
