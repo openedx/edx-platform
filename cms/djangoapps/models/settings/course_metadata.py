@@ -45,8 +45,8 @@ class CourseMetadata(object):
 
             result[field.name] = {
                 'value': field.read_json(descriptor),
-                'display_name': field.display_name,
-                'help': field.help,
+                'display_name': _(field.display_name),
+                'help': _(field.help),
                 'deprecated': field.runtime_options.get('deprecated', False)
             }
 
