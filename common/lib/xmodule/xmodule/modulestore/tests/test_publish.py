@@ -19,7 +19,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # Should be 1 to verify course unique, 11 parent fetches,
         # and n per _create_item where n is the size of the course tree non-leaf nodes
         # for inheritance computation (which is 7*4 + sum(1..4) = 38) (max_finds)
-        with check_mongo_calls(self.draft_mongo, 70, 27):
+        with check_mongo_calls(self.draft_mongo, 71, 27):
             with check_mongo_calls(self.old_mongo, 70, 27):
                 super(TestPublish, self)._create_course(split=False)
 
@@ -67,7 +67,9 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         item = self.draft_mongo.get_item(location, 2)
         # Vert1 has 3 children; so, publishes 4 nodes which may mean 4 inserts & 1 bulk remove
         # 25-June-2014 find calls are 19. Probably due to inheritance recomputation?
-        with check_mongo_calls(self.draft_mongo, 19, 5):
+        # 02-July-2014 send calls are 7. 5 from above, plus 2 for updating subtree edit info for Chapter1 and course
+        #              find calls are 22. 19 from above, plus 3 for finding the parent of Vert1, Chapter1, and course
+        with check_mongo_calls(self.draft_mongo, 22, 7):
             self.draft_mongo.publish(item.location, self.userid)
 
         # verify status

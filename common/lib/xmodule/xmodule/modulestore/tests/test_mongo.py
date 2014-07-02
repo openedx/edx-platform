@@ -487,7 +487,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
     def test_has_changes_direct_only(self):
         """
-        Tests that has_changes() returns false when an xblock in a direct only category is checked
+        Tests that has_changes() returns false when a new xblock in a direct only category is checked
         """
         course_location = Location('edx', 'direct', '2012_Fall', 'course', 'test_course')
         chapter_location = Location('edx', 'direct', '2012_Fall', 'chapter', 'test_chapter')
@@ -527,6 +527,186 @@ class TestMongoModuleStore(unittest.TestCase):
         # Publish and verify again
         self.draft_store.publish(location, dummy_user)
         self.assertFalse(self.draft_store.has_changes(location))
+
+    def _create_test_tree(self, name, user_id=123):
+        """
+        Creates and returns a tree with the following structure:
+        Grandparent
+            Parent Sibling
+            Parent
+                Child
+                Child Sibling
+
+        """
+        locations = {
+            'grandparent': Location('edX', 'tree', name, 'chapter', 'grandparent'),
+            'parent_sibling': Location('edX', 'tree', name, 'sequential', 'parent_sibling'),
+            'parent': Location('edX', 'tree', name, 'sequential', 'parent'),
+            'child_sibling': Location('edX', 'tree', name, 'vertical', 'child_sibling'),
+            'child': Location('edX', 'tree', name, 'vertical', 'child'),
+        }
+
+        for key in locations:
+            self.draft_store.create_and_save_xmodule(locations[key], user_id=user_id)
+
+        grandparent = self.draft_store.get_item(locations['grandparent'])
+        grandparent.children += [locations['parent_sibling'], locations['parent']]
+        self.draft_store.update_item(grandparent, user_id=user_id)
+
+        parent = self.draft_store.get_item(locations['parent'])
+        parent.children += [locations['child_sibling'], locations['child']]
+        self.draft_store.update_item(parent, user_id=user_id)
+
+        self.draft_store.publish(locations['parent'], user_id)
+        self.draft_store.publish(locations['parent_sibling'], user_id)
+
+        return locations
+
+    def test_has_changes_ancestors(self):
+        """
+        Tests that has_changes() returns true on ancestors when a child is changed
+        """
+        dummy_user = 123
+        locations = self._create_test_tree('has_changes_ancestors')
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self.draft_store.has_changes(locations[key]))
+
+        # Change the child
+        child = self.draft_store.get_item(locations['child'])
+        child.display_name = 'Changed Display Name'
+        self.draft_store.update_item(child, user_id=dummy_user)
+
+        # All ancestors should have changes, but not siblings
+        self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
+        self.assertTrue(self.draft_store.has_changes(locations['parent']))
+        self.assertTrue(self.draft_store.has_changes(locations['child']))
+        self.assertFalse(self.draft_store.has_changes(locations['parent_sibling']))
+        self.assertFalse(self.draft_store.has_changes(locations['child_sibling']))
+
+        # Publish the unit with changes
+        self.draft_store.publish(locations['parent'], dummy_user)
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self.draft_store.has_changes(locations[key]))
+
+    def test_has_changes_publish_ancestors(self):
+        """
+        Tests that has_changes() returns false after a child is published only if all children are unchanged
+        """
+        dummy_user = 123
+        locations = self._create_test_tree('has_changes_publish_ancestors')
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self.draft_store.has_changes(locations[key]))
+
+        # Change both children
+        child = self.draft_store.get_item(locations['child'])
+        child_sibling = self.draft_store.get_item(locations['child_sibling'])
+        child.display_name = 'Changed Display Name'
+        child_sibling.display_name = 'Changed Display Name'
+        self.draft_store.update_item(child, user_id=dummy_user)
+        self.draft_store.update_item(child_sibling, user_id=dummy_user)
+
+        # Verify that ancestors have changes
+        self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
+        self.assertTrue(self.draft_store.has_changes(locations['parent']))
+
+        # Publish one child
+        self.draft_store.publish(locations['child_sibling'], dummy_user)
+
+        # Verify that ancestors still have changes
+        self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
+        self.assertTrue(self.draft_store.has_changes(locations['parent']))
+
+        # Publish the other child
+        self.draft_store.publish(locations['child'], dummy_user)
+
+        # Verify that ancestors now have no changes
+        self.assertFalse(self.draft_store.has_changes(locations['grandparent']))
+        self.assertFalse(self.draft_store.has_changes(locations['parent']))
+
+    def test_has_changes_add_remove_child(self):
+        """
+        Tests that has_changes() returns true for the parent when a child with changes is added
+        and false when that child is removed.
+        """
+        dummy_user = 123
+        locations = self._create_test_tree('has_changes_add_remove_child')
+
+        # Test that the ancestors don't have changes
+        self.assertFalse(self.draft_store.has_changes(locations['grandparent']))
+        self.assertFalse(self.draft_store.has_changes(locations['parent']))
+
+        # Create a new child and attach it to parent
+        new_child_location = Location('edX', 'tree', 'has_changes_add_remove_child', 'vertical', 'new_child')
+        self.draft_store.create_and_save_xmodule(new_child_location, user_id=dummy_user)
+        parent = self.draft_store.get_item(locations['parent'])
+        parent.children += [new_child_location]
+        self.draft_store.update_item(parent, user_id=dummy_user)
+
+        # Verify that the ancestors now have changes
+        self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
+        self.assertTrue(self.draft_store.has_changes(locations['parent']))
+
+        # Remove the child from the parent
+        parent = self.draft_store.get_item(locations['parent'])
+        parent.children = [locations['child'], locations['child_sibling']]
+        self.draft_store.update_item(parent, user_id=dummy_user)
+
+        # Verify that ancestors now have no changes
+        self.assertFalse(self.draft_store.has_changes(locations['grandparent']))
+        self.assertFalse(self.draft_store.has_changes(locations['parent']))
+
+    def test_update_edit_info_ancestors(self):
+        """
+        Tests that edited_on, edited_by, subtree_edited_on, and subtree_edited_by are set correctly during update
+        """
+        create_user = 123
+        edit_user = 456
+        locations = self._create_test_tree('update_edit_info_ancestors', create_user)
+
+        def check_node(location_key, after, before, edited_by, subtree_after, subtree_before, subtree_by):
+            """
+            Checks that the node given by location_key matches the given edit_info constraints.
+            """
+            node = self.draft_store.get_item(locations[location_key])
+            if after:
+                self.assertLess(after, node.edited_on)
+            self.assertLess(node.edited_on, before)
+            self.assertEqual(node.edited_by, edited_by)
+            if subtree_after:
+                self.assertLess(subtree_after, node.subtree_edited_on)
+            self.assertLess(node.subtree_edited_on, subtree_before)
+            self.assertEqual(node.subtree_edited_by, subtree_by)
+
+        after_create = datetime.now(UTC)
+        # Verify that all nodes were last edited in the past by create_user
+        for key in locations:
+            check_node(key, None, after_create, create_user, None, after_create, create_user)
+
+        # Change the child
+        child = self.draft_store.get_item(locations['child'])
+        child.display_name = 'Changed Display Name'
+        self.draft_store.update_item(child, user_id=edit_user)
+
+        after_edit = datetime.now(UTC)
+        ancestors = ['parent', 'grandparent']
+        others = ['child_sibling', 'parent_sibling']
+
+        # Verify that child was last edited between after_create and after_edit by edit_user
+        check_node('child', after_create, after_edit, edit_user, after_create, after_edit, edit_user)
+
+        # Verify that ancestors edit info is unchanged, but their subtree edit info matches child
+        for key in ancestors:
+            check_node(key, None, after_create, create_user, after_create, after_edit, edit_user)
+
+        # Verify that others have unchanged edit info
+        for key in others:
+            check_node(key, None, after_create, create_user, None, after_create, create_user)
 
     def test_update_edit_info(self):
         """
