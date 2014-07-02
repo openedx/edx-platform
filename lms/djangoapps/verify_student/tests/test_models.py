@@ -2,7 +2,7 @@
 from datetime import timedelta, datetime
 import json
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
 from mock import patch
 import pytz

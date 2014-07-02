@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from analytics.csvs import create_csv_response
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250

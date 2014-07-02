@@ -177,15 +177,17 @@ ${fragment.foot_html()}
 </div>
 % endif
 
-% if accordion:
-  <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+% if default_tab:
+  <%include file="/courseware/course_navigation.html" />
+% else:
   <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
 <div class="container">
   <div class="course-wrapper">
 
-% if accordion:
+% if disable_accordion is UNDEFINED or not disable_accordion:
     <div class="course-index" role="navigation">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
@@ -193,7 +195,11 @@ ${fragment.foot_html()}
 
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
-          ${accordion}
+          % if accordion.strip():
+            ${accordion}
+          % else:
+            <div class="chapter">${_("No content has been added to this course")}</div>
+          % endif
         </nav>
       </div>
     </div>

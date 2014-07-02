@@ -19,7 +19,7 @@ div.calc-main {
     float: right;
     height: 20px;
     @include hide-text;
-    @include inline-block;
+    display: inline-block;
     margin-right: 10px;
     padding: 8px 12px;
     position: relative;

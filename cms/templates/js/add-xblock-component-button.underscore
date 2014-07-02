@@ -4,5 +4,5 @@
 <a href="#" class="single-template" data-type="<%= type %>" data-category="<%= templates[0].category %>">
 <% } %>
   <span class="large-template-icon large-<%= type %>-icon"></span>
-  <span class="name"><%= type %></span>
+  <span class="name"><%= display_name %></span>
 </a>

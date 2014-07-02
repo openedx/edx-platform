@@ -22,8 +22,8 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.x_module import XModuleDescriptor, STUDENT_VIEW
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
@@ -94,7 +94,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # get the rendered HTML output which should have the rewritten link
-        html = module.render('student_view').content
+        html = module.render(STUDENT_VIEW).content
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
@@ -464,7 +464,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             wrap_xmodule_display=True,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
@@ -477,7 +477,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             wrap_xmodule_display=False,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
@@ -489,7 +489,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/foo_content'.format(
@@ -507,7 +507,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/_file.jpg'.format(
@@ -531,7 +531,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             static_asset_path="toy_course_dir",
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('href="/static/toy_course_dir', result_fragment.content)
 
     def test_course_image(self):
@@ -557,7 +557,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/courses/{course_id}/bar/content'.format(
@@ -638,14 +638,14 @@ class MongoViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_studio_course(self):
         """Regular Studio courses should see 'View in Studio' links."""
         self.setup_mongo_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_only_in_top_level_vertical(self):
         """Regular Studio courses should not see 'View in Studio' for child verticals of verticals."""
         self.setup_mongo_course()
         # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
         parts = result_fragment.content.split('xmodule_VerticalModule')
         self.assertEqual(3, len(parts), "Did not find two vertical modules")
@@ -656,7 +656,7 @@ class MongoViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_xml_authored(self):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
         self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -670,19 +670,19 @@ class MixedViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_mongo_backed(self):
         """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
         self.setup_mongo_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_xml_authored(self):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
         self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_xml_backed(self):
         """Course in XML only modulestore should not see 'View in Studio' links."""
         self.setup_xml_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -696,7 +696,7 @@ class XmlViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_xml_backed(self):
         """Course in XML only modulestore should not see 'View in Studio' links."""
         self.setup_xml_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -742,7 +742,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Debug', result_fragment.content)
 
     def test_staff_debug_info_enabled(self):
@@ -753,7 +753,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
@@ -765,7 +765,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('histrogram', result_fragment.content)
 
     def test_histogram_enabled_for_unscored_xmodules(self):
@@ -789,7 +789,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 field_data_cache,
                 self.course.id,
             )
-            module.render('student_view')
+            module.render(STUDENT_VIEW)
             self.assertFalse(mock_grade_histogram.called)
 
     def test_histogram_enabled_for_scored_xmodules(self):
@@ -812,16 +812,17 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 self.field_data_cache,
                 self.course.id,
             )
-            module.render('student_view')
+            module.render(STUDENT_VIEW)
             self.assertTrue(mock_grade_histogram.called)
 
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
+# The "set" here is to work around the bug that load_classes returns duplicates for multiply-delcared classes.
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
     class_ for (name, class_) in XModuleDescriptor.load_classes()
     if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
-]
+)
 
 
 @ddt

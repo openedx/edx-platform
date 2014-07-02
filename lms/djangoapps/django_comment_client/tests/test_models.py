@@ -1,9 +1,12 @@
 import django_comment_common.models as models
 from django.test import TestCase
+from django.test.utils import override_settings
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class RoleClassTestCase(TestCase):
     def setUp(self):
         # For course ID, syntax edx/classname/classdate is important

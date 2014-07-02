@@ -5,13 +5,12 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
-from django.test.utils import override_settings
 from contentstore.management.commands.migrate_to_split import Command
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator
 # pylint: disable=E1101
 
 
@@ -45,7 +44,6 @@ class TestArgParsing(unittest.TestCase):
 
 
 @unittest.skip("Not fixing split mongo until we land this long branch")
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestMigrateToSplit(ModuleStoreTestCase):
     """
     Unit tests for migrating a course from old mongo to split mongo
@@ -58,7 +56,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         password = 'foo'
         self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, 'split')
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
         self.addCleanup(clear_existing_modulestores)
 
     def test_user_email(self):
@@ -86,6 +84,6 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             str(self.user.id),
             "org.dept+name.run",
         )
-        locator = CourseLocator(org="org.dept", offering="name.run", branch="published")
+        locator = CourseLocator(org="org.dept", offering="name.run", branch=ModuleStoreEnum.RevisionOption.published_only)
         course_from_split = modulestore('split').get_course(locator)
         self.assertIsNotNone(course_from_split)

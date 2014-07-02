@@ -2,11 +2,9 @@
  * XBlockContainerPage is used to display Studio's container page for an xblock which has children.
  * This page allows the user to understand and manipulate the xblock and its children.
  */
-define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
-    "js/views/baseview", "js/views/container", "js/views/xblock", "js/views/components/add_xblock",
-    "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, gettext, NotificationView, BaseView, ContainerView, XBlockView, AddXBlockComponent,
-              EditXBlockModal, XBlockInfo) {
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/container",
+        "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
+    function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo) {
         var XBlockContainerPage = BaseView.extend({
             // takes XBlockInfo as a model
 
@@ -14,7 +12,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
 
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
-                this.noContentElement = this.$('.no-container-content');
                 this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
@@ -24,28 +21,27 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
 
             render: function(options) {
                 var self = this,
-                    noContentElement = this.noContentElement,
                     xblockView = this.xblockView,
                     loadingElement = this.$('.ui-loading');
                 loadingElement.removeClass('is-hidden');
 
                 // Hide both blocks until we know which one to show
-                noContentElement.addClass('is-hidden');
                 xblockView.$el.addClass('is-hidden');
 
-                // Add actions to any top level buttons, e.g. "Edit" of the container itself
-                self.addButtonActions(this.$el);
+                if (!options || !options.refresh) {
+                    // Add actions to any top level buttons, e.g. "Edit" of the container itself.
+                    // Do not add the actions on "refresh" though, as the handlers are already registered.
+                    self.addButtonActions(this.$el);
+                }
 
                 // Render the xblock
                 xblockView.render({
                     success: function(xblock) {
-                        if (xblockView.hasChildXBlocks()) {
-                            xblockView.$el.removeClass('is-hidden');
-                            self.renderAddXBlockComponents();
-                            self.onXBlockRefresh(xblockView);
-                        } else {
-                            noContentElement.removeClass('is-hidden');
-                        }
+                        xblockView.xblock.runtime.notify("page-shown", self);
+                        xblockView.$el.removeClass('is-hidden');
+                        self.renderAddXBlockComponents();
+                        self.onXBlockRefresh(xblockView);
+                        self.refreshTitle();
                         loadingElement.addClass('is-hidden');
                         self.delegateEvents();
                     }
@@ -58,6 +54,12 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
 
             getURLRoot: function() {
                 return this.xblockView.model.urlRoot;
+            },
+
+            refreshTitle: function() {
+                var title = this.$('.xblock-header .header-details .xblock-display-name').first().text().trim();
+                this.$('.page-header-title').text(title);
+                this.$('.page-header .subtitle a').last().text(title);
             },
 
             onXBlockRefresh: function(xblockView) {
@@ -112,12 +114,16 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                     buttonPanel = target.closest('.add-xblock-component'),
                     listPanel = buttonPanel.prev(),
                     scrollOffset = this.getScrollOffset(buttonPanel),
-                    placeholderElement = $('<div></div>').appendTo(listPanel),
+                    placeholderElement = $('<div class="studio-xblock-wrapper"></div>').appendTo(listPanel),
                     requestData = _.extend(template, {
                         parent_locator: parentLocator
                     });
                 return $.postJSON(this.getURLRoot() + '/', requestData,
-                    _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset));
+                    _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset))
+                    .fail(function() {
+                        // Remove the placeholder if the update failed
+                        placeholderElement.remove();
+                    });
             },
 
             duplicateComponent: function(xblockElement) {
@@ -129,14 +135,18 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                 this.runOperationShowingMessage(gettext('Duplicating&hellip;'),
                     function() {
                         var scrollOffset = self.getScrollOffset(xblockElement),
-                            placeholderElement = $('<div></div>').insertAfter(xblockElement),
+                            placeholderElement = $('<div class="studio-xblock-wrapper"></div>').insertAfter(xblockElement),
                             parentElement = self.findXBlockElement(parent),
                             requestData = {
                                 duplicate_source_locator: xblockElement.data('locator'),
                                 parent_locator: parentElement.data('locator')
                             };
                         return $.postJSON(self.getURLRoot() + '/', requestData,
-                            _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset));
+                            _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset))
+                            .fail(function() {
+                                // Remove the placeholder if the update failed
+                                placeholderElement.remove();
+                            });
                     });
             },
 
@@ -151,16 +161,20 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                                 return $.ajax({
                                     type: 'DELETE',
                                     url: self.getURLRoot() + "/" +
-                                        xblockElement.data('locator') + "?" +
-                                        $.param({recurse: true, all_versions: false})
-                                }).success(function() {
-                                    // get the parent so we can remove this component from its parent.
-                                    var parent = self.findXBlockElement(xblockElement.parent());
-                                    xblockElement.remove();
-                                    self.xblockView.updateChildren(parent);
-                                });
+                                        xblockElement.data('locator')
+                                }).success(_.bind(self.onDelete, self, xblockElement));
                             });
                     });
+            },
+
+            onDelete: function(xblockElement) {
+                // get the parent so we can remove this component from its parent.
+                var xblockView = this.xblockView,
+                    xblock = xblockView.xblock,
+                    parent = this.findXBlockElement(xblockElement.parent());
+                xblockElement.remove();
+                xblockView.updateChildren(parent);
+                xblock.runtime.notify('deleted-child', parent.data('locator'));
             },
 
             onNewXBlock: function(xblockElement, scrollOffset, data) {
@@ -173,14 +187,14 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
              * Refreshes the specified xblock's display. If the xblock is an inline child of a
              * reorderable container then the element will be refreshed inline. If not, then the
              * parent container will be refreshed instead.
-             * @param xblockElement The element representing the xblock to be refreshed.
+             * @param element An element representing the xblock to be refreshed.
              */
-            refreshXBlock: function(xblockElement) {
-                var parentElement = xblockElement.parent(),
-                    rootLocator = this.xblockView.model.id,
-                    xblockLocator = xblockElement.data('locator');
-                if (xblockLocator === rootLocator) {
-                    this.render();
+            refreshXBlock: function(element) {
+                var xblockElement = this.findXBlockElement(element),
+                    parentElement = xblockElement.parent(),
+                    rootLocator = this.xblockView.model.id;
+                if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
+                    this.render({refresh: true});
                 } else if (parentElement.hasClass('reorderable-container')) {
                     this.refreshChildXBlock(xblockElement);
                 } else {

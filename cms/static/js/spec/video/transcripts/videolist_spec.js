@@ -1,11 +1,13 @@
 define(
     [
-        "jquery", "underscore",
-        "js/views/video/transcripts/utils", "js/views/video/transcripts/metadata_videolist",
-        "js/views/metadata", "js/models/metadata", "js/views/abstract_editor",
-        "sinon", "xmodule", "jasmine-jquery"
+        'jquery', 'underscore',
+        'js/views/video/transcripts/utils',
+        'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
+        'js/views/abstract_editor',
+        'sinon', 'xmodule', 'jasmine-jquery'
     ],
-function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, sinon) {
+function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
+    'use strict';
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
@@ -14,19 +16,19 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             component_locator = 'component_locator',
             videoList = [
                 {
-                    mode: "youtube",
-                    type: "youtube",
-                    video: "12345678901"
+                    mode: 'youtube',
+                    type: 'youtube',
+                    video: '12345678901'
                 },
                 {
-                    mode: "html5",
-                    type: "mp4",
-                    video: "video"
+                    mode: 'html5',
+                    type: 'mp4',
+                    video: 'video'
                 },
                 {
-                    mode: "html5",
-                    type: "webm",
-                    video: "video"
+                    mode: 'html5',
+                    type: 'webm',
+                    video: 'video'
                 }
             ],
             modelStub = {
@@ -54,7 +56,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             sinonXhr = sinon.fakeServer.create();
             sinonXhr.respondWith([
                 200,
-                { "Content-Type": "application/json"},
+                { 'Content-Type': 'application/json'},
                 response
             ]);
 
@@ -65,15 +67,15 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                     'data-locator': component_locator
                 }),
                 model = new MetadataModel(modelStub),
-                videoList, $el;
+                $el;
 
             setFixtures(tpl);
 
             appendSetFixtures(
-                $("<script>",
+                $('<script>',
                     {
-                        id: "metadata-videolist-entry",
-                        type: "text/template"
+                        id: 'metadata-videolist-entry',
+                        type: 'text/template'
                     }
                 ).text(videoListEntryTemplate)
             );
@@ -147,7 +149,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                 }
 
                 return flag;
-            }, "Ajax Timeout", 750);
+            }, 'Ajax Timeout', 750);
 
             runs(expectFunc);
         };
@@ -189,21 +191,21 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             it('is rendered with opened extra videos bar', function () {
                 var videoListLength = [
                         {
-                            mode: "youtube",
-                            type: "youtube",
-                            video: "12345678901"
+                            mode: 'youtube',
+                            type: 'youtube',
+                            video: '12345678901'
                         },
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         }
                     ],
                     videoListHtml5mode = [
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         }
                     ];
 
@@ -240,9 +242,9 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             it('is rendered without opened extra videos bar', function () {
                 var videoList = [
                         {
-                            mode: "youtube",
-                            type: "youtube",
-                            video: "12345678901"
+                            mode: 'youtube',
+                            type: 'youtube',
+                            video: '12345678901'
                         }
                     ];
 
@@ -263,6 +265,59 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
 
         });
 
+        describe('isUniqOtherVideos', function () {
+            it('Unique data - return true', function () {
+                var data = videoList.concat([{
+                    mode: 'html5',
+                    type: 'other',
+                    video: 'pxxZrg'
+                }]);
+
+                waitsForResponse(function () {
+                    var result = view.isUniqOtherVideos(data);
+
+                    expect(result).toBe(true);
+                });
+
+            });
+
+            it('Not Unique data - return false', function () {
+                var data = [
+                        {
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
+                        },
+                        {
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
+                        },
+                        {
+                            mode: 'html5',
+                            type: 'other',
+                            video: 'pxxZrg'
+                        },
+                        {
+                            mode: 'html5',
+                            type: 'other',
+                            video: 'pxxZrg'
+                        },
+                        {
+                            mode: 'youtube',
+                            type: 'youtube',
+                            video: '12345678901'
+                        }
+                    ];
+
+                waitsForResponse(function () {
+                    var result = view.isUniqOtherVideos(data);
+
+                    expect(result).toBe(false);
+                });
+            });
+        });
+
         describe('isUniqVideoTypes', function () {
 
             it('Unique data - return true', function () {
@@ -279,19 +334,24 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             it('Not Unique data - return false', function () {
                 var data = [
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         },
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         },
                         {
-                            mode: "youtube",
-                            type: "youtube",
-                            video: "12345678901"
+                            mode: 'html5',
+                            type: 'other',
+                            video: 'pxxZrg'
+                        },
+                        {
+                            mode: 'youtube',
+                            type: 'youtube',
+                            video: '12345678901'
                         }
                     ];
 
@@ -304,23 +364,27 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
         });
 
         describe('checkIsUniqVideoTypes', function () {
-
             it('Error is shown', function () {
                 var data = [
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         },
                         {
-                            mode: "html5",
-                            type: "mp4",
-                            video: "video"
+                            mode: 'html5',
+                            type: 'mp4',
+                            video: 'video'
                         },
                         {
-                            mode: "youtube",
-                            type: "youtube",
-                            video: "12345678901"
+                            mode: 'html5',
+                            type: 'other',
+                            video: 'pxxZrg'
+                        },
+                        {
+                            mode: 'youtube',
+                            type: 'youtube',
+                            video: '12345678901'
                         }
                     ];
 
@@ -350,7 +414,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                 spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
             });
 
-            it('Error message are shown', function () {
+            it('Error message is shown', function () {
                 waitsForResponse(function () {
                     var data = { mode: 'incorrect' },
                         result = view.checkValidity(data, true);
@@ -361,7 +425,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                 });
             });
 
-            it('Error message are shown when flag is not passed', function () {
+            it('Error message is shown when flag is not passed', function () {
                 waitsForResponse(function () {
                     var data = { mode: 'incorrect' },
                         result = view.checkValidity(data);
@@ -435,6 +499,11 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                     mode: 'html5',
                     type: 'mp4',
                     video: 'video'
+                },
+                {
+                    mode: 'html5',
+                    type: 'other',
+                    video: 'pxxZrg'
                 }
             ];
 
@@ -442,6 +511,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                 view.setValueInEditor([
                     'http://youtu.be/12345678901',
                     'video.mp4',
+                    'http://goo.gl/pxxZrg',
                     'video'
                 ]);
                 expect(view).assertIsCorrectVideoList(value);
@@ -540,13 +610,17 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();
                         expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
-                        expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                        expect($.fn.prop).toHaveBeenCalledWith(
+                            'disabled', true
+                        );
+                        expect($.fn.addClass).toHaveBeenCalledWith(
+                            'is-disabled'
+                        );
                     });
                 }
             );
 
-            it('Main field has invalid value - extra Videos Bar should be closed',
+            it('Main field has invalid value - extra Videos Bar is closed',
                 function () {
                     $.fn.hasClass.andReturn(true);
                     view.checkValidity.andReturn(false);
@@ -556,8 +630,12 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();
                         expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
-                        expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                        expect($.fn.prop).toHaveBeenCalledWith(
+                            'disabled', true
+                        );
+                        expect($.fn.addClass).toHaveBeenCalledWith(
+                            'is-disabled'
+                        );
                     });
                 }
             );
@@ -572,8 +650,12 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).toHaveBeenCalled();
                         expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
-                        expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                        expect($.fn.prop).toHaveBeenCalledWith(
+                            'disabled', false
+                        );
+                        expect($.fn.removeClass).toHaveBeenCalledWith(
+                            'is-disabled'
+                        );
                     });
                 }
             );
@@ -588,8 +670,12 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                         expect(messenger.hideError).toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();
                         expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
-                        expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                        expect($.fn.prop).toHaveBeenCalledWith(
+                            'disabled', false
+                        );
+                        expect($.fn.removeClass).toHaveBeenCalledWith(
+                            'is-disabled'
+                        );
                     });
                 }
             );

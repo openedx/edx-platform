@@ -34,7 +34,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
@@ -147,7 +147,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
 
 def get_module(user, request, usage_key, field_data_cache,
-               position=None, not_found_ok=False, wrap_xmodule_display=True,
+               position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
     """
@@ -159,11 +159,13 @@ def get_module(user, request, usage_key, field_data_cache,
       - user                  : User for whom we're getting the module
       - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
                                 and such works based on user.
-      - location              : A Location-like object identifying the module to load
+      - usage_key             : A UsageKey object identifying the module to load
       - field_data_cache      : a FieldDataCache
-      - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
+      - log_if_not_found      : If this is True, we log a debug message if we cannot find the requested xmodule.
+      - wrap_xmodule_display  : If this is True, wrap the output display in a single div to allow for the
+                                XModule javascript to be bound correctly
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
       - static_asset_path     : static asset path to use (overrides descriptor's value); needed
@@ -183,9 +185,10 @@ def get_module(user, request, usage_key, field_data_cache,
                                          grade_bucket_type=grade_bucket_type,
                                          static_asset_path=static_asset_path)
     except ItemNotFoundError:
-        if not not_found_ok:
-            log.exception("Error in get_module")
+        if log_if_not_found:
+            log.debug("Error in get_module: ItemNotFoundError")
         return None
+
     except:
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
@@ -222,17 +225,19 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
+    user_location = getattr(request, 'session', {}).get('country_code')
+
     return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
                                               position, wrap_xmodule_display, grade_bucket_type,
-                                              static_asset_path)
+                                              static_asset_path, user_location)
 
 
 def get_module_system_for_user(user, field_data_cache,
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
                                position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path=''):
+                               static_asset_path='', user_location=None):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -314,7 +319,7 @@ def get_module_system_for_user(user, field_data_cache,
         return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                                   track_function, make_xqueue_callback,
                                                   position, wrap_xmodule_display, grade_bucket_type,
-                                                  static_asset_path)
+                                                  static_asset_path, user_location)
 
     def handle_grade_event(block, event_type, event):
         user_id = event.get('user_id', user.id)
@@ -383,7 +388,7 @@ def get_module_system_for_user(user, field_data_cache,
         (inner_system, inner_student_data) = get_module_system_for_user(
             real_user, field_data_cache_real_user,  # These have implicit user bindings, rest of args considered not to
             module.descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-            grade_bucket_type, static_asset_path
+            grade_bucket_type, static_asset_path, user_location
         )
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
         module.descriptor.bind_for_student(
@@ -440,7 +445,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, 'staff', descriptor, course_id):
-            block_wrappers.append(partial(add_staff_markup, user))
+            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -503,6 +509,7 @@ def get_module_system_for_user(user, field_data_cache,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
+        user_location=user_location,
     )
     if settings.FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)
@@ -534,7 +541,7 @@ def get_module_system_for_user(user, field_data_cache,
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path=''):
+                                       static_asset_path='', user_location=None):
     """
     Actually implement get_module, without requiring a request.
 
@@ -550,7 +557,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     (system, student_data) = get_module_system_for_user(
         user, field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-        grade_bucket_type, static_asset_path
+        grade_bucket_type, static_asset_path, user_location
     )
 
     descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access

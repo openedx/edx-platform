@@ -71,7 +71,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 // Notify the runtime that the modal has been shown
                 if (runtime) {
                     this.runtime = runtime;
-                    runtime.notify("edit-modal-shown", this);
+                    runtime.notify('modal-shown', this);
                 }
 
                 // Update the modal's header
@@ -111,13 +111,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             getTitle: function() {
-                var displayName = this.xblockElement.find('.xblock-header .header-details').text().trim();
-                // If not found, try the old unit page style rendering
+                var displayName = this.xblockInfo.get('display_name');
                 if (!displayName) {
-                    displayName = this.xblockElement.find('.component-header').text().trim();
-                    if (!displayName) {
-                        displayName = gettext('Component');
-                    }
+                    displayName = gettext('Component');
                 }
                 return interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
             },
@@ -132,17 +128,11 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             changeMode: function(event) {
+                this.removeCheatsheetVisibility();
                 var parent = $(event.target.parentElement),
                     mode = parent.data('mode');
                 event.preventDefault();
                 this.selectMode(mode);
-                var $cheatsheet = $('.simple-editor-cheatsheet');
-                if ($cheatsheet.length == 0){
-                    $cheatsheet = $('.simple-editor-open-ended-cheatsheet');
-                }
-                $(".CodeMirror").css({"overflow": "none"});
-                $(".modal-content").removeAttr("style");
-                $cheatsheet.removeClass('shown');
             },
 
             selectMode: function(mode) {
@@ -176,23 +166,26 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
                 // Notify the runtime that the modal has been hidden
                 if (this.runtime) {
-                    this.runtime.notify('edit-modal-hidden');
+                    this.runtime.notify('modal-hidden');
                 }
-
-                // Completely clear the contents of the modal
-                this.undelegateEvents();
-                this.$el.html("");
             },
 
             findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {
                 var xblockInfo = defaultXBlockInfo,
-                    xblockElement;
+                    xblockElement,
+                    displayName;
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
+                    displayName = xblockWrapperElement.find('.xblock-header .header-details .xblock-display-name').text().trim();
+                    // If not found, try looking for the old unit page style rendering
+                    if (!displayName) {
+                        displayName = this.xblockElement.find('.component-header').text().trim();
+                    }
                     xblockInfo = new XBlockInfo({
                         id: xblockWrapperElement.data('locator'),
                         courseKey: xblockWrapperElement.data('course-key'),
-                        category: xblockElement.data('block-type')
+                        category: xblockElement.data('block-type'),
+                        display_name: displayName
                     });
                 }
                 return xblockInfo;
@@ -204,6 +197,17 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     mode: mode,
                     displayName: displayName
                 }));
+            },
+
+            removeCheatsheetVisibility: function() {
+                var cheatsheet = $('article.simple-editor-open-ended-cheatsheet');
+                if (cheatsheet.length === 0) {
+                    cheatsheet = $('article.simple-editor-cheatsheet');
+                }
+                if (cheatsheet.hasClass('shown')) {
+                    cheatsheet.removeClass('shown');
+                    $('.modal-content').removeClass('cheatsheet-is-shown');
+                }
             }
         });
 

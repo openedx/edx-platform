@@ -47,7 +47,6 @@ from ratelimitbackend.exceptions import RateLimitException
 import student.views
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 

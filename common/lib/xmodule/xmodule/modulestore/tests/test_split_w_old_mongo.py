@@ -5,10 +5,12 @@ import uuid
 import random
 
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import MongoModuleStore, DraftMongoModuleStore
 from xmodule.modulestore.mongo.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore import ModuleStoreEnum
+from mock import Mock
 
 
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
@@ -39,7 +41,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         'xblock_mixins': (InheritanceMixin,)
     }
 
-    split_course_key = CourseLocator('test_org', 'test_course.runid', branch='draft')
+    split_course_key = CourseLocator('test_org', 'test_course.runid', branch=ModuleStoreEnum.BranchName.draft)
 
     def setUp(self):
         self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
@@ -53,7 +55,9 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
-        self.draft_mongo = DraftMongoModuleStore(self.db_config, **self.modulestore_options)
+        self.draft_mongo = DraftMongoModuleStore(
+            self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
+        )
         self.addCleanup(self.tear_down_mongo)
         self.old_course_key = None
         self.runtime = None
@@ -86,7 +90,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             mongo = self.old_mongo
         else:
             mongo = self.draft_mongo
-        mongo.create_and_save_xmodule(location, data, metadata, self.runtime)
+        mongo.create_and_save_xmodule(location, self.userid, definition_data=data, metadata=metadata, runtime=self.runtime)
         if isinstance(data, basestring):
             fields = {'data': data}
         else:

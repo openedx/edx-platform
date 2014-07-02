@@ -45,7 +45,7 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
-from xmodule.modulestore import Location
+from util.query import use_read_replica_if_available
 
 log = get_task_logger(__name__)
 
@@ -109,7 +109,7 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        recipient_qset = staff_qset | instructor_qset
+        recipient_qset = (staff_qset | instructor_qset).distinct()
         if to_option == SEND_TO_ALL:
             # We also require students to have activated their accounts to
             # provide verification that the provided email address is valid.
@@ -118,11 +118,20 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
                 courseenrollment__course_id=course_id,
                 courseenrollment__is_active=True
             )
-            recipient_qset = recipient_qset | enrollment_qset
-        recipient_qset = recipient_qset.distinct()
+            # Now we do some queryset sidestepping to avoid doing a DISTINCT
+            # query across the course staff and the enrolled students, which
+            # forces the creation of a temporary table in the db.
+            unenrolled_staff_qset = recipient_qset.exclude(
+                courseenrollment__course_id=course_id, courseenrollment__is_active=True
+            )
+            # use read_replica if available:
+            unenrolled_staff_qset = use_read_replica_if_available(unenrolled_staff_qset)
 
-    recipient_qset = recipient_qset.order_by('pk')
-    return recipient_qset
+            unenrolled_staff_ids = [user.id for user in unenrolled_staff_qset]
+            recipient_qset = enrollment_qset | User.objects.filter(id__in=unenrolled_staff_ids)
+
+    # again, use read_replica if available to lighten the load for large queries
+    return use_read_replica_if_available(recipient_qset)
 
 
 def _get_course_email_context(course):
@@ -232,8 +241,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         _create_send_email_subtask,
         recipient_qset,
         recipient_fields,
-        settings.BULK_EMAIL_EMAILS_PER_QUERY,
-        settings.BULK_EMAIL_EMAILS_PER_TASK
+        settings.BULK_EMAIL_EMAILS_PER_TASK,
     )
 
     # We want to return progress here, as this is what will be stored in the

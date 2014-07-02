@@ -28,10 +28,10 @@ The following documentation is available:
   * The `Gene Explorer`_ tool.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 *************

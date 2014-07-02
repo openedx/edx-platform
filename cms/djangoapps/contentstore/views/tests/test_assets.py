@@ -18,7 +18,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from django.test.utils import override_settings
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
 
 class AssetsTestCase(CourseTestCase):
@@ -48,9 +48,10 @@ class BasicAssetsTestCase(AssetsTestCase):
         self.assertEquals(path, '/static/my_file_name.jpg')
 
     def test_pdf_asset(self):
-        module_store = modulestore('direct')
+        module_store = modulestore()
         _, course_items = import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),
@@ -191,9 +192,10 @@ class LockAssetTestCase(AssetsTestCase):
             return json.loads(resp.content)
 
         # Load the toy course.
-        module_store = modulestore('direct')
+        module_store = modulestore()
         _, course_items = import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),

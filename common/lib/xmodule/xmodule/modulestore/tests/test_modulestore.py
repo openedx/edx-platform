@@ -2,7 +2,7 @@ from nose.tools import assert_equals, assert_raises, assert_true, assert_false  
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 def check_path_to_location(modulestore):
@@ -63,8 +63,10 @@ def check_has_course_method(modulestore, locator, locator_key_fields):
             ]
             for changes in locator_case_changes:
                 search_locator = locator.replace(**changes)
+                # if ignore_case is true, the course would be found with a different-cased course locator.
+                # if ignore_case is false, the course should NOT found given an incorrectly-cased locator.
                 assert_equals(
-                    modulestore.has_course(search_locator, ignore_case),
+                    modulestore.has_course(search_locator, ignore_case) is not None,
                     ignore_case,
                     error_message.format(search_locator, ignore_case)
                 )

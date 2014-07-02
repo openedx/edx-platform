@@ -9,10 +9,10 @@ from django.core.exceptions import ValidationError
 from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization
 
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -78,7 +78,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             raise forms.ValidationError(msg)
 
         # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
-        is_studio_course = modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE
+        is_studio_course = modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml
         if not is_studio_course:
             msg = "Course Email feature is only available for courses authored in Studio. "
             msg += '"{0}" appears to be an XML backed course.'.format(course_key.to_deprecated_string())

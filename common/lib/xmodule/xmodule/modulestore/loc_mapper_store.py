@@ -7,9 +7,10 @@ import pymongo
 import bson.son
 import urllib
 
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class LocMapperStore(object):
@@ -53,7 +54,9 @@ class LocMapperStore(object):
         self.cache = cache
 
     # location_map functions
-    def create_map_entry(self, course_key, org=None, offering=None, draft_branch='draft', prod_branch='published',
+    def create_map_entry(self, course_key, org=None, offering=None,
+                         draft_branch=ModuleStoreEnum.BranchName.draft,
+                         prod_branch=ModuleStoreEnum.BranchName.published,
                          block_map=None):
         """
         Add a new entry to map this SlashSeparatedCourseKey to the new style CourseLocator.org & offering. If
@@ -99,9 +102,7 @@ class LocMapperStore(object):
         self.location_map.insert({
             '_id': course_son,
             'org': org,
-            'lower_org': org.lower(),
             'offering': offering,
-            'lower_offering': offering.lower(),
             'draft_branch': draft_branch,
             'prod_branch': prod_branch,
             'block_map': block_map or {},
@@ -196,7 +197,7 @@ class LocMapperStore(object):
         self._cache_location_map_entry(location, published_usage, draft_usage)
         return result
 
-    def translate_locator_to_location(self, locator, get_course=False, lower_only=False):
+    def translate_locator_to_location(self, locator, get_course=False):
         """
         Returns an old style Location for the given Locator if there's an appropriate entry in the
         mapping collection. Note, it requires that the course was previously mapped (a side effect of
@@ -210,53 +211,31 @@ class LocMapperStore(object):
             locator: a BlockUsageLocator to translate
             get_course: rather than finding the map for this locator, returns the CourseKey
                 for the mapped course.
-            lower_only: (obsolete?) the locator's fields are lowercased and not the actual case
-                for the identifier (e.g., came from a sql db which lowercases all ids). Find the actual
-                case Location for the desired object
         """
         if get_course:
             cached_value = self._get_course_location_from_cache(
                 # if locator is already a course_key it won't have course_key attr
-                getattr(locator, 'course_key', locator),
-                lower_only
+                getattr(locator, 'course_key', locator)
             )
         else:
             cached_value = self._get_location_from_cache(locator)
         if cached_value:
             return cached_value
 
-        # This does not require that the course exist in any modulestore
-        # only that it has a mapping entry.
-        if lower_only:
-            # migrate any records which don't have the lower_org and lower_offering fields as
-            # this won't be able to find what it wants. (only needs to be run once ever per db,
-            # I'm not sure how to control that, but I'm putting some check here for once per launch)
-            if not getattr(self, 'lower_offering_migrated', False):
-                obsolete = self.location_map.find(
-                    {'lower_org': {"$exists": False}, "lower_offering": {"$exists": False}, }
-                )
-                self._migrate_if_necessary(obsolete)
-                setattr(self, 'lower_offering_migrated', True)
+        # migrate any records which don't have the org and offering fields as
+        # this won't be able to find what it wants. (only needs to be run once ever per db,
+        # I'm not sure how to control that, but I'm putting some check here for once per launch)
+        if not getattr(self, 'offering_migrated', False):
+            obsolete = self.location_map.find(
+                {'org': {"$exists": False}, "offering": {"$exists": False}, }
+            )
+            self._migrate_if_necessary(obsolete)
+            setattr(self, 'offering_migrated', True)
 
-            entry = self.location_map.find_one(bson.son.SON([
-                ('lower_org', locator.org.lower()),
-                ('lower_offering', locator.offering.lower()),
-            ]))
-        else:
-            # migrate any records which don't have the lower_org and lower_offering fields as
-            # this won't be able to find what it wants. (only needs to be run once ever per db,
-            # I'm not sure how to control that, but I'm putting some check here for once per launch)
-            if not getattr(self, 'offering_migrated', False):
-                obsolete = self.location_map.find(
-                    {'org': {"$exists": False}, "offering": {"$exists": False}, }
-                )
-                self._migrate_if_necessary(obsolete)
-                setattr(self, 'offering_migrated', True)
-
-            entry = self.location_map.find_one(bson.son.SON([
-                ('org', locator.org),
-                ('lower_offering', locator.offering),
-            ]))
+        entry = self.location_map.find_one(bson.son.SON([
+            ('org', locator.org),
+            ('offering', locator.offering),
+        ]))
 
         # look for one which maps to this block block_id
         if entry is None:
@@ -268,7 +247,7 @@ class LocMapperStore(object):
         for old_name, cat_to_usage in entry['block_map'].iteritems():
             for category, block_id in cat_to_usage.iteritems():
                 # cache all entries and then figure out if we have the one we want
-                # Always return revision=None because the
+                # Always return revision=MongoRevisionKey.published because the
                 # old draft module store wraps locations as draft before
                 # trying to access things.
                 location = old_course_id.make_usage_key(
@@ -276,12 +255,8 @@ class LocMapperStore(object):
                     self.decode_key_from_mongo(old_name)
                 )
 
-                if lower_only:
-                    entry_org = "lower_org"
-                    entry_offering = "lower_offering"
-                else:
-                    entry_org = "org"
-                    entry_offering = "offering"
+                entry_org = "org"
+                entry_offering = "offering"
 
                 published_locator = BlockUsageLocator(
                     CourseLocator(
@@ -453,17 +428,19 @@ class LocMapperStore(object):
         """
         return self.cache.get(unicode(locator))
 
-    def _get_course_location_from_cache(self, locator_package_id, lower_only=False):
+    def _get_course_location_from_cache(self, course_key):
         """
-        See if the package_id is in the cache. If so, return the mapped location to the
+        See if the course_key is in the cache. If so, return the mapped location to the
         course root.
         """
-        if lower_only:
-            cache_key = u'courseIdLower+{}'.format(locator_package_id.lower())
-        else:
-            cache_key = u'courseId+{}'.format(locator_package_id)
-
+        cache_key = self._course_key_cache_string(course_key)
         return self.cache.get(cache_key)
+
+    def _course_key_cache_string(self, course_key):
+        """
+        Return the string used to cache the course key
+        """
+        return u'{0.org}+{0.offering}'.format(course_key)
 
     def _cache_course_locator(self, old_course_id, published_course_locator, draft_course_locator):
         """
@@ -481,8 +458,7 @@ class LocMapperStore(object):
         """
         setmany = {}
         if location.category == 'course':
-            setmany[u'courseId+{}'.format(published_usage.package_id)] = location
-            setmany[u'courseIdLower+{}'.format(published_usage.package_id.lower())] = location
+            setmany[self._course_key_cache_string(published_usage)] = location.course_key
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
         setmany[unicode(location)] = (published_usage, draft_usage)
@@ -503,8 +479,7 @@ class LocMapperStore(object):
             delete_keys = []
             published_locator = unicode(cached_key[0].course_key)
             course_location = self._course_location_from_cache(published_locator)
-            delete_keys.append(u'courseId+{}'.format(published_locator))
-            delete_keys.append(u'courseIdLower+{}'.format(unicode(cached_key[0].course_key).lower()))
+            delete_keys.append(self._course_key_cache_string(course_key))
             delete_keys.append(published_locator)
             delete_keys.append(unicode(cached_key[1].course_key))
             delete_keys.append(unicode(course_location))
@@ -534,8 +509,7 @@ class LocMapperStore(object):
         """
         delete_keys = []
         if location.category == 'course':
-            delete_keys.append(u'courseId+{}'.format(published_usage.package_id))
-            delete_keys.append(u'courseIdLower+{}'.format(published_usage.package_id.lower()))
+            delete_keys.append(self._course_key_cache_string(published_usage.course_key))
 
         delete_keys.append(unicode(published_usage))
         delete_keys.append(unicode(draft_usage))
@@ -559,7 +533,7 @@ class LocMapperStore(object):
         """
         If entry had an '_id' without a run, remove the whole record.
 
-        Add fields: schema, org, offering, lower_org, and lower_offering
+        Add fields: schema, org, offering
         Remove: course_id, lower_course_id
         :param entry:
         """
@@ -578,9 +552,7 @@ class LocMapperStore(object):
         entry.pop('lower_course_id', None)
         old_course_id = SlashSeparatedCourseKey(entry['_id']['org'], entry['_id']['course'], entry['_id']['name'])
         entry['org'] = old_course_id.org
-        entry['lower_org'] = old_course_id.org.lower()
         entry['offering'] = old_course_id.offering.replace('/', '+')
-        entry['lower_offering'] = entry['offering'].lower()
         return self._migrate_1(entry, True)
 
     # insert new migrations just before _migrate_top. _migrate_top sets the schema version and

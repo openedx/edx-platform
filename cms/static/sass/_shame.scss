@@ -74,3 +74,11 @@ body b {
 * use the @include placeholder Bourbon mixin (http://bourbon.io/docs/#placeholder) for any placeholder styling
 
 */
+
+.modal-content.cheatsheet-is-shown {
+  overflow: visible !important;
+
+  .CodeMirror {
+    overflow: visible !important;
+  }
+}

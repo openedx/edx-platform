@@ -24,9 +24,9 @@ from unittest.case import SkipTest, TestCase
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem
+from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -324,7 +324,7 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
         """
         self.assertEqual(
             descriptor._xmodule.get_html(),
-            descriptor.render('student_view').content
+            descriptor.render(STUDENT_VIEW).content
         )
 
 
@@ -343,7 +343,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         """
         Assert that studio_view and get_html render the same.
         """
-        self.assertEqual(descriptor.get_html(), descriptor.render('studio_view').content)
+        self.assertEqual(descriptor.get_html(), descriptor.render(STUDIO_VIEW).content)
 
 
 class TestXModuleHandler(TestCase):

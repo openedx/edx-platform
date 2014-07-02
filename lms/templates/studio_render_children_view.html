@@ -1,8 +1,12 @@
-<ol class="reorderable-container">
+% if can_reorder:
+    <ol class="reorderable-container">
+% endif
     % for item in items:
     ${item['content']}
     % endfor
-</ol>
-% if not xblock_context['read_only']:
+% if can_reorder:
+    </ol>
+% endif
+% if can_add and not xblock_context['read_only']:
 <div class="add-xblock-component new-component-item adding"></div>
 % endif

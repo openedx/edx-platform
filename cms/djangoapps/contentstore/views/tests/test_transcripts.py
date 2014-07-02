@@ -18,15 +18,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.video_module import transcripts_utils
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class Basetranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 

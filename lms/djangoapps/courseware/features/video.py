@@ -14,6 +14,7 @@ from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
+
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
 VIDEO_SOURCE_PORT = settings.VIDEO_SOURCE_PORT
@@ -54,6 +55,7 @@ VIDEO_MENUS = {
 }
 
 coursenum = 'test_course'
+
 
 @before.each_scenario
 def setUp(scenario):
@@ -436,7 +438,7 @@ def error_message_has_correct_text(_step):
 @step('I make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
-    if world.is_css_not_present(SELECTOR, wait_time=30):
+    if world.is_css_not_present(SELECTOR):
         if captions_state == 'closed':
             world.css_click('.hide-subtitles')
     else:

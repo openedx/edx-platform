@@ -176,6 +176,46 @@ body.course.unit,
       }
     }
 
+    .xblock-message-area {
+      .xblock-student_view {
+        padding: 0px;
+      }
+
+      .xmodule_DiscussionModule,
+      .xmodule_HtmlModule,
+      .xblock {
+        margin-top: 0px;
+      }
+
+      .xblock-message {
+        border-radius: 0 0 0 2px;
+
+        .edit-button {
+          color: $orange-l1;
+
+          .icon-pencil {
+            display: none;
+          }
+        }
+
+        &.information {
+          @extend %t-copy-sub2;
+          padding-top: 0;
+          color: $gray-l1;
+        }
+
+        &.has-warnings {
+          border: 0;
+          border-top: 3px solid $orange;
+        }
+
+        &.has-errors {
+          border: 0;
+          border-top: 3px solid $red-l2;
+        }
+      }
+    }
+
     // UI: DnD - specific elems/cases - unit
     .courseware-unit {
 
@@ -750,17 +790,19 @@ body.unit {
 
 body.unit {
 
-  .component-actions {
+  .component-actions,
+  .xblock-header-secondary .actions-list {
 
     .action-item {
       display: inline-block;
       margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
 
       .action-button {
+        @include transition(all $tmg-f3 linear 0s);
         display: block;
-        padding: 0 $baseline/2;
+        padding: ($baseline/5) ($baseline/2);
         width: auto;
-        height: ($baseline*1.5);
+        height: auto;
         border-radius: 3px;
         color: $gray-l1;
 
@@ -770,10 +812,10 @@ body.unit {
         }
 
         .action-button-text {
-          padding-left: 1px;
-          vertical-align: bottom;
+          display: inline-block;
+          vertical-align: baseline;
+          padding: 0 1px;
           text-transform: uppercase;
-          line-height: 17px;
         }
 
         &.delete-button:hover {
@@ -783,7 +825,7 @@ body.unit {
 
       [class^="icon-"] {
         display: inline-block;
-        vertical-align: bottom;
+        vertical-align: baseline;
       }
     }
   }
@@ -1128,7 +1170,7 @@ body.unit .xblock-type-container {
     }
   }
 
-  .xblock-header {
+  .xblock-header-primary {
     border-bottom: 0;
     border-radius: ($baseline/5);
 
@@ -1177,6 +1219,44 @@ body.unit .component.editing {
     margin-top: 0;
   }
 }
+
+// UI: special case xblock with no preview, ex. experiment blocks
+
+body.unit .component {
+
+  .wrapper-component-action-header.nopreview {
+    position: relative;
+    border-bottom: 0;
+  }
+
+  .xblock-header-secondary {
+    overflow: hidden;
+    border-top: 1px solid $gray-l3;
+    background-color: $gray-l5;
+    padding: ($baseline/2);
+
+    .meta-info {
+      display: inline-block;
+      vertical-align: middle;
+      width: 65%;
+      padding-left: ($baseline/4);
+      font-style: italic;
+      color: $gray;
+    }
+
+    .actions-list {
+      display: inline-block;
+      vertical-align: middle;
+      width: 33%;
+      text-align: right;
+
+      .action-item {
+        margin: 0;
+      }
+    }
+  }
+}
+
 
 
 body.view-unit .main-column .unit-body,

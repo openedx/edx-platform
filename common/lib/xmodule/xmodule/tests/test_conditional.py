@@ -7,10 +7,11 @@ from mock import Mock, patch
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
+from xmodule.x_module import STUDENT_VIEW
 
 
 ORG = 'test_org'
@@ -129,7 +130,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules = ConditionalFactory.create(self.test_system)
         # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
-        html = modules['cond_module'].render('student_view').content
+        html = modules['cond_module'].render(STUDENT_VIEW).content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
             'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
@@ -219,7 +220,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
-        html = module.render('student_view').content
+        html = module.render(STUDENT_VIEW).content
         print "html type: ", type(html)
         print "html: ", html
         html_expect = module.xmodule_runtime.render_template(

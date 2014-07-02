@@ -212,6 +212,7 @@ define([
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
+    "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
 
     "js/spec/utils/drag_and_drop_spec",
@@ -231,6 +232,8 @@ define([
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
+
+    "js/spec/xblock/cms.runtime.v1_spec",
 
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js

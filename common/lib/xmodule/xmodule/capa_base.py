@@ -189,6 +189,15 @@ class CapaFields(object):
         default=False,
         scope=Scope.settings
     )
+    matlab_api_key = String(
+        display_name="Matlab API key",
+        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+             "This key is granted for exclusive use by this course for the specified duration. "
+             "Please do not share the API key with other courses and notify MathWorks immediately "
+             "if you believe the key is exposed or compromised. To obtain a key for your course, "
+             "or to report and issue, please contact moocsupport@mathworks.com",
+        scope=Scope.settings
+    )
 
 
 class CapaMixin(CapaFields):
@@ -240,7 +249,11 @@ class CapaMixin(CapaFields):
                 # e.g. in the CMS
                 msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
                 msg += u'<p><pre>{tb}</pre></p>'.format(
-                    tb=cgi.escape(traceback.format_exc()))
+                    # just the traceback, no message - it is already present above
+                    tb=cgi.escape(
+                        u''.join(['Traceback (most recent call last):\n'] +
+                        traceback.format_tb(sys.exc_info()[2])))
+                    )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
@@ -292,6 +305,7 @@ class CapaMixin(CapaFields):
             seed=self.runtime.seed,      # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.xqueue,
+            matlab_api_key=self.matlab_api_key
         )
 
         ### @jbau 2-21-14 edx-west HACK for deanonymized email HERE ###

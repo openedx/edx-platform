@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 
 
-STUDENT_FEATURES = ('username', 'first_name', 'last_name', 'is_staff', 'email')
+STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals')
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES

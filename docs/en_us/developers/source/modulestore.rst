@@ -54,28 +54,6 @@ and migrating data between modulestores.
     :show-inheritance:
 
 
-
-Content Keys
-============
-
-These packages provide the definition of the key types that are
-used in the modulestores to address content, and definitions of
-key types.
-
-.. automodule:: xmodule.modulestore.keys
-    :members:
-    :show-inheritance:
-
-.. automodule:: xmodule.modulestore.locations
-    :members:
-    :show-inheritance:
-
-.. automodule:: xmodule.modulestore.locator
-    :members:
-    :show-inheritance:
-
-
-
 Xml Import/Export
 =================
 

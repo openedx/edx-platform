@@ -4,70 +4,70 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# agarwal <agarwal@cag.csail.mit.edu>, 2013
-# ammubhave <ammubhave@gmail.com>, 2013
-# ammubhave <ammubhave@gmail.com>, 2013
-# agarwal <agarwal@cag.csail.mit.edu>, 2013
-# anantvima <anant.vima@anu.edu.au>, 2014
+# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
+# Amol Bhave <ammubhave@gmail.com>, 2013
+# Amol Bhave <ammubhave@gmail.com>, 2013
+# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
+# Anant Vima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # gvidushiin <gvidushiin@gmail.com>, 2014
-# sarina <sarina@edx.org>, 2014
-# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# agarwal <agarwal@cag.csail.mit.edu>, 2013
-# ammubhave <ammubhave@gmail.com>, 2013
-# anantvima <anant.vima@anu.edu.au>, 2014
-# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
-# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
+# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
+# Amol Bhave <ammubhave@gmail.com>, 2013
+# Anant Vima <anant.vima@anu.edu.au>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# ammubhave <ammubhave@gmail.com>, 2013
-# ammubhave <ammubhave@gmail.com>, 2013
-# anantvima <anant.vima@anu.edu.au>, 2014
-# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
+# Amol Bhave <ammubhave@gmail.com>, 2013
+# Amol Bhave <ammubhave@gmail.com>, 2013
+# Anant Vima <anant.vima@anu.edu.au>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # gvidushiin <gvidushiin@gmail.com>, 2014
-# sarina <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# ammubhave <ammubhave@gmail.com>, 2013
+# Amol Bhave <ammubhave@gmail.com>, 2013
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # gvidushiin <gvidushiin@gmail.com>, 2014
-# Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
+# CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# agarwal <agarwal@cag.csail.mit.edu>, 2013
-# agarwal <agarwal@cag.csail.mit.edu>, 2013
+# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
+# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# anantvima <anant.vima@anu.edu.au>, 2014
+# Anant Vima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"POT-Creation-Date: 2014-06-19 00:16-0400\n"
 "PO-Revision-Date: 2014-03-28 05:40+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -85,6 +85,25 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "ओपन एन्डेड पैनल"
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "चर्चा"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "समस्या"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -230,7 +249,7 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
@@ -384,15 +403,23 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -421,6 +448,10 @@ msgstr "इस ई-मेल से जुड़ा हुआ एक खात�
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "पुरानी ई-मेल और नई ई-मेल एक जैसी है।"
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -849,13 +880,25 @@ msgstr "जवाब नहीं दिया हुआ"
 msgid "processing"
 msgstr ""
 
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"आपकी फ़ाइल (ओं) को दर्ज़ कर लिया गया है। जैसे ही प्रस्तुति ग्रेड कर कर दी "
-"जाएगी, यह संदेश ग्रेडर की राय के साथ बदल दिया जाएगा।"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -877,6 +920,35 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "संकेत फ़ंक्शन {hintfn} के मूल्यांकन में त्रुटि {err}।"
@@ -888,6 +960,10 @@ msgstr "(Source code line unavailable)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "एक्स एम एल स्रोत लाइन {sourcenum} देखें।"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr ""
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -977,7 +1053,7 @@ msgid "No answer provided."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
+msgid "Error: No grader has been set up for this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1030,6 +1106,19 @@ msgstr ""
 "SchematicResponse का मूल्यांकन करने में त्रुटि। त्रुटि यह थी: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr "स्टाफ़ के जवाब की व्याख्या एक संख्या के रूप में नहीं की जा सकी।"
 
@@ -1038,6 +1127,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr "'{given_answer}' की व्याख्या एक संख्या के रूप में नहीं की जा सकी।"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1053,6 +1143,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1827,6 +1918,47 @@ msgstr ""
 msgid "Secret Token String for Annotation"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -1972,6 +2104,75 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "त्रुटि"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration for how users are grouped for this content experiment. "
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/split_test_studio_header.html
+msgid "You must select a group configuration for this content experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment will not be shown to students because it refers to a"
+" group configuration that has been deleted. You can delete this experiment "
+"or reinstate the group configuration to repair it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment is in an invalid state and cannot be repaired. "
+"Please delete and recreate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
 #. the content of a course
@@ -1999,13 +2200,6 @@ msgstr "प्रगति"
 #: lms/templates/wiki/base.html
 msgid "Wiki"
 msgstr "विकी"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
-msgstr "चर्चा"
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
@@ -2053,6 +2247,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2359,10 +2563,6 @@ msgid "Basic"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -2463,6 +2663,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2647,18 +2848,12 @@ msgstr ""
 msgid "subsections"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "समस्या"
-
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
+msgid "Percent of Students"
 msgstr ""
 
 #: lms/templates/folditchallenge.html
@@ -2753,42 +2948,85 @@ msgstr "निर्दिष्ट दूरस्थ शाखा उपलब
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "निर्दिष्ट शाखा पर स्विच करने में असमर्थ. अपनी शाखा नाम की जाँच करें."
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
-msgstr "प्रमाणीकरण में विफल {0}, त्रुटि {1}\n"
+#: lms/djangoapps/dashboard/support.py cms/templates/login.html
+#: cms/templates/register.html
+msgid "Email Address"
+msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "प्रमाणीकरण में विफल {0}\n"
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "पाठ्यक्रम आईडी"
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr ""
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "पासवर्ड निश्चित कर दिया गया "
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr "सब ठीक है!"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr "उपयोगकर्ता का नाम देना अनिवार्य है"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr "पूरा नाम देना आवश्यक है"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "ईमेल को समाप्त होना चाहिए"
+msgid "Email address must end in {domain}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "विफल - ईमेल {0} पहले से ही external_id के रूप में मौजूद है "
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -2800,24 +3038,24 @@ msgid "email address required (not username)"
 msgstr "ईमेल पते की आवश्यकता है (उपयोगकर्ता नाम की नहीं)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "ओह, इंटेग्रिटी त्रुटि, उपयोगकर्ता {0} बनाने में विफल"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "उपयोगकर्ता {0} सफलतापूर्वक बनाया गया!"
+msgid "User {user} created successfully!"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "उपयोगकर्ता इस ईमेल पते {0} से नहीं खोजा जा सका है"
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "उपयोगकर्ता नाम {0} - {1} के साथ उपयोगकर्ता को नहीं खोजा जा सका"
+msgid "Cannot find user with username {username} - {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "उपयोगकर्ता {0} नष्ट करें"
+msgid "Deleted user {username}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -2840,7 +3078,6 @@ msgid "Courses loaded in the modulestore"
 msgstr "पाठ्यक्रमों को मॉड्यूल स्टोर में लोड कर दिया गया"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 #, fuzzy
 msgid "username"
@@ -2851,7 +3088,6 @@ msgstr ""
 "उपयोगकर्तानाम"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr "ई-मेल"
 
@@ -2877,6 +3113,9 @@ msgstr ""
 msgid "Added Course"
 msgstr "पाठ्यक्रम जोड़ा गया"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -2909,16 +3148,16 @@ msgstr ""
 "की जांच करें। आउटपुट था: {0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "भंडार को {0} क्लोन करने में असफल "
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "सफलतापूर्वक शाखा का बदलाव: {branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "लोड किए गए पाठ्यक्रम {0} {1}<br/>में त्रुटियाँ:"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
@@ -2929,6 +3168,8 @@ msgstr "पाठ्यक्रम का नाम"
 msgid "Directory/ID"
 msgstr "निर्देशिका/आईडी"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Git प्रतिबद्ध"
@@ -2954,7 +3195,6 @@ msgid "Deleted"
 msgstr "नष्ट कर दिया गया"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "पाठ्यक्रम_आईडी"
 
@@ -2975,12 +3215,10 @@ msgid "Enrollment information for all courses"
 msgstr "सभी पाठ्यक्रमों के लिए नामांकन की जानकारी"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr "भूमिका"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "पूरा_नाम"
 
@@ -2990,26 +3228,6 @@ msgid ""
 " and optionally specified directory."
 msgstr ""
 "निर्दिष्ट git भंडार को मॉड्यूल स्टोर और वैकल्पिक निर्देशिका में आयात करें"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr "उपयोगकर्ता इस ई-मेल पते से खोजा नहीं जा सका"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr "उपयोगकर्ता नाम के साथ उपयोगकर्ता को नहीं खोजा जा सका"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr "प्रमाणीकरण में विफल"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr "भंडार को क्लोन या खींचने में असमर्थ"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
-msgstr "त्रुटि - आईडी के साथ पाठ्यक्रम प्राप्त नहीं कर सकता"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -3067,6 +3285,10 @@ msgstr "उपयोगकर्ता मौजूद नहीं है।"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "कार्य पहले से ही चल रहा है।"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3170,6 +3392,10 @@ msgstr "डेटा डाउनलोड"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "एनेलिटिक्स"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "मेट्रिक्स"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -3979,12 +4205,10 @@ msgid "The course you requested does not exist."
 msgstr "आपने जिस पाठ्यक्रम के लिए अनुरोध किया है वह मौजूद नहीं है"
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr "यह पाठ्यक्रम{0} आपके कार्ट में पहले से ही है "
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr "आप पहले से ही इस पाठ्यक्रम में पंजीकृत हैं {0}।"
 
@@ -4415,6 +4639,51 @@ msgstr "कोई कीमत नहीं चुनी गई है या �
 msgid "Skip to this view's content"
 msgstr "इस दृश्य के कन्टेन्ट पर जाएं"
 
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -4610,7 +4879,9 @@ msgstr "लेख को नष्ट करें"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4653,6 +4924,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "आप एक लेख को नष्ट कर रहे हैं। कृपया इस क्रिया की पुष्टि करें।"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5111,6 +5383,18 @@ msgstr ""
 msgid "Upload completed"
 msgstr "अपलोड पूरा हुआ"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
@@ -5258,7 +5542,7 @@ msgstr "लोड हो रहा है..."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "देखें"
@@ -5378,8 +5662,9 @@ msgstr "सेवा की शर्तें"
 msgid "Privacy Policy"
 msgstr "निजता नीति"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "सहायता"
@@ -5422,10 +5707,8 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
 msgstr ""
-"मुझे भुगतान क्यों करना होगा? तब क्या होगा अगर मैं सभी आवश्यकताओं को पूरा "
-"नहीं कर पाता या कर पाती?"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5468,34 +5751,19 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
-"अगर आप न्यूनतम शुल्क नहीं दे सकते या फिर आप कोर्स की आवश्यकताएं नहीं पूरी "
-"करते तो आप पाठ्यक्रम को ऑडिट कर सकते हैं या फिर निःशुल्क तौर पर ऑनर कोड "
-"प्रमाण पत्र के लिए पढ़ सकते हैं। अगर आप ऑनर कोड प्रमाण पत्र के लिए पढ़ना "
-"चाहें तो ऑनर कोड प्रमाण पत्र के डिब्बे को क्लिक करें और हमें लिख कर बताएं कि"
-" आप वेरीफ़ाइड प्रमाण पत्र को क्यों नहीं कर सकते। इसके बाद अपनी रजिस्ट्रेशन "
-"पूरी करने के लिए 'प्रमाण पत्र चुनें' बटन को क्लिक करें।"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "ऑनर कोड प्रमाणपत्र चुनें"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "अपनी स्थिति स्पष्ट करें:"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"कृपया कुछ वाक्यों में लिखें की आप भुगतान सहित वैरीफाईड प्रमाण पत्र को छोड़कर "
-"ऑनर कोड प्रमाण पत्र की और क्यों बढ़ना चाहते हैं:"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -5685,6 +5953,12 @@ msgstr "कुछ गड़बड़ हो गई। कृपया बाद 
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "कृपया अपना नया ई-मेल वैरीफ़ाई करें"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -6185,13 +6459,9 @@ msgstr "कृपया हमें {link_start}ई-मेल भेजें{l
 msgid "Please try again later."
 msgstr "कृपया बाद में फिर से कोशिश कीजिए।"
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "आपके कोई नोट्स नहीं है।"
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
+msgstr ""
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -6446,11 +6716,6 @@ msgstr "रौ डेटा:"
 msgid "Accepted"
 msgstr "स्वीकार किया गया"
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "त्रुटि"
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr "अस्वीकृत"
@@ -6522,6 +6787,11 @@ msgstr ""
 "<strong>चेतावनी:</strong> आपका ब्राउज़र पूरी तरह से समर्थित नहीं है। हम आपसे"
 " दृड़ता से{chrome_link_start}क्रोम{chrome_link_end} "
 "या{ff_link_start}फ़ायरफ़ौक्स{ff_link_end} उपयोग करने की सलाह देते हैं।"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "आपके कोई नोट्स नहीं है।"
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -6869,6 +7139,10 @@ msgstr "लॉग-इन"
 msgid "Group {group_id}"
 msgstr "समूह {group_id}"
 
+#: lms/templates/split_test_studio_header.html
+msgid "Select a Group Configuration"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr "स्टाफ़ डीबग सूचना"
@@ -7068,11 +7342,6 @@ msgstr "प्लेटफ़ॉर्म संस्करण"
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
 msgstr "तारीख़"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "पाठ्यक्रम आईडी"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7579,6 +7848,10 @@ msgid "Course Navigation"
 msgstr "पाठ्यक्रम नेविगेशन"
 
 #: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
 msgstr "कैलक्यूलेटर खोलें"
 
@@ -7765,10 +8038,6 @@ msgstr "डेटाडंप"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
 msgstr "समूहों का प्रबंधन करें"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "मेट्रिक्स"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -8134,11 +8403,9 @@ msgstr "छात्रों की संख्या"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-"देशों के हिसाब से छात्रों का वितरण, सभी पाठ्यक्रम, सितम्बर-12 से अक्तूबर-17 "
-"तक, सरवर 1 (यहां एक उदाहरण के तौर पर दिखाया गया है):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9598,10 +9865,6 @@ msgid ""
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "भाग_डिस्प्ले_नाम"
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -10462,15 +10725,12 @@ msgstr "इतने आइटम ऑर्डर किए हैं:"
 msgid "Qty"
 msgstr "मात्रा"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "Note: items with strikethough like"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "भुगतान वापिस हो गया है।"
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -10640,10 +10900,6 @@ msgstr "ऑर्डर न."
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "कुल"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "यह"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -11939,7 +12195,9 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
@@ -11955,17 +12213,12 @@ msgstr ""
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
 msgid "Container"
-msgstr ""
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
 msgstr ""
 
 #: cms/templates/container.html cms/templates/container.html
@@ -11998,6 +12251,11 @@ msgid ""
 "this page. In the case of experiment blocks, this allows you to confirm that"
 " you have properly configured your experiment groups and make changes to "
 "existing content."
+msgstr ""
+
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -12387,7 +12645,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
+"Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -12426,7 +12684,7 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
+"let you reorganize quickly."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -12447,9 +12705,8 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -12458,8 +12715,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -12478,8 +12735,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
 msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
@@ -12505,8 +12762,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -13015,10 +13272,6 @@ msgstr ""
 msgid "Required Information to Sign In to edX Studio"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr ""
-
 #: cms/templates/login.html
 msgid "Studio Support"
 msgstr ""
@@ -13442,8 +13695,7 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -13894,7 +14146,7 @@ msgstr ""
 msgid "Help &amp; Account Navigation"
 msgstr ""
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -13908,14 +14160,6 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html
@@ -14003,6 +14247,22 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about edX Studio?"
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"This content experiment refers to a group configuration that has been "
+"deleted."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid "This content experiment uses group configuration '{0}'."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

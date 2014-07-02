@@ -13,7 +13,7 @@ from fs.osfs import OSFS
 import os
 import json
 from bson.son import SON
-from xmodule.modulestore.locations import AssetLocation
+from opaque_keys.edx.locations import AssetLocation
 
 
 class MongoContentStore(ContentStore):
@@ -66,8 +66,8 @@ class MongoContentStore(ContentStore):
     def delete(self, location_or_id):
         if isinstance(location_or_id, AssetLocation):
             location_or_id = self.asset_db_key(location_or_id)
-        if self.fs.exists({"_id": location_or_id}):
-            self.fs.delete(location_or_id)
+        # Deletes of non-existent files are considered successful
+        self.fs.delete(location_or_id)
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = self.asset_db_key(location)
@@ -103,10 +103,8 @@ class MongoContentStore(ContentStore):
 
     def get_stream(self, location):
         content_id = self.asset_db_key(location)
-        fs_pointer = self.fs_files.find_one({'_id': content_id}, fields={'_id': 1})
-
         try:
-            handle = self.fs.get(fs_pointer['_id'])
+            handle = self.fs.get(content_id)
         except NoFile:
             raise NotFoundError()
 
@@ -148,7 +146,15 @@ class MongoContentStore(ContentStore):
 
         for asset in assets:
             asset_location = AssetLocation._from_deprecated_son(asset['_id'], course_key.run)  # pylint: disable=protected-access
-            self.export(asset_location, output_directory)
+            # TODO: On 6/19/14, I had to put a try/except around this
+            # to export a course. The course failed on JSON files in
+            # the /static/ directory placed in it with an import.
+            # 
+            # If this hasn't been looked at in a while, remove this comment. 
+            #
+            # When debugging course exports, this might be a good place
+            # to look. -- pmitros
+            self.export(asset_location, output_directory) 
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
                     policy.setdefault(asset_location.name, {})[attr] = value
@@ -238,11 +244,10 @@ class MongoContentStore(ContentStore):
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key = self.asset_db_key(location)
-        # FIXME remove fetch and use a form of update which fails if doesn't exist
-        item = self.fs_files.find_one({'_id': asset_db_key})
-        if item is None:
+        # catch upsert error and raise NotFoundError if asset doesn't exist
+        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        if not result.get('updatedExisting', True):
             raise NotFoundError(asset_db_key)
-        self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict})
 
     def get_attrs(self, location):
         """

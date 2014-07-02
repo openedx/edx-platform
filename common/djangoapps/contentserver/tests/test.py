@@ -15,11 +15,9 @@ from django.test.utils import override_settings
 from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
-from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.tests.django_utils import (studio_store_config,
-    ModuleStoreTestCase)
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
 
 log = logging.getLogger(__name__)
@@ -27,10 +25,8 @@ log = logging.getLogger(__name__)
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
-TEST_MODULESTORE = studio_store_config(settings.TEST_ROOT / "data")
 
-
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that use the toy course.
@@ -40,16 +36,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Create user and login.
         """
-
-        settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
-        settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
-
         self.client = Client()
         self.contentstore = contentstore()
 
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        import_from_xml(modulestore('direct'), 'common/test/data/', ['toy'],
+        import_from_xml(modulestore(), '**replace_user**', 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
 
         # A locked asset

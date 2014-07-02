@@ -5,19 +5,19 @@ from verify_student import views
 urlpatterns = patterns(
     '',
     url(
-        r'^show_requirements/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
+        r'^show_requirements/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
         views.show_requirements,
         name="verify_student_show_requirements"
     ),
 
     url(
-        r'^verify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
+        r'^verify/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
         views.VerifyView.as_view(),  # pylint: disable=E1120
         name="verify_student_verify"
     ),
 
     url(
-        r'^verified/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
+        r'^verified/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
         views.VerifiedView.as_view(),
         name="verify_student_verified"
     ),
@@ -41,7 +41,7 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^midcourse_reverify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
+        r'^midcourse_reverify/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
         views.MidCourseReverifyView.as_view(),  # pylint: disable=E1120
         name="verify_student_midcourse_reverify"
     ),

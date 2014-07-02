@@ -28,16 +28,15 @@ from xmodule.html_module import CourseInfoModule
 log = logging.getLogger(__name__)
 
 
-def get_course_updates(location, provided_id):
+def get_course_updates(location, provided_id, user_id):
     """
     Retrieve the relevant course_info updates and unpack into the model which the client expects:
     [{id : index, date : string, content : html string}]
     """
     try:
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
     except ItemNotFoundError:
-        modulestore('direct').create_and_save_xmodule(location)
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().create_and_save_xmodule(location, user_id)
 
     course_update_items = get_course_update_items(course_updates, provided_id)
     return _get_visible_update(course_update_items)
@@ -50,10 +49,9 @@ def update_course_updates(location, update, passed_id=None, user=None):
     into the html structure.
     """
     try:
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
     except ItemNotFoundError:
-        modulestore('direct').create_and_save_xmodule(location)
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().create_and_save_xmodule(location, user.id)
 
     course_update_items = list(reversed(get_course_update_items(course_updates)))
 
@@ -135,7 +133,7 @@ def delete_course_update(location, update, passed_id, user):
         return HttpResponseBadRequest()
 
     try:
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
@@ -239,6 +237,6 @@ def save_course_update_items(location, course_updates, course_update_items, user
     course_updates.data = _get_html(course_update_items)
 
     # update db record
-    modulestore('direct').update_item(course_updates, user)
+    modulestore().update_item(course_updates, user.id)
 
     return course_updates

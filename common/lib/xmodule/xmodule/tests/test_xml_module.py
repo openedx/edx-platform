@@ -44,11 +44,7 @@ class TestFields(object):
         values=[{'display_name': 'first', 'value': 'value a'},
                 {'display_name': 'second', 'value': 'value b'}]
     )
-    showanswer = String(
-        help="When to show the problem answer to the student",
-        scope=Scope.settings,
-        default="finished"
-    )
+    showanswer = InheritanceMixin.showanswer
     # Used for testing select type
     float_select = Float(scope=Scope.settings, default=.999, values=[1.23, 0.98])
     # Used for testing float type

@@ -1,7 +1,8 @@
 """ Unit tests for checklist methods in views.py. """
-from contentstore.utils import get_modulestore, reverse_course_url
+from contentstore.utils import reverse_course_url
 from contentstore.views.checklist import expand_checklist_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore
 
 import json
 from contentstore.tests.utils import CourseTestCase
@@ -21,8 +22,7 @@ class ChecklistTestCase(CourseTestCase):
 
     def get_persisted_checklists(self):
         """ Returns the checklists as persisted in the modulestore. """
-        modulestore = get_modulestore(self.course.location)
-        return modulestore.get_item(self.course.location).checklists
+        return modulestore().get_item(self.course.location).checklists
 
     def compare_checklists(self, persisted, request):
         """
@@ -54,8 +54,7 @@ class ChecklistTestCase(CourseTestCase):
         self.course.checklists = None
         # Save the changed `checklists` to the underlying KeyValueStore before updating the modulestore
         self.course.save()
-        modulestore = get_modulestore(self.course.location)
-        modulestore.update_item(self.course, self.user.id)
+        modulestore().update_item(self.course, self.user.id)
         self.assertEqual(self.get_persisted_checklists(), None)
         response = self.client.get(self.checklists_url)
         self.assertEqual(payload, response.content)

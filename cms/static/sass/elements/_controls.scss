@@ -230,9 +230,10 @@
     vertical-align: middle;
 
     .action-button {
+      @include transition(all $tmg-f3 linear 0s);
       display: block;
       border-radius: 3px;
-      padding: ($baseline/4) ($baseline/2);
+      padding: 3px ($baseline/2);
       color: $gray-l1;
 
       &:hover {

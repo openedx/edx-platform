@@ -5,7 +5,7 @@ Tests for sandboxing.py in util app
 from django.test import TestCase
 from util.sandboxing import can_execute_unsafe_code
 from django.test.utils import override_settings
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class SandboxingTest(TestCase):

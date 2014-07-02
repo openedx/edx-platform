@@ -1,4 +1,4 @@
-@shard_1
+@shard_1 @requires_stub_youtube
 Feature: CMS Video Component Editor
   As a course author, I want to be able to create video components
 
@@ -223,4 +223,19 @@ Feature: CMS Video Component Editor
     And I choose "zh" language code
     And I click button "Add"
     Then I cannot choose "zh" language code
+
+  # 18
+  Scenario: User can see table of content at the first position
+    Given I have created a Video component
+    And I edit the component
+    And I open tab "Advanced"
+    And I upload transcript files:
+      |lang_code|filename               |
+      |uk       |uk_transcripts.srt     |
+      |table    |chinese_transcripts.srt|
+    And I save changes
+    Then when I view the video it does show the captions
+    And I see "好 各位同学" text in the captions
+    And video language menu has "table, uk" translations
+    And I see video language with code "table" at position "0"
 

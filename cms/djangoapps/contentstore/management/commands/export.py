@@ -6,10 +6,10 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.django import contentstore
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -35,4 +35,4 @@ class Command(BaseCommand):
         root_dir = os.path.dirname(output_path)
         course_dir = os.path.splitext(os.path.basename(output_path))[0]
 
-        export_to_xml(modulestore('direct'), contentstore(), course_key, root_dir, course_dir, modulestore())
+        export_to_xml(modulestore(), contentstore(), course_key, root_dir, course_dir)

@@ -98,7 +98,6 @@ function (HTML5Video, Resizer) {
             if (!state.isFlashMode() && state.speed != '1.0') {
                 state.videoPlayer.setPlaybackRate(state.speed);
             }
-            state.videoPlayer.player.setVolume(state.currentVolume);
         });
 
         if (state.isYoutubeType()) {
@@ -143,7 +142,7 @@ function (HTML5Video, Resizer) {
         if (state.videoType === 'html5') {
             state.videoPlayer.player = new HTML5Video.Player(state.el, {
                 playerVars:   state.videoPlayer.playerVars,
-                videoSources: state.html5Sources,
+                videoSources: state.config.sources,
                 events: {
                     onReady:       state.videoPlayer.onReady,
                     onStateChange: state.videoPlayer.onStateChange
@@ -432,7 +431,8 @@ function (HTML5Video, Resizer) {
     // Reinitialized on a onSeek event.
     function onSeek(params) {
         var time = params.time,
-            type = params.type;
+            type = params.type,
+            oldTime = this.videoPlayer.currentTime;
 
         // After the user seeks, the video will start playing from
         // the sought point, and stop playing at the end.
@@ -442,11 +442,10 @@ function (HTML5Video, Resizer) {
         }
 
         this.videoPlayer.seekTo(time);
-
         this.videoPlayer.log(
             'seek_video',
             {
-                old_time: this.videoPlayer.currentTime,
+                old_time: oldTime,
                 new_time: time,
                 type: type
             }
@@ -507,6 +506,12 @@ function (HTML5Video, Resizer) {
 
     function onEnded() {
         var time = this.videoPlayer.duration();
+        this.videoPlayer.log(
+            'stop_video',
+            {
+                currentTime: this.videoPlayer.currentTime
+            }
+        );
 
         this.trigger('videoControl.pause', null);
         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
@@ -582,6 +587,10 @@ function (HTML5Video, Resizer) {
 
         this.el.on('speedchange', function (event, speed) {
             _this.videoPlayer.onSpeedChange(speed);
+        });
+
+        this.el.on('volumechange volumechange:silent', function (event, volume) {
+            _this.videoPlayer.onVolumeChange(volume);
         });
 
         this.videoPlayer.log('load_video');
@@ -919,7 +928,6 @@ function (HTML5Video, Resizer) {
 
     function onVolumeChange(volume) {
         this.videoPlayer.player.setVolume(volume);
-        this.el.trigger('volumechange', arguments);
     }
 });
 

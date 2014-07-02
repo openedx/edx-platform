@@ -16,6 +16,7 @@ from .common import *
 import os
 from path import path
 from warnings import filterwarnings
+from uuid import uuid4
 
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
@@ -110,17 +111,20 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-# point tests at the test courses by default
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': COMMON_TEST_DATA_ROOT,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
+MODULESTORE_BRANCH = 'draft-preferred'
+update_module_store_settings(
+    MODULESTORE,
+    module_store_options={
+        'fs_root': TEST_ROOT / "data",
+    },
+    xml_store_options={
+        'data_dir': COMMON_TEST_DATA_ROOT,
+    },
+    doc_store_settings={
+        'db': 'test_xmodule',
+        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+    },
+)
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -128,12 +132,6 @@ CONTENTSTORE = {
         'host': 'localhost',
         'db': 'xcontent',
     }
-}
-
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'test_xmodule',
-    'collection': 'test_modulestore',
 }
 
 DATABASES = {
@@ -300,6 +298,9 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
 
+PLATFORM_NAME = "edX"
+SITE_NAME = "edx.org"
+
 # set up some testing for microsites
 MICROSITE_CONFIGURATION = {
     "test_microsite": {
@@ -328,6 +329,12 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
 FEATURES['USE_MICROSITES'] = True
 
+# add extra template directory for test-only templates
+MAKO_TEMPLATES['main'].extend([
+    COMMON_ROOT / 'test' / 'templates'
+])
+
+
 ######### LinkedIn ########
 LINKEDIN_API['COMPANY_ID'] = '0000000'
 
@@ -335,4 +342,8 @@ LINKEDIN_API['COMPANY_ID'] = '0000000'
 VERIFY_STUDENT["SOFTWARE_SECURE"] = {
         "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
         "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+}
+
+VIDEO_CDN_URL = {
+    'CN': 'http://api.xuetangx.com/edx/video?s3_url='
 }

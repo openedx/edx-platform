@@ -32,13 +32,16 @@ import json
 from path import path
 
 from .discussionsettings import *
+from .modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
+PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
+PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -475,23 +478,6 @@ COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
-############################### XModule Store ##################################
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': DATA_DIR,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
-CONTENTSTORE = None
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'xmodule',
-    'collection': 'modulestore',
-}
-
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
@@ -505,6 +491,45 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+############# ModuleStore Configuration ##########
+
+MODULESTORE_BRANCH = 'published-only'
+CONTENTSTORE = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'mappings': {},
+            'reference_type': 'Location',
+            'stores': [
+                {
+                    'NAME': 'draft',
+                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': {
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'fs_root': DATA_DIR,
+                        'render_template': 'edxmako.shortcuts.render_to_string',
+                    }
+                },
+                {
+                    'NAME': 'xml',
+                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+                    'OPTIONS': {
+                        'data_dir': DATA_DIR,
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    }
+                },
+            ]
+        }
+    }
+}
 
 #################### Python sandbox ############################################
 
@@ -542,7 +567,7 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
@@ -555,6 +580,8 @@ SERVER_EMAIL = 'devops@example.com'
 TECH_SUPPORT_EMAIL = 'technical@example.com'
 CONTACT_EMAIL = 'info@example.com'
 BUGS_EMAIL = 'bugs@example.com'
+UNIVERSITY_EMAIL = 'university@example.com'
+PRESS_EMAIL = 'press@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -580,6 +607,7 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
+    ('am', u'አማርኛ'),  # Amharic
     ('ar', u'العربية'),  # Arabic
     ('az', u'azərbaycanca'),  # Azerbaijani
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
@@ -637,12 +665,14 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('ta', u'தமிழ்'),  # Tamil
     ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Ukranian
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
+    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
 )
 
@@ -799,6 +829,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
@@ -868,6 +899,7 @@ main_vendor_js = [
     'js/vendor/ova/reply-annotator.js',
     'js/vendor/ova/tags-annotator.js',
     'js/vendor/ova/flagging-annotator.js',
+    'js/vendor/ova/diacritic-annotator.js',
     'js/vendor/ova/jquery-Watch.js',
     'js/vendor/ova/openseadragon.js',
     'js/vendor/ova/OpenSeaDragonAnnotation.js',
@@ -890,14 +922,15 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
-            'css/vendor/ova/edx-annotator.css',
             'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
             'css/vendor/ova/video-js.min.css',
             'css/vendor/ova/rangeslider.css',
             'css/vendor/ova/share-annotator.css',
             'css/vendor/ova/richText-annotator.css',
             'css/vendor/ova/tags-annotator.css',
             'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
             'css/vendor/ova/ova.css',
             'js/vendor/ova/catch/css/main.css'
         ],
@@ -1120,7 +1153,6 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
-BULK_EMAIL_EMAILS_PER_QUERY = 1000
 
 # Initial delay used for retrying tasks.  Additional retries use
 # longer delays.  Value is in seconds.
@@ -1394,6 +1426,12 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
+
+############################ ORA 2 ############################################
+
+# By default, don't use a file prefix
+ORA2_FILE_PREFIX = None
 
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####

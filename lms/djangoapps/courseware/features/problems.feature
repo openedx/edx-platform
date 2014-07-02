@@ -1,4 +1,4 @@
-@shard_1
+@shard_1 @requires_stub_xqueue
 Feature: LMS.Answer problems
     As a student in an edX course
     In order to test my understanding of the material

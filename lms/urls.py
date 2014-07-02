@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 
 import django.contrib.auth.views
 
+from microsite_configuration import microsite
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -67,7 +69,7 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
-    
+
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
@@ -81,8 +83,8 @@ urlpatterns += (
 
 js_info_dict = {
     'domain': 'djangojs',
-    # No packages needed, we get LOCALE_PATHS anyway.
-    'packages': (),
+    # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
+    'packages': ('openassessment',),
 }
 
 urlpatterns += (
@@ -96,11 +98,23 @@ if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
         url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
     )
 
+urlpatterns += (
+    url(r'^support/', include('dashboard.support_urls')),
+)
+
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
 urlpatterns += (
     url(r'^404$', 'static_template_view.views.render',
         {'template': '404.html'}, name="404"),
 )
+
+# Favicon
+favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
+urlpatterns += ((
+    r'^favicon\.ico$',
+    'django.views.generic.simple.redirect_to',
+    {'url':  settings.STATIC_URL + favicon_path}
+),)
 
 # Semi-static views only used by edX, not by themes
 if not settings.FEATURES["USE_CUSTOM_THEME"]:
@@ -121,10 +135,7 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-
-        # Favicon
-        (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-    )
+)
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.
@@ -148,7 +159,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
     # Make the assumption that the URL we want is the lowercased
     # version of the map key
-    urlpatterns += (url(r'^%s' % key.lower(),
+    urlpatterns += (url(r'^%s$' % key.lower(),
                         'static_template_view.views.render',
                         {'template': template}, name=value),)
 
@@ -276,8 +287,6 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor/api/',
             include('instructor.views.api_urls')),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.instructor_dashboard.spoc_gradebook', name='spoc_gradebook'),
 
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
@@ -366,7 +375,7 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
-        'courseware.views.static_tab', name="static_tab"),
+            'courseware.views.static_tab', name="static_tab"),
     )
 
     if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
@@ -379,8 +388,6 @@ if settings.COURSEWARE_ENABLED:
 
 if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_gradebook$',
-            'instructor.views.legacy.gradebook', name='gradebook_legacy'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_grade_summary$',
             'instructor.views.legacy.grade_summary', name='grade_summary_legacy'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/legacy_instructor_dash$',

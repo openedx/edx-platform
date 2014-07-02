@@ -11,13 +11,13 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from mock import patch
 
 from bulk_email.models import CourseAuthorization
 from bulk_email.forms import CourseAuthorizationAdminForm
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -132,7 +132,7 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
     def test_xml_course_authorization(self):
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         # Assert this is an XML course
-        self.assertEqual(modulestore().get_modulestore_type(course_id), XML_MODULESTORE_TYPE)
+        self.assertEqual(modulestore().get_modulestore_type(course_id), ModuleStoreEnum.Type.xml)
 
         form_data = {'course_id': course_id.to_deprecated_string(), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)

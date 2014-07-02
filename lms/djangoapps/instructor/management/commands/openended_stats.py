@@ -7,9 +7,8 @@ import time
 from django.core.management.base import BaseCommand
 from optparse import make_option
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 from courseware.courses import get_course

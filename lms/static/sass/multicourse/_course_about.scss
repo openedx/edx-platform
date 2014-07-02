@@ -53,7 +53,7 @@
           h1 {
             color: $base-font-color;
             font-weight: normal;
-            @include inline-block;
+            display: inline-block;
             margin: 0;
             letter-spacing: 0px;
             text-align: left;
@@ -74,7 +74,7 @@
           }
 
           h2 {
-            @include inline-block;
+            display: inline-block;
             margin: 0;
 
             a {
@@ -239,14 +239,14 @@
 
   .container {
     @include clearfix;
-    
+
     .wrap-instructor-info {
       &.studio-view {
         position: relative;
         margin: ($baseline/2) 0 0 0;
         overflow: hidden;
       }
-      
+
       .instructor-info-action {
         @extend %t-copy-sub2;
         float: right;
@@ -256,14 +256,14 @@
         text-align: right;
         text-transform: uppercase;
         color: $lighter-base-font-color;
-    
+
         &:hover {
           background-color: $link-hover;
           color: $white;
         }
       }
     }
-    
+
     nav {
       border-bottom: 1px solid $border-color-2;
       @include box-sizing(border-box);
@@ -280,7 +280,7 @@
       a {
         border-bottom: 3px solid transparent;
         color: $lighter-base-font-color;
-        @include inline-block;
+        display: inline-block;
         letter-spacing: 1px;
         margin: 0 15px;
         padding: 0px 5px 15px;
@@ -305,7 +305,7 @@
     margin-right: flex-gutter();
     width: flex-grid(8);
     font: normal 1em/1.6em $serif;
-    
+
     h2 {
       margin-top: ($baseline*1.5);
     }
@@ -450,7 +450,7 @@
         font-family: $sans-serif;
         font-style: italic;
         font-weight: 800;
-        @include inline-block;
+        display: inline-block;
         letter-spacing: 0px;
         margin-right: 15px;
         padding-right: 15px;
@@ -507,7 +507,7 @@
 
         .share {
           height: 44px;
-          @include inline-block;
+          display: inline-block;
           margin-right: 10px;
           opacity: 0.5;
           @include transition(all 0.15s linear 0s);

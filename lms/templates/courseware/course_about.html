@@ -285,15 +285,15 @@
               </a>
             % else:
               <%
-                site_domain = microsite.get_value('site_domain', 'www.edx.org')
-                platform_name = microsite.get_value('platform_name', 'edX')
+                site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
+                platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
 
                 # Translators: This text will be automatically posted to the student's
                 # Twitter account. {url} should appear at the end of the text.
                 tweet_text = _("I just registered for {number} {title} through {account}: {url}").format(
                     number=course.number,
                     title=get_course_about_section(course, 'title'),
-                    account=microsite.get_value('course_about_twitter_account', '@edxonline'),
+                    account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
                     url=u"http://{domain}{path}".format(
                         domain=site_domain,
                         path=reverse('about_course', args=[course.id.to_deprecated_string()])
@@ -301,7 +301,7 @@
                 ).replace(u" ", u"+")
                 tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
 
-                facebook_link = microsite.get_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
+                facebook_link = microsite.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
                 email_subject = u"mailto:?subject={subject}&body={body}".format(
                     subject=_("Take a course with {platform} online").format(platform=platform_name),

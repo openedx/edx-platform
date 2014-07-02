@@ -21,11 +21,11 @@ from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, NonRegisteredUserFactory
 from edxmako.middleware import MakoMiddleware
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory
 
 import courseware.views as views
@@ -80,13 +80,13 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
-        course = CourseFactory()
-        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
-        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        vertical = ItemFactory(category='vertical', parent_location=section.location)
-        self.component = ItemFactory(category='problem', parent_location=vertical.location)
+        self.course = CourseFactory()
+        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
+        self.component = ItemFactory(category='problem', parent_location=self.vertical.location)
 
-        self.course_key = course.id
+        self.course_key = self.course.id
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
@@ -145,7 +145,34 @@ class ViewsTestCase(TestCase):
         mock_module.position = 3
         mock_module.get_display_items.return_value = []
         self.assertRaises(Http404, views.redirect_to_course_position,
-                          mock_module)
+                          mock_module, views.CONTENT_DEPTH)
+
+    def test_index_invalid_position(self):
+        request_url = '/'.join([
+            '/courses',
+            self.course.id.to_deprecated_string(),
+            self.chapter.location.name,
+            self.section.location.name,
+            'f'
+        ])
+        response = self.client.get(request_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_unicode_handling_in_url(self):
+        url_parts = [
+            '/courses',
+            self.course.id.to_deprecated_string(),
+            self.chapter.location.name,
+            self.section.location.name,
+            '1'
+        ]
+
+        for idx, val in enumerate(url_parts):
+            url_parts_copy = url_parts[:]
+            url_parts_copy[idx] = val + u'χ'
+            request_url = '/'.join(url_parts_copy)
+            response = self.client.get(request_url)
+            self.assertEqual(response.status_code, 404)
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))

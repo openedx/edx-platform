@@ -5,6 +5,36 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
+
+Studio: Show display names and help text in Advanced Settings. Also hide deprecated settings
+by default.
+
+Studio: Move Peer Assessment into advanced problems menu.
+
+Studio: Support creation and editing of split_test instances (Content Experiments)
+entirely in Studio. STUD-1658.
+
+Blades: Add context-aware video index. BLD-933
+
+Blades: Fix bug with incorrect link format and redirection. BLD-1049
+
+Blades: Fix bug with incorrect RelativeTime value after XML serialization. BLD-1060
+
+LMS: Update bulk email implementation to lessen load on the database
+by consolidating chunked queries for recipients into a single query.
+
+Blades: Fix link to javascript file in ChoiceTextResponse. BLD-1103.
+
+All: refactored code to handle course_ids, module_ids, etc in a cleaner way.
+See https://github.com/edx/edx-platform/wiki/Opaque-Keys for details.
+
+Blades: Remove Video player outline. BLD-975.
+
+Blades: Fix Youtube regular expression in video player editor. BLD-967.
+
+Studio: Support editing of containers. STUD-1312.
+
 Blades: Fix displaying transcripts on touch devices. BLD-1033.
 
 Blades: Tolerance expressed in percentage now computes correctly. BLD-522.
@@ -15,7 +45,8 @@ Studio: Add drag-and-drop support to the container page. STUD-1309.
 
 Common: Add extensible third-party auth module.
 
-Blades: Added new error message that displays when HTML5 video is not supported altogether. Make sure spinner gets hidden when error message is shown. BLD-638.
+Blades: Added new error message that displays when HTML5 video is not supported
+altogether. Make sure spinner gets hidden when error message is shown. BLD-638.
 
 LMS: Switch default instructor dashboard to the new (formerly "beta")
   instructor dashboard. Puts the old (now "legacy") dash behind a feature flag.

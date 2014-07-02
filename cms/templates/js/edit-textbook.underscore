@@ -15,7 +15,7 @@
         </div>
   </fieldset>
   <fieldset class="chapters-fields">
-    <legend class="sr"><%= gettext("Chapter(s) information") %></legend>
+    <legend class="sr"><%= gettext("Chapter information") %></legend>
       <ol class="chapters list-input enum"></ol>
 
     <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>

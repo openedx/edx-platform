@@ -307,6 +307,7 @@ events that originate on the server (during the processing of a request).
 =========================
 Enrollment Events
 =========================
+
 .. tracked_command.py
 
 ``edx.course.enrollment.activated`` and ``edx.course.enrollment.deactivated``
@@ -437,7 +438,7 @@ when a student clicks this option, and the process of upgrading the
 ``event`` **Member Fields**: None.
        
 ``edx.course.enrollment.upgrade.succeeded``
-------------------------------------------
+--------------------------------------------
 
 The server emits this event when the process of upgrading a student's
 ``student_courseenrollment.mode`` from 'audit' or 'honor' to 'verified' is
@@ -458,7 +459,7 @@ complete.
      - Details and Member Fields
    * - ``mode``
      - string
-     - always 'verified'
+     - Set to 'verified'.
 
 ``event`` **Member Fields**: None.
 
@@ -467,7 +468,9 @@ complete.
 ==============================
 Navigational Events   
 ==============================
+
 .. display_spec.coffee
+
 The browser emits these events when a user selects a navigational control. 
 
 * ``seq_goto`` is emitted when a user jumps between units in a sequence. 
@@ -525,7 +528,9 @@ JavaScript Logger itself.
 ==============================
 Video Interaction Events   
 ==============================
+
 .. video_player_spec.js, lms-modules.js
+
 The browser emits these events when a user works with a video.
 
 **Component**: Video
@@ -535,9 +540,12 @@ The browser emits these events when a user works with a video.
 ``play_video``, ``pause_video``
 ---------------------------------
 
-* The browser emits ``play_video`` events on video play. 
+* The browser emits ``play_video`` events when the user clicks the video
+  **play** control.
 
-* The browser emits  ``pause_video`` events on video pause. 
+* The browser emits  ``pause_video`` events when the user clicks the video
+  **pause** control. The browser also emits these events when the video player
+  reaches the end of the video file and play automatically stops.
 
 ``event`` **Member Fields**: These events have the same ``event`` fields.
 
@@ -562,11 +570,35 @@ The browser emits these events when a user works with a video.
      - string
      - Video speed in use: '0.75', '1.0', '1.25', '1.50'.
 
+``stop_video``
+--------------------
+
+The browser emits  ``stop_video`` events when the video player reaches the end
+of the video file and play automatically stops.
+
+**History**: Added 25 June 2014.
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``currentTime``
+     - float
+     - Time the video ended, in seconds. 
+
 ``seek_video``
 -----------------
 
 The browser emits ``seek_video`` events when a user clicks the playback bar or
 transcript to go to a different point in the video file.
+
+**History**: Prior to 25 Jun 2014, the ``old_time`` and ``new_time`` were set
+to the same value.
 
 ``event`` **Member Fields**: 
 
@@ -578,16 +610,16 @@ transcript to go to a different point in the video file.
      - Type
      - Details
    * - ``old_time``
-     - 
-     - The time in the video that the user chose to go to a different point in the file.
+     - integer
+     - The time in the video, in seconds, at which the user chose to go to a
+       different point in the file.
    * - ``new_time``
-     - 
-     - The time in the video that the user selected as the destination point.
+     - integer
+     - The time in the video, in seconds, that the user selected as the
+       destination point.
    * - ``type``
-     - 
+     - string
      - The navigational method used to change position within the video.
-
-.. need types
 
 ``speed_change_video`` 
 ------------------------
@@ -685,7 +717,9 @@ display the video transcript.
 =================================
 Textbook Interaction Events   
 =================================
+
 .. pdf-analytics.js
+
 ``book``
 ----------
 
@@ -1217,10 +1251,8 @@ user selects or clears the **Match Case** option for a search.
 =================================
 Problem Interaction Events 
 =================================
-.. lms-modules.js
-.. %%
-.. These events are 
-.. Capa Module
+
+.. lms-modules.js These events are Capa Module
 
 Problem interaction events are emitted by the server or the browser to capture
 information about interactions with problems, specifically, problems defined in
@@ -1228,7 +1260,9 @@ the edX Capa module.
 
 ``problem_check`` (Browser)
 ----------------------------
+
 .. no sample to check
+
 Both browser interactions and server requests produce ``problem_check`` events.
 The browser emits ``problem_check`` events when a user checks a problem.
 
@@ -1240,7 +1274,9 @@ checked, styled as GET parameters.
 
 ``problem_check`` (Server)
 ----------------------------
+
 .. no sample to check
+
 Both browser interactions and server requests produce ``problem_check`` events.
 
 The server emits ``problem_check`` events when a problem is successfully checked. 
@@ -1338,7 +1374,9 @@ The server emits ``problem_check`` events when a problem is successfully checked
 
 ``problem_check_fail``
 -----------------------------
+
 .. no sample to check
+
 The server emits ``problem_check_fail`` events when a problem cannot be checked successfully.
 
 **Event Source**: Server
@@ -1391,7 +1429,9 @@ The browser emits ``problem_reset`` events when a user clicks **Reset** to reset
 
 ``problem_rescore``
 -----------------------------
+
 .. no sample to check
+
 The server emits ``problem_rescore`` events when a problem is successfully rescored.  
 
 **Event Source**: Server
@@ -1435,7 +1475,9 @@ The server emits ``problem_rescore`` events when a problem is successfully resco
 
 ``problem_rescore_fail``
 -----------------------------
+
 .. no sample to check
+
 The server emits ``problem_rescore_fail`` events when a problem cannot be successfully rescored.  
 
 **Event Source**: Server
@@ -1461,7 +1503,9 @@ The server emits ``problem_rescore_fail`` events when a problem cannot be succes
 
 ``problem_save``
 -----------------------------
+
 .. no sample to check
+
 The browser emits ``problem_save`` events when a user saves a problem.
 
 **Event Source**: Browser
@@ -1470,8 +1514,11 @@ The browser emits ``problem_save`` events when a user saves a problem.
 
 ``problem_show``
 -----------------------------
+
 .. no sample to check
+
 The browser emits ``problem_show`` events when a problem is shown.  
+
 .. %%
 
 **Event Source**: Browser
@@ -1491,8 +1538,11 @@ The browser emits ``problem_show`` events when a problem is shown.
 
 ``reset_problem``
 ------------------------------------------------
+
 .. no sample to check
+
 The server emits ``reset_problem`` events when a problem has been reset successfully. 
+
 .. %%what is the difference between reset_problem and problem_reset?
 
 **Event Source**: Server
@@ -1518,7 +1568,9 @@ The server emits ``reset_problem`` events when a problem has been reset successf
 
 ``reset_problem_fail`` 
 ------------------------------------------------
+
 .. no sample to check
+
 The server emits ``reset_problem_fail`` events when a problem cannot be reset successfully. 
 
 **Event Source**: Server
@@ -1544,7 +1596,9 @@ The server emits ``reset_problem_fail`` events when a problem cannot be reset su
 
 ``show_answer`` 
 ------------------------------------------------
+
 .. no sample to check
+
 The server emits ``show_answer`` events when the answer to a problem is shown. 
 
 **Event Source**: Server
@@ -1568,6 +1622,7 @@ The server emits ``show_answer`` events when the answer to a problem is shown.
 
 ``save_problem_fail`` 
 ------------------------------------------------
+
 .. no sample to check
 
 The server emits ``save_problem_fail``  events when a problem cannot be saved successfully. 
@@ -1598,7 +1653,9 @@ The server emits ``save_problem_fail``  events when a problem cannot be saved su
 
 ``save_problem_success`` 
 ------------------------------------------------
+
 .. no sample to check
+
 The server emits ``save_problem_success`` events when a problem is saved successfully. 
 
 **Event Source**: Server
@@ -1624,7 +1681,9 @@ The server emits ``save_problem_success`` events when a problem is saved success
 
 ``problem_graded``
 -------------------
+
 .. return Logger.log('problem_graded', [_this.answers, response.contents], _this.id);
+
 The server emits a ``problem_graded`` event each time a user clicks **Check**
 for a problem and it is graded successfully.
 
@@ -1649,8 +1708,7 @@ for a problem and it is graded successfully.
 ======================================
 Open Response Assessment Events 
 ======================================
-.. reviewers: I did not spend much editing time on these descriptions, I only
-.. changed the presentation. Please review for accuracy only.
+
 **History**: The events in this section record interactions with the prototype
 implementation of open response assessment (ORA) problem types. As of May 2014,
 new courses are not using this implementation of ORA and a complete redesign of
@@ -1739,7 +1797,9 @@ user hides or redisplays a combined open-ended problem.
 
 ``peer_grading_hide_question`` and ``peer_grading_show_question``
 ---------------------------------------------------------------------
+
 .. I couldn't find these names in any js file. peer_grading_problem.js includes oe_hide or show_question.
+
 The browser emits ``peer_grading_hide_question`` and
 ``peer_grading_show_question`` events when the user hides or redisplays a
 problem that is peer graded.
@@ -1765,7 +1825,9 @@ problem that is peer graded.
 
 ``staff_grading_hide_question`` and ``staff_grading_show_question``
 -----------------------------------------------------------------------
+
 .. staff_grading.js
+
 The browser emits ``staff_grading_hide_question`` and
 ``staff_grading_show_question`` events when the user hides or redisplays a
 problem that is staff graded.
@@ -1892,25 +1954,40 @@ Forum Events
 ``edx.forum.searched``
 ----------------------------------
 
-After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.text_search`` event.
+After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.searched`` event.
 
 **Component**: Discussion Tab
 
 **Event Source**: Server
 
-**History**: Added 16 May 2014.
+**History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
+Jun 2014.
 
 ``event`` **Fields**:
 
-+---------------------+---------------+----------------------------------------------------------------------------------------------------+
-| Field               | Type          | Details                                                                                            |
-+=====================+===============+====================================================================================================+
-| ``query``           | string        | The text entered into the search box by the user.                                                  |
-+---------------------+---------------+----------------------------------------------------------------------------------------------------+
-| ``page``            | integer       | Results are returned in sets of 20 per page. Identifies the page of results requested by the user. |
-+---------------------+---------------+----------------------------------------------------------------------------------------------------+
-| ``total_results``   | integer       | The total number of results matching the query.                                                    |
-+---------------------+---------------+----------------------------------------------------------------------------------------------------+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``query``
+     - string
+     - The text entered into the search box by the user.
+   * - ``page``
+     - integer
+     - Results are returned in sets of 20 per page. Identifies the page of
+       results requested by the user.
+   * - ``total_results``
+     - integer
+     - The total number of results matching the query.
+   * - ``corrected_text``
+     - string
+     - A re-spelling of the query, suggested by the search engine, which was
+       automatically substituted for the original one.  This happens only when
+       there are no results for the original query, but the index contains
+       matches for a similar term or phrase.  Otherwise, this field is null.
 
 .. _Instructor_Event_Types:
 
@@ -1963,6 +2040,7 @@ are common to all events.
 ===================================================================
  ``delete-student-module-state`` and ``rescore-student-submission``
 ===================================================================
+
 .. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
 
 **Component**: Instructor Dashboard
@@ -2039,6 +2117,7 @@ are common to all events.
 ======================================================
 ``add_instructor`` and ``remove_instructor`` 
 ======================================================
+
 .. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
 
 **Component**: Instructor Dashboard
@@ -2061,6 +2140,7 @@ are common to all events.
 ======================================================
 List Discussion Staff Events
 ======================================================
+
 .. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
 
 * ``list-forum-admins``
@@ -2089,6 +2169,7 @@ List Discussion Staff Events
 ======================================================
 Manage Discussion Staff Events   
 ======================================================
+
 .. previously a comma-separated list; "Rows identical after the second column" (which means the name and description columns) were combined
 
 * ``add-forum-admin``

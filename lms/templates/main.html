@@ -111,18 +111,14 @@
 
   <%include file="mathjax_accessible.html" />
 
-% if not suppress_toplevel_navigation:
   <%include file="${header_file}" />
-%endif
 
   <div class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </div>
 
-% if not suppress_toplevel_navigation:
   <%include file="${footer_file}" />
-% endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>

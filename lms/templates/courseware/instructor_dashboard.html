@@ -253,7 +253,7 @@ function goto( mode)
     % endif
 
     <p>
-    <a href="${reverse('gradebook_legacy', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    <a href="${reverse('spoc_gradebook', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
@@ -801,7 +801,7 @@ function goto( mode)
   %endif
 
    <p>
-     ${_("Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):")}
+     ${_("Student distribution per country, all courses, Sep 12 to Oct 17, 1 server (shown here as an example):")}
    </p>
 
 <div id="posts-list" class="clearfix">

@@ -14,7 +14,7 @@ from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import Location
+from opaque_keys.edx.locations import Location
 from instructor_task.models import InstructorTask, PROGRESS
 
 

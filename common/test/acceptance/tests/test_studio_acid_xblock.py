@@ -32,7 +32,6 @@ class XBlockAcidBase(WebAppTest):
             'display_name': 'Test Course ' + self.unique_id
         }
 
-        self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.outline = CourseOutlinePage(
             self.browser,
             self.course_info['org'],
@@ -44,6 +43,13 @@ class XBlockAcidBase(WebAppTest):
 
         self.setup_fixtures()
 
+        self.auth_page = AutoAuthPage(
+            self.browser,
+            staff=False,
+            username=self.user.get('username'),
+            email=self.user.get('email'),
+            password=self.user.get('password')
+        )
         self.auth_page.visit()
 
     def validate_acid_block_preview(self, acid_block):
@@ -112,6 +118,8 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
             )
         ).install()
 
+        self.user = course_fix.user
+
 
 class XBlockAcidParentBase(XBlockAcidBase):
     """
@@ -167,6 +175,8 @@ class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
             )
         ).install()
 
+        self.user = course_fix.user
+
 
 class XBlockAcidChildTest(XBlockAcidParentBase):
     """
@@ -196,6 +206,9 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
                 )
             )
         ).install()
+
+        self.user = course_fix.user
+
 
     @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):

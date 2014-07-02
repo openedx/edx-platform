@@ -294,7 +294,8 @@ class ExportTestCase(CourseTestCase):
         """
         Export failure.
         """
-        ItemFactory.create(parent_location=self.course.location, category='aawefawef')
+        fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
+        self.store.publish(fake_xblock.location, self.user.id)
         self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):

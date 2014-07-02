@@ -38,6 +38,13 @@ class StaffPage(PageObject):
         self.q(css='input.check').first.click()
         self.wait_for_ajax()
 
+    def load_problem_via_ajax(self):
+        """
+        Load problem via ajax by clicking next.
+        """
+        self.q(css="li.next").click()
+        self.wait_for_ajax()
+
 
 class StaffDebugPage(PageObject):
     """
@@ -56,7 +63,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a#staff-debug-reset').click()
+        self.q(css='section.staff-modal a.staff-debug-reset').click()
 
     def delete_state(self, user=None):
         """
@@ -64,7 +71,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').fill(user)
-        self.q(css='section.staff-modal a#staff-debug-sdelete').click()
+        self.q(css='section.staff-modal a.staff-debug-sdelete').click()
 
     def rescore(self, user=None):
         """
@@ -73,7 +80,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a#staff-debug-rescore').click()
+        self.q(css='section.staff-modal a.staff-debug-rescore').click()
 
     @property
     def idash_msg(self):

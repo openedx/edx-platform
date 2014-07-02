@@ -2,12 +2,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from modulestore_config import TEST_DATA_DRAFT_MONGO_MODULESTORE
+from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestDraftModuleStore(TestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()

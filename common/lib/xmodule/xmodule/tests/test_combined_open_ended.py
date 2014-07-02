@@ -22,9 +22,10 @@ from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
+from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_util_open_ended import (
     DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
@@ -1041,7 +1042,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 0)
 
-        html = self._module().render('student_view').content
+        html = self._module().render(STUDENT_VIEW).content
         self.assertIsInstance(html, basestring)
 
         rubric = self._handle_ajax("get_combined_rubric", {})
@@ -1098,7 +1099,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         # Move to the next step in the problem
         self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 1)
-        self._module().render('student_view')
+        self._module().render(STUDENT_VIEW)
 
         # Try to get the rubric from the module
         self._handle_ajax("get_combined_rubric", {})
@@ -1131,7 +1132,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(module.current_task_number, 1)
 
         # Get html and other data client will request
-        module.render('student_view')
+        module.render(STUDENT_VIEW)
 
         self._handle_ajax("skip_post_assessment", {})
 
@@ -1167,7 +1168,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         # Move to the next step in the problem
         self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 1)
-        self._module().render('student_view')
+        self._module().render(STUDENT_VIEW)
 
         # Try to get the rubric from the module
         self._handle_ajax("get_combined_rubric", {})
@@ -1198,7 +1199,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(module.current_task_number, 1)
 
         # Get html and other data client will request
-        module.render('student_view')
+        module.render(STUDENT_VIEW)
 
         self._handle_ajax("skip_post_assessment", {})
 
@@ -1268,7 +1269,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 0)
 
-        html = self._module().render('student_view').content
+        html = self._module().render(STUDENT_VIEW).content
         self.assertIsInstance(html, basestring)
 
         # Module should now be done

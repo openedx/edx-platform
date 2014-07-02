@@ -21,8 +21,8 @@ define(["jquery", "js/views/feedback_notification", "js/spec_helpers/create_sino
             appendSetFixtures('<div id="page-notification"></div>');
         };
 
-        createNotificationSpy = function() {
-            var notificationSpy = spyOnConstructor(NotificationView, "Mini", ["show", "hide"]);
+        createNotificationSpy = function(type) {
+            var notificationSpy = spyOnConstructor(NotificationView, type || "Mini", ["show", "hide"]);
             notificationSpy.show.andReturn(notificationSpy);
             return notificationSpy;
         };

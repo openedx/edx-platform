@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
-from xmodule.modulestore.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from ..utils import get_lms_link_for_item
 
@@ -117,7 +117,7 @@ def reorder_tabs_handler(course_item, request):
 
     # persist the new order of the tabs
     course_item.tabs = new_tab_list
-    modulestore('direct').update_item(course_item, request.user.id)
+    modulestore().update_item(course_item, request.user.id)
 
     return JsonResponse()
 
@@ -140,7 +140,7 @@ def edit_tab_handler(course_item, request):
     if 'is_hidden' in request.json:
         # set the is_hidden attribute on the requested tab
         tab.is_hidden = request.json['is_hidden']
-        modulestore('direct').update_item(course_item, request.user.id)
+        modulestore().update_item(course_item, request.user.id)
     else:
         raise NotImplementedError('Unsupported request to edit tab: {0}'.format(request.json))
 
@@ -163,7 +163,7 @@ def get_tab_by_locator(tab_list, usage_key_string):
     Look for a tab with the specified locator.  Returns the first matching tab.
     """
     tab_location = UsageKey.from_string(usage_key_string)
-    item = modulestore('direct').get_item(tab_location)
+    item = modulestore().get_item(tab_location)
     static_tab = StaticTab(
         name=item.display_name,
         url_slug=item.location.name,
@@ -192,7 +192,7 @@ def primitive_delete(course, num):
     # Note for future implementations: if you delete a static_tab, then Chris Dodge
     # points out that there's other stuff to delete beyond this element.
     # This code happens to not delete static_tab so it doesn't come up.
-    modulestore('direct').update_item(course, '**replace_user**')
+    modulestore().update_item(course, '**replace_user**')
 
 
 def primitive_insert(course, num, tab_type, name):
@@ -201,5 +201,5 @@ def primitive_insert(course, num, tab_type, name):
     new_tab = CourseTab.from_json({u'type': unicode(tab_type), u'name': unicode(name)})
     tabs = course.tabs
     tabs.insert(num, new_tab)
-    modulestore('direct').update_item(course, '**replace_user**')
+    modulestore().update_item(course, '**replace_user**')
 

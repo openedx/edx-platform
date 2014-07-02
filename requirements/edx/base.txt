@@ -4,8 +4,6 @@
 #   * @jtauber - to check licensing
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
--r repo.txt
-
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
@@ -14,6 +12,7 @@ boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
 distribute>=0.6.28, <0.7
+django-babel-underscore==0.1.0
 django-celery==3.0.17
 django-countries==1.5
 django-extensions==1.2.5
@@ -47,7 +46,8 @@ Markdown==2.2.1
 mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
-oauthlib==0.5.1
+nose==1.3.3
+oauthlib==0.6.3
 paramiko==1.9.0
 path.py==3.0.1
 Pillow==1.7.8
@@ -65,7 +65,8 @@ python-social-auth==0.1.23
 pytz==2012h
 pysrt==0.4.7
 PyYAML==3.10
-requests==1.2.3
+requests==2.3.0
+requests-oauthlib==0.4.1
 scipy==0.11.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
@@ -109,7 +110,7 @@ django-debug-toolbar-mongo
 # Used for testing
 chrono==1.0.2
 coverage==3.7
-ddt==0.7.1
+ddt==0.8.0
 django-crum==0.5
 django_nose==1.2
 factory_boy==2.2.1
@@ -131,3 +132,6 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
 git+https://github.com/mitocw/django-cas.git
+
+# edX packages
+edx-submissions==0.0.2

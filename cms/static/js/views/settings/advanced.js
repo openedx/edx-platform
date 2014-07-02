@@ -4,6 +4,7 @@ define(["js/views/validation", "jquery", "underscore", "gettext", "codemirror"],
 var AdvancedView = ValidatingView.extend({
     error_saving : "error_saving",
     successful_changes: "successful_changes",
+    render_deprecated: false,
 
     // Model class is CMS.Models.Settings.Advanced
     events : {
@@ -29,9 +30,11 @@ var AdvancedView = ValidatingView.extend({
 
         // iterate through model and produce key : value editors for each property in model.get
         var self = this;
-        _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
+        _.each(_.sortBy(_.keys(this.model.attributes), function(key) { return self.model.get(key).display_name; }),
             function(key) {
-                listEle$.append(self.renderTemplate(key, self.model.get(key)));
+                if (self.render_deprecated || !self.model.get(key).deprecated) {
+                    listEle$.append(self.renderTemplate(key, self.model.get(key)));
+                }
             });
 
         var policyValues = listEle$.find('.json');
@@ -91,7 +94,9 @@ var AdvancedView = ValidatingView.extend({
                     }
                 }
                 if (JSONValue !== undefined) {
-                    self.model.set(key, JSONValue);
+                    var modelVal = self.model.get(key);
+                    modelVal.value = JSONValue;
+                    self.model.set(key, modelVal);
                 }
             });
     },
@@ -120,9 +125,10 @@ var AdvancedView = ValidatingView.extend({
             reset: true
         });
     },
-    renderTemplate: function (key, value) {
+    renderTemplate: function (key, model) {
         var newKeyId = _.uniqueId('policy_key_'),
-        newEle = this.template({ key : key, value : JSON.stringify(value, null, 4),
+        newEle = this.template({ key: key, display_name : model.display_name, help: model.help,
+            value : JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
             keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_')});
 
         this.fieldToSelectorMap[key] = newKeyId;

@@ -7,6 +7,7 @@ define(["jquery", "js/spec_helpers/view_helpers"],
             getModalElement,
             isShowingModal,
             hideModalIfShowing,
+            pressModalButton,
             cancelModal,
             cancelModalIfShowing;
 
@@ -26,6 +27,11 @@ define(["jquery", "js/spec_helpers/view_helpers"],
             return modalElement;
         };
 
+        getModalTitle = function(modal) {
+            var modalElement = getModalElement(modal);
+            return modalElement.find('.modal-window-title').text();
+        };
+
         isShowingModal = function(modal) {
             var modalElement = getModalElement(modal);
             return modalElement.length > 0;
@@ -37,12 +43,16 @@ define(["jquery", "js/spec_helpers/view_helpers"],
             }
         };
 
-        cancelModal = function(modal) {
-            var modalElement, cancelButton;
+        pressModalButton = function(selector, modal) {
+            var modalElement, button;
             modalElement = getModalElement(modal);
-            cancelButton = modalElement.find('.action-cancel:visible');
-            expect(cancelButton.length).toBe(1);
-            cancelButton.click();
+            button = modalElement.find(selector + ':visible');
+            expect(button.length).toBe(1);
+            button.click();
+        };
+
+        cancelModal = function(modal) {
+            pressModalButton('.action-cancel', modal);
         };
 
         cancelModalIfShowing = function(modal) {
@@ -52,9 +62,12 @@ define(["jquery", "js/spec_helpers/view_helpers"],
         };
 
         return $.extend(view_helpers, {
+            'getModalElement': getModalElement,
+            'getModalTitle': getModalTitle,
             'installModalTemplates': installModalTemplates,
             'isShowingModal': isShowingModal,
             'hideModalIfShowing': hideModalIfShowing,
+            'pressModalButton': pressModalButton,
             'cancelModal': cancelModal,
             'cancelModalIfShowing': cancelModalIfShowing
         });
