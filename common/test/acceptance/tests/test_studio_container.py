@@ -1,5 +1,7 @@
 """
 Acceptance tests for Studio related to the container page.
+The container page is used both for display units, and for
+displaying containers within units.
 """
 
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -9,6 +11,7 @@ from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.utils import add_discussion
+from ..pages.lms.courseware import CoursewarePage
 
 from unittest import skip
 from bok_choy.promise import Promise
@@ -408,3 +411,102 @@ class EditContainerTest(NestedVerticalTest):
         """
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
+
+
+class UnitPublishingTest(ContainerBase):
+    """
+    Tests of the publishing control and related widgets on the Unit page.
+    """
+
+    def setup_fixtures(self):
+        """
+        Sets up a course structure with a unit and a single HTML child.
+        """
+        self.html_content = '<p><strong>Body of HTML Unit.</strong></p>'
+        self.courseware = CoursewarePage(self.browser, self.course_id)
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('html', 'Test html', data=self.html_content)
+                    )
+                )
+            )
+        ).install()
+
+        self.user = course_fix.user
+
+    def test_publishing(self):
+        """
+        Test the state changes when a published unit has draft changes.
+        """
+        unit = self.go_to_unit_page()
+        self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+        # Should not be able to click on Publish action -- but I don't know how to test that it is not clickable.
+        # TODO: continue discussion with Muhammad and Jay about this.
+
+        # Add a component to the page so it will have unpublished changes.
+        add_discussion(unit)
+        self.assertEqual("Publishing Status\nDraft (Unpublished changes)", unit.publish_title)
+        unit.publish_action.click()
+        unit.wait_for_ajax()
+        self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+
+    # TODO: part of future story.
+    # def test_discard_changes(self):
+    #     """
+    #     Test the state after discard changes.
+    #     """
+    #     unit = self.go_to_unit_page()
+    #     add_discussion(unit)
+    #     unit = unit.discard_changes()
+    #     self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+
+    def test_view_live_no_changes(self):
+        """
+        Tests viewing of live with initial published content.
+        """
+        unit = self.go_to_unit_page()
+        unit.view_published_version()
+        self.assertEqual(1, self.courseware.num_xblock_components)
+        self.assertEqual('html', self.courseware.xblock_component_type(0))
+
+    def test_view_live_changes(self):
+        """
+        Tests that viewing of live with draft content does not show the draft content.
+        """
+        unit = self.go_to_unit_page()
+        add_discussion(unit)
+        unit.view_published_version()
+        self.assertEqual(1, self.courseware.num_xblock_components)
+        self.assertEqual('html', self.courseware.xblock_component_type(0))
+        self.assertEqual(self.html_content, self.courseware.xblock_component_html_content(0))
+
+    def test_view_live_after_publish(self):
+        """
+        Tests viewing of live after creating draft and publishing it.
+        """
+        unit = self.go_to_unit_page()
+        add_discussion(unit)
+        unit.publish_action.click()
+        unit.view_published_version()
+        self.assertEqual(2, self.courseware.num_xblock_components)
+        self.assertEqual('html', self.courseware.xblock_component_type(0))
+        self.assertEqual('discussion', self.courseware.xblock_component_type(1))
+
+    # TODO: need to work with Jay/Christine to get testing of "Preview" working.
+    # def test_preview(self):
+    #     unit = self.go_to_unit_page()
+    #     add_discussion(unit)
+    #     unit.preview()
+    #     self.assertEqual(2, self.courseware.num_xblock_components)
+    #     self.assertEqual('html', self.courseware.xblock_component_type(0))
+    #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
