@@ -23,6 +23,8 @@ from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import PublishState
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from opaque_keys.edx.keys import UsageKey, CourseKey
@@ -567,7 +569,7 @@ class TestEditItem(ItemTest):
         self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
         self.assertIsNone(published.due)
         # Fetch the published version again to make sure the due date is still unset.
-        published = modulestore().get_item(published.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
+        published = modulestore().get_item(published.location, revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertIsNone(published.due)
 
     def test_make_public_with_update(self):
@@ -620,7 +622,7 @@ class TestEditItem(ItemTest):
         draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertNotEqual(draft.data, published.data)
         # Fetch the published version again to make sure the data is correct.
-        published = modulestore().get_item(published.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
+        published = modulestore().get_item(published.location, revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertNotEqual(draft.data, published.data)
 
     def test_publish_states_of_nested_xblocks(self):

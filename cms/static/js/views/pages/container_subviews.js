@@ -92,6 +92,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 BaseView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('publish-xblock');
                 this.model.on('sync', this.onSync, this);
+                this.renderPage = this.options.renderPage;
             },
 
             onSync: function(e) {
@@ -121,6 +122,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 this.runOperationShowingMessage(gettext('Publishing&hellip;'),
                     function () {
                         return xblockInfo.save({publish: 'make_public'});
+                    }).always(function() {
+                        xblockInfo.set("publish", null);
                     }).done(function () {
                         xblockInfo.fetch();
                     });
@@ -130,7 +133,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                var xblockInfo = this.model, view;
+                var xblockInfo = this.model, view, renderPage = this.renderPage;
 
                 view = new PromptView.Warning({
                     title: gettext("Discard Changes"),
@@ -144,7 +147,19 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                                     type: 'DELETE',
                                     url: xblockInfo.url()
                                 }).success(function () {
-                                    return window.location.reload();
+                                    window.alert("Refresh the page to see that changes were discarded. " +
+                                        "Auto-refresh will be implemented in a later story.");
+                                    /* Fetch is never returning on sandbox-- try
+                                       doing a PUT instead of a DELETE with publish option
+                                       to work around, or contact dev ops.
+                                       STUD-1860
+                                    window.crazyAjaxHandler = xblockInfo.fetch({
+                                        complete: function(a, b, c) {
+                                            debugger;
+                                        }
+                                    });
+                                    renderPage();
+                                    */
                                 });
                             }
                         },
