@@ -49,7 +49,7 @@ def press_the_notification_button(page, name):
     page.wait_for_ajax()
 
 
-def add_discussion(page, menu_index):
+def add_discussion(page, menu_index=0):
     """
     Add a new instance of the discussion category.
 
