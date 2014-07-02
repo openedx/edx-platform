@@ -42,6 +42,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
     """
     Test the location to locator mapper
     """
+    @unittest.skip("getting rid of loc_mapper")
     def test_create_map(self):
         def _construct_course_son(org, course, run):
             """
@@ -88,6 +89,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_delete_course_map(self):
         """
         Test that course location is properly remove from loc_mapper and cache when course is deleted
@@ -119,6 +121,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         cached_value = loc_mapper()._get_course_location_from_cache(course_location)
         self.assertIsNone(cached_value, 'Entry found in cache')
 
+    @unittest.skip("getting rid of loc_mapper")
     def translate_n_check(self, location, org, offering, block_id, branch, add_entry=False):
         """
         Request translation, check org, offering, block_id, and branch
@@ -141,6 +144,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(course_locator.offering, offering)
         self.assertEqual(course_locator.branch, branch)
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_translate_location_read_only(self):
         """
         Test the variants of translate_location which don't create entries, just decode
@@ -213,6 +217,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             'problem3', ModuleStoreEnum.BranchName.published
         )
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_translate_location_dwim(self):
         """
         Test the location translation mechanisms which try to do-what-i-mean by creating new
@@ -254,6 +259,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             new_prob_locn, delta_new_org, delta_new_offering, new_usage_id, ModuleStoreEnum.BranchName.published, True
         )
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_translate_locator(self):
         """
         tests translate_locator_to_location(BlockUsageLocator)
@@ -340,6 +346,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location(org, course, run, 'problem', 'abc123', MongoRevisionKey.published))
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_special_chars(self):
         """
         Test locations which have special characters
@@ -356,6 +363,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         reverted_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(location, reverted_location)
 
+    @unittest.skip("getting rid of loc_mapper")
     def test_name_collision(self):
         """
         Test dwim translation when the old name was not unique
