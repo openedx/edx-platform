@@ -24,33 +24,25 @@ def remove_coupon(request):
     """
     coupon_id = request.REQUEST.get('id', None)
     if not coupon_id:
-        context = {
-            'success': False,
+        return JsonResponse({
             'message': _('coupon id is None')
-        }
-        return JsonResponse(context)
+        }, status=400)  # status code 400: Bad Request
 
     try:
         coupon = Coupon.objects.get(id=coupon_id)
     except ObjectDoesNotExist:
-        context = {
-            'success': False,
+        return JsonResponse({
             'message': _('coupon with the coupon id ({coupon_id}) DoesNotExist').format(coupon_id=coupon_id)
-        }
-        return JsonResponse(context)
-    if coupon.is_active:
-        coupon.is_active = False
-        coupon.save()
-        context = {
-            'success': True,
-            'message': _('coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon_id))
-        }
-    else:
-        context = {
-            'success': False,
-            'message': _('coupon with the coupon id ({coupon_id}) is already inactive'.format(coupon_id=coupon_id))
-        }
-    return JsonResponse(context)
+        }, status=400)  # status code 400: Bad Request
+    if not coupon.is_active:
+        return JsonResponse({
+            'message': _('coupon with the coupon id ({coupon_id}) is already inactive').format(coupon_id=coupon_id)
+        }, status=400)  # status code 400: Bad Request
+    coupon.is_active = False
+    coupon.save()
+    return JsonResponse({
+        'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
+    })  # status code 200: OK by default
 
 
 @require_POST
@@ -91,7 +83,7 @@ def update_coupon(request):
     try:
         coupon = Coupon.objects.get(pk=coupon_id)
     except ObjectDoesNotExist:
-        return HttpResponseNotFound(_("coupon with the coupon id ({coupon_id}) DoesNotExist".format(coupon_id=coupon_id)))
+        return HttpResponseNotFound(_("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id))
 
     code = request.REQUEST.get('code')
     filtered_coupons = Coupon.objects.filter(~Q(id=coupon_id), code=code, is_active=True)
@@ -108,7 +100,7 @@ def update_coupon(request):
         coupon.percentage_discount = discount
         coupon.save()
 
-    return HttpResponse(_("coupon with the coupon id ({coupon_id}) updated Successfully".format(coupon_id=coupon_id)))
+    return HttpResponse(_("coupon with the coupon id ({coupon_id}) updated Successfully").format(coupon_id=coupon_id))
 
 
 @require_POST
@@ -127,12 +119,12 @@ def get_coupon_info(request):
         coupon = Coupon.objects.get(id=coupon_id)
     except ObjectDoesNotExist:
         return JsonResponse({
-            'message': _("coupon with the coupon id ({coupon_id}) DoesNotExist".format(coupon_id=coupon_id))
+            'message': _("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
 
     if not coupon.is_active:
         return JsonResponse({
-            'message': _("coupon with the coupon id ({coupon_id}) is already inactive".format(coupon_id=coupon_id))
+            'message': _("coupon with the coupon id ({coupon_id}) is already inactive").format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
 
     return JsonResponse({
@@ -140,5 +132,5 @@ def get_coupon_info(request):
         'coupon_description': coupon.description,
         'coupon_course_id': coupon.course_id.to_deprecated_string(),
         'coupon_discount': coupon.percentage_discount,
-        'message': 'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon_id)
+        'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
     })  # status code 200: OK by default

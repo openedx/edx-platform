@@ -86,10 +86,10 @@
         success: function (data) {
             $('#coupon-error').val('');
             $('#coupon-error').attr('style', 'display: none');
-            $('input#edit_coupon_code').val(resp.coupon_code);
-            $('input#edit_coupon_discount').val(resp.coupon_discount);
-            $('textarea#edit_coupon_description').val(resp.coupon_description);
-            $('input#edit_coupon_course_id').val(resp.coupon_course_id);
+            $('input#edit_coupon_code').val(data.coupon_code);
+            $('input#edit_coupon_discount').val(data.coupon_discount);
+            $('textarea#edit_coupon_description').val(data.coupon_description);
+            $('input#edit_coupon_course_id').val(data.coupon_course_id);
             $('#edit-modal-trigger').click();
           },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -112,16 +112,14 @@
         type: "POST",
         data: {id: $(this).data('item-id')},
         url: "${section_data['ajax_remove_coupon_url']}",
-        success: function (resp) {
-          if (resp.success) {
-            location.reload(true);
-          }
-          else {
-            $('#coupon-error').val('');
-            $('#coupon-error').attr('style', 'display: none');
-            $('#coupon-error').html(resp.message).show();
+        success: function (data) {
             anchor.removeData("disabled");
-          }
+            location.reload(true);
+          },
+        error: function(jqXHR, textStatus, errorThrown) {
+          var data = $.parseJSON(jqXHR.responseText);
+          $('#coupon-error').html(data.message).show();
+          anchor.removeData("disabled");
         }
       });
     });
