@@ -94,7 +94,7 @@ def update_coupon(request):
         return HttpResponseNotFound(_("coupon with the coupon id ({coupon_id}) DoesNotExist".format(coupon_id=coupon_id)))
 
     code = request.REQUEST.get('code')
-    filtered_coupons = Coupons.objects.filter(~Q(id=coupon_id), code=code, is_active=True)
+    filtered_coupons = Coupon.objects.filter(~Q(id=coupon_id), code=code, is_active=True)
 
     if filtered_coupons:
         return HttpResponseNotFound(_("coupon with the coupon id ({coupon_id}) already exists").format(coupon_id=coupon_id))
