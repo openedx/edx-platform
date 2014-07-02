@@ -153,15 +153,13 @@ class DashboardTest(TestCase):
         )
         self.client = Client()
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def check_verification_status_on(self, mode, value):
         """
         Check that the css class and the status message are in the dashboard html.
         """
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
-        try:
-            response = self.client.get(reverse('dashboard'))
-        except NoReverseMatch:
-            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        response = self.client.get(reverse('dashboard'))
         self.assertContains(response, "class=\"course {0}\"".format(mode))
         self.assertContains(response, value)
 
@@ -175,15 +173,13 @@ class DashboardTest(TestCase):
         self.check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
         self.check_verification_status_on('audit', 'You\'re auditing this course')
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def check_verification_status_off(self, mode, value):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
-        try:
-            response = self.client.get(reverse('dashboard'))
-        except NoReverseMatch:
-            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, "class=\"course {0}\"".format(mode))
         self.assertNotContains(response, value)
 
@@ -230,7 +226,6 @@ class DashboardTest(TestCase):
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         verified_mode.save()
         self.assertFalse(enrollment.refundable())
-
 
 
 class EnrollInCourseTest(TestCase):
