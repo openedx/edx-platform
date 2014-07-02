@@ -53,7 +53,10 @@ class ItemTest(CourseTestCase):
         """
         parsed = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        return UsageKey.from_string(parsed['locator'])
+        key = UsageKey.from_string(parsed['locator'])
+        if key.course_key.run is None:
+            key = key.map_into_course(CourseKey.from_string(parsed['courseKey']))
+        return key
 
     def create_xblock(self, parent_usage_key=None, display_name=None, category=None, boilerplate=None):
         data = {

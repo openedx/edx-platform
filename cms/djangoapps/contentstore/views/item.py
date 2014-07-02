@@ -144,7 +144,7 @@ def xblock_handler(request, usage_key_string):
                 request.user,
             )
 
-            return JsonResponse({"locator": unicode(dest_usage_key)})
+            return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
         else:
             return _create_item(request)
     else:
@@ -403,7 +403,7 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    store.create_and_save_xmodule(
+    created_block = store.create_and_save_xmodule(
         dest_usage_key,
         request.user.id,
         definition_data=data,
@@ -426,10 +426,10 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(dest_usage_key)
+        parent.children.append(created_block.location)
         store.update_item(parent, request.user.id)
 
-    return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
+    return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
@@ -439,8 +439,8 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
     store = modulestore()
     source_item = store.get_item(duplicate_source_usage_key)
     # Change the blockID to be unique.
-    dest_usage_key = duplicate_source_usage_key.replace(name=uuid4().hex)
-    category = dest_usage_key.category
+    dest_usage_key = source_item.location.replace(name=uuid4().hex)
+    category = dest_usage_key.block_type
 
     # Update the display name to indicate this is a duplicate (unless display name provided).
     duplicate_metadata = own_metadata(source_item)
@@ -465,7 +465,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dupe = _duplicate_item(dest_usage_key, child, user=user)
+            dupe = _duplicate_item(dest_module.location, child, user=user)
             dest_module.children.append(dupe)
         store.update_item(dest_module, user.id if user else None)
 
@@ -473,14 +473,14 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
         parent = store.get_item(parent_usage_key)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
-        if duplicate_source_usage_key in parent.children:
-            source_index = parent.children.index(duplicate_source_usage_key)
-            parent.children.insert(source_index + 1, dest_usage_key)
+        if source_item.location in parent.children:
+            source_index = parent.children.index(source_item.location)
+            parent.children.insert(source_index + 1, dest_module.location)
         else:
-            parent.children.append(dest_usage_key)
+            parent.children.append(dest_module.location)
         store.update_item(parent, user.id if user else None)
 
-    return dest_usage_key
+    return dest_module.location
 
 
 def _delete_item(usage_key, user):
@@ -553,12 +553,12 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
         data = replace_static_urls(
             data,
             None,
-            course_id=usage_key.course_key
+            course_id=module.location.course_key
         )
 
     # Note that children aren't being returned until we have a use case.
     return {
-        'id': unicode(usage_key),
+        'id': unicode(module.location),
         'data': data,
         'metadata': own_metadata(module)
     }

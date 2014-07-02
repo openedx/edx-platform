@@ -189,7 +189,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id.make_usage_key('conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
-        different_course_id = SlashSeparatedCourseKey('edX', 'different_course', 'copy_run')
+        different_course_id = SlashSeparatedCourseKey('edX', 'different_course', None)
         self.assertListEqual(
             [
                 target_course_id.make_usage_key('problem', 'choiceprob'),
