@@ -43,6 +43,6 @@ class GetPreviewHtmlTestCase(TestCase):
         # Verify student view html is returned, and the usage ID is as expected.
         self.assertRegexpMatches(
             html,
-            'data-usage-id="location:MITx\+999\+Robot_Super_Course\+html\+html_[0-9]*"'
+            'data-usage-id="i4x://MITx/999/html/html_[0-9]*"'
         )
         self.assertRegexpMatches(html, '<html>foobar</html>')

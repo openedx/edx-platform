@@ -311,7 +311,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         direct_store = self.store
         _, course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
         usage_key = course_items[0].id.make_usage_key('vertical', 'vertical_test')
-
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         resp = self.client.get_json(
             get_url('xblock_view_handler', usage_key, kwargs={'view_name': 'container_preview'})
@@ -319,10 +318,10 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # These are the data-ids of the xblocks contained in the vertical.
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+sample_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+separate_file_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+video_with_end_time')
-        self.assertContains(resp, 'edX+toy+2012_Fall+poll_question+T1_changemind_poll_foo_2')
+        self.assertContains(resp, 'edX/toy/video/sample_video')
+        self.assertContains(resp, 'edX/toy/video/separate_file_video')
+        self.assertContains(resp, 'edX/toy/video/video_with_end_time')
+        self.assertContains(resp, 'edX/toy/poll_question/T1_changemind_poll_foo_2')
 
     def test_delete(self):
         store = self.store
@@ -1217,7 +1216,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-locator="location:MITx+999+Robot_Super_Course+course+Robot_Super_Course" data-course-key="slashes:MITx+999+Robot_Super_Course">',
+            '<article class="courseware-overview" data-locator="i4x://MITx/999/course/Robot_Super_Course" data-course-key="MITx/999/Robot_Super_Course">',
             status_code=200,
             html=True
         )
@@ -1238,7 +1237,7 @@ class ContentStoreTest(ContentStoreTestCase):
         data = parse_json(resp)
         self.assertRegexpMatches(
             data['locator'],
-            r"location:MITx\+999\+Robot_Super_Course\+chapter\+([0-9]|[a-f]){3,}$"
+            r"MITx/999/chapter/([0-9]|[a-f]){3,}$"
         )
 
     def test_capa_module(self):
