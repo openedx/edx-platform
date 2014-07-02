@@ -34,17 +34,15 @@ Feature: CMS.HTML Editor
     Then the href link is rewritten to "c4x/MITx/999/asset/image.jpg"
     And the link is shown as "/static/image.jpg" in the Link Plugin
 
-  Scenario: TinyMCE and CodeMirror preserve style tags
+  Scenario: TinyMCE and CodeMirror strip style tags
     Given I have created a Blank HTML Page
     When I edit the page
     And type "<p class='title'>pages</p><style><!-- .title { color: red; } --></style>" in the code editor and press OK
     And I save the page
     Then the page text contains:
       """
-      <p class="title">pages</p>
-      <style><!--
-      .title { color: red; }
-      --></style>
+<p></p>
+<p>pages</p>
       """
 
   Scenario: TinyMCE and CodeMirror preserve span tags
@@ -118,15 +116,24 @@ Feature: CMS.HTML Editor
 #      fancy html
 #      """
 
-# Skipping in master due to brittleness JZ 05/22/2014
-#  Scenario: Can switch from Raw Editor to Visual
-#    Given I have created a raw HTML component
-#    And I edit the component and select the Visual Editor
-#    And I save the page
-#    When I edit the page
-#    And type "less fancy html" in the code editor and press OK
-#    And I save the page
-#    Then the page text contains:
-#      """
-#      less fancy html
-#      """
+=======
+  Scenario: Can switch from Raw Editor to Visual
+    Given I have created a raw HTML component
+    And I edit the component and select the Visual Editor
+    And I save the page
+    When I edit the page
+    And type "less fancy html" in the code editor and press OK
+    And I save the page
+    Then the page text contains:
+      """
+      less fancy html
+      """
+
+  Scenario: Visual Editor warns when data will be lost
+    Given I have created a raw HTML component
+    When I edit the page
+    And type "<div class='notallowed'>hello</div>" into the Raw Editor
+    And select the Visual Editor
+    And I save the page
+    When I edit the page
+>>>>>>> Add test for html editor warning.
