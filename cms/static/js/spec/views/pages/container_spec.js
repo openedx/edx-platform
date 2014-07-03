@@ -143,7 +143,10 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     renderContainerPage(mockContainerXBlockHtml, this);
                     inlineEditDisplayName(updatedDisplayName);
                     displayNameInput.change();
+                    // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, { });
+                    // This is the response for the subsequent fetch operation.
+                    create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
                     expect(displayNameInput).toHaveClass('is-hidden');
                     expect(displayNameElement).not.toHaveClass('is-hidden');
                     expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
@@ -153,8 +156,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('does not change the title when a display name update fails', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     inlineEditDisplayName(updatedDisplayName);
+                    var initialRequests = requests.length;
                     displayNameInput.change();
                     create_sinon.respondWithError(requests);
+                    // No fetch operation should occur.
+                    expect(initialRequests + 1).toBe(requests.length);
                     expect(displayNameElement).toHaveClass('is-hidden');
                     expect(displayNameInput).not.toHaveClass('is-hidden');
                     expect(displayNameInput.val().trim()).toBe(updatedDisplayName);
@@ -305,13 +311,18 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         create_sinon.respondWithJson(requests, {});
 
                         // first request contains given component's id (to delete the component)
-                        expect(requests[requests.length - 2].url).toMatch(
+                        expect(requests[requests.length - 3].url).toMatch(
                             new RegExp("locator-component-" + GROUP_TO_TEST + (componentIndex + 1))
                         );
 
                         // second request contains parent's id (to remove as child)
-                        expect(lastRequest().url).toMatch(
+                        expect(requests[requests.length - 2].url).toMatch(
                             new RegExp("locator-group-" + GROUP_TO_TEST)
+                        );
+
+                        // third request if a fetch of the container.
+                        expect(lastRequest().url).toMatch(
+                            new RegExp("locator-container")
                         );
                     };
 

@@ -77,7 +77,8 @@ define(["jquery", "gettext", "js/views/baseview"],
                     function() {
                         return xblockInfo.save(requestData);
                     }).done(function() {
-                        xblockInfo.set(fieldName, newValue);
+                        // Update publish and last modified information from the server.
+                        xblockInfo.fetch();
                     });
             },
 

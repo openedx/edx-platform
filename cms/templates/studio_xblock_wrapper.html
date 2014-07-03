@@ -34,7 +34,7 @@ label = xblock.display_name or xblock.scope_ids.block_type
         </div>
         <div class="header-actions">
             <ul class="actions-list">
-                % if not xblock_context['read_only'] and not is_root:
+                % if not is_root:
                     % if not show_inline:
                         <li class="action-item action-edit">
                             <a href="#" class="edit-button action-button">
