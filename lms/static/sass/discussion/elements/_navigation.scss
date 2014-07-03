@@ -1,6 +1,7 @@
 .forum-nav {
   @include box-sizing(border-box);
   float: left;
+  position: relative;
   border: 1px solid #aaa;
   border-radius: 3px;
 }
@@ -27,6 +28,7 @@
   }
 
   .icon {
+    @include font-size(14);
     margin-right: ($baseline/4);
   }
 }
@@ -87,7 +89,17 @@
 }
 
 .forum-nav-browse-menu {
+  @include font-size(14);
   overflow-y: scroll;
+  list-style: none;
+}
+
+.forum-nav-browse-submenu {
+  list-style: none;
+}
+
+.forum-nav-browse-title {
+  display: block;
 }
 
 .forum-nav-browse-title .icon {
@@ -130,6 +142,7 @@
 // -----------
 .forum-nav-thread-list {
   overflow-y: scroll;
+  list-style: none;
 }
 
 .forum-nav-thread {
@@ -137,7 +150,7 @@
 }
 
 .forum-nav-thread-link {
-  @include clearfix();
+  display: block;
 }
 
 %forum-nav-thread-wrapper {
@@ -269,6 +282,7 @@
 }
 
 %forum-nav-load-more-content {
+  display: block;
   text-align: center;
 }
 
