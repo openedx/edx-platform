@@ -26,7 +26,6 @@ from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 from xmodule.exceptions import NotFoundError, InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mixed import store_branch_setting
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey
@@ -873,7 +872,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         mongo_store.collection.find = wrapper.find
 
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
-        with store_branch_setting(mongo_store, ModuleStoreEnum.Branch.published_only):
+        with mongo_store.branch_setting(ModuleStoreEnum.Branch.published_only):
             course = mongo_store.get_course(course_id, depth=2)
 
             # make sure we haven't done too many round trips to DB
