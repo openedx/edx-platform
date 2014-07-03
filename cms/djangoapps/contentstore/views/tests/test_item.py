@@ -549,22 +549,6 @@ class TestEditItem(ItemTest):
         )
         self.verify_publish_state(self.problem_usage_key, PublishState.public)
 
-    def test_make_private(self):
-        """ Test making a public problem private (un-publishing it). """
-        # Make problem public.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_public'}
-        )
-        self.verify_publish_state(self.problem_usage_key, PublishState.public)
-
-        # Now make it private
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_private'}
-        )
-        self.verify_publish_state(self.problem_usage_key, PublishState.private)
-
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
         # Make problem public.
@@ -574,13 +558,6 @@ class TestEditItem(ItemTest):
         )
         published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
 
-        # Now make it draft, which means both versions will exist.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'create_draft'}
-        )
-        self.verify_publish_state(self.problem_usage_key, PublishState.draft)
-
         # Update the draft version and check that published is different.
         self.client.ajax_post(
             self.problem_update_url,
@@ -588,6 +565,9 @@ class TestEditItem(ItemTest):
         )
         updated_draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertIsNone(published.due)
+        # Fetch the published version again to make sure the due date is still unset.
+        published = modulestore().get_item(published.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
         self.assertIsNone(published.due)
 
     def test_make_public_with_update(self):
@@ -601,112 +581,6 @@ class TestEditItem(ItemTest):
         )
         published = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
-
-    def test_make_private_with_update(self):
-        """ Make a problem private and update it at the same time. """
-        # Make problem public.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_public'}
-        )
-        self.verify_publish_state(self.problem_usage_key, PublishState.public)
-
-        # Make problem private and update.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'metadata': {'due': '2077-10-10T04:00Z'},
-                'publish': 'make_private'
-            }
-        )
-        draft = self.verify_publish_state(self.problem_usage_key, PublishState.private)
-        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
-
-    def test_create_draft_with_update(self):
-        """ Create a draft and update it at the same time. """
-        # Make problem public.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_public'}
-        )
-        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
-
-        # Now make it draft, which means both versions will exist.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'metadata': {'due': '2077-10-10T04:00Z'},
-                'publish': 'create_draft'
-            }
-        )
-        draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
-        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
-        self.assertIsNone(published.due)
-
-    def test_create_draft_with_multiple_requests(self):
-        """
-        Create a draft request returns already created version if it exists.
-        """
-        # Make problem public.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_public'}
-        )
-        self.verify_publish_state(self.problem_usage_key, PublishState.public)
-
-        # Now make it draft, which means both versions will exist.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'publish': 'create_draft'
-            }
-        )
-        draft_1 = self.verify_publish_state(self.problem_usage_key, PublishState.draft)
-
-        # Now check that when a user sends request to create a draft when there is already a draft version then
-        # user gets that already created draft instead of getting 'DuplicateItemError' exception.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'publish': 'create_draft'
-            }
-        )
-        draft_2 = self.verify_publish_state(self.problem_usage_key, PublishState.draft)
-        self.assertIsNotNone(draft_2)
-        self.assertEqual(draft_1, draft_2)
-
-    def test_make_private_with_multiple_requests(self):
-        """
-        Make private requests gets proper response even if xmodule is already made private.
-        """
-        # Make problem public.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={'publish': 'make_public'}
-        )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key))
-
-        # Now make it private, and check that its version is private
-        resp = self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'publish': 'make_private'
-            }
-        )
-        self.assertEqual(resp.status_code, 200)
-        draft_1 = self.verify_publish_state(self.problem_usage_key, PublishState.private)
-
-        # Now check that when a user sends request to make it private when it already is private then
-        # user gets that private version instead of getting 'ItemNotFoundError' exception.
-        self.client.ajax_post(
-            self.problem_update_url,
-            data={
-                'publish': 'make_private'
-            }
-        )
-        self.assertEqual(resp.status_code, 200)
-        draft_2 = self.verify_publish_state(self.problem_usage_key, PublishState.private)
-        self.assertEqual(draft_1, draft_2)
 
     def test_published_and_draft_contents_with_update(self):
         """ Create a draft and publish it then modify the draft and check that published content is not modified """
@@ -724,8 +598,7 @@ class TestEditItem(ItemTest):
             data={
                 'id': unicode(self.problem_usage_key),
                 'metadata': {},
-                'data': "<p>Problem content draft.</p>",
-                'publish': 'create_draft'
+                'data': "<p>Problem content draft.</p>"
             }
         )
 
@@ -745,6 +618,9 @@ class TestEditItem(ItemTest):
 
         # Both published and draft content should still be different
         draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
+        self.assertNotEqual(draft.data, published.data)
+        # Fetch the published version again to make sure the data is correct.
+        published = modulestore().get_item(published.location, revision=REVISION_OPTION_PUBLISHED_ONLY)
         self.assertNotEqual(draft.data, published.data)
 
     def test_publish_states_of_nested_xblocks(self):
@@ -777,7 +653,6 @@ class TestEditItem(ItemTest):
             data={
                 'id': unicode(unit_usage_key),
                 'metadata': {},
-                'publish': 'create_draft'
             }
         )
         self.assertEqual(resp.status_code, 200)
