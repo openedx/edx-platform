@@ -498,15 +498,16 @@ class DraftModuleStore(MongoModuleStore):
         :return: True if the draft and published versions differ
         """
 
-        # a non direct only xblock has changes if it is in a non public state
-        if location.category not in DIRECT_ONLY_CATEGORIES:
-            return self.compute_publish_state(self.get_item(location)) != PublishState.public
+        item = self.get_item(location)
+
+        # don't check children if this block has changes (is not public)
+        if self.compute_publish_state(item) != PublishState.public:
+            return True
+        # if this block doesn't have changes, then check its children
+        elif item.has_children:
+            return any([self.has_changes(child) for child in item.children])
+        # otherwise there are no changes
         else:
-            item = self.get_item(location)
-            if item.has_children:
-                for child in item.children:
-                    if self.has_changes(child):
-                        return True
             return False
 
     def publish(self, location, user_id):

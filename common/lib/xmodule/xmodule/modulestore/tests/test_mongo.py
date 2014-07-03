@@ -661,6 +661,32 @@ class TestMongoModuleStore(unittest.TestCase):
         self.assertFalse(self.draft_store.has_changes(locations['grandparent']))
         self.assertFalse(self.draft_store.has_changes(locations['parent']))
 
+    def test_has_changes_non_direct_only_children(self):
+        """
+        Tests that has_changes() returns true after editing the child of a vertical (both not direct only categories).
+        """
+        dummy_user = 123
+        parent_location = Location('edX', 'test', 'non_direct_only_children', 'vertical', 'parent')
+        child_location = Location('edX', 'test', 'non_direct_only_children', 'html', 'child')
+
+        parent = self.draft_store.create_and_save_xmodule(parent_location, user_id=dummy_user)
+        child = self.draft_store.create_and_save_xmodule(child_location, user_id=dummy_user)
+        parent.children += [child_location]
+        self.draft_store.update_item(parent, user_id=dummy_user)
+        self.draft_store.publish(parent_location, dummy_user)
+
+        # Verify that there are no changes
+        self.assertFalse(self.draft_store.has_changes(parent_location))
+        self.assertFalse(self.draft_store.has_changes(child_location))
+
+        # Change the child
+        child.display_name = 'Changed Display Name'
+        self.draft_store.update_item(child, user_id=123)
+
+        # Verify that both parent and child have changes
+        self.assertTrue(self.draft_store.has_changes(parent_location))
+        self.assertTrue(self.draft_store.has_changes(child_location))
+
     def test_update_edit_info_ancestors(self):
         """
         Tests that edited_on, edited_by, subtree_edited_on, and subtree_edited_by are set correctly during update
