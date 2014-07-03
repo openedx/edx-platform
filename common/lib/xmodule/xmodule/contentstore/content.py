@@ -151,7 +151,7 @@ class StaticContent(object):
     def _key_to_string(key):
         """Converts the given key to a string, honoring the deprecated flag."""
         # TODO OpaqueKey - remove deprecated check once opaque keys lands
-        if hasattr(key, 'deprecated'):
+        if getattr(key, 'deprecated', False):
             return key.to_deprecated_string()
         else:
             return unicode(key)
