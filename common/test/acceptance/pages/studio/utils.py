@@ -37,7 +37,7 @@ def wait_for_notification(page):
     Promise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
 
 
-def add_discussion(page, menu_index):
+def add_discussion(page, menu_index=0):
     """
     Add a new instance of the discussion category.
 
