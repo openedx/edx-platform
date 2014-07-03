@@ -105,6 +105,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     SCHEMA_VERSION = 1
     reference_type = Locator
+
     def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,

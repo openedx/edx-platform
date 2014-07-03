@@ -34,6 +34,7 @@ class TestContentstore(unittest.TestCase):
     # don't use these 2 class vars as they restore behavior once the tests are done
     asset_deprecated = None
     ssck_deprecated = None
+
     @classmethod
     def setUpClass(cls):
         """
@@ -75,6 +76,7 @@ class TestContentstore(unittest.TestCase):
 
         self.course1_files = ['contains.sh', 'picture1.jpg', 'picture2.jpg']
         self.course2_files = ['picture1.jpg', 'picture3.jpg', 'door_2.ogg']
+
         def load_assets(course_key, files):
             locked = False
             for filename in files:

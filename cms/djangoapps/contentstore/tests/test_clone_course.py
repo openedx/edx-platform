@@ -28,4 +28,3 @@ class CloneCourseTest(CourseTestCase):
             split_course4_id = CourseLocator(org="edx4", offering="split4", branch=ModuleStoreEnum.BranchName.draft)
             self.store.clone_course(split_course3_id, split_course4_id, self.user.id)
             self.assertCoursesEqual(split_course3_id, split_course4_id)
-

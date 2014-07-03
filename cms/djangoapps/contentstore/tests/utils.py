@@ -327,6 +327,7 @@ class CourseTestCase(ModuleStoreTestCase):
             else:
                 self.assertEqual(value, course2_asset_attrs[key])
 
+
 def test_no_locations(test, resp, status_code=200, html=True):
     """
     Verifies that "i4x", which appears in old locations, but not

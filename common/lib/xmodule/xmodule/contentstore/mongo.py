@@ -317,6 +317,7 @@ class MongoContentStore(ContentStore):
     # stability of order is more important than sanity of order as any changes to order make things
     # unfindable
     ordered_key_fields = ['category', 'name', 'course', 'tag', 'org', 'revision']
+
     @classmethod
     def asset_db_key(cls, location):
         """
