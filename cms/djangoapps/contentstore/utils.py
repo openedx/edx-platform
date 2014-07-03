@@ -14,7 +14,6 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
@@ -37,7 +36,7 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore()
     content_store = contentstore()
 
-    with store_bulk_write_operations_on_course(module_store, course_id):
+    with module_store.bulk_write_operations(course_id):
         if delete_course(module_store, content_store, course_id, commit):
 
             print 'removing User permissions from course....'
