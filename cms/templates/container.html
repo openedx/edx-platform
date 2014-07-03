@@ -26,30 +26,30 @@ from django.utils.translation import ugettext as _
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
+
+<script type="text/template" id="publish-xblock-tpl">
+    <%static:include path="js/publish-xblock.underscore" />
+</script>
 % endfor
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 </%block>
 
 <%block name="jsextra">
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-<%
-main_xblock_info = {
-    'id': str(xblock_locator),
-    'display_name': xblock.display_name_with_default,
-    'category': xblock.category,
-};
-%>
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
             function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
                 var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
-                var mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
+                // TODO: can go back to dumping on server side if easier.
+                var mainXBlockInfo = new XBlockInfo(${json.dumps(xblock_info) | n});
+                var isUnitPage = ${json.dumps(is_unit_page)}
 
                 xmoduleLoader.done(function () {
                     var view = new ContainerPage({
                         el: $('#content'),
                         model: mainXBlockInfo,
-                        templates: templates
+                        templates: templates,
+                        isUnitPage: isUnitPage
                     });
                     view.render();
                 });
@@ -86,13 +86,24 @@ main_xblock_info = {
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
-                % if not is_unit_page and not unit_publish_state == 'public':
-                <li class="action-item action-edit nav-item">
-                    <a href="#" class="button edit-button action-button">
-                        <i class="icon-pencil"></i>
-                        <span class="action-button-text">${_("Edit")}</span>
-                    </a>
-                </li>
+                % if is_unit_page:
+                    <li class="action-item action-view nav-item">
+                        <a href="${published_preview_link}" class="button view-button action-button is-disabled">
+                            <span class="action-button-text">${_("View Published Version")}</span>
+                        </a>
+                    </li>
+                    <li class="action-item action-preview nav-item">
+                        <a href="${draft_preview_link}" class="button preview-button action-button is-disabled">
+                            <span class="action-button-text">${_("Preview Changes")}</span>
+                        </a>
+                    </li>
+                % else:
+                    <li class="action-item action-edit nav-item">
+                        <a href="#" class="button edit-button action-button">
+                            <i class="icon-pencil"></i>
+                            <span class="action-button-text">${_("Edit")}</span>
+                        </a>
+                    </li>
                 % endif
             </ul>
         </nav>
@@ -103,7 +114,7 @@ main_xblock_info = {
     <div class="inner-wrapper">
         <section class="content-area">
 
-            <article class="content-primary window">
+            <article class="content-primary">
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
@@ -120,16 +131,17 @@ main_xblock_info = {
                     </div>
                 % endif
                 % if is_unit_page:
-                    <div class="unit-location">
-                        <h4 class="header">${_("Unit Location")}</h4>
-                        <div class="wrapper-unit-id content-bit">
+                    <div id="publish-unit"></div>
+                    <div class="unit-location is-hidden">
+                        <h4 class="bar-mod-title">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">Unit Location ID</h5>
                             <p class="unit-id">
                                 <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
                             </p>
                         </div>
-                        <div class="wrapper-unit-tree-location content-bit">
+                        <div class="wrapper-unit-tree-location bar-mod-content">
                             <h5 class="title">Unit Tree Location</h5>
                             <ol>
                                 <li class="section">
