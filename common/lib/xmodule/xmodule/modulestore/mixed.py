@@ -466,10 +466,12 @@ def store_branch_setting(store, branch_setting):
     """
     A context manager for temporarily setting a store's branch value
 
-    Note: to be effective, the store must be a direct pointer to the underlying store;
-        not the intermediary Mixed store.
+    Args:
+        store: which store to temporarily change. If set to Mixed, it
+            changes the default modulestore.
     """
-    assert not isinstance(store, MixedModuleStore)
+    if isinstance(store, MixedModuleStore):
+        store = store.modulestores[0]
 
     try:
         previous_branch_setting_func = store.branch_setting_func
