@@ -217,6 +217,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify updates displayed
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                    // Verify that the "published" value has been cleared out of the model.
+                    expect(containerPage.model.get("publish")).toBeNull();
                 });
 
                 it('can does not fetch if publish fails', function () {
@@ -235,6 +237,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify still in draft state.
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
+                    // Verify that the "published" value has been cleared out of the model.
+                    expect(containerPage.model.get("publish")).toBeNull();
                 });
 
                 /* STUD-1860

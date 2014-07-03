@@ -122,6 +122,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 this.runOperationShowingMessage(gettext('Publishing&hellip;'),
                     function () {
                         return xblockInfo.save({publish: 'make_public'});
+                    }).always(function() {
+                        xblockInfo.set("publish", null);
                     }).done(function () {
                         xblockInfo.fetch();
                     });

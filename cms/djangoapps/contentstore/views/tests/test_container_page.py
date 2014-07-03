@@ -21,7 +21,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.vertical = ItemFactory.create(parent_location=self.sequential.location,
                                            category='vertical', display_name='Unit', user_id=self.user.id)
         self.html = ItemFactory.create(parent_location=self.vertical.location,
-                                        category="html", display_name="HTML", user_id=self.user.id)
+                                       category="html", display_name="HTML", user_id=self.user.id)
         self.child_container = ItemFactory.create(parent_location=self.vertical.location,
                                                   category='split_test', display_name='Split Test',
                                                   user_id=self.user.id)
