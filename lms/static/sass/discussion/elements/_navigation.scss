@@ -64,7 +64,6 @@
 // Browse menu
 // -----------
 .forum-nav-browse-menu-wrapper {
-  overflow-y: scroll;
   border-bottom: 1px solid $gray-l3;
   background: $gray-l5;
 }
@@ -85,6 +84,10 @@
 
 .forum-nav-browse-filter-input {
   width: 100%;
+}
+
+.forum-nav-browse-menu {
+  overflow-y: scroll;
 }
 
 .forum-nav-browse-title .icon {

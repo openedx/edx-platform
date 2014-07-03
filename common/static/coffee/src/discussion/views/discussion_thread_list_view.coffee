@@ -107,8 +107,9 @@ if Backbone?
 
       headerHeight = @$(".forum-nav-header").outerHeight()
       refineBarHeight = @$(".forum-nav-refine-bar").outerHeight()
+      browseFilterHeight = @$(".forum-nav-browse-filter").outerHeight()
       @$('.forum-nav-thread-list').css('height', (sidebarHeight - headerHeight - refineBarHeight - 2) + 'px')
-      @$('.forum-nav-browse-menu-wrapper').css('height', (sidebarHeight - headerHeight - 2) + 'px')
+      @$('.forum-nav-browse-menu').css('height', (sidebarHeight - headerHeight - browseFilterHeight - 2) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
@@ -267,6 +268,7 @@ if Backbone?
         @$(".forum-nav-thread-list-wrapper").hide()
         $(".forum-nav-browse-filter-input").focus()
         $("body").bind "click", @hideBrowseMenu
+        @updateSidebar()
 
     hideBrowseMenu: =>
       if @isBrowseMenuVisible()
@@ -274,6 +276,7 @@ if Backbone?
         @$(".forum-nav-browse-menu-wrapper").hide()
         @$(".forum-nav-thread-list-wrapper").show()
         $("body").unbind "click", @hideBrowseMenu
+        @updateSidebar()
 
     toggleBrowseMenu: (event) =>
       event.preventDefault()
