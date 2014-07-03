@@ -1,0 +1,51 @@
+<div class="bit-publishing <% if (published && !has_changes) { %>published<% } else { %>draft<%} %>">
+    <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
+        <% if (published && !has_changes) { %>
+           <%= gettext("Published") %>
+        <% } else { %>
+           <%= gettext("Draft (Unpublished changes)") %>
+        <% } %>
+    </h3>
+
+    <!--To be added in STUDIO-1708-->
+    <!--<div class="wrapper-last-draft bar-mod-content">-->
+        <!--<p class="copy meta">-->
+            <!--Draft saved on 6/15/2014 at 12:45pm by amako-->
+        <!--</p>-->
+    <!--</div>-->
+
+    <!--To be added in STUD-1712-->
+    <!--<div class="wrapper-release bar-mod-content">-->
+        <!--<h5 class="title">Will Release:</h5>-->
+        <!--<p class="copy">-->
+            <!--<span class="release-date">July 25, 2014</span> with-->
+            <!--<span class="release-with">Section "Week 1"</span>-->
+        <!--</p>-->
+    <!--</div>-->
+
+    <!--To be added in STUD-1713-->
+    <!--<div class="wrapper-visibility bar-mod-content">-->
+        <!--<h5 class="title">Will be Visible to:</h5>-->
+        <!--<p class="copy">Staff and Students</p>-->
+        <!--<p class="action-inline">-->
+            <!--<a href="">-->
+                <!--<i class="icon-unlock is-disabled"></i> Hide from Students-->
+            <!--</a>-->
+        <!--</p>-->
+    <!--</div>-->
+
+    <div class="wrapper-pub-actions bar-mod-actions">
+        <ul class="action-list">
+            <li class="action-item">
+                <a class="action-publish action-primary <% if (published && !has_changes) { %>is-disabled<% } %>"
+                   href=""><%= gettext("Publish") %>
+                </a>
+            </li>
+            <li class="action-item">
+                <a class="action-discard action-secondary <% if (!published || !has_changes) { %>is-disabled<% } %>"
+                   href=""><%= gettext("Discard Changes") %>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

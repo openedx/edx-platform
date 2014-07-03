@@ -19,15 +19,17 @@ class ContainerPageTestCase(StudioPageTestCase):
     def setUp(self):
         super(ContainerPageTestCase, self).setUp()
         self.vertical = ItemFactory.create(parent_location=self.sequential.location,
-                                           category='vertical', display_name='Unit')
+                                           category='vertical', display_name='Unit', user_id=self.user.id)
         self.html = ItemFactory.create(parent_location=self.vertical.location,
-                                        category="html", display_name="HTML")
+                                        category="html", display_name="HTML", user_id=self.user.id)
         self.child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                  category='split_test', display_name='Split Test')
+                                                  category='split_test', display_name='Split Test',
+                                                  user_id=self.user.id)
         self.child_vertical = ItemFactory.create(parent_location=self.child_container.location,
-                                                 category='vertical', display_name='Child Vertical')
+                                                 category='vertical', display_name='Child Vertical',
+                                                 user_id=self.user.id)
         self.video = ItemFactory.create(parent_location=self.child_vertical.location,
-                                        category="video", display_name="My Video")
+                                        category="video", display_name="My Video", user_id=self.user.id)
         self.store = modulestore()
 
     def test_container_html(self):
@@ -54,11 +56,13 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         draft_container = ItemFactory.create(
             parent_location=self.child_container.location,
-            category="wrapper", display_name="Wrapper"
+            category="wrapper", display_name="Wrapper",
+            user_id=self.user.id
         )
         ItemFactory.create(
             parent_location=draft_container.location,
-            category="html", display_name="Child HTML"
+            category="html", display_name="Child HTML",
+            user_id=self.user.id
         )
 
         def test_container_html(xblock):
@@ -121,15 +125,16 @@ class ContainerPageTestCase(StudioPageTestCase):
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
         empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
-        published_empty_child_container = self.store.publish(empty_child_container.location, '**replace_user**')
+                                                   category='split_test', display_name='Split Test',
+                                                   user_id=self.user.id)
+        published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        # TODO: We should delete some of these test cases when doing publishing story.
         empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
+                                                   category='split_test', display_name='Split Test',
+                                                   user_id=self.user.id)
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)

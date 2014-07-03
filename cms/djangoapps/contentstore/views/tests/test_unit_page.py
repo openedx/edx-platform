@@ -25,7 +25,7 @@ class UnitPageTestCase(StudioPageTestCase):
         """
         Verify that a public xblock's preview returns the expected HTML.
         """
-        published_video = self.store.publish(self.video.location, '**replace_user**')
+        published_video = self.store.publish(self.video.location, self.user.id)
         self.validate_preview_html(published_video, STUDENT_VIEW, can_add=False)
 
     def test_draft_component_preview_html(self):
@@ -43,7 +43,7 @@ class UnitPageTestCase(StudioPageTestCase):
                                              category='split_test', display_name='Split Test')
         ItemFactory.create(parent_location=child_container.location,
                            category='html', display_name='grandchild')
-        published_child_container = self.store.publish(child_container.location, '**replace_user**')
+        published_child_container = self.store.publish(child_container.location, self.user.id)
         self.validate_preview_html(published_child_container, STUDENT_VIEW, can_add=False)
 
     def test_draft_child_container_preview_html(self):

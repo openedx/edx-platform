@@ -152,6 +152,7 @@ def xml_only_video(step):
         category='video',
         data='<video youtube="1.00:%s"></video>' % youtube_id,
         modulestore=store,
+        user_id=world.scenario_dict["USER"].id
     )
 
 
