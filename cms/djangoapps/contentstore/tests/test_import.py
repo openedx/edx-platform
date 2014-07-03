@@ -21,7 +21,6 @@ from xmodule.contentstore.django import _CONTENTSTORE
 
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
-from pymongo import MongoClient
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -55,7 +54,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
     def load_test_import_course(self):

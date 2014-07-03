@@ -159,10 +159,8 @@ class ModuleStoreTestCase(TestCase):
             connection.drop_database(store.db.name)
             connection.close()
 
-        if hasattr(store, 'contentstore') and store.contentstore.fs_files:
-            db = store.contentstore.fs_files.database
-            db.connection.drop_database(db)
-            db.connection.close()
+        if hasattr(store, 'contentstore'):
+            store.contentstore.drop_database()
 
         location_mapper = loc_mapper()
         if location_mapper.db:

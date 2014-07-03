@@ -9,7 +9,6 @@ from datetime import timedelta
 from fs.osfs import OSFS
 from json import loads
 from path import path
-from pymongo import MongoClient
 from tempdir import mkdtemp_clean
 from textwrap import dedent
 from uuid import uuid4
@@ -77,7 +76,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
     TODO: refactor using CourseFactory so they do not.
     """
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
@@ -950,7 +949,7 @@ class ContentStoreTest(ContentStoreTestCase):
         }
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
     def assert_created_course(self, number_suffix=None):
