@@ -15,6 +15,12 @@ from bson.son import SON
 from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
 
 
+# TODO OpaqueKey remove after merge of opaque urls
+assert not hasattr(AssetLocation, 'deprecated')
+setattr(AssetLocation, 'deprecated', True)
+setattr(SlashSeparatedCourseKey, 'deprecated', True)
+
+
 class MongoContentStore(ContentStore):
 
     # pylint: disable=W0613
