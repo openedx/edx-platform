@@ -89,7 +89,7 @@ if Backbone?
       discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top
       discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight()
 
-      sidebar = $(".sidebar")
+      sidebar = $(".forum-nav")
       if scrollTop > discussionsBodyTop - @sidebar_padding
         sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
       else
