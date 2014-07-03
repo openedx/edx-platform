@@ -246,7 +246,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     discussion_blackouts = List(
-        display_name="Discussion Blackout Dates",
+        display_name=_("Discussion Blackout Dates"),
         help=_("Enter pairs of dates between which students cannot post to discussion forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to include the \"T\" between the date and time)."),
         scope=Scope.settings
     )
