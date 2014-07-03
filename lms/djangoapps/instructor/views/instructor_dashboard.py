@@ -2,6 +2,8 @@
 Instructor Dashboard Views
 """
 
+import logging
+
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -27,11 +29,13 @@ from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from analyticsclient.client import RestClient
+from analyticsclient.client import RestClient, ClientError
 from analyticsclient.course import Course
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+log = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -250,22 +254,7 @@ def _section_analytics(course_key, access):
     }
 
     if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
-        auth_token = settings.ANALYTICS_DATA_TOKEN
-        base_url = settings.ANALYTICS_DATA_URL
-
-        client = RestClient(base_url=base_url, auth_token=auth_token)
-        course = Course(client, course_key)
-
-        section_data['active_student_count'] = course.recent_active_user_count['count']
-
-        def format_date(value):
-            return value.split('T')[0]
-
-        start = course.recent_active_user_count['interval_start']
-        end = course.recent_active_user_count['interval_end']
-
-        section_data['active_student_count_start'] = format_date(start)
-        section_data['active_student_count_end'] = format_date(end)
+        _update_active_students(course_key, section_data)
 
     return section_data
 
@@ -284,3 +273,30 @@ def _section_metrics(course_key, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def _update_active_students(course_key, section_data):
+    auth_token = settings.ANALYTICS_DATA_TOKEN
+    base_url = settings.ANALYTICS_DATA_URL
+
+    section_data['active_student_count'] = 'N/A'
+    section_data['active_student_count_start'] = 'N/A'
+    section_data['active_student_count_end'] = 'N/A'
+
+    try:
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        course = Course(client, course_key)
+
+        section_data['active_student_count'] = course.recent_active_user_count['count']
+
+        def format_date(value):
+            return value.split('T')[0]
+
+        start = course.recent_active_user_count['interval_start']
+        end = course.recent_active_user_count['interval_end']
+
+        section_data['active_student_count_start'] = format_date(start)
+        section_data['active_student_count_end'] = format_date(end)
+
+    except (ClientError, KeyError) as e:
+        log.exception(e)
