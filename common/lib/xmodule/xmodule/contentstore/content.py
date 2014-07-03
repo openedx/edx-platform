@@ -10,10 +10,16 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey
 from .django import contentstore
 from PIL import Image
+
+
+# TODO OpaqueKey remove after merge of opaque urls
+assert not hasattr(AssetLocation, 'deprecated')
+setattr(AssetLocation, 'deprecated', True)
+setattr(SlashSeparatedCourseKey, 'deprecated', True)
 
 
 class StaticContent(object):
