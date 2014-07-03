@@ -141,7 +141,6 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
           detailed_settings_url = utils.reverse_course_url('settings_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
-          group_configurations_config_url = utils.reverse_course_url('group_configurations_list_handler', context_course.id)
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
@@ -149,8 +148,8 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
-            <li class="nav-item"><a href="${group_configurations_config_url}">${_("Group Configurations")}</a></li>
+          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
           % endif
           </ul>
         </nav>
