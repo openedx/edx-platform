@@ -26,7 +26,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
-from xmodule.modulestore import REVISION_OPTION_ALL
 
 from util.json_request import expect_json, JsonResponse
 
