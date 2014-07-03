@@ -30,6 +30,8 @@ class ContentFactory(factory.Factory):
 
 
 class Thread(ContentFactory):
+    anonymous = False
+    anonymous_to_peers = False
     comments_count = 0
     unread_comments_count = 0
     title = "dummy thread title"

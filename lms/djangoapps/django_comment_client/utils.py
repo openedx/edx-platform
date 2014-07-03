@@ -360,7 +360,7 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content):
+def safe_content(content, is_staff=False):
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
@@ -372,7 +372,7 @@ def safe_content(content):
 
     ]
 
-    if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
+    if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
         fields += ['username', 'user_id']
 
     if 'children' in content:
