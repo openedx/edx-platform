@@ -285,7 +285,7 @@ def _update_active_students(course_key, section_data):
 
     try:
         client = RestClient(base_url=base_url, auth_token=auth_token)
-        course = Course(client, course_key)
+        course = Course(client, course_key.to_deprecated_string())
 
         section_data['active_student_count'] = course.recent_active_user_count['count']
 
