@@ -4,15 +4,15 @@
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/container",
         "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock", "js/models/xblock_info",
-        "js/views/xblock_string_field_editor"],
+        "js/views/xblock_string_field_editor", "js/views/pages/container_subviews"],
     function ($, _, gettext, BaseView, ContainerView, XBlockView, AddXBlockComponent, EditXBlockModal, XBlockInfo,
-                XBlockStringFieldEditor) {
+                XBlockStringFieldEditor, ContainerSubviews) {
         var XBlockContainerPage = BaseView.extend({
             // takes XBlockInfo as a model
 
             view: 'container_preview',
 
-            initialize: function() {
+            initialize: function(options) {
                 BaseView.prototype.initialize.call(this);
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
@@ -24,16 +24,39 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                     model: this.model,
                     view: this.view
                 });
+                this.isUnitPage = this.options.isUnitPage;
+                if (this.isUnitPage) {
+                    this.xblockPublisher = new ContainerSubviews.Publisher({
+                        el: this.$('#publish-unit'),
+                        model: this.model
+                    });
+                    this.xblockPublisher.render();
+
+                    // No need to render initially. This is only used for updating state
+                    // when the unit changes visibility.
+                    this.visibilityState = new ContainerSubviews.VisibilityStateController({
+                        el: this.$('.section-item.editing a'),
+                        model: this.model
+                    });
+                    this.previewActions = new ContainerSubviews.PreviewActionController({
+                        el: this.$('.nav-actions'),
+                        model: this.model
+                    });
+                    this.previewActions.render();
+                }
             },
 
             render: function(options) {
                 var self = this,
                     xblockView = this.xblockView,
-                    loadingElement = this.$('.ui-loading');
-                loadingElement.removeClass('is-hidden');
+                    loadingElement = this.$('.ui-loading'),
+                    unitLocationTree = this.$('.unit-location'),
+                    hiddenCss='is-hidden';
+
+                loadingElement.removeClass(hiddenCss);
 
                 // Hide both blocks until we know which one to show
-                xblockView.$el.addClass('is-hidden');
+                xblockView.$el.addClass(hiddenCss);
 
                 if (!options || !options.refresh) {
                     // Add actions to any top level buttons, e.g. "Edit" of the container itself.
@@ -45,11 +68,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 xblockView.render({
                     success: function() {
                         xblockView.xblock.runtime.notify("page-shown", self);
-                        xblockView.$el.removeClass('is-hidden');
+                        xblockView.$el.removeClass(hiddenCss);
                         self.renderAddXBlockComponents();
                         self.onXBlockRefresh(xblockView);
                         self.refreshDisplayName();
-                        loadingElement.addClass('is-hidden');
+                        loadingElement.addClass(hiddenCss);
+                        unitLocationTree.removeClass(hiddenCss);
                         self.delegateEvents();
                     }
                 });
@@ -71,6 +95,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
             onXBlockRefresh: function(xblockView) {
                 this.addButtonActions(xblockView.$el);
                 this.xblockView.refresh();
+                // Update publish and last modified information from the server.
+                this.model.fetch();
             },
 
             renderAddXBlockComponents: function() {
@@ -181,6 +207,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                 xblockElement.remove();
                 xblockView.updateChildren(parent);
                 xblock.runtime.notify('deleted-child', parent.data('locator'));
+                // Update publish and last modified information from the server.
+                this.model.fetch();
             },
 
             onNewXBlock: function(xblockElement, scrollOffset, data) {

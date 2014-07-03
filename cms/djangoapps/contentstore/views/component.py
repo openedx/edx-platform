@@ -23,6 +23,7 @@ from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item, compute_publish_state
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from contentstore.views.item import create_xblock_info
 
 from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
@@ -169,7 +170,7 @@ def container_handler(request, usage_key_string):
 
         usage_key = UsageKey.from_string(usage_key_string)
         try:
-            course, xblock, __ = _get_item_in_course(request, usage_key)
+            course, xblock, lms_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
@@ -187,15 +188,38 @@ def container_handler(request, usage_key_string):
             parent = get_parent_xblock(parent)
         ancestor_xblocks.reverse()
 
-        subsection = get_parent_xblock(unit) if unit else None
-        section = get_parent_xblock(subsection) if subsection else None
-        # TODO: correct with publishing story.
-        unit_publish_state = 'draft'
+        assert unit is not None, "Could not determine unit page"
+        subsection = get_parent_xblock(unit)
+        assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
+        section = get_parent_xblock(subsection)
+        assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
+        xblock_info = create_xblock_info(usage_key, xblock)
+
+        # Create the link for preview.
+        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
+        # need to figure out where this item is in the list of children as the
+        # preview will need this
+        index = 1
+        for child in subsection.get_children():
+            if child.location == unit.location:
+                break
+            index += 1
+        preview_lms_link = (
+            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
+        ).format(
+            preview_lms_base=preview_lms_base,
+            lms_base=settings.LMS_BASE,
+            org=course.location.org,
+            course=course.location.course,
+            course_name=course.location.name,
+            section=section.location.name,
+            subsection=subsection.location.name,
+            index=index
+        )
 
         return render_to_response('container.html', {
             'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
-            'unit_publish_state': unit_publish_state,
             'xblock_locator': xblock.location,
             'unit': unit,
             'is_unit_page': is_unit_page,
@@ -204,6 +228,9 @@ def container_handler(request, usage_key_string):
             'new_unit_category': 'vertical',
             'ancestor_xblocks': ancestor_xblocks,
             'component_templates': json.dumps(component_templates),
+            'xblock_info': xblock_info,
+            'draft_preview_link': preview_lms_link,
+            'published_preview_link': lms_link,
         })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
