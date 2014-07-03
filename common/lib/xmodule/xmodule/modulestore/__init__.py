@@ -10,6 +10,7 @@ import datetime
 
 from collections import namedtuple, defaultdict
 import collections
+from contextlib import contextmanager
 
 from abc import ABCMeta, abstractmethod
 from xblock.plugin import default_select
@@ -447,6 +448,28 @@ class ModuleStoreReadBase(ModuleStoreRead):
         # default is to say yes by not raising an exception
         return {'default_impl': True}
 
+    @contextmanager
+    def default_store(self, store_type):
+        """
+        A context manager for temporarily changing the default store
+        """
+        if self.get_modulestore_type(None) != store_type:
+            raise ValueError(u"Cannot set default store to type {}".format(store_type))
+        yield
+
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):
+        """
+        A context manager for temporarily setting a store's branch value
+        """
+        previous_branch_setting_func = getattr(self, 'branch_setting_func', None)
+        try:
+            self.branch_setting_func = lambda: branch_setting
+            yield
+        finally:
+            self.branch_setting_func = previous_branch_setting_func
+
+
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
@@ -529,6 +552,29 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
         super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
         return dest_course_id
+
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO
+        # Make this multi-process-safe if future operations need it.
+        # Right now, only Import Course, Clone Course, and Delete Course use this, so
+        # it's ok if the cached metadata in the memcache is invalid when another
+        # request comes in for the same course.
+        try:
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._begin_bulk_write_operation(course_id)
+            yield
+        finally:
+            # check for the begin method here,
+            # since it's an error if an end method is not defined when a begin method is
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

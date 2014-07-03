@@ -390,13 +390,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.ignore_write_events_on_courses = set()
         self._course_run_cache = {}
 
-    def begin_bulk_write_operation_on_course(self, course_id):
+    def _begin_bulk_write_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """
         self.ignore_write_events_on_courses.add(course_id)
 
-    def end_bulk_write_operation_on_course(self, course_id):
+    def _end_bulk_write_operation(self, course_id):
         """
         Restart updating the meta-data inheritance cache for the given course.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.

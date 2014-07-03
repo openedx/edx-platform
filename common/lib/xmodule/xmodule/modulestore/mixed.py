@@ -492,9 +492,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise NotImplementedError(u"Cannot call {} on store {}".format(method, store))
 
     @contextmanager
-    def set_default_store(self, store_type):
+    def default_store(self, store_type):
         """
-        A context manager for temporarily changing the default store in the Mixed modulestore
+        A context manager for temporarily changing the default store in the Mixed modulestore to the given store type
         """
         previous_store_list = self.modulestores
         found = False
@@ -509,50 +509,22 @@ class MixedModuleStore(ModuleStoreWriteBase):
         finally:
             self.modulestores = previous_store_list
 
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):
+        """
+        A context manager for temporarily setting the branch value for the given course' store
+        to the given branch_setting.  If course_id is None, the default store is used.
+        """
+        store = self._get_modulestore_for_courseid(course_id)
+        with store.branch_setting(branch_setting, course_id):
+            yield
 
-@contextmanager
-def store_branch_setting(store, branch_setting):
-    """
-    A context manager for temporarily setting a store's branch value
-
-    Note: to be effective, the store must be a direct pointer to the underlying store;
-        not the intermediary Mixed store.
-    """
-    assert not isinstance(store, MixedModuleStore)
-
-    try:
-        previous_branch_setting_func = store.branch_setting_func
-        store.branch_setting_func = lambda: branch_setting
-        yield
-    finally:
-        store.branch_setting_func = previous_branch_setting_func
-
-
-@contextmanager
-def store_bulk_write_operations_on_course(store, course_id):
-    """
-    A context manager for notifying the store of bulk write events.
-
-    In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
-    until the bulk operation is completed.
-
-    The store can be either the Mixed modulestore or a direct pointer to the underlying store.
-    """
-
-    # TODO
-    # Make this multi-process-safe if future operations need it.
-    # Right now, only Import Course, Clone Course, and Delete Course use this, so
-    # it's ok if the cached metadata in the memcache is invalid when another
-    # request comes in for the same course.
-
-    # if the caller passed in the mixed modulestore, get a direct pointer to the underlying store
-    if hasattr(store, '_get_modulestore_by_course_id'):
-        store = store._get_modulestore_by_course_id(course_id)
-
-    try:
-        if hasattr(store, 'begin_bulk_write_operation_on_course'):
-            store.begin_bulk_write_operation_on_course(course_id)
-        yield
-    finally:
-        if hasattr(store, 'begin_bulk_write_operation_on_course'):
-            store.end_bulk_write_operation_on_course(course_id)
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+        If course_id is None, the default store is used.
+        """
+        store = self._get_modulestore_for_courseid(course_id)
+        with store.bulk_write_operations(course_id):
+            yield

@@ -10,7 +10,6 @@ from xmodule.x_module import XModuleDescriptor
 from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
@@ -179,7 +178,7 @@ def import_from_xml(
                 )
                 continue
 
-        with store_bulk_write_operations_on_course(store, dest_course_id):
+        with store.bulk_write_operations(dest_course_id):
             course_data_path = None
 
             if verbose:

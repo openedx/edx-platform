@@ -1,4 +1,4 @@
-# pylint: disable=W0212
+# pylint: disable=protected-access
 
 """
 Django management command to migrate a course from the old Mongo modulestore
