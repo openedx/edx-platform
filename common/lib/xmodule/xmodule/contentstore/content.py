@@ -149,6 +149,7 @@ class StaticContent(object):
 
     @staticmethod
     def _key_to_string(key):
+        """Converts the given key to a string, honoring the deprecated flag."""
         # TODO - remove deprecated check once opaque keys lands
         if hasattr(key, 'deprecated'):
             return key.to_deprecated_string()

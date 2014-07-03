@@ -16,6 +16,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore import ModuleStoreEnum
 # pylint: disable=E1101
+# pylint: disable=W0212
 
 
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")

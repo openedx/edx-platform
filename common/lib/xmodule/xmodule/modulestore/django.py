@@ -38,7 +38,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, content_store, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -63,7 +63,7 @@ def create_modulestore_instance(engine, contentstore, doc_store_config, options,
         metadata_inheritance_cache = get_cache('default')
 
     return class_(
-        contentstore=contentstore,
+        contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),

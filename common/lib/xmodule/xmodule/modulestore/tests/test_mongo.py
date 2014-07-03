@@ -1,3 +1,5 @@
+# pylint: disable=E1101
+# pylint: disable=W0212
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none

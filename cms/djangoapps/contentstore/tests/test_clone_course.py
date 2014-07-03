@@ -1,3 +1,6 @@
+"""
+Unit tests for cloning a course between the same and different module stores.
+"""
 from django.utils.unittest import skip
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
@@ -7,7 +10,11 @@ from contentstore.tests.utils import CourseTestCase
 
 @skip("Pending integration with latest opaque-keys library - need removal of offering, make_asset_key on CourseLocator, etc.")
 class CloneCourseTest(CourseTestCase):
+    """
+    Unit tests for cloning a course
+    """
     def test_clone_course(self):
+        """Tests cloning of a course as follows: XML -> Mongo (+ data) -> Mongo -> Split -> Split"""
         # 1. import and populate test toy course
         mongo_course1_id = self.import_and_populate_course()
         self.check_populated_course(mongo_course1_id)

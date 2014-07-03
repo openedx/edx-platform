@@ -1,3 +1,4 @@
+# pylint: disable=E1101
 '''
 Utilities for contentstore tests
 '''
@@ -18,7 +19,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_importer import import_from_xml
 from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from opaque_keys.edx.locator import CourseLocator
 from contentstore.utils import reverse_url
 
 
@@ -214,30 +214,32 @@ class CourseTestCase(ModuleStoreTestCase):
         self.check_verticals(items)
 
         def verify_item_publish_state(item, publish_state):
+            """Verifies the publish state of the item is as expected."""
             if publish_state in (PublishState.private, PublishState.draft):
                 self.assertTrue(getattr(item, 'is_draft', False))
             else:
                 self.assertFalse(getattr(item, 'is_draft', False))
             self.assertEqual(self.store.compute_publish_state(item), publish_state)
 
-        def get_and_verify_item_publish_state(item_type, item_name, publish_state):
+        def get_and_verify_publish_state(item_type, item_name, publish_state):
+            """Gets the given item from the store and verifies the publish state of the item is as expected."""
             item = self.store.get_item(course_id.make_usage_key(item_type, item_name))
             verify_item_publish_state(item, publish_state)
             return item
 
         # verify that the draft vertical is draft
-        vertical = get_and_verify_item_publish_state('vertical', self.TEST_VERTICAL, PublishState.draft)
+        vertical = get_and_verify_publish_state('vertical', self.TEST_VERTICAL, PublishState.draft)
         for child in vertical.get_children():
             verify_item_publish_state(child, PublishState.draft)
 
         # make sure that we don't have a sequential that is not in draft mode
-        sequential = get_and_verify_item_publish_state('sequential', self.SEQUENTIAL, PublishState.public)
+        sequential = get_and_verify_publish_state('sequential', self.SEQUENTIAL, PublishState.public)
 
         # verify that we have the private vertical
-        private_vertical = get_and_verify_item_publish_state('vertical', self.PRIVATE_VERTICAL, PublishState.private)
+        private_vertical = get_and_verify_publish_state('vertical', self.PRIVATE_VERTICAL, PublishState.private)
 
         # verify that we have the public vertical
-        public_vertical = get_and_verify_item_publish_state('vertical', self.PUBLISHED_VERTICAL, PublishState.public)
+        public_vertical = get_and_verify_publish_state('vertical', self.PUBLISHED_VERTICAL, PublishState.public)
 
         # verify verticals are children of sequential
         for vert in [vertical, private_vertical, public_vertical]:
@@ -298,7 +300,7 @@ class CourseTestCase(ModuleStoreTestCase):
         # compare assets
         content_store = contentstore()
         course1_assets, count_course1_assets = content_store.get_all_content_for_course(course1_id)
-        course2_assets, count_course2_assets = content_store.get_all_content_for_course(course2_id)
+        _, count_course2_assets = content_store.get_all_content_for_course(course2_id)
         self.assertEqual(count_course1_assets, count_course2_assets)
         for asset in course1_assets:
             asset_id = asset.get('content_son', asset['_id'])
@@ -315,6 +317,7 @@ class CourseTestCase(ModuleStoreTestCase):
             test_no_locations(self, resp)
 
     def assertAssetsEqual(self, asset_key, course1_id, course2_id):
+        """Verifies the asset of the given key has the same attributes in both given courses."""
         content_store = contentstore()
         course1_asset_attrs = content_store.get_attrs(asset_key.map_into_course(course1_id))
         course2_asset_attrs = content_store.get_attrs(asset_key.map_into_course(course2_id))

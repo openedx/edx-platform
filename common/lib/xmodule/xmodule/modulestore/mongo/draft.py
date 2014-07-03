@@ -166,7 +166,7 @@ class DraftModuleStore(MongoModuleStore):
             )
 
         # clone the assets
-        super(MongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
 
         # get the whole old course
         new_course = self.get_course(dest_course_id)
@@ -186,6 +186,7 @@ class DraftModuleStore(MongoModuleStore):
         return True
 
     def _clone_modules(self, modules, dest_course_id, user_id):
+        """Clones each module into the given course"""
         for module in modules:
             original_loc = module.location
             module.location = module.location.map_into_course(dest_course_id)

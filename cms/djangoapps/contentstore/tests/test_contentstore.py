@@ -710,6 +710,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         shutil.rmtree(root_dir)
 
     def check_import(self, root_dir, content_store, course_id):
+        """Imports the course in root_dir into the given course_id and verifies its content"""
         # reimport
         import_from_xml(
             self.store,
@@ -724,17 +725,18 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.check_populated_course(course_id)
 
         # verify additional export attributes
-        def verify_export_attributes_removed(attributes):
+        def verify_export_attrs_removed(attributes):
+            """Verifies all temporary attributes added during export are removed"""
             self.assertNotIn('index_in_children_list', attributes)
             self.assertNotIn('parent_sequential_url', attributes)
 
         vertical = self.store.get_item(course_id.make_usage_key('vertical', self.TEST_VERTICAL))
-        verify_export_attributes_removed(vertical.xml_attributes)
+        verify_export_attrs_removed(vertical.xml_attributes)
 
         for child in vertical.get_children():
-            verify_export_attributes_removed(child.xml_attributes)
+            verify_export_attrs_removed(child.xml_attributes)
             if hasattr(child, 'data'):
-                verify_export_attributes_removed(child.data)
+                verify_export_attrs_removed(child.data)
 
     def test_export_course_with_metadata_only_video(self):
         content_store = contentstore()
