@@ -14,12 +14,25 @@
             <nav class="nav-actions">
                 <h3 class="sr">Page Actions</h3>
                 <ul>
-                    <li class="action-item action-edit nav-item">
-                        <a href="#" class="button edit-button action-button">
-                            <i class="icon-pencil"></i>
-                            <span class="action-button-text">${_("Edit")}</span>
-                        </a>
-                    </li>
+                    % if is_unit_page:
+                        <li class="action-item action-view nav-item">
+                            <a href="${published_preview_link}" class="button view-button action-button is-disabled">
+                                <span class="action-button-text">${_("View Published Version")}</span>
+                            </a>
+                        </li>
+                        <li class="action-item action-preview nav-item">
+                            <a href="${draft_preview_link}" class="button preview-button action-button is-disabled">
+                                <span class="action-button-text">${_("Preview Changes")}</span>
+                            </a>
+                        </li>
+                    % else:
+                        <li class="action-item action-edit nav-item">
+                            <a href="#" class="button edit-button action-button">
+                                <i class="icon-pencil"></i>
+                                <span class="action-button-text">${_("Edit")}</span>
+                            </a>
+                        </li>
+                % endif
                 </ul>
             </nav>
         </header>
@@ -37,7 +50,44 @@
                     </div>
                 </article>
                 <aside class="content-supplementary" role="complimentary">
+                    <div id="publish-unit" class="window"></div>
                 </aside>
+                <div class="unit-location">
+                        <h4 class="header">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id content-bit">
+                            <h5 class="title">Unit Location ID</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
+                            </p>
+                        </div>
+                        <div class="wrapper-unit-tree-location content-bit">
+                            <h5 class="title">Unit Tree Location</h5>
+                            <ol>
+                                <li class="section">
+                                    <a href="course-overview-url" class="section-item section-name">
+                                        <span class="section-name">Test Section</span>
+                                    </a>
+                                    <ol>
+                                        <li class="subsection">
+                                            <div class="section-item">
+                                                <span class="subsection-name"><span class="subsection-name-value">Test Subsection</span></span>
+                                            </div>
+                                            <ol class="sortable-unit-list">
+                                                <li class="courseware-unit unit is-draggable" data-locator="locator-container"
+                                                    data-parent="" data-course-key="">
+                                                <div class="section-item editing">
+                                                    <a href="unit-url" class="private-item">
+                                                        <span class="unit-name">Test Container</span>
+                                                    </a>
+                                                </div>
+                                            </ol>
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
             </section>
         </div>
     </div>

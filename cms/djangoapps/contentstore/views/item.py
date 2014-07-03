@@ -21,11 +21,15 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
+from contentstore.utils import compute_publish_state
+from xmodule.modulestore import PublishState
+from django.contrib.auth.models import User
+from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
@@ -83,7 +87,7 @@ def xblock_handler(request, usage_key_string):
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
+                :publish: can be only one value-- 'make_public'
               The JSON representation on the updated xblock (minus children) is returned.
 
               if usage_key_string is not specified, create a new xblock instance, either by duplicating
@@ -186,7 +190,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
@@ -203,7 +206,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            # change not authored by requestor but by xblocks.
             store.update_item(xblock, request.user.id)
         elif view_name in (PREVIEW_VIEWS + container_views):
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
@@ -220,7 +222,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
             context = {
                 'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
                 'is_unit_page': is_unit(xblock),
-                'read_only': is_read_only,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items
             }
@@ -253,19 +254,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-def _is_xblock_read_only(xblock):
-    """
-    Returns true if the specified xblock is read-only, meaning that it cannot be edited.
-    """
-    # We allow direct editing of xblocks in DIRECT_ONLY_CATEGORIES (for example, static pages).
-    # if xblock.category in DIRECT_ONLY_CATEGORIES:
-    #     return False
-    # component_publish_state = compute_publish_state(xblock)
-    # return component_publish_state == PublishState.public
-    # TODO: correct with publishing story.
-    return False
-
-
 def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout=None,
                grader_type=None, publish=None):
     """
@@ -290,19 +278,6 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 
     old_metadata = own_metadata(existing_item)
     old_content = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
-
-    if publish:
-        if publish == 'make_private':
-            try:
-                store.unpublish(existing_item.location, user.id),
-            except ItemNotFoundError:
-                pass
-        elif publish == 'create_draft':
-            try:
-                store.convert_to_draft(existing_item.location, user.id)
-            except DuplicateItemError:
-                pass
-
 
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
@@ -564,8 +539,30 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
         )
 
     # Note that children aren't being returned until we have a use case.
-    return {
-        'id': unicode(module.location),
-        'data': data,
-        'metadata': own_metadata(module)
+    return create_xblock_info(usage_key, module, data, own_metadata(module))
+
+
+def create_xblock_info(usage_key, xblock, data=None, metadata=None):
+    """
+    Creates the information needed for client-side XBlockInfo.
+
+    If data or metadata are not specified, their information will not be added
+    (regardless of whether or not the xblock actually has data or metadata).
+    """
+    publish_state = compute_publish_state(xblock) if xblock else None
+
+    xblock_info = {
+        "id": unicode(xblock.location),
+        "display_name": xblock.display_name_with_default,
+        "category": xblock.category,
+        "has_changes": modulestore().has_changes(usage_key),
+        "published": publish_state in (PublishState.public, PublishState.draft),
+        "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
+        "edited_by": User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None
     }
+    if data is not None:
+        xblock_info["data"] = data
+    if metadata is not None:
+        xblock_info["metadata"] = metadata
+
+    return xblock_info
