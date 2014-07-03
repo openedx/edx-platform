@@ -530,6 +530,30 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
 
+    @ddt.data('draft')
+    def test_has_changes_draft_mongo(self, default_ms):
+        """
+        Smoke test for has_changes with draft mongo modulestore.
+
+        Tests already exist for both split and draft in their own test files.
+        """
+        self.initdb(default_ms)
+        item = self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
+        self.assertTrue(self.store.has_changes(item.location))
+        self.store.publish(item.location, self.user_id)
+        self.assertFalse(self.store.has_changes(item.location))
+
+    @ddt.data('split')
+    def test_has_changes_split(self, default_ms):
+        """
+        Smoke test for has_changes with split modulestore.
+
+        Tests already exist for both split and draft in their own test files.
+        """
+        self.initdb(default_ms)
+        self.assertTrue(self.store.has_changes(self.writable_chapter_location))
+        # split modulestore's "publish" method is currently called "xblock_publish"
+
     def test_xml_get_courses(self):
         """
         Test that the xml modulestore only loaded the courses from the maps.
