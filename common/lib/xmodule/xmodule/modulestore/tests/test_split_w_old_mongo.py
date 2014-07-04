@@ -49,14 +49,15 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.userid = random.getrandbits(32)
         super(SplitWMongoCourseBoostrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
+            None,
             self.db_config,
             **self.modulestore_options
         )
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
-        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
+        self.old_mongo = MongoModuleStore(None, self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftMongoModuleStore(
-            self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
+            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
         )
         self.addCleanup(self.tear_down_mongo)
         self.old_course_key = None

@@ -1,6 +1,5 @@
 from cache_toolbox.core import get_cached_content, set_cached_content, del_cached_content
 from opaque_keys.edx.locations import Location
-from xmodule.contentstore.content import StaticContent
 from django.test import TestCase
 
 
