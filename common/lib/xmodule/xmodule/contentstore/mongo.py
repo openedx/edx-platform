@@ -12,7 +12,7 @@ from fs.osfs import OSFS
 import os
 import json
 from bson.son import SON
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
 
 
 class MongoContentStore(ContentStore):
