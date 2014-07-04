@@ -42,7 +42,7 @@ class MongoContentStore(ContentStore):
 
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
-        # TODO remove after merge of opaque urls
+        # TODO OpaqueKey - remove after merge of opaque urls
         if not hasattr(AssetLocation, 'deprecated'):
             setattr(AssetLocation, 'deprecated', True)
             setattr(SlashSeparatedCourseKey, 'deprecated', True)

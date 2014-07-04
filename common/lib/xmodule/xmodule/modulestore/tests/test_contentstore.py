@@ -36,15 +36,6 @@ class TestContentstore(unittest.TestCase):
     ssck_deprecated = None
 
     @classmethod
-    def setUpClass(cls):
-        """
-        Saves deprecated values which the tests override
-        """
-        return super(TestContentstore, cls).setUpClass()
-        cls.asset_deprecated = getattr(AssetLocation, 'deprecated')
-        cls.ssck_deprecated = getattr(SlashSeparatedCourseKey, 'deprecated')
-
-    @classmethod
     def tearDownClass(cls):
         """
         Restores deprecated values

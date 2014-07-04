@@ -1,3 +1,5 @@
+# pylint: disable=W0212
+
 """
 Django management command to migrate a course from the old Mongo modulestore
 to the new split-Mongo modulestore.

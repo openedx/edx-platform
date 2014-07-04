@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=E1101
+# pylint: disable=W0212
 
 import copy
 import mock
@@ -128,6 +129,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 400)
 
     def check_edit_unit(self, test_course_name):
+        """Verifies the editing HTML in all the verticals in the given test course"""
         _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
 
         items = self.store.get_items(course_items[0].id, category='vertical')
@@ -939,7 +941,7 @@ class ContentStoreTest(ContentStoreTestCase):
     Tests for the CMS ContentStore application.
     """
     def setUp(self):
-        super(ContentStoreTestCase, self).setUp()
+        super(ContentStoreTest, self).setUp()
 
         self.course_data = {
             'org': 'MITx',

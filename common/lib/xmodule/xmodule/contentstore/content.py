@@ -112,7 +112,7 @@ class StaticContent(object):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        # TODO - change to from_string once opaque keys lands
+        # TODO OpaqueKey - change to from_string once opaque keys lands
         # return AssetLocation.from_string(path)
         return AssetLocation.from_deprecated_string(path)
 
@@ -150,7 +150,7 @@ class StaticContent(object):
     @staticmethod
     def _key_to_string(key):
         """Converts the given key to a string, honoring the deprecated flag."""
-        # TODO - remove deprecated check once opaque keys lands
+        # TODO OpaqueKey - remove deprecated check once opaque keys lands
         if hasattr(key, 'deprecated'):
             return key.to_deprecated_string()
         else:
