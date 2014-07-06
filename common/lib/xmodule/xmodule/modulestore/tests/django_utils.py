@@ -136,7 +136,8 @@ class ModuleStoreTestCase(TestCase):
         to update metadata.
         """
         store = modulestore()
-        store.update_item(course, '**replace_user**')
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            store.update_item(course, '**replace_user**')
         updated_course = store.get_course(course.id)
         return updated_course
 
