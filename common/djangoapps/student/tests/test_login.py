@@ -346,10 +346,19 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
     """
     def setUp(self):
         super(ExternalAuthShibTest, self).setUp()
-        self.course = CourseFactory.create(org='Stanford', number='456', display_name='NO SHIB')
-        self.shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
-        self.shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(self.shib_course, self.user.id)
+        self.course = CourseFactory.create(
+            org='Stanford',
+            number='456',
+            display_name='NO SHIB',
+            user_id=self.user.id,
+        )
+        self.shib_course = CourseFactory.create(
+            org='Stanford',
+            number='123',
+            display_name='Shib Only',
+            enrollment_domain='shib:https://idp.stanford.edu/',
+            user_id=self.user.id,
+        )
         self.user_w_map = UserFactory.create(email='withmap@stanford.edu')
         self.extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
                                        external_email='withmap@stanford.edu',

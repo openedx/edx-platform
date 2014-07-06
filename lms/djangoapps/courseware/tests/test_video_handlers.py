@@ -12,6 +12,7 @@ from webob import Request
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -411,7 +412,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.course.static_asset_path = 'dummy/static'
         self.course.save()
         store = modulestore()
-        store.update_item(self.course, self.user.id)
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            store.update_item(self.course, self.user.id)
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')

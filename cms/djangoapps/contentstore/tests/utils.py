@@ -89,7 +89,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         Create a non-staff user, log them in (if authenticate=True), and return the client, user to use for testing.
         """
-        nonstaff, password = super(CourseTestCase, self).create_non_staff_authed_user_client()
+        nonstaff, password = self.create_non_staff_user()
 
         client = Client()
         if authenticate:
