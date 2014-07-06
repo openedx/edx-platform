@@ -35,7 +35,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.staff_pwd = super(ContentStoreToyCourseTest, self).setUp()
         self.staff_usr = self.user
-        self.non_staff_usr, self.non_staff_pwd = self.create_non_staff_authed_user_client()
+        self.non_staff_usr, self.non_staff_pwd = self.create_non_staff_user()
 
         self.client = Client()
         self.contentstore = contentstore()

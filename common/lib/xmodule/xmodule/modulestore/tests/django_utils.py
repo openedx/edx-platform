@@ -129,6 +129,13 @@ class ModuleStoreTestCase(TestCase):
           your `setUp()` method.
     """
     def setUp(self, **kwargs):
+        """
+        Creates a test User if `create_user` is True.
+        Returns the password for the test User.
+
+        Args:
+            create_user - specifies whether or not to create a test User.  Default is True.
+        """
         super(ModuleStoreTestCase, self).setUp()
 
         self.store = modulestore()
@@ -151,20 +158,21 @@ class ModuleStoreTestCase(TestCase):
 
         return password
 
-    def create_non_staff_authed_user_client(self):
+    def create_non_staff_user(self):
         """
-        Create a non-staff user, log them in (if authenticate=True), and return the client, user to use for testing.
+        Creates a non-staff test user.
+        Returns the non-staff test user and its password.
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff = User.objects.create_user(uname, 'test+student@edx.org', password)
+        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
-        nonstaff.is_active = True
-        nonstaff.is_staff = False
-        nonstaff.save()
-        return nonstaff, password
+        nonstaff_user.is_active = True
+        nonstaff_user.is_staff = False
+        nonstaff_user.save()
+        return nonstaff_user, password
 
     def update_course(self, course, user_id):
         """
