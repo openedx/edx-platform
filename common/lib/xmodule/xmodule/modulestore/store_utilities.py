@@ -85,25 +85,3 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
             logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))
 
     return text
-
-
-def delete_course(modulestore, contentstore, course_key, commit=False):
-    """
-    This method will actually do the work to delete all content in a course in a MongoDB backed
-    courseware store. BE VERY CAREFUL, this is not reversable.
-    """
-
-    # check to see if the source course is actually there
-    if not modulestore.has_course(course_key):
-        raise Exception("Cannot find a course at {0}. Aborting".format(course_key))
-
-    if commit:
-        print "Deleting assets and thumbnails {}".format(course_key)
-        contentstore.delete_all_course_assets(course_key)
-
-    # finally delete the course
-    print "Deleting {0}...".format(course_key)
-    if commit:
-        modulestore.delete_course(course_key, '**replace-user**')
-
-    return True

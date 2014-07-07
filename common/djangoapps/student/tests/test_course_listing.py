@@ -97,7 +97,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         course_location = SlashSeparatedCourseKey('testOrg', 'doomedCourse', 'RunBabyRun')
         self._create_course_with_access_groups(course_location)
-        mongo_store.delete_course(course_location)
+        mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
         course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
         course = self._create_course_with_access_groups(course_location)

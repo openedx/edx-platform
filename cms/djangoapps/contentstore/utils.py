@@ -11,12 +11,10 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.store_utilities import delete_course
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -28,27 +26,25 @@ NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def delete_course_and_groups(course_id, commit=False):
+def delete_course_and_groups(course_id, user_id):
     """
     This deletes the courseware associated with a course_id as well as cleaning update_item
     the various user table stuff (groups, permissions, etc.)
     """
     module_store = modulestore()
-    content_store = contentstore()
 
     with module_store.bulk_write_operations(course_id):
-        if delete_course(module_store, content_store, course_id, commit):
+        module_store.delete_course(course_id, user_id)
 
-            print 'removing User permissions from course....'
-            # in the django layer, we need to remove all the user permissions groups associated with this course
-            if commit:
-                try:
-                    staff_role = CourseStaffRole(course_id)
-                    staff_role.remove_users(*staff_role.users_with_role())
-                    instructor_role = CourseInstructorRole(course_id)
-                    instructor_role.remove_users(*instructor_role.users_with_role())
-                except Exception as err:
-                    log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
+        print 'removing User permissions from course....'
+        # in the django layer, we need to remove all the user permissions groups associated with this course
+        try:
+            staff_role = CourseStaffRole(course_id)
+            staff_role.remove_users(*staff_role.users_with_role())
+            instructor_role = CourseInstructorRole(course_id)
+            instructor_role.remove_users(*instructor_role.users_with_role())
+        except Exception as err:
+            log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
 
 
 def get_lms_link_for_item(location, preview=False):
