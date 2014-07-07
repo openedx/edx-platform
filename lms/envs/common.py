@@ -265,6 +265,9 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False
 }
 
 # Used for A/B testing
