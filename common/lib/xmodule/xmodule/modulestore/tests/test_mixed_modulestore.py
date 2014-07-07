@@ -104,12 +104,6 @@ class TestMixedModuleStore(unittest.TestCase):
         self.addCleanup(self.connection.close)
         super(TestMixedModuleStore, self).setUp()
 
-        patcher = patch.multiple(
-            'xmodule.modulestore.mixed',
-            create_modulestore_instance=create_modulestore_instance,
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
         self.addTypeEqualityFunc(CourseLocator, '_compareIgnoreVersion')
         # define attrs which get set in initdb to quell pylint
@@ -207,7 +201,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(None, **self.options)
+        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
         self.addCleanup(self.store.close_all_connections)
 
         # convert to CourseKeys

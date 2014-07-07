@@ -151,7 +151,6 @@ def import_from_xml(
 
     # If we're going to remap the course_id, then we can only do that with
     # a single course
-
     if target_course_id:
         assert(len(xml_module_store.modules) == 1)
 

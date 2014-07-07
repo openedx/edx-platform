@@ -71,6 +71,7 @@ def create_modulestore_instance(engine, content_store, doc_store_config, options
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
         branch_setting_func=_get_modulestore_branch_setting,
+        create_modulestore_instance=create_modulestore_instance,
         **_options
     )
 

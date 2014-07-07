@@ -12,7 +12,6 @@ from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import create_modulestore_instance
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -30,12 +29,15 @@ class MixedModuleStore(ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, contentstore, mappings, stores, i18n_service=None, **kwargs):
+    def __init__(self, contentstore, mappings, stores, i18n_service=None, create_modulestore_instance=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
         """
         super(MixedModuleStore, self).__init__(contentstore, **kwargs)
+
+        if create_modulestore_instance is None:
+            raise ValueError('MixedModuleStore constructor must be passed a create_modulestore_instance function')
 
         self.modulestores = []
         self.mappings = {}
