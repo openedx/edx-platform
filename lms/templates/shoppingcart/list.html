@@ -42,10 +42,7 @@
                 <b>${_("Total Amount")}: <span> ${"{0:0.2f}".format(amount)} </span> </b>
             </td>
         </tr>
-        <!--<tr class="cart-totals">-->
-          <!--<td colspan="4"></td>-->
 
-        <!--</tr>-->
       </tbody>
       <tfoot>
         <tr class="always-white">
@@ -93,9 +90,7 @@
                }
       )
       .success(function(data) {
-                 if(data.response=='success'){
-                       location.reload(true);
-                 }
+                 location.reload(true);
               })
       .error(function(data,status) {
                   if(status=="parsererror"){
