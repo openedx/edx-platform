@@ -96,6 +96,10 @@ urlpatterns += patterns(
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
 )
 
+if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
+    urlpatterns += (url(r'^group_configurations/(?P<course_key_string>[^/]+)$',
+                        'contentstore.views.group_configurations_list_handler'),)
+
 js_info_dict = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
