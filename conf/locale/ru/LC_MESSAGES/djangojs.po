@@ -56,14 +56,16 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # webslavic <webslavic@yahoo.com>, 2014
+# Weyedide <weyedide@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-19 00:15-0400\n"
-"PO-Revision-Date: 2014-06-23 06:52+0000\n"
-"Last-Translator: Weyedide <weyedide@gmail.com>\n"
+"POT-Creation-Date: 2014-07-07 10:28-0400\n"
+"PO-Revision-Date: 2014-07-07 14:30+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -185,7 +187,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr ""
+msgstr "Статус: не загружено"
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
@@ -389,20 +391,24 @@ msgstr[2] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr ""
+msgstr "Субтитры будут отображаться, когда"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
-msgstr ""
+msgstr "Включить субтитры"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
+msgstr "Отключить субтитры"
+
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
 msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr ""
+msgstr "Скрыть Обсуждения"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
@@ -444,7 +450,6 @@ msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -506,6 +511,10 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr ""
 
@@ -513,6 +522,14 @@ msgstr ""
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -1565,6 +1582,10 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -1673,6 +1694,10 @@ msgstr ""
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
+msgstr ""
+
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
 msgstr ""
 
 #: cms/static/js/base.js
@@ -2037,7 +2062,7 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
-msgstr ""
+msgstr "Часто встречающиеся типы заданий"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
@@ -2047,9 +2072,13 @@ msgstr ""
 msgid "Add New Component"
 msgstr ""
 
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
+msgstr ""
+
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr ""
+msgstr "Список загруженных файлов и материалов курса"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Embed URL"
@@ -2134,7 +2163,7 @@ msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
-msgstr ""
+msgstr "Количество отбрасываемых"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "total exercises that won't be graded"
@@ -2149,6 +2178,7 @@ msgid ""
 "There is invalid code in your content. Please check to make sure it is valid"
 " HTML."
 msgstr ""
+"Неверный код в содержимом. Пожалуйста, убедитесь в верности HTML-кода."
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Name"
@@ -2272,7 +2302,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
-msgstr ""
+msgstr "Добавить ссылки на дополнительные версии"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
