@@ -115,6 +115,16 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
         <section class="content-area">
 
             <article class="content-primary">
+                % if is_visible_to_students:
+                    <div class="container-message wrapper-message">
+                        <div class="message has-warnings">
+                            <p class="warning">
+                                <i class="icon-warning-sign"></i>
+                                ${_("This content is live for students. Edit with caution.")}
+                            </p>
+                        </div>
+                    </div>
+                % endif
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
