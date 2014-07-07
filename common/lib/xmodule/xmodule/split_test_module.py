@@ -343,6 +343,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
+@XBlock.needs('user')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -553,7 +554,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         for group in user_partition.groups:
             str_group_id = unicode(group.id)
             if str_group_id not in self.group_id_to_child:
-                self._create_vertical_for_group(group, request.user.id)
+                user_id = self.runtime.service(self, 'user').user_id
+                self._create_vertical_for_group(group, user_id)
                 changed = True
 
         if changed:
