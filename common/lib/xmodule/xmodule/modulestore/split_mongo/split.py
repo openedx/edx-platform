@@ -1380,7 +1380,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return result
 
-    def delete_course(self, course_key, user_id=None):
+    def delete_course(self, course_key, user_id):
         """
         Remove the given course from the course index.
 
@@ -1395,6 +1395,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index)
 
+        # We do NOT call the super class here since we need to keep the assets
+        # in case the course is later restored.
+        # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
+
     def revert_to_published(self, location, user_id=None):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
@@ -1406,13 +1410,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :raises InvalidVersionError: if no published version exists for the location specified
         """
         raise NotImplementedError()
-
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as structures
-        are loaded on demand, rather than up front
-        """
-        return {}
 
     def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """
