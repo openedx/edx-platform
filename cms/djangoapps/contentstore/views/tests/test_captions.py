@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 

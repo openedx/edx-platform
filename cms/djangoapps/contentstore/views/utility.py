@@ -11,7 +11,7 @@ from util.json_request import JsonResponse
 
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from .access import has_course_access
 
