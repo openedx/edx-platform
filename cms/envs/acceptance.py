@@ -67,7 +67,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
+        'OPTIONS': {
+            'timeout': 30,
+        },
     }
 }
 
