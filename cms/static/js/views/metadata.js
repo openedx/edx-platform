@@ -549,5 +549,24 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
         }
     });
 
+    Metadata.Boolean = AbstractEditor.extend({
+
+        events : {
+            "change .input" : "updateModel",
+            "click .setting-clear" : "clear"
+        },
+
+        templateName: "metadata-boolean-entry",
+
+        getValueFromEditor: function () {
+            return this.$el.find('#' + this.uniqueId).is(':checked');
+        },
+
+        setValueInEditor: function (value) {
+            this.$el.find('#' + this.uniqueId).prop('checked', value);
+        }
+    });
+
+
     return Metadata;
 });

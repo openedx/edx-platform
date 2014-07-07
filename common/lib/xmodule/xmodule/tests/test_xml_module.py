@@ -220,7 +220,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         self.assert_field_values(
             editable_fields, 'boolean_select', TestFields.boolean_select,
             explicitly_set=False, value=None, default_value=None,
-            type='Select', options=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}]
+            type='Boolean', options=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}]
         )
 
         # Test for float

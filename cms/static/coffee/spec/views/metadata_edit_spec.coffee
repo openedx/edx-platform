@@ -15,6 +15,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
       optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
       listEntryTemplate = readFixtures('metadata-list-entry.underscore')
       dictEntryTemplate = readFixtures('metadata-dict-entry.underscore')
+      booleanEntryTemplate = readFixtures('metadata-boolean-entry.underscore')
 
       beforeEach ->
           setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
@@ -23,6 +24,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-list-entry", type: "text/template"}).text(listEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-dict-entry", type: "text/template"}).text(dictEntryTemplate))
+          appendSetFixtures($("<script>", {id: "metadata-boolean-entry", type: "text/template"}).text(booleanEntryTemplate))
 
       genericEntry = {
           default_value: 'default value',
@@ -112,6 +114,20 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           }
       }
 
+      booleanEntry = {
+          default_value: false,
+          display_name: "True or False",
+          explicitly_set: false,
+          field_name: "boolean",
+          help: "Do you have a bike, car or roller-skates?",
+          options: [
+              {"display_name": "True", "value": true},
+              {"display_name": "False", "value": false}
+          ],
+          type: MetadataModel.BOOLEAN_TYPE,
+          value: true
+      }
+
 
       # Test for the editor that creates the individual views.
       describe "MetadataView.Editor creates editors for each field", ->
@@ -137,17 +153,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
                       },
                       listEntry,
                       timeEntry,
-                      dictEntry
+                      dictEntry,
+                      booleanEntry,
                   ]
               )
 
           it "creates child views on initialize, and sorts them alphabetically", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              expect(childModels.length).toBe(8)
+              expect(childModels.length).toBe(9)
               # Be sure to check list view as well as other input types
               childViews = view.$el.find('.setting-input, .list-settings')
-              expect(childViews.length).toBe(8)
+              expect(childViews.length).toBe(9)
 
               verifyEntry = (index, display_name, type) ->
                   expect(childModels[index].get('display_name')).toBe(display_name)
@@ -159,8 +176,9 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyEntry(3, 'New Dict', '')
               verifyEntry(4, 'Show Answer', 'select-one')
               verifyEntry(5, 'Time', 'text')
-              verifyEntry(6, 'Unknown', 'text')
-              verifyEntry(7, 'Weight', 'number')
+              verifyEntry(6, 'True or False', 'checkbox')
+              verifyEntry(7, 'Unknown', 'text')
+              verifyEntry(8, 'Weight', 'number')
 
           it "returns its display name", ->
               view = new MetadataView.Editor({collection: @model})
@@ -232,7 +250,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           it "uses a text input type", ->
               assertInputType(@view, 'text')
 
-          it "returns the intial value upon initialization", ->
+          it "returns the initial value upon initialization", ->
               assertValueInView(@view, 'Word cloud')
 
           it "can update its value in the view", ->
@@ -606,3 +624,24 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           @el.find('input.input-key').last().val('third setting')
           @el.find('input.input-key').last().trigger('input')
           expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
+
+      describe "MetadataView.Boolean is an option input type with clear functionality", ->
+          beforeEach ->
+              model = new MetadataModel(booleanEntry)
+              @view = new MetadataView.Boolean({model: model})
+
+          it "uses a checkbox input type", ->
+              assertInputType(@view, 'checkbox')
+
+          it "returns the initial value upon initialization", ->
+              assertValueInView(@view, true)
+
+          it "can update its value in the view", ->
+              assertCanUpdateView(@view, true)
+              assertCanUpdateView(@view, false)
+
+          it "has a clear method to revert to the model default", ->
+              assertClear(@view, false)
+
+          it "has an update model method", ->
+              assertUpdateModel(@view, null, true)

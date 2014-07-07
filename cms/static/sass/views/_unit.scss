@@ -547,6 +547,11 @@ body.course.unit,
         }
       }
 
+      input[type="checkbox"] {
+        width: 1em;
+        height: 1em;
+      }
+
       select {
         //box-shadow: 0 1px 2px $shadow-l1 inset;
 
@@ -733,6 +738,15 @@ body.course.unit,
           &:hover {
             color: $blue;
           }
+        }
+      }
+
+      .metadata-boolean {
+        .wrapper-setting-input {
+          display: inline-block;
+          text-align: center;
+          vertical-align: middle;
+          width: 45%;
         }
       }
     }
