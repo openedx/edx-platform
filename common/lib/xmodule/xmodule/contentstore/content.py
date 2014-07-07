@@ -63,7 +63,7 @@ class StaticContent(object):
         return self.location
 
     def get_url_path(self):
-        return self._key_to_string(self.location)
+        return self.location.to_deprecated_string()
 
     @property
     def data(self):
@@ -104,7 +104,7 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, CourseKey))
-        return StaticContent._key_to_string(course_key.make_asset_key('asset', ''))
+        return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
     def get_location_from_path(path):
@@ -124,7 +124,7 @@ class StaticContent(object):
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
         loc = StaticContent.compute_location(course_id, orig_path)
-        loc_url = StaticContent._key_to_string(loc)
+        loc_url = loc.to_deprecated_string()
 
         # parse the query params for "^/static/" and replace with the location url
         orig_query = parse_qsl(query)
@@ -135,7 +135,7 @@ class StaticContent(object):
                     course_id,
                     query_value[len('/static/'):],
                 )
-                new_query_url = StaticContent._key_to_string(new_query)
+                new_query_url = new_query.to_deprecated_string()
                 new_query_list.append((query_name, new_query_url))
             else:
                 new_query_list.append((query_name, query_value))
@@ -145,15 +145,6 @@ class StaticContent(object):
 
     def stream_data(self):
         yield self._data
-
-    @staticmethod
-    def _key_to_string(key):
-        """Converts the given key to a string, honoring the deprecated flag."""
-        # TODO OpaqueKey - remove deprecated check once opaque keys lands
-        if getattr(key, 'deprecated', False):
-            return key.to_deprecated_string()
-        else:
-            return unicode(key)
 
 
 class StaticContentStream(StaticContent):
