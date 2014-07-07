@@ -13,6 +13,7 @@
 # rqllira <contato@raquellira.com>, 2014
 # edgarapmelo <edgarapmelo@gmail.com>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
+# Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
@@ -49,19 +50,21 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# lukassem <lucas_sem@hotmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
 # mmauryx <matheus_w_dias@hotmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-19 00:15-0400\n"
-"PO-Revision-Date: 2014-06-19 04:17+0000\n"
+"POT-Creation-Date: 2014-07-07 10:28-0400\n"
+"PO-Revision-Date: 2014-07-07 14:30+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -401,6 +404,10 @@ msgstr "Ativar legenda"
 msgid "Turn off captions"
 msgstr "Desativar legenda"
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr ""
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -453,7 +460,6 @@ msgstr ""
 "novamente."
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -512,6 +518,10 @@ msgstr[0] "%(unread_count)s novo comentário"
 msgstr[1] "%(unread_count)s novos comentários"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Carregando a lista de tópicos"
 
@@ -519,6 +529,14 @@ msgstr "Carregando a lista de tópicos"
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -1637,6 +1655,10 @@ msgstr "Lista de itens"
 msgid "Heading"
 msgstr "Cabeçalho"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "Ocorreu um erro desconhecido."
@@ -1742,6 +1764,10 @@ msgstr ""
 
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
+msgstr ""
+
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
 msgstr ""
 
 #: cms/static/js/base.js
@@ -2120,6 +2146,10 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

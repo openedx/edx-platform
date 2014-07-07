@@ -43,8 +43,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-19 00:15-0400\n"
-"PO-Revision-Date: 2014-06-19 04:17+0000\n"
+"POT-Creation-Date: 2014-07-07 10:28-0400\n"
+"PO-Revision-Date: 2014-07-07 14:30+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
@@ -373,6 +373,10 @@ msgstr "Untertitel einschalten"
 msgid "Turn off captions"
 msgstr "Untertitel ausschalten"
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr ""
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -424,7 +428,6 @@ msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -484,6 +487,10 @@ msgstr[0] "%(unread_count)s neuer Kommentar"
 msgstr[1] "%(unread_count)s neue Kommentare"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Lade Themenliste"
 
@@ -491,6 +498,14 @@ msgstr "Lade Themenliste"
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -1561,6 +1576,10 @@ msgstr "Listelement"
 msgid "Heading"
 msgstr "Überschrift"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -1672,6 +1691,10 @@ msgstr ""
 #: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr "Ja, diese Komponente löschen"
+
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr ""
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -2068,6 +2091,10 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

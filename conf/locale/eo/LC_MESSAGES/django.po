@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-23 07:58-0400\n"
-"PO-Revision-Date: 2014-06-23 11:58:12.299623\n"
+"POT-Creation-Date: 2014-07-07 12:38-0400\n"
+"PO-Revision-Date: 2014-07-07 16:38:22.731143\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -185,6 +185,10 @@ msgstr "Çöürsé ïd ïs ïnvälïd Ⱡ'σя#"
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Çöürsé ïs füll Ⱡ'#"
+
+#: common/djangoapps/student/views.py
+msgid "Student is already enrolled"
+msgstr "Stüdént ïs älréädý énrölléd Ⱡ'σяєм#"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -1160,7 +1164,6 @@ msgstr "XML dätä för thé ännötätïön Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/html_module.py
@@ -1206,6 +1209,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Mäxïmüm Àttémpts Ⱡ'σ#"
 
@@ -1243,7 +1247,9 @@ msgstr ""
 "Àmöünt öf tïmé äftér thé düé däté thät süßmïssïöns wïll ßé äççéptéd Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕ#"
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/problem.html
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Shöw Ànswér Ⱡ#"
 
@@ -1291,6 +1297,7 @@ msgstr ""
 "Whéthér tö förçé thé sävé ßüttön tö äppéär ön thé pägé Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Rändömïzätïön Ⱡ'#"
 
@@ -1673,6 +1680,260 @@ msgstr ""
 "тємρσя ιη¢ι∂ι∂υηт υт ł#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "LTI Passports"
+msgstr "LTÌ Pässpörts Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the passports for course LTI tools in the following format: "
+"\"id\":\"client_key:client_secret\"."
+msgstr ""
+"Éntér thé pässpörts för çöürsé LTÌ tööls ïn thé föllöwïng förmät: "
+"\"ïd\":\"çlïént_kéý:çlïént_séçrét\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Advertised Start Date"
+msgstr "Çöürsé Àdvértïséd Stärt Däté Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the date you want to advertise as the course start date, if this date "
+"is different from the set start date. To advertise the set start date, enter"
+" null."
+msgstr ""
+"Éntér thé däté ýöü wänt tö ädvértïsé äs thé çöürsé stärt däté, ïf thïs däté "
+"ïs dïfférént fröm thé sét stärt däté. Tö ädvértïsé thé sét stärt däté, éntér"
+" nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Calculator"
+msgstr "Shöw Çälçülätör Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the calculator in the "
+"course."
+msgstr ""
+"Éntér trüé ör fälsé. Whén trüé, stüdénts çän séé thé çälçülätör ïn thé "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the name of the course as it should appear in the edX.org course list."
+msgstr ""
+"Éntér thé nämé öf thé çöürsé äs ït shöüld äppéär ïn thé édX.örg çöürsé lïst."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Display Name"
+msgstr "Çöürsé Dïspläý Nämé Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Course Editor"
+msgstr "Çöürsé Édïtör Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgstr ""
+"Éntér thé méthöd ßý whïçh thïs çöürsé ïs édïtéd (\"XML\" ör \"Stüdïö\"). "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Chat Widget"
+msgstr "Shöw Çhät Wïdgét Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the chat widget in the "
+"course."
+msgstr ""
+"Éntér trüé ör fälsé. Whén trüé, stüdénts çän séé thé çhät wïdgét ïn thé "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Survey URL"
+msgstr "Çöürsé Sürvéý ÛRL Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the URL for the end-of-course survey. If your course does not have a "
+"survey, enter null."
+msgstr ""
+"Éntér thé ÛRL för thé énd-öf-çöürsé sürvéý. Ìf ýöür çöürsé döés nöt hävé ä "
+"sürvéý, éntér nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Blackout Dates"
+msgstr "Dïsçüssïön Bläçköüt Dätés Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as "
+"dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to"
+" include the \"T\" between the date and time)."
+msgstr ""
+"Éntér päïrs öf dätés ßétwéén whïçh stüdénts çännöt pöst tö dïsçüssïön "
+"förüms, förmättéd äs \"ÝÝÝÝ-MM-DD-ÝÝÝÝ-MM-DD\". Tö spéçïfý tïmés äs wéll äs "
+"dätés, förmät thé päïrs äs \"ÝÝÝÝ-MM-DDTHH:MM-ÝÝÝÝ-MM-DDTHH:MM\" (ßé süré tö"
+" ïnçlüdé thé \"T\" ßétwéén thé däté änd tïmé). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Topic Mapping"
+msgstr "Dïsçüssïön Töpïç Mäppïng Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2014_T1\"}."
+msgstr ""
+"Éntér dïsçüssïön çätégörïés ïn thé föllöwïng förmät: \"ÇätégörýNämé\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. För "
+"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2014_T1\"}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Sorting Alphabetical"
+msgstr "Dïsçüssïön Sörtïng Àlphäßétïçäl Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, dïsçüssïön çätégörïés änd süßçätégörïés äré "
+"sörtéd älphäßétïçällý. Ìf fälsé, théý äré sörtéd çhrönölögïçällý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Announcement Date"
+msgstr "Çöürsé Ànnöünçémént Däté Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the date to announce your course."
+msgstr "Éntér thé däté tö ännöünçé ýöür çöürsé. Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohort Configuration"
+msgstr "Çöhört Çönfïgürätïön Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohorts are not currently supported by edX."
+msgstr "Çöhörts äré nöt çürréntlý süppörtéd ßý édX. Ⱡ'σяєм ιρѕυм#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Is New"
+msgstr "Çöürsé Ìs Néw Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course appears in the list of new courses "
+"on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, thé çöürsé äppéärs ïn thé lïst öf néw çöürsés "
+"ön édx.örg, änd ä Néw! ßädgé témpörärïlý äppéärs néxt tö thé çöürsé ïmägé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Not Graded"
+msgstr "Çöürsé Nöt Grädéd Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, the course will not be graded."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, thé çöürsé wïll nöt ßé grädéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Disable Progress Graph"
+msgstr "Dïsäßlé Prögréss Gräph Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, students cannot view the progress graph."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, stüdénts çännöt vïéw thé prögréss gräph. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "PDF Textbooks"
+msgstr "PDF Téxtßööks Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "List of dictionaries containing pdf_textbook configuration"
+msgstr ""
+"Lïst öf dïçtïönärïés çöntäïnïng pdf_téxtßöök çönfïgürätïön Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "HTML Textbooks"
+msgstr "HTML Téxtßööks Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"For HTML textbooks that appear as separate tabs in the courseware, enter the"
+" name of the tab (usually the name of the book) as well as the URLs and "
+"titles of all the chapters in the book."
+msgstr ""
+"För HTML téxtßööks thät äppéär äs sépäräté täßs ïn thé çöürséwäré, éntér thé"
+" nämé öf thé täß (üsüällý thé nämé öf thé ßöök) äs wéll äs thé ÛRLs änd "
+"tïtlés öf äll thé çhäptérs ïn thé ßöök. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Remote Gradebook"
+msgstr "Rémöté Grädéßöök Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the remote gradebook mapping. Only use this setting when "
+"REMOTE_GRADEBOOK_URL has been specified."
+msgstr ""
+"Éntér thé rémöté grädéßöök mäppïng. Önlý üsé thïs séttïng whén "
+"RÉMÖTÉ_GRÀDÉBÖÖK_ÛRL häs ßéén spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts"
+msgstr "Àllöw Ànönýmöüs Dïsçüssïön Pösts Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, stüdénts çän çréäté dïsçüssïön pösts thät äré "
+"änönýmöüs tö äll üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr "Àllöw Ànönýmöüs Dïsçüssïön Pösts tö Péérs Ⱡ'σяєм ιρѕυ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, stüdénts çän çréäté dïsçüssïön pösts thät äré "
+"änönýmöüs tö öthér stüdénts. Thïs séttïng döés nöt mäké pösts änönýmöüs tö "
+"çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Advanced Module List"
+msgstr "Àdvänçéd Mödülé Lïst Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the names of the advanced components to use in your course."
+msgstr ""
+"Éntér thé nämés öf thé ädvänçéd çömpönénts tö üsé ïn ýöür çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Getting Started With Studio"
 msgstr "Géttïng Stärtéd Wïth Stüdïö Ⱡ'σяєм#"
 
@@ -1940,6 +2201,185 @@ msgstr ""
 "énröll ïn ýöür çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Info Sidebar Name"
+msgstr "Çöürsé Ìnfö Sïdéßär Nämé Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the heading that you want students to see above your course handouts "
+"on the Course Info page. Your course handouts appear in the right panel of "
+"the page."
+msgstr ""
+"Éntér thé héädïng thät ýöü wänt stüdénts tö séé äßövé ýöür çöürsé händöüts "
+"ön thé Çöürsé Ìnfö pägé. Ýöür çöürsé händöüts äppéär ïn thé rïght pänél öf "
+"thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Due Date Display Format"
+msgstr "Düé Däté Dïspläý Förmät Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
+"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+msgstr ""
+"Éntér thé förmät düé dätés äré dïspläýéd ïn. Düé dätés müst ßé ïn MM-DD-"
+"ÝÝÝÝ, DD-MM-ÝÝÝÝ, ÝÝÝÝ-MM-DD, ör ÝÝÝÝ-DD-MM förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "External Login Domain"
+msgstr "Éxtérnäl Lögïn Dömäïn Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the external login method students can use for the course."
+msgstr ""
+"Éntér thé éxtérnäl lögïn méthöd stüdénts çän üsé för thé çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificates Downloadable Before End"
+msgstr "Çértïfïçätés Döwnlöädäßlé Béföré Énd Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can download certificates before the "
+"course ends, if they've met certificate requirements."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, stüdénts çän döwnlöäd çértïfïçätés ßéföré thé "
+"çöürsé énds, ïf théý'vé mét çértïfïçäté réqüïréménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course About Page Image"
+msgstr "Çöürsé Àßöüt Pägé Ìmägé Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Edit the name of the course image file. You must upload this file on the "
+"Files & Uploads page. You can also set the course image on the Settings & "
+"Details page."
+msgstr ""
+"Édït thé nämé öf thé çöürsé ïmägé fïlé. Ýöü müst üplöäd thïs fïlé ön thé "
+"Fïlés & Ûplöäds pägé. Ýöü çän älsö sét thé çöürsé ïmägé ön thé Séttïngs & "
+"Détäïls pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the short name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+"Bétwéén qüötätïön märks, éntér thé shört nämé öf thé çöürsé tö üsé ön thé "
+"çértïfïçäté thät stüdénts réçéïvé whén théý çömplété thé çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Short)"
+msgstr "Çértïfïçäté Nämé (Shört) Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the long name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+"Bétwéén qüötätïön märks, éntér thé löng nämé öf thé çöürsé tö üsé ön thé "
+"çértïfïçäté thät stüdénts réçéïvé whén théý çömplété thé çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Long)"
+msgstr "Çértïfïçäté Nämé (Löng) Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CSS Class for Course Reruns"
+msgstr "ÇSS Çläss för Çöürsé Rérüns Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+msgstr ""
+"Àllöws çöürsés tö shäré thé sämé çss çläss äçröss rüns évén ïf théý hävé "
+"dïfférént nümßérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Forum External Link"
+msgstr "Dïsçüssïön Förüm Éxtérnäl Lïnk Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr ""
+"Àllöws spéçïfïçätïön öf än éxtérnäl lïnk tö répläçé dïsçüssïön förüms. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Hide Progress Tab"
+msgstr "Hïdé Prögréss Täß Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows hiding of the progress tab."
+msgstr "Àllöws hïdïng öf thé prögréss täß. Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Organization Display String"
+msgstr "Çöürsé Örgänïzätïön Dïspläý Strïng Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course organization that you want to appear in the courseware. "
+"This setting overrides the organization that you entered when you created "
+"the course. To use the organization that you entered when you created the "
+"course, enter null."
+msgstr ""
+"Éntér thé çöürsé örgänïzätïön thät ýöü wänt tö äppéär ïn thé çöürséwäré. "
+"Thïs séttïng övérrïdés thé örgänïzätïön thät ýöü éntéréd whén ýöü çréätéd "
+"thé çöürsé. Tö üsé thé örgänïzätïön thät ýöü éntéréd whén ýöü çréätéd thé "
+"çöürsé, éntér nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тєм#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Number Display String"
+msgstr "Çöürsé Nümßér Dïspläý Strïng Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course number that you want to appear in the courseware. This "
+"setting overrides the course number that you entered when you created the "
+"course. To use the course number that you entered when you created the "
+"course, enter null."
+msgstr ""
+"Éntér thé çöürsé nümßér thät ýöü wänt tö äppéär ïn thé çöürséwäré. Thïs "
+"séttïng övérrïdés thé çöürsé nümßér thät ýöü éntéréd whén ýöü çréätéd thé "
+"çöürsé. Tö üsé thé çöürsé nümßér thät ýöü éntéréd whén ýöü çréätéd thé "
+"çöürsé, éntér nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ т#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Maximum Student Enrollment"
+msgstr "Çöürsé Mäxïmüm Stüdént Énröllmént Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
+msgstr ""
+"Éntér thé mäxïmüm nümßér öf stüdénts thät çän énröll ïn thé çöürsé. Tö ällöw"
+" än ünlïmïtéd nümßér öf stüdénts, éntér nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Public Wiki Access"
+msgstr "Àllöw Püßlïç Wïkï Àççéss Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, edX users can view the course wiki even if "
+"they're not enrolled in the course."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, édX üsérs çän vïéw thé çöürsé wïkï évén ïf "
+"théý'ré nöt énrölléd ïn thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "Généräl #"
 
@@ -2061,6 +2501,7 @@ msgstr "Séçrét strïng för ännötätïön störägé Ⱡ'σяєм ιρ#"
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Secret Token String for Annotation"
 msgstr "Séçrét Tökén Strïng för Ànnötätïön Ⱡ'σяєм ιρ#"
 
@@ -2295,6 +2736,15 @@ msgstr "Stüdént dätä för ä gïvén péér grädïng prößlém. Ⱡ'σяє
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Peer Grading Interface"
 msgstr "Péér Grädïng Ìntérfäçé Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Due Date"
+msgstr "Düé Däté #"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Enter the date by which problems are due."
+msgstr "Éntér thé däté ßý whïçh prößléms äré düé. Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -2552,6 +3002,164 @@ msgstr "Àll pössïßlé wörds fröm äll stüdénts. Ⱡ'σяєм ιρѕ#"
 msgid "Top num_top_words words for word cloud."
 msgstr "Töp nüm_töp_wörds wörds för wörd çlöüd. Ⱡ'σяєм ιρѕ#"
 
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the default date by which problems are due."
+msgstr "Éntér thé défäült däté ßý whïçh prößléms äré düé. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "GIT URL"
+msgstr "GÌT ÛRL #"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the URL for the course data GIT repository."
+msgstr "Éntér thé ÛRL för thé çöürsé dätä GÌT répösïtörý. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "XQA Key"
+msgstr "XQÀ Kéý #"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "This setting is not currently supported."
+msgstr "Thïs séttïng ïs nöt çürréntlý süppörtéd. Ⱡ'σяєм ιρѕυ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
+msgstr ""
+"Éntér thé séçrét strïng för ännötätïön störägé. Thé téxtännötätïön, "
+"vïdéöännötätïön, änd ïmägéännötätïön ädvänçéd mödülés réqüïré thïs strïng. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "URL for Annotation Storage"
+msgstr "ÛRL för Ànnötätïön Störägé Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
+msgstr ""
+"Éntér thé löçätïön öf thé ännötätïön störägé sérvér. Thé téxtännötätïön, "
+"vïdéöännötätïön, änd ïmägéännötätïön ädvänçéd mödülés réqüïré thïs séttïng. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", and \"never\"."
+msgstr ""
+"Spéçïfý whén thé Shöw Ànswér ßüttön äppéärs för éäçh prößlém. Välïd välüés "
+"äré \"älwäýs\", \"änswéréd\", \"ättémptéd\", \"çlöséd\", \"fïnïshéd\", "
+"\"päst_düé\", änd \"névér\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ι#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify how often variable values in a problem are randomized when a student"
+" loads the problem. Valid values are \"always\", \"onreset\", \"never\", and"
+" \"per_student\". This setting only applies to problems that have randomly "
+"generated numeric values."
+msgstr ""
+"Spéçïfý höw öftén värïäßlé välüés ïn ä prößlém äré rändömïzéd whén ä stüdént"
+" löäds thé prößlém. Välïd välüés äré \"älwäýs\", \"önrését\", \"névér\", änd"
+" \"pér_stüdént\". Thïs séttïng önlý äpplïés tö prößléms thät hävé rändömlý "
+"générätéd nümérïç välüés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Days Early for Beta Users"
+msgstr "Däýs Éärlý för Bétä Ûsérs Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr ""
+"Éntér thé nümßér öf däýs ßéföré thé stärt däté thät ßétä üsérs çän äççéss "
+"thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Static Asset Path"
+msgstr "Stätïç Àssét Päth Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr ""
+"Éntér thé päth tö üsé för fïlés ön thé Fïlés & Ûplöäds pägé. Thïs välüé "
+"övérrïdés thé Stüdïö défäült, ç4x://. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Text Customization"
+msgstr "Téxt Çüstömïzätïön Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter string customization substitutions for particular locations."
+msgstr ""
+"Éntér strïng çüstömïzätïön süßstïtütïöns för pärtïçülär löçätïöns. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable LaTeX Compiler"
+msgstr "Énäßlé LäTéX Çömpïlér Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, ýöü çän üsé thé LäTéX témplätés för HTML "
+"çömpönénts änd ädvänçéd Prößlém çömpönénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. This"
+" is a course-wide setting, but you can specify a different number when you "
+"create an individual problem. To allow unlimited attempts, enter null."
+msgstr ""
+"Éntér thé mäxïmüm nümßér öf tïmés ä stüdént çän trý tö änswér prößléms. Thïs"
+" ïs ä çöürsé-wïdé séttïng, ßüt ýöü çän spéçïfý ä dïfférént nümßér whén ýöü "
+"çréäté än ïndïvïdüäl prößlém. Tö ällöw ünlïmïtéd ättémpts, éntér nüll. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr "Mätläß ÀPÌ kéý Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+"Éntér thé ÀPÌ kéý prövïdéd ßý MäthWörks för äççéssïng thé MÀTLÀB Höstéd "
+"Sérvïçé. Thïs kéý ïs gräntéd för éxçlüsïvé üsé ïn thïs çöürsé för thé "
+"spéçïfïéd dürätïön. Dö nöt shäré thé ÀPÌ kéý wïth öthér çöürsés. Nötïfý "
+"MäthWörks ïmmédïätélý ïf ýöü ßélïévé thé kéý ïs éxpöséd ör çömprömïséd. Tö "
+"ößtäïn ä kéý för ýöür çöürsé, ör tö répört än ïssüé, pléäsé çöntäçt "
+"mööçsüppört@mäthwörks.çöm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Experiment Group Configurations"
+msgstr "Éxpérïmént Gröüp Çönfïgürätïöns Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the configurations that govern how students are grouped for content "
+"experiments."
+msgstr ""
+"Éntér thé çönfïgürätïöns thät gövérn höw stüdénts äré gröüpéd för çöntént "
+"éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
@@ -2770,10 +3378,6 @@ msgid ""
 msgstr ""
 "Çän't réçéïvé tränsçrïpts fröm Ýöütüßé för {youtube_id}. Stätüs çödé: "
 "{status_code}. Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr "Çän't fïnd äný tränsçrïpts ön thé Ýöütüßé sérvïçé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
@@ -3258,7 +3862,6 @@ msgstr "Émäïl Àddréss Ⱡ'#"
 
 #: lms/djangoapps/dashboard/support.py
 #: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Course ID"
 msgstr "Çöürsé ÌD #"
 
@@ -3465,7 +4068,7 @@ msgid "Loaded course {course_name}<br/>Errors:"
 msgstr "Löädéd çöürsé {course_name}<br/>Érrörs: Ⱡ'σяєм#"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html cms/templates/settings.html
+#: cms/templates/index.html
 msgid "Course Name"
 msgstr "Çöürsé Nämé Ⱡ#"
 
@@ -3579,12 +4182,6 @@ msgstr ""
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Gööd Ⱡ'σяєм#"
-
-#: lms/djangoapps/django_comment_client/forum/views.py
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "All Groups"
-msgstr "Àll Gröüps Ⱡ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -5011,6 +5608,56 @@ msgid "No selected price or selected price is below minimum."
 msgstr ""
 "Nö séléçtéd prïçé ör séléçtéd prïçé ïs ßélöw mïnïmüm. Ⱡ'σяєм ιρѕυм ∂σ#"
 
+#: lms/lib/xblock/mixin.py
+msgid "Courseware Chrome"
+msgstr "Çöürséwäré Çhrömé Ⱡ'σ#"
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
+"\"chromeless\" -- to not use tabs or the accordion; \n"
+"\"tabs\" -- to use tabs only; \n"
+"\"accordion\" -- to use the accordion only; or \n"
+"\"tabs,accordion\" -- to use tabs and the accordion."
+msgstr ""
+"Éntér thé çhrömé, ör nävïgätïön tööls, tö üsé för thé XBlöçk ïn thé LMS. Välïd välüés äré: \n"
+"\"çhröméléss\" -- tö nöt üsé täßs ör thé äççördïön; \n"
+"\"täßs\" -- tö üsé täßs önlý; \n"
+"\"äççördïön\" -- tö üsé thé äççördïön önlý; ör \n"
+"\"täßs,äççördïön\" -- tö üsé täßs änd thé äççördïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂#"
+
+#: lms/lib/xblock/mixin.py
+msgid "Default Tab"
+msgstr "Défäült Täß Ⱡ#"
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
+" is selected."
+msgstr ""
+"Éntér thé täß thät ïs séléçtéd ïn thé XBlöçk. Ìf nöt sét, thé Çöürséwäré täß"
+" ïs séléçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/lib/xblock/mixin.py
+msgid "LaTeX Source File Name"
+msgstr "LäTéX Söürçé Fïlé Nämé Ⱡ'σяє#"
+
+#: lms/lib/xblock/mixin.py
+msgid "Enter the source file name for LaTeX."
+msgstr "Éntér thé söürçé fïlé nämé för LäTéX. Ⱡ'σяєм ιρѕ#"
+
+#: lms/lib/xblock/mixin.py
+msgid "Course Is Public"
+msgstr "Çöürsé Ìs Püßlïç Ⱡ'σ#"
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter true or false. If true, the course is open to the public. If false, "
+"the course is open only to admins."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, thé çöürsé ïs öpén tö thé püßlïç. Ìf fälsé, "
+"thé çöürsé ïs öpén önlý tö ädmïns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to this view's content"
@@ -5934,6 +6581,10 @@ msgstr ""
 "Öptïönäl nötés äßöüt thïs üsér (för éxämplé, whý çöürsé çréätïön äççéss wäs "
 "dénïéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
+#: cms/djangoapps/models/settings/course_metadata.py
+msgid "Incorrect format for field '{name}'. {detailed_message}"
+msgstr "Ìnçörréçt förmät för fïéld '{name}'. {detailed_message} Ⱡ'σяєм ιρѕ#"
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -5973,13 +6624,11 @@ msgstr "Çöürsé Nümßér Ⱡ'#"
 
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
+#: cms/templates/overview.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕ#"
@@ -7852,7 +8501,11 @@ msgstr "Délété çöürsé fröm sïté Ⱡ'σяє#"
 msgid "Platform Version"
 msgstr "Plätförm Vérsïön Ⱡ'σ#"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Recent git load activity for {course_id}"
+msgstr "Réçént gït löäd äçtïvïtý för {course_id} Ⱡ'σяєм ι#"
+
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
@@ -7860,14 +8513,8 @@ msgstr "Däté Ⱡ'σяєм#"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Gït Àçtïön Ⱡ#"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for"
-msgstr "Réçént gït löäd äçtïvïtý för Ⱡ'σяєм #"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -9437,94 +10084,20 @@ msgid "filter topics"
 msgstr "fïltér töpïçs Ⱡ'#"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show All Discussions"
-msgstr "Shöw Àll Dïsçüssïöns Ⱡ'σя#"
+msgid "All Discussions"
+msgstr "Àll Dïsçüssïöns Ⱡ'#"
 
 #: lms/templates/discussion/_filter_dropdown.html
-msgid "Show Flagged Discussions"
-msgstr "Shöw Fläggéd Dïsçüssïöns Ⱡ'σяє#"
+msgid "Flagged Discussions"
+msgstr "Fläggéd Dïsçüssïöns Ⱡ'σя#"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Pösts Ì'm Föllöwïng Ⱡ'σя#"
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "follow this post"
-msgstr "föllöw thïs pöst Ⱡ'σ#"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously"
-msgstr "pöst änönýmöüslý Ⱡ'σ#"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously to classmates"
-msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм #"
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Make visible to:"
-msgstr "Mäké vïsïßlé tö: Ⱡ'σ#"
-
-#: lms/templates/discussion/_inline_new_post.html
-msgid "My Cohort"
-msgstr "Mý Çöhört #"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "new post title"
-msgstr "néw pöst tïtlé Ⱡ'#"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: wiki/forms.py wiki/forms.py wiki/forms.py
-msgid "Title"
-msgstr "Tïtlé Ⱡ'σяєм ι#"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Enter your question or comment…"
-msgstr "Éntér ýöür qüéstïön ör çömmént… Ⱡ'σяєм ι#"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Add post"
-msgstr "Àdd pöst #"
-
-#: lms/templates/discussion/_new_post.html
-msgid "Create new post about:"
-msgstr "Çréäté néw pöst äßöüt: Ⱡ'σяє#"
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter List"
-msgstr "Fïltér Lïst Ⱡ#"
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter discussion areas"
-msgstr "Fïltér dïsçüssïön äréäs Ⱡ'σяє#"
-
 #: lms/templates/discussion/_recent_active_posts.html
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "Föllöwïng #"
 
@@ -9537,48 +10110,35 @@ msgid "Hide"
 msgstr "Hïdé Ⱡ'σяєм#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Home"
-msgstr "Dïsçüssïön Hömé Ⱡ'#"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Topics"
-msgstr "Dïsçüssïön Töpïçs Ⱡ'σ#"
-
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; current selection is: "
 msgstr "Dïsçüssïön töpïçs; çürrént séléçtïön ïs:  Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Search all discussions"
-msgstr "Séärçh äll dïsçüssïöns Ⱡ'σяє#"
+msgid "Search all posts"
+msgstr "Séärçh äll pösts Ⱡ'σ#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Sort by:"
-msgstr "Sört ßý: #"
+msgid "View all cohorts"
+msgstr "Vïéw äll çöhörts Ⱡ'σ#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "date"
-msgstr "däté Ⱡ'σяєм#"
+msgid "View as {cohort_name}"
+msgstr "Vïéw äs {cohort_name} Ⱡ#"
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "votes"
-msgstr "vötés Ⱡ'σяєм ι#"
+msgid "by recent activity"
+msgstr "ßý réçént äçtïvïtý Ⱡ'σ#"
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "comments"
-msgstr "çömménts #"
+msgid "by most activity"
+msgstr "ßý möst äçtïvïtý Ⱡ'σ#"
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show:"
-msgstr "Shöw: Ⱡ'σяєм ι#"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View All"
-msgstr "Vïéw Àll #"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View as {name}"
-msgstr "Vïéw äs {name} Ⱡ#"
+msgid "by most votes"
+msgstr "ßý möst vötés Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
@@ -9630,6 +10190,7 @@ msgid "Pin Thread"
 msgstr "Pïn Thréäd Ⱡ#"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
 msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
@@ -9645,6 +10206,12 @@ msgstr "Édïtïng pöst Ⱡ#"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Edit post title"
 msgstr "Édït pöst tïtlé Ⱡ'#"
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: wiki/forms.py wiki/forms.py
+msgid "Title"
+msgstr "Tïtlé Ⱡ'σяєм ι#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update post"
@@ -9688,6 +10255,24 @@ msgid "Update comment"
 msgstr "Ûpdäté çömmént Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
+msgid "By: Staff"
+msgstr "Bý: Stäff #"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "By: Community TA"
+msgstr "Bý: Çömmünïtý TÀ Ⱡ'σ#"
+
+#. Translators: This is a label for a forum thread with a response that was
+#. endorsed by the course staff
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Endorsed response"
+msgstr "Éndörséd réspönsé Ⱡ'σ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
+msgstr "%(votes_up_count)s%(span_sr_open)s vötés %(span_close)s Ⱡ'σ#"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
@@ -9698,10 +10283,6 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s %(span_sr_open)sçömménts %(span_close)s Ⱡ'σя#"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr "%(votes_up_count)s%(span_sr_open)s vötés %(span_close)s Ⱡ'σ#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "DISCUSSION HOME:"
@@ -9759,6 +10340,57 @@ msgstr ""
 "Çhéçk thïs ßöx tö réçéïvé än émäïl dïgést önçé ä däý nötïfýïng ýöü äßöüt "
 "néw, ünréäd äçtïvïtý fröm pösts ýöü äré föllöwïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Create new post about:"
+msgstr "Çréäté néw pöst äßöüt: Ⱡ'σяє#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Show All Discussions"
+msgstr "Shöw Àll Dïsçüssïöns Ⱡ'σя#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter List"
+msgstr "Fïltér Lïst Ⱡ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter discussion areas"
+msgstr "Fïltér dïsçüssïön äréäs Ⱡ'σяє#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "follow this post"
+msgstr "föllöw thïs pöst Ⱡ'σ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously"
+msgstr "pöst änönýmöüslý Ⱡ'σ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously to classmates"
+msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм #"
+
+#. Translators: This labels the selector for which group of students can view
+#. a
+#. post
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Make visible to:"
+msgstr "Mäké vïsïßlé tö: Ⱡ'σ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "All Groups"
+msgstr "Àll Gröüps Ⱡ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "new post title"
+msgstr "néw pöst tïtlé Ⱡ'#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Enter your question or comment…"
+msgstr "Éntér ýöür qüéstïön ör çömmént… Ⱡ'σяєм ι#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add post"
+msgstr "Àdd pöst #"
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
@@ -10232,6 +10864,24 @@ msgstr "Fläg äs ïnäppröprïäté çöntént för lätér révïéw Ⱡ'σя
 #: lms/templates/instructor/staff_grading.html
 msgid "Skip"
 msgstr "Skïp Ⱡ'σяєм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Active Students"
+msgstr "Àçtïvé Stüdénts Ⱡ'#"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+"Thé çöünt öf stüdénts whö ïntéräçtéd ät léäst önçé ßý öpénïng pägés, pläýïng"
+" vïdéös, pöstïng ïn dïsçüssïöns, süßmïttïng prößléms, ör çömplétïng öthér "
+"äçtïvïtïés. Thé däté rängé ïnçlüdés äll äçtïvïtïés fröm mïdnïght ön thé "
+"stärt däté (ïnçlüsïvé) thöügh mïdnïght ön thé énd däté (éxçlüsïvé). Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Score Distribution"
@@ -14067,7 +14717,7 @@ msgstr ""
 "Nöté: Thïs ïs pärt öf ýöür çöürsé ÛRL, sö nö späçés ör spéçïäl çhäräçtérs "
 "äré ällöwéd änd ït çännöt ßé çhängéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Course Run"
 msgstr "Çöürsé Rün Ⱡ#"
 
@@ -14925,6 +15575,14 @@ msgstr "Grädïng #"
 #: cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "Àdvänçéd Séttïngs Ⱡ'σ#"
+
+#: cms/templates/settings_advanced.html
+msgid "Hide Deprecated Settings"
+msgstr "Hïdé Dépréçätéd Séttïngs Ⱡ'σяє#"
+
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+msgid "Show Deprecated Settings"
+msgstr "Shöw Dépréçätéd Séttïngs Ⱡ'σяє#"
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-23 07:56-0400\n"
-"PO-Revision-Date: 2014-06-23 11:58:12.329666\n"
+"POT-Creation-Date: 2014-07-07 12:36-0400\n"
+"PO-Revision-Date: 2014-07-07 16:38:22.768763\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -441,7 +441,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -498,6 +497,10 @@ msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
 msgstr[0] "%(unread_count)s néw çömmént Ⱡ'#"
 msgstr[1] "%(unread_count)s néw çömménts Ⱡ'σ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr "Séärçh Résülts Ⱡ'#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
@@ -1670,6 +1673,10 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr "Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt.  Ⱡ'σяєм ιρѕυм #"
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "Ûnknöwn Érrör Öççürréd. Ⱡ'σяє#"
@@ -2199,6 +2206,10 @@ msgstr "Àdvänçéd #"
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
 msgstr "Àdd Néw Çömpönént Ⱡ'σ#"
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
+msgstr "Dépréçätéd Ⱡ#"
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
