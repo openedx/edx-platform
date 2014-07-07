@@ -68,3 +68,32 @@ def event_is_emitted(_step, event_type, event_source):
 
     for field in REQUIRED_EVENT_FIELDS:
         assert_in(field, event)
+
+
+@step('(\d+) "(.*)" (server|browser) events are emitted$')
+def n_events_are_emitted(_step, count, event_type, event_source):
+
+    # Ensure all events are written out to mongo before querying.
+    world.mongo_client.fsync()
+
+    criteria = {
+        'event_type': event_type,
+        'event_source': event_source,
+        'agent': {
+            '$ne': 'python/splinter'
+        }
+    }
+    cursor = world.event_collection.find(criteria)
+    assert_equals(cursor.count(), int(count))
+
+    event = cursor.next()
+
+    expected_field_values = {
+        "username": world.scenario_dict['USER'].username,
+        "event_type": event_type,
+    }
+    for key, value in expected_field_values.iteritems():
+        assert_equals(event[key], value)
+
+    for field in REQUIRED_EVENT_FIELDS:
+        assert_in(field, event)

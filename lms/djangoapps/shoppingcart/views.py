@@ -21,6 +21,7 @@ from .processors import process_postpay_callback, render_purchase_form_html
 log = logging.getLogger("shoppingcart")
 
 EVENT_NAME_USER_UPGRADED = 'edx.course.enrollment.upgrade.succeeded'
+EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 REPORT_TYPES = [
     ("refund_report", RefundReport),

@@ -103,6 +103,20 @@ def i_am_registered_for_the_course(step, course):
     world.log_in(username='robot', password='test')
 
 
+@step(u'I am registered to audit the course "([^"]*)"$')
+def i_am_registered_to_audit_the_course(step, course):
+    # Create the course
+    create_course(step, course)
+    # Create the user
+    world.create_user('robot', 'test')
+    u = User.objects.get(username='robot')
+
+    # If the user is not already enrolled, enroll the user.
+    world.log_in(username='robot', password='test')
+
+    CourseEnrollment.enroll(u, course_id(course),"audit")
+
+
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(_step, course, extra_tab_name):
     world.ItemFactory.create(
