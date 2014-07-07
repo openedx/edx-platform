@@ -1395,13 +1395,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index)
 
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as structures
-        are loaded on demand, rather than up front
-        """
-        return {}
-
     def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """
         Updates block_json with any inheritable setting set by an ancestor and recurses to children.
