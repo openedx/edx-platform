@@ -21,7 +21,7 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, compute_publish_state
+from contentstore.utils import get_lms_link_for_item, compute_publish_state, is_xblock_visible_to_students
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import create_xblock_info
 
@@ -224,6 +224,7 @@ def container_handler(request, usage_key_string):
             'xblock_locator': xblock.location,
             'unit': unit,
             'is_unit_page': is_unit_page,
+            'is_visible_to_students': is_xblock_visible_to_students(xblock),
             'subsection': subsection,
             'section': section,
             'new_unit_category': 'vertical',
