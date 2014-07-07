@@ -730,6 +730,70 @@
 
 // ====================
 
+// block-level messages and validation
+.wrapper-message {
+
+  .message {
+    @extend %t-copy-sub1;
+    background-color: $gray-d2;
+    padding: ($baseline/2) ($baseline*.75);
+    color: $white;
+
+    [class^="icon-"] {
+      font-style: normal;
+    }
+
+    &.information {
+      @extend %t-copy-sub1;
+      background-color: $gray-l5;
+      color: $gray-d2;
+    }
+
+    &.validation {
+      background-color: $gray-d2;
+      color: $white;
+
+      a {
+        color: $blue-l2;
+      }
+    }
+
+    &.has-warnings {
+      border-bottom: 3px solid $orange;
+
+      .icon-warning-sign {
+        margin-right: ($baseline/2);
+        color: $orange;
+      }
+    }
+
+    &.has-errors {
+      border-bottom: 3px solid $red-l2;
+
+      .icon-exclamation-sign {
+        margin-right: ($baseline/2);
+        color: $red-l2;
+      }
+    }
+  }
+
+  .message-list {
+    margin-bottom: 0;
+  }
+
+  .message-actions {
+    padding: ($baseline/2) $baseline;
+    background-color: $gray-d1;
+
+    .actions-list {
+      @extend %actions-list;
+    }
+  }
+}
+
+
+// ====================
+
 // temporary
 body.uxdesign.alerts {
 
