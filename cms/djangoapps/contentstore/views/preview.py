@@ -95,20 +95,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return local_resource_url(block, uri)
 
 
-class StudioUserService(object):
-    """
-    Provides a Studio implementation of the XBlock user service.
-    """
-
-    def __init__(self, request):
-        super(StudioUserService, self).__init__()
-        self._request = request
-
-    @property
-    def user_id(self):
-        return self._request.user.id
-
-
 def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -153,7 +139,6 @@ def _preview_module_system(request, descriptor):
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),
-            "user": StudioUserService(request),
         },
     )
 
