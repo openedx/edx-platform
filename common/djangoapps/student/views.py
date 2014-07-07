@@ -72,6 +72,8 @@ from lang_pref import LANGUAGE_KEY
 
 import track.views
 
+import analytics
+
 from dogapi import dog_stats_api
 
 from util.json_request import JsonResponse
@@ -1237,6 +1239,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
     dog_stats_api.increment("common.student.account_created")
     create_comments_service_user(user)
+
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+        analytics.track(user.id, "Created a New Account", {
+            'email': user.email,
+            'username': user.username
+        })
 
     context = {
         'name': post_vars['name'],

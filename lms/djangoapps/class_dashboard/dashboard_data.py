@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
-from analytics.csvs import create_csv_response
+from instructor_analytics.csvs import create_csv_response
 
 from opaque_keys.edx.locations import Location
 
