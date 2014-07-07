@@ -409,6 +409,14 @@ class DraftModuleStore(MongoModuleStore):
 
         # remove subtree from its parent
         parent_locations = self._get_raw_parent_locations(location, key_revision=parent_revision)
+        # if no parents, then we're trying to delete something which we should convert to draft
+        if not parent_locations:
+            # find the published parent, convert it to draft, then manipulate the draft
+            parent_locations = self._get_raw_parent_locations(location, key_revision=MongoRevisionKey.published)
+            # parent_locations will still be empty if the object was an orphan
+            if parent_locations:
+                draft_parent = self.convert_to_draft(parent_locations[0], user_id)
+                parent_locations = [draft_parent.location]
         # there could be 2 parents if
         #   Case 1: the draft item moved from one parent to another
         #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
@@ -561,7 +569,7 @@ class DraftModuleStore(MongoModuleStore):
                             if published_parent == item_location:
                                 # Case 1: child was deleted in draft parent item
                                 # So, delete published version of the child now that we're publishing the draft parent
-                                self._delete_subtree(item_location, [as_published])
+                                self._delete_subtree(orig_child, [as_published])
                             else:
                                 # Case 2: child was moved to a new draft parent item
                                 # So, do not delete the child.  It will be published when the new parent is published.
