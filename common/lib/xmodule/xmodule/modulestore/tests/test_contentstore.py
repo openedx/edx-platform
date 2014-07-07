@@ -154,10 +154,7 @@ class TestContentstore(unittest.TestCase):
         course1_assets, count = self.contentstore.get_all_content_for_course(self.course1_key)
         self.assertEqual(count, len(self.course1_files), course1_assets)
         for asset in course1_assets:
-            if deprecated:
-                parsed = AssetLocation.from_deprecated_string(asset['filename'])
-            else:
-                parsed = AssetLocation.from_string(asset['filename'])
+            parsed = AssetLocation.from_deprecated_string(asset['filename'])
             self.assertIn(parsed.name, self.course1_files)
 
         course1_assets, __ = self.contentstore.get_all_content_for_course(self.course1_key, 1, 1)
