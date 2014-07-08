@@ -22,6 +22,14 @@
 
             <div class="item-actions">
                 <ul class="actions-list">
+                    <% if (isEditable) { %>
+                        <li class="action-item action-configure">
+                            <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
+                                <i class="icon-gear"></i>
+                                <span class="sr"><%= gettext('Configure') %></span>
+                            </a>
+                        </li>
+                    <% } %>
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
                             <i class="icon-remove"></i>
@@ -36,10 +44,15 @@
                 <div class="meta-info">
                     <% if (xblockInfo.get('published')) { %>
                         <i class="icon-check"></i>
-                        <%= gettext('Released:') %> Dec 31, 2015 at 21:00 UTC
+                        <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
                     <% } else { %>
                         <i class="icon-time"></i>
-                        <%= gettext('Scheduled:') %> Dec 31, 2015 at 21:00 UTC
+                        <%= gettext('Scheduled:') %> <%= xblockInfo.get('release_date') %>
+                    <% } %>
+                    <% if (xblockInfo.get('due_date')) { %>
+                        <i class="icon-time"></i>
+                        <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
+                        <%= gettext('Policy:') %> <%= xblockInfo.get('grading_format') %>
                     <% } %>
                 </div>
             <% } %>

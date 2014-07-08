@@ -15,8 +15,9 @@
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
-        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
+        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor",
+         "js/views/modals/edit_section_in_outline"],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, EditSectionXBlockModal) {
 
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -72,7 +73,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     addChildLabel: addChildName,
                     defaultNewChildName: defaultNewChildName,
                     isCollapsed: isCollapsed,
-                    includesChildren: this.shouldRenderChildren()
+                    includesChildren: this.shouldRenderChildren(),
+                    isEditable: this.isEditable(),
                 });
                 if (this.parentInfo) {
                     this.setElement($(html));
@@ -137,6 +139,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 var self = this;
                 element.find('.delete-button').click(_.bind(this.handleDeleteEvent, this));
                 element.find('.add-button').click(_.bind(this.handleAddEvent, this));
+                element.find('.configure-button').click(function(event) {
+                    event.preventDefault();
+                    self.editXBlock($(event.target));
+                });
             },
 
             shouldRenderChildren: function() {
@@ -235,6 +241,17 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     }
                 });
             },
+
+            isEditable: function() {
+                return _.contains(['sequential', 'chapter'], this.model.get('category'));
+            },
+
+            editXBlock: function() {
+                var modal;
+                modal = new EditSectionXBlockModal(this.model);
+                modal.show();
+            },
+
 
             handleAddEvent: function(event) {
                 var self = this,

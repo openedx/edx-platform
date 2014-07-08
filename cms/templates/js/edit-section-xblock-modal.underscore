@@ -1,0 +1,69 @@
+<div class="xblock-editor window view-subsection" data-locator="<%= xblockInfo.get('id') %>" data-course-key="<%= xblockInfo.get('courseKey') %>">
+    <div class="edit-section-modal window-contents unit-settings">
+
+   <% if (xblockInfo.get('category') === 'chapter') { %>
+        <p> Change the settings for this section </p>
+    <% } %>
+   <% if (xblockInfo.get('category') === 'sequential') { %>
+        <p> Change the current publishing status for this Subsection </p>
+    <% } %>
+
+
+    <p><b><%= gettext('Release') %></b></p>
+      <div class="scheduled-date-input">
+        <div class="datepair" data-language="javascript">
+          <div class="field field-start-date">
+            <label for="start_date"><%= gettext('Release Day') %></label>
+            <input type="text" id="start_date" name="start_date"
+                value="<%=  xblockInfo.get('release_date') ? getDateTime(xblockInfo.get('release_date')).date: null %>"
+                placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          </div>
+          <div class="field field-start-time">
+            <label for="start_time"><%= gettext('Release Time in UTC') %> (<abbr title="<%= gettext('Coordinated Universal Time') %>"><%= gettext('UTC') %></abbr>)</label>
+            <input type="text" id="start_time" name="start_time"
+                value="<%= xblockInfo.get('release_date') ? getDateTime(xblockInfo.get('release_date')).time : null %>"
+                placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          </div>
+          <a href="#" data-tooltip="<%= gettext('Delete') %>" class="sync-date">
+                <i class="icon-remove"></i>
+                <span class="sr"><%= gettext('Delete') %></span>
+        </a>
+        </div>
+      </div>
+
+
+
+    <% if (xblockInfo.get('category') === 'sequential') { %>
+        <br><br>
+        <div class="gradable">
+            <p><b><%= gettext('Grading') %></b></p>
+            <span> <%= gettext('Grade as:') %></span>
+            <div class="gradable-status" data-initial-status="<%= xblockInfo.get('grading_format')  ? xblockInfo.get('grading_format')  : 'notgraded' %>"></div>
+        </div>
+        <div class="due-date-input">
+            <div class="datepair date-setter">
+                <div class="field field-start-date">
+                    <label for="due_date"><%= gettext('Due Date') %></label>
+                    <input type="text" id="due_date" name="due_date"
+                    value="<%= xblockInfo.get('due_date') ? getDateTime(xblockInfo.get('due_date')).date : null %>"
+                    placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+                </div>
+                <div class="field field-start-time">
+                        <label for="due_time"><%= gettext('Due Time in UTC') %> (<abbr title="<%=  gettext('Coordinated Universal Time') %>">UTC</abbr>)</label>
+                        <input type="text" id="due_time" name="due_time"
+                        value="<%= xblockInfo.get('due_date')  ? getDateTime(xblockInfo.get('due_date')).time : null %>"
+                        placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+                </div>
+              <a href="#" data-tooltip="<%= gettext('Remove date') %>" class="remove-date">
+                <i class="icon-remove"></i>
+                <span class="sr"><%= gettext('Delete') %></span>
+              </a>
+            </div>
+        </div>
+    <% } %>
+
+
+  </div>
+  </div>
+
+</div>

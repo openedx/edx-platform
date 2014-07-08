@@ -74,17 +74,40 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              * True if this xblock is currently visible to students. This is computed server-side
              * so that the logic isn't duplicated on the client.
              */
-            "currently_visible_to_students": null
+            "currently_visible_to_students": null,
+            /**
+            * If xblock is graded, the date after which student assesment will be evaluated.
+            **/
+            "due_date": null,
+            /**
+            * Grading policy for xblock
+            **/
+            "grading_format": null,
+            /**
+            * Course graders
+            **/
+            "course_graders": null,
         },
 
         parse: function(response) {
+            var ret = $.extend(true, {}, response);
+
             if (response.ancestor_info) {
-                response.ancestor_info.ancestors = this.parseXBlockInfoList(response.ancestor_info.ancestors);
+                ret.ancestor_info.ancestors = this.parseXBlockInfoList(response.ancestor_info.ancestors);
             }
             if (response.child_info) {
-                response.child_info.children = this.parseXBlockInfoList(response.child_info.children);
+                ret.child_info.children = this.parseXBlockInfoList(response.child_info.children);
             }
-            return response;
+
+            return ret;
+        },
+
+        preprocessFieldNames: function(metadataObject) {
+            metadataObject.metadata.start = metadataObject.metadata.release_date;
+            delete metadataObject.metadata.release_date;
+            metadataObject.metadata.due = metadataObject.metadata.due_date;
+            delete metadataObject.metadata.due_date;
+            return metadataObject;
         },
 
         parseXBlockInfoList: function(list) {

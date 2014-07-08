@@ -79,13 +79,30 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             var requestData = createUpdateRequestData(fieldName, newValue);
             return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                 function() {
-                    return xblockInfo.save(requestData, { patch: true });
+                    var processedData = xblockInfo.preprocessFieldNames(requestData);
+                    return xblockInfo.save(processedData, { patch: true });
+                });
+        };
+
+        /**
+         * Updates the specified field of an xblock to a new value.
+         * @param xblockInfo The XBlockInfo model representing the xblock.
+         * @param fieldName The xblock field name to be updated.
+         * @param newValue The new value for the field.
+         * @returns {jQuery promise} A promise representing the updating of the field.
+         */
+        updateXBlockFields = function(xblockInfo, metadata) {
+            return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+                function() {
+                    var processedData = xblockInfo.preprocessFieldNames(metadata);
+                    return xblockInfo.save(processedData, { patch: true });
                 });
         };
 
         return {
             'addXBlock': addXBlock,
             'deleteXBlock': deleteXBlock,
-            'updateXBlockField': updateXBlockField
+            'updateXBlockField': updateXBlockField,
+            'updateXBlockFields': updateXBlockFields,
         };
     });
