@@ -130,6 +130,21 @@ def i18n_transifex_pull():
 
 
 @task
+def i18n_rtl():
+    cmd = "i18n_tool transifex"
+    sh(cmd + " rtl")
+
+    print("Now generating langugage files...")
+
+    cmd = "i18n_tool generate"
+    sh(cmd + " --rtl")
+
+    print("Committing translations...")
+    sh('git clean -fdX conf/locale')
+    sh('git add conf/locale')
+    sh('git commit --amend')
+
+@task
 @needs(
     "pavelib.i18n.i18n_transifex_pull",
     "pavelib.i18n.i18n_extract",

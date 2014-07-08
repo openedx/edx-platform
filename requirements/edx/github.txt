@@ -30,4 +30,4 @@
 -e git+https://github.com/edx/edx-ora2.git@release-2014-09-12T14.26#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@a7c506befdf9b97bbbb6961e0b0c7fa4807003eb#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
--e git+https://github.com/edx/i18n-tools.git@0d7847f9dfa2281640527b4dc51f5854f950f9b7#egg=i18n-tools
+-e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
