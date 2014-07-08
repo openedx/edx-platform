@@ -98,7 +98,9 @@ Annotator.Plugin.Share = (function(_super) {
 			titleText = title!=''?'<div class="share-text-annotator">'+title+'</div>':'',
 			shareButton = '<div class="share-button-annotator share-button" '+id+'></div>',
 			popup = '<div class="share-popup-overlay-bg" style="z-index:30000000000"><div class="share-popup"><div class="share-popup-items"></div><div class="close-btn">Close</div></div></div>';
-		return '<div class="share-container-annotator">'+titleText+shareButton+popup+'</div>';
+		if($('.share-popup-overlay-bg').length === 0)
+			$('.annotator-wrapper').append(popup);
+		return '<div class="share-container-annotator">'+titleText+shareButton+'</div>';
 	}
 	
 	//template for the design of the Share Plugin
@@ -122,15 +124,15 @@ Annotator.Plugin.Share = (function(_super) {
 		var share = this;
 		
 		// hide popup when user clicks on close button
-		$(field).find('.close-btn').click(function() {
+		$('.close-btn').click(function() {
 			$('.share-popup-overlay-bg').hide();
 		});
 		// hides the popup if user clicks anywhere outside the container
-		$(field).find('.share-popup-overlay-bg').click(function() {
+		$('.share-popup-overlay-bg').click(function() {
 			$('.share-popup-overlay-bg').hide();
 		});
 		// prevents the overlay from closing if user clicks inside the popup overlay
-		$(field).find('.share-popup').click(function() {
+		$('.share-popup').click(function() {
 			return false;
 		});
 		// Share button
@@ -145,15 +147,15 @@ Annotator.Plugin.Share = (function(_super) {
 			share.uri = share.createAPIURL(method,ovaId,url, annotation); 
 			
 			//display your popup
-			$(this).parent().find('.share-popup-overlay-bg').show(); 
+			$('.share-popup-overlay-bg').show(); 
 			
 			//build buttons
-			$(this).parent().find('.share-popup-items').html(share.buildHTMLPopup(title)); 
+			$('.share-popup-items').html(share.buildHTMLPopup(title)); 
 			
 			//buttons actions
 			if (typeof share.options.shareIn!='undefined'){
 				share.options.shareIn.forEach(function(item) {
-					$(_field).parent().find('.share-'+item+'-annotator.share-button').click(function() {
+					$('.share-'+item+'-annotator.share-button').click(function() {
 						var url = share.createAPIURL(method,ovaId,url, annotation),
 							title = "Sharing a annotation with Open Video Annotation";
 							link = encodeURIComponent(url),
