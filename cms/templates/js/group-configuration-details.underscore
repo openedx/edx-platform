@@ -23,19 +23,22 @@
         <li class="group-configuration-groups-count">
             <%= groupsCountMessage %>
         </li>
+        <li class="group-configuration-usage-count">
+            <%= usageCountMessage %>
+        </li>
       <% } %>
     </ol>
 
     <% if(showGroups) { %>
       <% allocation = Math.floor(100 / groups.length) %>
-        <ol class="groups groups-<%= index %>">
-          <% groups.each(function(group, groupIndex) { %>
-            <li class="group group-<%= groupIndex %>"
-              ><span class="group-name"><%= group.get('name') %></span
-              ><span class="group-allocation"><%= allocation %>%</span
-            ></li>
-          <% }) %>
-        </ol>
+      <ol class="groups groups-<%= index %>">
+        <% groups.each(function(group, groupIndex) { %>
+          <li class="group group-<%= groupIndex %>">
+            <span class="group-name"><%= group.get('name') %></span>
+            <span class="group-allocation"><%= allocation %>%</span>
+          </li>
+        <% }) %>
+      </ol>
     <% } %>
     <ul class="actions group-configuration-actions">
         <li class="action action-edit">
@@ -43,3 +46,21 @@
         </li>
     </ul>
 </div>
+<% if(showGroups) { %>
+  <div class="wrapper-group-configuration-usages">
+    <% if (!_.isEmpty(usage)) { %>
+      <h4 class="group-configuration-usage-text"><%= gettext('This Group Configuration is used in:') %></h4>
+      <ol class="group-configuration-usage">
+        <% _.each(usage, function(unit) { %>
+          <li class="group-configuration-usage-unit">
+            <a href=<%= unit.url %> ><%= unit.label %></a>
+          </li>
+        <% }) %>
+      </ol>
+    <% } else { %>
+      <p class="group-configuration-usage-text">
+        <%= outlineAnchorMessage %>
+      </p>
+    <% } %>
+  </div>
+<% } %>

@@ -9,6 +9,9 @@ define([
       this.addMatchers({
         toBeInstanceOf: function(expected) {
           return this.actual instanceof expected;
+        },
+        toBeEmpty: function() {
+            return this.actual.length === 0;
         }
       });
     });
@@ -38,6 +41,10 @@ define([
                 expect(groups).toBeInstanceOf(GroupCollection);
                 expect(groups.at(0).get('name')).toBe('Group A');
                 expect(groups.at(1).get('name')).toBe('Group B');
+            });
+
+            it('should have an empty usage by default', function() {
+                expect(this.model.get('usage')).toBeEmpty();
             });
 
             it('should be able to reset itself', function() {
@@ -120,7 +127,8 @@ define([
                                 'order': 1,
                                 'name': 'Group 2'
                             }
-                        ]
+                        ],
+                        'usage': []
                     },
                     model = new GroupConfigurationModel(
                         serverModelSpec, { parse: true }
