@@ -62,6 +62,7 @@ urlpatterns += patterns(
 
 # restful api
 urlpatterns += patterns(
+
     'contentstore.views',
 
     url(r'^$', 'howitworks', name='homepage'),
@@ -134,6 +135,11 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
+
+#ajax call cites
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+)
 
 if settings.DEBUG:
     try:

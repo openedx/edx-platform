@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student Views
 """
@@ -86,6 +87,10 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
+
+from student.validators import validate_cedula
+from cities.models import City
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -270,6 +275,7 @@ def _cert_info(user, course, cert_status):
     }
 
     default_status = 'processing'
+    #default_status = 'ready'
 
     default_info = {'status': default_status,
                     'show_disabled_download_button': False,
@@ -1057,6 +1063,7 @@ def _do_create_account(post_vars):
     password_history_entry.create(user)
 
     registration.register(user)
+    city = City.objects.get(id=post_vars['city_id'])
 
     profile = UserProfile(user=user)
     profile.name = post_vars['name']
@@ -1066,6 +1073,8 @@ def _do_create_account(post_vars):
     profile.city = post_vars.get('city')
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
+    profile.cedula = post_vars.get('cedula')
+    profile.city = city
 
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
@@ -1185,6 +1194,16 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['value'] = error_str[field_name]
             js['field'] = field_name
             return JsonResponse(js, status=400)
+    
+    city = City.objects.get(id=post_vars['city_id'])
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = _("A valid ID is required.").format(field=a)
+            js['field'] = 'cedula'
+            return HttpResponse(json.dumps(js))        
 
         max_length = 75
         if field_name == 'username':
@@ -1874,3 +1893,19 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    Verificar informacion academica de estudiante
+    """
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
+    return HttpResponse(json.dumps(data))

@@ -1,7 +1,7 @@
 [main]
 host = https://www.transifex.com
 
-[edx-platform.django-partial]
+[edx-in-iaen.django-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
 source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
@@ -25,7 +25,7 @@ source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.mako]
+[edx-in-iaen.mako]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
 source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en

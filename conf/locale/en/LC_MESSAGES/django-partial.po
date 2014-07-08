@@ -1,0 +1,1835 @@
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
+# Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2014.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1a\n"
+"Report-Msgid-Bugs-To: translation_team@edx.org\n"
+"POT-Creation-Date: 2014-01-06 18:55+0000\n"
+"PO-Revision-Date: 2014-01-06 18:58:17.248679\n"
+"Last-Translator: \n"
+"Language-Team: translation team <translation_team@edx.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+#: cms/djangoapps/contentstore/utils.py:25
+msgid "Open Ended Panel"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py:26
+msgid "My Notes"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/assets.py:172
+msgid "Upload completed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py:226
+msgid ""
+"Unable to create course '{name}'.\n"
+"\n"
+"{err}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py:238
+msgid ""
+"There is already a course defined with the same organization, course number,"
+" and course run. Please change either organization or course number to be "
+"unique."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py:244
+#: cms/djangoapps/contentstore/views/course.py:248
+#: cms/djangoapps/contentstore/views/course.py:270
+#: cms/djangoapps/contentstore/views/course.py:273
+msgid ""
+"Please change either the organization or course number so that it is unique."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py:266
+msgid ""
+"There is already a course defined with the same organization and course "
+"number. Please change at least one field to be unique."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py:81
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py:118
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py:206
+msgid "Could not find the course.xml file in the package."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:38
+msgid "Courseware"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:39
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:105
+msgid "Course Info"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:40
+msgid "Discussion"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:41
+msgid "Wiki"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:42
+msgid "Syllabus"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/tabs.py:43
+msgid "Progress"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:104
+msgid "Insufficient permissions"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:112
+msgid "Could not find user by email address '{email}'."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:138
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:156
+#: cms/djangoapps/contentstore/views/user.py:190
+msgid "You may not remove the last instructor from a course"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:170
+msgid "`role` is required"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/user.py:176
+msgid "Only instructors may create other instructors"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:33
+msgid "unrequested"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:34
+msgid "pending"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:35
+msgid "granted"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:36
+msgid "denied"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:39
+msgid "Studio user"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:41
+msgid "The date when state was last updated"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:43
+msgid "Current course creator state"
+msgstr ""
+
+#: cms/djangoapps/course_creators/models.py:44
+msgid ""
+"Optional notes about this user (for example, why course creation access was "
+"denied)"
+msgstr ""
+
+#: common/djangoapps/cities/models.py:24 common/djangoapps/cities/models.py:40
+msgid "Code"
+msgstr ""
+
+#: common/djangoapps/cities/models.py:25
+msgid "State"
+msgstr ""
+
+#: common/djangoapps/cities/models.py:32
+msgid "States"
+msgstr ""
+
+#: common/djangoapps/cities/models.py:39
+msgid "City"
+msgstr ""
+
+#: common/djangoapps/cities/models.py:47
+msgid "Cities"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py:43
+msgid "Honor Code Certificate"
+msgstr ""
+
+#: common/djangoapps/course_modes/views.py:81
+#: common/djangoapps/student/views.py:448
+msgid "Enrollment is closed"
+msgstr ""
+
+#: common/djangoapps/course_modes/views.py:90
+msgid "Enrollment mode not supported"
+msgstr ""
+
+#: common/djangoapps/course_modes/views.py:106
+msgid "Invalid amount selected."
+msgstr ""
+
+#: common/djangoapps/course_modes/views.py:111
+msgid "No selected price or selected price is too low."
+msgstr ""
+
+#: common/djangoapps/student/middleware.py:26
+msgid ""
+"Your account has been disabled. If you believe this was done in error, "
+"please contact us at {link_start}{support_email}{link_end}"
+msgstr ""
+
+#: common/djangoapps/student/middleware.py:33
+msgid "Disabled Account"
+msgstr ""
+
+#: common/djangoapps/student/models.py:191
+msgid "Male"
+msgstr ""
+
+#: common/djangoapps/student/models.py:191
+msgid "Female"
+msgstr ""
+
+#: common/djangoapps/student/models.py:191
+#: common/djangoapps/student/models.py:209
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py:201
+msgid "Doctorate"
+msgstr ""
+
+#: common/djangoapps/student/models.py:202
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py:203
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py:204
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py:205
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py:206
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py:207
+msgid "Elementary/primary school"
+msgstr ""
+
+#: common/djangoapps/student/models.py:208
+msgid "None"
+msgstr ""
+
+#: common/djangoapps/student/validators.py:12
+#: common/djangoapps/student/views.py:1322
+#: common/djangoapps/student/views.py:1332
+msgid "Invalid ID"
+msgstr ""
+
+#: common/djangoapps/student/views.py:432
+msgid "Course id not specified"
+msgstr ""
+
+#: common/djangoapps/student/views.py:445
+msgid "Course id is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views.py:471
+msgid "Your level of education is not accepted for this course."
+msgstr ""
+
+#: common/djangoapps/student/views.py:491
+msgid "You are not enrolled in this course"
+msgstr ""
+
+#: common/djangoapps/student/views.py:502
+msgid "Enrollment action is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views.py:558
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+
+#: common/djangoapps/student/views.py:589
+msgid "Too many failed login attempts. Try again later."
+msgstr ""
+
+#: common/djangoapps/student/views.py:596
+msgid "Email or password is incorrect."
+msgstr ""
+
+#: common/djangoapps/student/views.py:643
+msgid ""
+"This account has not been activated. We have sent another activation "
+"message. Please check your e-mail for the activation instructions."
+msgstr ""
+
+#: common/djangoapps/student/views.py:708
+msgid "Please enter a username"
+msgstr ""
+
+#: common/djangoapps/student/views.py:713
+msgid "Please choose an option"
+msgstr ""
+
+#: common/djangoapps/student/views.py:720
+msgid "User with username {} does not exist"
+msgstr ""
+
+#: common/djangoapps/student/views.py:728
+msgid "Successfully disabled {}'s account"
+msgstr ""
+
+#: common/djangoapps/student/views.py:732
+msgid "Successfully reenabled {}'s account"
+msgstr ""
+
+#: common/djangoapps/student/views.py:735
+msgid "Unexpected account status"
+msgstr ""
+
+#: common/djangoapps/student/views.py:780
+msgid "An account with the Public Username '{username}' already exists."
+msgstr ""
+
+#: common/djangoapps/student/views.py:785
+msgid "An account with the Email '{email}' already exists."
+msgstr ""
+
+#: common/djangoapps/student/views.py:849
+msgid "Error (401 {field}). E-mail us."
+msgstr ""
+
+#: common/djangoapps/student/views.py:854
+msgid "To enroll, you must follow the honor code."
+msgstr ""
+
+#: common/djangoapps/student/views.py:866
+msgid "You must accept the terms of service."
+msgstr ""
+
+#: common/djangoapps/student/views.py:882
+msgid "Username must be minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:883
+msgid "A properly formatted e-mail is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:884
+msgid "Your legal name must be a minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:885
+msgid "A valid password is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:886
+msgid "Accepting Terms of Service is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:887
+msgid "Agreeing to the Honor Code is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:888
+msgid "A valid City is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:899
+msgid "A valid ID is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:906
+msgid "Valid e-mail is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:913
+msgid "Username should only consist of A-Z and 0-9, with no spaces."
+msgstr ""
+
+#: common/djangoapps/student/views.py:945
+msgid "Could not send activation e-mail."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1087
+msgid "Unknown error. Please e-mail us to let us know how it happened."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1135
+msgid "No inactive user with this e-mail exists"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1148
+msgid "Unable to send reactivation email"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1165
+msgid "Invalid password"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1172
+msgid "Valid e-mail address required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1177
+msgid "An account with this e-mail already exists."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1193
+msgid "Old email is the same as the new email."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1287
+msgid "Name required"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:362
+msgid "Check"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:363
+msgid "Final Check"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module.py:312
+msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgstr ""
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
+msgid "Navigation"
+msgstr ""
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:123
+msgid "About these documents"
+msgstr ""
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:126
+msgid "Index"
+msgstr ""
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:129
+#: lms/templates/wiki/plugins/attachments/index.html:40
+msgid "Search"
+msgstr ""
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:132
+msgid "Copyright"
+msgstr ""
+
+#: lms/djangoapps/courseware/features/video.py:115
+msgid "ERROR: No playable video sources found!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:138
+msgid "Failed in authenticating {0}, error {1}\n"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:142
+msgid "Failed in authenticating {0}\n"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:143
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:254
+msgid "fixed password"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:148
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:263
+msgid "All ok!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:155
+#: lms/djangoapps/dashboard/sysadmin.py:227
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:145
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:176
+msgid "Must provide username"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:157
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:151
+msgid "Must provide full name"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:168
+msgid "email must end in"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:173
+msgid "Failed - email {0} already exists as external_id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:179
+msgid "Password must be supplied if not using certificates"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:184
+msgid "email address required (not username)"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:193
+msgid "Oops, failed to create user {0}, IntegrityError"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:220
+msgid "User {0} created successfully!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:232
+msgid "Cannot find user with email address {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:238
+msgid "Cannot find user with username {0} - {1}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:242
+msgid "Deleted user {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:250
+msgid "Statistic"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:250
+msgid "Value"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:251
+msgid "Site statistics"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:252
+msgid "Total number of users"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:256
+msgid "Courses loaded in the modulestore"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:290
+#: lms/djangoapps/dashboard/sysadmin.py:616
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+msgid "username"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:290
+#: lms/djangoapps/dashboard/sysadmin.py:617
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:344
+msgid "email"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:297
+msgid "Repair Results"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:306
+msgid "Create User Results"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:311
+msgid "Delete User Results"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:355
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:274
+msgid "The git repo location should end with '.git', and be a valid url"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:371
+msgid "Adding course using git repo {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:399
+msgid "Added course from"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:400
+msgid "<pre>{0}</pre>"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:408
+msgid ""
+"Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
+"is generally not safe to import into an XMLModuleStore with multithreaded. "
+"We recommend you enable the MongoDB based module store instead, unless this "
+"is a development environment."
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:416
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:324
+msgid ""
+"The course {0} already exists in the data directory! (reloading anyway)"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:427
+msgid "Unable to clone or pull repository. Please check your url."
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:431
+msgid "Failed to clone repository to {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:439
+msgid "Loaded course {0} {1}<br/>Errors:"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:467
+#: lms/djangoapps/dashboard/sysadmin.py:582
+msgid "Course Name"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:467
+msgid "Directory/ID"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:468
+msgid "Git Commit"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:468
+msgid "Last Change"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:469
+msgid "Last Editor"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:470
+msgid "Information about all courses"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:515
+msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:545
+msgid "Deleted"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:582
+#: lms/djangoapps/dashboard/sysadmin.py:615
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+msgid "course_id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:583
+msgid "# enrolled"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:583
+msgid "# staff"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:584
+msgid "instructors"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:585
+msgid "Enrollment information for all courses"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:616
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+msgid "role"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:617
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:344
+msgid "full_name"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:663
+msgid ""
+"Unable to connect to mongodb to save log, please check MONGODB_LOG settings."
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:676
+msgid "Cannot find course {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:55
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:404
+msgid ""
+"Path {0} doesn't exist, please create it, or configure a different path with"
+" GIT_REPO_DIR"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:67
+msgid "Oops, not a git ssh url?"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:68
+msgid "Expecting something like git@github.com:mitocw/edx4edx_lite.git"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:82
+msgid "directory already exists, doing a git pull instead of git clone"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:95
+msgid "git clone or pull failed!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:104
+msgid "Unable to get git log"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:107
+msgid ""
+"\n"
+"Commit ID: {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:114
+msgid "Unable to get branch info"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:139
+msgid "Unable to run import command."
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:142
+msgid "The underlying module store does not support import."
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:166
+msgid "Studio course dir = {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:169
+msgid "   -> exists, but is not symlink"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:175
+msgid "Failed to remove course directory"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:178
+msgid "   -> creating symlink between {0} and {1}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:182
+msgid "Unable to create course symlink"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:195
+msgid ""
+"Unable to connect to mongodb to save log, please check MONGODB_LOG settings"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:208
+msgid "saved CourseImportLog for {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:218
+msgid "Import the specified git repository into the modulestore and directory"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:225
+msgid "This script requires a mongo module store"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:228
+msgid "This script requires at least one argument, the git URL"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:232
+msgid "This script requires no more than two arguments"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:241
+msgid "Repo was not added, check log output for details"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:183
+msgid "Cannot find user with email address"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:189
+msgid "Cannot find user with username"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:252
+msgid "Failed in authenticating"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:280
+msgid "Unable to clone or pull repository"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:301
+msgid "Error - cannot get course with ID"
+msgstr ""
+
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:464
+msgid "Cannot find course"
+msgstr ""
+
+#: lms/djangoapps/django_comment_client/base/views.py:566
+#, python-format
+msgid "allowed file types are '%(file_types)s'"
+msgstr ""
+
+#: lms/djangoapps/django_comment_client/base/views.py:581
+#, python-format
+msgid "maximum upload file size is %(file_size)sK"
+msgstr ""
+
+#: lms/djangoapps/django_comment_client/base/views.py:590
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:61
+msgid "User does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:67
+msgid "Task is already running."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:689
+msgid "Complete"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:689
+msgid "Incomplete"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:781
+msgid ""
+"Your grade report is being generated! You can view the status of the "
+"generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:784
+msgid ""
+"A grade report generation task is already in progress. Check the 'Pending "
+"Instructor Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:137
+msgid "Membership"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:153
+msgid "Student Admin"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:168
+msgid "Data Download"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:192
+msgid "Email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:206
+msgid "Analytics"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py:58
+msgid "rescored"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py:85
+msgid "reset"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py:107
+#: lms/templates/wiki/plugins/attachments/index.html:74
+msgid "deleted"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py:129
+msgid "emailed"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks.py:139
+msgid "graded"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:108
+#: lms/djangoapps/instructor_task/views.py:113
+msgid "No status information available"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:112
+msgid "No task_output information found for instructor_task {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:118
+msgid "No parsable task_output information found for instructor_task {0}: {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:120
+msgid "No parsable status information available"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:123
+msgid "No message provided"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:126
+msgid "Invalid task_output information found for instructor_task {0}: {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:128
+msgid "No progress status information available"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/views.py:147
+msgid "No parsable task_input information found for instructor_task {0}: {1}"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {attempted} and {succeeded} are counts.
+#: lms/djangoapps/instructor_task/views.py:157
+msgid "Progress: {action} {succeeded} of {attempted} so far"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {student} is a student identifier.
+#: lms/djangoapps/instructor_task/views.py:162
+msgid "Unable to find submission to be {action} for student '{student}'"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {student} is a student identifier.
+#: lms/djangoapps/instructor_task/views.py:165
+msgid "Problem failed to be {action} for student '{student}'"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {student} is a student identifier.
+#: lms/djangoapps/instructor_task/views.py:169
+msgid "Problem successfully {action} for student '{student}'"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#: lms/djangoapps/instructor_task/views.py:174
+msgid "Unable to find any students with submissions to be {action}"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {attempted} is a count.
+#: lms/djangoapps/instructor_task/views.py:177
+msgid "Problem failed to be {action} for any of {attempted} students"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {attempted} is a count.
+#: lms/djangoapps/instructor_task/views.py:181
+msgid "Problem successfully {action} for {attempted} students"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {succeeded} and {attempted} are counts.
+#: lms/djangoapps/instructor_task/views.py:184
+msgid "Problem {action} for {succeeded} of {attempted} students"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#: lms/djangoapps/instructor_task/views.py:189
+msgid "Unable to find any recipients to be {action}"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {attempted} is a count.
+#: lms/djangoapps/instructor_task/views.py:192
+msgid "Message failed to be {action} for any of {attempted} recipients "
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {attempted} is a count.
+#: lms/djangoapps/instructor_task/views.py:196
+msgid "Message successfully {action} for {attempted} recipients"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {succeeded} and {attempted} are counts.
+#: lms/djangoapps/instructor_task/views.py:199
+msgid "Message {action} for {succeeded} of {attempted} recipients"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {succeeded} and {attempted} are counts.
+#: lms/djangoapps/instructor_task/views.py:203
+msgid "Status: {action} {succeeded} of {attempted}"
+msgstr ""
+
+#. Translators: {skipped} is a count.  This message is appended to task
+#. progress status messages.
+#: lms/djangoapps/instructor_task/views.py:207
+msgid " (skipping {skipped})"
+msgstr ""
+
+#. Translators: {total} is a count.  This message is appended to task progress
+#. status messages.
+#: lms/djangoapps/instructor_task/views.py:211
+msgid " (out of {total})"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:20
+msgid "AI Assessment"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:21
+msgid "Peer Assessment"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:22
+msgid "Not yet available"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:23
+msgid "Automatic Checker"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:24
+msgid "Instructor Assessment"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:27
+msgid ""
+"Error occurred while contacting the grading service.  Please notify course "
+"staff."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:28
+msgid ""
+"Error occurred while contacting the grading service.  Please notify your edX"
+" point of contact."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:98
+msgid "for course {0} and student {1}."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:51
+msgid ""
+"View all problems that require peer assessment in this particular course."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:52
+msgid ""
+"View ungraded submissions submitted by students for the open ended problems "
+"in the course."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:53
+msgid ""
+"View open ended problems that you have previously submitted for grading."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:54
+msgid "View submissions that have been flagged by students as inappropriate."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:58
+#: lms/djangoapps/open_ended_grading/views.py:59
+msgid "New submissions to grade"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:60
+msgid "New grades have been returned"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:61
+msgid "Submissions have been flagged for review"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/views.py:129
+msgid ""
+"\n"
+"        Error with initializing peer grading.\n"
+"        There has not been a peer grading module created in the courseware that would allow you to grade others.\n"
+"        Please check back later for this.\n"
+"        "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:163
+msgid "Order Payment Confirmation"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:234
+msgid "Trying to add a different currency into the cart"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:457
+msgid ""
+"Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
+" enrollments."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:524
+msgid "[Refund] User-Requested Refund"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:571
+msgid "Mode {mode} does not exist for {course_id}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:583
+msgid "Certificate of Achievement, {mode_name} for course {course}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:626
+msgid ""
+"Note - you have up to 2 weeks into the course to unenroll from the Verified "
+"Certificate option and receive a full refund. To receive your refund, "
+"contact {billing_email}. Please include your order number in your e-mail. "
+"Please do NOT include your credit card information."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:32
+msgid "You must be logged-in to add to a shopping cart"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:38
+#: lms/djangoapps/shoppingcart/tests/test_views.py:85
+msgid "The course you requested does not exist."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:40
+#: lms/djangoapps/shoppingcart/tests/test_views.py:72
+msgid "The course {0} is already in your cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:42
+#: lms/djangoapps/shoppingcart/tests/test_views.py:79
+msgid "You are already registered in course {0}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:43
+msgid "Course added to cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:178
+msgid "You do not have permission to view this page."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:147
+msgid "The payment processor did not return a required parameter: {0}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:153
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:168
+msgid "The payment processor returned a badly-typed value {0} for param {1}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:159
+msgid ""
+"The payment processor accepted an order whose number is not in our system."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:179
+msgid ""
+"The amount charged by the processor {0} {1} is different than the total cost"
+" of the order {2} {3}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:307
+msgid "Successful transaction."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:308
+msgid "The request is missing one or more required fields."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:309
+msgid "One or more fields in the request contains invalid data."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:316
+msgid ""
+"Error: General system failure. Possible fix: retry the payment after a few "
+"minutes."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:328
+msgid ""
+"The issuing bank has questions about the request. Possible fix: retry with "
+"another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:340
+msgid ""
+"Insufficient funds in the account. Possible fix: retry with another form of "
+"payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:342
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:353
+msgid "Unknown reason"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:343
+msgid ""
+"Issuing bank unavailable. Possible fix: retry again after a few minutes"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
+msgid ""
+"The card has reached the credit limit. Possible fix: retry with another form"
+" of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:350
+msgid ""
+"Invalid card verification number. Possible fix: retry with another form of "
+"payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:354
+msgid ""
+"Invalid account number. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:360
+msgid ""
+"General decline by the processor.  Possible fix: retry with another form of "
+"payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:366
+msgid "The requested amount exceeds the originally authorized amount."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
+msgid "Processor Failure.  Possible fix: retry the payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:369
+msgid "The authorization has already been captured"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:372
+msgid ""
+"The requested transaction amount must match the previous transaction amount."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:380
+msgid "The request ID is invalid."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:390
+msgid "The transaction has already been settled or reversed."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:398
+msgid "You requested a credit for a capture that was previously voided"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/tests/test_views.py:346
+msgid "Download Purchase Report"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/tests/test_views.py:358
+msgid ""
+"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/tests/test_views.py:375
+msgid "There are too many results in your report."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:554
+msgid "No photo ID was provided."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:555
+msgid "We couldn't read your name from your photo ID image."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:556
+msgid ""
+"The name associated with your account and the name on your ID do not match."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:557
+msgid "The image of your face was not clear."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:558
+msgid "Your face was not visible in your self-photo"
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py:576
+msgid "There was an error verifying your ID photos."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py:153
+msgid "Selected price is not valid number."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py:163
+msgid "This course doesn't support verified certificates"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py:166
+msgid "No selected price or selected price is below minimum."
+msgstr ""
+
+#: lms/templates/main_django.html:32
+msgid "Skip to this view's content"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html:8
+#: lms/templates/registration/password_reset_complete.html:63
+msgid "Your Password Reset is Complete"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html:69
+#, python-format
+msgid ""
+"\n"
+"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
+"      "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:9
+#, python-format
+msgid ""
+"\n"
+"      Reset Your %(platform_name)s Password\n"
+"  "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:68
+#, python-format
+msgid ""
+"\n"
+"          Reset Your %(platform_name)s Password\n"
+"          "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:78
+msgid "Password Reset Form"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:85
+#, python-format
+msgid ""
+"\n"
+"                We're sorry, %(platform_name)s enrollment is not available in your region\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:92
+msgid "The following errors occured while processing your registration: "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:94
+msgid "You must complete all fields."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:95
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:100
+msgid ""
+"We're sorry, our systems seem to be having trouble processing your password "
+"reset"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:102
+#, python-format
+msgid ""
+"\n"
+"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:109
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly. <br /> Required fields are noted by <strong "
+"class=\"indicator\">bold text and an asterisk (*)</strong>."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:113
+msgid "Required Information"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:117
+msgid "Your New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:121
+msgid "Your New Password Again"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:128
+msgid "Change My Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:135
+msgid "Your Password Reset Was Unsuccessful"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:138
+#, python-format
+msgid ""
+"\n"
+"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
+"        "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:148
+msgid "Password Reset Help"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:152
+msgid "Need Help?"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html:154
+#, python-format
+msgid ""
+"\n"
+"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
+"          "
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html:2
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at edx.org."
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html:13
+msgid "The edX Team"
+msgstr ""
+
+#: lms/templates/wiki/article.html:31
+msgid "Last modified:"
+msgstr ""
+
+#: lms/templates/wiki/article.html:37
+msgid "See all children"
+msgstr ""
+
+#: lms/templates/wiki/article.html:48
+msgid "This article was last modified:"
+msgstr ""
+
+#: lms/templates/wiki/create.html:5 lms/templates/wiki/create.html.py:30
+msgid "Add new article"
+msgstr ""
+
+#: lms/templates/wiki/create.html:37
+msgid "Create article"
+msgstr ""
+
+#: lms/templates/wiki/create.html:42 lms/templates/wiki/delete.html:13
+#: lms/templates/wiki/delete.html.py:54
+msgid "Go back"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:5 lms/templates/wiki/delete.html.py:50
+#: lms/templates/wiki/edit.html:42
+msgid "Delete article"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:9
+#: lms/templates/wiki/plugins/attachments/index.html:92
+msgid "Delete"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:12
+msgid "You cannot delete a root article."
+msgstr ""
+
+#: lms/templates/wiki/delete.html:18
+msgid ""
+"You cannot delete this article because you do not have permission to delete "
+"articles with children. Try to remove the children manually one-by-one."
+msgstr ""
+
+#: lms/templates/wiki/delete.html:24
+msgid ""
+"You are deleting an article. This means that its children will be deleted as"
+" well. If you choose to purge, children will also be purged!"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:26
+msgid "Articles that will be deleted"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:32
+msgid "...and more!"
+msgstr ""
+
+#: lms/templates/wiki/delete.html:40
+msgid "You are deleting an article. Please confirm."
+msgstr ""
+
+#: lms/templates/wiki/edit.html:5
+msgid "Edit"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:29 lms/templates/wiki/edit.html.py:61
+msgid "Save changes"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:37
+msgid "Preview"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:48 lms/templates/wiki/history.html:204
+#: lms/templates/wiki/history.html:235
+#: lms/templates/wiki/includes/cheatsheet.html:4
+msgid "Close Modal"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:51
+msgid "Wiki Preview"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:51 lms/templates/wiki/history.html:207
+#: lms/templates/wiki/history.html:238
+#: lms/templates/wiki/includes/cheatsheet.html:7
+msgid "modal open"
+msgstr ""
+
+#: lms/templates/wiki/edit.html:66
+msgid "Back to editor"
+msgstr ""
+
+#: lms/templates/wiki/history.html:5
+msgid "History"
+msgstr ""
+
+#: lms/templates/wiki/history.html:95
+msgid ""
+"Click each revision to see a list of edited lines. Click the Preview button "
+"to see how the article looked at this stage. At the bottom of this page, you"
+" can change to a particular revision or merge an old revision with the "
+"current one."
+msgstr ""
+
+#: lms/templates/wiki/history.html:114
+msgid "no log message"
+msgstr ""
+
+#: lms/templates/wiki/history.html:134
+msgid "Preview this revision"
+msgstr ""
+
+#: lms/templates/wiki/history.html:153
+msgid "Auto log:"
+msgstr ""
+
+#: lms/templates/wiki/history.html:161
+msgid "Change"
+msgstr ""
+
+#: lms/templates/wiki/history.html:184 lms/templates/wiki/history.html:189
+msgid "Merge selected with current..."
+msgstr ""
+
+#: lms/templates/wiki/history.html:194
+msgid "Switch to selected version"
+msgstr ""
+
+#: lms/templates/wiki/history.html:207
+msgid "Wiki Revision Preview"
+msgstr ""
+
+#: lms/templates/wiki/history.html:216 lms/templates/wiki/history.html:251
+msgid "Back to history view"
+msgstr ""
+
+#: lms/templates/wiki/history.html:221 lms/templates/wiki/history.html:226
+msgid "Switch to this version"
+msgstr ""
+
+#: lms/templates/wiki/history.html:238
+msgid "Merge Revision"
+msgstr ""
+
+#: lms/templates/wiki/history.html:242
+msgid "Merge with current"
+msgstr ""
+
+#: lms/templates/wiki/history.html:243
+msgid ""
+"When you merge a revision with the current, all data will be retained from "
+"both versions and merged at its approximate location from each revision."
+msgstr ""
+
+#: lms/templates/wiki/history.html:243
+msgid "After this, it's important to do a manual review."
+msgstr ""
+
+#: lms/templates/wiki/history.html:256 lms/templates/wiki/history.html:261
+msgid "Create new merged version"
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:13
+msgid "Previewing revision"
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:20
+msgid "Previewing merge between"
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:22
+msgid "and"
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:31
+msgid "This revision has been deleted."
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:32
+msgid "Restoring to this revision will mark the article as deleted."
+msgstr ""
+
+#: lms/templates/wiki/includes/anonymous_blocked.html:7
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
+msgstr ""
+
+#: lms/templates/wiki/includes/anonymous_blocked.html:11
+msgid "You need to log in or sign up to use this function."
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:7
+msgid "Wiki Cheatsheet"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:13
+msgid "Wiki Syntax Help"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:14
+msgid ""
+"This wiki uses <strong>Markdown</strong> for styling. There are several "
+"useful guides online. See any of the links below for in-depth details:"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:16
+msgid "Markdown: Basics"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:17
+msgid "Quick Markdown Syntax Guide"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:18
+msgid "Miniature Markdown Guide"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:20
+msgid ""
+"To create a new wiki article, create a link to it. Clicking the link gives "
+"you the creation page."
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:21
+msgid "[Article Name](wiki:ArticleName)"
+msgstr ""
+
+#. Translators: Do not translate "edX"
+#: lms/templates/wiki/includes/cheatsheet.html:27
+msgid "edX Additions:"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:35
+msgid "Useful examples:"
+msgstr ""
+
+#. Translators: Do not translate "edX" or "Wikipedia"
+#: lms/templates/wiki/includes/cheatsheet.html:40
+msgid "http://wikipedia.org"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:41
+msgid "[Wikipedia](http://wikipedia.org)"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:42
+msgid "[edX Wiki](wiki:/edx/)"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:45
+msgid "Huge Header"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:48
+msgid "Smaller Header"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:51
+msgid "*emphasis* or _emphasis_"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:53
+msgid "**strong** or __strong__"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:55
+msgid "Unordered List"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:56
+msgid "Sub Item 1"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:57
+msgid "Sub Item 2"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:59
+msgid "Ordered"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:60
+msgid "List"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:62
+msgid "Quotes"
+msgstr ""
+
+#. Translators: Do not translate 'cheatsheetLink'
+#: lms/templates/wiki/includes/editor_widget.html:7
+#, python-format
+msgid ""
+"\n"
+"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
+"\t"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:5
+msgid "Attachments"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:14
+msgid "Upload new file"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:17
+msgid "Search and add file"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:23
+msgid "Upload File"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:27
+msgid "Upload file"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:35
+msgid "Search files and articles"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:36
+msgid ""
+"You can reuse files from other articles. These files are subject to updates "
+"on other articles which may or may not be a good thing."
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:65
+msgid ""
+"The following files are available for this article. Copy the markdown tag to"
+" directly refer to a file from the article text."
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:84
+msgid "Markdown tag"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:85
+msgid "Uploaded by"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:86
+msgid "Size"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:87
+msgid "File History"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:94
+msgid "Detach"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:97
+msgid "Replace"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:104
+msgid "Restore"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:115
+msgid "anonymous (IP logged)"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:122
+msgid "File history"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:122
+msgid "revisions"
+msgstr ""
+
+#: lms/templates/wiki/plugins/attachments/index.html:130
+msgid "There are no attachments for this article."
+msgstr ""

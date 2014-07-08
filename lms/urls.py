@@ -493,6 +493,12 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         url(r'', include('third_party_auth.urls')),
     )
 
+# Extra ajax calls
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler')
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:

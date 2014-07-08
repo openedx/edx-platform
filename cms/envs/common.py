@@ -67,7 +67,7 @@ FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False,
+    'ENABLE_CREATOR_GROUP': True,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
@@ -144,7 +144,7 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-EDX_ROOT_URL = ''
+EDX_ROOT_URL = 'beta.iaen.edu.ec'
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
 LOGIN_URL = EDX_ROOT_URL + '/signin'
@@ -292,9 +292,8 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'
 LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True
@@ -536,6 +535,8 @@ INSTALLED_APPS = (
 
     # Monitoring signals
     'monitoring',
+    # Cities UPEx
+    'cities',
 )
 
 
@@ -626,3 +627,6 @@ for app_name in OPTIONAL_APPS:
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70

@@ -1,0 +1,80 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+<%! import json %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="title">${_("Syllabuses")}</%block>
+<%block name="bodyclass">is-signedin course view-syllabuses feature-upload</%block>
+
+<%block name="header_extras">
+% for template_name in ["edit-syllabus", "show-syllabus", "edit-topic", "no-syllabuses" ]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.SYLLABUSES = "${syllabus_url}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
+require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabuses"],
+        function(Section, SyllabusCollection, ListSyllabusesView) {
+  var syllabuses = new SyllabusCollection(${json.dumps(syllabuses)}, {parse: true});
+  var tbView = new ListSyllabusesView({collection: syllabuses});
+
+  $(function() {
+      $(".content-primary").append(tbView.render().el);
+      $(".nav-actions .new-button").click(function(e) {
+          tbView.addOne(e);
+      })
+      $(window).on("beforeunload", function() {
+          var dirty = syllabuses.find(function(syllabus) { return syllabus.isDirty(); });
+          if(dirty) {
+              return gettext("You have unsaved changes. Do you really want to leave this page?");
+          }
+      })
+  })
+});
+</script>
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Content")}</small>
+        <span class="sr">&gt; </span>${_("Syllabus")}
+      </h1>
+
+      <nav class="nav-actions">
+        <h3 class="sr">${_("Page Actions")}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Syllabus")}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+
+      </article>
+      <aside class="content-supplementary" role="complimentary">
+        <div class="bit">
+          <h3 class="title-3">${_("Why should I break my text into chapters?")}</h3>
+          <p>${_("It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
+        </div>
+        <div class="bit">
+          <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
+          <p>${_("If you haven't broken your text into chapters, you can upload the entire text as a single chapter and enter a name of your choice in the Chapter Name field.")}</p>
+        </div>
+      </aside>
+    </section>
+  </div>
+</%block>
