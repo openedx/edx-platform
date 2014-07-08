@@ -48,18 +48,18 @@ def have_a_course_with_two_sections(step):
         display_name='Subsection Beta',)
 
 
-@step(u'I navigate to the course overview page$')
-def navigate_to_the_course_overview_page(step):
+@step(u'I navigate to the course outline page$')
+def navigate_to_the_course_outline_page(step):
     create_studio_user(is_staff=True)
     log_into_studio()
     course_locator = 'a.course-link'
     world.css_click(course_locator)
 
 
-@step(u'I navigate to the courseware page of a course with multiple sections')
-def nav_to_the_courseware_page_of_a_course_with_multiple_sections(step):
+@step(u'I navigate to the outline page of a course with multiple sections')
+def nav_to_the_outline_page_of_a_course_with_multiple_sections(step):
     step.given('I have a course with multiple sections')
-    step.given('I navigate to the course overview page')
+    step.given('I navigate to the course outline page')
 
 
 @step(u'I add a section')
@@ -78,13 +78,13 @@ def i_click_the_text_span(step, text):
 
 @step(u'I collapse the first section$')
 def i_collapse_a_section(step):
-    collapse_locator = 'section.courseware-section a.collapse'
+    collapse_locator = 'section.outline-section a.collapse'
     world.css_click(collapse_locator)
 
 
 @step(u'I expand the first section$')
 def i_expand_a_section(step):
-    expand_locator = 'section.courseware-section a.expand'
+    expand_locator = 'section.outline-section a.expand'
     world.css_click(expand_locator)
 
 
