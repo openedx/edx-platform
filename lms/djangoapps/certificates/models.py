@@ -81,6 +81,9 @@ class CertificateWhitelist(models.Model):
 
 
 class GeneratedCertificate(models.Model):
+
+    MODES = Choices('verified', 'honor', 'audit')
+
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='')
@@ -90,7 +93,6 @@ class GeneratedCertificate(models.Model):
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
-    MODES = Choices('verified', 'honor', 'audit')
     mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(
@@ -102,6 +104,18 @@ class GeneratedCertificate(models.Model):
     class Meta:
         unique_together = (('user', 'course_id'),)
 
+    @classmethod
+    def certificate_for_student(cls, student, course_id):
+        """
+        This returns the certificate for a student for a particular course
+        or None if no such certificate exits.
+        """
+        try:
+            return cls.objects.get(user=student, course_id=course_id)
+        except cls.DoesNotExist:
+            pass
+
+        return None
 
 def certificate_status_for_student(student, course_id):
     '''
