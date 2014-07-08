@@ -159,7 +159,7 @@ def get_current_child(xmodule, min_depth=None):
             default_child = child_modules[0]
         else:
             content_children = [child for child in child_modules if
-                                child.has_children_at_depth(min_depth - 1)]
+                                child.has_children_at_depth(min_depth - 1) and child.get_display_items()]
             default_child = content_children[0] if content_children else None
 
         return default_child
@@ -432,8 +432,12 @@ def index(request, course_id, chapter=None, section=None,
             studio_url = get_studio_url(course, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
-                # Something went wrong -- perhaps this chapter has no sections visible to the user
-                raise Http404
+                # Something went wrong -- perhaps this chapter has no sections visible to the user.
+                # Clearing out the last-visited state and showing "first-time" view by redirecting
+                # to courseware.
+                course_module.position = None
+                course_module.save()
+                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             prev_section_url = reverse('courseware_section', kwargs={
                 'course_id': course_key.to_deprecated_string(),
                 'chapter': chapter_descriptor.url_name,
