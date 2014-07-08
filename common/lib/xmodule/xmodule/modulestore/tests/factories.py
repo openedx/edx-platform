@@ -181,7 +181,7 @@ class ItemFactory(XModuleFactory):
             # Save the attributes we just set
             module.save()
 
-            store.update_item(module, '**replace_user**')
+            store.update_item(module, user_id)
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -194,16 +194,16 @@ class ItemFactory(XModuleFactory):
                         url_slug=location.name,
                     )
                 )
-                store.update_item(course, '**replace_user**')
+                store.update_item(course, user_id)
 
             # parent and publish the item, so it can be accessed
             if 'detached' not in module._class_tags:
                 parent.children.append(location)
-                store.update_item(parent, '**replace_user**')
+                store.update_item(parent, user_id)
                 if publish_item:
-                    store.publish(parent.location, '**replace_user**')
+                    store.publish(parent.location, user_id)
             elif publish_item:
-                store.publish(location, '**replace_user**')
+                store.publish(location, user_id)
 
         # return the published item
         return store.get_item(location)
