@@ -20,14 +20,15 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
+#from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+#@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class Basetranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 
