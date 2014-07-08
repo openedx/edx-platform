@@ -438,7 +438,7 @@ class ImportTestCase(BaseCourseTestCase):
         print("course errors:")
 
         # Expect to find an error/exception about characters in "®esources"
-        expect = "UnicodeEncodeError"
+        expect = "InvalidKeyError"
         errors = [
             (msg.encode("utf-8"), err.encode("utf-8"))
             for msg, err

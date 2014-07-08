@@ -80,7 +80,7 @@ class MongoConnection(object):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        case_regex = r"(?i)^{}$" if ignore_case else r"{}"
+        case_regex = ur"(?i)^{}$" if ignore_case else ur"{}"
         return self.course_index.find_one(
             son.SON([
                 (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
