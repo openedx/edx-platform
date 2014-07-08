@@ -1,6 +1,6 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/utils/view_utils",
-        "js/views/pages/course_outline", "js/models/xblock_outline_info"],
-    function ($, create_sinon, view_helpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo) {
+        "js/views/pages/course_outline", "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers"],
+    function ($, create_sinon, view_helpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, edit_helpers) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
@@ -56,6 +56,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     published: true,
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
                     edited_by: 'MockUser',
+                    course_graders: '["Lab", "Howework"]',
                     child_info: {
                         category: 'vertical',
                         display_name: 'Unit',
@@ -109,6 +110,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 view_helpers.installViewTemplates();
                 view_helpers.installTemplate('course-outline');
                 view_helpers.installTemplate('xblock-string-field-editor');
+                view_helpers.installTemplate('modal-button');
+                view_helpers.installTemplate('basic-modal');
+                view_helpers.installTemplate('edit-outline-item-modal');
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON('mock-course', 'Mock Course', [
                     createMockSectionJSON('mock-section', 'Mock Section', [
@@ -134,6 +138,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
             afterEach(function () {
                 view_helpers.removeMockAnalytics();
+                edit_helpers.cancelModalIfShowing();
             });
 
             describe('Initial display', function() {
@@ -342,14 +347,100 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expandItemsAndVerifyState('section');
                     collapseItemsAndVerifyState('section');
                 });
+
+                it('can be edited', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.section-header-actions .configure-button').click();
+                    $("#start_date").val("1/2/2015");
+                    // Section release date can't be cleared.
+                    expect($(".edit-outline-item-modal .action-clear")).not.toExist();
+
+                    // Section does not contain due_date or grading type selector
+                    expect($("due_date")).not.toExist();
+                    expect($("grading_format")).not.toExist();
+
+                    $(".edit-outline-item-modal .action-save").click();
+
+                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
+                        "metadata":{
+                            "start":"2015-01-02T00:00:00.000Z",
+                        }
+                    });
+                    expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
+
+                    // This is the response for the change operation.
+                    create_sinon.respondWithJson(requests, {});
+                    var mockResponseSectionJSON = $.extend(true, {}, 
+                        createMockSectionJSON('mock-section', 'Mock Section', [
+                            createMockSubsectionJSON('mock-subsection', 'Mock Subsection', [{
+                                id: 'mock-unit',
+                                display_name: 'Mock Unit',
+                                category: 'vertical',
+                                studio_url: '/container/mock-unit',
+                                is_container: true,
+                                has_changes: true,
+                                published: false,
+                                edited_on: 'Jul 02, 2014 at 20:56 UTC',
+                                edited_by: 'MockUser'
+                            }
+                            ])
+                        ]),
+                        {
+                            release_date: 'Jan 02, 2015 at 00:00 UTC',   
+                        }
+                    );
+                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section')
+                    expect(requests.length).toBe(2);
+                    // This is the response for the subsequent fetch operation for the section.
+                    create_sinon.respondWithJson(requests, mockResponseSectionJSON);
+
+                    expect($(".outline-section .status-release-value")).toContainText("Jan 02, 2015 at 00:00 UTC");
+                });
             });
 
             describe("Subsection", function() {
-                var getDisplayNameWrapper;
+                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
                 };
+
+                setEditModalValues = function (start_date, due_date, grading_type) {
+                    $("#start_date").val(start_date);
+                    $("#due_date").val(due_date);
+                    $("#grading_type").val(grading_type);
+                }
+
+                // Contains hard-coded dates because dates are presented in different formats.
+                var mockServerValuesJson = $.extend(true, {},
+                    createMockSectionJSON('mock-section', 'Mock Section', [
+                        createMockSubsectionJSON('mock-subsection', 'Mock Subsection', [{
+                            id: 'mock-unit',
+                            display_name: 'Mock Unit',
+                            category: 'vertical',
+                            studio_url: '/container/mock-unit',
+                            is_container: true,
+                            has_changes: true,
+                            published: false,
+                            edited_on: 'Jul 02, 2014 at 20:56 UTC',
+                            edited_by: 'MockUser'
+                        }
+                        ])
+                    ]),
+                    {
+                        release_date: 'Jan 01, 2970 at 05:00 UTC',
+                        child_info: { //Section child_info
+                            children: [{ // Section children
+                                graded: true,
+                                due_date: 'Jul 10, 2014 at 00:00 UTC',
+                                release_date: 'Jul 09, 2014 at 00:00 UTC',
+                                start: "2014-07-09T00:00:00Z",
+                                format: "Lab",
+                                due: "2014-07-10T00:00:00Z"
+                            }]
+                        }
+                    }
+                );
 
                 it('can be deleted', function() {
                     var promptSpy = view_helpers.createPromptSpy();
@@ -409,6 +500,80 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     collapseItemsAndVerifyState('subsection');
                     expandItemsAndVerifyState('subsection');
                 });
+
+                it('can be edited', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
+                    $(".edit-outline-item-modal .action-save").click();
+                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
+                        "graderType":"Lab",
+                        "metadata":{
+                            "start":"2014-07-09T00:00:00.000Z",
+                            "due":"2014-07-10T00:00:00.000Z"
+                        }
+                    });
+                    expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
+
+                    // This is the response for the change operation.
+                    create_sinon.respondWithJson(requests, {});
+                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section')
+                    expect(requests.length).toBe(2);
+                    // This is the response for the subsequent fetch operation for the section.
+                    create_sinon.respondWithJson(requests, mockServerValuesJson);
+
+                    expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .due-date")).toContainText("Due date: Jul 10, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .policy")).toContainText("Policy: Lab");
+
+                    expect($(".outline-item .outline-subsection .policy")).toContainText("Policy: Lab");
+                    outlinePage.$('.outline-item .outline-subsection .configure-button').click();
+                    expect($("#start_date").val()).toBe('7/9/2014');
+                    expect($("#due_date").val()).toBe('7/10/2014');
+                    expect($("#grading_type").val()).toBe('Lab');
+                });
+
+                it('release date, due date and grading type can be cleared.', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-item .outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
+                    $(".edit-outline-item-modal .action-save").click();
+
+                    // This is the response for the change operation.
+                    create_sinon.respondWithJson(requests, {});
+                    // This is the response for the subsequent fetch operation.
+                    create_sinon.respondWithJson(requests, mockServerValuesJson);
+
+                    expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .due-date")).toContainText("Due date: Jul 10, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .policy")).toContainText("Policy: Lab");
+
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#start_date").val()).toBe('7/9/2014');
+                    expect($("#due_date").val()).toBe('7/10/2014');
+                    expect($("#grading_type").val()).toBe('Lab');
+
+                    $(".edit-outline-item-modal .scheduled-date-input .action-clear").click();
+                    $(".edit-outline-item-modal .due-date-input .action-clear").click();
+                    expect($("#start_date").val()).toBe('');
+                    expect($("#due_date").val()).toBe('');
+
+                    $("#grading_type").val('notgraded');
+
+                    $(".edit-outline-item-modal .action-save").click();
+
+                    // This is the response for the change operation.
+                    create_sinon.respondWithJson(requests, {});
+                    // This is the response for the subsequent fetch operation.
+                    create_sinon.respondWithJson(requests,
+                        createMockSectionJSON('mock-section', 'Mock Section', [
+                            createMockSubsectionJSON('mock-subsection', 'Mock Subsection', [])
+                        ])
+                    );
+                    expect($(".outline-subsection .status-release-value")).not.toContainText("Jul 09, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .due-date")).not.toExist();
+                    expect($(".outline-subsection .policy")).not.toExist();
+                });
             });
 
             // Note: most tests for units can be found in Bok Choy
@@ -432,6 +597,22 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expandItemsAndVerifyState('subsection');
                     unitAnchor = getItemsOfType('unit').find('.unit-title a');
                     expect(unitAnchor.attr('href')).toBe('/container/mock-unit');
+                });
+            });
+
+            describe("Date and Time picker", function() {
+                // Two datetime formats can came from server: '%Y-%m-%dT%H:%M:%SZ' and %Y-%m-%dT%H:%M:%S+TZ:TZ'
+                it('can parse dates in both formats that can come from server', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    expect($("#start_date").val()).toBe('');
+                    expect($("#start_time").val()).toBe('');
+                    DateUtils.setDate($("#start_date"), ("#start_time"), "2015-08-10T05:10:00Z");
+                    expect($("#start_date").val()).toBe('8/10/2015');
+                    expect($("#start_time").val()).toBe('05:10');
+                    DateUtils.setDate($("#start_date"), ("#start_time"), "2014-07-09T00:00:00+00:00");
+                    expect($("#start_date").val()).toBe('7/9/2014');
+                    expect($("#start_time").val()).toBe('00:00');
                 });
             });
         });

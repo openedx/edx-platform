@@ -1,4 +1,4 @@
-define(["jquery", "jquery.ui", "jquery.timepicker"], function($) {
+define(["jquery", "date", "jquery.ui", "jquery.timepicker"], function($, date) {
     var getDate = function (datepickerInput, timepickerInput) {
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
@@ -14,5 +14,19 @@ define(["jquery", "jquery.ui", "jquery.timepicker"], function($) {
             return null;
         }
     };
-    return getDate;
+
+    var setDate = function (datepickerInput, timepickerInput, datetime) {
+        // given a pair of inputs (datepicker and timepicker) and the date as an
+        // ISO-formatted date string.
+        datetime = date.parse(datetime);
+        if (datetime) {
+            $(datepickerInput).datepicker("setDate", datetime);
+            $(timepickerInput).timepicker("setTime", datetime);
+        }
+    };
+
+    return {
+        getDate: getDate,
+        setDate: setDate
+    };
 });

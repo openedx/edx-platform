@@ -1,5 +1,5 @@
 define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "js/utils/drag_and_drop",
-    "js/utils/cancel_on_escape", "js/utils/get_date", "js/utils/module"],
+    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module"],
     function (domReady, $, ui, _, gettext, NotificationView, ContentDragger, CancelOnEscape,
               DateUtils, ModuleUtils) {
 
@@ -61,7 +61,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
         var saveSetSectionScheduleDate = function (e) {
             e.preventDefault();
 
-            var datetime = DateUtils(
+            var datetime = DateUtils.getDate(
                 $('.edit-section-publish-settings .start-date'),
                 $('.edit-section-publish-settings .start-time')
             );

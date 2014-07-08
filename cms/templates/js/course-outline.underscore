@@ -42,8 +42,7 @@ if (statusType === 'warning') {
         <% } else { %>
             <h3 class="<%= xblockType %>-header-details">
         <% } %>
-
-                <% if (category === 'vertical') { %>
+                <% if (xblockInfo.isVertical()) { %>
                     <span class="unit-title item-title">
                         <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
                     </span>
@@ -56,6 +55,14 @@ if (statusType === 'warning') {
 
         <div class="<%= xblockType %>-header-actions">
             <ul class="actions-list">
+                <% if (xblockInfo.isEditableOnCourseOutline()) { %>
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
+                            <i class="icon-gear"></i>
+                            <span class="sr action-button-text"><%= gettext('Configure') %></span>
+                        </a>
+                    </li>
+                <% } %>
                 <li class="action-item action-delete">
                     <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
                         <i class="icon icon-trash"></i>
@@ -66,7 +73,7 @@ if (statusType === 'warning') {
         </div>
     </div>
     <div class="<%= xblockType %>-status">
-        <% if (category !== 'vertical') { %>
+        <% if (!xblockInfo.isVertical()) { %>
             <div class="status-release">
                 <p>
                     <span class="sr status-release-label"><%= gettext('Release Status:') %></span>
@@ -85,6 +92,17 @@ if (statusType === 'warning') {
                             <%= xblockInfo.get('release_date') %>
                         <% } %>
                     </span>
+                    <% if (xblockInfo.get('due_date')) { %>
+                        <span class="due-date">
+                            <i class="icon-time"></i>
+                            <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
+                        </span>
+                    <% } %>
+                    <% if (xblockInfo.get('graded')) { %>
+                        <span class="policy">
+                            <%= gettext('Policy:') %> <%= xblockInfo.get('format') %>
+                        </span>
+                    <% } %>
                 </p>
             </div>
         <% } %>
