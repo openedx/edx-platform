@@ -7,9 +7,7 @@ from mock import patch
 
 from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
-from django.test.utils import override_settings
 from contentstore.management.commands.rollback_split_course import Command
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.persistent_factories import PersistentCourseFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -39,7 +37,6 @@ class TestArgParsing(unittest.TestCase):
 
 
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
     """
     Unit tests for rolling back a split-mongo course from command line,
@@ -58,7 +55,6 @@ class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
 
 
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
     """
     Unit tests for rolling back a split-mongo course from command line,
@@ -77,7 +73,6 @@ class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
 
 
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourse(ModuleStoreTestCase):
     """
     Unit tests for rolling back a split-mongo course from command line

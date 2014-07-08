@@ -135,6 +135,9 @@ def get_discussion_category_map(course):
 
     modules = _get_discussion_modules(course)
 
+    is_course_cohorted = course.is_cohorted
+    cohorted_discussion_ids = course.cohorted_discussions
+
     for module in modules:
         id = module.discussion_id
         title = module.discussion_target
@@ -179,7 +182,8 @@ def get_discussion_category_map(course):
         for entry in entries:
             node[level]["entries"][entry["title"]] = {"id": entry["id"],
                                                       "sort_key": entry["sort_key"],
-                                                      "start_date": entry["start_date"]}
+                                                      "start_date": entry["start_date"],
+                                                      "is_cohorted": is_course_cohorted}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
@@ -187,7 +191,8 @@ def get_discussion_category_map(course):
     for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
-                                          "start_date": datetime.now(UTC())}
+                                          "start_date": datetime.now(UTC()),
+                                          "is_cohorted": is_course_cohorted and entry["id"] in cohorted_discussion_ids}
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 

@@ -129,13 +129,12 @@ class CourseUpdateTest(CourseTestCase):
         '''
         # get the updates and populate 'data' field with some data.
         location = self.course.id.make_usage_key('course_info', 'updates')
-        modulestore('direct').create_and_save_xmodule(location)
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().create_and_save_xmodule(location, self.user.id)
         update_date = u"January 23, 2014"
         update_content = u"Hello world!"
         update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
         course_updates.data = update_data
-        modulestore('direct').update_item(course_updates, self.user.id)
+        modulestore().update_item(course_updates, self.user.id)
 
         # test getting all updates list
         course_update_url = self.create_update_url()
@@ -155,7 +154,7 @@ class CourseUpdateTest(CourseTestCase):
 
         # test that while updating it converts old data (with string format in 'data' field)
         # to new data (with list format in 'items' field) and respectively updates 'data' field.
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items, [])
         # now try to update first update item
         update_content = 'Testing'
@@ -164,20 +163,20 @@ class CourseUpdateTest(CourseTestCase):
             course_update_url + '1', payload, HTTP_X_HTTP_METHOD_OVERRIDE="PUT", REQUEST_METHOD="POST"
         )
         self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
         # course_updates 'data' field should update accordingly
         update_data = u"<section><article><h2>{date}</h2>{content}</article></section>".format(date=update_date, content=update_content)
         self.assertEqual(course_updates.data, update_data)
 
         # test delete course update item (soft delete)
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
         # now try to delete first update item
         resp = self.client.delete(course_update_url + '1')
         self.assertEqual(json.loads(resp.content), [])
         # confirm that course update is soft deleted ('status' flag set to 'deleted') in db
-        course_updates = modulestore('direct').get_item(location)
+        course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items,
                          [{u'date': update_date, u'content': update_content, u'id': 1, u'status': 'deleted'}])
 
@@ -204,10 +203,10 @@ class CourseUpdateTest(CourseTestCase):
         '''Test trying to add to a saved course_update which is not an ol.'''
         # get the updates and set to something wrong
         location = self.course.id.make_usage_key('course_info', 'updates')
-        modulestore('direct').create_and_save_xmodule(location)
-        course_updates = modulestore('direct').get_item(location)
+        modulestore().create_and_save_xmodule(location, self.user.id)
+        course_updates = modulestore().get_item(location)
         course_updates.data = 'bad news'
-        modulestore('direct').update_item(course_updates, self.user.id)
+        modulestore().update_item(course_updates, self.user.id)
 
         init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
         content = init_content + '</iframe>'

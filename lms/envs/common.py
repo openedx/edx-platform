@@ -32,6 +32,7 @@ import json
 from path import path
 
 from .discussionsettings import *
+from .modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
@@ -458,23 +459,6 @@ COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
-############################### XModule Store ##################################
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': DATA_DIR,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
-CONTENTSTORE = None
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'xmodule',
-    'collection': 'modulestore',
-}
-
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
@@ -488,6 +472,45 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+############# ModuleStore Configuration ##########
+
+MODULESTORE_BRANCH = 'published-only'
+CONTENTSTORE = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'mappings': {},
+            'reference_type': 'Location',
+            'stores': [
+                {
+                    'NAME': 'draft',
+                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': {
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'fs_root': DATA_DIR,
+                        'render_template': 'edxmako.shortcuts.render_to_string',
+                    }
+                },
+                {
+                    'NAME': 'xml',
+                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+                    'OPTIONS': {
+                        'data_dir': DATA_DIR,
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    }
+                },
+            ]
+        }
+    }
+}
 
 #################### Python sandbox ############################################
 
@@ -831,6 +854,7 @@ courseware_js = (
         'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
+    ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 

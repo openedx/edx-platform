@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 
 import django.contrib.auth.views
 
+from microsite_configuration import microsite
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -97,7 +99,7 @@ if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
     )
 
 urlpatterns += (
-    url(r'support/', include('dashboard.support_urls')),
+    url(r'^support/', include('dashboard.support_urls')),
 )
 
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -105,6 +107,14 @@ urlpatterns += (
     url(r'^404$', 'static_template_view.views.render',
         {'template': '404.html'}, name="404"),
 )
+
+# Favicon
+favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
+urlpatterns += ((
+    r'^favicon\.ico$',
+    'django.views.generic.simple.redirect_to',
+    {'url':  settings.STATIC_URL + favicon_path}
+),)
 
 # Semi-static views only used by edX, not by themes
 if not settings.FEATURES["USE_CUSTOM_THEME"]:
@@ -125,10 +135,7 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-
-        # Favicon
-        (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-    )
+)
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.

@@ -16,9 +16,11 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 import mongoengine
+from django.utils.timezone import utc as UTC
+from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
@@ -110,6 +112,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
@@ -395,7 +398,6 @@ class TestSysadmin(SysadminBaseTestCase):
         self._rm_edx4edx()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
@@ -504,6 +506,36 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self.assertIn('======&gt; IMPORTING course',
                       response.content)
+
+        self._rm_edx4edx()
+
+    def test_gitlog_date(self):
+        """
+        Make sure the date is timezone-aware and being converted/formatted
+        properly.
+        """
+
+        tz_names = [
+            'America/New_York',  # UTC - 5
+            'Asia/Pyongyang',    # UTC + 9
+            'Europe/London',     # UTC
+            'Canada/Yukon',      # UTC - 8
+            'Europe/Moscow',     # UTC + 4
+        ]
+        tz_format = DEFAULT_DATE_TIME_FORMAT
+
+        self._setstaff_login()
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+
+        self._add_edx4edx()
+        date = CourseImportLog.objects.first().created.replace(tzinfo=UTC)
+
+        for timezone in tz_names:
+            with (override_settings(TIME_ZONE=timezone)):
+                date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
+                response = self.client.get(reverse('gitlogs'))
+
+                self.assertIn(date_text, response.content)
 
         self._rm_edx4edx()
 

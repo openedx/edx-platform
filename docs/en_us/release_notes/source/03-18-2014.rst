@@ -34,14 +34,14 @@ The following documentation is available:
   * `Information for Your Students`_
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
   Recent changes include:
 
   * `Certificate Data`_
 
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 *************

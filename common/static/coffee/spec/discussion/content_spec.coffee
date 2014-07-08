@@ -1,9 +1,6 @@
 describe 'All Content', ->
     beforeEach ->
-        # TODO: figure out a better way of handling this
-        # It is set up in main.coffee DiscussionApp.start
-        window.$$course_id = 'edX/999/test'
-        window.user = new DiscussionUser {id: '567'}
+        DiscussionSpecHelper.setUpGlobals()
 
     describe 'Content', ->
         beforeEach ->

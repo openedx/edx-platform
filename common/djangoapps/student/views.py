@@ -53,7 +53,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
@@ -462,7 +462,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -543,7 +543,7 @@ def dashboard(request):
 def try_change_enrollment(request):
     """
     This method calls change_enrollment if the necessary POST
-    parameters are present, but does not return anything. It
+    parameters are present, but does not return anything in most cases. It
     simply logs the result or exception. This is usually
     called after a registration or login, as secondary action.
     It should not interrupt a successful registration or login.
@@ -559,7 +559,10 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
-            if enrollment_response.content != '':
+            # Hack: since change_enrollment delivers its redirect_url in the content
+            # of its response, we check here that only the 200 codes with content
+            # will return redirect_urls.
+            if enrollment_response.status_code == 200 and enrollment_response.content != '':
                 return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
@@ -612,6 +615,12 @@ def change_enrollment(request):
 
         if is_course_full:
             return HttpResponseBadRequest(_("Course is full"))
+
+        # check to see if user is currently enrolled in that course
+        if CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(
+                _("Student is already enrolled")
+            )
 
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.

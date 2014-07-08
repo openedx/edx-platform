@@ -5,9 +5,9 @@ Tests for split_migrator
 import uuid
 import random
 import mock
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.modulestore.split_migrator import SplitMigrator
-from xmodule.modulestore.mongo import draft
 from xmodule.modulestore.tests import test_location_mapper
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
@@ -177,7 +177,9 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # check that locations match
         self.assertEqual(
             presplit_dag_root.location,
-            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(revision=None)
+            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(
+                revision=MongoRevisionKey.published
+            )
         )
         # compare all fields but children
         for name, field in presplit_dag_root.fields.iteritems():

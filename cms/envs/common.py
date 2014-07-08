@@ -25,12 +25,15 @@ Longer TODO:
 # pylint: disable=W0401, W0611, W0614
 
 import imp
+import os
 import sys
 import lms.envs.common
+# Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE
 )
 from path import path
+from lms.envs.modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from dealer.git import git
@@ -99,6 +102,9 @@ FEATURES = {
 
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
+
+    # Toggles Group Configuration editing functionality
+    'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
 }
 ENABLE_JASMINE = False
 
@@ -243,6 +249,9 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+############################ Modulestore Configuration ################################
+MODULESTORE_BRANCH = 'draft-preferred'
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
