@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 06/23/14
+     - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
    * - 05/20/14
      - Added the :ref:`Analytics` chapter.
    * - 04/25/2014

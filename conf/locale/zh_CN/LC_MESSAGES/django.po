@@ -5,56 +5,61 @@
 # 
 # Translators:
 # vingte <411029240@qq.com>, 2014
-# Bookman <bookman@vip.163.com>, 2013
-# PeterWang.Dut <peterwang.dut@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
+# Changyue Wang <peterwang.dut@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
-# hanwentao <wentao.han@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
+# bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
-# Jie <jie.li@anu.edu.au>, 2013
-# Jie <jie.li@anu.edu.au>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# jsgang <jsgang9@gmail.com>, 2014
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
-# csc <am15501@163.com>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
+# shuchuanchen <am15501@163.com>, 2014
 # riceball <snowyu.lee@gmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
-# thinxer <me@thinxer.com>, 2013
-# vicapple22 <vicapple22@gmail.com>, 2013
-# hanwentao <wentao.han@gmail.com>, 2013-2014
+# Jianfei Wang <me@thinxer.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013-2014
 # wuqiong <wuqiong417@gmail.com>, 2014
-# xdsnet <xdsnet@gmail.com>, 2013
-# zibuyu <liuliudong@163.com>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
-# vicapple22 <vicapple22@gmail.com>, 2013
-# xdsnet <xdsnet@gmail.com>, 2013
-# fmyzjs <fmyzjs@gmail.com>, 2014
+# 熊冬升 <xdsnet@gmail.com>, 2013
+# yan9yu, 2014
+# 刘知远 <liuliudong@163.com>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
+# 竹轩 <fmyzjs@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Bookman <bookman@vip.163.com>, 2013
+# 肖寒 <bookman@vip.163.com>, 2013
 # focusheart <focusheart@gmail.com>, 2014
-# hanwentao <wentao.han@gmail.com>, 2013
-# harry75369 <harry75369@gmail.com>, 2014
+# Wentao Han <wentao.han@gmail.com>, 2013
+# Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
-# Jie <jie.li@anu.edu.au>, 2013
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
-# csc <am15501@163.com>, 2014
-# thinxer <me@thinxer.com>, 2013
-# vicapple22 <vicapple22@gmail.com>, 2013
-# xdsnet <xdsnet@gmail.com>, 2013
-# zibuyu <liuliudong@163.com>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
+# shuchuanchen <am15501@163.com>, 2014
+# louyihua <supermouselyh@hotmail.com>, 2014
+# Jianfei Wang <me@thinxer.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)
 # Copyright (C) 2014 edX
@@ -63,96 +68,102 @@
 # Translators:
 # perypery <410224186@qq.com>, 2014
 # vingte <411029240@qq.com>, 2014
-# alphaf52 <alphaf52@gmail.com>, 2013
-# Bookman <bookman@vip.163.com>, 2013
-# PeterWang.Dut <peterwang.dut@gmail.com>, 2014
-# cmouse <cmouse@163.com>, 2013
+# 刘家骅 <alphaf52@gmail.com>, 2013
+# 肖寒 <bookman@vip.163.com>, 2013
+# Changyue Wang <peterwang.dut@gmail.com>, 2014
+# Yufei Xue <cmouse@163.com>, 2013
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
-# chuxi <chuxiking@163.com>, 2014
-# hanwentao <wentao.han@gmail.com>, 2013
-# Fynn <u5135571@anu.edu.au>, 2014
-# happylily <happylily0516@foxmail.com>, 2013
-# harry75369 <harry75369@gmail.com>, 2014
+# Hanwei <chuxiking@163.com>, 2014
+# Wentao Han <wentao.han@gmail.com>, 2013
+# HAO WU <u5135571@anu.edu.au>, 2014
+# 李莉 <happylily0516@foxmail.com>, 2013
+# Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2014
-# iflab <webmaster@iflab.org>, 2014
+# Hu Tong <buildmindht@outlook.com>, 2014
+# bnw, 2014
+# ifLab Bistu <webmaster@iflab.org>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
-# Jie <jie.li@anu.edu.au>, 2013
-# Jie <jie.li@anu.edu.au>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
-# kuangchong07 <kuangchong07@gmail.com>, 2013
+# 匡冲 <kuangchong07@gmail.com>, 2013
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # Junjie, 2014
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# Sarina Canelake <sarina@edx.org>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
-# thinxer <me@thinxer.com>, 2013
+# Jianfei Wang <me@thinxer.com>, 2013
 # tucunchao <tucunchao@gmail.com>, 2013
-# vicapple22 <vicapple22@gmail.com>, 2013
-# hanwentao <wentao.han@gmail.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
 # wuqiong <wuqiong417@gmail.com>, 2014
-# xdsnet <xdsnet@gmail.com>, 2013
-# BeiLuoShiMen <beiluo.shimen@icloud.com>, 2014
-# zhaoyu <zhaoyu62188@gmail.com>, 2013
-# Zm <zmlarry@foxmail.com>, 2013
-# zhaoyu <zhaoyu62188@gmail.com>, 2013
-# zibuyu <liuliudong@163.com>, 2013
-# Zm <zmlarry@foxmail.com>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
-# alphaf52 <alphaf52@gmail.com>, 2013
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
-# kuangchong07 <kuangchong07@gmail.com>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
-# happylily <happylily0516@foxmail.com>, 2013
-# xdsnet <xdsnet@gmail.com>, 2013
-# fmyzjs <fmyzjs@gmail.com>, 2014
-# c0710204 <c0710204@gmail.com>, 2014
+# 熊冬升 <xdsnet@gmail.com>, 2013
+# yan9yu, 2014
+# Yufei Xue <cmouse@163.com>, 2014
+# Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
+# Yu Zhao <zhaoyu62188@gmail.com>, 2013
+# Zhang Meng <zmlarry@foxmail.com>, 2013
+# Yu Zhao <zhaoyu62188@gmail.com>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# Zhang Meng <zmlarry@foxmail.com>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 刘家骅 <alphaf52@gmail.com>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 匡冲 <kuangchong07@gmail.com>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 李莉 <happylily0516@foxmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
+# 竹轩 <fmyzjs@gmail.com>, 2014
+# 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# alphaf52 <alphaf52@gmail.com>, 2013
-# Bookman <bookman@vip.163.com>, 2013
-# cmouse <cmouse@163.com>, 2013
+# AdiaCheng <75707teen@gmail.com>, 2014
+# 刘家骅 <alphaf52@gmail.com>, 2013
+# 肖寒 <bookman@vip.163.com>, 2013
+# Yufei Xue <cmouse@163.com>, 2013
 # focusheart <focusheart@gmail.com>, 2014
-# hanwentao <wentao.han@gmail.com>, 2013
-# happylily <happylily0516@foxmail.com>, 2013
-# harry75369 <harry75369@gmail.com>, 2014
+# Wentao Han <wentao.han@gmail.com>, 2013
+# 李莉 <happylily0516@foxmail.com>, 2013
+# Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
-# Jie <jie.li@anu.edu.au>, 2013
+# Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
-# kuangchong07 <kuangchong07@gmail.com>, 2013
-# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# 匡冲 <kuangchong07@gmail.com>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
-# thinxer <me@thinxer.com>, 2013
+# Jianfei Wang <me@thinxer.com>, 2013
 # tucunchao <tucunchao@gmail.com>, 2013
-# vicapple22 <vicapple22@gmail.com>, 2013
-# xdsnet <xdsnet@gmail.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
 # yezhixin20 <yezhixin20@gmail.com>, 2014
-# zhaoyu <zhaoyu62188@gmail.com>, 2013
-# zibuyu <liuliudong@163.com>, 2013
-# Zm <zmlarry@foxmail.com>, 2013
-# ztaihong <zth@xjau.edu.cn>, 2014
-# ztaihong <zth@xjau.edu.cn>, 2014
-# fmyzjs <fmyzjs@gmail.com>, 2014
+# Yu Zhao <zhaoyu62188@gmail.com>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# Zhang Meng <zmlarry@foxmail.com>, 2013
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 张太红 <zth@xjau.edu.cn>, 2014
+# 竹轩 <fmyzjs@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# hanwentao <wentao.han@gmail.com>, 2013
-# hanwentao <wentao.han@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -160,20 +171,20 @@
 # 
 # Translators:
 # focusheart <focusheart@gmail.com>, 2014
-# harry75369 <harry75369@gmail.com>, 2014
+# Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
-# imhtt <hty0508@gmail.com>, 2014
+# Tianyu Huang <hty0508@gmail.com>, 2014
 # wuqiong <wuqiong417@gmail.com>, 2014
-# yetie <yetie.net@gmail.com>, 2014
-# BeiLuoShiMen <beiluo.shimen@icloud.com>, 2014
-# zhou_Scott <zbzcool@163.com>, 2014
+# xianwei yang <yetie.net@gmail.com>, 2014
+# Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
+# zhoubizhang <zbzcool@163.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"POT-Creation-Date: 2014-07-07 10:29-0400\n"
 "PO-Revision-Date: 2014-05-23 12:14+0000\n"
 "Last-Translator: wuqiong <wuqiong417@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -191,6 +202,25 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "开放问题面板"
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "论坛"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "问题"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -299,6 +329,10 @@ msgid "Course is full"
 msgstr "该课程已满"
 
 #: common/djangoapps/student/views.py
+msgid "Student is already enrolled"
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "您还没有注册本课程"
 
@@ -331,9 +365,9 @@ msgstr "由于过多的登录失败该账号被暂时锁定。请稍晚一点再
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
-msgstr "根据本站安全策略，您的密码已经过期。您必须重新变更密码方可登录。请点击本页面的“忘记密码”来修改您的密码"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
@@ -480,15 +514,21 @@ msgstr "未知错误。请给我们发电子邮件，告知错误是如何发生
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr "您的密码最近使用过。至少使用过({0})个不同密码之后才可以重新使用先前的密码"
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr "密码变更太频繁。根据安全本站策略，变更密码必须间隔( {0}) 天"
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -517,6 +557,10 @@ msgstr "该邮箱地址已经存在一个对应账号。"
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "新邮件地址与旧邮件地址相同。"
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -945,11 +989,25 @@ msgstr "未答复"
 msgid "processing"
 msgstr "处理中"
 
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
-msgstr "你的文件已经被发布。当评定完成，此消息将被评定者的反馈所替代。"
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -967,6 +1025,35 @@ msgstr "发布。当响应返回，该消息将被反馈信息所替代。"
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr " Xqueue在 {xqueue_timeout} 秒内无响应，终止。"
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "在评价提示功能{hintfn}发生错误{err}。"
@@ -978,6 +1065,10 @@ msgstr "(源代码不可用 )"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "查看XML源文件{sourcenum}."
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr ""
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -1070,8 +1161,8 @@ msgid "No answer provided."
 msgstr "未提供答案。"
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
-msgstr "问题检查失败：没有配置外部队列服务器。"
+msgid "Error: No grader has been set up for this problem."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
@@ -1114,6 +1205,19 @@ msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr "评估SchematicResponse出错。错误为： {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr "工作人员的大幅无法被解析为一个数字。"
 
@@ -1122,6 +1226,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr "无法将'{given_answer}'解析为一个数字。"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1130,13 +1235,13 @@ msgstr ""
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1172,6 +1277,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr ""
 
@@ -1245,6 +1351,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr ""
 
@@ -1562,6 +1669,210 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "LTI Passports"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the passports for course LTI tools in the following format: "
+"\"id\":\"client_key:client_secret\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Advertised Start Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the date you want to advertise as the course start date, if this date "
+"is different from the set start date. To advertise the set start date, enter"
+" null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Calculator"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the calculator in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the name of the course as it should appear in the edX.org course list."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Course Editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Chat Widget"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the chat widget in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Survey URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the URL for the end-of-course survey. If your course does not have a "
+"survey, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Blackout Dates"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as "
+"dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to"
+" include the \"T\" between the date and time)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Topic Mapping"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2014_T1\"}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Sorting Alphabetical"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Announcement Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the date to announce your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohort Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohorts are not currently supported by edX."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Is New"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course appears in the list of new courses "
+"on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Not Graded"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, the course will not be graded."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Disable Progress Graph"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, students cannot view the progress graph."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "PDF Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "List of dictionaries containing pdf_textbook configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "HTML Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"For HTML textbooks that appear as separate tabs in the courseware, enter the"
+" name of the tab (usually the name of the book) as well as the URLs and "
+"titles of all the chapters in the book."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Remote Gradebook"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the remote gradebook mapping. Only use this setting when "
+"REMOTE_GRADEBOOK_URL has been specified."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Advanced Module List"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the names of the advanced components to use in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Getting Started With Studio"
 msgstr ""
 
@@ -1789,6 +2100,146 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Info Sidebar Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the heading that you want students to see above your course handouts "
+"on the Course Info page. Your course handouts appear in the right panel of "
+"the page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Due Date Display Format"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
+"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "External Login Domain"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the external login method students can use for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificates Downloadable Before End"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can download certificates before the "
+"course ends, if they've met certificate requirements."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course About Page Image"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Edit the name of the course image file. You must upload this file on the "
+"Files & Uploads page. You can also set the course image on the Settings & "
+"Details page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the short name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Short)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the long name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Long)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CSS Class for Course Reruns"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Forum External Link"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Hide Progress Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows hiding of the progress tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Organization Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course organization that you want to appear in the courseware. "
+"This setting overrides the organization that you entered when you created "
+"the course. To use the organization that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Number Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course number that you want to appear in the courseware. This "
+"setting overrides the course number that you entered when you created the "
+"course. To use the course number that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Maximum Student Enrollment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Public Wiki Access"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, edX users can view the course wiki even if "
+"they're not enrolled in the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "一般"
 
@@ -1897,7 +2348,49 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Secret Token String for Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -2045,18 +2538,98 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Due Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Enter the date by which problems are due."
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "错误"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "The experiment is not associated with a group configuration."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Select a Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Add Missing Groups"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
 #. the content of a course
 #: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/courseware/courseware-error.html
-#, fuzzy
 msgid "Courseware"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"课件\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"课程"
+msgstr "课程页面"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -2077,13 +2650,6 @@ msgstr "进度"
 #: lms/templates/wiki/base.html
 msgid "Wiki"
 msgstr "维基"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
-msgstr "讨论"
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
@@ -2136,6 +2702,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2196,6 +2772,126 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "GIT URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the URL for the course data GIT repository."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "XQA Key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "This setting is not currently supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "URL for Annotation Storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", and \"never\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify how often variable values in a problem are randomized when a student"
+" loads the problem. Valid values are \"always\", \"onreset\", \"never\", and"
+" \"per_student\". This setting only applies to problems that have randomly "
+"generated numeric values."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Days Early for Beta Users"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Static Asset Path"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Text Customization"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter string customization substitutions for particular locations."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable LaTeX Compiler"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. This"
+" is a course-wide setting, but you can specify a different number when you "
+"create an individual problem. To allow unlimited attempts, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Experiment Group Configurations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the configurations that govern how students are grouped for content "
+"experiments."
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -2397,10 +3093,6 @@ msgid ""
 msgstr "不能从Youtube接受{youtube_id}的成绩单。状态码为：{status_code}。"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr "在Youtube服务上找不到任何字幕。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "我们只支持SubRip (*.srt)格式的字幕。"
 
@@ -2420,10 +3112,6 @@ msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -2528,6 +3216,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2715,18 +3404,12 @@ msgstr ""
 msgid "subsections"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "问题"
-
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
+msgid "Percent of Students"
 msgstr ""
 
 #: lms/templates/folditchallenge.html
@@ -2817,42 +3500,83 @@ msgstr "指定的远程分支无效。"
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "无法切换到指定的分支。请检查你的分支名。"
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
-msgstr "认证失败{0}，错误{1}\n"
+#: cms/templates/login.html cms/templates/register.html
+msgid "Email Address"
+msgstr "电子邮件地址"
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "认证失败{0}\n"
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "课程编号"
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr ""
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "修改后的密码"
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr "一切正常！"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr "请提供用户名"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr "请提供全名"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "电子邮件地址必须结束于"
+msgid "Email address must end in {domain}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "失败 - 电子邮件 {0} 作为外部ID已经存在了"
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -2863,24 +3587,24 @@ msgid "email address required (not username)"
 msgstr "电子邮件地址必填(不是用户名)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "啊，创建用户{0}失败，完整性错误"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "用户 {0} 创建成功！"
+msgid "User {user} created successfully!"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "未找到邮件地址 为{0} 的用户"
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "未找到用户名 {0} - {1} 的用户"
+msgid "Cannot find user with username {username} - {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "已删除用户 {0}"
+msgid "Deleted user {username}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -2903,13 +3627,11 @@ msgid "Courses loaded in the modulestore"
 msgstr "已加载课程至模块仓库"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 msgid "username"
 msgstr "用户名"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr "电子邮件"
 
@@ -2934,6 +3656,9 @@ msgstr "Git仓库应为以'.git'结尾的有效url"
 msgid "Added Course"
 msgstr "添加课程"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -2959,19 +3684,19 @@ msgid ""
 msgstr "无法克隆或拉取代码仓库。请检查你的url。输出是：{0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "无法clone仓库到 {0}"
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "成功切换到分支：{branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "加载课程 {0} {1} <br/> 错误："
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html cms/templates/settings.html
+#: cms/templates/index.html
 msgid "Course Name"
 msgstr "课程名称"
 
@@ -2979,6 +3704,8 @@ msgstr "课程名称"
 msgid "Directory/ID"
 msgstr "目录/ID"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Git提交"
@@ -3004,7 +3731,6 @@ msgid "Deleted"
 msgstr "已删除"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "课程ID"
 
@@ -3025,12 +3751,10 @@ msgid "Enrollment information for all courses"
 msgstr "所有课程的注册信息"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr "角色"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "全名"
 
@@ -3039,26 +3763,6 @@ msgid ""
 "Import the specified git repository and optional branch into the modulestore"
 " and optionally specified directory."
 msgstr "倒入指定的git代码仓库和可选分支到模块库与可选的指定目录。"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr "无法通过邮件地址找到用户"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr "无法通过用户名找到用户"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr "认证失败"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr "无法clone或者pull仓库"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
-msgstr "错误，不能通过 ID 取得课程"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -3102,12 +3806,6 @@ msgstr "上传文件出错，请联系网站管理员，谢谢。"
 msgid "Good"
 msgstr "好"
 
-#: lms/djangoapps/django_comment_client/forum/views.py
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "All Groups"
-msgstr "所有分组"
-
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
 msgstr "该用户不存在。"
@@ -3115,6 +3813,10 @@ msgstr "该用户不存在。"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "任务已在运行中。"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3213,6 +3915,10 @@ msgstr "数据下载"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "分析"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "度量"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -3983,12 +4689,10 @@ msgid "The course you requested does not exist."
 msgstr "您请求的课程不存在。"
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr "课程 {0} 已经在您的购物车中"
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr "您已经在课程 {0} 中注册。"
 
@@ -4399,10 +5103,96 @@ msgstr "本课程不支持认证证书。"
 msgid "No selected price or selected price is below minimum."
 msgstr "未选择价格或选择的价格低于最低价。"
 
+#: lms/lib/xblock/mixin.py
+msgid "Courseware Chrome"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
+"\"chromeless\" -- to not use tabs or the accordion; \n"
+"\"tabs\" -- to use tabs only; \n"
+"\"accordion\" -- to use the accordion only; or \n"
+"\"tabs,accordion\" -- to use tabs and the accordion."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Default Tab"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
+" is selected."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "LaTeX Source File Name"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Enter the source file name for LaTeX."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Course Is Public"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter true or false. If true, the course is open to the public. If false, "
+"the course is open only to admins."
+msgstr ""
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to this view's content"
 msgstr "跳过本内容页"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr ""
 
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
@@ -4596,7 +5386,9 @@ msgstr "删除文章"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4633,6 +5425,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "您正试图删除文章。请确认！"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5073,6 +5866,18 @@ msgstr ""
 msgid "Upload completed"
 msgstr "上传完成"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
@@ -5196,6 +6001,10 @@ msgid ""
 "denied)"
 msgstr "关于本用户的可选备注（例如，课程创建被拒绝的原因）"
 
+#: cms/djangoapps/models/settings/course_metadata.py
+msgid "Incorrect format for field '{name}'. {detailed_message}"
+msgstr ""
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -5219,7 +6028,7 @@ msgstr "载入中..."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "阅览"
@@ -5235,13 +6044,11 @@ msgstr "课程代码"
 
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
+#: cms/templates/overview.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "取消"
@@ -5337,8 +6144,9 @@ msgstr "服务条款"
 msgid "Privacy Policy"
 msgstr "隐私政策"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "帮助"
@@ -5381,8 +6189,8 @@ msgid "):"
 msgstr ")："
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
-msgstr "为什么需要付费？不满足所有要求将如何？"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5415,27 +6223,19 @@ msgstr "如果我支付不起或者没有必要设备怎么办？"
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
-"如果你无法支付最低费用或者没有满足最低要求，你可以旁听或者选择诚信准则证书而无需付费。如果你希望获得诚信准则证书，请点击“诚信准则证书”，并在下方告诉我们你不能获得身份认证证书的原因，然后点击‘选择证书’按钮来完成你的注册。"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "选择诚信准则证书"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "解释你的情况："
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr "请简短描述你选择诚信准则证书而不选择付费课程认证证书的原因；"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -5611,6 +6411,12 @@ msgstr "出现错误，请稍后再试。"
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "请验证您的新邮箱"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -6086,13 +6892,9 @@ msgstr "请 {link_start}发送e-mail{link_end} 给我们。"
 msgid "Please try again later."
 msgstr "请稍后再试。"
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "您没有任何笔记。"
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
+msgstr ""
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -6253,7 +7055,7 @@ msgstr "{points} / {total_points} 分"
 #. this LTI unit
 #: lms/templates/lti.html
 msgid "{total_points} points possible"
-msgstr "总分{total_points} "
+msgstr "本题共有{total_points} 分"
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -6337,11 +7139,6 @@ msgstr "原始数据："
 msgid "Accepted"
 msgstr "通过"
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "错误"
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr "拒绝"
@@ -6413,6 +7210,11 @@ msgstr ""
 "<strong>警告：</strong> 你的浏览器不支持全部功能。我们强烈建议您使用 "
 "{chrome_link_start}谷歌浏览器{chrome_link_end}或者 "
 "{ff_link_start}火狐浏览器{ff_link_end}。"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "您没有任何笔记。"
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -6741,6 +7543,22 @@ msgstr "已经有了账号？"
 msgid "Login."
 msgstr "登录"
 
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment has issues that affect content visibility."
+msgstr ""
+
+#: lms/templates/split_test_author_view.html
+msgid "Active Groups"
+msgstr ""
+
+#: lms/templates/split_test_author_view.html
+msgid "Inactive Groups"
+msgstr ""
+
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
@@ -6939,27 +7757,20 @@ msgstr "从网站中删除课程"
 msgid "Platform Version"
 msgstr "平台版本"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Recent git load activity for {course_id}"
+msgstr ""
+
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
 msgstr "日期"
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "课程编号"
-
 #. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "Git动作"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for"
-msgstr "近期的git加载活动"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -7325,7 +8136,7 @@ msgstr "您已注册了此课程"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
-msgstr "进入课程"
+msgstr "进入课程页面"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -7420,7 +8231,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr "{course_number} 课件"
+msgstr "{course_number} 课程页面"
 
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
@@ -7429,6 +8240,10 @@ msgstr "返回考试"
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
 msgstr "课程导航"
+
+#: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
@@ -7616,10 +8431,6 @@ msgstr "数据转储 "
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
 msgstr "管理小组"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "度量"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -7945,9 +8756,9 @@ msgstr "学生数目"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
-msgstr "每个国家的学生分布，所有课程，9月12日到10月17日，一台服务器(这里显示了一个样例)："
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -8008,7 +8819,7 @@ msgstr "关于{course_number}"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
-msgstr "进入课程"
+msgstr "进入课程页面"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
@@ -8044,7 +8855,7 @@ msgstr "在职员界面查看成绩"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr "学生 '{username}' ({email}) 的课程进度"
+msgstr "学生 '{username}' ({email}) 的学习进度"
 
 #: lms/templates/courseware/progress.html
 msgid "Download your certificate"
@@ -8056,7 +8867,7 @@ msgstr "{earned:.3n} 来自可能的总分 {total:.3n}"
 
 #: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
-msgstr "问题得分："
+msgstr "测验得分："
 
 #: lms/templates/courseware/progress.html
 msgid "Practice Scores: "
@@ -8088,7 +8899,7 @@ msgstr "您的最终成绩："
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
-msgstr "要为为{cert_name_short}做评定："
+msgstr "评定{cert_name_short}所需要的成绩："
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -8379,94 +9190,20 @@ msgid "filter topics"
 msgstr "过滤主题"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show All Discussions"
-msgstr "显示所有讨论帖"
+msgid "All Discussions"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
-msgid "Show Flagged Discussions"
-msgstr "显示被举报的讨论帖"
+msgid "Flagged Discussions"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "follow this post"
-msgstr "关注这个帖子"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously"
-msgstr "匿名发帖"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously to classmates"
-msgstr "向同学匿名发帖"
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Make visible to:"
-msgstr "对其可见："
-
-#: lms/templates/discussion/_inline_new_post.html
-msgid "My Cohort"
-msgstr "我的同伴"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "new post title"
-msgstr "新文章标题"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: wiki/forms.py wiki/forms.py wiki/forms.py
-msgid "Title"
-msgstr "标题"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Enter your question or comment…"
-msgstr "请输入您的问题和评论"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Add post"
-msgstr "发新讨论帖"
-
-#: lms/templates/discussion/_new_post.html
-msgid "Create new post about:"
-msgstr "新贴的主题："
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter List"
-msgstr "过滤列表"
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter discussion areas"
-msgstr "过滤讨论部分"
-
 #: lms/templates/discussion/_recent_active_posts.html
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "关注"
 
@@ -8479,48 +9216,35 @@ msgid "Hide"
 msgstr "隐藏"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Home"
-msgstr "课后讨论"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Topics"
-msgstr "讨论主题"
-
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; current selection is: "
 msgstr "讨论主题；当前选中的是:"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Search all discussions"
-msgstr "查找所有讨论"
+msgid "Search all posts"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Sort by:"
-msgstr "排序："
+msgid "View all cohorts"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "date"
-msgstr "日期"
+msgid "View as {cohort_name}"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "votes"
-msgstr "票数"
+msgid "by recent activity"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "comments"
-msgstr "评论数"
+msgid "by most activity"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show:"
-msgstr "显示："
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View All"
-msgstr "查看所有"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View as {name}"
-msgstr "以{name}查看"
+msgid "by most votes"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
@@ -8565,20 +9289,21 @@ msgstr "跟踪这个帖子"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report Misuse"
-msgstr "报告滥用"
+msgstr "举报不恰当讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
 msgstr "置顶讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
-msgstr "已处理"
+msgstr "置顶"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(这是关于%(courseware_title_linked)s的消息)"
+msgstr "(这是关于%(courseware_title_linked)s的讨论)"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
@@ -8587,6 +9312,12 @@ msgstr "编辑讨论帖"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Edit post title"
 msgstr "编辑帖子标题"
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: wiki/forms.py wiki/forms.py
+msgid "Title"
+msgstr "标题"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update post"
@@ -8630,6 +9361,24 @@ msgid "Update comment"
 msgstr "更新注释"
 
 #: lms/templates/discussion/_underscore_templates.html
+msgid "By: Staff"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "By: Community TA"
+msgstr ""
+
+#. Translators: This is a label for a forum thread with a response that was
+#. endorsed by the course staff
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Endorsed response"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
+msgstr "%(votes_up_count)s%(span_sr_open)s 投票 %(span_close)s"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
@@ -8642,20 +9391,16 @@ msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s %(span_sr_open)s评论 %(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr "%(votes_up_count)s%(span_sr_open)s 投票 %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "DISCUSSION HOME:"
-msgstr "讨论区首页："
+msgstr "讨论区："
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "HOW TO USE EDX DISCUSSIONS"
-msgstr "如何使用EDX讨论工具"
+msgstr "如何使用edX论坛"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Find discussions"
-msgstr "搜索讨论"
+msgstr "搜索讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Focus in on specific topics"
@@ -8663,7 +9408,7 @@ msgstr "关注特定话题"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Search for specific posts "
-msgstr "搜索特殊话题"
+msgstr "搜索特定讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Sort by date, vote, or comments"
@@ -8671,19 +9416,19 @@ msgstr "按照日期，投票或评论排序"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Engage with posts"
-msgstr "参与帖子"
+msgstr "参与讨论"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Upvote posts and good responses"
-msgstr "更新发布与良性反馈"
+msgstr "投票支持优秀讨论帖及回复贴"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report Forum Misuse"
-msgstr "举报恶意灌水"
+msgstr "举报不恰当论坛讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Follow posts for updates"
-msgstr "关注帖子更新"
+msgstr "关注讨论帖更新"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Receive updates"
@@ -8697,7 +9442,58 @@ msgstr "切换通知设置"
 msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
-msgstr "勾选此选项，每天接收一次文摘邮件，提醒你关注的帖子的最新活动消息。"
+msgstr "勾选此选项，每天接收一封提醒邮件，以摘要方式通知你所关注的讨论帖的更新情况。"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Create new post about:"
+msgstr "新贴的主题："
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Show All Discussions"
+msgstr "显示所有讨论帖"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter List"
+msgstr "过滤列表"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter discussion areas"
+msgstr "过滤讨论部分"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "follow this post"
+msgstr "关注这个帖子"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously"
+msgstr "匿名发帖"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously to classmates"
+msgstr "向同学匿名发帖"
+
+#. Translators: This labels the selector for which group of students can view
+#. a
+#. post
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Make visible to:"
+msgstr "对其可见："
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "All Groups"
+msgstr "所有分组"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "new post title"
+msgstr "新文章标题"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Enter your question or comment…"
+msgstr "请输入您的问题和评论"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add post"
+msgstr "发新讨论帖"
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
@@ -9096,6 +9892,18 @@ msgid "Skip"
 msgstr "跳过"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Active Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Score Distribution"
 msgstr "成绩分布"
 
@@ -9354,10 +10162,6 @@ msgid ""
 "transition time, you can still access the old Instructor Dashboard by "
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr "我们已经改变教师面板界面外观。值此更改时期，您依然可以通过点击'回归传统界面'按钮以访问旧教师面板界面。"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "章节_显示_姓名"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10138,15 +10942,12 @@ msgstr "订单项目："
 msgid "Qty"
 msgstr "数量"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "注意：划了删除线的项目"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "已退款。"
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -10302,10 +11103,6 @@ msgstr "订单号："
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "总计"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "这个"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -11481,7 +12278,9 @@ msgstr "您所做的课程检查表的修改将会自动保存，其它成员也
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "复制"
@@ -11497,7 +12296,6 @@ msgstr "删除此组件"
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
@@ -11505,10 +12303,6 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Container"
 msgstr "容器"
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
-msgstr "该页面尚无内容。"
 
 #: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
@@ -11541,6 +12335,11 @@ msgid ""
 " you have properly configured your experiment groups and make changes to "
 "existing content."
 msgstr "您可以在这个页面上浏览、编辑包含其它组件的课程组件。针对实验板块，这有助于您确认实验组配置的正确性，也便于您修改已经存在的页面内容。"
+
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
+msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
@@ -11933,8 +12732,8 @@ msgstr "欢迎来到"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
-msgstr "Studio 帮您管理在线课程，让您可以专注于课程的教学。"
+"Studio helps manage your online courses, so you can focus on teaching them"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
@@ -11973,8 +12772,8 @@ msgstr "随时改变您的思路"
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
-msgstr "在任何地方起草您的大纲和创建内容。简单的拖放工具可以帮助您快速重新组织课程结构。"
+"let you reorganize quickly."
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Go A Week Or A Semester At A Time"
@@ -11994,12 +12793,9 @@ msgstr "学习不仅仅是听课"
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
-"Studio "
-"以一种能提升教学效果的方式帮您组织内容&mdash;短视频教程、随堂练习等各种资源交织在一起。通过几次简单的点击就可以插入视频和各种类型的练习题。"
 
 #: cms/templates/howitworks.html
 msgid "Create Learning Pathways"
@@ -12007,9 +12803,9 @@ msgstr "创建学习路径"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
-msgstr "通过多媒体、HTML和练习等形式帮助您的学生理解互动教学点。"
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
@@ -12027,9 +12823,9 @@ msgstr "丰富的平台库可以支持各种问题类型"
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
-msgstr "这不仅仅是多重选择。Studio有多种问题类型来挑战学习者。"
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
+msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
@@ -12055,9 +12851,9 @@ msgstr "即时修改"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
-msgstr "发现一个错误？没有问题。在您需要的时候，点击保存按钮即可使您的更改生效。"
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
@@ -12384,7 +13180,7 @@ msgid ""
 "are allowed and it cannot be changed."
 msgstr "注意：这是课程URL的一部分，请勿使用空格或特殊字符，一旦设定不可更改。"
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Course Run"
 msgstr "开课时间"
 
@@ -12576,10 +13372,6 @@ msgstr "如果您没有Studio账号，请现在注册。"
 #: cms/templates/login.html
 msgid "Required Information to Sign In to edX Studio"
 msgstr "登录edX Studio所需的信息"
-
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr "电子邮件地址"
 
 #: cms/templates/login.html
 msgid "Studio Support"
@@ -13009,13 +13801,8 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
-"这些日期影响<strong>您的课程何时可以被浏览</strong>，但是它们<strong>并不是在您的课程总结页面显示的日期</strong>。为了在课程总结页面提供课程开始和注册的日期，请遵循您的"
-" <abbr title=\"Program Manager\">项目经理</abbr> 或者康拉德 沃伦 <a rel=\"email\" "
-"class=\"action action-email\" "
-"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>提供的说明。"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -13137,6 +13924,14 @@ msgstr "评分"
 #: cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "高级设置"
+
+#: cms/templates/settings_advanced.html
+msgid "Hide Deprecated Settings"
+msgstr ""
+
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+msgid "Show Deprecated Settings"
+msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
@@ -13468,7 +14263,7 @@ msgstr "导出"
 msgid "Help &amp; Account Navigation"
 msgstr "帮助 &amp; 账户导航"
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -13483,14 +14278,6 @@ msgstr "退出"
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
 msgstr "您当前没有登录"
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr "Studio指南"
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
-msgstr "Studio帮助"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"

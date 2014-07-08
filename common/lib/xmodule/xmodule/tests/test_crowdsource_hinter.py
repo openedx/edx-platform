@@ -8,6 +8,7 @@ import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+from xmodule.x_module import STUDENT_VIEW
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
 from xblock.core import XBlock
@@ -245,7 +246,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return [FakeChild()]
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.render('student_view').content
+        out_html = mock_module.render(STUDENT_VIEW).content
         self.assertTrue('This is supposed to be test html.' in out_html)
         self.assertTrue('i4x://this/is/a/fake/id' in out_html)
 
@@ -262,7 +263,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return []
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.render('student_view').content
+        out_html = mock_module.render(STUDENT_VIEW).content
         self.assertTrue('Error in loading crowdsourced hinter' in out_html)
 
     @unittest.skip("Needs to be finished.")
@@ -273,7 +274,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         NOT WORKING RIGHT NOW
         """
         mock_module = VerticalWithModulesFactory.create()
-        out_html = mock_module.render('student_view').content
+        out_html = mock_module.render(STUDENT_VIEW).content
         self.assertTrue('Test numerical problem.' in out_html)
         self.assertTrue('Another test numerical problem.' in out_html)
 

@@ -18,6 +18,9 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
+  @setUser: (user) ->
+    @user = user
+
   @loadRoles: (roles)->
     @roleIds = roles
 
@@ -29,10 +32,12 @@ class @DiscussionUtil
     @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
+    user_id ?= @user?.id
     staff = _.union(@roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @isTA: (user_id) ->
+    user_id ?= @user?.id
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
 
@@ -73,6 +78,7 @@ class @DiscussionUtil
       downvote_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
       undo_vote_for_comment   : "/courses/#{$$course_id}/discussion/comments/#{param}/unvote"
       upload                  : "/courses/#{$$course_id}/discussion/upload"
+      users                   : "/courses/#{$$course_id}/discussion/users"
       search                  : "/courses/#{$$course_id}/discussion/forum/search"
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
@@ -86,6 +92,10 @@ class @DiscussionUtil
       "disable_notifications" : "/notification_prefs/disable/"
       "notifications_status" : "/notification_prefs/status/"
     }[name]
+
+  @ignoreEnterKey: (event) =>
+    if event.which == 13
+      event.preventDefault()
 
   @activateOnSpace: (event, func) ->
     if event.which == 32

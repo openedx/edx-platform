@@ -55,6 +55,12 @@ nav {
     &:hover {
 
     }
+
+    &.nav-course-settings {
+      .wrapper-nav-sub {
+        width: ($baseline*9);
+      }
+    }
   }
 
   .wrapper-nav-sub {

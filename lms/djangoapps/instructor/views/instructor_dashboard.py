@@ -2,6 +2,8 @@
 Instructor Dashboard Views
 """
 
+import logging
+
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -15,7 +17,7 @@ from django.conf import settings
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -27,8 +29,13 @@ from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
+from analyticsclient.client import RestClient, ClientError
+from analyticsclient.course import Course
+
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+log = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -37,7 +44,7 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,
@@ -245,6 +252,10 @@ def _section_analytics(course_key, access):
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
+
+    if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
+        _update_active_students(course_key, section_data)
+
     return section_data
 
 
@@ -252,7 +263,7 @@ def _section_metrics(course_key, access):
     """Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'metrics',
-        'section_display_name': ('Metrics'),
+        'section_display_name': _('Metrics'),
         'access': access,
         'course_id': course_key.to_deprecated_string(),
         'sub_section_display_name': get_section_display_name(course_key),
@@ -262,3 +273,30 @@ def _section_metrics(course_key, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def _update_active_students(course_key, section_data):
+    auth_token = settings.ANALYTICS_DATA_TOKEN
+    base_url = settings.ANALYTICS_DATA_URL
+
+    section_data['active_student_count'] = 'N/A'
+    section_data['active_student_count_start'] = 'N/A'
+    section_data['active_student_count_end'] = 'N/A'
+
+    try:
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        course = Course(client, course_key.to_deprecated_string())
+
+        section_data['active_student_count'] = course.recent_active_user_count['count']
+
+        def format_date(value):
+            return value.split('T')[0]
+
+        start = course.recent_active_user_count['interval_start']
+        end = course.recent_active_user_count['interval_end']
+
+        section_data['active_student_count_start'] = format_date(start)
+        section_data['active_student_count_end'] = format_date(end)
+
+    except (ClientError, KeyError) as e:
+        log.exception(e)

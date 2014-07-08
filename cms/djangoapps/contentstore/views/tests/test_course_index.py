@@ -4,6 +4,7 @@ Unit tests for getting the list of courses and the course outline.
 import json
 import lxml
 
+from cms.urls import COURSE_KEY_PATTERN
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -38,7 +39,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/slashes:{0}'.format(Locator.ALLOWED_ID_CHARS)
+                'course/{}'.format(COURSE_KEY_PATTERN)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')

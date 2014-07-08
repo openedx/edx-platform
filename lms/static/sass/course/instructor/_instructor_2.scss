@@ -766,3 +766,12 @@ section.instructor-dashboard-content-2 {
 input[name="subject"] {
   width:600px;
 }
+
+.enrollment-wrapper {
+  margin-bottom: $baseline * 2;
+
+  .count {
+    color: green;
+    font-weight: bold;
+  }
+}

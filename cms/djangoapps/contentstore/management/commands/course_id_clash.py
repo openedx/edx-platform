@@ -3,6 +3,7 @@ Script for finding all courses whose org/name pairs == other courses when ignori
 """
 from django.core.management.base import BaseCommand
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 
 
 #
@@ -10,12 +11,12 @@ from xmodule.modulestore.django import modulestore
 #
 class Command(BaseCommand):
     """
-    Script for finding all courses whose org/name pairs == other courses when ignoring case
+    Script for finding all courses in the Mongo Modulestore whose org/name pairs == other courses when ignoring case
     """
-    help = 'List all courses ids which may collide when ignoring case'
+    help = 'List all courses ids in the Mongo Modulestore which may collide when ignoring case'
 
     def handle(self, *args, **options):
-        mstore = modulestore()
+        mstore = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # pylint: disable=protected-access
         if hasattr(mstore, 'collection'):
             map_fn = '''
                 function () {

@@ -1,0 +1,22 @@
+<div id="content">
+
+    <div class="wrapper-mast wrapper">
+        <header class="mast has-actions has-subtitle">
+            <h1 class="page-header">
+                <small class="subtitle">${_("Settings")}</small>
+                <span class="sr">&gt; </span>${_("Group Configurations")}
+            </h1>
+        </header>
+    </div>
+
+    <div class="wrapper-content wrapper">
+        <section class="content">
+            <article class="content-primary" role="main">
+                <div class="ui-loading">
+                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                </div>
+            </article>
+            <aside class="content-supplementary" role="complimentary"></aside>
+        </section>
+    </div>
+</div>

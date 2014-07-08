@@ -205,16 +205,67 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
-    <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
-        <span class="title">${"<%- title %>"}</span>
+  <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
+    <a href="#" class="forum-nav-thread-link">
+      <div class="forum-nav-thread-wrapper-1">
+        <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
+        js_block = u"""
+        var labels = "";
+        if (pinned) {{
+            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+        }}
+        if (typeof(subscribed) != "undefined" && subscribed) {{
+            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+        }}
+        if (staff_authored) {{
+            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+        }}
+        if (community_ta_authored) {{
+            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+        }}
+        if (labels != "") {{
+            print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
+        }}
+        """.format(
+            ## Translators: This is a label for a forum thread that has been pinned
+            pinned_text=escapejs(_("Pinned")),
+            ## Translators: This is a label for a forum thread that the user is subscribed to
+            following_text=escapejs(_("Following")),
+            ## Translators: This is a label for a forum thread that was authored by a member of the course staff
+            staff_text=escapejs(_("By: Staff")),
+            ## Translators: This is a label for a forum thread that was authored by a community TA
+            community_ta_text=escapejs(_("By: Community TA"))
+        )
+         %>
+        ${"<%"}${js_block}${"%>"}
+      </div><div class="forum-nav-thread-wrapper-2">
+        ${"<% if (endorsed) { %>"}
+          ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
+          <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">${_("Endorsed response")}</span></span>
+        ${"<% } %>"}
+        <%
+        js_block = u"""
+            interpolate(
+                '{}',
+                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
+                true
+                )
+        """.format(
+                ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
+                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
+            )
+        %>
+        <span class="forum-nav-thread-votes-count">+${'<%='}${js_block}${'%>'}</span>
+        <% 
         js_block =  u"""
         var fmt;
+        // Counts in data do not include the post itself, but the UI should
         var data = {{
             'span_sr_open': '<span class=\"sr\">',
             'span_close': '</span>',
-            'unread_comments_count': unread_comments_count,
-            'comments_count': comments_count
+            'unread_comments_count': unread_comments_count + (read ? 0 : 1),
+            'comments_count': comments_count + 1
             }};
         if (unread_comments_count > 0) {{
             fmt = '{markup_with_unread}';
@@ -229,24 +280,14 @@
                 markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
             )
         %>
-        <span class="comments-count">
+        <span class="forum-nav-thread-comments-count ${'<% if (unread_comments_count > 0) { %>is-unread<% } %>'}">
             ${'<%'}${js_block}${'%>'}
         </span>
-        <%
-        js_block = u"""
-            interpolate(
-                '{}',
-                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
-                true
-                )
-        """.format(
-                ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
-                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
-            )
-        %>
-        <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
+      </div>
     </a>
+  </li>
 </script>
+
 <script aria-hidden="true" type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
     <section class="home-header">
@@ -318,4 +359,109 @@
           <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
         </div>
     </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-tab-template">
+    <div class="inner-wrapper">
+        <form class="new-post-form">
+            <div class="left-column">
+                <!-- BEGIN topic dropdown -->
+                ${'<%= topic_dropdown_html %>'}
+                <!-- END topic dropdown -->
+                <!-- BEGIN options -->
+                ${'<%= options_html %>'}
+                <!-- END options -->
+            </div>
+            <div class="right-column">
+                <!-- BEGIN errors display -->
+                <ul class="new-post-form-errors"></ul>
+                <!-- END errors display -->
+                <!-- BEGIN content editor -->
+                ${'<%= editor_html %>'}
+                <!-- END content editor -->
+            </div>
+        </form>
+    </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-inline-template">
+    <div class="inner-wrapper">
+        <!-- BEGIN errors display -->
+        <div class="new-post-form-errors">
+        </div>
+        <!-- END errors display -->
+        <form class="new-post-form">
+            <!-- BEGIN content editor -->
+            ${'<%= editor_html %>'}
+            <!-- END content editor -->
+            <!-- BEGIN options -->
+            ${'<%= options_html %>'}
+            <!-- END options -->
+        </form>
+    </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
+    <li role="menuitem"><a href="#" class="topic" data-discussion_id="${'<%- id %>'}" aria-describedby="topic-name-span-${'<%- id %>'}" cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a></li>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
+    <li role="menuitem">
+        <a href="#"><span class="category-menu-span">${'<%- text %>'}</span></a>
+        <ul role="menu">${'<%= entries %>'}</ul>
+    </li>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-topic-dropdown-template">
+    <span class="topic-dropdown-label" id="topic-dropdown-label">${_("Create new post about:")}</span>
+    <div class="form-topic-drop">
+        <a href="#" aria-labelledby="topic-dropdown-label" class="topic_dropdown_button">${_("Show All Discussions")}<span class="drop-arrow" aria-hidden="true">▾</span></a>
+        <div class="topic_menu_wrapper">
+            <div class="topic_menu_search" role="menu">
+                <label class="sr" for="browse-topic-newpost">${_("Filter List")}</label>
+                <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="${_('Filter discussion areas')}">
+            </div>
+            <ul class="topic_menu" role="menu">${'<%= topics_html %>'}</ul>
+        </div>
+    </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-options-template">
+    <div class="options">
+        <input type="checkbox" name="follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">${_("follow this post")}</label>
+        ${'<% if (allow_anonymous) { %>'}
+        <br>
+        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous">
+        <label for="new-post-anonymous">${_("post anonymously")}</label>
+        ${'<% } %>'}
+        ${'<% if (allow_anonymous_to_peers) { %>'}
+        <br>
+        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers">
+        <label for="new-post-anonymous-to-peers">${_("post anonymously to classmates")}</label>
+        ${'<% } %>'}
+        ${'<% if (cohort_options) { %>'}
+        <div class="form-group-label choose-cohort">
+            ## Translators: This labels the selector for which group of students can view a post
+            ${_("Make visible to:")}
+            <select class="group-filter-select new-post-group" name="group_id">
+                <option value="">${_("All Groups")}</option>
+                ${'<% _.each(cohort_options, function(opt) { %>'}
+                    <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
+                ${'<% }); %>'}
+            </select>
+        </div>
+        ${'<% } %>'}
+    </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="new-post-editor-template">
+    <div class="form-row">
+        <label class="sr" for="new-post-title">${_("new post title")}</label>
+        <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="${_('Title')}">
+    </div>
+    <div class="form-row">
+        <div class="new-post-body" name="body" placeholder="${_(u'Enter your question or comment…')}"></div>
+    </div>
+    <input type="submit" id="new-post-submit" class="submit" value="${_('Add post')}">
+    <a href="#" class="new-post-cancel">${_('Cancel')}</a>
 </script>

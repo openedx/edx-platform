@@ -2,11 +2,13 @@
 These are tests for disabling and enabling student accounts, and for making sure
 that students with disabled accounts are unable to access the courseware.
 """
+import unittest
+
 from student.tests.factories import UserFactory, UserStandingFactory
 from student.models import UserStanding
+from django.conf import settings
 from django.test import TestCase, Client
-from django.core.urlresolvers import reverse, NoReverseMatch
-from nose.plugins.skip import SkipTest
+from django.core.urlresolvers import reverse
 
 
 class UserStandingTest(TestCase):
@@ -48,27 +50,21 @@ class UserStandingTest(TestCase):
             changed_by=self.admin
         )
 
-        # set different stock urls for lms and cms
-        # to test disabled accounts' access to site
-        try:
-            self.some_url = reverse('dashboard')
-        except NoReverseMatch:
-            self.some_url = '/course/'
+        # set stock url to test disabled accounts' access to site
+        self.some_url = '/'
 
         # since it's only possible to disable accounts from lms, we're going
         # to skip tests for cms
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_disable_account(self):
         self.assertEqual(
             UserStanding.objects.filter(user=self.good_user).count(), 0
         )
-        try:
-            response = self.admin_client.post(reverse('disable_account_ajax'), {
-                'username': self.good_user.username,
-                'account_action': 'disable',
-            })
-        except NoReverseMatch:
-            raise SkipTest()
+        response = self.admin_client.post(reverse('disable_account_ajax'), {
+            'username': self.good_user.username,
+            'account_action': 'disable',
+        })
         self.assertEqual(
             UserStanding.objects.get(user=self.good_user).account_status,
             UserStanding.ACCOUNT_DISABLED
@@ -78,37 +74,31 @@ class UserStandingTest(TestCase):
         response = self.bad_user_client.get(self.some_url)
         self.assertEqual(response.status_code, 403)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_reenable_account(self):
-        try:
-            response = self.admin_client.post(reverse('disable_account_ajax'), {
-                'username': self.bad_user.username,
-                'account_action': 'reenable'
-            })
-        except NoReverseMatch:
-            raise SkipTest()
+        response = self.admin_client.post(reverse('disable_account_ajax'), {
+            'username': self.bad_user.username,
+            'account_action': 'reenable'
+        })
         self.assertEqual(
             UserStanding.objects.get(user=self.bad_user).account_status,
             UserStanding.ACCOUNT_ENABLED
         )
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_non_staff_cant_access_disable_view(self):
-        try:
-            response = self.non_staff_client.get(reverse('manage_user_standing'), {
-                'user': self.non_staff,
-            })
-        except NoReverseMatch:
-            raise SkipTest()
+        response = self.non_staff_client.get(reverse('manage_user_standing'), {
+            'user': self.non_staff,
+        })
         self.assertEqual(response.status_code, 404)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_non_staff_cant_disable_account(self):
-        try:
-            response = self.non_staff_client.post(reverse('disable_account_ajax'), {
-                'username': self.good_user.username,
-                'user': self.non_staff,
-                'account_action': 'disable'
-            })
-        except NoReverseMatch:
-            raise SkipTest()
+        response = self.non_staff_client.post(reverse('disable_account_ajax'), {
+            'username': self.good_user.username,
+            'user': self.non_staff,
+            'account_action': 'disable'
+        })
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             UserStanding.objects.filter(user=self.good_user).count(), 0

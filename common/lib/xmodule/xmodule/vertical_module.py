@@ -1,8 +1,8 @@
 from xblock.fragment import Fragment
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
-from xmodule.studio_editable import StudioEditableModule
+from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from pkg_resources import resource_string
 from copy import copy
 
@@ -19,13 +19,28 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
     ''' Layout module for laying out submodules vertically.'''
 
     def student_view(self, context):
-        # When rendering a Studio preview, use a different template to support drag and drop.
-        if context and context.get('runtime_type', None) == 'studio':
-            return self.studio_preview_view(context)
+        fragment = Fragment()
+        contents = []
 
-        return self.render_view(context, 'vert_module.html')
+        child_context = {} if not context else copy(context)
+        child_context['child_of_vertical'] = True
 
-    def studio_preview_view(self, context):
+        for child in self.get_display_items():
+            rendered_child = child.render(STUDENT_VIEW, child_context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
+                'id': child.location.to_deprecated_string(),
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents,
+            'xblock_context': context,
+        }))
+        return fragment
+
+    def author_view(self, context):
         """
         Renders the Studio preview view, which supports drag and drop.
         """
@@ -34,31 +49,6 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
         # a more concise version that appears alongside the "View =>" link.
         if context.get('container_view'):
             self.render_children(context, fragment, can_reorder=True, can_add=True)
-        return fragment
-
-    def render_view(self, context, template_name):
-        """
-        Helper method for rendering student_view and the Studio version.
-        """
-        fragment = Fragment()
-        contents = []
-
-        child_context = {} if not context else copy(context)
-        child_context['child_of_vertical'] = True
-
-        for child in self.get_display_items():
-            rendered_child = child.render('student_view', child_context)
-            fragment.add_frag_resources(rendered_child)
-
-            contents.append({
-                'id': child.location.to_deprecated_string(),
-                'content': rendered_child.content
-            })
-
-        fragment.add_content(self.system.render_template(template_name, {
-            'items': contents,
-            'xblock_context': context,
-        }))
         return fragment
 
     def get_progress(self):
@@ -77,7 +67,10 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
         return new_class
 
 
-class VerticalDescriptor(VerticalFields, SequenceDescriptor):
+class VerticalDescriptor(VerticalFields, SequenceDescriptor, StudioEditableDescriptor):
+    """
+    Descriptor class for editing verticals.
+    """
     module_class = VerticalModule
 
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}

@@ -1,0 +1,73 @@
+{% extends "main_django.html" %}
+{% load i18n %}
+{% block title %}
+<title>
+Manual Refund
+</title>
+{% endblock %}
+{% block headextra %}
+
+<style type="text/css">
+.errorlist,.messages {
+    color: red;
+}
+.success {
+    color: green;
+}
+strong {
+    padding-right: 10px;
+}
+</style>
+{% endblock %}
+
+
+{% block body %}
+<div class="content-wrapper" id="content">
+    <div class="container about">
+        <h1>{% trans "Manual Refund" %}</h1>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="POST" id="refund_form">
+            {% csrf_token %}
+            {{form.as_p}}
+            <p>
+            <input type="button" value="Cancel" onclick="javascript:location=location"/> <input type="submit" value="{% if cert %}Refund{% else %}Confirm{% endif %}" /> 
+            </p>
+        </form>
+        {% if cert %}
+        <section class="content-wrapper">
+            <h2>
+                {% trans "About to refund this order:" %}
+            </h2>
+            <p>
+                <strong>{% trans "Order Id:" %}</strong> {{cert.order.id}}
+            </p>
+            <p>
+                <strong>{% trans "Enrollment:" %}</strong> {{enrollment.course_id}} {{enrollment.mode}} ({% if enrollment.is_active %}{% trans "enrolled" %}{% else %}{% trans "unenrolled" %}{% endif %})
+            </p>
+            <p>
+                <strong>{% trans "Cost:" %}</strong> {{cert.unit_cost}} {{cert.currency}}
+            </p>
+            <p>
+                <strong>{% trans "CertificateItem Status:" %}</strong> {{cert.status}}
+            </p>
+            <p>
+                <strong>{% trans "Order Status:" %}</strong> {{cert.order.status}}
+            </p>
+            <p>
+                <strong>{% trans "Fulfilled Time:" %}</strong> {{cert.fulfilled_time}}
+            </p>
+            <p>
+                <strong>{% trans "Refund Request Time:" %}</strong> {{cert.refund_requested_time}}
+            </p>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

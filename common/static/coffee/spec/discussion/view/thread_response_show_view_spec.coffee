@@ -1,5 +1,6 @@
 describe "ThreadResponseShowView", ->
     beforeEach ->
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures(
             """
             <div class="discussion-post">
@@ -22,7 +23,6 @@ describe "ThreadResponseShowView", ->
         @comment = new Comment(@commentData)
         @view = new ThreadResponseShowView({ model: @comment })
         @view.setElement($(".discussion-post"))
-        window.user = new DiscussionUser({id: "567", upvoted_ids: []})
 
     it "renders the vote correctly", ->
         DiscussionViewSpecHelper.checkRenderVote(@view, @comment)

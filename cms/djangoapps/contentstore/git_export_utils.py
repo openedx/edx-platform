@@ -128,8 +128,8 @@ def export_to_git(course_id, repo, user='', rdir=None):
     root_dir = os.path.dirname(rdirp)
     course_dir = os.path.splitext(os.path.basename(rdirp))[0]
     try:
-        export_to_xml(modulestore('direct'), contentstore(), course_id,
-                      root_dir, course_dir, modulestore())
+        export_to_xml(modulestore(), contentstore(), course_id,
+                      root_dir, course_dir)
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')
         raise GitExportError(GitExportError.XML_EXPORT_FAIL)

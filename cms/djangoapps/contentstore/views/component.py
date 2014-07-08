@@ -13,6 +13,7 @@ from edxmako.shortcuts import render_to_response
 
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import PublishState
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -21,7 +22,7 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
+from contentstore.utils import get_lms_link_for_item, compute_publish_state
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -42,10 +43,10 @@ log = logging.getLogger(__name__)
 
 # NOTE: unit_handler assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+SPLIT_TEST_COMPONENT_TYPE = 'split_test'
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-
 if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
     ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 else:
@@ -61,17 +62,24 @@ else:
         # XBlocks from pmitros repos are prototypes. They should not be used
         # except for edX Learning Sciences experiments on edge.edx.org without
         # further work to make them robust, maintainable, finalize data formats,
-        # etc. 
+        # etc.
         'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-        'openassessment',  # edx-ora2
-        'split_test'
+        SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
+# Specify xblocks that should be treated as advanced problems. Each entry is a tuple
+# specifying the xblock name and an optional YAML template to be used.
+ADVANCED_PROBLEM_TYPES = [
+    {
+        'component': 'openassessment',
+        'boilerplate_name': None
+    }
+]
 
 @require_GET
 @login_required
@@ -90,7 +98,7 @@ def subsection_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(usage_key, preview=True)
+        preview_link = get_lms_link_for_item(item.location, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -127,9 +135,9 @@ def subsection_handler(request, usage_key_string):
                 'new_unit_category': 'vertical',
                 'lms_link': lms_link,
                 'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(usage_key.course_key).graders),
+                'course_graders': json.dumps(CourseGradingModel.fetch(item.location.course_key).graders),
                 'parent_item': parent,
-                'locator': usage_key,
+                'locator': item.location,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
                 'can_view_live': can_view_live
@@ -165,7 +173,7 @@ def unit_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
+        component_templates = get_component_templates(course)
 
         xblocks = item.get_children()
 
@@ -204,7 +212,7 @@ def unit_handler(request, usage_key_string):
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
-            'unit_usage_key': usage_key,
+            'unit_usage_key': item.location,
             'child_usage_keys': [block.scope_ids.usage_id for block in xblocks],
             'component_templates': json.dumps(component_templates),
             'draft_preview_link': preview_lms_link,
@@ -245,7 +253,7 @@ def container_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = _get_component_templates(course)
+        component_templates = get_component_templates(course)
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
         while parent and parent.category != 'sequential':
@@ -260,7 +268,7 @@ def container_handler(request, usage_key_string):
             'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
             'unit_publish_state': unit_publish_state,
-            'xblock_locator': usage_key,
+            'xblock_locator': xblock.location,
             'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
             'ancestor_xblocks': ancestor_xblocks,
             'component_templates': json.dumps(component_templates),
@@ -269,7 +277,7 @@ def container_handler(request, usage_key_string):
         return HttpResponseBadRequest("Only supports html requests")
 
 
-def _get_component_templates(course):
+def get_component_templates(course):
     """
     Returns the applicable component templates that can be used by the specified course.
     """
@@ -297,9 +305,19 @@ def _get_component_templates(course):
         'problem': _("Problem"),
         'video': _("Video")
     }
-    advanced_component_display_names = {}
+
+    def get_component_display_name(component, default_display_name=None):
+        """
+        Returns the display name for the specified component.
+        """
+        component_class = _load_mixed_class(component)
+        if hasattr(component_class, 'display_name') and component_class.display_name.default:
+            return _(component_class.display_name.default)
+        else:
+            return default_display_name
 
     component_templates = []
+    categories = set()
     # The component_templates array is in the order of "advanced" (if present), followed
     # by the components in the order listed in COMPONENT_TYPES.
     for category in COMPONENT_TYPES:
@@ -308,11 +326,9 @@ def _get_component_templates(course):
         # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
-        if hasattr(component_class, 'display_name'):
-            display_name = _(component_class.display_name.default) if component_class.display_name.default else _('Blank')
-        else:
-            display_name = _('Blank')
+        display_name = get_component_display_name(category, _('Blank'))
         templates_for_category.append(create_template_dict(display_name, category))
+        categories.add(category)
 
         # add boilerplates
         if hasattr(component_class, 'templates'):
@@ -327,6 +343,16 @@ def _get_component_templates(course):
                             template['metadata'].get('markdown') is not None
                         )
                     )
+
+        # Add any advanced problem types
+        if category == 'problem':
+            for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
+                component = advanced_problem_type['component']
+                boilerplate_name = advanced_problem_type['boilerplate_name']
+                component_display_name = get_component_display_name(component)
+                templates_for_category.append(create_template_dict(component_display_name, component, boilerplate_name))
+                categories.add(component)
+
         component_templates.append({
             "type": category,
             "templates": templates_for_category,
@@ -342,21 +368,17 @@ def _get_component_templates(course):
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in ADVANCED_COMPONENT_TYPES:
+            if category in ADVANCED_COMPONENT_TYPES and not category in categories:
                 # boilerplates not supported for advanced components
                 try:
-                    component_class = _load_mixed_class(category)
-
-                    if component_class.display_name.default:
-                        template_display_name = _(component_class.display_name.default)
-                    else:
-                        template_display_name = advanced_component_display_names.get(category, category)
+                    component_display_name = get_component_display_name(category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
-                            template_display_name,
+                            component_display_name,
                             category
                         )
                     )
+                    categories.add(category)
                 except PluginMissingError:
                     # dhm: I got this once but it can happen any time the
                     # course author configures an advanced component which does
@@ -393,8 +415,8 @@ def _get_item_in_course(request, usage_key):
         raise PermissionDenied()
 
     course = modulestore().get_course(course_key)
-    item = get_modulestore(usage_key).get_item(usage_key, depth=1)
-    lms_link = get_lms_link_for_item(usage_key)
+    item = modulestore().get_item(usage_key, depth=1)
+    lms_link = get_lms_link_for_item(item.location)
 
     return course, item, lms_link
 
@@ -416,7 +438,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = get_modulestore(usage_key).get_item(usage_key)
+    descriptor = modulestore().get_item(usage_key)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -429,6 +451,6 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call; so, request user didn't author
     # the change
-    get_modulestore(usage_key).update_item(descriptor, None)
+    modulestore().update_item(descriptor, None)
 
     return webob_to_django_response(resp)

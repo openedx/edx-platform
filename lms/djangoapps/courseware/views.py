@@ -42,6 +42,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
+from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from opaque_keys import InvalidKeyError
 
@@ -338,12 +339,24 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
+
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
                     return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
+
+            ## Allow chromeless operation
+            if section_descriptor.chrome:
+                chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
+                if 'accordion' not in chrome:
+                    context['disable_accordion'] = True
+                if 'tabs' not in chrome:
+                    context['disable_tabs'] = True
+
+            if section_descriptor.default_tab:
+                context['default_tab'] = section_descriptor.default_tab
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
@@ -353,6 +366,13 @@ def index(request, course_id, chapter=None, section=None,
             # html, which in general will need all of its children
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_key, user, section_descriptor, depth=None)
+
+            # Verify that position a string is in fact an int
+            if position is not None:
+                try:
+                    int(position)
+                except ValueError:
+                    raise Http404("Position {} is not an integer!".format(position))
 
             section_module = get_module_for_descriptor(
                 request.user,
@@ -370,7 +390,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render('student_view')
+            context['fragment'] = section_module.render(STUDENT_VIEW)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -397,6 +417,12 @@ def index(request, course_id, chapter=None, section=None,
 
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
+
+        # Doesn't bar Unicode characters from URL, but if Unicode characters do
+        # cause an error it is a graceful failure.
+        if isinstance(e, UnicodeEncodeError):
+            raise Http404("URL contains Unicode characters")
+
         if isinstance(e, Http404):
             # let it propagate
             raise
@@ -852,7 +878,7 @@ def get_static_tab_contents(request, course, tab):
     html = ''
     if tab_module is not None:
         try:
-            html = tab_module.render('student_view').content
+            html = tab_module.render(STUDENT_VIEW).content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(

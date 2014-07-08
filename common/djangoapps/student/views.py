@@ -24,6 +24,7 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          Http404)
 from django.shortcuts import redirect
+from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
@@ -53,7 +54,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
@@ -467,7 +468,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -548,7 +549,7 @@ def dashboard(request):
 def try_change_enrollment(request):
     """
     This method calls change_enrollment if the necessary POST
-    parameters are present, but does not return anything. It
+    parameters are present, but does not return anything in most cases. It
     simply logs the result or exception. This is usually
     called after a registration or login, as secondary action.
     It should not interrupt a successful registration or login.
@@ -564,7 +565,10 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
-            if enrollment_response.content != '':
+            # Hack: since change_enrollment delivers its redirect_url in the content
+            # of its response, we check here that only the 200 codes with content
+            # will return redirect_urls.
+            if enrollment_response.status_code == 200 and enrollment_response.content != '':
                 return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
@@ -617,6 +621,12 @@ def change_enrollment(request):
 
         if is_course_full:
             return HttpResponseBadRequest(_("Course is full"))
+
+        # check to see if user is currently enrolled in that course
+        if CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(
+                _("Student is already enrolled")
+            )
 
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
@@ -1530,14 +1540,20 @@ def password_reset_confirm_wrapper(
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
             else:
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-            err_msg = _("You are re-using a password that you have used recently. You must "
-                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+            err_msg = ungettext(
+                "You are re-using a password that you have used recently. You must have {num} distinct password before reusing a previous password.",
+                "You are re-using a password that you have used recently. You must have {num} distinct passwords before reusing a previous password.",
+                num_distinct
+            ).format(num=num_distinct)
 
         # also, check to see if passwords are getting reset too frequent
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
-                        "{0} day(s) must elapse between password resets").format(num_days)
+            err_msg = ungettext(
+                "You are resetting passwords too frequently. Due to security policies, {num} day must elapse between password resets.",
+                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets.",
+                num_days
+            ).format(num=num_days)
 
     if err_msg:
         # We have an password reset attempt which violates some security policy, use the

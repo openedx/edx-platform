@@ -64,7 +64,7 @@
 
     .no-container-content {
       @extend %ui-well;
-      padding: ($baseline*2);
+      padding: $baseline;
       background-color: $gray-l4;
       text-align: center;
       color: $gray;
@@ -78,7 +78,7 @@
         @extend %t-action4;
         padding: 8px 20px 10px;
         text-align: center;
-        margin-left: $baseline;
+        margin: ($baseline/2) 0 ($baseline/2) $baseline;
 
         [class^="icon-"] {
           margin-right: ($baseline/2);
@@ -158,6 +158,8 @@ body.view-container .content-primary {
     // CASE: page level xblock rendering
     &.level-page {
       margin: 0;
+      box-shadow: none;
+      border: 0;
 
       .xblock-header {
         display: none;
@@ -166,15 +168,36 @@ body.view-container .content-primary {
       .xblock-message {
         border-radius: 3px 3px 0 0;
 
+        &.validation {
+          padding-top: ($baseline*.75);
+        }
+
+        .xblock-message-list {
+          margin: ($baseline/5) ($baseline*2.5);
+          list-style-type: disc;
+          color: $gray-l3;
+        }
+
+        .xblock-message-item {
+          padding-bottom: ($baseline/4);
+        }
+
         &.information {
-          @extend %t-copy-base;
-          margin-bottom: $baseline;
-          border-bottom: 1px solid $gray-l4;
-          padding: ($baseline/2) ($baseline*.75);
+          padding: 0 0 ($baseline/2) 0;
           background-color: $gray-l5;
           color: $gray-d1;
         }
       }
+
+      .no-container-content {
+
+        .xblock-message-list {
+          margin: 0;
+          list-style-type: none;
+          color: $gray-d2;
+        }
+      }
+
     }
 
     // CASE: nesting level xblock rendering
@@ -249,6 +272,74 @@ body.view-container .content-primary {
         .xblock-render {
           display: none;
         }
+      }
+
+      .wrapper-xblock-message {
+
+        .xblock-message {
+          border-radius: 0 0 3px 3px;
+
+          .xblock-message-list {
+            margin: 0;
+            list-style-type: none;
+          }
+
+          &.information {
+            @extend %t-copy-sub2;
+            padding: 0 0 ($baseline/2) $baseline;
+            color: $gray-l1;
+          }
+
+          &.validation.has-warnings {
+            border: 0;
+            border-top: 3px solid $orange;
+          }
+
+          &.validation.has-errors {
+            border: 0;
+            border-top: 3px solid $red-l2;
+          }
+        }
+      }
+    }
+  }
+
+  // groups in experiments
+  .wrapper-groups {
+
+    .title {
+      @extend %t-title7;
+      margin-left: ($baseline/2);
+      color: $gray-l1;
+    }
+
+    &.is-active {
+
+      // Don't show delete buttons on active groups
+      .wrapper-xblock.level-nesting > .xblock-header .action-delete {
+        display: none;
+      }
+
+
+    }
+
+    &.is-inactive {
+      margin: ($baseline*1.5) 0 0 0;
+      border-top: 2px dotted $gray-l2;
+      padding: ($baseline*.75) 0;
+      background-color: $gray-l4;
+
+      .wrapper-xblock.level-nesting {
+        @include transition(all $tmg-f2 linear 0s);
+        opacity: .7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      .new-component-item {
+        display: none;
       }
     }
   }

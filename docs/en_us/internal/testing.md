@@ -133,6 +133,10 @@ or
 To run a single django test class:
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest
+    
+When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc. In this case, it is helpful to look at the output of paver, and run just the specific command (optionally, stripping away coverage metrics). At the time of this writing, the command is: 
+
+    python ./manage.py lms test --verbosity=1 lms/djangoapps/courseware/tests/test_courses.py   --traceback --settings=test
 
 To run a single django test:
 
@@ -239,29 +243,29 @@ the supported development enviornment for the edX Platform.
 
 To run all the bok choy acceptance tests:
 
-    rake test:bok_choy
+    paver test_bokchoy
 
 Once the database has been set up and the static files collected, you can use the 'fast' 
 option to skip those tasks. This option can also be used with any of the test specs below:
 
-    rake test:bok_choy:fast
+    paver test_bokchoy --fasttest
 
 To run single test, specify the name of the test file. For example:
 
-    rake test:bok_choy[test_lms.py]
+    paver test_bokchoy -t test_lms.py
 
 To run single test faster by not repeating setup tasks:
 
-    rake test:bok_choy:fast[test_lms.py]
+    paver test_bokchoy -t test_lms.py --fasttest
 
 To test only a certain feature, specify the file and the testcase class:
 
-    rake test:bok_choy:fast[test_lms.py:RegistrationTest]
+    paver test_bokchoy -t test_lms.py:RegistrationTest
 
 To execute only a certain test case, specify the file name, class, and 
 test case method:
 
-    rake test:bok_choy:fast[test_lms.py:RegistrationTest.test_register]
+    paver test_bokchoy -t test_lms.py:RegistrationTest.test_register
 
 During acceptance test execution, log files and also screenshots of failed tests
 are captured in test_root/log.
@@ -287,23 +291,23 @@ To run all the acceptance tests:
 
 To run only for lms or cms:
 
-    rake test:acceptance:lms
-    rake test:acceptance:cms
+    paver test_acceptance -s lms
+    paver test_acceptance -s cms
 
 To test only a specific feature:
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature"
 
 To test only a specific scenario
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature -s 3"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature -s 3"
 
-To start the debugger on failure, add the `--pdb` option:
+To start the debugger on failure, add the `--pdb` option to extra_args:
 
-    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
+    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature --pdb"
 
 To run tests faster by not collecting static files, you can use
-`rake test:acceptance:lms:fast` and `rake test:acceptance:cms:fast`.
+`paver test_acceptance -s lms --fasttest` and `paver test_acceptance -s cms --fasttest`.
 
 Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py

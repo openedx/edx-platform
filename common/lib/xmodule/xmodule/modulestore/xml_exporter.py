@@ -7,15 +7,16 @@ import lxml.etree
 from xblock.fields import Scope
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from opaque_keys.edx.locations import Location
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.mixed import store_branch_setting
 from fs.osfs import OSFS
 from json import dumps
 import json
-import datetime
 import os
 from path import path
 import shutil
+from xmodule.modulestore.mongo.base import DIRECT_ONLY_CATEGORIES
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -25,29 +26,7 @@ EXPORT_VERSION_KEY = "export_format"
 DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
 
-class EdxJSONEncoder(json.JSONEncoder):
-    """
-    Custom JSONEncoder that handles `Location` and `datetime.datetime` objects.
-
-    `Location`s are encoded as their url string form, and `datetime`s as
-    ISO date strings
-    """
-    def default(self, obj):
-        if isinstance(obj, Location):
-            return obj.to_deprecated_string()
-        elif isinstance(obj, datetime.datetime):
-            if obj.tzinfo is not None:
-                if obj.utcoffset() is None:
-                    return obj.isoformat() + 'Z'
-                else:
-                    return obj.isoformat()
-            else:
-                return obj.isoformat()
-        else:
-            return super(EdxJSONEncoder, self).default(obj)
-
-
-def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, draft_modulestore=None):
+def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     """
     Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
 
@@ -56,8 +35,6 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, d
     `course_key`: The `CourseKey` of the `CourseModuleDescriptor` to export
     `root_dir`: The directory to write the exported xml to
     `course_dir`: The name of the directory inside `root_dir` to write the course content to
-    `draft_modulestore`: An optional `DraftModuleStore` that contains draft content, which will be exported
-        alongside the public content in the course.
     """
 
     course = modulestore.get_course(course_key)
@@ -66,7 +43,10 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, d
     export_fs = course.runtime.export_fs = fsm.makeopendir(course_dir)
 
     root = lxml.etree.Element('unknown')
-    course.add_xml_to_node(root)
+
+    # export only the published content
+    with store_branch_setting(course.runtime.modulestore, ModuleStoreEnum.Branch.published_only):
+        course.add_xml_to_node(root)
 
     with export_fs.open('course.xml', 'w') as course_xml:
         lxml.etree.ElementTree(root).write(course_xml)
@@ -121,26 +101,33 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir, d
         policy = {'course/' + course.location.name: own_metadata(course)}
         course_policy.write(dumps(policy, cls=EdxJSONEncoder))
 
-    # export draft content
     # NOTE: this code assumes that verticals are the top most draftable container
-    # should we change the application, then this assumption will no longer
-    # be valid
-    if draft_modulestore is not None:
-        draft_verticals = draft_modulestore.get_items(course_key, category='vertical', revision='draft')
-        if len(draft_verticals) > 0:
-            draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
-            for draft_vertical in draft_verticals:
-                parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location)
-                # Don't try to export orphaned items.
-                if len(parent_locs) > 0:
-                    logging.debug('parent_locs = {0}'.format(parent_locs))
-                    draft_vertical.xml_attributes['parent_sequential_url'] = parent_locs[0].to_deprecated_string()
-                    sequential = modulestore.get_item(parent_locs[0])
+    # should we change the application, then this assumption will no longer be valid
+    # NOTE: we need to explicitly implement the logic for setting the vertical's parent
+    # and index here since the XML modulestore cannot load draft modules
+    draft_verticals = modulestore.get_items(
+        course_key,
+        category='vertical',
+        revision=ModuleStoreEnum.RevisionOption.draft_only
+    )
+    if len(draft_verticals) > 0:
+        draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
+        for draft_vertical in draft_verticals:
+            parent_loc = modulestore.get_parent_location(
+                draft_vertical.location,
+                revision=ModuleStoreEnum.RevisionOption.draft_preferred
+            )
+            # Don't try to export orphaned items.
+            if parent_loc is not None:
+                logging.debug('parent_loc = {0}'.format(parent_loc))
+                if parent_loc.category in DIRECT_ONLY_CATEGORIES:
+                    draft_vertical.xml_attributes['parent_sequential_url'] = parent_loc.to_deprecated_string()
+                    sequential = modulestore.get_item(parent_loc)
                     index = sequential.children.index(draft_vertical.location)
                     draft_vertical.xml_attributes['index_in_children_list'] = str(index)
-                    draft_vertical.runtime.export_fs = draft_course_dir
-                    node = lxml.etree.Element('unknown')
-                    draft_vertical.add_xml_to_node(node)
+                draft_vertical.runtime.export_fs = draft_course_dir
+                node = lxml.etree.Element('unknown')
+                draft_vertical.add_xml_to_node(node)
 
 
 def _export_field_content(xblock_item, item_dir):
@@ -205,7 +192,7 @@ def convert_between_versions(source_dir, target_dir):
 
         shutil.copytree(published_dir, copy_root)
 
-        # If there is a "draft" branch, copy it. All other branches are ignored.
+        # If there is a DRAFT branch, copy it. All other branches are ignored.
         copy_drafts()
 
     def copy_drafts():

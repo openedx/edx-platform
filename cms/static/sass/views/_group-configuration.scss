@@ -1,0 +1,160 @@
+// studio - views - group-configurations
+// ====================
+.view-group-configurations {
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+
+    .notice-moduledisabled {
+      @extend %ui-well;
+      @extend %t-copy-base;
+      background-color: $white;
+      padding: ($baseline*1.5) $baseline;
+      text-align: center;
+    }
+
+    .no-group-configurations-content {
+      @extend %ui-well;
+      padding: ($baseline*2);
+      background-color: $gray-l4;
+      text-align: center;
+      color: $gray;
+    }
+
+    .group-configuration {
+      @extend %ui-window;
+      position: relative;
+
+      .view-group-configuration {
+        padding: $baseline ($baseline*1.5);
+
+        .group-configuration-header {
+          margin-bottom: 0;
+          border-bottom: 0;
+        }
+
+        .group-configuration-title {
+          @extend %t-title;
+          @include font-size(22);
+          @include line-height(22);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-right: ($baseline*14);
+          font-weight: bold;
+
+          .group-toggle {
+            display: inline-block;
+            padding-left: $baseline;
+            color: $black;
+
+            &:hover, &:focus {
+              color: $blue;
+            }
+          }
+        }
+
+        .group-configuration-info {
+          color: $gray-l1;
+          margin-left: $baseline;
+
+          &.group-configuration-info-inline {
+            display: table;
+            width: 70%;
+            margin: ($baseline/4) 0 ($baseline/2) $baseline;
+
+            li {
+              @include box-sizing(border-box);
+              display: table-cell;
+              margin-right: 1%;
+            }
+          }
+
+          &.group-configuration-info-block {
+            li {
+              padding: ($baseline/4) 0;
+            }
+          }
+
+          .group-configuration-label {
+            text-transform: uppercase;
+          }
+
+          .group-configuration-description {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .ui-toggle-expansion {
+          @include transition(rotate .15s ease-in-out .25s);
+          @include font-size(21);
+          display: inline-block;
+          width: ($baseline*0.75);
+          vertical-align: baseline;
+          margin-left: -$baseline;
+        }
+
+        &.is-selectable {
+          cursor: pointer;
+
+          &:hover {
+            color: $blue;
+
+            .ui-toggle-expansion {
+              color: $blue;
+            }
+          }
+        }
+
+        .groups {
+          margin-left: $baseline;
+          margin-bottom: ($baseline*0.75);
+
+          .group {
+            @extend %t-copy-sub2;
+            @include font-size(18);
+            @include line-height(16);
+            padding: ($baseline/7) 0 ($baseline/4);
+            border-top: 1px solid $gray-l4;
+            white-space: nowrap;
+
+            &:first-child {
+              border-top: none;
+            }
+
+            .group-name {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: inline-block;
+              vertical-align: middle;
+              width: 75%;
+              margin-right: 5%;
+            }
+
+            .group-allocation {
+              display: inline-block;
+              vertical-align: middle;
+              width: 20%;
+              color: $gray-l1;
+              text-align: right;
+            }
+          }
+        }
+      }
+
+      &:hover .actions {
+        opacity: 1.0;
+      }
+    }
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+}

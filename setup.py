@@ -10,6 +10,5 @@ setup(
     packages=[
         "lms",
         "cms",
-        "i18n",
     ],
 )

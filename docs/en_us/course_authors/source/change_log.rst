@@ -4,6 +4,22 @@ Change Log
 
 
 ***********
+July, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 07/01/14
+     - Updated :ref:`The Course End Date` to specify when students can earn and
+       access certificates.
+   
+
+
+***********
 June, 2014
 ***********
 
@@ -13,41 +29,19 @@ June, 2014
 
    * - Date
      - Change
+   * - 06/20/14
+     - Added a :ref:`Preface` with resources for course teams, developers,
+       researchers, and students.
+   * - 06/18/14    
+     - In the :ref:`View and download student data` section, updated the
+       example report to include the new User ID column.
+   * - 06/17/14   
+     - Added :ref:`Video TOC` section to :ref:`Working with Video Components`.
    * - 06/06/14   
      - Added a description of email task workflow states to the :ref:`Launch`
        section.
    * - 06/03/14   
      - Added :ref:`gradebook` to the :ref:`Grades` section.
-
-***********
-June, 2014
-***********
-
-.. list-table::
-   :widths: 10 70
-   :header-rows: 1
-
-   * - Date
-     - Change
-   * - 06/03/14   
-     - Added :ref:`gradebook` to the :ref:`Grades` section.
-
-***********
-June, 2014
-***********
-
-.. list-table::
-   :widths: 10 70
-   :header-rows: 1
-
-   * - Date
-     - Change
-   * - 06/06/14   
-     - Added a description of email task workflow states to the :ref:`Launch`
-       section.
-   * - 06/03/14   
-     - Added :ref:`gradebook` to the :ref:`Grades` section.
-       
 
 ***********
 May, 2014

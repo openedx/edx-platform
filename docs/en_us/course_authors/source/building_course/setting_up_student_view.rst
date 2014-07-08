@@ -170,27 +170,42 @@ yet started:
 The Course End Date
 ***********************************
 
-When your course is completed, students see the course end date on their
-dashboards.
+The course end date is the date after which students can no longer earn credit
+toward certificates. Students who have earned certificates can view them after
+the course end date.
 
-.. note:: For courses on edX.org_, you must communicate the course end date to
+.. important::
+ If you do not set a course end date, students will not be able to access
+ earned certificates.
+
+.. note:: 
+ For courses on edX.org_, you must communicate the course end date to
  your edX Program Manager, to ensure the date is accurate on the course
  summary page.
 
-If grades and certificates are not yet issued, or if students enroll in an
-archived course after it has ended, the course appears in the dashboard as in
-the following example:
+After grades and certificates are finalized, students see the course end date
+on their personal dashboards, as shown in the following examples.
 
-.. image:: ../Images/dashboard-wrapping-course.png
- :alt: Image of a course on the student dashboard that has ended, but not been
-     graded
+* If grades and certificates are not yet finalized, students can see the course
+  end date and a message:
 
-If grades are complete and certificates are issued, students see the course, the
-end date, and the message as in the following example:
+  .. image:: ../Images/dashboard-wrapping-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
 
-.. image:: ../Images/dashboard-completed-course.png
- :alt: Image of a course on the student dashboard that has ended, but not been
-     graded
+* When grades and certificates are finalized, students who have not earned a
+  certificate see their score and the score required to earn a certificate:
+  
+  .. image:: ../Images/dashboard-no-cert-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
+
+* Students whose final score is equal to or higher than the required score can
+  click **Download Certificate** to get their certificates as PDFs:
+
+  .. image:: ../Images/dashboard-completed-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
 
 
 .. _Describe Your Course:

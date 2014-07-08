@@ -1,14 +1,11 @@
 from unittest import skip
 
 from django.contrib.auth.models import User
-from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
 
 
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class InternationalizationTest(ModuleStoreTestCase):
     """
     Tests to validate Internationalization.

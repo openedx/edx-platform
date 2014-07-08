@@ -1,0 +1,84 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "group_configurations" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%! import json %>
+<%!
+  from contentstore import utils
+  from django.utils.translation import ugettext as _
+%>
+
+<%block name="title">${_("Group Configurations")}</%block>
+<%block name="bodyclass">is-signedin course view-group-configurations</%block>
+
+<%block name="header_extras">
+% for template_name in ["group-configuration-details", "no-group-configurations", "basic-modal", "modal-button"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+require(["!domReady", "js/collections/group_configuration", "js/views/pages/group_configurations"],
+function(doc, GroupConfigurationCollection, GroupConfigurationsPage, xmoduleLoader) {
+  % if configurations is not None:
+    var view = new GroupConfigurationsPage({
+        el: $('.content-primary'),
+        collection: new GroupConfigurationCollection(${json.dumps(configurations)}, { url: "${group_configuration_url}" })
+    });
+    view.render();
+  % endif
+});
+</script>
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Settings")}</small>
+        <span class="sr">&gt; </span>${_("Group Configurations")}
+      </h1>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+      % if configurations is None:
+        <div class="notice notice-incontext notice-moduledisabled">
+            <p class="copy">
+                ${_("This module is disabled at the moment.")}
+            </p>
+        </div>
+      % else:
+        <div class="ui-loading">
+            <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+        </div>
+      % endif
+      </article>
+      <aside class="content-supplementary" role="complimentary">
+        <div class="bit">
+      % if context_course:
+        <%
+          details_url = utils.reverse_course_url('settings_handler', context_course.id)
+          grading_url = utils.reverse_course_url('grading_handler', context_course.id)
+          course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
+          advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
+        %>
+      <h3 class="title-3">${_("Other Course Settings")}</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+      </aside>
+    </section>
+  </div>
+</%block>

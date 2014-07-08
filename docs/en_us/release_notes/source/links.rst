@@ -20,11 +20,13 @@
 
 .. _Installing, Configuring, and Running the edX Platform: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/
 
+.. _Installing the edX Production Stack: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/prodstack/install_prodstack.html
+
 .. _Creating Peer Assessments: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
 
-.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
+.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 
-.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 

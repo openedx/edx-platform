@@ -5,6 +5,7 @@ import json
 from operator import itemgetter
 
 from . import BaseTestXmodule
+from xmodule.x_module import STUDENT_VIEW
 
 
 class TestWordCloud(BaseTestXmodule):
@@ -242,7 +243,7 @@ class TestWordCloud(BaseTestXmodule):
 
     def test_word_cloud_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
-        fragment = self.runtime.render(self.item_descriptor, 'student_view')
+        fragment = self.runtime.render(self.item_descriptor, STUDENT_VIEW)
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,

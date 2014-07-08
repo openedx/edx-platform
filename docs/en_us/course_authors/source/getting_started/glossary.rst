@@ -143,6 +143,18 @@ C
 D
 ****
 
+.. _Data Czar_g:
+
+**Data Czar**
+
+  A data czar is the single representative at a partner institution who is
+  responsible for receiving course data from edX, and transferring it securely
+  to researchers and other interested parties after it is received.
+
+  See `edX Research Guide`_.
+
+.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
+
 .. _Discussion Forum:
  
 **Discussion Forum**

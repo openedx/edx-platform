@@ -6,12 +6,10 @@ import json
 
 from django.contrib.auth.models import User
 from django.test.client import Client
-from django.test.utils import override_settings
 
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
-from contentstore.utils import get_modulestore
 from student.models import Registration
 
 
@@ -58,8 +56,6 @@ class AjaxEnabledTestClient(Client):
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
 
-
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
         """
@@ -91,7 +87,7 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
-        self.store = get_modulestore(self.course.location)
+        self.store = modulestore()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """

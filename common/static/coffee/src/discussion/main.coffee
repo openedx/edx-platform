@@ -6,16 +6,22 @@ if Backbone?
       element = $(elem)
       window.$$course_id = element.data("course-id")
       user_info = element.data("user-info")
+      sort_preference = element.data("sort-preference")
       threads = element.data("threads")
       thread_pages = element.data("thread-pages")
       content_info = element.data("content-info")
-      window.user = new DiscussionUser(user_info)
+      user = new DiscussionUser(user_info)
+      DiscussionUtil.setUser(user)
+      window.user = user
       Content.loadContentInfos(content_info)
-      discussion = new Discussion(threads, pages: thread_pages)
-      new DiscussionRouter({discussion: discussion})
+      discussion = new Discussion(threads, {pages: thread_pages, sort: sort_preference})
+      course_settings = new DiscussionCourseSettings(element.data("course-settings"))
+      new DiscussionRouter({discussion: discussion, course_settings: course_settings})
       Backbone.history.start({pushState: true, root: "/courses/#{$$course_id}/discussion/forum/"})
   DiscussionProfileApp =
     start: (elem) ->
+      # Roles are not included in user profile page, but they are not used for anything
+      DiscussionUtil.loadRoles({"Moderator": [], "Administrator": [], "Community TA": []})
       element = $(elem)
       window.$$course_id = element.data("course-id")
       threads = element.data("threads")
