@@ -337,6 +337,7 @@ def create_new_course(request):
         new_course = modulestore().create_course(
             course_key.org,
             course_key.offering,
+            request.user.id,
             fields=fields,
         )
 

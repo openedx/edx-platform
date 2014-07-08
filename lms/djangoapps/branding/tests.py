@@ -28,12 +28,12 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     Tests that anonymous users can access the '/' page,  Need courses with start date
     """
     def setUp(self):
-        self.store = modulestore()
+        super(AnonymousIndexPageTest, self).setUp()
         self.factory = RequestFactory()
         self.course = CourseFactory.create()
         self.course.days_early_for_beta = 5
         self.course.enrollment_start = datetime.datetime.now(UTC) + datetime.timedelta(days=3)
-        self.store.update_item(self.course, '**replace_user**')
+        self.store.update_item(self.course, self.user.id)
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_none_user_index_access_with_startdate_fails(self):

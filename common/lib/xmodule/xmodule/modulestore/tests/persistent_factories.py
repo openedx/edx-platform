@@ -33,7 +33,7 @@ class PersistentCourseFactory(SplitFactory):
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, offering='999', org='testX', user_id='test_user',
+    def _create(cls, target_class, offering='999', org='testX', user_id=ModuleStoreEnum.UserID.test,
                 master_branch=ModuleStoreEnum.BranchName.draft, **kwargs):
 
         modulestore = kwargs.pop('modulestore')
@@ -59,7 +59,7 @@ class ItemFactory(SplitFactory):
     # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, parent_location, category='chapter',
-                user_id='test_user', block_id=None, definition_locator=None, force=False,
+                user_id=ModuleStoreEnum.UserID.test, block_id=None, definition_locator=None, force=False,
                 continue_version=False, **kwargs):
         """
         passes *kwargs* as the new item's field values:

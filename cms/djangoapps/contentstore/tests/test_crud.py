@@ -187,11 +187,11 @@ class TemplateTests(unittest.TestCase):
         )
         first_problem.max_attempts = 3
         first_problem.save()  # decache the above into the kvs
-        updated_problem = self.split_store.update_item(first_problem, '**replace_user**')
+        updated_problem = self.split_store.update_item(first_problem, ModuleStoreEnum.UserID.test)
         self.assertIsNotNone(updated_problem.previous_version)
         self.assertEqual(updated_problem.previous_version, first_problem.update_version)
         self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
-        updated_loc = self.split_store.delete_item(updated_problem.location, '**replace_user**', 'testbot')
+        updated_loc = self.split_store.delete_item(updated_problem.location, ModuleStoreEnum.UserID.test, 'testbot')
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',

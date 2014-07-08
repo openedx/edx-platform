@@ -208,7 +208,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         location = InstructorTaskTestCase.problem_location(problem_url_name)
         item = self.module_store.get_item(location)
         item.data = problem_xml
-        self.module_store.update_item(item, '**replace_user**')
+        self.module_store.update_item(item, self.user.id)
 
     def get_student_module(self, username, descriptor):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""

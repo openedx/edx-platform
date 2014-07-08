@@ -6,8 +6,8 @@ Utilities for contentstore tests
 import json
 import re
 
-from django.contrib.auth.models import User
 from django.test.client import Client
+from django.contrib.auth.models import User
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
@@ -68,53 +68,32 @@ class AjaxEnabledTestClient(Client):
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
         """
-        These tests need a user in the DB so that the django Test Client
-        can log them in.
+        These tests need a user in the DB so that the django Test Client can log them in.
+        The test user is created in the ModuleStoreTestCase setUp method.
         They inherit from the ModuleStoreTestCase class so that the mongodb collection
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the user so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
+        user_password = super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=uname, password=password)
+        self.client.login(username=self.user.username, password=user_password)
 
         self.course = CourseFactory.create(
             org='MITx',
             number='999',
             display_name='Robot Super Course',
         )
-        self.store = modulestore()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """
         Create a non-staff user, log them in (if authenticate=True), and return the client, user to use for testing.
         """
-        uname = 'teststudent'
-        password = 'foo'
-        nonstaff = User.objects.create_user(uname, 'test+student@edx.org', password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        nonstaff.is_active = True
-        nonstaff.is_staff = False
-        nonstaff.save()
+        nonstaff, password = super(CourseTestCase, self).create_non_staff_authed_user_client()
 
         client = Client()
         if authenticate:
-            client.login(username=uname, password=password)
+            client.login(username=nonstaff.username, password=password)
         return client, nonstaff
 
     def populate_course(self):

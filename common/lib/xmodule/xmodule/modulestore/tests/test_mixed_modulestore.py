@@ -116,7 +116,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
         self.course_locations = []
 
-        self.user_id = 0
+        self.user_id = ModuleStoreEnum.UserID.test
 
     # pylint: disable=invalid-name
     def _create_course(self, default, course_key):
@@ -127,12 +127,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             offering = course_key.offering.replace('/', '.')
         else:
             offering = course_key.offering
-        course = self.store.create_course(course_key.org, offering)
+        course = self.store.create_course(course_key.org, offering, self.user_id)
         category = self.writable_chapter_location.category
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
-            course.location, category, location=self.writable_chapter_location, block_id=block_id
+            course.location, category, self.user_id, location=self.writable_chapter_location, block_id=block_id
         )
         if isinstance(course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
@@ -184,7 +184,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         ]
 
         def create_sub_tree(parent, block_info):
-            block = self.store.create_item(parent.location, category=block_info.category, block_id=block_info.display_name)
+            block = self.store.create_item(parent.location, block_info.category, self.user_id, block_id=block_info.display_name)
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
             # reload the block to update its children field
@@ -306,13 +306,13 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
         with self.assertRaises(NotImplementedError):  # ensure it doesn't allow writing
-            self.store.update_item(course, None)
+            self.store.update_item(course, self.user_id)
         # now do it for a r/w db
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
-        self.store.update_item(course, None)
+        self.store.update_item(course, self.user_id)
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertTrue(course.show_calculator)
 
@@ -324,8 +324,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         # r/o try deleting the course (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
-            self.store.delete_item(self.xml_chapter_location, 13)
-        self.store.delete_item(self.writable_chapter_location, 9)
+            self.store.delete_item(self.xml_chapter_location, self.user_id)
+        self.store.delete_item(self.writable_chapter_location, self.user_id)
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
@@ -367,7 +367,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
-            xml_store.create_course("org", "course/run", 999)
+            xml_store.create_course("org", "course/run", self.user_id)
 
     @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):
@@ -547,7 +547,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         # create an orphan
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
+        orphan = self.store.create_item(course_id, 'problem', self.user_id, block_id='orphan')
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         if default_ms == 'split':
             self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
@@ -561,7 +561,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         new location for the child
         """
         self.initdb(default_ms)
-        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
+        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', self.user_id, block_id='orphan')
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 

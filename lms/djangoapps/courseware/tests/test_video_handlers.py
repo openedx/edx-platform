@@ -411,7 +411,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.course.static_asset_path = 'dummy/static'
         self.course.save()
         store = modulestore()
-        store.update_item(self.course, 'OEoXaMPEzfM')
+        store.update_item(self.course, self.user.id)
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
