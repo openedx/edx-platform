@@ -12,6 +12,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             beforeEach(function () {
                 edit_helpers.installTemplate('xblock-string-field-editor');
                 edit_helpers.installTemplate('publish-xblock');
+                edit_helpers.installTemplate('publish-history');
                 appendSetFixtures(mockContainerPage);
 
                 model = new XBlockInfo({
@@ -130,6 +131,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     draftBit = "draft",
                     publishButtonCss = ".action-publish",
                     discardChangesButtonCss = ".action-discard",
+                    lastDraftCss = ".wrapper-last-draft",
                     request, lastRequest, promptSpies, sendDiscardChangesToServer;
 
                 lastRequest = function() { return requests[requests.length - 1]; };
@@ -279,6 +281,49 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     expect(requests.length).toEqual(numRequests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
+                });
+
+                it('renders the last published date and user when there are no changes', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "has_changes": false,
+                        "edited_on": "Jun 30, 2014 at 14:20 UTC", "edited_by": "joe",
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
+                    expect(containerPage.$(lastDraftCss).text()).
+                        toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
+                });
+
+                it('renders the last saved date and user when there are changes', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "has_changes": true,
+                        "edited_on": "Jul 02, 2014 at 14:20 UTC", "edited_by": "joe",
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
+                    expect(containerPage.$(lastDraftCss).text()).
+                        toContain("Draft saved on Jul 02, 2014 at 14:20 UTC by joe");
+                });
+            });
+
+            describe("PublishHistory", function () {
+                var lastPublishCss = ".wrapper-last-publish";
+
+                it('renders the last published date and user when the block is published', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true,
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako" });
+                    expect(containerPage.$(lastPublishCss).text()).
+                        toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
+                });
+
+                it('renders never published when the block is unpublished', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": false,
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako" });
+                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
+                });
+
+                it('renders correctly when the block is published without publish info', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true, "published_on": null, "published_by": null});
+                    expect(containerPage.$(lastPublishCss).text()).toContain("Previously published");
                 });
             });
         });
