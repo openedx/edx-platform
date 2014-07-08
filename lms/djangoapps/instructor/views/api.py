@@ -20,6 +20,8 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
 from util.json_request import JsonResponse
+from util.date_utils import get_default_time_display
+from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -36,7 +38,6 @@ from courseware.models import StudentModule
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
-from instructor_task.views import get_task_completion_info
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
@@ -52,7 +53,7 @@ import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
 
-from submissions import api as sub_api # installed from the edx-submissions repository
+from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
 
@@ -610,9 +611,10 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
     # TODO: the User.objects query and CSV generation here could be
-    # centralized into instructor_analytics. Currently instructor_analytics 
+    # centralized into instructor_analytics. Currently instructor_analytics
     # has similar functionality but not quite what's needed.
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(mimetype='text/csv')
@@ -850,45 +852,6 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
-def extract_task_features(task):
-    """
-    Convert task to dict for json rendering.
-    Expects tasks have the following features:
-    * task_type (str, type of task)
-    * task_input (dict, input(s) to the task)
-    * task_id (str, celery id of the task)
-    * requester (str, username who submitted the task)
-    * task_state (str, state of task eg PROGRESS, COMPLETED)
-    * created (datetime, when the task was completed)
-    * task_output (optional)
-    """
-    # Pull out information from the task
-    features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
-    task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
-    # Some information (created, duration, status, task message) require additional formatting
-    task_feature_dict['created'] = task.created.isoformat()
-
-    # Get duration info, if known
-    duration_sec = 'unknown'
-    if hasattr(task, 'task_output') and task.task_output is not None:
-        try:
-            task_output = json.loads(task.task_output)
-        except ValueError:
-            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
-        else:
-            if 'duration_ms' in task_output:
-                duration_sec = int(task_output['duration_ms'] / 1000.0)
-    task_feature_dict['duration_sec'] = duration_sec
-
-    # Get progress status message & success information
-    success, task_message = get_task_completion_info(task)
-    status = _("Complete") if success else _("Incomplete")
-    task_feature_dict['status'] = status
-    task_feature_dict['task_message'] = task_message
-
-    return task_feature_dict
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -903,6 +866,24 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_email_content(requests, course_id):
+    """
+    List the content of bulk emails sent
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    task_type = 'bulk_course_email'
+    # First get tasks list of bulk emails sent
+    emails = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+
+    response_payload = {
+        'emails': map(extract_email_features, emails),
     }
     return JsonResponse(response_payload)
 

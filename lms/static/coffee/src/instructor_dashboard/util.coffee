@@ -119,6 +119,119 @@ create_task_list_table = ($table_tasks, tasks_data) ->
   $table_tasks.append $table_placeholder
   grid = new Slick.Grid($table_placeholder, table_data, columns, options)
 
+# Formats the subject field for email content history table
+subject_formatter = (row, cell, value, columnDef, dataContext) ->
+  if !value then return gettext("An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.")
+  subject_text = $('<span>').text(value['subject']).html()
+  return '<p><a href="#email_message_' + value['id']+ '" id="email_message_' + value['id'] + '_trig">' + subject_text + '</a></p>'
+
+# Formats the created field for the email content history table
+created_formatter = (row, cell, value, columnDef, dataContext) ->
+  if !value then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+
+# Formats the number sent field for the email content history table
+number_sent_formatter = (row, cell, value, columndDef, dataContext) ->
+  if !value then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+
+# Creates a table to display the content of bulk course emails
+# sent in the past
+create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
+    $table_emails_inner.empty()
+    $table_emails.show()
+
+    options =
+      enableCellNavigation: true
+      enableColumnReorder: false
+      autoHeight: true
+      rowHeight: 50
+      forceFitColumns: true
+
+    columns = [
+      id: 'email'
+      field: 'email'
+      name: gettext('Subject')
+      minWidth: 80
+      cssClass: "email-content-cell"
+      formatter: subject_formatter
+    ,
+      id: 'created'
+      field: 'created'
+      name: gettext('Time Sent')
+      minWidth: 80
+      cssClass: "email-content-cell"
+      formatter: created_formatter
+    ,
+      id: 'number_sent'
+      field: 'number_sent'
+      name: gettext('Number Sent')
+      minwidth: 100
+      maxWidth: 150
+      cssClass: "email-content-cell"
+      formatter: number_sent_formatter
+    ,
+    ]
+
+    table_data = email_data
+
+    $table_placeholder = $ '<div/>', class: 'slickgrid'
+    $table_emails_inner.append $table_placeholder
+    grid = new Slick.Grid($table_placeholder, table_data, columns, options)
+    $table_emails.append $ '<br/>'
+
+# Creates the modal windows linked to each email in the email history
+# Displayed when instructor clicks an email's subject in the content history table
+create_email_message_views = ($messages_wrapper, emails) ->
+  $messages_wrapper.empty()
+  for email_info in emails
+
+    # If some error occured, bail out
+    if !email_info.email then return
+
+    # Create hidden section for modal window
+    email_id = email_info.email['id']
+    $message_content = $('<section>', "aria-hidden": "true", class: "modal email-modal", id: "email_message_" + email_id)
+    $email_wrapper = $ '<div>', class: 'inner-wrapper email-content-wrapper'
+    $email_header = $ '<div>', class: 'email-content-header'
+
+    # Add copy email body button
+    $email_header.append $('<input>', type: "button", name: "copy-email-body-text", value: gettext("Copy Email To Editor"), id: "copy_email_" + email_id)
+
+    $close_button = $ '<a>', href: '#', class: "close-modal"
+    $close_button.append $ '<i>', class: 'icon-remove'
+    $email_header.append $close_button
+
+    # HTML escape the subject line
+    subject_text = $('<span>').text(email_info.email['subject']).html()
+    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Subject:') + '</em> ' + subject_text)
+
+    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Time Sent:') + '</em> ' + email_info.created)
+    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent To:') + '</em> ' + email_info.sent_to)
+    $email_wrapper.append $email_header
+
+    $email_wrapper.append $ '<hr>'
+
+    # Last, add email content section
+    $email_content = $ '<div>', class: 'email-content-message'
+    $email_content.append $('<h2>', class: "message-bold").html("<em>" + gettext("Message:") + "</em>")
+    $message = $('<div>').html(email_info.email['html_message'])
+    $email_content.append $message
+    $email_wrapper.append $email_content
+
+    $message_content.append $email_wrapper
+    $messages_wrapper.append $message_content
+
+    # Setup buttons to open modal window and copy an email message
+    $('#email_message_' + email_info.email['id'] + '_trig').leanModal({closeButton: ".close-modal", copyEmailButton: "#copy_email_" + email_id})
+    setup_copy_email_button(email_id, email_info.email['html_message'], email_info.email['subject'])
+
+# Helper method to set click handler for modal copy email button
+setup_copy_email_button = (email_id, html_message, subject) ->
+    $("#copy_email_" + email_id).click =>
+        editor = tinyMCE.get("mce_0")
+        editor.setContent(html_message)
+        $('#id_subject').val(subject)
+
+
 # Helper class for managing the execution of interval tasks.
 # Handles pausing and restarting.
 class IntervalManager
@@ -178,4 +291,6 @@ if _?
     std_ajax_err: std_ajax_err
     IntervalManager: IntervalManager
     create_task_list_table: create_task_list_table
+    create_email_content_table: create_email_content_table
+    create_email_message_views: create_email_message_views
     PendingInstructorTasks: PendingInstructorTasks
