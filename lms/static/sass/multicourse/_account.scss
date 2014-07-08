@@ -148,7 +148,7 @@
         }
 
         .title-sub {
-          @include font-size(20);
+          @include font-size(15);
           margin-left: ($baseline*2);
           text-transform: lowercase;
           color: $header-graphic-sub-color;
