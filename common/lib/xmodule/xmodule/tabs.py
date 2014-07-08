@@ -630,7 +630,7 @@ class OpenEndedGradingTab(AuthenticatedCourseTab, GradingTab):
         super(OpenEndedGradingTab, self).__init__(
             # Translators: "Open Ended Panel" appears on a tab that, when clicked, opens up a panel that
             # displays information about open-ended problems that a user has submitted or needs to grade
-            name=_("Open Ended Panel"),
+            name=_("Assessment Panel"),
             tab_id=self.type,
             link_func=link_reverse_func('open_ended_notifications'),
         )
