@@ -258,6 +258,8 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    'ENABLE_VERBOSE_LOGGING_FOR_SESSIONS': False,
 }
 
 # Used for A/B testing
