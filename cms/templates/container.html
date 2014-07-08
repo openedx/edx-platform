@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 templates = ["basic-modal", "modal-button", "edit-xblock-modal",
     "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock"]
+    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history"]
 %>
 <%block name="header_extras">
 % for template_name in templates:
@@ -142,6 +142,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                 % endif
                 % if is_unit_page:
                     <div id="publish-unit"></div>
+                    <div id="publish-history" class="unit-publish-history"></div>
                     <div class="unit-location is-hidden">
                         <h4 class="bar-mod-title">${_("Unit Location")}</h4>
                         <div class="wrapper-unit-id bar-mod-content">
