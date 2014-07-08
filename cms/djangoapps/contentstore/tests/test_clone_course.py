@@ -1,8 +1,6 @@
 """
 Unit tests for cloning a course between the same and different module stores.
 """
-from django.utils.unittest.case import skipIf
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 from contentstore.tests.utils import CourseTestCase
@@ -12,8 +10,6 @@ class CloneCourseTest(CourseTestCase):
     """
     Unit tests for cloning a course
     """
-    # TODO Don is fixing this on his branch of split migrator
-    @skipIf(True, "Don is still working on split migrator")
     def test_clone_course(self):
         """Tests cloning of a course as follows: XML -> Mongo (+ data) -> Mongo -> Split -> Split"""
         # 1. import and populate test toy course

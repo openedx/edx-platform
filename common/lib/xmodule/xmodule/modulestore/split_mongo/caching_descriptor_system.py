@@ -1,14 +1,14 @@
 import sys
 import logging
-from xmodule.mako_module import MakoDescriptorSystem
+from xblock.runtime import KvsFieldData
+from xblock.fields import ScopeIds
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import KvsFieldData
+from xmodule.modulestore.split_mongo import encode_key_for_mongo
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
-from xblock.fields import ScopeIds
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
             course_entry['structure'].get('blocks', {}).get(
-                LocMapperStore.encode_key_for_mongo(course_entry['structure'].get('root'))
+                encode_key_for_mongo(course_entry['structure'].get('root'))
             )
         )
         self.default_class = default_class
