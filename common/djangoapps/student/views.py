@@ -87,6 +87,7 @@ from util.password_policy_validators import (
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
 
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -657,13 +658,16 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
+# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
+# seems Probably Incorrect
 def _parse_course_id_from_string(input_str):
     """
     Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
         return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
