@@ -17,7 +17,6 @@ from student.models import CourseEnrollment, UserProfile
 from courseware.models import CoursePreference
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import editable_modulestore
 
 from sneakpeek_deeplink.middleware import SneakPeekDeepLinkMiddleware
 
@@ -33,7 +32,6 @@ class SneakPeekDeeplinkMiddlewareTests(TestCase):
     Tests of Sneakpek deeplink middleware
     """
     def setUp(self):
-        self.store = editable_modulestore()
         self.client = Client()
         self.factory = RequestFactory()
         self.middleware = SneakPeekDeepLinkMiddleware()
