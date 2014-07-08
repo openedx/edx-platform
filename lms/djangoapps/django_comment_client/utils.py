@@ -293,7 +293,11 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
 
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
-        for child in content.get('children', []):
+        for child in (
+                content.get('children', []) +
+                content.get('endorsed_responses', []) +
+                content.get('non_endorsed_responses', [])
+        ):
             annotate(child)
     annotate(thread)
     return infos
@@ -369,15 +373,16 @@ def safe_content(content, is_staff=False):
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'unread_comments_count',
         'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
-        'stats', 'resp_skip', 'resp_limit', 'resp_total',
-
+        'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
+        'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
         fields += ['username', 'user_id']
 
-    if 'children' in content:
-        safe_children = [safe_content(child) for child in content['children']]
-        content['children'] = safe_children
+    for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
+        if child_content_key in content:
+            safe_children = [safe_content(child) for child in content[child_content_key]]
+            content[child_content_key] = safe_children
 
     return strip_none(extract(content, fields))
