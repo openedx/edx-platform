@@ -1,5 +1,5 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "js/utils/change_on_enter", "jquery.ui",
+    "js/utils/date_utils", "js/utils/module", "js/utils/handle_iframe_binding", "js/utils/change_on_enter", "jquery.ui",
     "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
     function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils, TriggerChangeEventOnEnter)
 {
@@ -196,7 +196,7 @@ function saveSubsection() {
     // get datetimes for start and due, stick into metadata
     _(["start", "due"]).each(function(name) {
 
-        var datetime = DateUtils(
+        var datetime = DateUtils.getDate(
             document.getElementById(name+"_date"),
             document.getElementById(name+"_time")
         );
