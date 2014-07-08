@@ -68,11 +68,20 @@ define(["jquery", "gettext", "js/views/baseview"],
                 this.getInput().addClass('is-hidden');
             },
 
+            cancelInput: function() {
+                this.getInput().val(this.model.get(this.fieldName));
+                this.hideInput();
+            },
+
             updateField: function() {
                 var xblockInfo = this.model,
-                    newValue = this.getInput().val(),
-                    requestData = this.createUpdateRequestData(newValue),
-                    fieldName = this.fieldName;
+                    newValue = this.getInput().val().trim(),
+                    oldValue = xblockInfo.get(this.fieldName),
+                    requestData = this.createUpdateRequestData(newValue);
+                if (newValue === '' || newValue === oldValue) {
+                    this.cancelInput();
+                    return;
+                }
                 this.runOperationShowingMessage(gettext('Saving&hellip;'),
                     function() {
                         return xblockInfo.save(requestData);
@@ -92,8 +101,7 @@ define(["jquery", "gettext", "js/views/baseview"],
 
             handleKeyUp: function(event) {
                 if (event.keyCode === 27) {   // Revert the changes if the user hits escape
-                    this.getInput().val(this.model.get(this.fieldName));
-                    this.hideInput();
+                    this.cancelInput();
                 }
             }
         });
