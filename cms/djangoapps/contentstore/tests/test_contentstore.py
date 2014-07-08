@@ -30,7 +30,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -632,7 +631,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.store.convert_to_draft(vertical.location, self.user.id)
 
         # delete the course
-        delete_course(self.store, content_store, course_id, commit=True)
+        self.store.delete_course(course_id, self.user.id)
 
         # assert that there's absolutely no non-draft modules in the course
         # this should also include all draft items
@@ -697,7 +696,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
             self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
         # remove old course
-        delete_course(self.store, content_store, course_id, commit=True)
+        self.store.delete_course(course_id, self.user.id)
 
         # reimport over old course
         self.check_import(root_dir, content_store, course_id)
@@ -909,7 +908,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         # Delete the course from module store and reimport it
 
-        delete_course(self.store, content_store, course_id, commit=True)
+        self.store.delete_course(course_id, self.user.id)
 
         import_from_xml(
             self.store, self.user.id, root_dir, ['test_export_no_content_store'],
@@ -997,7 +996,7 @@ class ContentStoreTest(ContentStoreTestCase):
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         course_id = _get_course_id(test_course_data)
         self.assertTrue(are_permissions_roles_seeded(course_id))
-        delete_course_and_groups(course_id, commit=True)
+        delete_course_and_groups(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
         with self.assertRaises(ItemNotFoundError):
             are_permissions_roles_seeded(course_id)
@@ -1009,7 +1008,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # unseed the forums for the first course
         course_id = _get_course_id(test_course_data)
-        delete_course_and_groups(course_id, commit=True)
+        delete_course_and_groups(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
         with self.assertRaises(ItemNotFoundError):
             are_permissions_roles_seeded(course_id)
@@ -1029,7 +1028,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
 
-        delete_course_and_groups(course_id, commit=True)
+        delete_course_and_groups(course_id, self.user.id)
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         # check that user has form role "Student" for this course even after deleting it
@@ -1051,7 +1050,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertTrue(len(instructor_role.users_with_role()) > 0)
 
         # Now delete course and check that user not in instructor groups of this course
-        delete_course_and_groups(course_id, commit=True)
+        delete_course_and_groups(course_id, self.user.id)
 
         # Update our cached user since its roles have changed
         self.user = User.objects.get_by_natural_key(self.user.natural_key()[0])

@@ -1380,7 +1380,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return result
 
-    def delete_course(self, course_key, user_id=None):
+    def delete_course(self, course_key, user_id):
         """
         Remove the given course from the course index.
 
@@ -1394,6 +1394,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index)
+
+        # We do NOT call the super class here since we need to keep the assets
+        # in case the course is later restored.
+        # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
 
     def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """
