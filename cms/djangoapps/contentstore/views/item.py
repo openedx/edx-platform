@@ -574,8 +574,10 @@ def create_xblock_info(usage_key, xblock, data=None, metadata=None):
         "category": xblock.category,
         "has_changes": modulestore().has_changes(usage_key),
         "published": publish_state in (PublishState.public, PublishState.draft),
-        "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
-        "edited_by": safe_get_username(xblock.edited_by)
+        "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
+        "edited_by": safe_get_username(xblock.subtree_edited_by),
+        "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
+        "published_by": safe_get_username(xblock.published_by),
     }
     if data is not None:
         xblock_info["data"] = data

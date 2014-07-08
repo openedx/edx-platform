@@ -7,12 +7,23 @@
         <% } %>
     </h3>
 
-    <!--To be added in STUDIO-1826-->
-    <!--<div class="wrapper-last-draft bar-mod-content">-->
-        <!--<p class="copy meta">-->
-            <!--Draft saved on 6/15/2014 at 12:45pm by amako-->
-        <!--</p>-->
-    <!--</div>-->
+    <div class="wrapper-last-draft bar-mod-content">
+        <p class="copy meta">
+            <% if (has_changes && edited_on && edited_by) {
+                var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
+                <%= interpolate(message, {
+                    last_saved_date: '<span class="date">' + edited_on + '</span>',
+                    edit_username: '<span class="user">' + edited_by + '</span>' }, true) %>
+            <% } else if (published_on && published_by) {
+                var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
+                <%= interpolate(message, {
+                    last_published_date: '<span class="date">' + published_on + '</span>',
+                    publish_username: '<span class="user">' + published_by + '</span>' }, true) %>
+            <% } else { %>
+                <%= gettext("Previously published") %>
+            <% } %>
+        </p>
+    </div>
 
     <!--To be added in STUD-1829-->
     <!--<div class="wrapper-release bar-mod-content">-->
