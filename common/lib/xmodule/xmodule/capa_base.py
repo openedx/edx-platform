@@ -18,6 +18,7 @@ except ImportError:
     dog_stats_api = None
 
 from pkg_resources import resource_string
+from lxml import etree
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
@@ -205,6 +206,9 @@ class CapaMixin(CapaFields):
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
 
+    show_hint_button = False
+    next_hint_index = 0
+
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
@@ -226,6 +230,8 @@ class CapaMixin(CapaFields):
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
+
+
             self.lcp = self.new_lcp(self.get_state_for_lcp())
 
             # At this point, we need to persist the randomization seed
@@ -583,14 +589,48 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def get_problem_html(self, encapsulate=True):
-        """
-        Return html for the problem.
+    def _tally_problem_hints(self):
+        '''
+        Count the number of problem hints specified in the problem XML, saving
+        that value in self.problem_hints_counts
+        :return: Number of problem hints found
+        '''
+        hint_elements_list = self.lcp.tree.xpath("//problem/demandhints/hint")
+        self.problem_hints_count = len(hint_elements_list)
+        self.show_hint_button = (self.problem_hints_count > 0)
+        return self.problem_hints_count
 
-        Adds check, reset, save buttons as necessary based on the problem config and state.
-        """
+    def _insert_problem_hint(self, html):
+        '''
+        If the student has requested a program hint, find the next hint to display
+        for this problem and insert it into the html stream. This function is only
+        called when the student requests a hint so there is no need to verify conditions.
+        :param html:    The original html string (with the special string '> <' embedded therein)
+        :return:        The (potentially) modified html string
+        '''
+
+        hint_element = self.lcp.tree.xpath("//problem/demandhints/hint")[ self.next_hint_index ]
+        hint_text = hint_element.text.strip()
+        html = html.replace('> <', '>' + hint_text + '<')  # replace the single space (see correctmap.py)
+
+        self.next_hint_index += 1
+        if self.next_hint_index > self.problem_hints_count:     # if all hints have been shown
+            self.next_hint_index = 0                            # reset back to the first hint again
+
+        return html
+
+    def get_problem_html(self, encapsulate=True, show_problem_hint=False):
+        '''
+        Return html for the problem.
+        Displays check, reset, save, and hint buttons as necessary.
+
+        :param encapsulate:         true -- embed the html in a problem <div>
+        :param show_problem_hint:   true -- present the next sequential problem hint to the student
+        :return:                    the updated html string
+        '''
 
         try:
+            self._tally_problem_hints()
             html = self.lcp.get_html()
 
         # If we cannot construct the problem HTML,
@@ -625,6 +665,8 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'show_hint_button': self.show_hint_button,
+            'next_hint_index':self.next_hint_index,
         }
 
         html = self.runtime.render_template('problem.html', context)
@@ -643,7 +685,19 @@ class CapaMixin(CapaFields):
         if self.runtime.replace_jump_to_id_urls:
             html = self.runtime.replace_jump_to_id_urls(html)
 
+        if show_problem_hint:                       # if the student has requested a problem hint
+            html = self._insert_problem_hint(html)  # add the next sequential problem hint to the html
+
         return html
+
+    def hint_button(self, data):
+        self.next_hint_index = int(data['next_hint_index'])
+        html = self.get_problem_html(encapsulate=False, show_problem_hint=True)
+
+        return {
+            'success': True,
+            'contents': html
+        }
 
     def is_past_due(self):
         """
