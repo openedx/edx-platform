@@ -100,8 +100,8 @@ def ensure_pr_fetch():
     pr_fetch = '+refs/pull/*/head:refs/remotes/edx/pr/*'
     if pr_fetch not in edx_fetches:
         git.config("remote.edx.fetch", pr_fetch, add=True)
-        git.fetch("edx")
         modified = True
+    git.fetch("edx")
     return modified
 
 
