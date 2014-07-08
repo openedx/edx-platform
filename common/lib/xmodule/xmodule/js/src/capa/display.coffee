@@ -31,6 +31,8 @@ class @Problem
     @checkButtonCheckText = @checkButton.val()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
+
+    @$('div.action input.hint_button').click @hint_button
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
@@ -697,3 +699,15 @@ class @Problem
       if @has_response
         @enableCheckButton true
     window.setTimeout(enableCheckButton, 750)
+
+
+  hint_button: =>
+    Logger.log 'hint_button', 0
+    inputElement = document.getElementsByClassName("hint_button")[0]
+    for anAttribute in inputElement.attributes
+      if inputElement.attributes[_i].name == "next_hint_index"
+        next_hint_index = inputElement.attributes[_i].nodeValue
+        break
+
+    $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>
+        @render(response.contents)
