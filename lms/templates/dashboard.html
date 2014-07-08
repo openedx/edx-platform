@@ -291,7 +291,10 @@
 
   <section class="my-courses" id="my-courses">
     <header>
-      <div style="display:flex"><h2>${_("Courses")} </h2><div style="flex-grow:1"></div><div style="font-size: 13px; color: #646464;">${_("ordered by recent activity")}</div></div>
+      <h2 class="my-courses-title">
+        <span class="my-courses-title-label">${_("Courses")}</span>
+        <span class="my-courses-title-description">${_("ordered by recent activity")}</span>
+      </h2>
     </header>
 
     % if len(course_enrollment_pairs) > 0:
