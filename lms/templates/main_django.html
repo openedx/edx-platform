@@ -29,6 +29,18 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
+  <script type="text/javascript">
+    $(function(){
+        // get current body width
+        var set_width = $(document.body).width();
+        $(window).bind('scroll resize', function(){
+            $('.backToTop').goToTop({
+                pageWidth: set_width,
+                duration: 300
+            });
+        });
+    });
+  </script>
   <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to this view's content" %}</a>
   {% include "navigation.html" %}
   <div class="content-wrapper" id="content">
