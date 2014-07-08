@@ -9,7 +9,7 @@ from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.video.video import VidoComponentPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import UniqueCourseTest, is_youtube_available
+from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 
 
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
@@ -115,3 +115,64 @@ class CMSVideoBaseTest(UniqueCourseTest):
         """
         self.unit_page.components[0].save_settings()
 
+
+class CMSVideoTest(CMSVideoBaseTest):
+    """
+    CMS Video Test Class
+    """
+
+    def setUp(self):
+        super(CMSVideoTest, self).setUp()
+
+    def tearDown(self):
+        YouTubeStubConfig.reset()
+
+    def _create_course_unit(self, youtube_stub_config=None):
+        """
+        Create CMS Video Course Unit and Navigates to it.
+
+        Arguments:
+            youtube_stub_config (dict)
+
+        """
+        if youtube_stub_config:
+            YouTubeStubConfig.configure(youtube_stub_config)
+
+        self.navigate_to_course_unit()
+
+    def test_youtube_stub_proxy(self):
+        """
+        Scenario: YouTube stub server proxies YouTube API correctly
+        Given youtube stub server proxies YouTube API
+        And I have created a Video component
+        Then I can see video button "play"
+        And I click video button "play"
+        Then I can see video button "pause"
+        """
+        self._create_course_unit(youtube_stub_config={'youtube_api_blocked': False})
+
+        self.assertTrue(self.video.is_button_shown('play'))
+        self.video.click_player_button('play')
+        self.assertTrue(self.video.is_button_shown('pause'))
+
+    def test_youtube_stub_blocks_youtube_api(self):
+        """
+        Scenario: YouTube stub server can block YouTube API
+        Given youtube stub server blocks YouTube API
+        And I have created a Video component
+        And I wait for "3" seconds
+        Then I do not see video button "play"
+        """
+        self._create_course_unit(youtube_stub_config={'youtube_api_blocked': True})
+
+        self.assertFalse(self.video.is_button_shown('play'))
+
+    def test_autoplay_is_disabled(self):
+        """
+        Scenario: Autoplay is disabled in Studio
+        Given I have created a Video component
+        Then when I view the video it does not have autoplay enabled
+        """
+        self._create_course_unit()
+
+        self.assertFalse(self.video.is_autoplay_enabled())

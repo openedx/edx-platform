@@ -3,12 +3,15 @@ CMS Video
 """
 
 import os
+import time
 import requests
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.javascript import wait_for_js, js_defined
+from ....tests.helpers import YouTubeStubConfig
 
 CLASS_SELECTORS = {
+    'video_container': 'div.video',
     'video_init': '.is-initialized',
     'video_xmodule': '.xmodule_VideoModule',
     'video_spinner': '.video-wrapper .spinner',
@@ -23,7 +26,15 @@ BUTTON_SELECTORS = {
     'upload_handout': '.upload-action',
     'handout_submit': '.action-upload',
     'handout_clear': '.wrapper-comp-setting.file-uploader .setting-clear',
+    'CC': '.hide-subtitles',
+    'volume': '.volume',
+    'play': '.video_control.play',
+    'pause': '.video_control.pause',
+    'handout': '.video-handout.video-download-button a',
 }
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 
 @js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery', 'window.XModule', 'window.XBlock',
@@ -61,7 +72,9 @@ class VidoComponentPage(PageObject):
         """
         self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_init']).present, 'Video Player Initialized')
         self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible, 'Video Buffering Completed')
-        self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible')
+
+        if not YouTubeStubConfig.get_configuartion().get('youtube_api_blocked'):
+            self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible')
 
     def click_button(self, button_name):
         """
@@ -139,3 +152,41 @@ class VidoComponentPage(PageObject):
         """
         return self.q(css=BUTTON_SELECTORS['handout_download']).present and self.q(
             css=BUTTON_SELECTORS['handout_download']).visible
+
+    def is_button_shown(self, button_name):
+        """
+        Check if a video button specified by `button_id` is visible.
+
+        Arguments:
+            button_name (str): name of button
+
+        Returns:
+            bool: button visibility status
+
+        """
+        return self.q(css=BUTTON_SELECTORS[button_name]).present and self.q(css=BUTTON_SELECTORS[button_name]).visible
+
+    def click_player_button(self, button_name):
+        """
+        Click on `button_name`.
+
+        Arguments:
+            button_name (str): name of button
+
+        """
+        time.sleep(DELAY)
+        self.wait_for_ajax()
+
+        self.click_button(button_name)
+
+    def is_autoplay_enabled(self):
+        """
+        Extract `data-autoplay` attribute to check video autoplay is enabled or disabled.
+
+        Returns:
+            bool: Tells if autoplay enabled/disabled.
+
+        """
+        auto_play = self.q(css=CLASS_SELECTORS['video_container']).attrs('data-autoplay')[0]
+
+        return auto_play.lower() == 'true'
