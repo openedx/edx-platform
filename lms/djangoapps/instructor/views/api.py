@@ -1733,14 +1733,14 @@ def get_survey(request, course_id):  # pylint: disable=W0613
     """
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/cp932)."""
+        import unicodecsv as csv
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        encoded = [unicode(s).encode('cp932') for s in header]
+        encoded = [unicode(s).encode('utf-8') for s in header]
         writer.writerow(encoded)
         for row in rows:
-            # NOTE: this data is mostly Japanese, so encode cp932
-            encoded = [unicode(s).encode('cp932') for s in row]
+            encoded = [unicode(s).encode('utf-8') for s in row]
             writer.writerow(encoded)
         return response
 

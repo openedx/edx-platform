@@ -175,7 +175,7 @@ msgstr "アンケート結果ダウンロード"
 
 #: lms/templates/instructor/instructor_dashboard_2/survey.html
 msgid "The survey result can be downloaded as a CSV file."
-msgstr "アンケート結果がCSVファイルでダウンロードできます。"
+msgstr "アンケート結果がCSVファイルでダウンロードできます。<br />CSVファイルをそのままExcelで開こうとすると、日本語が含まれている場合に文字化けしてしまいますので、一旦ファイルを保存した後、「UTF-8」に対応したテキストエディタで開き直してください。"
 
 #: lms/templates/instructor/instructor_dashboard_2/survey.html
 msgid "Get Survey CSV"
