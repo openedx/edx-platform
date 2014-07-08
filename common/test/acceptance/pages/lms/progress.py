@@ -18,6 +18,10 @@ class ProgressPage(CoursePage):
         )
         return is_present
 
+    @property
+    def grading_formats(self):
+        return [label.replace(' Scores:', '') for label in self.q(css="div.scores h3").text]
+
     def scores(self, chapter, section):
         """
         Return a list of (points, max_points) tuples representing the scores
