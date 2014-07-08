@@ -554,7 +554,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         return dest_course_id
 
     @contextmanager
-    def bulk_write_operations(store, course_id):
+    def bulk_write_operations(self, course_id):
         """
         A context manager for notifying the store of bulk write events.
 
@@ -567,14 +567,14 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # it's ok if the cached metadata in the memcache is invalid when another
         # request comes in for the same course.
         try:
-            if hasattr(store, '_begin_bulk_write_operation'):
-                store._begin_bulk_write_operation(course_id)
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._begin_bulk_write_operation(course_id)
             yield
         finally:
             # check for the begin method here,
             # since it's an error if an end method is not defined when a begin method is
-            if hasattr(store, '_begin_bulk_write_operation'):
-                store._end_bulk_write_operation(course_id)
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):
