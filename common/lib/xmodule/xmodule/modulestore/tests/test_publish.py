@@ -19,7 +19,8 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # Should be 1 to verify course unique, 11 parent fetches,
         # and n per _create_item where n is the size of the course tree non-leaf nodes
         # for inheritance computation (which is 7*4 + sum(1..4) = 38) (max_finds)
-        with check_mongo_calls(self.draft_mongo, 71, 27):
+        # July 9 2014: finds changed to 83 because create_and_save_xmodule now does a lookup on return
+        with check_mongo_calls(self.draft_mongo, 83, 27):
             with check_mongo_calls(self.old_mongo, 70, 27):
                 super(TestPublish, self)._create_course(split=False)
 

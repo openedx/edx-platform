@@ -139,6 +139,11 @@
 
       .wrapper-last-draft {
         padding: ($baseline*.75) ($baseline*.75) ($baseline/4) ($baseline*.75);
+
+        .date,
+        .user {
+          font-weight: 600;
+        }
       }
 
       .wrapper-release {
@@ -182,6 +187,26 @@
         }
       }
 
+    }
+
+    // versioning widget
+    .unit-publish-history {
+
+      .wrapper-last-publish {
+        margin-bottom: $baseline;
+        padding: ($baseline*.75);
+        background-color: $white;
+
+        .copy {
+          @extend %t-copy-sub2;
+          color: $gray;
+        }
+
+        .date,
+        .user {
+          font-weight: 600;
+        }
+      }
     }
 
     // location widget
