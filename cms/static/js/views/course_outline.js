@@ -9,8 +9,9 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils",
-        "js/models/xblock_outline_info"],
-    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo) {
+        "js/models/xblock_outline_info",
+        "js/views/modals/edit_outline_item"],
+    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, EditSectionXBlockModal) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
@@ -23,13 +24,12 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     return true;
                 }
                 // Only expand the course and its chapters (aka sections) initially
-                var category = this.model.get('category');
-                return category === 'course' || category === 'chapter';
+                return this.model.isCourse() || this.model.isChapter();
             },
 
             shouldRenderChildren: function() {
                 // Render all nodes up to verticals but not below
-                return this.model.get('category') !== 'vertical';
+                return !this.model.isVertical();
             },
 
             createChildView: function(xblockInfo, parentInfo, parentView) {
@@ -64,7 +64,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 var getViewToRefresh, view, expandedLocators;
 
                 getViewToRefresh = function(view) {
-                    if (view.model.get('category') === 'chapter' || !view.parentView) {
+                    if (view.model.isChapter() || !view.parentView) {
                         return view;
                     }
                     return getViewToRefresh(view.parentView);
@@ -119,11 +119,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
 
             onChildDeleted: function(childView) {
                 var xblockInfo = this.model,
-                    childCategory = childView.model.get('category'),
                     children = xblockInfo.get('child_info') && xblockInfo.get('child_info').children;
                 // If deleting a section that isn't the final one, just remove it for efficiency
                 // as it cannot visually effect the other sections.
-                if (childCategory === 'chapter' && children && children.length > 1) {
+                if (childView.model.isChapter() && children && children.length > 1) {
                     childView.$el.remove();
                     children.splice(children.indexOf(childView.model), 1);
                 } else {
@@ -138,6 +137,23 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     expanded_locators: [ locator ],
                     scroll_offset: scrollOffset || 0
                 };
+            },
+
+            editXBlock: function() {
+                var modal = new EditSectionXBlockModal({
+                    model: this.model,
+                    onSave: this.refresh.bind(this)
+                });
+
+                modal.show();
+            },
+
+            addButtonActions: function(element) {
+                XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
+                element.find('.configure-button').click(function(event) {
+                    event.preventDefault();
+                    this.editXBlock();
+                }.bind(this));
             }
         });
 
