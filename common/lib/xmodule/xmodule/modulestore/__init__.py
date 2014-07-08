@@ -602,7 +602,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
         self.update_item(new_object, user_id, allow_not_found=True)
-        return new_object
+        # Retrieve the item from the store so that it has edit info attributes
+        return self.get_item(location)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
