@@ -197,6 +197,7 @@ class ModuleStoreTestCase(TestCase):
         if hasattr(store, 'collection'):
             connection = store.collection.database.connection
             store.collection.drop()
+            connection.drop_database(store.collection.database.name)
             connection.close()
         elif hasattr(store, 'close_all_connections'):
             store.close_all_connections()
@@ -247,7 +248,7 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Flush the Mongo modulestore
-        ModuleStoreTestCase.drop_mongo_collections()
+        self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -256,7 +257,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore after each test.
         """
-        ModuleStoreTestCase.drop_mongo_collections()
+        self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()

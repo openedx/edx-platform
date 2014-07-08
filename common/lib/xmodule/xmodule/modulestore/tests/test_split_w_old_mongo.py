@@ -7,8 +7,7 @@ import random
 from xmodule.modulestore.inheritance import InheritanceMixin
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.mongo import MongoModuleStore, DraftMongoModuleStore
-from xmodule.modulestore.mongo.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -22,7 +21,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     Defines the following attrs on self:
     * user_id: a random non-registered mock user id
     * split_mongo: a pointer to the split mongo instance
-    * old_mongo: a pointer to the old_mongo instance
     * draft_mongo: a pointer to the old draft instance
     * split_course_key (CourseLocator): of the new course
     * old_course_key: the SlashSpecifiedCourseKey for the course
@@ -54,7 +52,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         )
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
-        self.old_mongo = MongoModuleStore(None, self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftMongoModuleStore(
             None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
         )
@@ -78,19 +75,23 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         """
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
-        split_db.drop_collection(self.old_mongo.collection)
+        split_db.drop_collection(self.draft_mongo.collection)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """
         Create the item of the given category and block id in split and old mongo, add it to the optional
         parent. The parent category is only needed because old mongo requires it for the id.
+
+        Note: if draft = False, it will create the draft and then publish it; so, it will overwrite any
+        existing draft for both the new item and the parent
         """
         location = self.old_course_key.make_usage_key(category, name)
-        if not draft or category in DIRECT_ONLY_CATEGORIES:
-            mongo = self.old_mongo
-        else:
-            mongo = self.draft_mongo
-        mongo.create_and_save_xmodule(location, self.user_id, definition_data=data, metadata=metadata, runtime=self.runtime)
+
+        self.draft_mongo.create_and_save_xmodule(
+            location, self.user_id, definition_data=data, metadata=metadata, runtime=self.runtime
+        )
+        if not draft:
+            self.draft_mongo.publish(location, self.user_id)
         if isinstance(data, basestring):
             fields = {'data': data}
         else:
@@ -99,13 +100,11 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         if parent_name:
             # add child to parent in mongo
             parent_location = self.old_course_key.make_usage_key(parent_category, parent_name)
-            if not draft or parent_category in DIRECT_ONLY_CATEGORIES:
-                mongo = self.old_mongo
-            else:
-                mongo = self.draft_mongo
-            parent = mongo.get_item(parent_location)
+            parent = self.draft_mongo.get_item(parent_location)
             parent.children.append(location)
-            mongo.update_item(parent, self.user_id)
+            self.draft_mongo.update_item(parent, self.user_id)
+            if not draft:
+                self.draft_mongo.publish(parent_location, self.user_id)
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
                 course_key=self.split_course_key,
@@ -137,6 +136,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.split_mongo.create_course(
                 self.split_course_key.org, self.split_course_key.course, self.split_course_key.run, self.user_id, fields=fields, root_block_id='runid'
             )
-        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', self.user_id, fields=fields)
+        old_course = self.draft_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', self.user_id, fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

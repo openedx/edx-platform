@@ -371,7 +371,11 @@ class DraftModuleStore(MongoModuleStore):
             DuplicateItemError: if the source or any of its descendants already has a draft copy
         """
         # delegating to internal b/c we don't want any public user to use the kwargs on the internal
-        return self._convert_to_draft(location, user_id)
+        self._convert_to_draft(location, user_id)
+
+        # return the new draft item (does another fetch)
+        # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
+        return self.get_item(location)
 
     def _convert_to_draft(self, location, user_id, delete_published=False, ignore_if_draft=False):
         """
@@ -426,10 +430,6 @@ class DraftModuleStore(MongoModuleStore):
 
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
-
-        # return the new draft item (does another fetch)
-        # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
-        return self.get_item(location)
 
     def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False):
         """
@@ -551,6 +551,8 @@ class DraftModuleStore(MongoModuleStore):
 
         first_tier = [as_func(location) for as_func in as_functions]
         self._breadth_first(_delete_item, first_tier)
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.refresh_cached_metadata_inheritance_tree(location.course_key)
 
     def _breadth_first(self, function, root_usages):
         """
@@ -579,8 +581,6 @@ class DraftModuleStore(MongoModuleStore):
 
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
         self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(root_usages[0].course_key)
 
     def has_changes(self, location):
         """
@@ -682,7 +682,7 @@ class DraftModuleStore(MongoModuleStore):
         to remove things from the published version
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
-        return self._convert_to_draft(location, user_id, delete_published=True)
+        self._convert_to_draft(location, user_id, delete_published=True)
 
     def revert_to_published(self, location, user_id=None):
         """

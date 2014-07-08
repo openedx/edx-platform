@@ -4,8 +4,7 @@ from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores, _MIXED_MODULESTORE, \
-    loc_mapper, _loc_singleton
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId
@@ -225,38 +224,3 @@ class TemplateTests(unittest.TestCase):
 
         version_history = self.split_store.get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
-
-
-class SplitAndLocMapperTests(unittest.TestCase):
-    """
-    Test injection of loc_mapper into Split
-    """
-    def test_split_inject_loc_mapper(self):
-        """
-        Test loc_mapper created before split
-        """
-        # ensure modulestore is not instantiated
-        self.assertIsNone(_MIXED_MODULESTORE)
-
-        # instantiate location mapper before split
-        mapper = loc_mapper()
-
-        # instantiate mixed modulestore and thus split
-        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-
-        # split must inject the same location mapper object since the mapper existed before it did
-        self.assertEqual(split_store.loc_mapper, mapper)
-
-    def test_loc_inject_into_split(self):
-        """
-        Test split created before loc_mapper
-        """
-        # ensure loc_mapper is not instantiated
-        self.assertIsNone(_loc_singleton)
-
-        # instantiate split before location mapper
-        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-
-        # split must have instantiated loc_mapper
-        mapper = loc_mapper()
-        self.assertEqual(split_store.loc_mapper, mapper)
