@@ -32,14 +32,21 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
              */
             "locked": null,
             /**
-             * Date of last edit to this xblock. Will be the latest change to either the draft
-             * or the published version.
+             * Date of the last edit to this xblock or any of its descendants.
              */
             "edited_on":null,
             /**
-             * User who last edited the xblock.
+             * User who last edited the xblock or any of its descendants.
              */
             "edited_by":null,
+            /**
+             * Date of the last publish of this xblock, or null if never published.
+             */
+            "published_on": null,
+            /**
+             * User who last published the xblock, or null if never published.
+             */
+            "published_by": null,
             /**
              * If the xblock is published, the date on which it will be released to students.
              */
