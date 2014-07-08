@@ -670,6 +670,51 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         return self._convert_to_draft(location, user_id, delete_published=True)
 
+    def revert_to_published(self, location, user_id=None):
+        """
+        Reverts an item to its last published version (recursively traversing all of its descendants).
+        If no published version exists, a VersionConflictError is thrown.
+
+        If a published version exists but there is no draft version of this item or any of its descendants, this
+        method is a no-op. It is also a no-op if the root item is in DIRECT_ONLY_CATEGORIES.
+
+        :raises InvalidVersionError: if no published version exists for the location specified
+        """
+        self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
+        _verify_revision_is_published(location)
+
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return
+
+        if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
+            raise InvalidVersionError(location)
+
+        def delete_draft_only(root_location):
+            """
+            Helper function that calls delete on the specified location if a draft version of the item exists.
+            If no draft exists, this function recursively calls itself on the children of the item.
+            """
+            query = root_location.to_deprecated_son(prefix='_id.')
+            del query['_id.revision']
+            versions_found = self.collection.find(
+                query, {'_id': True, 'definition.children': True}, sort=[SORT_REVISION_FAVOR_DRAFT]
+            )
+            # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
+            # of the draft version.
+            if versions_found.count() > 1:
+                self._delete_subtree(root_location, [as_draft])
+            elif versions_found.count() == 1:
+                # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
+                # delete_subtree as soon as we find an item with a draft version, if there is only 1 version
+                # it must be published (since adding a child to a published item creates a draft of the parent).
+                item = versions_found[0]
+                assert item.get('_id').get('revision') != MongoRevisionKey.draft
+                for child in item.get('definition', {}).get('children', []):
+                    child_loc = Location.from_deprecated_string(child)
+                    delete_draft_only(child_loc)
+
+        delete_draft_only(location)
+
     def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
         to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(course_key, items)
