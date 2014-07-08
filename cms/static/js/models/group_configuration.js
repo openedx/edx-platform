@@ -22,7 +22,8 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                     }
                 ]),
                 showGroups: false,
-                editing: false
+                editing: false,
+                usage: []
             };
         },
 

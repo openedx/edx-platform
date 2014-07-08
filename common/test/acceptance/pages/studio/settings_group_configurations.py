@@ -15,6 +15,7 @@ class GroupConfigurationsPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='body.view-group-configurations').present
 
+    @property
     def group_configurations(self):
         """
         Return list of the group configurations for the course.
@@ -68,6 +69,20 @@ class GroupConfiguration(object):
         """
         return self.find_css(css).first.text[0]
 
+    def click_outline_anchor(self):
+        """
+        Click on the `Course Outline` link.
+        """
+        css = 'p.group-configuration-usage-text a'
+        self.find_css(css).first.click()
+
+    def click_unit_anchor(self, index=0):
+        """
+        Click on the link to the unit.
+        """
+        css = 'li.group-configuration-usage-unit a'
+        self.find_css(css).nth(index).click()
+
     def edit(self):
         """
         Open editing view for the group configuration.
@@ -113,6 +128,14 @@ class GroupConfiguration(object):
         Return validation message.
         """
         return self.get_text('.message-status.error')
+
+    @property
+    def usages(self):
+        """
+        Return list of usages.
+        """
+        css = '.group-configuration-usage-unit'
+        return self.find_css(css).text
 
     @property
     def name(self):

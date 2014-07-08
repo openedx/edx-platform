@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
+import logging
 
 from django.utils.translation import ugettext as _
 import django.utils
@@ -32,7 +33,8 @@ from contentstore.utils import (
     get_lms_link_for_item,
     add_extra_panel_tab,
     remove_extra_panel_tab,
-    reverse_course_url
+    reverse_course_url,
+    reverse_usage_url,
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
@@ -69,6 +71,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'advanced_settings_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler']
+
+log = logging.getLogger(__name__)
 
 
 class AccessListFallback(Exception):
@@ -949,6 +953,62 @@ class GroupConfiguration(object):
             groups
         )
 
+    @staticmethod
+    def _get_usage_info(course, modulestore):
+        """
+        Get all units names and their urls that have experiments and associated
+        with configurations.
+
+        Returns:
+        {'user_partition_id':
+            [
+                {'label': 'Unit Name / Experiment Name', 'url': 'url_to_unit_1'},
+                {'label': 'Another Unit Name / Another Experiment Name', 'url': 'url_to_unit_1'}
+            ],
+        }
+        """
+        usage_info = {}
+        descriptors = modulestore.get_items(course.id, category='split_test')
+        for split_test in descriptors:
+            if split_test.user_partition_id not in usage_info:
+                usage_info[split_test.user_partition_id] = []
+
+            unit_location = modulestore.get_parent_location(split_test.location)
+            if not unit_location:
+                log.warning("Parent location of split_test module not found: %s", split_test.location)
+                continue
+
+            try:
+                unit = modulestore.get_item(unit_location)
+            except ItemNotFoundError:
+                log.warning("Unit not found: %s", unit_location)
+                continue
+
+            unit_url = reverse_usage_url(
+                'unit_handler',
+                course.location.course_key.make_usage_key(unit.location.block_type, unit.location.name)
+            )
+            usage_info[split_test.user_partition_id].append({
+                'label': '{} / {}'.format(unit.display_name, split_test.display_name),
+                'url': unit_url
+            })
+        return usage_info
+
+    @staticmethod
+    def add_usage_info(course, modulestore):
+        """
+        Add usage information to group configurations json.
+
+        Returns json of group configurations updated with usage information.
+        """
+        usage_info = GroupConfiguration._get_usage_info(course, modulestore)
+        configurations = []
+        for partition in course.user_partitions:
+            configuration = partition.to_json()
+            configuration['usage'] = usage_info.get(partition.id, [])
+            configurations.append(configuration)
+        return configurations
+
 
 @require_http_methods(("GET", "POST"))
 @login_required
@@ -968,12 +1028,16 @@ def group_configurations_list_handler(request, course_key_string):
 
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+        course_outline_url = reverse_course_url('course_handler', course_key)
         split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+        configurations = GroupConfiguration.add_usage_info(course, store)
 
         return render_to_response('group_configurations.html', {
             'context_course': course,
             'group_configuration_url': group_configuration_url,
-            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
+            'course_outline_url': course_outline_url,
+            'configurations': configurations if split_test_enabled else None,
         })
     elif "application/json" in request.META.get('HTTP_ACCEPT'):
         if request.method == 'POST':
