@@ -15,7 +15,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 modalName: 'basic',
                 modalType: 'generic',
                 modalSize: 'lg',
-                title: ''
+                title: '',
+                // A list of class names, separated by space.
+                viewSpecificClasses: ''
             }),
 
             initialize: function() {
@@ -39,7 +41,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                     name: this.options.modalName,
                     type: this.options.modalType,
                     size: this.options.modalSize,
-                    title: this.options.title
+                    title: this.options.title,
+                    viewSpecificClasses: this.options.viewSpecificClasses
                 }));
                 this.addActionButtons();
                 this.renderContents();
