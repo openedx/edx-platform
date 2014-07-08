@@ -308,6 +308,28 @@
       margin-bottom: 30px;
     }
 
+    // my courses title
+    .my-courses-title {
+      @include clearfix();
+    }
+
+    .my-courses-title-label {
+      display: inline-block;
+      vertical-align: middle;
+      width: flex-grid(6, 9);
+    }
+
+    .my-courses-title-description {
+      @extend %t-title7;
+      display: inline-block;
+      vertical-align: middle;
+      width: flex-grid(3, 9);
+      text-transform: lowercase;
+      text-align: right;
+      letter-spacing: 0;
+      color: $lighter-base-font-color;
+    }
+
     .empty-dashboard-message {
       padding: 60px 0px;
       text-align: center;
