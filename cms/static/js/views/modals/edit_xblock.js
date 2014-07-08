@@ -14,7 +14,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
-                addSaveButton: true
+                addSaveButton: true,
+                viewSpecificClasses: 'modal-editor confirm'
             }),
 
             initialize: function() {

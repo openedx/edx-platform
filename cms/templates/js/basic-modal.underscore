@@ -4,7 +4,7 @@
      aria-hidden=""
      role="dialog">
     <div class="modal-window-overlay"></div>
-    <div class="modal-window confirm modal-editor modal-<%= size %> modal-type-<%= type %>">
+    <div class="modal-window <%= viewSpecificClasses %> modal-<%= size %> modal-type-<%= type %>">
         <div class="<%= name %>-modal">
             <div class="modal-header">
                 <h2 class="title modal-window-title"><%= title %></h2>

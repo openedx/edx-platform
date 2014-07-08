@@ -14,7 +14,6 @@ class StudioCourseTest(UniqueCourseTest):
         Install a course with no content using a fixture.
         """
         super(StudioCourseTest, self).setUp()
-
         self.course_fixture = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],

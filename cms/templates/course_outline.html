@@ -28,7 +28,8 @@ from contentstore.utils import reverse_usage_url
 </%block>
 
 <%block name="header_extras">
-% for template_name in ['course-outline', 'xblock-string-field-editor']:
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'edit-outline-item-modal']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

@@ -1,8 +1,12 @@
 """
 Course Outline page in Studio.
 """
+import datetime
+
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
+
+from selenium.webdriver.support.ui import Select
 
 from .course_page import CoursePage
 from .container import ContainerPage
@@ -19,6 +23,7 @@ class CourseOutlineItem(object):
     NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
     STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
+    CONFIGURATION_BUTTON_SELECTOR = '.action-item .configure-button'
 
     def __repr__(self):
         # CourseOutlineItem is also used as a mixin for CourseOutlinePage, which doesn't have a locator
@@ -93,6 +98,27 @@ class CourseOutlineItem(object):
         return "is-editing" in self.q(
             css=self._bounded_selector(self.NAME_FIELD_WRAPPER_SELECTOR)
         )[0].get_attribute("class")
+
+    def edit(self):
+        self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()
+        modal = CourseOutlineModal(self)
+        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')
+        return modal
+
+    @property
+    def release_date(self):
+        element = self.q(css=self._bounded_selector(".status-release-value"))
+        return element.first.text[0] if element.present else None
+
+    @property
+    def due_date(self):
+        element = self.q(css=self._bounded_selector(".due-date"))
+        return element.first.text[0] if element.present else None
+
+    @property
+    def policy(self):
+        element = self.q(css=self._bounded_selector(".policy"))
+        return element.first.text[0] if element.present else None
 
 
 class CourseOutlineContainer(CourseOutlineItem):
@@ -413,3 +439,115 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             return ExpandCollapseLinkState.COLLAPSE
         else:
             return ExpandCollapseLinkState.EXPAND
+
+
+class CourseOutlineModal(object):
+    MODAL_SELECTOR = ".edit-outline-item-modal"
+
+    def __init__(self, page):
+        self.page = page
+
+    def _bounded_selector(self, selector):
+        """
+        Returns `selector`, but limited to this particular `CourseOutlineModal` context.
+        """
+        return " ".join([self.MODAL_SELECTOR, selector])
+
+    def is_shown(self):
+        return self.page.q(css=self.MODAL_SELECTOR).present
+
+    def find_css(self, selector):
+        return self.page.q(css=self._bounded_selector(selector))
+
+    def click(self, selector, index=0):
+        self.find_css(selector).nth(index).click()
+
+    def save(self):
+        self.click(".action-save")
+        self.page.wait_for_ajax()
+
+    def cancel(self):
+        self.click(".action-cancel")
+
+    def has_release_date(self):
+        return self.find_css("#start_date").present
+
+    def has_due_date(self):
+        return self.find_css("#due_date").present
+
+    def has_policy(self):
+        return self.find_css("#grading_type").present
+
+    def set_date(self, property_name, input_selector, date):
+        """
+        Set `date` value to input pointed by `selector` and `property_name`.
+        """
+        month, day, year = map(int, date.split('/'))
+        self.click(input_selector)
+        if getattr(self, property_name):
+            current_month, current_year = map(int, getattr(self, property_name).split('/')[1:])
+        else: # Use default timepicker values, which are current month and year.
+            current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
+        date_diff = 12 * (year - current_year) + month - current_month
+        selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
+        for i in xrange(abs(date_diff)):
+            self.page.q(css=selector).click()
+        self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
+        EmptyPromise(
+            lambda: getattr(self, property_name) == u'{m}/{d}/{y}'.format(m=month, d=day, y=year),
+            "{} is updated in modal.".format(property_name)
+        ).fulfill()
+
+    @property
+    def release_date(self):
+        return self.find_css("#start_date").first.attrs('value')[0]
+
+    @release_date.setter
+    def release_date(self, date):
+        """
+        Date is "mm/dd/yyyy" string.
+        """
+        self.set_date('release_date', "#start_date", date)
+
+    @property
+    def due_date(self):
+        return self.find_css("#due_date").first.attrs('value')[0]
+
+    @due_date.setter
+    def due_date(self, date):
+        """
+        Date is "mm/dd/yyyy" string.
+        """
+        self.set_date('due_date', "#due_date", date)
+
+    @property
+    def policy(self):
+        """
+        Select the grading format with `value` in the drop-down list.
+        """
+        element = self.find_css('#grading_type')[0]
+        return self.get_selected_option_text(element)
+
+    @policy.setter
+    def policy(self, grading_label):
+        """
+        Select the grading format with `value` in the drop-down list.
+        """
+        element = self.find_css('#grading_type')[0]
+        select = Select(element)
+        select.select_by_visible_text(grading_label)
+
+        EmptyPromise(
+            lambda: self.policy == grading_label,
+            "Grading label is updated.",
+        ).fulfill()
+
+    def get_selected_option_text(self, element):
+        """
+        Returns the text of the first selected option for the element.
+        """
+        if element:
+            select = Select(element)
+            return select.first_selected_option.text
+        else:
+            return None
