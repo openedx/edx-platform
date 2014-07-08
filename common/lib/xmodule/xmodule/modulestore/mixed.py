@@ -273,7 +273,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, offering, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
@@ -319,7 +319,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 source_course_id, user_id, dest_course_id.org, dest_course_id.offering
             )
 
-    def create_item(self, course_or_parent_loc, category, user_id=None, **kwargs):
+    def create_item(self, course_or_parent_loc, category, user_id, **kwargs):
         """
         Create and return the item. If parent_loc is a specific location v a course id,
         it installs the new item as a child of the parent (if the parent_loc is a specific
@@ -346,7 +346,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if parent_loc is not None and not 'detached' in xblock._class_tags:
                 parent = store.get_item(parent_loc)
                 parent.children.append(location)
-                store.update_item(parent)
+                store.update_item(parent, user_id)
         elif isinstance(store, SplitMongoModuleStore):
             if not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))
@@ -371,7 +371,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._verify_modulestore_support(xblock.location, 'update_item')
         return store.update_item(xblock, user_id, allow_not_found)
 
-    def delete_item(self, location, user_id=None, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """

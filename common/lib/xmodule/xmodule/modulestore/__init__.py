@@ -76,8 +76,8 @@ class ModuleStoreEnum(object):
         """
         Values for user ID defaults
         """
-        # Note: we use negative values here to (try to) not conflict
-        # with user identifiers provided by an actual user service.
+        # Note: we use negative values here to (try to) not collide
+        # with user identifiers provided by actual user services.
 
         # user ID to use for all management commands
         mgmt_command = -1
@@ -307,7 +307,7 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
@@ -323,7 +323,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def delete_item(self, location, user_id=None, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):
         """
         Delete an item and its subtree from persistence. Remove the item from any parents (Note, does not
         affect parents from other branches or logical branches; thus, in old mongo, deleting something
@@ -342,7 +342,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, offering, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
@@ -532,7 +532,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
@@ -547,7 +547,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         raise NotImplementedError
 
-    def delete_item(self, location, user_id=None, force=False):
+    def delete_item(self, location, user_id, force=False):
         """
         Delete an item from persistence. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.

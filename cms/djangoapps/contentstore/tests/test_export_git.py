@@ -65,7 +65,7 @@ class TestExportGit(CourseTestCase):
         Test failed course export response.
         """
         self.course_module.giturl = 'foobar'
-        modulestore().update_item(self.course_module, '**replace_user**')
+        modulestore().update_item(self.course_module, self.user.id)
 
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertIn('Export Failed:', response.content)
@@ -75,7 +75,7 @@ class TestExportGit(CourseTestCase):
         Regression test for making sure errors are properly stringified
         """
         self.course_module.giturl = 'foobar'
-        modulestore().update_item(self.course_module, '**replace_user**')
+        modulestore().update_item(self.course_module, self.user.id)
 
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertNotIn('django.utils.functional.__proxy__', response.content)
@@ -98,7 +98,7 @@ class TestExportGit(CourseTestCase):
 
         self.populate_course()
         self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
-        modulestore().update_item(self.course_module, '**replace_user**')
+        modulestore().update_item(self.course_module, self.user.id)
 
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertIn('Export Succeeded', response.content)

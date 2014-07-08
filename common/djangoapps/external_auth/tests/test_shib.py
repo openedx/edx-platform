@@ -17,7 +17,6 @@ from django.utils.importlib import import_module
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -80,7 +79,7 @@ class ShibSPTest(ModuleStoreTestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        self.store = modulestore()
+        super(ShibSPTest, self).setUp(create_user=False)
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_exception_shib_login(self):
@@ -383,7 +382,7 @@ class ShibSPTest(ModuleStoreTestCase):
         for domain in ["", "shib:https://idp.stanford.edu/"]:
             # set domains
             course.enrollment_domain = domain
-            self.store.update_item(course, '**replace_user**')
+            self.store.update_item(course, self.user.id)
 
             # setting location to test that GET params get passed through
             login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
@@ -452,11 +451,11 @@ class ShibSPTest(ModuleStoreTestCase):
         # create 2 course, one with limited enrollment one without
         shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(shib_course, '**replace_user**')
+        self.store.update_item(shib_course, self.user.id)
 
         open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         open_enroll_course.enrollment_domain = ''
-        self.store.update_item(open_enroll_course, '**replace_user**')
+        self.store.update_item(open_enroll_course, self.user.id)
 
         # create 3 kinds of students, external_auth matching shib_course, external_auth not matching, no external auth
         shib_student = UserFactory.create()
@@ -522,7 +521,7 @@ class ShibSPTest(ModuleStoreTestCase):
 
         course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(course, '**replace_user**')
+        self.store.update_item(course, self.user.id)
 
         # use django test client for sessions and url processing
         # no enrollment before trying

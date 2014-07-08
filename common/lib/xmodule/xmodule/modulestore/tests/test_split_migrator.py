@@ -5,6 +5,7 @@ Tests for split_migrator
 import uuid
 import random
 import mock
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.modulestore.split_migrator import SplitMigrator
@@ -63,7 +64,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         self.create_random_units(False, both_vert_loc)
         draft_both = self.draft_mongo.get_item(both_vert_loc)
         draft_both.display_name = 'Both vertical renamed'
-        self.draft_mongo.update_item(draft_both)
+        self.draft_mongo.update_item(draft_both, ModuleStoreEnum.UserID.test)
         self.create_random_units(True, both_vert_loc)
         # vertical in draft only (x2)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)

@@ -19,8 +19,6 @@ from django.test.utils import override_settings
 from courseware import grades
 from courseware.models import StudentModule
 
-from xmodule.modulestore.django import modulestore
-
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -46,7 +44,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
 
-        super(TestSubmittingProblems, self).setUp()
+        super(TestSubmittingProblems, self).setUp(create_user=False)
         # Create course
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         assert self.course, "Couldn't load course %r" % self.COURSE_NAME
@@ -64,7 +62,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Re-fetch the course from the database so that the object being dealt with has everything added to it.
         """
-        self.course = modulestore().get_course(self.course.id)
+        self.course = self.store.get_course(self.course.id)
 
     def problem_location(self, problem_url_name):
         """
@@ -230,8 +228,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         self.course.grading_policy = grading_policy
-        store = modulestore()
-        store.update_item(self.course, '**replace_user**')
+        self.update_course(self.course, self.student_user.id)
         self.refresh_course()
 
     def get_grade_summary(self):

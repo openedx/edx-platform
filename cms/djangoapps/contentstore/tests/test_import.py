@@ -33,25 +33,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the use so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-
-        # Save the data that we've just changed to the db.
-        self.user.save()
-
+        password = super(ContentStoreImportTest, self).setUp()
+        
         self.client = Client()
-        self.client.login(username=uname, password=password)
+        self.client.login(username=self.user.username, password=password)
 
     def tearDown(self):
         contentstore().drop_database()
@@ -66,7 +51,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore()
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['test_import_course'],
             static_content_store=content_store,
@@ -86,7 +71,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store, __, course = self.load_test_import_course()
         __, course_items = import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data',
             ['test_import_course_2'],
             target_course_id=course.id,
@@ -102,7 +87,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         course_id = SlashSeparatedCourseKey(u'Юникода', u'unicode_course', u'échantillon')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['2014_Uni'],
             target_course_id=course_id
@@ -148,7 +133,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore()
-        import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
+        import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
         course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -159,7 +144,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        _, courses = import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        _, courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -178,7 +163,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         target_course_id = SlashSeparatedCourseKey('testX', 'conditional_copy', 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['conditional'],
             target_course_id=target_course_id
@@ -208,7 +193,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         target_course_id = SlashSeparatedCourseKey('testX', 'peergrading_copy', 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['open_ended'],
             target_course_id=target_course_id
@@ -227,7 +212,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         target_course_id = SlashSeparatedCourseKey('testX', 'split_test_copy', 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['split_test_module'],
             target_course_id=target_course_id

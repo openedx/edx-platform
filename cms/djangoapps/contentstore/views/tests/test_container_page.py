@@ -137,7 +137,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
                                                    category='split_test', display_name='Split Test')
-        published_empty_child_container = self.store.publish(empty_child_container.location, '**replace_user**')
+        published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view,
                                    can_reorder=False, can_edit=False, can_add=False)
 

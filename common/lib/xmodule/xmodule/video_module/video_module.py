@@ -283,7 +283,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         Save module with updated metadata to database."
         """
         self.save()
-        self.runtime.modulestore.update_item(self, user.id if user else None)
+        self.runtime.modulestore.update_item(self, user.id)
 
     @property
     def editable_metadata_fields(self):

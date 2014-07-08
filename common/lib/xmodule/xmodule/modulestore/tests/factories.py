@@ -2,7 +2,7 @@ from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
-from xmodule.modulestore import prefer_xmodules
+from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
@@ -52,6 +52,7 @@ class CourseFactory(XModuleFactory):
         store = kwargs.pop('modulestore')
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
         run = kwargs.get('run', name)
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
         location = Location(org, number, run, 'course', name)
 
@@ -65,7 +66,7 @@ class CourseFactory(XModuleFactory):
         # Save the attributes we just set
         new_course.save()
         # Update the data in the mongo datastore
-        store.update_item(new_course, '**replace_user**')
+        store.update_item(new_course, user_id)
         return new_course
 
 
@@ -143,7 +144,7 @@ class ItemFactory(XModuleFactory):
         display_name = kwargs.pop('display_name', None)
         metadata = kwargs.pop('metadata', {})
         location = kwargs.pop('location')
-        user_id = kwargs.pop('user_id', 999)
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
         assert isinstance(location, Location)
         assert location != parent_location
@@ -175,11 +176,11 @@ class ItemFactory(XModuleFactory):
         # Save the attributes we just set
         module.save()
 
-        store.update_item(module, '**replace_user**')
+        store.update_item(module, user_id)
 
         if 'detached' not in module._class_tags:
             parent.children.append(location)
-            store.update_item(parent, '**replace_user**')
+            store.update_item(parent, user_id)
 
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -192,7 +193,7 @@ class ItemFactory(XModuleFactory):
                     url_slug=location.name,
                 )
             )
-            store.update_item(course, '**replace_user**')
+            store.update_item(course, user_id)
 
         return store.get_item(location)
 
