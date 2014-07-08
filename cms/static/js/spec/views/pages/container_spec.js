@@ -86,7 +86,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Editing the container", function() {
                 var updatedDisplayName = 'Updated Test Container',
-                    inlineEditDisplayName, displayNameElement, displayNameInput;
+                    expectEditCanceled, inlineEditDisplayName, displayNameElement, displayNameInput;
 
                 beforeEach(function() {
                     displayNameElement = containerPage.$('.page-header-title');
@@ -102,6 +102,25 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     displayNameInput = containerPage.$('.xblock-string-field-editor .xblock-field-input');
                     expect(displayNameInput).not.toHaveClass('is-hidden');
                     displayNameInput.val(newTitle);
+                };
+
+                expectEditCanceled = function(options) {
+                    var initialRequests;
+                    renderContainerPage(mockContainerXBlockHtml, options.that);
+                    initialRequests = requests.length;
+                    inlineEditDisplayName(options.newTitle);
+                    if (options.pressEscape) {
+                        displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
+                        displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
+                    } else {
+                        displayNameInput.change();
+                    }
+                    // No requests should be made when the edit is cancelled client-side
+                    expect(initialRequests).toBe(requests.length);
+                    expect(displayNameInput).toHaveClass('is-hidden');
+                    expect(displayNameElement).not.toHaveClass('is-hidden');
+                    expect(displayNameInput.val()).toBe(initialDisplayName);
+                    expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 };
 
                 it('can edit itself', function() {
@@ -167,18 +186,30 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 });
 
-                it('can cancel an inline edit', function() {
-                    var numRequests;
+                it('trims whitespace from the display name', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    inlineEditDisplayName(updatedDisplayName);
-                    numRequests = requests.length;
-                    displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
-                    displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
-                    expect(requests.length).toBe(numRequests);
+                    inlineEditDisplayName(updatedDisplayName + ' ');
+                    displayNameInput.change();
+                    // This is the response for the change operation.
+                    create_sinon.respondWithJson(requests, { });
+                    // This is the response for the subsequent fetch operation.
+                    create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
                     expect(displayNameInput).toHaveClass('is-hidden');
                     expect(displayNameElement).not.toHaveClass('is-hidden');
-                    expect(displayNameElement.text().trim()).toBe(initialDisplayName);
-                    expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
+                    expect(displayNameElement.text()).toBe(updatedDisplayName);
+                    expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
+                });
+
+                it('does not change the title when input is the empty string', function() {
+                    expectEditCanceled({newTitle: '', pressEscape: false, that: this});
+                });
+
+                it('does not change the title when input is whitespace-only', function() {
+                    expectEditCanceled({newTitle: ' ', pressEscape: false, that: this});
+                });
+
+                it('can cancel an inline edit', function() {
+                    expectEditCanceled({newTitle: updatedDisplayName, pressEscape: true, that: this});
                 });
             });
 
