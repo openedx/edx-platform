@@ -8,18 +8,15 @@ import re
 import json
 import datetime
 
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 import collections
 
 from abc import ABCMeta, abstractmethod
 from xblock.plugin import default_select
 
-from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
 
@@ -310,6 +307,19 @@ class ModuleStoreWrite(ModuleStoreRead):
 
         :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
+        """
+        pass
+
+    @abstractmethod
+    def revert_to_published(self, location, user_id=None):
+        """
+        Reverts an item to its last published version (recursively traversing all of its descendants).
+        If no published version exists, a VersionConflictError is thrown.
+
+        If a published version exists but there is no draft version of this item or any of its descendants, this
+        method is a no-op.
+
+        :raises InvalidVersionError: if no published version exists for the location specified
         """
         pass
 

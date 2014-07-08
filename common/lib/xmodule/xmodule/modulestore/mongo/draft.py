@@ -597,6 +597,44 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         return self._convert_to_draft(location, user_id, delete_published=True)
 
+    def revert_to_published(self, location, user_id=None):
+        """
+        Reverts an item to its last published version (recursively traversing all of its descendants).
+        If no published version exists, a VersionConflictError is thrown.
+
+        If a published version exists but there is no draft version of this item or any of its descendants, this
+        method is a no-op.
+
+        :raises InvalidVersionError: if no published version exists for the location specified
+        """
+        self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
+        _verify_revision_is_published(location)
+
+        if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
+            raise InvalidVersionError(location)
+
+        def delete_draft_only(root_location):
+            """
+            Helper function that calls delete on the specified location if a draft version of the item exists.
+            If no draft exists, this function recursively calls itself on the children of the item.
+            """
+            draft_xblock_location = as_draft(root_location)
+            draft_item = self.collection.find_one(
+                {'_id': draft_xblock_location.to_deprecated_son()}
+            )
+
+            # Note that even though we asked for a draft location, if the root_location is in
+            # DIRECT_ONLY_CATEGORIES, it won't actually be a draft. We never want to delete published items.
+            if draft_xblock_location.revision == 'draft' and draft_item is not None:
+                self._delete_subtree(root_location, [as_draft])
+            else:
+                published_item = self.collection.find_one({'_id': root_location.to_deprecated_son()})
+                for child in published_item.get('definition', {}).get('children', []):
+                    child_loc = Location.from_deprecated_string(child)
+                    delete_draft_only(child_loc)
+
+        delete_draft_only(location)
+
     def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
         to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(course_key, items)
