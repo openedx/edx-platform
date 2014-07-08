@@ -9,6 +9,7 @@ from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.exceptions import InvalidVersionError
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
@@ -459,6 +460,87 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             (child_to_delete, None, ModuleStoreEnum.RevisionOption.draft_preferred),
             (child_to_delete, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
+
+
+    @ddt.data('draft')
+    def test_revert_to_published_root_draft(self, default_ms):
+        """
+        Test calling revert_to_published on draft vertical.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        # delete leaf problem (will make parent vertical a draft)
+        self.store.delete_item(self.problem_x1a_1.location, self.user_id)
+
+        draft_parent = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(2, len(draft_parent.children))
+        published_parent = self.store.get_item(
+            self.vertical_x1a.location,
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
+        self.assertEqual(3, len(published_parent.children))
+
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+        reverted_parent = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(3, len(published_parent.children))
+        self.assertEqual(reverted_parent, published_parent)
+
+    @ddt.data('draft')
+    def test_revert_to_published_root_published(self, default_ms):
+        """
+        Test calling revert_to_published on a published vertical with a draft child.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        orig_display_name = self.problem_x1a_1.display_name
+
+        # Change display name of problem and update just it (so parent remains published)
+        self.problem_x1a_1.display_name = "updated before calling revert"
+        self.store.update_item(self.problem_x1a_1, self.user_id)
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+
+        reverted_problem = self.store.get_item(self.problem_x1a_1.location)
+        self.assertEqual(orig_display_name, reverted_problem.display_name)
+
+    @ddt.data('draft')
+    def test_revert_to_published_no_draft(self, default_ms):
+        """
+        Test calling revert_to_published on vertical with no draft content does nothing.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        orig_vertical = self.vertical_x1a
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+        reverted_vertical = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(orig_vertical, reverted_vertical)
+
+    @ddt.data('draft')
+    def test_revert_to_published_no_published(self, default_ms):
+        """
+        Test calling revert_to_published on vertical with no published version errors.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        with self.assertRaises(InvalidVersionError):
+            self.store.revert_to_published(self.vertical_x1a.location)
+
+    @ddt.data('draft')
+    def test_revert_to_published_direct_only(self, default_ms):
+        """
+        Test calling revert_to_published on a direct-only item is a no-op.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.revert_to_published(self.sequential_x1.location)
+        reverted_parent = self.store.get_item(self.sequential_x1.location)
+        # It does not discard the child vertical, even though that child is a draft (with no published version)
+        self.assertEqual(1, len(reverted_parent.children))
 
     @ddt.data('draft', 'split')
     def test_get_orphans(self, default_ms):
