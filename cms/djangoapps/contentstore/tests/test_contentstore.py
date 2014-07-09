@@ -22,7 +22,7 @@ from django.test.utils import override_settings
 from contentstore.tests.utils import parse_json, AjaxEnabledTestClient, CourseTestCase
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 from xmodule.exceptions import NotFoundError, InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
@@ -74,10 +74,6 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
     Tests that rely on the toy courses.
     TODO: refactor using CourseFactory so they do not.
     """
-    def tearDown(self):
-        contentstore().drop_database()
-        _CONTENTSTORE.clear()
-
     def check_components_on_page(self, component_types, expected_types):
         """
         Ensure that the right types end up on the page.
@@ -946,10 +942,6 @@ class ContentStoreTest(ContentStoreTestCase):
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
         }
-
-    def tearDown(self):
-        contentstore().drop_database()
-        _CONTENTSTORE.clear()
 
     def assert_created_course(self, number_suffix=None):
         """

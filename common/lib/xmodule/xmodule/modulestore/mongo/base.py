@@ -394,6 +394,24 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.ignore_write_events_on_courses = set()
         self._course_run_cache = {}
 
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying database
+        """
+        self.collection.database.connection.close()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        # drop the assets
+        super(MongoModuleStore, self)._drop_database()
+
+        connection = self.collection.database.connection
+        connection.drop_database(self.collection.database)
+        connection.close()
+
     def _begin_bulk_write_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course

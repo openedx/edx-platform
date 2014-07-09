@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.django import (
     modulestore, clear_existing_modulestores, loc_mapper
 )
+from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -187,27 +188,14 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections(modulestore_type=ModuleStoreEnum.Type.mongo):
+    def drop_mongo_collections():
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
-        store = modulestore()
-        if hasattr(store, '_get_modulestore_by_type'):
-            store = store._get_modulestore_by_type(modulestore_type)  # pylint: disable=W0212
-        if hasattr(store, 'collection'):
-            connection = store.collection.database.connection
-            store.collection.drop()
-            connection.drop_database(store.collection.database.name)
-            connection.close()
-        elif hasattr(store, 'close_all_connections'):
-            store.close_all_connections()
-        elif hasattr(store, 'db'):
-            connection = store.db.connection
-            connection.drop_database(store.db.name)
-            connection.close()
-
-        if hasattr(store, 'contentstore'):
-            store.contentstore.drop_database()
+        module_store = modulestore()
+        if hasattr(module_store, '_drop_database'):
+            module_store._drop_database()  # pylint: disable=protected-access
+        _CONTENTSTORE.clear()
 
         location_mapper = loc_mapper()
         if location_mapper.db:

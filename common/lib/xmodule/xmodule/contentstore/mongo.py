@@ -42,11 +42,18 @@ class MongoContentStore(ContentStore):
 
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
-    def drop_database(self):
+    def close_connections(self):
         """
-        Only for use by test code. Removes the database!
+        Closes any open connections to the underlying databases
         """
         self.fs_files.database.connection.close()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        self.close_connections()
         self.fs_files.database.connection.drop_database(self.fs_files.database)
 
     def save(self, content):

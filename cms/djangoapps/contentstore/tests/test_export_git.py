@@ -13,7 +13,6 @@ from django.test.utils import override_settings
 
 from .utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
-from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 
@@ -34,10 +33,6 @@ class TestExportGit(CourseTestCase):
         super(TestExportGit, self).setUp()
         self.course_module = modulestore().get_course(self.course.id)
         self.test_url = reverse_course_url('export_git', self.course.id)
-
-    def tearDown(self):
-        modulestore().contentstore.drop_database()
-        _CONTENTSTORE.clear()
 
     def test_giturl_missing(self):
         """

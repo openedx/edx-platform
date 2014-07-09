@@ -135,6 +135,24 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.render_template = render_template
         self.i18n_service = i18n_service
 
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        self.db.connection.close()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        # drop the assets
+        super(SplitMongoModuleStore, self)._drop_database()
+
+        connection = self.db.connection
+        connection.drop_database(self.db.name)
+        connection.close()
+
     def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True):
         '''
         Handles caching of items once inheritance and any other one time
