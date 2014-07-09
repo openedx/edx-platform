@@ -42,15 +42,30 @@
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
+            <div class="field required select" id="type-id">
+              <label for="type_id">${_("TYPE ID")}</label>
+              <select id="type-id" name="type_id">
+                <option value="cedula">CEDULA</option>
+                <option value="pasaporte">PASAPORTE</option>
+              </select>
+            </div>
+            <li class="field required text" id="field-cedula">
+              <label for="name">${_('Cedula / Pasaporte')}</label>
+              <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>
+              <span class="tip tip-input" id="cedula-tip">${_("Don't input special characters in your ID")}</span>
+            </li>
+
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
               <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
             </li>
 
             <li class="field-group">
-              <div class="field text" id="field-location">
-                <label for="location">${_("Your Location")}</label>
-                <input class="short" id="location" type="text" name="location" />
+              <div class="field required text" id="field-city">
+                <label for="city">${_('City')}</label>
+                <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito, Pichincha, Ecuador')}" required aria-required="true" aria-describedby="city-tip"/>
+                <span class="tip tip-input" id="city-tip">${_("Debe")} <strong>${_("seleccionar")}</strong> ${_("su ciudad de la lista que se desplega")} <strong>${_("cuando digite un texto.")}</strong></span>
+                <input type="hidden" name="city_id" value="" id="city_id"/>
               </div>
 
               <div class="field text" id="field-language">
@@ -130,4 +145,33 @@ require(["jquery", "jquery.cookie"], function($) {
   });
 });
   </script>
+
+<script type="text/javascript">
+require(["jquery","jquery.ui"], function($) {
+  $("#city").autocomplete({
+    source: function(request, response) { 
+        $.ajax({
+            url: "/city_lookup/",
+            dataType: "json",
+            data: { query: request.term },
+            success: function(data) {
+               response( $.map(data, function(item) {
+                 $("#city_id").val(item[0]);
+                 return {
+                     label: item[1],
+                     value: item[1]
+                 }
+               }));
+            }
+        });
+    },
+    open: function(){
+        $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+    },
+    close: function(){
+        $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+    }
+  });
+});
+</script>
 </%block>
