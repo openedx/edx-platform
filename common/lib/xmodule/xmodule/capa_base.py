@@ -596,7 +596,7 @@ class CapaMixin(CapaFields):
         that value in self.problem_hints_counts
         :return: Number of problem hints found
         '''
-        hint_elements_list = self.lcp.tree.xpath("//problem/demandhints/hint")
+        hint_elements_list = self.lcp.tree.xpath("//problem/demandhint/hint")
         self.problem_hints_count = len(hint_elements_list)
         self.show_hint_button = (self.problem_hints_count > 0)
         return self.problem_hints_count
@@ -610,7 +610,7 @@ class CapaMixin(CapaFields):
         :return:        The (potentially) modified html string
         '''
 
-        hint_element = self.lcp.tree.xpath("//problem/demandhints/hint")[ self.next_hint_index ]
+        hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
         hint_text = hint_element.text.strip()
         html = html.replace('> <', '>' + hint_text + '<')  # replace the single space (see correctmap.py)
 
@@ -690,12 +690,12 @@ class CapaMixin(CapaFields):
             html = self._insert_problem_hint(html)  # add the next sequential problem hint to the html
 
         html = self._strip_hints_from_xml(html)
-        # for hint_element in self.lcp.tree.xpath("//problem/demandhints/hint"):     # remove the demand hints from the XML else they will display
-        #     print '--------------- demandhints from //problem/demandhints/hint'
+        # for hint_element in self.lcp.tree.xpath("//problem/demandhint/hint"):     # remove the demand hints from the XML else they will display
+        #     print '--------------- demandhint from //problem/demandhint/hint'
         #     hint_element.getparent().remove(hint_element)
         #
-        # for hint_element in self.lcp.tree.xpath("//problem/demandhints/hint"):     # remove the demand hints from the XML else they will display
-        #     print '-------------------- STILL demandhints from //problem/demandhints/hint'
+        # for hint_element in self.lcp.tree.xpath("//problem/demandhint/hint"):     # remove the demand hints from the XML else they will display
+        #     print '-------------------- STILL demandhint from //problem/demandhint/hint'
 
         return html
 
@@ -704,14 +704,14 @@ class CapaMixin(CapaFields):
         Using a bit of regex magic, strip out of an html string an entire XML element. How this
         works is a bit obscure but it does work. Suppose our html has this element in it somewhere:
                     <foo/>
-                    <demandhints>
+                    <demandhint>
                         <hint> blah blah </hint>
-                    </demandhints>
+                    </demandhint>
                     <bar/>
         will be reduced to this:
                     <foo/>
                     <bar/>
-        when this funtion is called with element_name = 'demandhints'
+        when this funtion is called with element_name = 'demandhint'
         :param element_name: the name of the element to excise
         :param html:         the string representation of the XML to operate on
         :return:             a potentially modified string representation of the XML
@@ -723,8 +723,18 @@ class CapaMixin(CapaFields):
         return html
 
     def _strip_hints_from_xml(self, html):
-        html = self._strip_element('demandhints', html)
+        html = self._strip_element('demandhint', html)
         html = self._strip_element('choicehint', html)
+        html = self._strip_element('optionhint', html)
+        html = self._strip_element('stringhint', html)
+        html = self._strip_element('numerichint', html)
+        html = self._strip_element('optionhint', html)
+        html = self._strip_element('correcthint', html)
+        html = self._strip_element('regexphint', html)
+        html = self._strip_element('additional_answer', html)
+        html = self._strip_element('stringequalhint', html)
+        html = self._strip_element('booleanhint', html)
+        html = self._strip_element('stringequalhint', html)
         return html
 
     def hint_button(self, data):
