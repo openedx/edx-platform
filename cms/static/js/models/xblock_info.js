@@ -12,6 +12,9 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "is_container": null,
             "data": null,
             "metadata" : null,
+            /**
+             * The Studio URL for this xblock, or null if it doesn't have one.
+             */
             "studio_url": null,
             /**
              * An optional object with information about the children as well as about
