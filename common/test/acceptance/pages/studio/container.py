@@ -88,22 +88,13 @@ class ContainerPage(PageObject):
         """
         return self.q(css='.action-publish').first
 
-    # def discard_changes(self):
-    #     """
-    #     Discards draft changes and reloads the page.
-    #     NOT YET IMPLEMENTED-- part of future story
-    #     """
-    #
-    #     self.q(css='.action-discard').first.click()
-    #
-    #     # TODO: work with Jay/Christine on this. I can't find something to wait on
-    #     # that guarantees the button will be clickable.
-    #     time.sleep(2)
-    #
-    #     self.q(css='a.button.action-primary').first.click()
-    #     self.wait_for_ajax()
-    #
-    #     return ContainerPage(self.browser, self.locator).visit()
+    def discard_changes(self):
+        """
+        Discards draft changes (which will then re-render the page).
+        """
+        click_css(self, 'a.action-discard', 0, require_notification=False)
+        self.q(css='a.button.action-primary').first.click()
+        self.wait_for_ajax()
 
     def view_published_version(self):
         """
