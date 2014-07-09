@@ -342,16 +342,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         create_sinon.respondWithJson(requests, {});
 
                         // first request contains given component's id (to delete the component)
-                        expect(requests[requests.length - 3].url).toMatch(
+                        expect(requests[requests.length - 2].url).toMatch(
                             new RegExp("locator-component-" + GROUP_TO_TEST + (componentIndex + 1))
                         );
 
-                        // second request contains parent's id (to remove as child)
-                        expect(requests[requests.length - 2].url).toMatch(
-                            new RegExp("locator-group-" + GROUP_TO_TEST)
-                        );
-
-                        // third request if a fetch of the container.
+                        // second request if a fetch of the container.
                         expect(lastRequest().url).toMatch(
                             new RegExp("locator-container")
                         );
