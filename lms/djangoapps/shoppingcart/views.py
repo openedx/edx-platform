@@ -106,13 +106,15 @@ def remove_item(request):
     try:
         item = OrderItem.objects.get(id=item_id, status='cart')
         if item.user == request.user:
+            order_item_course_id = item.paidcourseregistration.course_id
             item.delete()
             log.info('order item {0} removed for user {0}'.format(item.order.id, request.user))
             try:
                 coupon_redemption = CouponRedemption.objects.get(user=request.user, order=item.order_id)
-                coupon_redemption.delete()
-                log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
-                         .format(coupon_redemption.coupon.code, request.user, item.order.id))
+                if order_item_course_id == coupon_redemption.coupon.course_id:
+                    coupon_redemption.delete()
+                    log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
+                             .format(coupon_redemption.coupon.code, request.user, item.order.id))
             except CouponRedemption.DoesNotExist:
                 log.exception('Coupon redemption does not exist for order item id={0}.'.format(item_id))
     except OrderItem.DoesNotExist:
@@ -130,20 +132,20 @@ def use_coupon(request):
         coupon = Coupon.objects.get(code=coupon_code)
     except Coupon.DoesNotExist:
         return HttpResponseNotFound(_("Discount does not exist against coupon '{0}'.".format(coupon_code)))
-    else:
-        if coupon.is_active:
-            try:
-                cart = Order.get_cart_for_user(request.user)
-                CouponRedemption.add_coupon_redemption(coupon, cart)
-            except CouponAlreadyExistException:
-                return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon_code)))
-            except ItemDoesNotExistAgainstCouponException:
-                return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon_code)))
 
-            response = HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
-            return response
-        else:
-            return HttpResponseBadRequest(_("Coupon '{0}' is inactive.".format(coupon_code)))
+    if coupon.is_active:
+        try:
+            cart = Order.get_cart_for_user(request.user)
+            CouponRedemption.add_coupon_redemption(coupon, cart)
+        except CouponAlreadyExistException:
+            return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon_code)))
+        except ItemDoesNotExistAgainstCouponException:
+            return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon_code)))
+
+        response = HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
+        return response
+    else:
+        return HttpResponseBadRequest(_("Coupon '{0}' is inactive.".format(coupon_code)))
 
 
 @csrf_exempt
