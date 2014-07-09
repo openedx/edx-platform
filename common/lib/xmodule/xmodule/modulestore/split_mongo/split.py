@@ -1395,6 +1395,18 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index)
 
+    def revert_to_published(self, location, user_id=None):
+        """
+        Reverts an item to its last published version (recursively traversing all of its descendants).
+        If no published version exists, a VersionConflictError is thrown.
+
+        If a published version exists but there is no draft version of this item or any of its descendants, this
+        method is a no-op.
+
+        :raises InvalidVersionError: if no published version exists for the location specified
+        """
+        raise NotImplementedError()
+
     def get_errored_courses(self):
         """
         This function doesn't make sense for the mongo modulestore, as structures

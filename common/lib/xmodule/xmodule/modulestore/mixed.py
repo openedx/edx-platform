@@ -385,6 +385,19 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._verify_modulestore_support(location, 'delete_item')
         store.delete_item(location, user_id=user_id, **kwargs)
 
+    def revert_to_published(self, location, user_id=None):
+        """
+        Reverts an item to its last published version (recursively traversing all of its descendants).
+        If no published version exists, a VersionConflictError is thrown.
+
+        If a published version exists but there is no draft version of this item or any of its descendants, this
+        method is a no-op.
+
+        :raises InvalidVersionError: if no published version exists for the location specified
+        """
+        store = self._verify_modulestore_support(location, 'revert_to_published')
+        return store.revert_to_published(location, user_id=user_id)
+
     def close_all_connections(self):
         """
         Close all db connections
