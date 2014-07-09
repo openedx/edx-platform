@@ -13,17 +13,16 @@ import csv
 import json
 from optparse import make_option
 
-from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
-from courseware.access import get_user_role
-from courseware.module_tree_reset import ProctorModuleInfo
-from courseware.models import StudentModule, StudentModuleHistory
-
 from django.conf import settings
 from django.dispatch import Signal
 from django.core.cache import get_cache
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+
+from student import roles
+from request_cache.middleware import RequestCache
+from xmodule.modulestore.django import modulestore
+from courseware.module_tree_reset import ProctorModuleInfo
+from courseware.models import StudentModule, StudentModuleHistory
 
 
 CACHE = get_cache('mongo_metadata_inheritance')
@@ -69,11 +68,14 @@ def update_stats(sm, stat, history=False):
     return "attempted"
 
 
-def compute_stats(course_id, csv_file=None):
+def compute_stats(course_id):
     pminfo = ProctorModuleInfo(course_id)
     all_problems = []
     stats = []
-    staffgroup = get_user_role(User.objects.get(username='staff'), pminfo.course.id)
+    course_url = pminfo.course.location.url()
+    staff_role = roles.CourseStaffRole(course_url)
+    inst_role = roles.CourseInstructorRole(course_url)
+    exclude_groups = staff_role._group_names + inst_role._group_names
 
     for rpmod in pminfo.rpmods:
         assignment_set_name = rpmod.ra_ps.display_name
@@ -86,7 +88,7 @@ def compute_stats(course_id, csv_file=None):
         stat = Stats()
         smset0 = StudentModule.objects.filter(module_state_key=problem.id,
                                               student__is_staff=False)
-        smset = smset0.exclude(student__groups__name__icontains=staffgroup)
+        smset = smset0.exclude(student__groups__name__in=exclude_groups)
         for sm in smset:
             stat.nassigned += 1
             ret = update_stats(sm, stat)
