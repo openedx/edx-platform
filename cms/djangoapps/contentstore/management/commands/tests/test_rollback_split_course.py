@@ -14,7 +14,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.split_migrator import SplitMigrator
+from xmodule.modulestore import ModuleStoreEnum
 # pylint: disable=E1101
+# pylint: disable=W0212
 
 
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
@@ -87,9 +89,8 @@ class TestRollbackSplitCourse(ModuleStoreTestCase):
 
         # migrate old course to split
         migrator = SplitMigrator(
-            draft_modulestore=modulestore('default'),
-            direct_modulestore=modulestore('direct'),
-            split_modulestore=modulestore('split'),
+            draft_modulestore=modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo),
+            split_modulestore=modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split),
             loc_mapper=loc_mapper(),
         )
         migrator.migrate_mongo_course(self.old_course.location, self.user)

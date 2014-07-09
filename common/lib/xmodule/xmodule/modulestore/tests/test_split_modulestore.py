@@ -1759,6 +1759,7 @@ def modulestore():
 
         # pylint: disable=W0142
         SplitModuleTest.modulestore = class_(
+            None,  # contentstore
             SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],
             **options
         )

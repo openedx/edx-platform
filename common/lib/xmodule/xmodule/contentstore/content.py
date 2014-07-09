@@ -10,8 +10,8 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
-from .django import contentstore
+from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
 
@@ -103,7 +103,7 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
@@ -111,6 +111,8 @@ class StaticContent(object):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
+        # TODO OpaqueKey - change to from_string once opaque keys lands
+        # return AssetLocation.from_string(path)
         return AssetLocation.from_deprecated_string(path)
 
     @staticmethod
@@ -213,6 +215,12 @@ class ContentStore(object):
         """
         raise NotImplementedError
 
+    def copy_all_course_assets(self, source_course_key, dest_course_key):
+        """
+        Copy all the course assets from source_course_key to dest_course_key
+        """
+        raise NotImplementedError
+
     def generate_thumbnail(self, content, tempfile_path=None):
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
@@ -248,7 +256,7 @@ class ContentStore(object):
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/jpeg', thumbnail_file)
 
-                contentstore().save(thumbnail_content)
+                self.save(thumbnail_content)
 
             except Exception, e:
                 # log and continue as thumbnails are generally considered as optional

@@ -500,8 +500,7 @@ class Transcript(object):
         Delete asset by location and filename.
         """
         try:
-            content = Transcript.get_asset(location, filename)
-            contentstore().delete(content.get_id())
+            contentstore().delete(Transcript.asset_location(location, filename))
             log.info("Transcript asset %s was removed from store.", filename)
         except NotFoundError:
             pass

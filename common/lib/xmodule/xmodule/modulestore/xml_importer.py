@@ -97,7 +97,7 @@ def import_static_content(
             try:
                 static_content_store.save(content)
             except Exception as err:
-                log.exception('Error importing {0}, error={1}'.format(
+                log.exception(u'Error importing {0}, error={1}'.format(
                     fullname_with_subpath, err
                 ))
 

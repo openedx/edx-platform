@@ -85,6 +85,7 @@ def modulestore():
 
         # pylint: disable=W0142
         ModuleStoreNoSettings.modulestore = class_(
+            None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
             **options
         )

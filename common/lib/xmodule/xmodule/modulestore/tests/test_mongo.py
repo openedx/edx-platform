@@ -1,3 +1,5 @@
+# pylint: disable=E1101
+# pylint: disable=W0212
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
@@ -86,8 +88,8 @@ class TestMongoModuleStore(unittest.TestCase):
             cls.connection.drop_database(DB)
             cls.connection.close()
 
-    @staticmethod
-    def initdb():
+    @classmethod
+    def initdb(cls):
         # connect to the db
         doc_store_config = {
             'host': HOST,
@@ -101,6 +103,7 @@ class TestMongoModuleStore(unittest.TestCase):
         # Also test draft store imports
         #
         draft_store = DraftModuleStore(
+            content_store,
             doc_store_config, FS_ROOT, RENDER_TEMPLATE,
             default_class=DEFAULT_CLASS,
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred
@@ -109,7 +112,7 @@ class TestMongoModuleStore(unittest.TestCase):
             draft_store,
             999,
             DATA_DIR,
-            TestMongoModuleStore.courses,
+            cls.courses,
             static_content_store=content_store
         )
 
@@ -131,13 +134,6 @@ class TestMongoModuleStore(unittest.TestCase):
         # Destroy the test db.
         connection.drop_database(DB)
 
-    def setUp(self):
-        # make a copy for convenience
-        self.connection = TestMongoModuleStore.connection
-
-    def tearDown(self):
-        pass
-
     def test_init(self):
         '''Make sure the db loads'''
         ids = list(self.connection[DB][COLLECTION].find({}, {'_id': True}))
@@ -145,6 +141,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
     def test_mongo_modulestore_type(self):
         store = MongoModuleStore(
+            None,
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
@@ -284,54 +281,57 @@ class TestMongoModuleStore(unittest.TestCase):
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
         location = Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')
-        course_content, __ = TestMongoModuleStore.content_store.get_all_content_for_course(location.course_key)
+        course_content, __ = self.content_store.get_all_content_for_course(location.course_key)
         assert_true(len(course_content) > 0)
         # a bit overkill, could just do for content[0]
         for content in course_content:
             assert not content.get('locked', False)
-            asset_key = AssetLocation._from_deprecated_son(content['_id'], location.run)
-            assert not TestMongoModuleStore.content_store.get_attr(asset_key, 'locked', False)
-            attrs = TestMongoModuleStore.content_store.get_attrs(asset_key)
+            asset_key = AssetLocation._from_deprecated_son(content.get('content_son', content['_id']), location.run)
+            assert not self.content_store.get_attr(asset_key, 'locked', False)
+            attrs = self.content_store.get_attrs(asset_key)
             assert_in('uploadDate', attrs)
             assert not attrs.get('locked', False)
-            TestMongoModuleStore.content_store.set_attr(asset_key, 'locked', True)
-            assert TestMongoModuleStore.content_store.get_attr(asset_key, 'locked', False)
-            attrs = TestMongoModuleStore.content_store.get_attrs(asset_key)
+            self.content_store.set_attr(asset_key, 'locked', True)
+            assert self.content_store.get_attr(asset_key, 'locked', False)
+            attrs = self.content_store.get_attrs(asset_key)
             assert_in('locked', attrs)
             assert attrs['locked'] is True
-            TestMongoModuleStore.content_store.set_attrs(asset_key, {'miscel': 99})
-            assert_equals(TestMongoModuleStore.content_store.get_attr(asset_key, 'miscel'), 99)
+            self.content_store.set_attrs(asset_key, {'miscel': 99})
+            assert_equals(self.content_store.get_attr(asset_key, 'miscel'), 99)
 
-        asset_key = AssetLocation._from_deprecated_son(course_content[0]['_id'], location.run)
+        asset_key = AssetLocation._from_deprecated_son(
+            course_content[0].get('content_son', course_content[0]['_id']),
+            location.run
+        )
         assert_raises(
-            AttributeError, TestMongoModuleStore.content_store.set_attr, asset_key,
+            AttributeError, self.content_store.set_attr, asset_key,
             'md5', 'ff1532598830e3feac91c2449eaa60d6'
         )
         assert_raises(
-            AttributeError, TestMongoModuleStore.content_store.set_attrs, asset_key,
+            AttributeError, self.content_store.set_attrs, asset_key,
             {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'}
         )
         assert_raises(
-            NotFoundError, TestMongoModuleStore.content_store.get_attr,
+            NotFoundError, self.content_store.get_attr,
             Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
             'displayname'
         )
         assert_raises(
-            NotFoundError, TestMongoModuleStore.content_store.set_attr,
+            NotFoundError, self.content_store.set_attr,
             Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
             'displayname', 'hello'
         )
         assert_raises(
-            NotFoundError, TestMongoModuleStore.content_store.get_attrs,
+            NotFoundError, self.content_store.get_attrs,
             Location('bogus', 'bogus', 'bogus', 'asset', 'bogus')
         )
         assert_raises(
-            NotFoundError, TestMongoModuleStore.content_store.set_attrs,
+            NotFoundError, self.content_store.set_attrs,
             Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
             {'displayname': 'hello'}
         )
         assert_raises(
-            NotFoundError, TestMongoModuleStore.content_store.set_attrs,
+            NotFoundError, self.content_store.set_attrs,
             Location('bogus', 'bogus', 'bogus', 'asset', None),
             {'displayname': 'hello'}
         )
