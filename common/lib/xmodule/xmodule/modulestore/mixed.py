@@ -118,6 +118,17 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 return store
         return None
 
+    def fill_in_run(self, course_key):
+        """
+        Some course_keys are used without runs. This function calls the corresponding
+        fill_in_run function on the appropriate modulestore.
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        if not hasattr(store, 'fill_in_run'):
+            return course_key
+        return store.fill_in_run(course_key)
+
+
     def has_item(self, usage_key, **kwargs):
         """
         Does the course include the xblock who's id is reference?

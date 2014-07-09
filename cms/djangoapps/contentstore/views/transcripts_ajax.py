@@ -533,6 +533,9 @@ def _get_item(request, data):
     """
     usage_key = UsageKey.from_string(data.get('locator'))
 
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+
     # This is placed before has_course_access() to validate the location,
     # because has_course_access() raises  r if location is invalid.
     item = modulestore().get_item(usage_key)

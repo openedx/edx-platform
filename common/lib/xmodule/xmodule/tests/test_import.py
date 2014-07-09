@@ -444,9 +444,6 @@ class ImportTestCase(BaseCourseTestCase):
             for msg, err
             in modulestore.get_course_errors(course.id)
         ]
-        for msg, err in errors:
-            print("msg: " + str(msg))
-            print("err: " + str(err))
 
         self.assertTrue(any(
             expect in msg or expect in err

@@ -101,6 +101,9 @@ def xblock_handler(request, usage_key_string):
     """
     if usage_key_string:
         usage_key = UsageKey.from_string(usage_key_string)
+        # usage_key's course_key may have an empty run property
+        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+
         if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
 
@@ -135,7 +138,15 @@ def xblock_handler(request, usage_key_string):
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
+            # usage_key's course_key may have an empty run property
+            parent_usage_key = parent_usage_key.replace(
+                course_key=modulestore().fill_in_run(parent_usage_key.course_key)
+            )
             duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
+            # usage_key's course_key may have an empty run property
+            duplicate_source_usage_key = duplicate_source_usage_key.replace(
+                course_key=modulestore().fill_in_run(duplicate_source_usage_key.course_key)
+            )
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
@@ -167,6 +178,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
             the second is the resource description
     """
     usage_key = UsageKey.from_string(usage_key_string)
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -376,6 +389,8 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 def _create_item(request):
     """View for create items."""
     usage_key = UsageKey.from_string(request.json['parent_locator'])
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     category = request.json['category']
 
     display_name = request.json.get('display_name')
