@@ -117,7 +117,7 @@
       }
 
       &.staff-only {
-        @extend %bar-module;
+        @extend %bar-module-black;
       }
 
       .bar-mod-content {
@@ -125,15 +125,7 @@
         padding: ($baseline/2) ($baseline*.75) ($baseline*.75) ($baseline*.75);
 
         .title {
-          @extend %t-title8;
           margin-bottom: ($baseline/10);
-          text-transform: uppercase;
-          color: $gray-l3;
-        }
-
-        .meta {
-          @extend %t-copy-sub2;
-          color: $gray-l1;
         }
       }
 
@@ -156,7 +148,13 @@
       .wrapper-visibility {
 
         .copy {
+          margin-bottom: ($baseline/10);
           font-weight: 600;
+        }
+
+        .action-inline [class^="icon-"] {
+          margin: 0 ($baseline/4);
+
         }
       }
 
@@ -218,7 +216,6 @@
         .unit-id-value {
           @extend %t-copy-sub1;
           display: inline-block;
-          margin: ($baseline/4) 0;
         }
 
         .tip {
@@ -235,7 +232,7 @@
           display: none;
         }
 
-        // need to explicitly set this since the html sturcture is different than the others
+        // need to explicitly set this since the html structure is different than the others
         .section-name:hover {
           background: $blue-l5;
           color: $blue;
