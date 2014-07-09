@@ -86,7 +86,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Editing the container", function() {
                 var updatedDisplayName = 'Updated Test Container',
-                    expectEditCanceled, inlineEditDisplayName, displayNameElement, displayNameInput;
+                    expectEditCanceled, displayNameElement, displayNameInput;
 
                 beforeEach(function() {
                     displayNameElement = containerPage.$('.page-header-title');
@@ -96,13 +96,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     edit_helpers.cancelModalIfShowing();
                 });
 
-                expectEditCanceled = function(options) {
+                expectEditCanceled = function(test, options) {
                     var initialRequests;
-                    renderContainerPage(mockContainerXBlockHtml, options.that);
+                    renderContainerPage(mockContainerXBlockHtml, test);
                     initialRequests = requests.length;
                     displayNameInput = edit_helpers.inlineEdit(displayNameElement, options.newTitle);
-                    displayNameInput.change();
-
                     if (options.pressEscape) {
                         displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
                         displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
@@ -111,9 +109,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     }
                     // No requests should be made when the edit is cancelled client-side
                     expect(initialRequests).toBe(requests.length);
-                    expect(displayNameInput).toHaveClass('is-hidden');
-                    expect(displayNameElement).not.toHaveClass('is-hidden');
-                    expect(displayNameInput.val()).toBe(initialDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameElement, initialDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 };
 
@@ -160,9 +156,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     create_sinon.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
                     create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    expect(displayNameInput).toHaveClass('is-hidden');
-                    expect(displayNameElement).not.toHaveClass('is-hidden');
-                    expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
                 });
 
@@ -175,9 +169,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     create_sinon.respondWithError(requests);
                     // No fetch operation should occur.
                     expect(initialRequests + 1).toBe(requests.length);
-                    expect(displayNameElement).toHaveClass('is-hidden');
-                    expect(displayNameInput).not.toHaveClass('is-hidden');
-                    expect(displayNameInput.val().trim()).toBe(updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameElement, initialDisplayName, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 });
 
@@ -189,22 +181,20 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     create_sinon.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
                     create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    expect(displayNameInput).toHaveClass('is-hidden');
-                    expect(displayNameElement).not.toHaveClass('is-hidden');
-                    expect(displayNameElement.text()).toBe(updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
                 });
 
                 it('does not change the title when input is the empty string', function() {
-                    expectEditCanceled({newTitle: '', pressEscape: false, that: this});
+                    expectEditCanceled(this, {newTitle: ''});
                 });
 
                 it('does not change the title when input is whitespace-only', function() {
-                    expectEditCanceled({newTitle: ' ', pressEscape: false, that: this});
+                    expectEditCanceled(this, {newTitle: ' '});
                 });
 
                 it('can cancel an inline edit', function() {
-                    expectEditCanceled({newTitle: updatedDisplayName, pressEscape: true, that: this});
+                    expectEditCanceled(this, {newTitle: updatedDisplayName, pressEscape: true});
                 });
             });
 

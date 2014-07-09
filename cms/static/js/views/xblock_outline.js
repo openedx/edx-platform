@@ -86,9 +86,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             addNameEditor: function() {
-                var xblockField = this.$('.wrapper-xblock-field');
+                var self = this,
+                    xblockField = this.$('.wrapper-xblock-field'),
+                    XBlockOutlineFieldEditor;
                 if (xblockField.length > 0) {
-                    this.nameEditor = new XBlockStringFieldEditor({
+                    XBlockOutlineFieldEditor = XBlockStringFieldEditor.extend({
+                        refresh: function() {
+                            self.refresh();
+                        }
+                    });
+                    this.nameEditor = new XBlockOutlineFieldEditor({
                         el: xblockField,
                         model: this.model
                     });
@@ -182,10 +189,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             /**
              * Refresh the view's model from the server, which will cause the view to refresh.
-             * @returns {*} A promise representing the refresh operation.
+             * @returns {promise} A promise representing the refresh operation.
              */
             refresh: function() {
-                return this.model.fetch({});
+                return this.model.fetch();
             },
 
             handleAddEvent: function(event) {

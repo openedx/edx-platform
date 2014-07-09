@@ -4,7 +4,7 @@
 define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
     function($, NotificationView, Prompt) {
         var installTemplate, installViewTemplates, createNotificationSpy, verifyNotificationShowing,
-            verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit,
+            verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics;
 
         installTemplate = function(templateName, isFirst, templateId) {
@@ -77,6 +77,18 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
             return inputField;
         };
 
+        verifyInlineEditChange = function(element, expectedValue, failedValue) {
+            var inputField = element.next().find('.xblock-field-input');
+            expect(element.text()).toBe(expectedValue);
+            if (failedValue) {
+                expect(element).toHaveClass('is-hidden');
+                expect(inputField).not.toHaveClass('is-hidden');
+            } else {
+                expect(element).not.toHaveClass('is-hidden');
+                expect(inputField).toHaveClass('is-hidden');
+            }
+        };
+
         return {
             'installTemplate': installTemplate,
             'installViewTemplates': installViewTemplates,
@@ -86,6 +98,7 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
             'createPromptSpy': createPromptSpy,
             'confirmPrompt': confirmPrompt,
             'inlineEdit': inlineEdit,
+            'verifyInlineEditChange': verifyInlineEditChange,
             'installMockAnalytics': installMockAnalytics,
             'removeMockAnalytics': removeMockAnalytics
         };

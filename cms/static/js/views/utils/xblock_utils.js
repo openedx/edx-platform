@@ -68,14 +68,18 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             };
         };
 
+        /**
+         * Updates the specified field of an xblock to a new value.
+         * @param xblockInfo The XBlockInfo model representing the xblock.
+         * @param fieldName The xblock field name to be updated.
+         * @param newValue The new value for the field.
+         * @returns {promise} A promise representing the updating of the field.
+         */
         updateXBlockField = function(xblockInfo, fieldName, newValue) {
             var requestData = createUpdateRequestData(fieldName, newValue);
-            ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+            return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                 function() {
                     return xblockInfo.save(requestData, { patch: true });
-                }).done(function() {
-                    // Update the model so that we get the latest publish and last modified information.
-                    xblockInfo.fetch();
                 });
         };
 

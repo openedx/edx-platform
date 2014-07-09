@@ -335,10 +335,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         createMockSectionJSON('Mock Section', [
                             createMockSubsectionJSON(updatedDisplayName, [])
                         ]));
-                    expect(displayNameInput).toHaveClass('is-hidden');
-                    expect(displayNameElement).not.toHaveClass('is-hidden');
-                    expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
-                    subsectionModel = outlinePage.model.get('child_info').children[0];
+                    subsectionHeaderElement = outlinePage.$('.outline-item-subsection > .wrapper-xblock-header');
+                    displayNameElement = subsectionHeaderElement.find('.xblock-field-value');
+                    view_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
+                    subsectionModel = outlinePage.model.get('child_info').children[0].get('child_info').children[0];
                     expect(subsectionModel.get('display_name')).toBe(updatedDisplayName);
                 });
 

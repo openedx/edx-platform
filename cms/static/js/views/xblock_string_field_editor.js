@@ -73,8 +73,16 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 this.hideInput();
             },
 
+            /**
+             * Refresh the model from the server so that it gets the latest publish and last modified information.
+             */
+            refresh: function() {
+                this.model.fetch();
+            },
+
             updateField: function() {
-                var xblockInfo = this.model,
+                var self = this,
+                    xblockInfo = this.model,
                     newValue = this.getInput().val().trim(),
                     oldValue = xblockInfo.get(this.fieldName);
                 // TODO: generalize this as not all xblock fields want to disallow empty strings...
@@ -82,7 +90,9 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                     this.cancelInput();
                     return;
                 }
-                XBlockViewUtils.updateXBlockField(xblockInfo, this.fieldName, newValue);
+                return XBlockViewUtils.updateXBlockField(xblockInfo, this.fieldName, newValue).done(function() {
+                    self.refresh();
+                });
             },
 
             handleKeyUp: function(event) {
