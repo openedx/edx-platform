@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 from student.models import CourseEnrollment
 
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -54,11 +54,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.url_unlocked = self.unlocked_asset.to_deprecated_string()
 
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
-
-    def tearDown(self):
-
-        contentstore().drop_database()
-        _CONTENTSTORE.clear()
 
     def test_unlocked_asset(self):
         """
