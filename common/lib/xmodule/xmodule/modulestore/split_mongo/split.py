@@ -374,7 +374,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         Gets the course descriptor for the course identified by the locator
         '''
-        assert(isinstance(course_id, CourseLocator))
+        if not isinstance(course_id, CourseLocator):
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(course_id)
+
         course_entry = self._lookup_course(course_id)
         root = course_entry['structure']['root']
         result = self._load_items(course_entry, [root], 0, lazy=True)
@@ -389,7 +392,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Note: we return the course_id instead of a boolean here since the found course may have
            a different id than the given course_id when ignore_case is True.
         '''
-        assert(isinstance(course_id, CourseLocator))
+        if not isinstance(course_id, CourseLocator):
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            return False
+
         course_index = self.db_connection.get_course_index(course_id, ignore_case)
         return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
 
@@ -432,7 +438,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        assert isinstance(usage_key, BlockUsageLocator)
+        if not isinstance(usage_key, BlockUsageLocator):
+            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(usage_key)
+
         course = self._lookup_course(usage_key)
         items = self._load_items(course, [usage_key.block_id], depth, lazy=True)
         if len(items) == 0:
@@ -1375,7 +1384,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        assert isinstance(usage_locator, BlockUsageLocator)
+        if not isinstance(usage_locator, BlockUsageLocator):
+            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(usage_locator)
+
         original_structure = self._lookup_course(usage_locator.course_key)['structure']
         if original_structure['root'] == usage_locator.block_id:
             raise ValueError("Cannot delete the root of a course")
