@@ -3,7 +3,6 @@ Script for cloning a course
 """
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from student.roles import CourseInstructorRole, CourseStaffRole
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
@@ -38,7 +37,7 @@ class Command(BaseCommand):
 
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 
-        with store_bulk_write_operations_on_course(mstore, dest_course_id):
+        with mstore.bulk_write_operations(dest_course_id):
             if mstore.clone_course(source_course_id, dest_course_id, None):
                 print("copying User permissions...")
                 # purposely avoids auth.add_user b/c it doesn't have a caller to authorize
