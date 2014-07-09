@@ -23,6 +23,17 @@ describe "NewPostView", ->
                 </div>
             </script>
 
+            <script aria-hidden="true" type="text/template" id="new-post-inline-template">
+                <div class="inner-wrapper">
+                    <div class="new-post-form-errors">
+                    </div>
+                    <form class="new-post-form">
+                        <%= editor_html %>
+                        <%= options_html %>
+                    </form>
+                </div>
+            </script>
+
             <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
                 <li role="menuitem"><a href="#" class="topic" data-discussion_id="<%- id %>" aria-describedby="topic-name-span-<%- id %>" cohorted="<%- is_cohorted %>"><%- text %></a></li>
             </script>
@@ -92,6 +103,9 @@ describe "NewPostView", ->
         window.$$course_id = "edX/999/test"
         spyOn(DiscussionUtil, "makeWmdEditor")
         @discussion = new Discussion([], {pages: 1})
+
+    describe "Drop down works correct", ->
+      beforeEach ->
         @view = new NewPostView(
           el: $(".new-post-article"),
           collection: @discussion,
@@ -121,8 +135,6 @@ describe "NewPostView", ->
         @view.render()
         @parent_category_text = "Basic Question Types"
         @selected_option_text = "Selection From Options"
-
-    describe "Drop down works correct", ->
 
       it "completely show parent category and sub-category", ->
         complete_text = @parent_category_text + " / " + @selected_option_text
@@ -158,3 +170,24 @@ describe "NewPostView", ->
         @view.$el.find( "ul.topic_menu li[role='menuitem'] > a" )[1].click()
         dropdown_text = @view.$el.find(".form-topic-drop > a").text()
         expect(dropdown_text.indexOf("/ span>")).toEqual(-1)
+
+    it "posts to the correct URL", ->
+      topicId = "test_topic"
+      spyOn($, "ajax").andCallFake(
+        (params) ->
+          expect(params.url.path()).toEqual(DiscussionUtil.urlFor("create_thread", topicId))
+          {always: ->}
+      )
+      view = new NewPostView(
+        el: $(".new-post-article"),
+        collection: @discussion,
+        course_settings: new DiscussionCourseSettings({
+          allow_anonymous: false,
+          allow_anonymous_to_peers: false
+        }),
+        mode: "inline",
+        topicId: topicId
+      )
+      view.render()
+      view.$(".new-post-form").submit()
+      expect($.ajax).toHaveBeenCalled()
