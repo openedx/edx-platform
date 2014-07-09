@@ -502,16 +502,16 @@ class LoncapaResponse(object):
         """True if the response has an answer-pool transformation."""
         return hasattr(self, '_has_answerpool')
 
-    def get_single_choice_hints_choice_response(self, new_cmap, student_answers, group_name):
+class LoncapaResponseChoice(LoncapaResponse):
+    """
+    An intermediate class to be supertype to the two types of "choice" problem. This
+    class allows both ChoiceResponse and MultipleChoiceResponse to use a common
+    function 'get_single_choice_hints'.
+    """
+    def __int__(self):
+        super(LoncapaResponseChoice, self).__init__(self, xml, inputfields, context, system)
 
-        # NOTE: this function is only called by MultipleChoiceResponse and ChoiceResponse classes.
-        #       it is included here to allow both those subclasses to use the same body of
-        #       code. A cleaner solution would be to create an intermediate subclass of this class
-        #       but superclass of MultipleChoiceResponse and ChoiceResponse to hold this function.
-        #       I tried that but ran into problems with initialization (there is some wierd
-        #       sequencing here) so I backed it out.   -- Thomas
-        #
-
+    def get_single_choice_hints(self, new_cmap, student_answers):
         '''
         Check the XML for any hints which should be delivered to the student based
         on the answer choices made.
@@ -519,7 +519,6 @@ class LoncapaResponse(object):
         :param new_cmap:        the 'correct map' to which applicable hints will be
                                 added for display by downstream code
         :param student_answers: the set of answer choices made by the student
-        :param group_name:      the name of the parent element holding the <choice> elements
         :return:                nothing
         '''
         for problem in student_answers:
@@ -759,7 +758,7 @@ class JavascriptResponse(LoncapaResponse):
 
 #-----------------------------------------------------------------------------
 @registry.register
-class ChoiceResponse(LoncapaResponse):
+class ChoiceResponse(LoncapaResponseChoice):
     """
     This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
@@ -858,8 +857,6 @@ class ChoiceResponse(LoncapaResponse):
             answers = {self.answer_id: list(self.correct_choices)}
         return answers
 
-    def get_single_choice_hints(self, new_cmap, student_answers):
-        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choice')
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
         """
@@ -911,7 +908,7 @@ class ChoiceResponse(LoncapaResponse):
 
 
 @registry.register
-class MultipleChoiceResponse(LoncapaResponse):
+class MultipleChoiceResponse(LoncapaResponseChoice):
     """
     Multiple Choice Response
     The shuffle and answer-pool features on this class enable permuting and
@@ -1218,8 +1215,6 @@ class MultipleChoiceResponse(LoncapaResponse):
 
         return (solution_id, subset_choices)
 
-    def get_single_choice_hints(self, new_cmap, student_answers):
-        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choice')
 
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
