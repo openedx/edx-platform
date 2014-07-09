@@ -79,15 +79,6 @@ if Backbone?
         if @attrRenderer[attr]
           @attrRenderer[attr].apply(@, [value])
 
-    $: (selector) ->
-      @$local.find(selector)
-
-    initLocal: ->
-      @$local = @$el.children(".local")
-      if not @$local.length
-        @$local = @$el
-      @$delegateElement = @$local
-
     makeWmdEditor: (cls_identifier) =>
       if not @$el.find(".wmd-panel").length
         DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), cls_identifier
@@ -103,7 +94,6 @@ if Backbone?
       
 
     initialize: ->
-      @initLocal()
       @model.bind('change', @renderPartialAttrs, @)
       
      
