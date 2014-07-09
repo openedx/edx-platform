@@ -20,7 +20,7 @@ define(['jquery', 'js/views/baseview'],
             /**
              * This renders the page's content and returns a promise that will be resolved once
              * the rendering has completed.
-             * @returns {boolean} A promise representing the rendering of the page.
+             * @returns {JQuery promise} A promise representing the rendering of the page.
              */
             renderPage: function() {
                 return $.Deferred().resolve().promise();
