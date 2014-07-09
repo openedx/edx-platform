@@ -187,26 +187,13 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections(modulestore_type=ModuleStoreEnum.Type.mongo):
+    def drop_mongo_collections():
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
-        store = modulestore()
-        if hasattr(store, '_get_modulestore_by_type'):
-            store = store._get_modulestore_by_type(modulestore_type)  # pylint: disable=W0212
-        if hasattr(store, 'collection'):
-            connection = store.collection.database.connection
-            store.collection.drop()
-            connection.close()
-        elif hasattr(store, 'close_all_connections'):
-            store.close_all_connections()
-        elif hasattr(store, 'db'):
-            connection = store.db.connection
-            connection.drop_database(store.db.name)
-            connection.close()
-
-        if hasattr(store, 'contentstore'):
-            store.contentstore.drop_database()
+        module_store = modulestore()
+        if hasattr(module_store, '_drop_all_databases'):
+            module_store._drop_all_databases()
 
         location_mapper = loc_mapper()
         if location_mapper.db:
@@ -214,25 +201,11 @@ class ModuleStoreTestCase(TestCase):
             location_mapper.db.connection.close()
 
     @classmethod
-    def setUpClass(cls):
-        """
-        Delete the existing modulestores, causing them to be reloaded.
-        """
-        # Clear out any existing modulestores,
-        # which will cause them to be re-created
-        # the next time they are accessed.
-        clear_existing_modulestores()
-        TestCase.setUpClass()
-
-    @classmethod
     def tearDownClass(cls):
         """
         Drop the existing modulestores, causing them to be reloaded.
         Clean up any data stored in Mongo.
         """
-        # Clean up by flushing the Mongo modulestore
-        cls.drop_mongo_collections()
-
         # Clear out the existing modulestores,
         # which will cause them to be re-created
         # the next time they are accessed.
@@ -240,17 +213,6 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
 
         TestCase.tearDownClass()
-
-    def _pre_setup(self):
-        """
-        Flush the ModuleStore.
-        """
-
-        # Flush the Mongo modulestore
-        ModuleStoreTestCase.drop_mongo_collections()
-
-        # Call superclass implementation
-        super(ModuleStoreTestCase, self)._pre_setup()
 
     def _post_teardown(self):
         """
