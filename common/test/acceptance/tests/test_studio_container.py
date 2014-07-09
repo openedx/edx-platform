@@ -417,6 +417,8 @@ class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
     """
+    PUBLISHED_STATUS = "Publishing Status\nPublished"
+    DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
 
     def setup_fixtures(self):
         """
@@ -449,26 +451,26 @@ class UnitPublishingTest(ContainerBase):
         Test the state changes when a published unit has draft changes.
         """
         unit = self.go_to_unit_page()
-        self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+        self.assertEqual(self.PUBLISHED_STATUS, unit.publish_title)
         # Should not be able to click on Publish action -- but I don't know how to test that it is not clickable.
         # TODO: continue discussion with Muhammad and Jay about this.
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
-        self.assertEqual("Publishing Status\nDraft (Unpublished changes)", unit.publish_title)
+        self.assertEqual(self.DRAFT_STATUS, unit.publish_title)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+        self.assertEqual(self.PUBLISHED_STATUS, unit.publish_title)
 
-    # TODO: part of future story.
-    # def test_discard_changes(self):
-    #     """
-    #     Test the state after discard changes.
-    #     """
-    #     unit = self.go_to_unit_page()
-    #     add_discussion(unit)
-    #     unit = unit.discard_changes()
-    #     self.assertEqual("Publishing Status\nPublished", unit.publish_title)
+    def test_discard_changes(self):
+        """
+        Test the state after discard changes.
+        """
+        unit = self.go_to_unit_page()
+        add_discussion(unit)
+        self.assertEqual(self.DRAFT_STATUS, unit.publish_title)
+        unit.discard_changes()
+        self.assertEqual(self.PUBLISHED_STATUS, unit.publish_title)
 
     def test_view_live_no_changes(self):
         """
