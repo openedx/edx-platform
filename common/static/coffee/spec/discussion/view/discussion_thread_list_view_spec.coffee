@@ -147,7 +147,7 @@ describe "DiscussionThreadListView", ->
                 </div>
             </div>
         </script>
-        <div class="sidebar"></div>
+        <div class="forum-nav"></div>
         """
         @threads = [
           makeThreadWithProps({
@@ -176,7 +176,7 @@ describe "DiscussionThreadListView", ->
         spyOn($, "ajax")
 
         @discussion = new Discussion([])
-        @view = new DiscussionThreadListView({collection: @discussion, el: $(".sidebar")})
+        @view = new DiscussionThreadListView({collection: @discussion, el: $(".forum-nav")})
         @view.render()
 
     makeThreadWithProps = (props) ->
@@ -196,7 +196,7 @@ describe "DiscussionThreadListView", ->
 
     makeView = (discussion) ->
       return new DiscussionThreadListView(
-          el: $(".sidebar"),
+          el: $(".forum-nav"),
           collection: discussion
       )
 

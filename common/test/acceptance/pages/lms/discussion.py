@@ -343,7 +343,7 @@ class DiscussionUserProfilePage(CoursePage):
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
 
-    ALERT_SELECTOR = ".discussion-body .sidebar .search-alert"
+    ALERT_SELECTOR = ".discussion-body .forum-nav .search-alert"
 
     def __init__(self, browser, course_id):
         super(DiscussionTabHomePage, self).__init__(browser, course_id)
