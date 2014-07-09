@@ -41,7 +41,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^event$', 'contentstore.views.event', name='event'),
 
     url(r'^xmodule/', include('pipeline_js.urls')),
-    url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),
     url(r'^lang_pref/', include('lang_pref.urls')),
@@ -95,6 +94,11 @@ urlpatterns += patterns(
     url(r'^textbooks/{}$'.format(COURSE_KEY_PATTERN), 'textbooks_list_handler'),
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
 )
+
+if settings.FEATURES.get('ENABLE_HEARTBEAT'):
+    urlpatterns += (
+        url(r'^heartbeat$', include('heartbeat.urls')),
+    )
 
 if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
     urlpatterns += (url(r'^group_configurations/(?P<course_key_string>[^/]+)$',
