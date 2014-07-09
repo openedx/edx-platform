@@ -50,7 +50,7 @@ if Backbone?
       if(@newPost.is(":visible"))
         @newPost.fadeOut()
 
-      @main = new DiscussionThreadView(el: $(".forum-content"), model: @thread)
+      @main = new DiscussionThreadView(el: $(".forum-content"), model: @thread, mode: "tab")
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
