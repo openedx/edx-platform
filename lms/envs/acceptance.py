@@ -27,10 +27,17 @@ import string
 def seed():
     return os.getppid()
 
-# Suppress error message "Cannot determine primary key of logged in user"
-# from track.middleware that gets triggered when using an auto_auth workflow
-# This is an ERROR level warning so we need to set the threshold at CRITICAL
-logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+# Silence noisy logs
+LOG_OVERRIDES = [
+    ('track.middleware', logging.CRITICAL),
+    ('codejail.safe_exec', logging.ERROR),
+    ('edx.courseware', logging.ERROR),
+    ('audit', logging.ERROR),
+    ('instructor_task.api_helper', logging.ERROR),
+]
+
+for log_name, log_level in LOG_OVERRIDES:
+    logging.getLogger(log_name).setLevel(log_level)
 
 update_module_store_settings(
     MODULESTORE,
