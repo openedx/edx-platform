@@ -182,9 +182,10 @@ def create_a_course():
     assert_true(world.is_css_present(course_title_css))
 
 
-def add_section(name='My Section'):
+def add_section(name=None):
     world.css_click('.course-outline .add-button')
-    set_element_value('.xblock-field-input', name, Keys.ENTER)
+    if name is not None:
+        set_element_value('.xblock-field-input', name, Keys.ENTER)
     assert_true(world.is_css_present('.outline-item-section .xblock-field-value'))
 
 

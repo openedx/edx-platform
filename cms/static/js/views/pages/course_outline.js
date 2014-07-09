@@ -17,9 +17,21 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 this.$('.add-button').click(function(event) {
                     self.outlineView.handleAddEvent(event);
                 });
+                this.model.on('change', this.setCollapseExpandVisibility, this);
+            },
+
+            setCollapseExpandVisibility: function() {
+                var has_content = this.hasContent(),
+                    collapseExpandButton = $('.toggle-button-expand-collapse');
+                if (has_content) {
+                    collapseExpandButton.show();
+                } else {
+                    collapseExpandButton.hide();
+                }
             },
 
             renderPage: function() {
+                this.setCollapseExpandVisibility();
                 this.outlineView = new CourseOutlineView({
                     el: this.$('.course-outline'),
                     model: this.model,
