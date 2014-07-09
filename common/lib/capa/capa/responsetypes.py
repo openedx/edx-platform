@@ -457,9 +457,6 @@ class LoncapaResponse(object):
         for hint_element in problem_element.findall('hints/hint'):
             problem_hint_list.append(hint_element.text.strip())
 
-        # for hint_element in problem_element.xpath('//hint'):
-        #     hint_element.getparent().remove(hint_element)
-
     def setup_response(self):
         self._extract_problem_hints()
 
