@@ -54,6 +54,9 @@ SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
 # sort order that returns PUBLISHED items first
 SORT_REVISION_FAVOR_PUBLISHED = ('_id.revision', pymongo.ASCENDING)
 
+BLOCK_TYPES_WITH_CHILDREN = list(set(
+    name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
+))
 
 class MongoRevisionKey(object):
     """
@@ -460,14 +463,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
 
         course_id = self.fill_in_run(course_id)
-        block_types_with_children = set(
-            name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
-        )
         query = SON([
             ('_id.tag', 'i4x'),
             ('_id.org', course_id.org),
             ('_id.course', course_id.course),
-            ('_id.category', {'$in': list(block_types_with_children)})
+            ('_id.category', {'$in': BLOCK_TYPES_WITH_CHILDREN})
         ])
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
