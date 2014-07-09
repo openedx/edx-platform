@@ -22,10 +22,16 @@
     padding: ($baseline*.75) ($baseline*.75) $baseline ($baseline*.75);
 
     .title {
-      @extend %t-title7;
-      margin-bottom: ($baseline/2);
+      @extend %t-title8;
+      margin-bottom: ($baseline/4);
       font-weight: 600;
-      color: $gray-d1;
+      color: $gray-l2;
+      text-transform: uppercase;
+    }
+
+    .meta {
+      @extend %t-copy-sub2;
+      color: $gray-l1;
     }
   }
 }
@@ -40,7 +46,6 @@
   }
 }
 
-
 // green bar and title bg version
 %bar-module-green {
   @extend %bar-module;
@@ -50,7 +55,6 @@
     background-color: $green-l5;
   }
 }
-
 
 // yellow bar and title bg version
 %bar-module-yellow {
@@ -62,8 +66,6 @@
   }
 }
 
-
-
 // red bar and title bg version
 %bar-module-red {
   @extend %bar-module;
@@ -71,6 +73,16 @@
 
   .bar-mod-title {
     background-color: $red-l5;
+  }
+}
+
+// black bar and title bg version
+%bar-module-black {
+  @extend %bar-module;
+  border-top: 5px solid $black;
+
+  .bar-mod-title {
+    background-color: $gray-l4;
   }
 }
 
