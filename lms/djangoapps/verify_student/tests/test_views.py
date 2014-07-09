@@ -35,7 +35,6 @@ from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 
-
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
@@ -386,8 +385,17 @@ class TestMidCourseReverifyView(TestCase):
                       kwargs={"course_id": self.course_key.to_deprecated_string()})
         response = self.client.get(url)
 
-        # Check that user entering the reverify flow was logged
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.mode_changed',
+            {
+                'user_id': self.user.id,
+                'course_id': self.course_key.to_deprecated_string(),
+                'mode': "verified",
+            }
+        )
+
+        # Check that user entering the reverify flow was logged, and that it was the last call
+        self.mock_tracker.emit.assert_called_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.reverify.started',
             {
                 'user_id': self.user.id,
@@ -395,6 +403,9 @@ class TestMidCourseReverifyView(TestCase):
                 'mode': "verified",
             }
         )
+
+        self.assertTrue(self.mock_tracker.emit.call_count, 2)
+
         self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
 
         self.assertEquals(response.status_code, 200)
@@ -408,8 +419,17 @@ class TestMidCourseReverifyView(TestCase):
 
         response = self.client.post(url, {'face_image': ','})
 
-        # Check that submission event was logged
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.mode_changed',
+            {
+                'user_id': self.user.id,
+                'course_id': self.course_key.to_deprecated_string(),
+                'mode': "verified",
+            }
+        )
+
+        # Check that submission event was logged, and that it was the last call
+        self.mock_tracker.emit.assert_called_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.reverify.submitted',
             {
                 'user_id': self.user.id,
@@ -417,6 +437,9 @@ class TestMidCourseReverifyView(TestCase):
                 'mode': "verified",
             }
         )
+
+        self.assertTrue(self.mock_tracker.emit.call_count, 2)
+
         self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
 
         self.assertEquals(response.status_code, 302)
