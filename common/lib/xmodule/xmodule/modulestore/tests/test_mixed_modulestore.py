@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDja
 # before importing the module
 from django.conf import settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -329,6 +330,32 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
+
+        # create and delete a private vertical with private children
+        private_vert_loc = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'private')
+        private_vert = self.store.create_and_save_xmodule(private_vert_loc, self.user_id, runtime=self.course.runtime)
+        self.course.children.append(private_vert_loc)
+        self.store.update_item(self.course, self.user_id)
+        private_leaf_loc = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('html', 'private_leaf')
+        self.store.create_and_save_xmodule(private_leaf_loc, self.user_id, runtime=self.course.runtime)
+        private_vert.children.append(private_leaf_loc)
+        self.store.update_item(private_vert, self.user_id)
+
+        # verify pre delete state (just to verify that the test is valid)
+        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == MongoRevisionKey.draft)
+        self.assertIsNotNone(self.store.get_item(private_vert_loc))
+        self.assertIsNotNone(self.store.get_item(private_leaf_loc))
+        course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
+        self.assertIn(private_vert_loc, course.children)
+
+        # delete the vertical and ensure the course no longer points to it
+        self.store.delete_item(private_vert_loc, self.user_id)
+        with self.assertRaises(ItemNotFoundError):
+            self.store.get_item(private_vert_loc)
+        with self.assertRaises(ItemNotFoundError):
+            self.store.get_item(private_leaf_loc)
+        course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
+        self.assertNotIn(private_vert_loc, course.children)
 
     @ddt.data('draft', 'split')
     def test_get_courses(self, default_ms):
