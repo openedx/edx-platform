@@ -22,7 +22,6 @@ if Backbone?
 
     render: ->
       @$el.html(@renderTemplate())
-      @initLocal()
       @delegateEvents()
 
       @renderShowView()

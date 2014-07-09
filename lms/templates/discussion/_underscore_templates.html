@@ -111,7 +111,7 @@
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <ol class="comments">
-        <li class="new-comment response-local">
+        <li class="new-comment">
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
@@ -128,7 +128,7 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
-    <header class="response-local">
+    <header>
         <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
         <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
@@ -138,11 +138,11 @@
         ${"<% } %>"}
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
-    <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
+    <div class="response-body">${"<%- body %>"}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
     </div>
-    <ul class="moderator-actions response-local">
+    <ul class="moderator-actions">
         <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
         <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
         <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
