@@ -2,8 +2,6 @@
 Utility methods useful for XBlock page tests.
 """
 from bok_choy.promise import Promise
-from selenium.webdriver.common.action_chains import ActionChains
-
 
 def wait_for_xblock_initialization(page, xblock_css):
     """
