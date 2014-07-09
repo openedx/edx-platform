@@ -544,6 +544,22 @@ class TestEditItem(ItemTest):
 
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
+        self._make_draft_content_different_from_published()
+
+    def test_revert_to_published(self):
+        """ Test reverting draft content to published """
+        self._make_draft_content_different_from_published()
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'discard_changes'}
+        )
+        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self.assertIsNone(published.due)
+
+    def _make_draft_content_different_from_published(self):
+        """
+        Helper method to create different draft and published versions of a problem.
+        """
         # Make problem public.
         self.client.ajax_post(
             self.problem_update_url,
