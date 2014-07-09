@@ -67,6 +67,8 @@ $(document).ready(function() {
 
     <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
 
+    %if false:
+    <!-- /experiment-control -->
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
 
@@ -213,6 +215,118 @@ $(document).ready(function() {
         </form>
       </article>
     </div> <!-- /wrapper-content-main -->
+
+    %else:
+    <!-- /experiment-variant-A -->
+    <div class="wrapper-register-choose wrapper-content-main exp-variant-A">
+      <article class="register-choose content-main">
+
+        %if not upgrade:
+        <h3 class="title">${_("How would you like to participate?")}</h3>
+        %endif
+
+        <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+
+          % if "audit" in modes:
+            <div class="register-choice register-choice-audit">
+              <div class="wrapper-copy">
+                <h4 class="title">${_("Audit This Course")}</h4>
+                <div class="copy">
+                  <p>${_("Prefer not to commit to all of the lectures, assignments, and assessments? Audit this course and have complete access to all of the course material. You decide how much you want to do. If you complete and pass the course you will automatically earn and Honor Code Certificate. This option is free.")}</p>
+                </div>
+              </div>
+
+              <ul class="list-actions">
+                <li class="action action-select">
+                <input type="submit" name="audit_mode" value="${_('Select Audit')}" />
+                </li>
+              </ul>
+            </div>
+          % endif
+
+          %if not upgrade:
+
+            % if "verified" in modes:
+            <span class="deco-divider">
+              <span class="copy">${_("or")}</span>
+            </span>
+            <div class="register-choice register-choice-certificate">
+              <div class="wrapper-copy">
+                <span class="deco-ribbon"></span>
+                <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+
+                %if upgrade:
+                  <div class="copy">
+                    <p>${_("Plan to use your completed coursework for job applications, career advancement, or school applications? Upgrade to work toward a Verified Certificate of Achievement to document your accomplishment. A minimum fee applies.")}</p>
+                  </div>
+                %else:
+                  <div class="copy">
+                    <p>${_("Plan to use your completed coursework for job applications, career advancement, or school applications? Then work toward a Verified Certificate of Achievement to document your accomplishment. A minimum fee applies.")}</p>
+                  </div>
+                %endif
+              </div>
+
+              <div class="field field-certificate-contribution">
+                <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span>${_("):")}</h5>
+
+                %if error:
+                <div class="msg msg-error msg-inline">
+                  <div class="copy">
+                    <p><i class="msg-icon icon-warning-sign"></i> ${error}</p>
+                  </div>
+                </div>
+                %endif
+
+                <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
+
+                <div class="help-tip is-expandable">
+                  <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Learn More about Verified Certificates")}</h5>
+
+                  <div class="copy expandable-area">
+                    <dl class="list-faq">
+                      <dt class="faq-question">${_("Why do I have to pay?")}</dt>
+                      <dd class="faq-answer">
+                        <p>${_("As a not-for-profit, edX uses your contribution to support our mission to provide quality education to everyone around the world, and to improve learning through research. While we have established a minimum fee, we ask that you contribute as much as you can.")}</p>
+                      </dd>
+
+                      <dt class="faq-question">${_("I'd like to pay more than the minimum.  Is my contribution tax deductible?")}</dt>
+                      <dd class="faq-answer">
+                        <p>${_("Please check with your tax advisor to determine whether your contribution is tax deductible.")}</p>
+                      </dd>
+
+                      % if "honor" in modes:
+                      <dt class="faq-question">${_("What if I can't afford it or don't have the necessary equipment?")}</dt>
+                      <dd class="faq-answer">
+                      <p>${_("If you can't afford the minimum fee or don't meet the requirements, you can audit the course or elect to pursue an honor code certificate at no cost.")}
+                         ${_("If you would like to pursue the honor code certificate, please check the honor code certificate box and then click the 'Select Certificate' button to complete your registration.")}</p>
+                      </dd>
+                      % endif
+                    </dl>
+                  </div>
+                </div>
+              </div>
+
+              <ul class="list-actions">
+                <li class="action action-select">
+                  %if upgrade:
+                  <input type="submit" name="certificate_mode" value="${_('Upgrade Your Registration')}" />
+                  %else:
+                  <input type="submit" name="certificate_mode" value="${_('Pursue a Verified Certificate')}" />
+                  %endif
+
+                </li>
+              </ul>
+            </div>
+
+            % endif
+
+          %endif
+
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        </form>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+    %endif
 
     <%include file="/verify_student/_verification_support.html" />
   </section>

@@ -415,6 +415,59 @@
     }
   }
 
+  // CASE: page header - experiment variant A overrides
+  .page-header.exp-variant-A {
+    margin-bottom: $baseline;
+    border-bottom: none;
+    border-left: ($baseline/4) solid $m-blue-l1;
+    background-color: $m-blue-l5;
+
+    .title {
+      margin: 0;
+      padding: ($baseline/2) $baseline;
+    }
+
+
+    .sts-label {
+      display: inline-block;
+      margin: 0;
+      border: none;
+      padding: 0;
+      text-transform: none;
+    }
+
+    .sts-course-org {
+      margin-right: 0;
+    }
+
+    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+      @extend %t-title5;
+      @extend %t-weight4;
+      @include font-size(14);
+      @include line-height(14);
+      display: inline-block;
+      color: $gray;
+    }
+
+    .wrapper-sts {
+      display: inline-block;
+      width: flex-grid(9,12);
+      margin-bottom: ($baseline/4);
+    }
+
+    .sts-course {
+      width: initial;
+    }
+
+    .title .sts-track {
+      display: inline-block;
+
+      .sts-track-value {
+        background: $m-blue-l1;
+      }
+    }
+  }
+
   // ====================
 
   // UI : progress
@@ -1123,6 +1176,14 @@
     }
   }
 
+  // CASE: supplemental content - experiment variant A overrides
+  .wrapper-content-supplementary.exp-variant-A {
+
+    .help-item-technical {
+      width: flex-grid(8,12);
+    }
+  }
+
   // ====================
 
   // VIEW: select a track
@@ -1333,6 +1394,23 @@
           @extend %text-sr;
         }
       }
+    }
+  }
+
+  // CASE: select a track - experiment variant A overrides
+  .wrapper-register-choose.exp-variant-A {
+
+    .register-choice {
+      width: flex-grid(12,12);
+    }
+
+    .deco-divider{
+      width: flex-grid(12,12);
+    }
+
+    .register-choice-certificate .list-actions {
+      border-top: none;
+      padding-top: none;
     }
   }
 
