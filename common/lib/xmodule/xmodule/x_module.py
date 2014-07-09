@@ -1262,14 +1262,14 @@ class DiscussionService(object):
         request.user = user
         user_info = cc.User.from_django_user(self.runtime.user).to_dict()
         course_id = self.runtime.course_id
-        course = get_course_with_access(self.runtime.user, course_id, 'load_forum')
+        course = get_course_with_access(self.runtime.user, 'load_forum', course_id)
         user_cohort_id = get_cohort_id(user, course_id)
 
         unsafethreads, query_params = get_threads(request, course_id)
         threads = [utils.safe_content(thread) for thread in unsafethreads]
 
         flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or \
-                         has_access(user, course, 'staff')
+                         has_access(user, 'staff', course)
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
         category_map = utils.get_discussion_category_map(course)
@@ -1279,8 +1279,8 @@ class DiscussionService(object):
 
         context = {
             'course': course,
-            'course_id': course.id,
-            'staff_access': has_access(user, course, 'staff'),
+            'course_id': course_id,
+            'staff_access': has_access(user, 'staff', course),
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
@@ -1315,12 +1315,12 @@ class DiscussionService(object):
         course_id = self.runtime.course_id
         user = self.runtime.user
 
-        course = get_course_with_access(user, course_id, 'load_forum')
+        course = get_course_with_access(user, 'load_forum', course_id)
         category_map = get_discussion_category_map(course)
 
         is_moderator = cached_has_permission(user, "see_all_cohorts", course_id)
         flag_moderator =  cached_has_permission(user, 'openclose_thread', course_id) or \
-                          has_access(user, course, 'staff')
+                          has_access(user, 'staff', course)
 
         context = {
             'course': course,
