@@ -1,8 +1,8 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedback_prompt"],
-    function ($, _, gettext, BaseView, PromptView) {
+define(["jquery", "underscore", "gettext", "js/views/baseview"],
+    function ($, _, gettext, BaseView) {
 
         var disabledCss = "is-disabled";
 
@@ -123,7 +123,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 }
                 this.runOperationShowingMessage(gettext('Publishing&hellip;'),
                     function () {
-                        return xblockInfo.save({publish: 'make_public'});
+                        return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
                         xblockInfo.set("publish", null);
                     }).done(function () {
@@ -132,49 +132,27 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
             },
 
             discardChanges: function (e) {
+                var xblockInfo = this.model, that=this, renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                var xblockInfo = this.model, view, renderPage = this.renderPage;
-
-                view = new PromptView.Warning({
-                    title: gettext("Discard Changes"),
-                    message: gettext("Are you sure you want to discard changes and revert to the last published version?"),
-                    actions: {
-                        primary: {
-                            text: gettext("Discard Changes"),
-                            click: function (view) {
-                                view.hide();
-                                $.ajax({
-                                    type: 'DELETE',
-                                    url: xblockInfo.url()
-                                }).success(function () {
-                                    window.alert("Refresh the page to see that changes were discarded. " +
-                                        "Auto-refresh will be implemented in a later story.");
-                                    /* Fetch is never returning on sandbox-- try
-                                       doing a PUT instead of a DELETE with publish option
-                                       to work around, or contact dev ops.
-                                       STUD-1860
-                                    window.crazyAjaxHandler = xblockInfo.fetch({
-                                        complete: function(a, b, c) {
-                                            debugger;
-                                        }
-                                    });
-                                    renderPage();
-                                    */
-                                });
-                            }
-                        },
-                        secondary: {
-                            text: gettext("Cancel"),
-                            click: function (view) {
-                                view.hide();
-                            }
-                        }
+                this.confirmThenRunOperation(gettext("Discard Changes"),
+                    gettext("Are you sure you want to discard changes and revert to the last published version?"),
+                    gettext("Discard Changes"),
+                    function () {
+                        that.runOperationShowingMessage(gettext('Discarding Changes&hellip;'),
+                            function () {
+                                return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
+                            }).always(function() {
+                                xblockInfo.set("publish", null);
+                            }).done(function () {
+                                renderPage();
+                            });
                     }
-                }).show();
+                );
             }
         });
+
 
         /**
          * PublishHistory displays when and by whom the xblock was last published, if it ever was.

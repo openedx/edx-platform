@@ -149,10 +149,9 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(promptSpies.constructor).toHaveBeenCalled();
                     promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
 
-                    request = lastRequest();
-                    expect(request.url).toEqual("/xblock/locator-container");
-                    expect(request.method).toEqual("DELETE");
-                    expect(request.requestBody).toEqual(null);
+                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                        {"publish": "discard_changes"}
+                    );
                 };
 
                 beforeEach(function() {
@@ -201,19 +200,15 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     containerPage.$(publishButtonCss).click();
                     edit_helpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
-                    request = lastRequest();
-                    expect(request.url).toEqual("/xblock/locator-container");
-                    expect(request.method).toEqual("POST");
-                    expect(JSON.parse(request.requestBody).publish).toEqual("make_public");
+                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                        {"publish": "make_public"}
+                    );
 
                     // Response to publish call
-                    respondWithJson({"id": "locator-container", "published": true, "has_changes": false});
+                    respondWithJson({"id": "locator-container", "data": null, "metadata":{}});
                     edit_helpers.verifyNotificationHidden(notificationSpy);
 
-                    request = lastRequest();
-                    expect(request.url).toEqual("/xblock/locator-container");
-                    expect(request.method).toEqual("GET");
-                    expect(request.requestBody).toEqual(null);
+                    create_sinon.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
                     respondWithJson({"id": "locator-container", "published": true, "has_changes": false});
 
@@ -243,28 +238,39 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(containerPage.model.get("publish")).toBeNull();
                 });
 
-                /* STUD-1860
                 it('can discard changes', function () {
-                    sendDiscardChangesToServer(this);
+                    var notificationSpy = edit_helpers.createNotificationSpy(),
+                        renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough(),
+                        numRequests;
 
-                    var numRequests = requests.length;
-                    create_sinon.respondToDelete(requests);
+                    sendDiscardChangesToServer(this);
+                    numRequests = requests.length;
+
+                    // Respond with success.
+                    respondWithJson({"id": "locator-container"});
+                    edit_helpers.verifyNotificationHidden(notificationSpy);
+
+                    // Verify other requests are sent to the server to update page state.
                     // Response to fetch, specifying the very next request (as multiple requests will be sent to server)
-                    respondWithJson({"id": "locator-container", "published": true, "has_changes": false}, numRequests);
-                    expect(containerPage.$(discardChangesButtonCss)).toHaveClass('is-disabled');
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                    expect(requests.length > numRequests).toBeTruthy();
+                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(renderPageSpy).toHaveBeenCalled();
                 });
-                */
 
                 it('does not fetch if discard changes fails', function () {
-                    sendDiscardChangesToServer(this);
+                    var renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough(),
+                        numRequests;
 
-                    var numRequests = requests.length;
+                    sendDiscardChangesToServer(this);
+                    numRequests = requests.length;
+
                     // Respond with failure
                     create_sinon.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
+                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(renderPageSpy).not.toHaveBeenCalled();
                 });
 
                 it('does not discard changes on cancel', function () {
