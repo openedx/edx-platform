@@ -1007,7 +1007,8 @@ body.discussion {
           max-height: 600px;
 
           .group-visibility-label {
-            margin: $baseline ($baseline*1.5) ($baseline*-0.5);
+            font-weight: 400;
+            margin-bottom: ($baseline*0.5);
           }
 
           .discussion-post {
@@ -1043,10 +1044,10 @@ body.discussion {
                 }
               }
 
-              h3 {
+              h1 {
                 font-size: 19px;
                 font-weight: 700;
-                margin-bottom: 0px;
+                margin-bottom: 0px !important; // Override courseware CSS
               }
 
               h4 {

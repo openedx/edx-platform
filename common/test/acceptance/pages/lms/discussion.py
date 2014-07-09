@@ -269,7 +269,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
 
     def expand(self):
         """Clicks the link to expand the thread"""
-        self._find_within(".expand-post").first.click()
+        self._find_within(".forum-thread-expand").first.click()
         EmptyPromise(
             lambda: bool(self.get_response_total_text()),
             "Thread expanded"
