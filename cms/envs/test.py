@@ -15,7 +15,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-from warnings import filterwarnings
+from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
 # import settings from LMS for consistent behavior with CMS
@@ -149,6 +149,10 @@ INSTALLED_APPS += ('external_auth', )
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
+# https://docs.python.org/2/library/warnings.html#the-warnings-filter
+simplefilter('ignore')  # Change to "default" to see the first instance of each hit
+                        # or "error" to convert all into errors
 
 ################################# CELERY ######################################
 
