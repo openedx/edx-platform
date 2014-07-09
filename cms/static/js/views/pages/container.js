@@ -213,7 +213,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                     xblock = xblockView.xblock,
                     parent = this.findXBlockElement(xblockElement.parent());
                 xblockElement.remove();
-                xblockView.updateChildren(parent);
                 xblock.runtime.notify('deleted-child', parent.data('locator'));
                 // Update publish and last modified information from the server.
                 this.model.fetch();
