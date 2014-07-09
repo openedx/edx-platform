@@ -4,11 +4,11 @@ Unit tests for getting the list of courses and the course outline.
 import json
 import lxml
 
-from cms.urls import COURSE_KEY_PATTERN
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locator import Locator
+from django.conf import settings
 
 
 class TestCourseIndex(CourseTestCase):
@@ -39,7 +39,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/{}'.format(COURSE_KEY_PATTERN)
+                'course/{}'.format(settings.COURSE_KEY_PATTERN)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')

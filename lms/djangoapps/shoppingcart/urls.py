@@ -13,7 +13,7 @@ if settings.FEATURES['ENABLE_SHOPPING_CART']:
         url(r'^$', 'show_cart'),
         url(r'^clear/$', 'clear_cart'),
         url(r'^remove_item/$', 'remove_item'),
-        url(r'^add/course/(?P<course_id>[^/]+/[^/]+/[^/]+)/$', 'add_course_to_cart', name='add_course_to_cart'),
+        url(r'^add/course/{}/$'.format(settings.COURSE_ID_PATTERN), 'add_course_to_cart', name='add_course_to_cart'),
     )
 
 if settings.FEATURES.get('ENABLE_PAYMENT_FAKE'):
