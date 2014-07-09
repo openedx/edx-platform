@@ -105,7 +105,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     SCHEMA_VERSION = 1
     reference_type = Locator
-    def __init__(self, doc_store_config, fs_root, render_template,
+
+    def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
                  loc_mapper=None,
@@ -115,7 +116,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(SplitMongoModuleStore, self).__init__(**kwargs)
+        super(SplitMongoModuleStore, self).__init__(contentstore, **kwargs)
         self.loc_mapper = loc_mapper
 
         self.db_connection = MongoConnection(**doc_store_config)
@@ -870,6 +871,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # reconstruct the new_item from the cache
         return self.get_item(item_loc)
 
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        See :meth: `.ModuleStoreWrite.clone_course` for documentation.
+
+        In split, other than copying the assets, this is cheap as it merely creates a new version of the
+        existing course.
+        """
+        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        source_index = self.get_course_index_info(source_course_id)
+        return self.create_course(
+            dest_course_id.org, dest_course_id.offering, user_id, fields=None,  # override start_date?
+            versions_dict=source_index['versions']
+        )
+
     def create_course(
         self, org, offering, user_id, fields=None,
         master_branch=ModuleStoreEnum.BranchName.draft, versions_dict=None, root_category='course',
@@ -1365,7 +1380,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return result
 
-    def delete_course(self, course_key, user_id=None):
+    def delete_course(self, course_key, user_id):
         """
         Remove the given course from the course index.
 
@@ -1380,12 +1395,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index)
 
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as structures
-        are loaded on demand, rather than up front
-        """
-        return {}
+        # We do NOT call the super class here since we need to keep the assets
+        # in case the course is later restored.
+        # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
 
     def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """

@@ -151,7 +151,7 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
     def tearDown(self):
         self.clear_subs_content()
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
 
@@ -190,7 +190,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
             org=self.org, number=self.number, display_name=self.display_name)
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        contentstore().drop_database()
         _CONTENTSTORE.clear()
 
     def test_success_downloading_subs(self):
