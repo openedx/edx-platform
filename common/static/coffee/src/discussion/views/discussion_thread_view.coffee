@@ -7,14 +7,20 @@ if Backbone?
     events:
       "click .discussion-submit-post": "submitComment"
       "click .add-response-btn": "scrollToAddResponse"
+      "click .forum-thread-expand": "expand"
+      "click .forum-thread-collapse": "collapse"
 
     $: (selector) ->
       @$el.find(selector)
 
-    initialize: ->
+    initialize: (options) ->
       super()
+      @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
+      if @mode not in ["tab", "inline"]
+        throw new Error("invalid mode: " + @mode)
       @createShowView()
       @responses = new Comments()
+      @loadedResponses = false
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -31,10 +37,44 @@ if Backbone?
       @makeWmdEditor "reply-body"
       @renderAddResponseButton()
       @responses.on("add", @renderResponse)
-      # Without a delay, jQuery doesn't add the loading extension defined in
-      # utils.coffee before safeAjax is invoked, which results in an error
-      setTimeout((=> @loadInitialResponses()), 100)
-      @
+      if @mode == "tab"
+        # Without a delay, jQuery doesn't add the loading extension defined in
+        # utils.coffee before safeAjax is invoked, which results in an error
+        setTimeout((=> @loadInitialResponses()), 100)
+        @$(".post-tools").hide()
+      else # mode == "inline"
+        @collapse()
+
+    expand: (event) ->
+      if event
+        event.preventDefault()
+      @$el.addClass("expanded")
+      @$el.find(".post-body").html(@model.get("body"))
+      @showView.convertMath()
+      @$el.find(".forum-thread-expand").hide()
+      @$el.find(".forum-thread-collapse").show()
+      @$el.find(".post-extended-content").show()
+      if not @loadedResponses
+        @loadInitialResponses()
+
+    collapse: (event) ->
+      if event
+        event.preventDefault()
+      @$el.removeClass("expanded")
+      @$el.find(".post-body").html(@getAbbreviatedBody())
+      @showView.convertMath()
+      @$el.find(".forum-thread-expand").show()
+      @$el.find(".forum-thread-collapse").hide()
+      @$el.find(".post-extended-content").hide()
+
+    getAbbreviatedBody: ->
+      cached = @model.get("abbreviatedBody")
+      if cached
+        cached
+      else
+        abbreviated = DiscussionUtil.abbreviateString @model.get("body"), 140
+        @model.set("abbreviatedBody", abbreviated)
+        abbreviated
 
     cleanup: ->
       if @responsesRequest?
@@ -56,6 +96,7 @@ if Backbone?
           @responses.add(data['content']['children'])
           @renderResponseCountAndPagination(data['content']['resp_total'])
           @trigger "thread:responses:rendered"
+          @loadedResponses = true
         error: (xhr) =>
           if xhr.status == 404
             DiscussionUtil.discussionAlert(
@@ -208,6 +249,7 @@ if Backbone?
               @model.set
                 title: newTitle
                 body: newBody
+              @model.unset("abbreviatedBody")
 
               @createShowView()
               @renderShowView()
@@ -231,9 +273,6 @@ if Backbone?
     renderEditView: () ->
       @renderSubView(@editView)
 
-    getShowViewClass: () ->
-      return DiscussionThreadShowView
-
     createShowView: () ->
 
       if @editView?
@@ -241,8 +280,7 @@ if Backbone?
         @editView.$el.empty()
         @editView = null
 
-      showViewClass = @getShowViewClass()
-      @showView = new showViewClass(model: @model)
+      @showView = new DiscussionThreadShowView({model: @model, mode: @mode})
       @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
 

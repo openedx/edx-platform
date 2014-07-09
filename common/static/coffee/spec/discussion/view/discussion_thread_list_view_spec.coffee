@@ -150,21 +150,21 @@ describe "DiscussionThreadListView", ->
         <div class="forum-nav"></div>
         """
         @threads = [
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "1",
             title: "Thread1",
             votes: {up_count: '20'},
             comments_count: 1,
             created_at: '2013-04-03T20:08:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "2",
             title: "Thread2",
             votes: {up_count: '42'},
             comments_count: 2,
             created_at: '2013-04-03T20:07:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "3",
             title: "Thread3",
             votes: {up_count: '12'},
@@ -179,20 +179,8 @@ describe "DiscussionThreadListView", ->
         @view = new DiscussionThreadListView({collection: @discussion, el: $(".forum-nav")})
         @view.render()
 
-    makeThreadWithProps = (props) ->
-      # Minimal set of properties necessary for rendering
-      thread = {
-        id: "dummy_id",
-        pinned: false,
-        endorsed: false,
-        votes: {up_count: '0'},
-        unread_comments_count: 0,
-        comments_count: 0,
-      }
-      $.extend(thread, props)
-
     renderSingleThreadWithProps = (props) ->
-      makeView(new Discussion([new Thread(makeThreadWithProps(props))])).render()
+      makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render()
 
     makeView = (discussion) ->
       return new DiscussionThreadListView(

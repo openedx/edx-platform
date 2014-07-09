@@ -23,13 +23,18 @@ if Backbone?
     $: (selector) ->
       @$el.find(selector)
 
-    initialize: ->
+    initialize: (options) ->
       super()
+      @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
+      if @mode not in ["tab", "inline"]
+        throw new Error("invalid mode: " + @mode)
       @model.on "change", @updateModelDetails
 
     renderTemplate: ->
       @template = _.template($("#thread-show-template").html())
-      @template(@model.toJSON())
+      context = @model.toJSON()
+      context.mode = @mode
+      @template(context)
 
     render: ->
       @$el.html(@renderTemplate())
@@ -170,13 +175,3 @@ if Backbone?
     highlight: (el) ->
       if el.html()
         el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-
-  class @DiscussionThreadInlineShowView extends DiscussionThreadShowView
-    renderTemplate: ->
-      @template = DiscussionUtil.getTemplate('_inline_thread_show')
-      params = @model.toJSON()
-      if @model.get('username')?
-        params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
-      Mustache.render(@template, params)
-
-     
