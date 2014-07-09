@@ -65,7 +65,7 @@ def hash_resource(resource):
 
 
 # pylint: disable=unused-argument
-@require_http_methods(("DELETE", "GET", "PUT", "POST"))
+@require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
 def xblock_handler(request, usage_key_string):
@@ -87,7 +87,10 @@ def xblock_handler(request, usage_key_string):
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be only one value-- 'make_public'
+                :publish: can be either -- 'make_public' (which publishes the content) or 'discard_changes'
+                       (which reverts to the last published version). If 'discard_changes', the other fields
+                       will not be used; that is, it is not possible to update and discard changes
+                       in a single operation.
               The JSON representation on the updated xblock (minus children) is returned.
 
               if usage_key_string is not specified, create a new xblock instance, either by duplicating
@@ -276,6 +279,13 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         log.error("Can't find item by location.")
         return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
+    # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
+    if publish == "discard_changes":
+        store.revert_to_published(usage_key, user.id)
+        # Returning the same sort of result that we do for other save operations. In the future,
+        # we may want to return the full XBlockInfo.
+        return JsonResponse({'id': unicode(usage_key)})
+
     old_metadata = own_metadata(existing_item)
     old_content = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
@@ -343,9 +353,9 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     if grader_type is not None:
         result.update(CourseGradingModel.update_section_grader_type(existing_item, grader_type, user))
 
-    # Make public after updating the xblock, in case the caller asked
-    # for both an update and a publish.
-    if publish and publish == 'make_public':
+    # Make public after updating the xblock, in case the caller asked for both an update and a publish.
+    # Although not supported in the UI, Bok Choy tests use this.
+    if publish == 'make_public':
         modulestore().publish(existing_item.location, user.id)
 
     # Note that children aren't being returned until we have a use case.
