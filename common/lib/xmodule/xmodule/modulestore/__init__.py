@@ -10,6 +10,7 @@ import datetime
 
 from collections import namedtuple, defaultdict
 import collections
+from contextlib import contextmanager
 
 from abc import ABCMeta, abstractmethod
 from xblock.plugin import default_select
@@ -330,6 +331,23 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        Sets up source_course_id to point a course with the same content as the desct_course_id. This
+        operation may be cheap or expensive. It may have to copy all assets and all xblock content or
+        merely setup new pointers.
+
+        Backward compatibility: this method used to require in some modulestores that dest_course_id
+        pointed to an empty but already created course. Implementers should support this or should
+        enable creating the course from scratch.
+
+        Raises:
+            ItemNotFoundError: if the source course doesn't exist (or any of its xblocks aren't found)
+            DuplicateItemError: if the destination course already exists (with content in some cases)
+        """
+        pass
+
+    @abstractmethod
     def delete_course(self, course_key, user_id=None):
         """
         Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
@@ -430,12 +448,36 @@ class ModuleStoreReadBase(ModuleStoreRead):
         # default is to say yes by not raising an exception
         return {'default_impl': True}
 
+    @contextmanager
+    def default_store(self, store_type):
+        """
+        A context manager for temporarily changing the default store
+        """
+        if self.get_modulestore_type(None) != store_type:
+            raise Exception(u"Cannot set default store to type {}".format(store_type))
+        yield
+
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):
+        """
+        A context manager for temporarily setting a store's branch value
+        """
+        previous_branch_setting_func = getattr(self, 'branch_setting_func', None)
+        try:
+            self.branch_setting_func = lambda: branch_setting
+            yield
+        finally:
+            self.branch_setting_func = previous_branch_setting_func
+
+
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, contentstore, **kwargs):
         super(ModuleStoreWriteBase, self).__init__(**kwargs)
+
+        self.contentstore = contentstore
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by partition_fields_by_scope, which is only needed because
         # the split mongo store is used for item creation as well as item persistence
@@ -500,6 +542,39 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
         self.update_item(new_object, user_id, allow_not_found=True)
         return new_object
+
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        This base method just copies the assets. The lower level impls must do the actual cloning of
+        content.
+        """
+        # copy the assets
+        self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+        super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
+        return dest_course_id
+
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO
+        # Make this multi-process-safe if future operations need it.
+        # Right now, only Import Course, Clone Course, and Delete Course use this, so
+        # it's ok if the cached metadata in the memcache is invalid when another
+        # request comes in for the same course.
+        try:
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._begin_bulk_write_operation(course_id)
+            yield
+        finally:
+            # check for the begin method here,
+            # since it's an error if an end method is not defined when a begin method is
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

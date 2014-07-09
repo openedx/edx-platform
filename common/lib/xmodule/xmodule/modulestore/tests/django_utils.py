@@ -7,7 +7,6 @@ from django.test import TestCase
 from xmodule.modulestore.django import (
     modulestore, clear_existing_modulestores, loc_mapper)
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.contentstore.django import contentstore
 
 
 def mixed_store_config(data_dir, mappings):
@@ -137,7 +136,8 @@ class ModuleStoreTestCase(TestCase):
         to update metadata.
         """
         store = modulestore()
-        store.update_item(course, '**replace_user**')
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            store.update_item(course, '**replace_user**')
         updated_course = store.get_course(course.id)
         return updated_course
 
@@ -160,10 +160,8 @@ class ModuleStoreTestCase(TestCase):
             connection.drop_database(store.db.name)
             connection.close()
 
-        if contentstore().fs_files:
-            db = contentstore().fs_files.database
-            db.connection.drop_database(db)
-            db.connection.close()
+        if hasattr(store, 'contentstore'):
+            store.contentstore.drop_database()
 
         location_mapper = loc_mapper()
         if location_mapper.db:

@@ -17,7 +17,6 @@ from student.views import _parse_course_id_from_string, _get_course_enrollment_d
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 
 from external_auth.models import ExternalAuthMap
@@ -348,9 +347,12 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
     def setUp(self):
         self.store = modulestore()
         self.course = CourseFactory.create(org='Stanford', number='456', display_name='NO SHIB')
-        self.shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
-        self.shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(self.shib_course, '**replace_user**')
+        self.shib_course = CourseFactory.create(
+            org='Stanford',
+            number='123',
+            display_name='Shib Only',
+            enrollment_domain='shib:https://idp.stanford.edu/',
+        )
         self.user_w_map = UserFactory.create(email='withmap@stanford.edu')
         self.extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
                                        external_email='withmap@stanford.edu',

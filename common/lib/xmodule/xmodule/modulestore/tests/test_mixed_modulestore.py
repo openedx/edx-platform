@@ -210,7 +210,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(**self.options)
+        self.store = MixedModuleStore(None, **self.options)
         self.addCleanup(self.store.close_all_connections)
 
         # convert to CourseKeys
@@ -518,7 +518,7 @@ def load_function(path):
 
 
 # pylint: disable=unused-argument
-def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -526,6 +526,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
 
     return class_(
         doc_store_config=doc_store_config,
+        contentstore=contentstore,
         branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
         **options
     )

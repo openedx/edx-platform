@@ -230,8 +230,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         self.course.grading_policy = grading_policy
-        store = modulestore()
-        store.update_item(self.course, '**replace_user**')
+        self.update_course(self.course)
         self.refresh_course()
 
     def get_grade_summary(self):

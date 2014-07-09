@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
-from xmodule.modulestore import PublishState
+from xmodule.modulestore import PublishState, ModuleStoreEnum, split_migrator
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -29,12 +29,12 @@ class MixedModuleStore(ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, mappings, stores, i18n_service=None, **kwargs):
+    def __init__(self, contentstore, mappings, stores, i18n_service=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
         """
-        super(MixedModuleStore, self).__init__(**kwargs)
+        super(MixedModuleStore, self).__init__(contentstore, **kwargs)
 
         self.modulestores = []
         self.mappings = {}
@@ -61,6 +61,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 ]
             store = create_modulestore_instance(
                 store_settings['ENGINE'],
+                self.contentstore,
                 store_settings.get('DOC_STORE_CONFIG', {}),
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
@@ -295,6 +296,36 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         return store.create_course(org, offering, user_id, fields, **kwargs)
 
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        See the superclass for the general documentation.
+
+        If cloning w/in a store, delegates to that store's clone_course which, in order to be self-
+        sufficient, should handle the asset copying (call the same method as this one does)
+        If cloning between stores,
+            * copy the assets
+            * migrate the courseware
+        """
+        source_modulestore = self._get_modulestore_for_courseid(source_course_id)
+        # for a temporary period of time, we may want to hardcode dest_modulestore as split if there's a split
+        # to have only course re-runs go to split. This code, however, uses the config'd priority
+        dest_modulestore = self._get_modulestore_for_courseid(dest_course_id)
+        if source_modulestore == dest_modulestore:
+            return source_modulestore.clone_course(source_course_id, dest_course_id, user_id)
+
+        # ensure super's only called once. The delegation above probably calls it; so, don't move
+        # the invocation above the delegation call
+        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+
+        if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
+            if not hasattr(self, 'split_migrator'):
+                self.split_migrator = split_migrator.SplitMigrator(
+                    dest_modulestore, source_modulestore, loc_mapper()
+                )
+            self.split_migrator.migrate_mongo_course(
+                source_course_id, user_id, dest_course_id.org, dest_course_id.offering
+            )
+
     def create_item(self, course_or_parent_loc, category, user_id=None, **kwargs):
         """
         Create and return the item. If parent_loc is a specific location v a course id,
@@ -460,50 +491,40 @@ class MixedModuleStore(ModuleStoreWriteBase):
         else:
             raise NotImplementedError(u"Cannot call {} on store {}".format(method, store))
 
+    @contextmanager
+    def default_store(self, store_type):
+        """
+        A context manager for temporarily changing the default store in the Mixed modulestore to the given store type
+        """
+        previous_store_list = self.modulestores
+        found = False
+        try:
+            for i, store in enumerate(self.modulestores):
+                if store.get_modulestore_type() == store_type:
+                    self.modulestores.insert(0, self.modulestores.pop(i))
+                    found = True
+                    yield
+            if not found:
+                raise Exception(u"Cannot find store of type {}".format(store_type))
+        finally:
+            self.modulestores = previous_store_list
 
-@contextmanager
-def store_branch_setting(store, branch_setting):
-    """
-    A context manager for temporarily setting a store's branch value
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):
+        """
+        A context manager for temporarily setting the branch value for the given course' store
+        to the given branch_setting.  If course_id is None, the default store is used.
+        """
+        store = self._get_modulestore_for_courseid(course_id)
+        with store.branch_setting(branch_setting, course_id):
+            yield
 
-    Note: to be effective, the store must be a direct pointer to the underlying store;
-        not the intermediary Mixed store.
-    """
-    assert not isinstance(store, MixedModuleStore)
-
-    try:
-        previous_branch_setting_func = store.branch_setting_func
-        store.branch_setting_func = lambda: branch_setting
-        yield
-    finally:
-        store.branch_setting_func = previous_branch_setting_func
-
-
-@contextmanager
-def store_bulk_write_operations_on_course(store, course_id):
-    """
-    A context manager for notifying the store of bulk write events.
-
-    In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
-    until the bulk operation is completed.
-
-    The store can be either the Mixed modulestore or a direct pointer to the underlying store.
-    """
-
-    # TODO
-    # Make this multi-process-safe if future operations need it.
-    # Right now, only Import Course, Clone Course, and Delete Course use this, so
-    # it's ok if the cached metadata in the memcache is invalid when another
-    # request comes in for the same course.
-
-    # if the caller passed in the mixed modulestore, get a direct pointer to the underlying store
-    if hasattr(store, '_get_modulestore_by_course_id'):
-        store = store._get_modulestore_by_course_id(course_id)
-
-    try:
-        if hasattr(store, 'begin_bulk_write_operation_on_course'):
-            store.begin_bulk_write_operation_on_course(course_id)
-        yield
-    finally:
-        if hasattr(store, 'begin_bulk_write_operation_on_course'):
-            store.end_bulk_write_operation_on_course(course_id)
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+        If course_id is None, the default store is used.
+        """
+        store = self._get_modulestore_for_courseid(course_id)
+        with store.bulk_write_operations(course_id):
+            yield
