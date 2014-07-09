@@ -9,6 +9,7 @@ import os
 import traceback
 import struct
 import sys
+import re
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
@@ -688,6 +689,42 @@ class CapaMixin(CapaFields):
         if show_problem_hint:                       # if the student has requested a problem hint
             html = self._insert_problem_hint(html)  # add the next sequential problem hint to the html
 
+        html = self._strip_hints_from_xml(html)
+        # for hint_element in self.lcp.tree.xpath("//problem/demandhints/hint"):     # remove the demand hints from the XML else they will display
+        #     print '--------------- demandhints from //problem/demandhints/hint'
+        #     hint_element.getparent().remove(hint_element)
+        #
+        # for hint_element in self.lcp.tree.xpath("//problem/demandhints/hint"):     # remove the demand hints from the XML else they will display
+        #     print '-------------------- STILL demandhints from //problem/demandhints/hint'
+
+        return html
+
+    def _strip_element(self, element_name, html):
+        """
+        Using a bit of regex magic, strip out of an html string an entire XML element. How this
+        works is a bit obscure but it does work. Suppose our html has this element in it somewhere:
+                    <foo/>
+                    <demandhints>
+                        <hint> blah blah </hint>
+                    </demandhints>
+                    <bar/>
+        will be reduced to this:
+                    <foo/>
+                    <bar/>
+        when this funtion is called with element_name = 'demandhints'
+        :param element_name: the name of the element to excise
+        :param html:         the string representation of the XML to operate on
+        :return:             a potentially modified string representation of the XML
+        """
+        length_start = len(html)
+        html = re.sub(r'</' + element_name + '>','~', html)
+        html = re.sub(r'<' + element_name + '[^~]+~', '', html)
+        print "     change size: " + str(len(html) - length_start) + " on " + element_name
+        return html
+
+    def _strip_hints_from_xml(self, html):
+        html = self._strip_element('demandhints', html)
+        html = self._strip_element('choicehint', html)
         return html
 
     def hint_button(self, data):
