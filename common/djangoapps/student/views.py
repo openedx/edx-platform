@@ -686,6 +686,7 @@ def notify_enrollment_by_email(course, user, request):
 
             else:
 
+                # If not default, use the default emailing template
                 course_url = reverse('info', args=(course.id.to_deprecated_string(),))
                 context = {
                     'course':course,
