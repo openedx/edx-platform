@@ -355,7 +355,7 @@ CatchAnnotation.prototype = {
         // to pulling the annotations for the email within this.options.userId.
         if(this.options.default_tab.toLowerCase() == 'instructor'){
             this.options.userId = this.options.instructor_email;
-            this._refresh('','');
+            this.changeUserId(this.options.userId);
         }
     },
 //    
@@ -527,6 +527,31 @@ CatchAnnotation.prototype = {
         this.refreshCatch(true);
         this.checkTotAnnotations();
     },
+    
+    /**
+     * This function makes sure that the annotations loaded are only the ones that we are
+     * currently looking for. Annotator has a habit of loading the user's annotations
+     * immediately without checking to see if we are doing some filtering or otherwise.
+     * Since it's a vendor file, this is the workaround for that bug.
+     */
+    cleanUpAnnotations: function(){
+    	var annotator = this.annotator,
+    		store = annotator.plugins.Store,
+    		annotations = store.annotations,
+    		self = this;
+    	
+    	//goes through all the annotations currently loaded
+    	$.each(annotations, function(key, value){
+    		//if the options.userID (i.e. the value we are searching for) is empty signifying
+    		//public or is equal to the person with update access, then we leave it alone,
+    		//otherwise we need to clean them up (i.e. disable them).
+    		if(self.options.userId !== '' && self.options.userId !== value.permissions.update[0]){
+    			$.each(value.highlights, function(key1, value1){
+    				$(value1).removeClass('annotator-hl');
+    			});
+    		}
+    	});
+    },
     loadAnnotations: function() {
         var annotator = this.annotator,
             loadFromSearch = annotator.plugins.Store.options.loadFromSearch,
@@ -601,6 +626,7 @@ CatchAnnotation.prototype = {
             annotator = this.annotator;
         //Subscribe to Annotator changes
         annotator.subscribe("annotationsLoaded", function (annotations){
+            self.cleanUpAnnotations();
             self.refreshCatch(self.clean);
             //hide or show more button
             self.checkTotAnnotations();
