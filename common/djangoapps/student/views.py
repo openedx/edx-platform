@@ -66,6 +66,8 @@ from courseware.access import has_access
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
+from student.validators import validate_cedula
+from cities.models import City
 import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
@@ -1089,6 +1091,21 @@ def _do_create_account(post_vars):
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
 
+    city = City.objects.get(id=post_vars['city_id'])
+    profile.city = city
+
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = "ID Incorrecto"
+            js['field'] = 'cedula'
+            js['sucess'] = False
+            return JsonResponse(js, status=400)
+
+    profile.cedula = post_vars['cedula']
+        
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
@@ -1896,3 +1913,18 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    Verificar informacion academica de estudiante
+    """
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
+    return HttpResponse(json.dumps(data))

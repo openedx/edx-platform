@@ -135,3 +135,7 @@ git+https://github.com/mitocw/django-cas.git
 
 # edX packages
 edx-submissions==0.0.3
+
+#suds WS
+git+https://github.com/ovnicraft/suds.git
+
