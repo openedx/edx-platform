@@ -2,7 +2,7 @@
 Utility methods useful for Studio page tests.
 """
 from bok_choy.promise import Promise
-from selenium.webdriver.common.action_chains import ActionChains
+# from selenium.webdriver.common.action_chains import ActionChains
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -16,7 +16,8 @@ def click_css(page, css, source_index=0, require_notification=True):
     """
     buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
     target = buttons[source_index]
-    ActionChains(page.browser).click(target).release().perform()
+    target.click()
+    # ActionChains(page.browser).click(target).release().perform()
     if require_notification:
         wait_for_notification(page)
 
