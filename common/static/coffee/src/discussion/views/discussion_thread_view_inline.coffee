@@ -10,12 +10,6 @@ if Backbone?
     initialize: ->
       super()
 
-    initLocal: ->
-      @$local = @$el.children(".discussion-article").children(".local")
-      if not @$local.length
-        @$local = @$el
-      @$delegateElement = @$local
-
     renderTemplate: () ->
       if @model.has('group_id')
         @template = DiscussionUtil.getTemplate("_inline_thread_cohorted")
