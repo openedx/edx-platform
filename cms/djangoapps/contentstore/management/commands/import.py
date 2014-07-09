@@ -38,7 +38,6 @@ class Command(BaseCommand):
             courses=course_dirs,
             dis=do_import_static))
         mstore = modulestore()
-
         _, course_items = import_from_xml(
             mstore, "**replace_user**", data_dir, course_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
