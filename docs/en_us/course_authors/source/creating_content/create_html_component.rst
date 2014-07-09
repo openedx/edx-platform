@@ -10,10 +10,11 @@ HTML Component Overview
 ***********************
 
 HTML, or HyperText Markup Language, is the standard markup language used to
-create web pages. Web browsers present HTML code in a more readable format. When
-students see text and images in your course, they are seeing HTML code that is
-formatted and presented by their browsers. For more information about HTML, see
-`Wikipedia <http://en.wikipedia.org/wiki/HTML>`_.
+create web pages. Web browsers present HTML code in a more readable format.
+
+When students see text and images in your course, they are seeing HTML code
+that is formatted and presented by their browsers. For more information about
+HTML, see `Wikipedia <http://en.wikipedia.org/wiki/HTML>`_.
 
 HTML components are the basic building blocks of your course content. You use
 HTML components to add and format text, links, images, and more. You can choose
@@ -32,9 +33,11 @@ For more information, see the following topics:
 * :ref:`Import LaTeX Code`
 
 .. note:: 
- Review :ref:`Organizing Your Course Content` and :ref:`Best Practices for HTML Markup` before you start working with HTML components.
+ Review :ref:`Developing Your Course Index` and :ref:`Best Practices for HTML
+ Markup` before you start working with HTML components.
 
-To add an instant hangout to an HTML component, see :ref:`Google Instant Hangout`.
+To add an instant hangout to an HTML component, see :ref:`Google Instant
+Hangout`.
 
 
 .. _Options for Editing HTML Components:

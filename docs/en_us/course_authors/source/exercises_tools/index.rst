@@ -4,6 +4,16 @@
 Creating Exercises and Tools
 ############################
 
+Use the chapters in this section to understand how to create exercises and
+tools in your course.
+
+For information on how to develop your course content in the Studio Outline
+page, see :ref:`Developing Your Course Index`.
+
+For information on building specific course component types, see :ref:`Creating
+Course Content Index`.
+
+
 .. toctree::
    :maxdepth: 2
    
