@@ -249,12 +249,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
 @expect_json
 def xblock_outline_handler(request, usage_key_string):
     """
-    The restful handler for requests for rendered xblock views.
-
-    Returns a json object containing two keys:
-        html: The rendered html of the view
-        resources: A list of tuples where the first element is the resource hash, and
-            the second is the resource description
+    The restful handler for requests for XBlock information about the block and its children.
+    This is used by the course outline in particular to construct the tree representation of
+    a course.
     """
     usage_key = UsageKey.from_string(usage_key_string)
     if not has_course_access(request.user, usage_key.course_key):
@@ -266,7 +263,7 @@ def xblock_outline_handler(request, usage_key_string):
         xblock = store.get_item(usage_key)
         return JsonResponse(create_xblock_info(xblock, include_child_info=True, recurse_child_info=True))
     else:
-        return HttpResponse(status=406)
+        return Http404
 
 
 def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout=None,
@@ -562,24 +559,29 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     If data or metadata are not specified, their information will not be added
     (regardless of whether or not the xblock actually has data or metadata).
+
+    There are three optional boolean parameters:
+      include_ancestor_info - if true, ancestor info is added to the response
+      include_child_info - if true, direct child info is included in the response
+      recurse_child_info - if true, child info is returned for the entire subtree
     """
-    publish_state = compute_publish_state(xblock)
+    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     is_container = xblock.has_children
 
     # TODO: remove this once the fake **replace_user** has been refactored away
     try:
-        edited_by = User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None
+        edited_by = User.objects.get(id=xblock.edited_by) if xblock.edited_by else None
     except ValueError:
-        edited_by = "Invalid username"
+        edited_by = None
 
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
         "has_changes": modulestore().has_changes(xblock.location),
-        "published": publish_state in (PublishState.public, PublishState.draft),
+        "published": published,
         "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
-        "edited_by": edited_by,
+        "edited_by": edited_by.username if edited_by else None,
         'is_container': is_container,
         'studio_url': xblock_studio_url(xblock),
     }

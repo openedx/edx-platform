@@ -23,7 +23,7 @@ define(['jquery', 'js/views/baseview'],
              * @returns {boolean} A promise representing the rendering of the page.
              */
             renderPage: function() {
-                return $.Deferred.resolve().promise();
+                return $.Deferred().resolve().promise();
             },
 
             /**
