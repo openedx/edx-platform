@@ -1,0 +1,255 @@
+<%inherit file="../../base.html" />
+<%!
+from django.core.urlresolvers import reverse
+%>
+<%block name="title">[template] Course Outline UI</%block>
+<%block name="bodyclass">is-signedin course view-outline</%block>
+
+<%block name="content">
+
+<div id="content">
+
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">Content</small>
+        <span class="sr">&gt; </span>Course Outline
+      </h1>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="toggle-button toggle-button-expand-collapse collapse-all">
+              <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span></span>
+              <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button view-button add-button" data-category="chapter" data-parent="" data-default-name="">
+              <i class="icon-plus"></i>Add Section
+            </a>
+          </li>
+          <li class="nav-item">
+          <a href="" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+
+      <article class="content-primary" role="main">
+
+        <div class="wrapper-dnd">
+          <article class="course-outline" data-locator="" data-course-key="">
+
+            <ol class="sortable-list sortable-course-list">
+
+              <!-- section -->
+              <li class="outline-item outline-item-section is-collapsible is-draggable " data-parent="" data-locator="">
+
+                <!--
+                <span class="draggable-drop-indicator draggable-drop-indicator-before">
+                  <i class="icon-caret-right"></i>
+                </span>
+                 -->
+
+                <div class="wrapper-xblock-header">
+                  <!-- xblock header primary -->
+                  <div class="wrapper-xblock-header-primary">
+                    <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
+                      <i class="icon-caret-down ui-toggle-expansion"></i>
+                      <span class="wrapper-xblock-field" data-field="">
+                        <span class="is-editable xblock-field-value">Introduction</span>
+                        <span class="xblock-string-field-editor">
+                          <input type="text" value="Introduction" class="xblock-field-input xblock-field-input-display_name is-hidden" data-metadata-name="">
+                        </span>
+                      </span>
+                    </h3>
+
+                    <div class="item-actions">
+                      <ul class="actions-list">
+                        <li class="action-item action-delete">
+                          <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                            <i class="icon-remove"></i>
+                            <span class="sr">Delete</span>
+                          </a>
+                        </li>
+
+                          <!--
+                          <li class="actions-item drag">
+                            <span data-tooltip="Drag to reorder" class="drag-handle">
+                              <span class="sr">Drag to reorder</span>
+                            </span>
+                          </li>
+                        -->
+                      </ul>
+                    </div>
+                  </div>
+
+                  <!-- xblock header secondary -->
+                  <div class="wrapper-xblock-header-secondary">
+                    <div class="meta-info">
+                      <i class="icon-check"></i>
+                      Released: Dec 31, 2015 at 21:00 UTC
+                    </div>
+
+                    <div class="item-actions">
+                      <ul class="actions-list">
+                        <!-- header secondary actions -->
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ^ section's subsection list -->
+                <ol class="sortable-list sortable-section-list">
+
+                  <li class="outline-item outline-item-subsection is-collapsible is-draggable" data-parent="" data-locator="">
+
+                    <!--
+                    <span class="draggable-drop-indicator draggable-drop-indicator-before">
+                      <i class="icon-caret-right"></i>
+                    </span>
+                  -->
+
+                  <div class="wrapper-xblock-header">
+                    <div class="wrapper-xblock-header-primary">
+
+                      <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
+                        <i class="icon-caret-down ui-toggle-expansion"></i>
+
+                        <span class="wrapper-xblock-field" data-field="">
+                          <span class="is-editable xblock-field-value">Demo Course Overview</span>
+
+                          <span class="xblock-string-field-editor">
+                            <input type="text" value="Demo Course Overview" class="xblock-field-input xblock-field-input-display_name is-hidden" data-metadata-name="">
+                          </span>
+                        </span>
+                      </h3>
+
+                      <div class="item-actions">
+                        <ul class="actions-list">
+                          <li class="action-item action-delete">
+                            <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                              <i class="icon-remove"></i>
+                              <span class="sr">Delete</span>
+                            </a>
+                          </li>
+
+                            <!--
+                            <li class="actions-item drag">
+                              <span data-tooltip="Drag to reorder" class="drag-handle">
+                                <span class="sr">Drag to reorder</span>
+                              </span>
+                            </li>
+                          -->
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="wrapper-xblock-header-secondary">
+                      <div class="item-actions">
+                        <ul class="actions-list">
+                          <!-- header secondary actions -->
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ^ subsection's unit list -->
+                  <ol class="sortable-list sortable-subsection-list">
+
+                    <li class="outline-item outline-item-unit is-draggable" data-parent="" data-locator="">
+
+                        <!--
+                        <span class="draggable-drop-indicator draggable-drop-indicator-before">
+                          <i class="icon-caret-right"></i>
+                        </span>
+                      -->
+
+                      <div class="wrapper-xblock-header">
+                        <div class="wrapper-xblock-header-primary">
+
+                          <h3 class="xblock-title">
+                            <a href="">Introduction: Video and Sequences</a>
+                          </h3>
+                        </div>
+
+                        <div class="wrapper-xblock-header-secondary">
+                          <div class="item-actions">
+                            <ul class="actions-list">
+                              <!-- header secondary actions -->
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <ol class="sortable-list sortable-unit-list">
+                        <!-- ???: not sure what is nested here -->
+                      </ol>
+
+                        <!--
+                        <span class="draggable-drop-indicator draggable-drop-indicator-after">
+                          <i class="icon-caret-right"></i>
+                        </span>
+                      -->
+                    </li>
+                  </ol>
+
+                  <!-- ^ add new unit  -->
+                  <div class="add-xblock-component">
+                    <a href="#" class="add-button" data-category="vertical" data-parent="" data-default-name="New Unit">
+                      <i class="icon-plus"></i>New Unit
+                    </a>
+                  </div>
+                </li>
+              </ol>
+
+              <!-- ^ add new subsection -->
+              <div class="add-xblock-component">
+                <a href="#" class="add-button" data-category="sequential" data-parent="" data-default-name="New Subsection">
+                  <i class="icon-plus"></i>New Subsection
+                </a>
+              </div>
+            </li><!-- /section -->
+          </ol>
+
+
+          <!-- ^ add new section -->
+          <div class="add-xblock-component">
+            <a href="#" class="add-button" data-category="chapter" data-parent="" data-default-name="New Section">
+              <i class="icon-plus"></i>
+              Add Section
+            </a>
+          </div>
+
+          </article>
+        </div>
+
+    <div class="ui-loading is-hidden">
+      <p><span class="spin">
+        <i class="icon-refresh"></i></span>
+        <span class="copy">Loading &hellip;</span>
+      </p>
+    </div>
+
+  </article>
+
+  <aside class="content-supplementary" role="complimentary">
+    <div class="bit">
+      <h3 class="title-3">What can I do on this page?</h3>
+      <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
+
+      <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
+    </div>
+  </aside>
+
+</section>
+</div>
+
+</div>
+</%block>
