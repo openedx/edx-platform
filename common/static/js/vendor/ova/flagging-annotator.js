@@ -13,8 +13,11 @@ Annotator.Plugin.Flagging = (function(_super) {
     //options, delete the options line below.
 	function Flagging(element,options) {
 		this.updateViewer = __bind(this.updateViewer, this);
+		this.updateField = __bind(this.updateField, this);
+		this.submitField = __bind(this.submitField, this);
         this.flagAnnotation = __bind(this.flagAnnotation, this);
         this.unflagAnnotation = __bind(this.unflagAnnotation, this);
+        this.getTotalFlaggingTags = __bind(this.getTotalFlaggingTags, this);
         this.options = options;
 		_ref = Flagging.__super__.constructor.apply(this, arguments);
 		return _ref;
@@ -24,6 +27,8 @@ Annotator.Plugin.Flagging = (function(_super) {
 	Flagging.prototype.field = null;
 	Flagging.prototype.input = null;
     Flagging.prototype.hasPressed = false;
+    Flagging.prototype.activeAnnotation = null;
+    Flagging.prototype.mixedTags = null;
     
     //this function will initialize the plug in. Create your fields here in the editor and viewer.
     Flagging.prototype.pluginInit = function() {
@@ -32,23 +37,91 @@ Annotator.Plugin.Flagging = (function(_super) {
 		if (!Annotator.supported()) {
 			return;
 		}
-		
+		//-- Editor
+		var self = this;
+		this.field = this.annotator.editor.addField({
+            type: 'checkbox',
+            load: this.updateField,
+            label: Annotator._t('Check the box to remove all flags.'),
+            submit: this.submitField,
+        });
+        
+        //add a class for this field to find it later. 
+        $(this.field).addClass('annotator-flagging');
 		
 		//-- Viewer
 		var newview = this.annotator.viewer.addField({
 			load: this.updateViewer,
 		});
-        
-        
 
 		return this.input = $(this.field).find(':input');
 	};
+	
+	/**
+	 * Gets the total number of tags associated with the flagging tool.
+	 * @param {Object} annotation Annotation item from Annotator.
+	 */
+	Flagging.prototype.getTotalFlaggingTags = function(annotation){
+        var tags = annotation.tags.slice();
+        //Goes through and gets the number of tags that contained the keyword "flagged"
+        return $.grep(tags, function(tag, index){
+            return (tag.indexOf('flagged') !== -1);
+        }).length;
+    }
+	
+	/**
+	 * Creates a new field in the editor in order to delete the flagged tags.
+	 * @param {HTMLElement} field The HTML element contained in the editor reserved for flagging.
+	 * @param {Object} annotation Annotation item from Annotator.
+	 */
+    Flagging.prototype.updateField = function(field, annotation) {
+        //figure out whether annotation is of image or not
+        var user_email = annotation.media === "image" ? 
+                            osda.options.optionsAnnotator.permissions.user.id:
+                            ova.options.optionsAnnotator.permissions.user.id;
+        
+        //get total number of flag tags as well as save a copy of the mixed tags
+        var totalFlags = this.getTotalFlaggingTags(annotation);   
+        this.mixedTags = annotation.tags;     
+        var self = this;
+        
+        //only show this field if you are an instructor and there are flags to remove
+        if(Catch.options.instructor_email === user_email && totalFlags > 0){
+            $('.annotator-flagging label')[0].innerHTML = "Check the box to remove " + totalFlags + " flag(s).";
+            this.activeAnnotation = annotation;
+            
+            //add function to change the text when the user checks the box or removes the check
+            $('.annotator-flagging input').change(function(evt){
+                if(!$('.annotator-flagging input:checkbox:checked').val()){
+                    $('.annotator-flagging label')[0].innerHTML = "Check the box to remove " + self.getTotalFlaggingTags(self.activeAnnotation) + " flag(s).";
+                } else {
+                    $('.annotator-flagging label')[0].innerHTML = "Flags have been removed. To undo, uncheck the box.";
+                }
+            });
+        } else {
+            $(field).remove();
+        }
+    }
     
+    /**
+     * Makes last-minute changes to the annotation right before it is saved in the server.
+     * @param {HTMLElement} field The HTML element contained in the editor reserved for flagging.
+	 * @param {Object} annotation Annotation item from Annotator.     
+	 */
+    Flagging.prototype.submitField = function(field, annotation) {
+        //if the user did not check the box go back and input all of the tags. 
+        if (!$('.annotator-flagging input:checkbox:checked').val()){
+            annotation.tags = this.mixedTags;
+        }
+    }
     
-    //The following allows you to edit the annotation popup when the viewer has already
-    //hit submit and is just viewing the annotation.
+    /** 
+     * The following allows you to edit the annotation popup when the viewer has already
+     * hit submit and is just viewing the annotation.
+     * @param {HTMLElement} field The HTML element contained in the editor reserved for flagging.
+	 * @param {Object} annotation Annotation item from Annotator.
+	 */
 	Flagging.prototype.updateViewer = function(field, annotation) {
-        $(field).remove();//remove the empty div created by annotator
 		var self = this;
         this.hasPressed = false;
         //perform routine to check if user has pressed the button before
@@ -73,7 +146,17 @@ Annotator.Plugin.Flagging = (function(_super) {
             var flagEl = fieldControl.find('.flag-icon'),
                 self = this;
             flagEl.click(function(){self.flagAnnotation(annotation,user,flagEl,field)});
-            
+        }
+        
+        var user_email = annotation.media === "image" ? 
+                            osda.options.optionsAnnotator.permissions.user.id:
+                            ova.options.optionsAnnotator.permissions.user.id;
+        var totalFlags = this.getTotalFlaggingTags(annotation);
+        //only show the number of times an annotation has been flagged if they are the instructors
+        if(Catch.options.instructor_email === user_email && totalFlags > 0){
+            $(field).append("<div class=\"flag-count\">This annotation has " + totalFlags + " flag(s).</div>");
+        } else {
+            $(field).remove();//remove the empty div created by annotator
         }
     }
     
