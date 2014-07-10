@@ -184,7 +184,7 @@ class DraftModuleStore(MongoModuleStore):
         new_course = self.get_course(dest_course_id)
         if new_course is None:
             # create_course creates the about overview
-            new_course = self.create_course(dest_course_id.org, dest_course_id.offering, user_id)
+            new_course = self.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
 
         # Get all modules under this namespace which is (tag, org, course) tuple
         modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
