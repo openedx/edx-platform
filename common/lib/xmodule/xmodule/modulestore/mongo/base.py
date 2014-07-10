@@ -849,11 +849,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-<<<<<<< HEAD
-    def create_course(self, org, offering, user_id, fields=None, **kwargs):
-=======
-    def create_course(self, org, course, run, user_id=None, fields=None, **kwargs):
->>>>>>> Fix up the signature to use course and run instead of just offering
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 

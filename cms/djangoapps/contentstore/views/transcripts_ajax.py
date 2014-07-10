@@ -532,15 +532,12 @@ def _get_item(request, data):
     Returns the item.
     """
     usage_key = UsageKey.from_string(data.get('locator'))
-
-    # usage_key's course_key may have an empty run property
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-
     # This is placed before has_course_access() to validate the location,
     # because has_course_access() raises  r if location is invalid.
     item = modulestore().get_item(usage_key)
 
-    if not has_course_access(request.user, usage_key.course_key):
+    # use the item's course_key, because the usage_key might not have the run
+    if not has_course_access(request.user, item.location.course_key):
         raise PermissionDenied()
 
     return item

@@ -20,7 +20,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     This class ensures the db gets created, opened, and cleaned up in addition to creating the course
 
     Defines the following attrs on self:
-    * userid: a random non-registered mock user id
+    * user_id: a random non-registered mock user id
     * split_mongo: a pointer to the split mongo instance
     * old_mongo: a pointer to the old_mongo instance
     * draft_mongo: a pointer to the old draft instance
@@ -45,7 +45,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     def setUp(self):
         self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
 
-        self.userid = random.getrandbits(32)
+        self.user_id = random.getrandbits(32)
         super(SplitWMongoCourseBoostrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
             None,
@@ -90,7 +90,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             mongo = self.old_mongo
         else:
             mongo = self.draft_mongo
-        mongo.create_and_save_xmodule(location, self.userid, definition_data=data, metadata=metadata, runtime=self.runtime)
+        mongo.create_and_save_xmodule(location, self.user_id, definition_data=data, metadata=metadata, runtime=self.runtime)
         if isinstance(data, basestring):
             fields = {'data': data}
         else:
@@ -105,7 +105,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
                 mongo = self.draft_mongo
             parent = mongo.get_item(parent_location)
             parent.children.append(location)
-            mongo.update_item(parent, self.userid)
+            mongo.update_item(parent, self.user_id)
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
                 course_key=self.split_course_key,
@@ -115,7 +115,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         else:
             course_or_parent_locator = self.split_course_key
         if split:
-            self.split_mongo.create_item(course_or_parent_locator, category, self.userid, block_id=name, fields=fields)
+            self.split_mongo.create_item(course_or_parent_locator, category, self.user_id, block_id=name, fields=fields)
 
     def _create_course(self, split=True):
         """
@@ -135,7 +135,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         if split:
             # split requires the course to be created separately from creating items
             self.split_mongo.create_course(
-                self.split_course_key.org, self.split_course_key.course, self.split_course_key.run, self.userid, fields=fields, root_block_id='runid'
+                self.split_course_key.org, self.split_course_key.course, self.split_course_key.run, self.user_id, fields=fields, root_block_id='runid'
             )
         old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', self.user_id, fields=fields)
         self.old_course_key = old_course.id

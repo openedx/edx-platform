@@ -70,7 +70,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # 02-July-2014 send calls are 7. 5 from above, plus 2 for updating subtree edit info for Chapter1 and course
         #              find calls are 22. 19 from above, plus 3 for finding the parent of Vert1, Chapter1, and course
         with check_mongo_calls(self.draft_mongo, 22, 7):
-            self.draft_mongo.publish(item.location, self.userid)
+            self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status
         item = self.draft_mongo.get_item(vert_location, 0)
@@ -79,7 +79,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
 
         # delete the draft version of the discussion
         location = self.old_course_key.make_usage_key('discussion', block_id='Discussion1')
-        self.draft_mongo.delete_item(location, self.userid)
+        self.draft_mongo.delete_item(location, self.user_id)
 
         draft_vert = self.draft_mongo.get_item(vert_location, 0)
         self.assertTrue(getattr(draft_vert, 'is_draft', False), "Deletion didn't convert parent to draft")
@@ -89,10 +89,10 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         draft_vert.children.remove(other_child_loc)
         other_vert = self.draft_mongo.get_item(self.old_course_key.make_usage_key('vertical', block_id='Vert2'), 0)
         other_vert.children.append(other_child_loc)
-        self.draft_mongo.update_item(draft_vert, self.userid)
-        self.draft_mongo.update_item(other_vert, self.userid)
+        self.draft_mongo.update_item(draft_vert, self.user_id)
+        self.draft_mongo.update_item(other_vert, self.user_id)
         # publish
-        self.draft_mongo.publish(vert_location, self.userid)
+        self.draft_mongo.publish(vert_location, self.user_id)
         item = self.old_mongo.get_item(vert_location, 0)
         self.assertNotIn(location, item.children)
         self.assertIsNone(self.draft_mongo.get_parent_location(location))
