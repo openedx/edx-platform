@@ -197,6 +197,32 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 #  simpleEditor.replaceSelection(revisedSelection);
 #}
 #
+
+
+
+
+  @findTargetedFeedbackItem: (answerString) ->
+    # parse a single answer string for any targeted feedback specifications
+    feedbackString = ''
+    matchString = ''
+    matches = answerString.match( /{{(.+)}}/ )       # string surrounded by {{...}} is a match group
+    if matches
+        matchString = matches[0]        # group 0 holds the entire matching string (includes delimiters)
+        feedbackString = matches[1]     # group 1 holds the matching characters (our string)
+        answerString = answerString.replace(matchString, '')
+
+    MarkdownEditingDescriptor.itemFeedbackStrings.push(feedbackString)  # add a feedback string entry (possibly null)
+    MarkdownEditingDescriptor.itemFeedbackMatches.push(matchString)     # add a match string entry (possibly null)
+
+    return answerString
+
+
+
+
+
+
+
+
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
       var xml = markdown,
@@ -206,13 +232,30 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
+      // initialize the targeted feedback working arrays
+      MarkdownEditingDescriptor.itemFeedbackStrings = [];
+      MarkdownEditingDescriptor.itemFeedbackMatches = [];
+      MarkdownEditingDescriptor.itemFeedbackTruthValue = [];
+
       // group multiple choice answers
+      confirm('group multiple choice answers :' + xml);
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
+        confirm('multiplechoiceresponse');
         var choices = '';
         var shuffle = false;
         var options = match.split('\n');
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
+
+            options[i] = MarkdownEditingDescriptor.findTargetedFeedbackItem(options[i], i);
+            hintString = String(MarkdownEditingDescriptor.itemFeedbackStrings[i]);
+            hintElement = '';
+            if (hintString.length > 0) {
+              hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
+            }
+
+
+
             var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
             var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
             var correct = /x/i.test(inparens);
@@ -223,39 +266,45 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             if(/!/.test(inparens)) {
               shuffle = true;
             }
-            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
+            choices += '        <choice correct="' + correct + '"' + fixed + '>' + value + hintElement + '        </choice>\n';
           }
         }
-        var result = '<multiplechoiceresponse>\n';
+        var result = '    <multiplechoiceresponse>\n';
         if(shuffle) {
-          result += '  <choicegroup type="MultipleChoice" shuffle="true">\n';
+          result += '        <choicegroup type="MultipleChoice" shuffle="true">\n';
         } else {
-          result += '  <choicegroup type="MultipleChoice">\n';
+          result += '        <choicegroup type="MultipleChoice">\n';
         }
         result += choices;
-        result += '  </choicegroup>\n';
-        result += '</multiplechoiceresponse>\n\n';
+        result += '        </choicegroup>\n';
+        result += '    </multiplechoiceresponse>\n\n';
         return result;
       });
 
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
-          var groupString = '<choiceresponse>\n',
+          var groupString = '    <choiceresponse>\n',
               options, value, correct;
 
-          groupString += '  <checkboxgroup direction="vertical">\n';
+          groupString += '        <checkboxgroup direction="vertical">\n';
           options = match.split('\n');
 
           for (i = 0; i < options.length; i += 1) {
               if(options[i].length > 0) {
+                  options[i] = MarkdownEditingDescriptor.findTargetedFeedbackItem(options[i], i);
+                  hintString = String(MarkdownEditingDescriptor.itemFeedbackStrings[i]);
+                  hintElement = '';
+                  if (hintString.length > 0) {
+                    hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
+                  }
                   value = options[i].split(/^\s*\[.?\]\s*/)[1];
                   correct = /^\s*\[x\]/i.test(options[i]);
-                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
-              }
+                  groupString += '        <choice  correct="' + correct + '">' + value + hintElement + '        </choice>\n';
+               }
           }
 
-          groupString += '  </checkboxgroup>\n';
-          groupString += '</choiceresponse>\n\n';
+          groupString += '        </checkboxgroup>\n';
+          groupString += '    </choiceresponse>\n\n';
 
           return groupString;
       });
@@ -411,7 +460,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\n\n\n/g, '\n');
 
       // surround w/ problem tag
-      xml = '<problem>\n' + xml + '\n</problem>';
+      xml = '<problem schema="edXML/1.0">\n' + xml + '\n</problem>';
 
       return xml;
     }`
