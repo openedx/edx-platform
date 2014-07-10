@@ -152,7 +152,9 @@
   &.disabled, &[disabled], &.is-disabled {
     cursor: default;
     pointer-events: none;
-    opacity: 0.5;
+    border: 1px solid $gray-l3;
+    background-color: $gray-l3;
+    color: $gray-l5;
   }
 
   .icon-inline {
@@ -178,11 +180,13 @@
   padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
+  box-shadow: none;
+  font-weight: 600;
   line-height: 1.5em;
   text-align: center;
 
   &:hover, &:active, &:focus {
-    box-shadow: 0 2px 1px $shadow-l1;
+    box-shadow: 0 2px 1px $shadow;
   }
 
   &.current, &.active {
@@ -268,10 +272,21 @@
 
 %no-content {
   @extend %ui-well;
-  padding: $baseline;
+  padding: ($baseline*2);
   background-color: $gray-l4;
   text-align: center;
   color: $gray;
+
+  .button,
+  .action {
+    @extend %btn-primary-green;
+    @include font-size(14);
+    margin-left: $baseline;
+
+    [class^="icon-"] {
+      margin-right: ($baseline/2);
+    }
+  }
 }
 
 .ui-loading {
