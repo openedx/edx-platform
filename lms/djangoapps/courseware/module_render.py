@@ -63,7 +63,6 @@ XQUEUE_INTERFACE = XQueueInterface(
 # Some brave person should make the variable names consistently someday, but the code's
 # coupled enough that it's kind of tricky--you've been warned!
 
-
 class LmsModuleRenderError(Exception):
     """
     An exception class for exceptions thrown by module_render that don't fit well elsewhere
