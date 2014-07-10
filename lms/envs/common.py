@@ -1633,6 +1633,7 @@ ALL_LANGUAGES = (
 OPTIONAL_APPS = (
     'edx_jsdraw',
     'mentoring',
+    'edx_sga',
 
     # edx-ora2
     'submissions',
