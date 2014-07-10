@@ -14,11 +14,17 @@ def convert_module_store_setting_if_needed(module_store_setting):
         """
         new_store_list = []
         for store_name, store_settings in old_stores.iteritems():
+
             store_settings['NAME'] = store_name
             if store_name == 'default':
                 new_store_list.insert(0, store_settings)
             else:
                 new_store_list.append(store_settings)
+
+            # migrate request for the old 'direct' Mongo store to the Draft store
+            if store_settings['ENGINE'] == 'xmodule.modulestore.mongo.MongoModuleStore':
+                store_settings['ENGINE'] = 'xmodule.modulestore.mongo.draft.DraftModuleStore'
+
         return new_store_list
 
     if module_store_setting is None:
