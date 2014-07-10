@@ -43,11 +43,6 @@ class MongoContentStore(ContentStore):
 
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
-        # TODO OpaqueKey - remove after merge of opaque urls
-        if not hasattr(AssetLocation, 'deprecated'):
-            setattr(AssetLocation, 'deprecated', True)
-            setattr(SlashSeparatedCourseKey, 'deprecated', True)
-
     def drop_database(self):
         """
         Only for use by test code. Removes the database!

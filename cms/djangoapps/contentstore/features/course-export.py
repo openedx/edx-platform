@@ -54,6 +54,10 @@ def i_click_on_error_dialog(step):
     course_key = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
     # we don't know the actual ID of the vertical. So just check that we did go to a
     # vertical page in the course (there should only be one).
-    vertical_usage_key = course_key.make_usage_key("vertical", "")
+    vertical_usage_key = course_key.make_usage_key("vertical", None)
     vertical_url = reverse_usage_url('unit_handler', vertical_usage_key)
+    # Remove the trailing "/None" from the URL - we don't know the course ID, so we just want to
+    # check that we visited a vertical URL.
+    if vertical_url.endswith("/None"):
+        vertical_url = vertical_url[:-5]
     assert_equal(1, world.browser.url.count(vertical_url))

@@ -318,11 +318,11 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         data = old_content['data'] if 'data' in old_content else None
 
     if children is not None:
-        children_usage_keys = [
-            UsageKey.from_string(child)
-            for child
-            in children
-        ]
+        children_usage_keys = []
+        for child in children:
+            child_usage_key = UsageKey.from_string(child)
+            child_usage_key = child_usage_key.replace(course_key=modulestore().fill_in_run(child_usage_key.course_key))
+            children_usage_keys.append(child_usage_key)
         existing_item.children = children_usage_keys
 
     # also commit any metadata which might have been passed along

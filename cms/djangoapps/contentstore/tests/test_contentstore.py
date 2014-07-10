@@ -1479,7 +1479,7 @@ class ContentStoreTest(ContentStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        import_from_xml(
+        __, courses = import_from_xml(
             self.store,
             self.user.id,
             'common/test/data/',
@@ -1487,7 +1487,7 @@ class ContentStoreTest(ContentStoreTestCase):
             static_content_store=content_store
         )
 
-        course = self.store.get_courses()[0]
+        course = courses[0]
 
         # Make sure the course image is set to the right place
         self.assertEqual(course.course_image, 'images_course_image.jpg')
