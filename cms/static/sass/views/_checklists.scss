@@ -272,10 +272,8 @@
         text-align: right;
 
         .action-primary {
-          @include blue-button;
-          @extend %t-action4;
-          font-weight: 600;
-          text-align: center;
+          @extend %btn-primary-blue;
+          @extend %t-action3;
         }
 
         .action-secondary {
@@ -319,10 +317,8 @@
         .task-actions {
 
           .action-primary {
-            @include grey-button;
-            @extend %t-action4;
-            font-weight: 600;
-            text-align: center;
+            @extend %btn-secondary-blue;
+            @extend %t-action3;
           }
         }
 

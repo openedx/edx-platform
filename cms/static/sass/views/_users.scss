@@ -55,8 +55,7 @@
         }
 
         .action-primary {
-          @include green-button(); // overwriting for the sake of syncing older green button styles for now
-          @extend %t-action3;
+          @extend %btn-primary-green;
           padding: ($baseline/2) $baseline;
         }
       }
