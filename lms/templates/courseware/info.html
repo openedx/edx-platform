@@ -40,8 +40,8 @@ $(document).ready(function(){
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
     </section>
-    <section aria-label="Handout Navigation" class="handouts">
-      <h1>${course.info_sidebar_name}</h1>
+    <section aria-label="${_('Handout Navigation')}" class="handouts">
+      <h1>${_(course.info_sidebar_name)}</h1>
       ${get_course_info_section(request, course, 'handouts')}
     </section>
     % else:
