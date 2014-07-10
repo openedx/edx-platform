@@ -109,7 +109,6 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-MODULESTORE_BRANCH = 'draft-preferred'
 update_module_store_settings(
     MODULESTORE,
     module_store_options={

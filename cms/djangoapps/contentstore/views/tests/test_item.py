@@ -25,10 +25,9 @@ from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import PublishState
-from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -40,7 +39,6 @@ class ItemTest(CourseTestCase):
 
         self.course_key = self.course.id
         self.usage_key = self.course.location
-        self.store = modulestore()
 
     def get_item_from_modulestore(self, usage_key, verify_is_draft=False):
         """

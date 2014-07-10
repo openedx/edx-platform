@@ -2,7 +2,7 @@ from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
-from xmodule.modulestore import prefer_xmodules
+from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
@@ -52,21 +52,23 @@ class CourseFactory(XModuleFactory):
         store = kwargs.pop('modulestore')
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
         run = kwargs.get('run', name)
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
         location = Location(org, number, run, 'course', name)
 
-        # Write the data to the mongo datastore
-        new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            # Write the data to the mongo datastore
+            new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
 
-        # The rest of kwargs become attributes on the course:
-        for k, v in kwargs.iteritems():
-            setattr(new_course, k, v)
+            # The rest of kwargs become attributes on the course:
+            for k, v in kwargs.iteritems():
+                setattr(new_course, k, v)
 
-        # Save the attributes we just set
-        new_course.save()
-        # Update the data in the mongo datastore
-        store.update_item(new_course, '**replace_user**')
-        return new_course
+            # Save the attributes we just set
+            new_course.save()
+            # Update the data in the mongo datastore
+            store.update_item(new_course, user_id)
+            return new_course
 
 
 class ItemFactory(XModuleFactory):
@@ -128,6 +130,8 @@ class ItemFactory(XModuleFactory):
 
         :boilerplate: (optional) the boilerplate for overriding field values
 
+        :publish_item: (optional) whether or not to publish the item (default is True)
+
         :target_class: is ignored
         """
 
@@ -143,7 +147,8 @@ class ItemFactory(XModuleFactory):
         display_name = kwargs.pop('display_name', None)
         metadata = kwargs.pop('metadata', {})
         location = kwargs.pop('location')
-        user_id = kwargs.pop('user_id', 999)
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+        publish_item = kwargs.pop('publish_item', True)
 
         assert isinstance(location, Location)
         assert location != parent_location
@@ -153,47 +158,55 @@ class ItemFactory(XModuleFactory):
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = kwargs.pop('parent', None) or store.get_item(parent_location)
 
-        if 'boilerplate' in kwargs:
-            template_id = kwargs.pop('boilerplate')
-            clz = XBlock.load_class(category, select=prefer_xmodules)
-            template = clz.get_template(template_id)
-            assert template is not None
-            metadata.update(template.get('metadata', {}))
-            if not isinstance(data, basestring):
-                data.update(template.get('data'))
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
 
-        # replace the display name with an optional parameter passed in from the caller
-        if display_name is not None:
-            metadata['display_name'] = display_name
-        runtime = parent.runtime if parent else None
-        store.create_and_save_xmodule(location, user_id, metadata=metadata, definition_data=data, runtime=runtime)
+            if 'boilerplate' in kwargs:
+                template_id = kwargs.pop('boilerplate')
+                clz = XBlock.load_class(category, select=prefer_xmodules)
+                template = clz.get_template(template_id)
+                assert template is not None
+                metadata.update(template.get('metadata', {}))
+                if not isinstance(data, basestring):
+                    data.update(template.get('data'))
 
-        module = store.get_item(location)
+            # replace the display name with an optional parameter passed in from the caller
+            if display_name is not None:
+                metadata['display_name'] = display_name
+            runtime = parent.runtime if parent else None
+            store.create_and_save_xmodule(location, user_id, metadata=metadata, definition_data=data, runtime=runtime)
 
-        for attr, val in kwargs.items():
-            setattr(module, attr, val)
-        # Save the attributes we just set
-        module.save()
+            module = store.get_item(location)
 
-        store.update_item(module, '**replace_user**')
+            for attr, val in kwargs.items():
+                setattr(module, attr, val)
+            # Save the attributes we just set
+            module.save()
 
-        if 'detached' not in module._class_tags:
-            parent.children.append(location)
-            store.update_item(parent, '**replace_user**')
+            store.update_item(module, user_id)
 
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-        # if we add one then we need to also add it to the policy information (i.e. metadata)
-        # we should remove this once we can break this reference from the course to static tabs
-        if category == 'static_tab':
-            course = store.get_course(location.course_key)
-            course.tabs.append(
-                StaticTab(
-                    name=display_name,
-                    url_slug=location.name,
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # if we add one then we need to also add it to the policy information (i.e. metadata)
+            # we should remove this once we can break this reference from the course to static tabs
+            if category == 'static_tab':
+                course = store.get_course(location.course_key)
+                course.tabs.append(
+                    StaticTab(
+                        name=display_name,
+                        url_slug=location.name,
+                    )
                 )
-            )
-            store.update_item(course, '**replace_user**')
+                store.update_item(course, user_id)
 
+            # parent and publish the item, so it can be accessed
+            if 'detached' not in module._class_tags:
+                parent.children.append(location)
+                store.update_item(parent, user_id)
+                if publish_item:
+                    store.publish(parent.location, user_id)
+            elif publish_item:
+                store.publish(location, user_id)
+
+        # return the published item
         return store.get_item(location)
 
 

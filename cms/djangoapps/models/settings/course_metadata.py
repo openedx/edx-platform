@@ -53,7 +53,7 @@ class CourseMetadata(object):
         return result
 
     @classmethod
-    def update_from_json(cls, descriptor, jsondict, filter_tabs=True, user=None):
+    def update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
@@ -84,6 +84,6 @@ class CourseMetadata(object):
             setattr(descriptor, key, value)
 
         if len(key_values) > 0:
-            modulestore().update_item(descriptor, user.id if user else None)
+            modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

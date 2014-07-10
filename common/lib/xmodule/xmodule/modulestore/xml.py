@@ -19,15 +19,14 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
-from . import ModuleStoreReadBase, Location, ModuleStoreEnum
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
@@ -720,7 +719,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
-    def get_items(self, course_id, settings=None, content=None, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, revision=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -745,6 +744,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                 you can search dates by providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
+        if revision == ModuleStoreEnum.RevisionOption.draft_only:
+            return []
+
         items = []
 
         category = kwargs.pop('category', None)

@@ -10,7 +10,6 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import MongoModuleStore, DraftMongoModuleStore
 from xmodule.modulestore.mongo.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore import ModuleStoreEnum
-from mock import Mock
 
 
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
@@ -49,14 +48,15 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.userid = random.getrandbits(32)
         super(SplitWMongoCourseBoostrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
+            None,
             self.db_config,
             **self.modulestore_options
         )
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
-        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
+        self.old_mongo = MongoModuleStore(None, self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftMongoModuleStore(
-            self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
+            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
         )
         self.addCleanup(self.tear_down_mongo)
         self.old_course_key = None
@@ -137,6 +137,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.split_mongo.create_course(
                 self.split_course_key.org, self.split_course_key.offering, self.userid, fields=fields, root_block_id='runid'
             )
-        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', fields=fields)
+        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', self.userid, fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

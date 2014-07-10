@@ -29,15 +29,6 @@
   position: relative;
 }
 
-// The sidebar class does a lot of things that we don't want in the thread list;
-// the following rules contain styling that is necessary and would otherwise
-// reside in elements/_navigation.scss if the sidebar styling did not make the
-// !important directive necessary.
-
-.forum-nav {
-  width: 31% !important;
-}
-
 // ------------------------
 // navigation - browse menu
 // ------------------------
@@ -62,22 +53,13 @@
   font-size: 12px !important;
 }
 
-// The sidebar class does a lot of things that we don't want in the thread list;
-// the following rules contain styling that is necessary and would otherwise
-// reside in elements/_navigation.scss if the sidebar styling did not make the
-// !important directive necessary.
-
-.forum-nav-browse-title {
-  border-bottom: 1px solid $gray-l3 !important;
-  padding: ($baseline/2) ($baseline/2) !important;
-
-  &:hover, &:focus {
-    background: $forum-color-active-thread !important;
-  }
+// Override global ul rules
+.forum-nav-browse-menu, .forum-nav-browse-submenu {
+  margin: 0;
 }
 
-.forum-nav-browse-submenu {
-  padding-left: $baseline !important;
+.forum-nav-browse-menu {
+  padding-left: 0;
 }
 
 // --------------------------------
@@ -93,50 +75,14 @@
 // navigation - thread list
 // --------------------------------
 
-// The sidebar class does a lot of things that we don't want in the thread list;
-// the following rules contain styling that is necessary and would otherwise
-// reside in elements/_navigation.scss if the sidebar styling did not make the
-// !important directive necessary.
-
-.forum-nav-thread {
-  background-color: $gray-l5 !important;
-
-  &.is-unread {
-    background-color: $white !important;
-  }
-}
-
-.forum-nav-thread-link {
-  padding: ($baseline/4) ($baseline/2) !important;
-
-  &.is-active, &:hover, &:focus {
-    background-color: $forum-color-active-thread !important;
-  }
-}
-
-li[class*=forum-nav-thread-label-] {
-  margin-top: ($baseline/4) !important;
-  padding: 1px 6px !important;
-}
-
-.forum-nav-load-more {
-  border-bottom: 1px solid $gray-l3 !important;
-  background-color: $gray-l5 !important;
-}
-
-.forum-nav-load-more-link {
-  &:hover, &:focus {
-    color: $link-color !important;
-    background-color: $forum-color-active-thread !important;
-  }
-}
-
-.forum-nav-load-more-link, .forum-nav-loading {
-  padding: $baseline 0 !important;
-}
-
 // The following rules would be unnecessary but for broadly scoped rules defined
 // elsewhere in our CSS.
+
+// Override global ul rules
+.forum-nav-thread-list, .forum-nav-thread-labels {
+  margin: 0;
+  padding-left: 0;
+}
 
 li[class*=forum-nav-thread-label-] {
   // Override global span rules

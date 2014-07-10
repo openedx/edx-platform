@@ -332,12 +332,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
-    reference_type = Location
+    reference_type = SlashSeparatedCourseKey
 
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
-    def __init__(self, doc_store_config, fs_root, render_template,
+    def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None,
@@ -346,7 +346,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(MongoModuleStore, self).__init__(**kwargs)
+        super(MongoModuleStore, self).__init__(contentstore, **kwargs)
 
         def do_connection(
             db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
@@ -390,13 +390,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.ignore_write_events_on_courses = set()
         self._course_run_cache = {}
 
-    def begin_bulk_write_operation_on_course(self, course_id):
+    def _begin_bulk_write_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """
         self.ignore_write_events_on_courses.add(course_id)
 
-    def end_bulk_write_operation_on_course(self, course_id):
+    def _end_bulk_write_operation(self, course_id):
         """
         Restart updating the meta-data inheritance cache for the given course.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.
@@ -841,7 +841,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, offering, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
@@ -857,7 +857,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Raises:
             InvalidLocationError: If a course with the same org and offering already exists
         """
-
         course, _, run = offering.partition('/')
         course_id = SlashSeparatedCourseKey(org, course, run)
 
@@ -892,15 +891,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         )
 
         return course
-
-    def delete_course(self, course_key, user_id=None):
-        """
-        The impl removes all of the db records for the course.
-        :param course_key:
-        :param user_id:
-        """
-        course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
         """
@@ -993,7 +983,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             self._update_single_item(parent, update)
             self._update_ancestors(parent, update)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False,
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,
                     is_publish_root=True):
         """
         Update the persisted version of xblock to reflect its current values.

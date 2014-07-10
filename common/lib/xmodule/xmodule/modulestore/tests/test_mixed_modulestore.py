@@ -9,6 +9,7 @@ from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.exceptions import InvalidVersionError
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
@@ -115,7 +116,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
         self.course_locations = []
 
-        self.user_id = 0
+        self.user_id = ModuleStoreEnum.UserID.test
 
     # pylint: disable=invalid-name
     def _create_course(self, default, course_key):
@@ -126,12 +127,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             offering = course_key.offering.replace('/', '.')
         else:
             offering = course_key.offering
-        course = self.store.create_course(course_key.org, offering)
+        course = self.store.create_course(course_key.org, offering, self.user_id)
         category = self.writable_chapter_location.category
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
-            course.location, category, location=self.writable_chapter_location, block_id=block_id
+            course.location, category, self.user_id, location=self.writable_chapter_location, block_id=block_id
         )
         if isinstance(course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
@@ -183,7 +184,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         ]
 
         def create_sub_tree(parent, block_info):
-            block = self.store.create_item(parent.location, category=block_info.category, block_id=block_info.display_name)
+            block = self.store.create_item(parent.location, block_info.category, self.user_id, block_id=block_info.display_name)
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
             # reload the block to update its children field
@@ -210,7 +211,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(**self.options)
+        self.store = MixedModuleStore(None, **self.options)
         self.addCleanup(self.store.close_all_connections)
 
         # convert to CourseKeys
@@ -305,13 +306,13 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
         with self.assertRaises(NotImplementedError):  # ensure it doesn't allow writing
-            self.store.update_item(course, None)
+            self.store.update_item(course, self.user_id)
         # now do it for a r/w db
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
-        self.store.update_item(course, None)
+        self.store.update_item(course, self.user_id)
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertTrue(course.show_calculator)
 
@@ -323,8 +324,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         # r/o try deleting the course (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
-            self.store.delete_item(self.xml_chapter_location, 13)
-        self.store.delete_item(self.writable_chapter_location, 9)
+            self.store.delete_item(self.xml_chapter_location, self.user_id)
+        self.store.delete_item(self.writable_chapter_location, self.user_id)
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
@@ -366,7 +367,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
-            xml_store.create_course("org", "course/run", 999)
+            xml_store.create_course("org", "course/run", self.user_id)
 
     @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):
@@ -460,12 +461,93 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             (child_to_delete, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
+
+    @ddt.data('draft')
+    def test_revert_to_published_root_draft(self, default_ms):
+        """
+        Test calling revert_to_published on draft vertical.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        # delete leaf problem (will make parent vertical a draft)
+        self.store.delete_item(self.problem_x1a_1.location, self.user_id)
+
+        draft_parent = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(2, len(draft_parent.children))
+        published_parent = self.store.get_item(
+            self.vertical_x1a.location,
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
+        self.assertEqual(3, len(published_parent.children))
+
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+        reverted_parent = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(3, len(published_parent.children))
+        self.assertEqual(reverted_parent, published_parent)
+
+    @ddt.data('draft')
+    def test_revert_to_published_root_published(self, default_ms):
+        """
+        Test calling revert_to_published on a published vertical with a draft child.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        orig_display_name = self.problem_x1a_1.display_name
+
+        # Change display name of problem and update just it (so parent remains published)
+        self.problem_x1a_1.display_name = "updated before calling revert"
+        self.store.update_item(self.problem_x1a_1, self.user_id)
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+
+        reverted_problem = self.store.get_item(self.problem_x1a_1.location)
+        self.assertEqual(orig_display_name, reverted_problem.display_name)
+
+    @ddt.data('draft')
+    def test_revert_to_published_no_draft(self, default_ms):
+        """
+        Test calling revert_to_published on vertical with no draft content does nothing.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        orig_vertical = self.vertical_x1a
+        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+        reverted_vertical = self.store.get_item(self.vertical_x1a.location)
+        self.assertEqual(orig_vertical, reverted_vertical)
+
+    @ddt.data('draft')
+    def test_revert_to_published_no_published(self, default_ms):
+        """
+        Test calling revert_to_published on vertical with no published version errors.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        with self.assertRaises(InvalidVersionError):
+            self.store.revert_to_published(self.vertical_x1a.location)
+
+    @ddt.data('draft')
+    def test_revert_to_published_direct_only(self, default_ms):
+        """
+        Test calling revert_to_published on a direct-only item is a no-op.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        self.store.revert_to_published(self.sequential_x1.location)
+        reverted_parent = self.store.get_item(self.sequential_x1.location)
+        # It does not discard the child vertical, even though that child is a draft (with no published version)
+        self.assertEqual(1, len(reverted_parent.children))
+
     @ddt.data('draft', 'split')
     def test_get_orphans(self, default_ms):
         self.initdb(default_ms)
         # create an orphan
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
+        orphan = self.store.create_item(course_id, 'problem', self.user_id, block_id='orphan')
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         if default_ms == 'split':
             self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
@@ -479,7 +561,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         new location for the child
         """
         self.initdb(default_ms)
-        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
+        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', self.user_id, block_id='orphan')
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 
@@ -518,7 +600,7 @@ def load_function(path):
 
 
 # pylint: disable=unused-argument
-def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -526,6 +608,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
 
     return class_(
         doc_store_config=doc_store_config,
+        contentstore=contentstore,
         branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
         **options
     )

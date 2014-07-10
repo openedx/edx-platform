@@ -51,7 +51,7 @@ class BasicAssetsTestCase(AssetsTestCase):
         module_store = modulestore()
         _, course_items = import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),
@@ -195,7 +195,7 @@ class LockAssetTestCase(AssetsTestCase):
         module_store = modulestore()
         _, course_items = import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),

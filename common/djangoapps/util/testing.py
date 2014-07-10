@@ -30,8 +30,8 @@ class UrlResetMixin(object):
         # Resolve a URL so that the new urlconf gets loaded
         resolve('/')
 
-    def setUp(self):
+    def setUp(self, **kwargs):
         """Reset django default urlconf before tests and after tests"""
-        super(UrlResetMixin, self).setUp()
+        super(UrlResetMixin, self).setUp(**kwargs)
         self._reset_urls()
         self.addCleanup(self._reset_urls)

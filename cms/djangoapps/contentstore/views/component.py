@@ -449,8 +449,8 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
-    # unintentional update to handle any side effects of handle call; so, request user didn't author
-    # the change
-    modulestore().update_item(descriptor, None)
+    # unintentional update to handle any side effects of handle call
+    # could potentially be updating actual course data or simply caching its values
+    modulestore().update_item(descriptor, request.user.id)
 
     return webob_to_django_response(resp)
