@@ -128,9 +128,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # put it in the error tracker--content folks need to see it.
 
                     if tag in need_uniq_names:
-                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      "state will not be properly tracked for this module.  Problem xml:"
-                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker(u"PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      u"state will not be properly tracked for this module.  Problem xml:"
+                                      u" '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -143,8 +143,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
-                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
-                               "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        msg = (u"Non-unique url_name in xml.  This may break state tracking for content."
+                               u"  url_name={0}.  Content={1}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
