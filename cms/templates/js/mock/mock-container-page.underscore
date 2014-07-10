@@ -43,6 +43,7 @@
             <section class="content-area">
 
                 <article class="content-primary window">
+                    <div class="container-message wrapper-message"></div>
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
                     <div class="ui-loading is-hidden">

@@ -33,7 +33,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
         /**
          * Confirms with the user whether to run an operation or not, and then runs it if desired.
          */
-        confirmThenRunOperation = function(title, message, actionLabel, operation) {
+        confirmThenRunOperation = function(title, message, actionLabel, operation, onCancelCallback) {
             return new PromptView.Warning({
                 title: title,
                 message: message,
@@ -48,6 +48,9 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                     secondary: {
                         text: gettext('Cancel'),
                         click: function(prompt) {
+                            if (onCancelCallback) {
+                                onCancelCallback();
+                            }
                             return prompt.hide();
                         }
                     }
