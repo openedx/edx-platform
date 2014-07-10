@@ -332,30 +332,40 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.store.get_item(self.writable_chapter_location)
 
         # create and delete a private vertical with private children
-        private_vert_loc = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'private')
-        private_vert = self.store.create_and_save_xmodule(private_vert_loc, self.user_id, runtime=self.course.runtime)
-        self.course.children.append(private_vert_loc)
-        self.store.update_item(self.course, self.user_id)
-        private_leaf_loc = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('html', 'private_leaf')
-        self.store.create_and_save_xmodule(private_leaf_loc, self.user_id, runtime=self.course.runtime)
-        private_vert.children.append(private_leaf_loc)
-        self.store.update_item(private_vert, self.user_id)
+        private_vert = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            self.course_locations[self.MONGO_COURSEID], 'vertical', user_id=self.user_id, block_id='private'
+        )
+        private_leaf = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            private_vert.location, 'html', user_id=self.user_id, block_id='private_leaf'
+        )
 
         # verify pre delete state (just to verify that the test is valid)
-        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == MongoRevisionKey.draft)
-        self.assertIsNotNone(self.store.get_item(private_vert_loc))
-        self.assertIsNotNone(self.store.get_item(private_leaf_loc))
+        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == ModuleStoreEnum.BranchName.draft)
+        if hasattr(private_vert.location, 'version_guid'):
+            # change to the HEAD version
+            vert_loc = private_vert.location.for_version(private_leaf.location.version_guid)
+        else:
+            vert_loc = private_vert.location
+        self.assertTrue(self.store.has_item(vert_loc))
+        self.assertTrue(self.store.has_item(private_leaf.location))
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
-        self.assertIn(private_vert_loc, course.children)
+        self.assertIn(vert_loc, course.children)
 
         # delete the vertical and ensure the course no longer points to it
-        self.store.delete_item(private_vert_loc, self.user_id)
-        with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(private_vert_loc)
-        with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(private_leaf_loc)
+        self.store.delete_item(vert_loc, self.user_id)
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
-        self.assertNotIn(private_vert_loc, course.children)
+        if hasattr(private_vert.location, 'version_guid'):
+            # change to the HEAD version
+            vert_loc = private_vert.location.for_version(course.location.version_guid)
+            leaf_loc = private_leaf.location.for_version(course.location.version_guid)
+        else:
+            vert_loc = private_vert.location
+            leaf_loc = private_leaf.location
+        self.assertFalse(self.store.has_item(vert_loc))
+        self.assertFalse(self.store.has_item(leaf_loc))
+        self.assertNotIn(vert_loc, course.children)
 
     @ddt.data('draft', 'split')
     def test_get_courses(self, default_ms):
