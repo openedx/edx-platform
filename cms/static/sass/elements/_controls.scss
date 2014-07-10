@@ -279,7 +279,7 @@
   }
 }
 
-// UI: elem is collapsible
+// UI: elem is collapsible - TODO: this should be transitioned away from in favor of %ui-expand-collapse
 %expand-collapse {
   @include transition(all $tmg-f2 linear 0s);
   display: inline-block;
@@ -302,6 +302,41 @@
   &.expand .ui-toggle-expansion {
     @include transform(rotate(-90deg));
     @include transform-origin(50% 50%);
+  }
+}
+
+// UI: expand collapse
+%ui-expand-collapse {
+  @include transition(all $tmg-f2 linear 0s);
+
+
+  // CASE: default (is expanded)
+  .ui-toggle-expansion {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+    display: inline-block;
+    vertical-align: middle;
+
+    .icon {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+    }
+
+    // STATE: hover/active
+    &:hover, &:active {
+      cursor: pointer;
+      color: $ui-link-color-focus;
+    }
+  }
+
+  // CASE: is collapsed
+  &.is-collapsed {
+
+    .ui-toggle-expansion {
+
+      .icon {
+        @include transform(rotate(-90deg));
+        @include transform-origin(50% 50%);
+      }
+    }
   }
 }
 

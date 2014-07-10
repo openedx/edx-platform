@@ -247,3 +247,27 @@
 %anim-flashDouble {
   @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }
+
+
+// ====================
+
+
+// pulse
+@include keyframes(pulse) {
+  0% {
+    opacity: 0.0;
+  }
+
+  50% {
+    opacity: 1.0;
+  }
+
+  100% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-pulse {
+  @include animation(pulse $tmg-f1 ease-in-out 1);
+}

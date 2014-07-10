@@ -1,9 +1,25 @@
 // studio - views - course outline
 // ====================
 
+// view-specific utilities
+// --------------------
+%outline-item-header {
+  @include clearfix();
+  line-height: 0;
+}
+
+%outline-item-content-hidden {
+  display: none;
+}
+
+%outline-item-content-shown {
+  display: block;
+}
+
 .view-outline {
 
   // page structure
+  // --------------------
   .content-primary,
   .content-supplementary {
     @include box-sizing(border-box);
@@ -37,26 +53,39 @@
   }
 
 
-  // page header bits
-  .toggle-button-sections {
-    @extend %t-copy-sub2;
-    position: relative;
-    display: none;
-    float: right;
-    margin-top: ($baseline/4);
-    color: $gray-l1;
+  // page header
+  // --------------------
+  .button-toggle-expand-collapse {
 
-    &.is-shown {
-      display: block;
+    // STATE: action will collapse all
+    &.collapse-all {
+
+      .expand-all {
+        display: none;
+      }
+
+      .collapse-all {
+        display: block;
+      }
     }
 
-    .label {
-      display: inline-block;
+    // STATE: action will expand all
+    &.expand-all {
+
+      .collapse-all {
+        display: none;
+      }
+
+      .expand-all {
+        display: block;
+      }
     }
   }
 
+  // adding outline elements
+  // --------------------
 
-  // new section, subsection, unit
+  // forms
   .new-section-name,
   .new-subsection-name-input {
     @include font-size(16);
@@ -84,6 +113,7 @@
     color: $gray-l1;
   }
 
+  // buttons
   .new-subsection-item,
   .new-unit-item {
     @extend %ui-btn-flat-outline;
@@ -106,491 +136,260 @@
 
 
   // UI: general action list styles (section and subsection)
-
+  // --------------------
   .expand-collapse {
     @extend %expand-collapse;
-    margin: 0 ($baseline/4);
   }
 
-  // UI: element actions list
-  // TODO: outline page can be updated to reflect styling from %actions-list in _controls.scss
-  .actions-list {
-    display: inline-block;
-    margin-bottom: 0;
-  }
+  // outline
+  // --------------------
+  .outline {
 
-  .actions-item {
-    @include font-size(13);
-    display: inline-block;
-    padding: 0 ($baseline/5);
-    vertical-align: middle;
+    // add/new items
+    .add-item {
+      margin-top: ($baseline*0.75);
 
-    .action {
-      min-width: ($baseline*.75);
-      color: $gray-l2;
+      .button-new {
+        @extend %ui-btn-flat-outline;
+        padding: ($baseline/2) $baseline;
+        display: block;
 
-      &:hover,
-      &.is-set {
-        color: $blue;
-        visibility: visible;
-      }
-
-      //reset old drag handle style
-      &.drag-handle {
-        float: none;
-        margin: 0;
-        background: transparent url(../img/drag-handles.png) right 5px no-repeat;
-        text-align: center;
-      }
-
-    }
-  }
-
-
-  // section styles
-  .courseware-section {
-    @extend %ui-window;
-    @include transition(background $tmg-avg ease-in-out 0);
-    position: relative;
-    padding: ($baseline*1.5) $baseline $baseline $baseline;
-
-    &.collapsed {
-      padding-bottom: 0;
-    }
-
-    &.collapsed .subsection-list,
-    .collapsed .subsection-list,
-    .collapsed > ol {
-        display: none !important;
-    }
-
-    &.new-section {
-      padding: ($baseline*1.5) $baseline 0 $baseline;
-
-      header {
-        @include clearfix();
-        height: auto;
-        border-bottom: 0;
-
-        .expand-collapse {
-          display: none;
+        .icon {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/2);
         }
+      }
+    }
 
-        .item-details {
-          width: auto;
+    .add-section {
+      margin-bottom: $baseline;
+    }
 
-          .section-name {
-            float: none;
+    .add-subsection {
+
+    }
+
+    .add-unit {
+      margin-left: $outline-indent-width;
+    }
+  }
+
+  // outline: items
+  .outline-item {
+
+    // CASE: expand/collapse-able
+    &.is-collapsible {
+
+      // only select the current item's toggle expansion controls
+      &:nth-child(1) .ui-toggle-expansion, &:nth-child(1) .item-title {
+
+        // STATE: hover/active
+        &:hover, &:active {
+          color: $blue;
+        }
+      }
+    }
+
+    // item: title
+    .item-title {
+
+      // STATE: is-editable
+      &.is-editable {
+
+        // editor
+        + .editor {
+          display: block;
+
+          .item-edit-title {
             width: 100%;
           }
         }
       }
     }
-
-    .section {
-      @include clearfix();
-      min-height: 65px; // needed to align with edit input
-      margin-bottom: 0;
-      border: 0;
-      padding: 0;
-
-      // section name area
-      .item-details {
-        @include clearfix();
-        width: 400px;
-        float: none;
-        display: inline-block;
-        padding: 0 0 ($baseline/2) 0;
-
-        .section-name {
-          @include font-size(19);
-          margin-right: ($baseline/2);
-        }
-
-        .section-name-span {
-          @include transition(color $tmg-f2 linear 0s);
-          cursor: pointer;
-
-          &:hover {
-            color: $blue;
-          }
-        }
-
-        .section-name-edit {
-          position: relative;
-          width: ($baseline*20);
-          background: $white;
-
-          input {
-            @include font-size(16);
-          }
-
-          .save-button {
-            @include blue-button;
-            padding: 7px $baseline 7px;
-            margin-right: ($baseline/4);
-          }
-
-          .cancel-button {
-            @include white-button;
-            padding: 7px $baseline 7px;
-          }
-        }
-      }
-
-
-      // section specific action styles
-      .item-actions {
-        position: relative;
-        display: inline-block;
-        float: right;
-        margin-bottom: ($baseline/2);
-        top: 0;
-      }
-
-      .actions-item {
-        padding: 0 0 0 8px;
-
-        &:last-child {
-          padding-right: 4px;
-        }
-
-        &.pubdate {
-          padding-right: 0;
-        }
-
-        .action {
-
-          &.pubdate {
-            visibility: hidden;
-          }
-
-          &:hover,
-          &.is-set {
-            color: $blue;
-            visibility: visible;
-          }
-        }
-
-        .section-published-date {
-          padding: ($baseline/5) ($baseline/2);
-          border-radius: 3px;
-          background: $gray-l5;
-          text-align: right;
-
-          .published-status {
-            @include font-size(12);
-            margin-right: 15px;
-
-            strong {
-              font-weight: bold;
-            }
-          }
-
-          &.released .section-published-date {
-            background-color: transparent;
-            color: $gray-l1;
-
-            a {
-              color: $gray-l2;
-
-              &:hover {
-                color: $blue;
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
+  // outline: sections
+  // --------------------
+  .outline-section {
 
-  // subsection styles
-  .courseware-subsection {
-    @include clearfix();
-    padding: 3px 0;
-
-    &.visible {
-      border-left: 5px solid $green;
+    // header
+    .section-header {
+      @extend %outline-item-header;
     }
 
-    &.mixed {
-      border-left: 5px solid $yellow-s1;
-    }
+    .section-header-details {
+      float: left;
+      width: flex-grid(6, 9);
 
-    .status {
-      @extend %cont-text-sr;
-    }
-
-    .section-item {
-      @include transition(background $tmg-avg ease-in-out 0);
-      @include font-size(13);
-      position: relative;
-      display: block;
-      background-color: $gray-l5;
-      padding: 6px 8px 8px 16px;
-
-      &:hover {
-        background: $blue-l5;
-
-        .item-actions {
-          display: block;
-        }
+      .icon, .wrapper-section-title {
+        display: inline-block;
+        vertical-align: top;
       }
 
-      &.editing {
-        background: $orange-l4;
+      .icon {
+        margin-right: ($baseline/4);
+      }
+
+      .wrapper-section-title {
+        width: flex-grid(5, 6);
+        line-height: 0;
       }
     }
 
-    .details {
-      display: block;
-      margin-bottom: 0;
-      width: 600px;
-
-      a {
-        color: $baseFontColor;
-      }
-    }
-  }
-
-  // gradable drop down
-  .gradable-status {
-    display: inline-block;
-    position: relative;
-
-    .status-label {
-      @include font-size(12);
-      width: 110px;
-      padding: 5px 40px 5px 10px;
-      border-radius: 3px;
-      color: transparent;
+    .section-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
+      margin-top: -($baseline/4);
       text-align: right;
-      font-weight: bold;
-      line-height: 16px;
-    }
 
-    .menu-toggle {
-      @extend %ui-depth1;
-      position: absolute;
-      top: 0;
-      right: 5px;
-      padding: 2px 5px;
-      color: $gray-l2;
-
-      &:hover,
-      &.is-active {
-        color: $blue;
-      }
-
-      &:focus {
-        outline: 0;
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
       }
     }
 
+    // status
+    .section-status {
+      margin: 0 0 0 ($outline-indent-width*1.25);
+    }
 
-    // gradable dropdown menu default
-    .menu {
-      @include font-size(12);
-      @include transition(opacity $tmg-f2 linear 0s);
-      display: none;
-      opacity: 0.0;
-      z-index: 1;
-      position: absolute;
-      top: -4px;
-      right: 0;
-      margin: 0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-      border: 1px solid $gray-l2;
-      border-radius: 4px;
-      padding: 8px 12px;
-      background: $white;
+    // content
+    .section-content {
+      @extend %outline-item-content-shown;
+    }
 
-      li {
-        width: 115px;
-        margin-bottom: 3px;
-        border-bottom: 1px solid $gray-l4;
-        padding-bottom: 3px;
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
 
-        &:last-child {
-          margin-bottom: 0;
-          border: none;
-          padding-bottom: 0;
-
-          .gradable-status-notgraded {
-            color: $gray;
-          }
-        }
-      }
-
-      a {
-        color: $blue;
-
-        &.is-selected {
-          font-weight: bold;
-        }
+      .ui-toggle-expansion {
+        @extend %t-icon3;
+        color: $gray-l3;
       }
     }
 
-    // gradable dropdown state
-    &.is-active {
+    // STATE: is-collapsed
+    &.is-collapsed {
 
-      .menu {
-        @extend %ui-depth3;
-        display: block;
-        opacity: 1.0;
-      }
-
-      .menu-toggle {
-        @extend %ui-depth4;
-      }
-    }
-
-    // set state
-    &.is-set {
-
-      .menu-toggle {
-        color: $blue;
-      }
-
-      .status-label {
-        display: block;
-        color: $blue;
+      .section-content {
+        @extend %outline-item-content-hidden;
       }
     }
   }
 
-  .courseware-subsection .sortable-unit-list {
-    margin: ($baseline/4) 0 0 0;
+  // outline: subsections
+  // --------------------
+  .list-subsections {
+    margin: $baseline 0 0 0;
   }
 
-  // unit styles
-  .courseware-unit {
-    margin: -1px 0 0 ($baseline*1.75);
+  .outline-subsection {
 
-    &.add-new-unit {
-      margin: 5px ($baseline*1.75) 0 ($baseline*1.75);
+    // header
+    .subsection-header {
+      @extend %outline-item-header;
     }
 
-    .section-item {
-      border: 0;
-      background-color: $white;
+    .subsection-header-details {
+      float: left;
+      width: flex-grid(6, 9);
+
+      .icon, .wrapper-subsection-title {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .icon {
+        margin-right: ($baseline/4);
+      }
+
+      .wrapper-subsection-title {
+        width: flex-grid(5, 6);
+        margin-top: -($baseline/10);
+        line-height: 0;
+      }
     }
 
-    .public-item {
-      color: $black;
+    .subsection-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
+      margin-top: -($baseline/4);
+      text-align: right;
+
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
+        margin-right: ($baseline/2);
+      }
     }
 
-    .private-item {
-      color: $gray-l1;
+    // status
+    .subsection-status {
+      margin: 0 0 0 $outline-indent-width;
     }
 
-    .draft-item {
-      color: $yellow-d1;
+    // content
+    .subsection-content {
+      @extend %outline-item-content-shown;
     }
 
-    .draft-item:after,
-    .public-item:after,
-    .private-item:after {
-      @include font-size(9);
-      margin-left: 3px;
-      font-weight: 600;
-      text-transform: uppercase;
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
+
+      .ui-toggle-expansion {
+        @extend %t-icon4;
+        color: $gray-l3;
+      }
     }
 
-    .draft-item:after {
-      content: "- draft";
-    }
+    // STATE: is-collapsed
+    &.is-collapsed {
 
-    .private-item:after {
-      content: "- private";
-    }
-  }
-
-
-
-  // modal to edit section publish settings
-  // basic non-backbone modal-window set-up
-  .wrapper-modal-window {
-    @extend %ui-depth4;
-    @include transition(all $tmg-f2 ease-in-out);
-    visibility: hidden;
-    pointer-events: none;
-    display: none;
-    position: fixed;
-    top: 0;
-    overflow: scroll;
-    background: $black-t2;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-
-    &:before {
-      content: '';
-      display: inline-block;
-      height: 100%;
-      vertical-align: middle;
-      margin-right: -0.25em; /* Adjusts for spacing */
-    }
-
-    .modal-window {
-      -webkit-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      opacity: 0;
-    }
-  }
-
-  // modal-window showing/hiding
-  &.modal-window-is-shown {
-    overflow: hidden;
-
-    .wrapper-modal-window.is-shown {
-      visibility: visible;
-      pointer-events: auto;
-      display: block;
-
-      .modal-window {
-        opacity: 1.0;
+      .subsection-content {
+        @extend %outline-item-content-hidden;
       }
     }
   }
 
-  .edit-section-publish-settings {
+  // outline: units
+  // --------------------
+  .list-units {
+    margin: $baseline 0 0 0;
+  }
 
-    .picker {
-      @include clearfix();
+  .outline-unit {
+    margin-left: $outline-indent-width;
 
+    // header
+    .unit-header {
+      @extend %outline-item-header;
+    }
 
-      .field {
-        float: left;
-        margin: 0 ($baseline/2) ($baseline/2);
+    .unit-header-details {
+      float: left;
+      width: flex-grid(6, 9);
+      margin-top: ($baseline/4);
+    }
 
-        label,
-        input {
-          display: block;
-          text-align: left;
-        }
+    .unit-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
+      margin-top: -($baseline/10);
+      text-align: right;
 
-        label {
-          @extend %t-copy-sub1;
-          margin-bottom: ($baseline/4);
-          font-weight: 600;
-        }
-
-        input[type="text"] {
-          @extend %t-copy-sub1;
-        }
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
       }
     }
   }
 
 
-
-  // UI: DnD - specific elems/cases - section
-  .courseware-section {
+  // UI: drag and drop: section
+  // --------------------
+  .outline-section {
 
     .draggable-drop-indicator-before {
       top: -($baseline/2);
@@ -613,8 +412,8 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - subsection
-  .courseware-subsection {
+  // UI: drag and drop: subsection
+  .outline-subsection {
 
     .draggable-drop-indicator-before {
       top: 0;
@@ -638,8 +437,8 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - unit
-  .courseware-unit {
+  // // UI: drag and drop: unit
+  .outline-unit {
 
     .draggable-drop-indicator-before {
       top: 0;
@@ -658,7 +457,7 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - empty parents splint
+  // UI: drag and drop: splints
   .ui-splint-indicator {
     position: relative;
   }
