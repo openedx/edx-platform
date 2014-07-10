@@ -544,6 +544,19 @@ class TestEditItem(ItemTest):
 
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
+        self._make_draft_content_different_from_published()
+
+    def test_revert_to_published(self):
+        """ Test reverting draft content to published """
+        self._make_draft_content_different_from_published()
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'discard_changes'}
+        )
+        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self.assertIsNone(published.due)
+
+    def _make_draft_content_different_from_published(self):
         # Make problem public.
         self.client.ajax_post(
             self.problem_update_url,
@@ -564,16 +577,16 @@ class TestEditItem(ItemTest):
         self.assertIsNone(published.due)
 
     def test_make_public_with_update(self):
-        """ Update a problem and make it public at the same time. """
+        """ Update a problem and make it public at the same time. Only the publish operation is done. """
         self.client.ajax_post(
             self.problem_update_url,
             data={
-                'metadata': {'due': '2077-10-10T04:00Z'},
+                'metadata': {'due': '2077-10-10T04:00Z'}, # Will be ignored when "publish" is present.
                 'publish': 'make_public'
             }
         )
         published = self.get_item_from_modulestore(self.problem_usage_key)
-        self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertIsNone(published.due)
 
     def test_published_and_draft_contents_with_update(self):
         """ Create a draft and publish it then modify the draft and check that published content is not modified """
