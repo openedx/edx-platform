@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
 <section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon')}">
   <div class="inner-wrapper">
     <button class="close-modal">
@@ -20,7 +21,7 @@
           ${_("Update Coupon Information")}</p>
       </div>
 
-      <form id="edit_coupon_form" action="${reverse('update_coupon')}" method="post" data-remote="true">
+      <form id="edit_coupon_form" action="${section_data['ajax_update_coupon']}" method="post" data-remote="true">
         <div id="coupon_form_error" class="modal-form-error"></div>
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="is-hidden">${_("Required Information")}</legend>

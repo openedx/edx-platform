@@ -30,7 +30,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
         mode = CourseMode(
-            course_id=self.course.id, mode_slug='honor',
+            course_id=self.course.id.to_deprecated_string(), mode_slug='honor',
             mode_display_name='honor', min_price=10, currency='usd'
         )
         mode.save()
@@ -74,7 +74,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         Test Add Coupon Scenarios. Handle all the HttpResponses return by add_coupon view
         """
         # URL for add_coupon
-        add_coupon_url = reverse('add_coupon')
+        add_coupon_url = reverse('add_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
             'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5
@@ -89,7 +89,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(add_coupon_url, data)
         self.assertTrue("coupon with the coupon code ({code}) already exist".format(code='A2314') in response.content)
 
-        response = self.client.post(self.url, data)
+        response = self.client.post(self.url)
         self.assertTrue('<td>ADSADASDSAD</td>' in response.content)
         self.assertTrue('<td>A2314</td>' in response.content)
         self.assertFalse('<td>111</td>' in response.content)
@@ -109,7 +109,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('<td>AS452</td>' in response.content)
 
         # URL for remove_coupon
-        delete_coupon_url = reverse('remove_coupon')
+        delete_coupon_url = reverse('remove_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id) in response.content)
 
@@ -135,7 +135,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         )
         coupon.save()
         # URL for edit_coupon_info
-        edit_url = reverse('get_coupon_info')
+        edit_url = reverse('get_coupon_info', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id) in response.content)
 
@@ -167,7 +167,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
             'course_id': coupon.course_id.to_deprecated_string()
         }
         # URL for update_coupon
-        update_coupon_url = reverse('update_coupon')
+        update_coupon_url = reverse('update_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id)in response.content)
 

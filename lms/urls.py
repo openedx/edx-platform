@@ -283,13 +283,13 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
         url(r'^courses/{}/instructor/api/'.format(settings.COURSE_ID_PATTERN),
             include('instructor.views.api_urls')),
-        url(r'^courses/remove_coupon$',
+        url(r'^courses/{}/remove_coupon$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.coupons.remove_coupon', name="remove_coupon"),
-        url(r'^courses/add_coupon$',
+        url(r'^courses/{}/add_coupon$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.coupons.add_coupon', name="add_coupon"),
-        url(r'^courses/update_coupon$',
+        url(r'^courses/{}/update_coupon$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.coupons.update_coupon', name="update_coupon"),
-        url(r'^courses/get_coupon_info$',
+        url(r'^courses/{}/get_coupon_info$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.coupons.get_coupon_info', name="get_coupon_info"),
 
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls

@@ -21,7 +21,7 @@
           ${_("Please enter Coupon detail below")}</p>
       </div>
 
-      <form id="add_coupon_form" action="${reverse('add_coupon')}" method="post" data-remote="true">
+      <form id="add_coupon_form" action="${section_data['ajax_add_coupon']}" method="post" data-remote="true">
         <div id="coupon_form_error" class="modal-form-error"></div>
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="is-hidden">${_("Required Information")}</legend>

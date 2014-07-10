@@ -74,10 +74,8 @@ def instructor_dashboard_2(request, course_id):
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
     course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
     course_mode_has_price = False
-    if course_honor_mode:
-        if course_honor_mode.min_price > 0:
-            course_mode_has_price = True
-
+    if course_honor_mode and course_honor_mode.min_price > 0:
+        course_mode_has_price = True
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
@@ -141,9 +139,10 @@ def _section_e_commerce(course_key, access):
         'section_display_name': _('E-Commerce'),
         'access': access,
         'course_id': course_key.to_deprecated_string(),
-        'ajax_remove_coupon_url': reverse('remove_coupon'),
-        'ajax_get_coupon_info': reverse('get_coupon_info'),
-        'ajax_update_coupon': reverse('update_coupon'),
+        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
         'coupons': coupons,
         'total_amount': total_amount,
