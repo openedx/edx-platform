@@ -51,6 +51,7 @@
                 </article>
                 <aside class="content-supplementary" role="complimentary">
                     <div id="publish-unit" class="window"></div>
+                    <div id="publish-history"></div>
                 </aside>
                 <div class="unit-location">
                         <h4 class="header">${_("Unit Location")}</h4>

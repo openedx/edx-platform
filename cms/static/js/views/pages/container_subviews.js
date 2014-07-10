@@ -108,7 +108,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                     has_changes: this.model.get('has_changes'),
                     published: this.model.get('published'),
                     edited_on: this.model.get('edited_on'),
-                    edited_by: this.model.get('edited_by')
+                    edited_by: this.model.get('edited_by'),
+                    published_on: this.model.get('published_on'),
+                    published_by: this.model.get('published_by')
                 }));
 
                 return this;
@@ -174,9 +176,40 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
             }
         });
 
+        /**
+         * PublishHistory displays when and by whom the xblock was last published, if it ever was.
+         */
+        var PublishHistory = BaseView.extend({
+            // takes XBlockInfo as a model
+
+            initialize: function () {
+                BaseView.prototype.initialize.call(this);
+                this.template = this.loadTemplate('publish-history');
+                this.model.on('sync', this.onSync, this);
+            },
+
+            onSync: function(e) {
+                if (e.changedAttributes() && (('published' in e.changedAttributes()) ||
+                    ('published_on' in e.changedAttributes()) || ('published_by' in e.changedAttributes()))) {
+                   this.render();
+                }
+            },
+
+            render: function () {
+                this.$el.html(this.template({
+                    published: this.model.get('published'),
+                    published_on: this.model.get('published_on'),
+                    published_by: this.model.get('published_by')
+                }));
+
+                return this;
+            }
+        });
+
         return {
             'VisibilityStateController': VisibilityStateController,
             'PreviewActionController': PreviewActionController,
-            'Publisher': Publisher
+            'Publisher': Publisher,
+            'PublishHistory': PublishHistory
         };
     }); // end define();
