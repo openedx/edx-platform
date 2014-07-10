@@ -10,16 +10,24 @@ class StaffPage(PageObject):
     """
 
     url = None
+    STAFF_STATUS_CSS = '#staffstatus'
 
     def is_browser_on_page(self):
-        return self.q(css='#staffstatus').present
+        return self.q(css=self.STAFF_STATUS_CSS).present
 
     @property
     def staff_status(self):
         """
         Return the current status, either Staff view or Student view
         """
-        return self.q(css='#staffstatus').text[0]
+        return self.q(css=self.STAFF_STATUS_CSS).text[0]
+
+    def toggle_staff_view(self):
+        """
+        Toggle between staff view and student view.
+        """
+        self.q(css=self.STAFF_STATUS_CSS).first.click()
+        self.wait_for_ajax()
 
     def open_staff_debug_info(self):
         """

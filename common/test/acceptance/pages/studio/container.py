@@ -78,6 +78,33 @@ class ContainerPage(PageObject):
         return self.q(css='.pub-status').first.text[0]
 
     @property
+    def release_title(self):
+        """
+        Returns the title before the release date in the publishing sidebar component.
+        """
+        return self.q(css='.wrapper-release .title').first.text[0]
+
+    @property
+    def release_date(self):
+        """
+        Returns the release date of the unit (with ancestor inherited from), as displayed
+        in the publishing sidebar component.
+        """
+        return self.q(css='.wrapper-release .copy').first.text[0]
+
+    @property
+    def currently_visible_to_students(self):
+        """
+        Returns True if the unit is marked as currently visible to students
+        (meaning that a warning is being displayed).
+        """
+        warnings = self.q(css='.container-message .warning')
+        if not warnings.is_present():
+            return False
+        warning_text = warnings.first.text[0]
+        return warning_text == "This content is live for students. Edit with caution."
+
+    @property
     def publish_action(self):
         """
         Returns the link for publishing a unit.
@@ -91,6 +118,22 @@ class ContainerPage(PageObject):
         click_css(self, 'a.action-discard', 0, require_notification=False)
         self.q(css='a.button.action-primary').first.click()
         self.wait_for_ajax()
+
+    def toggle_staff_lock(self):
+        """
+        Toggles "hide from students" which enables or disables a staff-only lock.
+
+        Returns True if the lock is now enabled, else False.
+        """
+        class_attribute_values = self.q(css='a.action-staff-lock>i').attrs('class')
+        was_locked_initially = 'icon-check' in class_attribute_values
+        if not was_locked_initially:
+            self.q(css='a.action-staff-lock').first.click()
+        else:
+            click_css(self, 'a.action-staff-lock', 0, require_notification=False)
+            self.q(css='a.button.action-primary').first.click()
+        self.wait_for_ajax()
+        return not was_locked_initially
 
     def view_published_version(self):
         """

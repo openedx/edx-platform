@@ -128,9 +128,10 @@ def compute_publish_state(xblock):
     return modulestore().compute_publish_state(xblock)
 
 
-def is_xblock_visible_to_students(xblock):
+def is_currently_visible_to_students(xblock):
     """
-    Returns true if there is a published version of the xblock that has been released.
+    Returns true if there is a published version of the xblock that is currently visible to students.
+    This means that it has a release date in the past, and the xblock has not been set to staff only.
     """
 
     try:
