@@ -395,7 +395,9 @@ class TestMixedModuleStore(unittest.TestCase):
         Tests already exist for both split and draft in their own test files.
         """
         self.initdb(default_ms)
-        item = self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
+        item = self.store.create_item(
+            self.course_locations[self.MONGO_COURSEID], 'problem', self.user_id, block_id='orphan'
+        )
         self.assertTrue(self.store.has_changes(item.location))
         self.store.publish(item.location, self.user_id)
         self.assertFalse(self.store.has_changes(item.location))
