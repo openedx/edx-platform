@@ -29,18 +29,18 @@ class ContainerPageTestCase(StudioPageTestCase):
 
         past = datetime.datetime(1970, 1, 1, tzinfo=UTC)
         future = datetime.datetime.now(UTC) + datetime.timedelta(days=1)
-        self.released_private_vertical = ItemFactory.create(
+        self.released_private_vertical = self._create_item(
             parent_location=self.sequential.location, category='vertical', display_name='Released Private Unit',
-            user_id=self.user.id, start=past)
-        self.unreleased_private_vertical = ItemFactory.create(
+            start=past)
+        self.unreleased_private_vertical = self._create_item(
             parent_location=self.sequential.location, category='vertical', display_name='Unreleased Private Unit',
-            user_id=self.user.id, start=future)
-        self.released_public_vertical = ItemFactory.create(
+            start=future)
+        self.released_public_vertical = self._create_item(
             parent_location=self.sequential.location, category='vertical', display_name='Released Public Unit',
-            user_id=self.user.id, start=past)
-        self.unreleased_public_vertical = ItemFactory.create(
+            start=past)
+        self.unreleased_public_vertical = self._create_item(
             parent_location=self.sequential.location, category='vertical', display_name='Unreleased Public Unit',
-            user_id=self.user.id, start=future)
+            start=future)
         self.store.publish(self.unreleased_public_vertical.location, self.user.id)
         self.store.publish(self.released_public_vertical.location, self.user.id)
 
@@ -123,6 +123,19 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.validate_preview_html(self.vertical, self.container_view)
         self.validate_preview_html(self.child_container, self.container_view)
         self.validate_preview_html(self.child_vertical, self.reorderable_child_view)
+
+    def _create_item(self, parent_location, category, display_name, **kwargs):
+        """
+        creates an item in the module store, without publishing it.
+        """
+        return ItemFactory.create(
+            parent_location=parent_location,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            user_id=self.user.id,
+            **kwargs
+        )
 
     def test_public_child_container_preview_html(self):
         """
