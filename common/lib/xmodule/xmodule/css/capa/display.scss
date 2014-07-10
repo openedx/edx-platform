@@ -615,7 +615,7 @@ div.problem {
   div.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset {
+    .save, .check, .show, .reset, .hint_button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
