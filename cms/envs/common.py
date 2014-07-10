@@ -785,6 +785,7 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 OPTIONAL_APPS = (
     'mentoring',
+    'edx_sga',
 
     # edx-ora2
     'submissions',
@@ -847,6 +848,7 @@ ADVANCED_COMPONENT_TYPES = [
     'graphical_slider_tool',
     'lti',
     'library_content',
+    'edx_sga',
     # XBlocks from pmitros repos are prototypes. They should not be used
     # except for edX Learning Sciences experiments on edge.edx.org without
     # further work to make them robust, maintainable, finalize data formats,

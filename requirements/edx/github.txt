@@ -43,3 +43,5 @@ git+https://github.com/edx/edx-lint.git@e0e73bcc7b3b7ed632a1db6e3b32b0a249721261
 -e git+https://github.com/edx/xblock-utils.git@17e247d66fabb53f0453515b093a030ee345a1b0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 
+# Third Party XBlocks
+-e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
