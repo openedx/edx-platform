@@ -107,7 +107,8 @@ if Backbone?
       @newPostView = new NewPostView(
         el: @newPostForm,
         collection: @discussion,
-        course_settings: @course_settings
+        course_settings: @course_settings,
+        topicId: discussionId
       )
       @newPostView.render()
       @discussion.on "add", @addThread
