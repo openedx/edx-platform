@@ -10,7 +10,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
          * A view that calls render when "has_changes" or "published" values in XBlockInfo have changed
          * after a server sync operation.
          */
-        var UnitStateListenerView =  BaseView.extend({
+        var ContainerStateListenerView = BaseView.extend({
 
             // takes XBlockInfo as a model
             initialize: function() {
@@ -18,18 +18,43 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, ['has_changes', 'published'])) {
+                if (this.shouldRefresh(model)) {
                    this.render();
                 }
+            },
+
+            shouldRefresh: function(model) {
+                return false;
             },
 
             render: function() {}
         });
 
+        var MessageView = ContainerStateListenerView.extend({
+            initialize: function () {
+                ContainerStateListenerView.prototype.initialize.call(this);
+                this.template = this.loadTemplate('container-message');
+            },
+
+            shouldRefresh: function(model) {
+                return ViewUtils.hasChangedAttributes(model, ['currently_visible_to_students']);
+            },
+
+            render: function() {
+                this.$el.html(this.template({
+                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
+                }));
+                return this;
+            }
+        });
+
         /**
          * A controller for updating the "View Live" and "Preview" buttons.
          */
-        var PreviewActionController = UnitStateListenerView.extend({
+        var PreviewActionController = ContainerStateListenerView.extend({
+            shouldRefresh: function(model) {
+                return ViewUtils.hasChangedAttributes(model, ['has_changes', 'published']);
+            },
 
             render: function() {
                 var previewAction = this.$el.find('.button-preview'),
@@ -59,7 +84,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         var Publisher = BaseView.extend({
             events: {
                 'click .action-publish': 'publish',
-                'click .action-discard': 'discardChanges'
+                'click .action-discard': 'discardChanges',
+                'click .action-staff-lock': 'toggleStaffLock'
             },
 
             // takes XBlockInfo as a model
@@ -72,22 +98,25 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, ['has_changes', 'published', 'edited_on', 'edited_by'])) {
+                if (ViewUtils.hasChangedAttributes(model, [
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'visible_to_staff_only'
+                ])) {
                    this.render();
                 }
             },
 
             render: function () {
                 this.$el.html(this.template({
-                    has_changes: this.model.get('has_changes'),
+                    hasChanges: this.model.get('has_changes'),
                     published: this.model.get('published'),
-                    edited_on: this.model.get('edited_on'),
-                    edited_by: this.model.get('edited_by'),
-                    published_on: this.model.get('published_on'),
-                    published_by: this.model.get('published_by'),
-                    released_to_students: this.model.get('released_to_students'),
-                    release_date: this.model.get('release_date'),
-                    release_date_from: this.model.get('release_date_from')
+                    editedOn: this.model.get('edited_on'),
+                    editedBy: this.model.get('edited_by'),
+                    publishedOn: this.model.get('published_on'),
+                    publishedBy: this.model.get('published_by'),
+                    releasedToStudents: this.model.get('released_to_students'),
+                    releaseDate: this.model.get('release_date'),
+                    releaseDateFrom: this.model.get('release_date_from'),
+                    visibleToStaffOnly: this.model.get('visible_to_staff_only')
                 }));
 
                 return this;
@@ -127,9 +156,59 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                             });
                     }
                 );
+            },
+
+            toggleStaffLock: function (e) {
+                var xblockInfo = this.model, self=this, enableStaffLock,
+                    saveAndPublishStaffLock, revertCheckBox;
+                if (e && e.preventDefault) {
+                    e.preventDefault();
+                }
+                enableStaffLock = !xblockInfo.get('visible_to_staff_only');
+
+                revertCheckBox = function() {
+                    self.checkStaffLock(!enableStaffLock);
+                };
+
+                saveAndPublishStaffLock = function() {
+                    return xblockInfo.save({
+                        publish: 'republish',
+                        metadata: {visible_to_staff_only: enableStaffLock}},
+                        {patch: true}
+                    ).always(function() {
+                        xblockInfo.set("publish", null);
+                    }).done(function () {
+                        xblockInfo.fetch();
+                    }).fail(function() {
+                        revertCheckBox();
+                    });
+                };
+
+                this.checkStaffLock(enableStaffLock);
+                if (enableStaffLock) {
+                    ViewUtils.runOperationShowingMessage(gettext('Setting Staff Lock&hellip;'),
+                        _.bind(saveAndPublishStaffLock, self));
+                } else {
+                    ViewUtils.confirmThenRunOperation(gettext("Remove Staff Lock"),
+                        gettext("Are you sure you want to remove the staff lock? Once you publish this unit, it will be released to students on the release date."),
+                        gettext("Remove Staff Lock"),
+                        function() {
+                            ViewUtils.runOperationShowingMessage(gettext('Removing Staff Lock&hellip;'),
+                                _.bind(saveAndPublishStaffLock, self));
+                        },
+                        function() {
+                            // On cancel, revert the check in the check box
+                            revertCheckBox();
+                        }
+                    );
+                }
+            },
+
+            checkStaffLock: function(check) {
+                this.$('.action-staff-lock i').removeClass('icon-check icon-check-empty');
+                this.$('.action-staff-lock i').addClass(check ? 'icon-check' : 'icon-check-empty');
             }
         });
-
 
         /**
          * PublishHistory displays when and by whom the xblock was last published, if it ever was.
@@ -161,6 +240,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         });
 
         return {
+            'MessageView': MessageView,
             'PreviewActionController': PreviewActionController,
             'Publisher': Publisher,
             'PublishHistory': PublishHistory
