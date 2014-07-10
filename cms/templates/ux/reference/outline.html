@@ -31,7 +31,7 @@ from django.core.urlresolvers import reverse
             </a>
           </li>
           <li class="nav-item">
-          <a href="" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
+            <a href="" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
           </li>
         </ul>
       </nav>
@@ -44,212 +44,720 @@ from django.core.urlresolvers import reverse
       <article class="content-primary" role="main">
 
         <div class="wrapper-dnd">
-          <article class="course-outline" data-locator="" data-course-key="">
+          <article class="outline" data-locator="" data-course-key="">
+            <h2 class="sr outline-title">Your Course's Outline</h2>
 
-            <ol class="sortable-list sortable-course-list">
+            <ol class="list-sections is-sortable">
 
               <!-- section -->
-              <li class="outline-item outline-item-section is-collapsible is-draggable " data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
 
-                <!--
-                <span class="draggable-drop-indicator draggable-drop-indicator-before">
-                  <i class="icon-caret-right"></i>
-                </span>
-                 -->
+                <%include file="outline_section_header.html" />
 
-                <div class="wrapper-xblock-header">
-                  <!-- xblock header primary -->
-                  <div class="wrapper-xblock-header-primary">
-                    <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
-                      <i class="icon-caret-down ui-toggle-expansion"></i>
-                      <span class="wrapper-xblock-field" data-field="">
-                        <span class="is-editable xblock-field-value">Introduction</span>
-                        <span class="xblock-string-field-editor">
-                          <input type="text" value="Introduction" class="xblock-field-input xblock-field-input-display_name is-hidden" data-metadata-name="">
-                        </span>
-                      </span>
-                    </h3>
-
-                    <div class="item-actions">
-                      <ul class="actions-list">
-                        <li class="action-item action-delete">
-                          <a href="#" data-tooltip="Delete" class="delete-button action-button">
-                            <i class="icon-remove"></i>
-                            <span class="sr">Delete</span>
-                          </a>
-                        </li>
-
-                          <!--
-                          <li class="actions-item drag">
-                            <span data-tooltip="Drag to reorder" class="drag-handle">
-                              <span class="sr">Drag to reorder</span>
-                            </span>
-                          </li>
-                        -->
-                      </ul>
-                    </div>
-                  </div>
-
-                  <!-- xblock header secondary -->
-                  <div class="wrapper-xblock-header-secondary">
-                    <div class="meta-info">
-                      <i class="icon-check"></i>
-                      Released: Dec 31, 2015 at 21:00 UTC
-                    </div>
-
-                    <div class="item-actions">
-                      <ul class="actions-list">
-                        <!-- header secondary actions -->
-                      </ul>
-                    </div>
-                  </div>
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
                 </div>
+                <!-- /section-status -->
 
-                <!-- ^ section's subsection list -->
-                <ol class="sortable-list sortable-section-list">
+                <div class="section-content">
+                  <ol class="list-subsections is-sortable">
+                    <!-- subsection -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable" data-parent="" data-locator="">
 
-                  <li class="outline-item outline-item-subsection is-collapsible is-draggable" data-parent="" data-locator="">
+                      <%include file="outline_subsection_header.html" />
 
-                    <!--
-                    <span class="draggable-drop-indicator draggable-drop-indicator-before">
-                      <i class="icon-caret-right"></i>
-                    </span>
-                  -->
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
 
-                  <div class="wrapper-xblock-header">
-                    <div class="wrapper-xblock-header-primary">
+                        <%include file="outline_status_grading.html" />
+                      </div>
+                      <!-- /subsection-status -->
 
-                      <h3 class="xblock-title expand-collapse collapse" title="Collapse/Expand this Checklist">
-                        <i class="icon-caret-down ui-toggle-expansion"></i>
+                      <div class="subsection-content">
+                        <ol class="list-units is-sortable">
+                          <!-- unit -->
+                          <li class="outline-item outline-unit is-draggable" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
 
-                        <span class="wrapper-xblock-field" data-field="">
-                          <span class="is-editable xblock-field-value">Demo Course Overview</span>
-
-                          <span class="xblock-string-field-editor">
-                            <input type="text" value="Demo Course Overview" class="xblock-field-input xblock-field-input-display_name is-hidden" data-metadata-name="">
-                          </span>
-                        </span>
-                      </h3>
-
-                      <div class="item-actions">
-                        <ul class="actions-list">
-                          <li class="action-item action-delete">
-                            <a href="#" data-tooltip="Delete" class="delete-button action-button">
-                              <i class="icon-remove"></i>
-                              <span class="sr">Delete</span>
-                            </a>
+                            <div class="unit-status">
+                              <div class="status-message">
+                                <!-- conditional status message here -->
+                              </div>
+                            </div>
+                            <!-- /unit-status -->
                           </li>
-
-                            <!--
-                            <li class="actions-item drag">
-                              <span data-tooltip="Drag to reorder" class="drag-handle">
-                                <span class="sr">Drag to reorder</span>
-                              </span>
-                            </li>
-                          -->
-                        </ul>
+                        </ol>
+                        <!-- /list: units -->
                       </div>
-                    </div>
+                      <!-- /subsection-content -->
 
-                    <div class="wrapper-xblock-header-secondary">
-                      <div class="item-actions">
-                        <ul class="actions-list">
-                          <!-- header secondary actions -->
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ^ subsection's unit list -->
-                  <ol class="sortable-list sortable-subsection-list">
-
-                    <li class="outline-item outline-item-unit is-draggable" data-parent="" data-locator="">
-
-                        <!--
-                        <span class="draggable-drop-indicator draggable-drop-indicator-before">
-                          <i class="icon-caret-right"></i>
-                        </span>
-                      -->
-
-                      <div class="wrapper-xblock-header">
-                        <div class="wrapper-xblock-header-primary">
-
-                          <h3 class="xblock-title">
-                            <a href="">Introduction: Video and Sequences</a>
-                          </h3>
-                        </div>
-
-                        <div class="wrapper-xblock-header-secondary">
-                          <div class="item-actions">
-                            <ul class="actions-list">
-                              <!-- header secondary actions -->
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-
-                      <ol class="sortable-list sortable-unit-list">
-                        <!-- ???: not sure what is nested here -->
-                      </ol>
-
-                        <!--
-                        <span class="draggable-drop-indicator draggable-drop-indicator-after">
-                          <i class="icon-caret-right"></i>
-                        </span>
-                      -->
+                      <%include file="outline_add-unit.html" />
                     </li>
+                    <!-- /subsection -->
                   </ol>
+                  <!-- /list: subsections -->
 
-                  <!-- ^ add new unit  -->
-                  <div class="add-xblock-component">
-                    <a href="#" class="add-button" data-category="vertical" data-parent="" data-default-name="New Unit">
-                      <i class="icon-plus"></i>New Unit
-                    </a>
-                  </div>
-                </li>
-              </ol>
+                  <%include file="outline_add-subsection.html" />
 
-              <!-- ^ add new subsection -->
-              <div class="add-xblock-component">
-                <a href="#" class="add-button" data-category="sequential" data-parent="" data-default-name="New Subsection">
-                  <i class="icon-plus"></i>New Subsection
-                </a>
-              </div>
-            </li><!-- /section -->
-          </ol>
+                </div>
+                <!-- /section-content -->
+              </li>
+              <!-- /section -->
+            </ol>
+            <!-- /list: sections -->
+
+            <%include file="outline_add-section.html" />
 
 
-          <!-- ^ add new section -->
-          <div class="add-xblock-component">
-            <a href="#" class="add-button" data-category="chapter" data-parent="" data-default-name="New Section">
-              <i class="icon-plus"></i>
-              Add Section
-            </a>
-          </div>
+            <!-- ========== -->
 
+
+            <!-- STATES: sections -->
+            <ol class="list-sections is-sortable">
+
+              <!-- section: not published + not scheduled/released -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-draft.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+               <!-- /section: not published + not scheduled/released -->
+
+              <!-- section: not published + release date in future -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: not published + release date in future -->
+
+              <!-- section: not published + release date in past -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-released is-scheduled  is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-released.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: not published + release date in past -->
+
+              <!-- section: published + scheduled -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + scheduled -->
+
+              <!-- section: published + released -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-released.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + released -->
+
+              <!-- section: published + scheduled + locked content -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
+
+                  <%include file="outline_status_message-lock.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + scheduled + locked content -->
+
+              <!-- section: published + released + locked content -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-released.html" />
+
+                  <%include file="outline_status_message-lock.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + released + locked content -->
+
+              <!-- section: locked content -->
+              <li class="outline-item outline-section is-collapsible is-draggable has-staff-only is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-lock.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: locked content -->
+
+              <!-- section: published + released + has changes -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-released.html" />
+
+                  <%include file="outline_status_message-unpublished_changes.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + released + has changes -->
+
+              <!-- section: published + scheduled + has changes -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
+
+                  <%include file="outline_status_message-unpublished_changes.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + scheduled + has changes -->
+
+              <!-- section: published + released + has error -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-released.html" />
+
+                  <%include file="outline_status_message-error.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + released + has error -->
+
+              <!-- section: published + scheduled + has error -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-scheduled.html" />
+
+                  <%include file="outline_status_message-error.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <!-- subsections + units here -->
+                </div>
+              </li>
+              <!-- /section: published + scheduled + has error -->
+
+
+              <!-- ========== -->
+
+
+              <!-- section: placeholder -->
+              <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-draft.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <ol class="list-subsections is-sortable">
+                    <!-- subsection: not published + not scheduled/released -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-draft.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                        <!-- units here  -->
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: not published + not scheduled/released -->
+
+                    <!-- subsection: not published + not scheduled/released + graded -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-graded is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-draft.html" />
+
+                        <%include file="outline_status_grading.html" />
+
+                        <div class="status-message">
+                          <!-- conditional status message here -->
+                        </div>
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: not published + not scheduled/released + graded -->
+
+                    <!-- subsection: published + scheduled w/ section -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled_with_parent.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled w/ section -->
+
+                    <!-- subsection: published + scheduled + graded  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+
+                        <%include file="outline_status_grading.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled + graded -->
+
+                    <!-- subsection: published + scheduled + graded + due date  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+
+                        <%include file="outline_status_grading.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled + graded + due date -->
+
+                    <!-- subsection: published + scheduled + graded + due date + locked content  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+
+                        <%include file="outline_status_grading.html" />
+
+                        <%include file="outline_status_message-lock.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled + graded + due date + locked content -->
+
+                    <!-- subsection: published + released  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-released_with_parent.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released -->
+
+                    <!-- subsection: published + released (on specific date) + graded  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <div class="status-release">
+                          <p>
+                            <span class="sr status-release-label">Release Status:</span>
+                            <span class="status-release-value">
+                              <i class="icon-check-sign"></i>
+                              Released <span class="sr">on</span>:
+                            </span>
+                            <span class="status-release-date">March 25, 2014</span>
+                          </p>
+                        </div>
+
+                        <%include file="outline_status_grading.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released (on specific date) + graded -->
+
+                    <!-- subsection: published + released + graded + due date  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-released_with_parent.html" />
+
+                        <%include file="outline_status_grading.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released + graded + due date -->
+
+                    <!-- subsection: published + released + graded + due date + locked content  -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-released_with_parent.html" />
+
+                        <%include file="outline_status_grading.html" />
+
+                        <%include file="outline_status_message-lock.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released + graded + due date + locked content -->
+
+                    <!-- subsection: locked content -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_message-lock.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: locked content -->
+
+                    <!-- /subsection: published + scheduled + has changes -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+
+                        <%include file="outline_status_message-unpublished_units.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled + has changes -->
+
+                    <!-- subsection: published + released + has changes -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-released.html" />
+
+                        <%include file="outline_status_message-unpublished_changes.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released + has changes -->
+
+                    <!-- subsection: published + released + has error -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-released.html" />
+
+                        <%include file="outline_status_message-error.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + released + has error -->
+
+                    <!-- subsection: published + scheduled + has error -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+
+                        <%include file="outline_status_message-error.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: published + scheduled + has error -->
+                  </ol>
+                </div>
+              </li>
+              <!-- /section: placeholder -->
+
+
+              <!-- ========== -->
+
+
+              <!-- section: placeholder -->
+              <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
+
+                <%include file="outline_section_header.html" />
+
+                <div class="section-status">
+                  <%include file="outline_status_release-draft.html" />
+                </div>
+                <!-- /section-status -->
+
+                <div class="section-content">
+                  <ol class="list-subsections is-sortable">
+                    <!-- subsection: placeholder -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable" data-parent="" data-locator="">
+
+                      <%include file="outline_subsection_header.html" />
+
+                      <div class="subsection-status">
+                        <%include file="outline_status_release-scheduled.html" />
+                      </div>
+                      <!-- /subsection-status -->
+
+                      <div class="subsection-content">
+                        <ol class="list-units is-sortable">
+
+                          <!-- unit -->
+                          <li class="outline-item outline-unit is-draggable" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <div class="status-message">
+                                <!-- conditional status message here -->
+                              </div>
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit -->
+
+
+                          <!-- unit: not published -->
+                          <li class="outline-item outline-unit is-draggable" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <div class="status-message">
+                                Draft
+                              </div>
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit: not published -->
+
+                          <!-- unit: published -->
+                          <li class="outline-item outline-unit is-draggable is-published" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+                          </li>
+                          <!-- /unit: published -->
+
+                          <!-- unit: not published + locked content -->
+                          <li class="outline-item outline-unit is-draggable is-staff-only" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <%include file="outline_status_message-lock.html" />
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit: not published + locked content -->
+
+                          <!-- unit: published + has changes -->
+                          <li class="outline-item outline-unit is-draggable is-published has-changes" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <%include file="outline_status_message-unpublished_changes.html" />
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit: published + has changes -->
+
+                          <!-- unit: not published + has changes -->
+                          <li class="outline-item outline-unit is-draggable has-changes" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <%include file="outline_status_message-unpublished_units.html" />
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit: not published + has changes -->
+
+                          <!-- unit: has error -->
+                          <li class="outline-item outline-unit is-draggable has-errors" data-parent="" data-locator="">
+                            <%include file="outline_unit_header.html" />
+
+                            <div class="unit-status">
+                              <%include file="outline_status_message-error.html" />
+                            </div>
+                            <!-- /unit-status -->
+                          </li>
+                          <!-- /unit: has error -->
+                        </ol>
+                        <!-- /list: units -->
+                      </div>
+                      <!-- /subsection-content -->
+                    </li>
+                    <!-- /subsection: placeholder -->
+                  </ol>
+                </div>
+              </li>
+              <!-- /section: placeholder -->
+            </ol>
           </article>
         </div>
 
-    <div class="ui-loading is-hidden">
-      <p><span class="spin">
-        <i class="icon-refresh"></i></span>
-        <span class="copy">Loading &hellip;</span>
-      </p>
-    </div>
+        <div class="ui-loading is-hidden">
+          <p><span class="spin">
+            <i class="icon-refresh"></i></span>
+            <span class="copy">Loading &hellip;</span>
+          </p>
+        </div>
 
-  </article>
+      </article>
 
-  <aside class="content-supplementary" role="complimentary">
-    <div class="bit">
-      <h3 class="title-3">What can I do on this page?</h3>
-      <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
+      <aside class="content-supplementary" role="complimentary">
+        <div class="bit">
+          <h3 class="title-3">What can I do on this page?</h3>
+          <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
 
-      <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
-    </div>
-  </aside>
+          <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
+        </div>
+      </aside>
 
-</section>
-</div>
+    </section>
+  </div>
 
 </div>
 </%block>
