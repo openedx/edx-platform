@@ -336,7 +336,7 @@
           background: $gray-l5;
 
           .action-primary {
-            @include blue-button();
+            @extend %btn-primary-blue;
             @extend %t-action3;
             font-weight: 600;
 
@@ -738,6 +738,10 @@
       .actions {
         float: left;
         width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
 
         .delete-button {
           margin: 0;
