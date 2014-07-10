@@ -446,17 +446,17 @@ class SplitModuleTest(unittest.TestCase):
     }
     
     @staticmethod
-    def bootstrapDB():
+    def bootstrapDB(split_store):
         '''
         Sets up the initial data into the db
         '''
-        split_store = modulestore()
         for _course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
             course = split_store.create_course(
                 course_spec['org'],
                 course_spec['course'],
                 course_spec['run'],
                 course_spec['user_id'],
+                master_branch=BRANCH_NAME_DRAFT,
                 fields=course_spec['fields'],
                 root_block_id=course_spec['root_block_id']
             )
@@ -493,8 +493,8 @@ class SplitModuleTest(unittest.TestCase):
             block_type='course',
             block_id="head23456"
         )
-        destination = CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
-        split_store.xblock_publish("test@edx.org", to_publish, destination, [to_publish], None)
+        destination = CourseLocator(org="testx", offering="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
+        split_store.copy("test@edx.org", to_publish, destination, [to_publish], None)
 
     def setUp(self):
         self.user_id = random.getrandbits(32)
@@ -823,32 +823,6 @@ class SplitModuleItemTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(course.location.for_branch(BRANCH_NAME_PUBLISHED))
 
-    def test_has_changes(self):
-        """
-        Tests that has_changes() only returns true when changes are present
-        """
-        draft_course = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
-        published_course = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_PUBLISHED)
-        head = draft_course.make_usage_key('course', 'head12345')
-        dummy_user = ModuleStoreEnum.UserID.test
-
-        # Not yet published, so changes are present
-        self.assertTrue(modulestore().has_changes(head))
-
-        # Publish and verify that there are no unpublished changes
-        modulestore().xblock_publish(dummy_user, draft_course, published_course, [head], None)
-        self.assertFalse(modulestore().has_changes(head))
-
-        # Change the course, then check that there now are changes
-        course = modulestore().get_item(head)
-        course.show_calculator = not course.show_calculator
-        modulestore().update_item(course, dummy_user)
-        self.assertTrue(modulestore().has_changes(head))
-
-        # Publish and verify again
-        modulestore().xblock_publish(dummy_user, draft_course, published_course, [head], None)
-        self.assertFalse(modulestore().has_changes(head))
-
     def test_get_non_root(self):
         # not a course obj
         locator = BlockUsageLocator(
@@ -1140,7 +1114,7 @@ class TestItemCrud(SplitModuleTest):
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org', 'test_transaction', 'test_run', user)
+        new_course = modulestore().create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
         new_course_locator = new_course.id
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
@@ -1382,7 +1356,7 @@ class TestItemCrud(SplitModuleTest):
         """
         Create a course we can delete
         """
-        course = modulestore().create_course('nihilx', 'deletion', 'run', 'deleting_user')
+        course = modulestore().create_course('nihilx', 'deletion', 'run', 'deleting_user', BRANCH_NAME_DRAFT)
         root = course.location.version_agnostic().for_branch(BRANCH_NAME_DRAFT)
         for _ in range(4):
             self.create_subtree_for_deletion(root, ['chapter', 'vertical', 'problem'])
@@ -1409,7 +1383,9 @@ class TestCourseCreation(SplitModuleTest):
         The simplest case but probing all expected results from it.
         """
         # Oddly getting differences of 200nsec
-        new_course = modulestore().create_course('test_org', 'test_course', 'test_run', 'create_user')
+        new_course = modulestore().create_course(
+            'test_org', 'test_course', 'test_run', 'create_user', BRANCH_NAME_DRAFT
+        )
         new_locator = new_course.location
         # check index entry
         index_info = modulestore().get_course_index_info(new_locator)
@@ -1437,7 +1413,7 @@ class TestCourseCreation(SplitModuleTest):
         original_locator = CourseLocator(org='testx', course='wonderful', run="run", branch=BRANCH_NAME_DRAFT)
         original_index = modulestore().get_course_index_info(original_locator)
         new_draft = modulestore().create_course(
-            'best', 'leech', 'leech_run', 'leech_master',
+            'best', 'leech', 'leech_run', 'leech_master', BRANCH_NAME_DRAFT,
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
         self.assertRegexpMatches(new_draft_locator.org, 'best')
@@ -1493,7 +1469,7 @@ class TestCourseCreation(SplitModuleTest):
         fields['grading_policy']['GRADE_CUTOFFS'] = {'A': .9, 'B': .8, 'C': .65}
         fields['display_name'] = 'Derivative'
         new_draft = modulestore().create_course(
-            'counter', 'leech', 'leech_run', 'leech_master',
+            'counter', 'leech', 'leech_run', 'leech_master', BRANCH_NAME_DRAFT,
             versions_dict={BRANCH_NAME_DRAFT: original_index['versions'][BRANCH_NAME_DRAFT]},
             fields=fields
         )
@@ -1540,7 +1516,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
-            'test_org', 'test_transaction', 'test_run', user,
+            'test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT,
             root_block_id='top', root_category='chapter'
         )
         self.assertEqual(new_course.location.block_id, 'top')
@@ -1559,10 +1535,12 @@ class TestCourseCreation(SplitModuleTest):
         Test create_course rejects duplicate id
         """
         user = random.getrandbits(32)
-        courses = modulestore().get_courses()
+        courses = modulestore().get_courses(BRANCH_NAME_DRAFT)
         with self.assertRaises(DuplicateCourseError):
             dupe_course_key = courses[0].location.course_key
-            modulestore().create_course(dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user)
+            modulestore().create_course(
+                dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
+            )
 
 
 class TestInheritance(SplitModuleTest):
@@ -1609,7 +1587,7 @@ class TestPublish(SplitModuleTest):
         chapter1 = source_course.make_usage_key('chapter', 'chapter1')
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         chapter3 = source_course.make_usage_key('chapter', 'chapter3')
-        modulestore().xblock_publish(self.user_id, source_course, dest_course, [head], [chapter2, chapter3])
+        modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2, chapter3])
         expected = [head.block_id, chapter1.block_id]
         self._check_course(
             source_course, dest_course, expected, [chapter2.block_id, chapter3.block_id, "problem1", "problem3_2"]
@@ -1625,7 +1603,7 @@ class TestPublish(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(new_module.location.map_into_course(dest_course))
         # publish it
-        modulestore().xblock_publish(self.user_id, source_course, dest_course, [new_module.location], None)
+        modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
         expected.append(new_module.location.block_id)
         # check that it is in the published course and that its parent is the chapter
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
@@ -1637,7 +1615,7 @@ class TestPublish(SplitModuleTest):
             source_course, "course_info", self.user_id, block_id="handouts"
         )
         # publish it
-        modulestore().xblock_publish(self.user_id, source_course, dest_course, [new_module.location], None)
+        modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
         expected.append(new_module.location.block_id)
         # check that it is in the published course (no error means it worked)
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
@@ -1656,15 +1634,15 @@ class TestPublish(SplitModuleTest):
         chapter3 = source_course.make_usage_key('chapter', 'chapter3')
         problem1 = source_course.make_usage_key('problem', 'problem1')
         with self.assertRaises(ItemNotFoundError):
-            modulestore().xblock_publish(self.user_id, source_course, destination_course, [chapter3], None)
+            modulestore().copy(self.user_id, source_course, destination_course, [chapter3], None)
         # publishing into a new branch w/o publishing the root
         destination_course = CourseLocator(org='testx', course='GreekHero', run='run', branch=BRANCH_NAME_PUBLISHED)
         with self.assertRaises(ItemNotFoundError):
-            modulestore().xblock_publish(self.user_id, source_course, destination_course, [chapter3], None)
+            modulestore().copy(self.user_id, source_course, destination_course, [chapter3], None)
         # publishing a subdag w/o the parent already in course
-        modulestore().xblock_publish(self.user_id, source_course, destination_course, [head], [chapter3])
+        modulestore().copy(self.user_id, source_course, destination_course, [head], [chapter3])
         with self.assertRaises(ItemNotFoundError):
-            modulestore().xblock_publish(self.user_id, source_course, destination_course, [problem1], [])
+            modulestore().copy(self.user_id, source_course, destination_course, [problem1], [])
 
     def test_move_delete(self):
         """
@@ -1675,7 +1653,7 @@ class TestPublish(SplitModuleTest):
         head = source_course.make_usage_key('course', "head12345")
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         problem1 = source_course.make_usage_key('problem', 'problem1')
-        modulestore().xblock_publish(self.user_id, source_course, dest_course, [head], [chapter2])
+        modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
         expected = ["head12345", "chapter1", "chapter3", "problem1", "problem3_2"]
         self._check_course(source_course, dest_course, expected, ["chapter2"])
         # now move problem1 and delete problem3_2
@@ -1684,7 +1662,7 @@ class TestPublish(SplitModuleTest):
         chapter1.children.append(problem1)
         chapter3.children.remove(problem1.map_into_course(chapter3.location.course_key))
         modulestore().delete_item(source_course.make_usage_key("problem", "problem3_2"), self.user_id)
-        modulestore().xblock_publish(self.user_id, source_course, dest_course, [head], [chapter2])
+        modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
         expected = ["head12345", "chapter1", "chapter3", "problem1"]
         self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
 
@@ -1776,7 +1754,7 @@ def modulestore():
             **options
         )
 
-        SplitModuleTest.bootstrapDB()
+        SplitModuleTest.bootstrapDB(SplitModuleTest.modulestore)
 
     return SplitModuleTest.modulestore
 

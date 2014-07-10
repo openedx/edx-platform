@@ -67,7 +67,7 @@ class TestMixedModuleStore(unittest.TestCase):
             },
             {
                 'NAME': 'split',
-                'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
+                'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                 'OPTIONS': modulestore_options
             },
@@ -562,7 +562,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
         with self.assertRaises(InvalidVersionError):
-            self.store.revert_to_published(self.vertical_x1a.location)
+            self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
 
     @ddt.data('draft')
     def test_revert_to_published_direct_only(self, default_ms):
@@ -571,7 +571,7 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        self.store.revert_to_published(self.sequential_x1.location)
+        self.store.revert_to_published(self.sequential_x1.location, self.user_id)
         reverted_parent = self.store.get_item(self.sequential_x1.location)
         # It does not discard the child vertical, even though that child is a draft (with no published version)
         self.assertEqual(1, len(reverted_parent.children))

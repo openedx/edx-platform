@@ -53,7 +53,6 @@ class DraftModuleStore(MongoModuleStore):
             branch_setting_func: a function that returns the branch setting to use for this store's operations
         """
         super(DraftModuleStore, self).__init__(*args, **kwargs)
-        self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
 
     def get_item(self, usage_key, depth=0, revision=None):
         """

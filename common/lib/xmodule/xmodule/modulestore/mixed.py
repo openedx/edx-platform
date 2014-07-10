@@ -170,7 +170,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_key)
-        return store.get_items(course_key, settings, content, **kwargs)
+        return store.get_items(course_key, settings=settings, content=content, **kwargs)
 
     def get_courses(self):
         '''
@@ -270,7 +270,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, **kwargs):
         """
         Creates and returns the course.
 
@@ -285,10 +285,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
         """
         store = self._get_modulestore_for_courseid(None)
-        if not hasattr(store, 'create_course'):
-            raise NotImplementedError(u"Cannot create a course on store {}".format(store))
-
-        return store.create_course(org, course, run, user_id, fields, **kwargs)
+        return store.create_course(org, course, run, user_id, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
@@ -376,7 +373,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._verify_modulestore_support(location, 'delete_item')
         store.delete_item(location, user_id=user_id, **kwargs)
 
-    def revert_to_published(self, location, user_id=None):
+    def revert_to_published(self, location, user_id):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
         If no published version exists, a VersionConflictError is thrown.
@@ -387,7 +384,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         :raises InvalidVersionError: if no published version exists for the location specified
         """
         store = self._verify_modulestore_support(location, 'revert_to_published')
-        return store.revert_to_published(location, user_id=user_id)
+        return store.revert_to_published(location, user_id)
 
     def close_all_connections(self):
         """
