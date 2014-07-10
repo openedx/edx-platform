@@ -298,6 +298,14 @@ class ModuleStoreRead(object):
         """
         pass
 
+    @abstractmethod
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        pass
+
+
 class ModuleStoreWrite(ModuleStoreRead):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -386,6 +394,14 @@ class ModuleStoreWrite(ModuleStoreRead):
         """
         pass
 
+    @abstractmethod
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        pass
+
 
 class ModuleStoreReadBase(ModuleStoreRead):
     '''
@@ -395,6 +411,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
 
     def __init__(
         self,
+        contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
         xblock_mixins=(), xblock_select=None,
@@ -411,6 +428,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.contentstore = contentstore
 
     def get_course_errors(self, course_key):
         """
@@ -481,6 +499,14 @@ class ModuleStoreReadBase(ModuleStoreRead):
         # default is to say yes by not raising an exception
         return {'default_impl': True}
 
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        if self.contentstore:
+            self.contentstore.close_connections()
+        super(ModuleStoreReadBase, self).close_connections()
+
     @contextmanager
     def default_store(self, store_type):
         """
@@ -508,9 +534,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     Implement interface functionality that can be shared.
     '''
     def __init__(self, contentstore, **kwargs):
-        super(ModuleStoreWriteBase, self).__init__(**kwargs)
+        super(ModuleStoreWriteBase, self).__init__(contentstore=contentstore, **kwargs)
 
-        self.contentstore = contentstore
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by partition_fields_by_scope, which is only needed because
         # the split mongo store is used for item creation as well as item persistence
@@ -594,6 +619,14 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # delete the assets
         self.contentstore.delete_all_course_assets(course_key)
         super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        self.contentstore._drop_database()
+        super(ModuleStoreWriteBase, self)._drop_database()
 
     @contextmanager
     def bulk_write_operations(self, course_id):

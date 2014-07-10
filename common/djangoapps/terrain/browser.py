@@ -16,9 +16,7 @@ import requests
 from base64 import encodestring
 from json import dumps
 
-from pymongo import MongoClient
 import xmodule.modulestore.django
-from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 
 # There is an import issue when using django-staticfiles with lettuce
@@ -186,11 +184,7 @@ def reset_databases(scenario):
     whereas modulestore data is in unique collection names.  This data is created implicitly during the scenarios.
     If no data is created during the test, these lines equivilently do nothing.
     '''
-    modulestore = xmodule.modulestore.django.modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-    modulestore.contentstore.drop_database()
-    _CONTENTSTORE.clear()
-
-    modulestore.collection.drop()
+    xmodule.modulestore.django.modulestore()._drop_all_databases()
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
