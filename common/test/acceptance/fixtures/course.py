@@ -2,6 +2,7 @@
 Fixture to create a course and course components (XBlocks).
 """
 
+import mimetypes
 import json
 import re
 import datetime
@@ -407,10 +408,10 @@ class CourseFixture(StudioApiFixture):
         test_dir = path(__file__).abspath().dirname().dirname().dirname()
 
         for asset_name in self._assets:
-            srt_path = test_dir + '/data/uploads/' + asset_name
+            asset_file_path = test_dir + '/data/uploads/' + asset_name
 
-            asset_file = open(srt_path)
-            files = {'file': (asset_name, asset_file)}
+            asset_file = open(asset_file_path)
+            files = {'file': (asset_name, asset_file, mimetypes.guess_type(asset_file_path)[0])}
 
             headers = {
                 'Accept': 'application/json',
