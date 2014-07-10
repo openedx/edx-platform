@@ -369,7 +369,7 @@ def export_handler(request, course_key_string):
 
         wrapper = FileWrapper(export_file)
         response = HttpResponse(wrapper, content_type='application/x-tgz')
-        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(unicode(export_file.name).encode('utf-8'))
+        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name.encode('utf-8'))
         response['Content-Length'] = os.path.getsize(export_file.name)
         return response
 
