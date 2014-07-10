@@ -12,8 +12,10 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
+from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
+                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id,
+                                   get_cohort)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -36,7 +38,7 @@ def _attr_safe_json(obj):
     return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
 @newrelic.agent.function_trace()
-def make_course_settings(course, include_category_map=False):
+def make_course_settings(course, include_category_map=False, user=None):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
@@ -46,11 +48,21 @@ def make_course_settings(course, include_category_map=False):
         'is_cohorted': is_course_cohorted(course.id),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
-        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course.id)],
+        'cohorts': [{"id": str(g.id), "name": g.name} for g in \
+                    get_course_cohorts(course.id, group_type=CourseUserGroup.ANY)],
     }
 
     if include_category_map:
         obj['category_map'] = utils.get_discussion_category_map(course)
+
+    # Do not show all cohorts if the user does not have the permission
+    if user and is_course_cohorted(course.id) and \
+       not cached_has_permission(user, "see_all_cohorts", course.id):
+        user_cohorts = get_cohort(user, course.id,
+                                  group_type=CourseUserGroup.ANY, allow_multiple=True)
+        user_cohort_ids = [str(cohort.id) for cohort in user_cohorts]
+        obj['cohorts'] = [cohort for cohort in obj['cohorts'] \
+                          if cohort['id'] in user_cohort_ids]
 
     return obj
 
@@ -90,16 +102,22 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
+    group_ids = []
 
     if group_id == "all":
         group_id = None
 
     if not group_id:
         if not cached_has_permission(request.user, "see_all_cohorts", course_id):
-            group_id = get_cohort_id(request.user, course_id)
+            user_cohorts = get_cohort(request.user, course_id,
+                                      group_type=CourseUserGroup.ANY, allow_multiple=True)
+            user_cohort_ids = [str(cohort.id) for cohort in user_cohorts]
+            group_ids = user_cohort_ids
+    else:
+        group_ids.append(group_id)
 
-    if group_id:
-        default_query_params["group_id"] = group_id
+    if group_ids:
+        default_query_params["group_ids"] = ",".join(group_ids)
 
     #so by default, a moderator sees all items, and a student sees his cohort
 
@@ -139,7 +157,6 @@ def inline_discussion(request, course_id, discussion_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
     course = get_course_with_access(request.user, 'load_forum', course_id)
 
     threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
@@ -149,6 +166,7 @@ def inline_discussion(request, course_id, discussion_id):
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
+
     return utils.JsonResponse({
         'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
         'user_info': user_info,
@@ -156,7 +174,7 @@ def inline_discussion(request, course_id, discussion_id):
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],
         'roles': utils.get_role_ids(course_id),
-        'course_settings': make_course_settings(course)
+        'course_settings': make_course_settings(course, user=request.user)
     })
 
 @login_required
@@ -168,7 +186,7 @@ def forum_form_discussion(request, course_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course, include_category_map=True, user=request.user)
 
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
@@ -197,7 +215,9 @@ def forum_form_discussion(request, course_id):
         })
     else:
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-            user_cohort_id = get_cohort_id(request.user, course_id)
+            user_cohorts = get_cohort(request.user, course_id,
+                                      group_type=CourseUserGroup.ANY, allow_multiple=True)
+            user_cohort_ids = [str(cohort.id) for cohort in user_cohorts]
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -213,7 +233,7 @@ def forum_form_discussion(request, course_id):
             'roles': _attr_safe_json(utils.get_role_ids(course_id)),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id, # read from container in NewPostView
+            'user_cohorts': ",".join(user_cohort_ids), # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_id),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
@@ -230,7 +250,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course, include_category_map=True, user=request.user)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -282,7 +302,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-            user_cohort = get_cohort_id(request.user, course_id)
+            user_cohorts = get_cohort(request.user, course_id,
+                                      group_type=CourseUserGroup.ANY, allow_multiple=True)
+            user_cohort_ids = [str(cohort.id) for cohort in user_cohorts]
 
         context = {
             'discussion_id': discussion_id,
@@ -301,7 +323,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'is_course_cohorted': is_course_cohorted(course_id),
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'cohorts': course_settings["cohorts"],
-            'user_cohort': user_cohort,
+            'user_cohorts': ",".join(user_cohort_ids),
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': _attr_safe_json(course_settings)

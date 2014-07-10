@@ -60,13 +60,16 @@ if Backbone?
 
       getOptionsHTML: () ->
           # cohort options?
-          if @course_settings.get("is_cohorted") and DiscussionUtil.isStaff()
-              user_cohort_id = $("#discussion-container").data("user-cohort-id")
-              cohort_options = _.map @course_settings.get("cohorts"), (cohort) ->
+          if @course_settings.get("is_cohorted")
+              user_cohort_ids = $("#discussion-container").data("user-cohort-ids")
+              user_cohort_id = if user_cohort_ids then user_cohort_ids.split(',')[0] else null
+              cohorts = @course_settings.get("cohorts")
+              cohort_options = _.map cohorts, (cohort) ->
                   {value: cohort.id, text: cohort.name, selected: cohort.id==user_cohort_id}
           else
               cohort_options = null
           context = _.clone(@course_settings.attributes)
+          context.user_is_staff = DiscussionUtil.isStaff()
           context.cohort_options = cohort_options
           _.template($("#new-post-options-template").html(), context)
 
