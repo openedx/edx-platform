@@ -609,9 +609,9 @@ class CapaMixin(CapaFields):
         :param html:    The original html string (with the special string '> <' embedded therein)
         :return:        The (potentially) modified html string
         '''
-
         hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
         hint_text = hint_element.text.strip()
+        print '    self.next_hint_index: ' + str(self.next_hint_index) + '  ' + hint_text
         html = html.replace('> <', '>' + hint_text + '<')  # replace the single space (see correctmap.py)
 
         self.next_hint_index += 1
@@ -719,7 +719,8 @@ class CapaMixin(CapaFields):
         length_start = len(html)
         html = re.sub(r'</' + element_name + '>','~', html)
         html = re.sub(r'<' + element_name + '[^~]+~', '', html)
-        print "     change size: " + str(len(html) - length_start) + " on " + element_name
+        if len(html) != length_start:
+            print "     change size: " + str(len(html) - length_start) + " on " + element_name
         return html
 
     def _strip_hints_from_xml(self, html):
