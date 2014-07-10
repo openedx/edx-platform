@@ -63,26 +63,9 @@
         }
 
         // buttons
-        .action-button {
+        .button {
           @extend %btn-primary-blue;
           @extend %sizing;
-        }
-
-        .new-button {
-          @extend %btn-primary-green;
-          @extend %sizing;
-        }
-
-        .view-button {
-          @extend %btn-primary-blue;
-          @extend %sizing;
-        }
-
-        .edit-button {
-          @include blue-button;
-          @extend %sizing;
-          padding: ($baseline/4) ($baseline/2);
-          text-align: center;
 
           .action-button-text {
             display: inline-block;
@@ -92,6 +75,11 @@
           [class^="icon-"] {
             display: inline-block;
             vertical-align: baseline;
+          }
+
+          &.new-button {
+            @extend %btn-primary-green;
+            @extend %sizing;
           }
         }
       }
