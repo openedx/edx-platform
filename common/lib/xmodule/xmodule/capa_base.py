@@ -1147,7 +1147,7 @@ class CapaMixin(CapaFields):
         #       'success' will always be incorrect
         event_info['grade'] = published_grade['grade']
         event_info['max_grade'] = published_grade['max_grade']
-        event_info['correct_map'] = correct_map.get_dict()
+        event_info['correct_map'] = correct_map.get_dict() 
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
