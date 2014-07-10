@@ -1,6 +1,9 @@
 # .gitignore for edx-platform.
 # There's a lot here, please try to keep it organized.
 
+*.map
+
+
 ### Files private to developers
 
 requirements/private.txt
