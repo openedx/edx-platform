@@ -62,6 +62,7 @@ CORRECTMAP_PY = None
 QUESTION_HINT_CORRECT_STYLE = 'question_hint_correct'
 QUESTION_HINT_INCORRECT_STYLE = 'question_hint_incorrect'
 QUESTION_HINT_COMPOUND_STYLE = 'question_hint_compound_condiiton'
+PROBLEM_HINT_STYLE = 'problem_hint'
 
 #-----------------------------------------------------------------------------
 # Exceptions
