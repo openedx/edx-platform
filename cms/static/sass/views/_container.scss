@@ -36,19 +36,10 @@
         .nav-actions {
 
           .button {
-            @extend %btn-primary-blue;
             @extend %t-action3;
-            box-shadow: none;
             padding: ($baseline/4) ($baseline*.75);
             font-weight: 400;
-
-            &.is-disabled {
-              // TO-DO: will review styling before merge to master
-              // background-color: $gray-l2;
-              // border-color: $gray-l2;
-            }
           }
-
         }
       }
     }
@@ -108,15 +99,18 @@
     .bit-publishing {
       @extend %bar-module;
 
-      &.published {
+      &.published,
+      &.is-published {
         @extend %bar-module-green;
       }
 
-      &.draft {
+      &.draft ,
+      &.is-draft {
         @extend %bar-module-yellow;
       }
 
-      &.staff-only {
+      &.staff-only,
+      &.is-staff-only {
         @extend %bar-module-black;
       }
 
@@ -165,11 +159,6 @@
           @extend %btn-primary-blue;
           display: block;
           padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
-
-          &.is-disabled {
-            border: 1px solid $gray-l2;
-            background-color: $gray-l2;
-          }
         }
 
         .action-discard {
