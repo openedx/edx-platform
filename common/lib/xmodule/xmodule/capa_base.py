@@ -601,6 +601,28 @@ class CapaMixin(CapaFields):
         self.show_hint_button = (self.problem_hints_count > 0)
         return self.problem_hints_count
 
+    def _replace_div_text(self, hint_text, html):
+        """
+        This is a clumsy way of inserting the text of a problem hint into the html stream.
+        We're relying here on a very specific pattern appearing in the html. That pattern is
+        replaced by the new hint text embedded in some of the html that was in the match pattern.
+
+        If the magic pattern is not found in the html string, an exception is thrown.
+
+        There is probably a better way to do this but I couldn't think anything better this far
+        downstream.
+        :param hint_text:   the text of the hint to be inserted
+        :param html:        the existing html string to be modified
+        :return:            the modified version of the html string
+        """
+        MARKER_PATTERN = '<div hidden class="problem_hint">MARKER</div>'  # this appears verbatim in problem.html
+        REPLACEMENT_STRING = '<div        class="problem_hint">' + hint_text + '</div>'
+        if str(html).__contains__(MARKER_PATTERN):
+            html = html.replace(MARKER_PATTERN, REPLACEMENT_STRING)  # replace the marker pattern (see problem.html)
+        else:
+            raise NotFoundError('Marker pattern not found')
+        return html
+
     def _insert_problem_hint(self, html):
         '''
         If the student has requested a program hint, find the next hint to display
@@ -611,8 +633,7 @@ class CapaMixin(CapaFields):
         '''
         hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
         hint_text = hint_element.text.strip()
-        print '    self.next_hint_index: ' + str(self.next_hint_index) + '  ' + hint_text
-        html = html.replace('> <', '>' + hint_text + '<')  # replace the single space (see correctmap.py)
+        html = self._replace_div_text(hint_text, html)
 
         self.next_hint_index += 1
         if self.next_hint_index > self.problem_hints_count:     # if all hints have been shown
@@ -690,12 +711,6 @@ class CapaMixin(CapaFields):
             html = self._insert_problem_hint(html)  # add the next sequential problem hint to the html
 
         html = self._strip_hints_from_xml(html)
-        # for hint_element in self.lcp.tree.xpath("//problem/demandhint/hint"):     # remove the demand hints from the XML else they will display
-        #     print '--------------- demandhint from //problem/demandhint/hint'
-        #     hint_element.getparent().remove(hint_element)
-        #
-        # for hint_element in self.lcp.tree.xpath("//problem/demandhint/hint"):     # remove the demand hints from the XML else they will display
-        #     print '-------------------- STILL demandhint from //problem/demandhint/hint'
 
         return html
 
