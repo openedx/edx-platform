@@ -29,6 +29,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     model: this.model,
                     view: this.view
                 });
+                this.messageView = new ContainerSubviews.MessageView({
+                    el: this.$('.container-message'),
+                    model: this.model
+                });
+                this.messageView.render();
                 this.isUnitPage = this.options.isUnitPage;
                 if (this.isUnitPage) {
                     this.xblockPublisher = new ContainerSubviews.Publisher({

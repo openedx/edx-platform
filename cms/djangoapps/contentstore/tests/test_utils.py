@@ -231,7 +231,7 @@ class XBlockVisibilityTestCase(TestCase):
         vertical.start = self.future
         modulestore().update_item(vertical, self.dummy_user)
 
-        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+        self.assertTrue(utils.is_currently_visible_to_students(vertical))
 
     def _test_visible_to_students(self, expected_visible_without_lock, name, start_date, publish=False):
         """
@@ -239,13 +239,13 @@ class XBlockVisibilityTestCase(TestCase):
         with and without visible_to_staff_only set.
         """
         no_staff_lock = self._create_xblock_with_start_date(name, start_date, publish, visible_to_staff_only=False)
-        self.assertEqual(expected_visible_without_lock, utils.is_xblock_visible_to_students(no_staff_lock))
+        self.assertEqual(expected_visible_without_lock, utils.is_currently_visible_to_students(no_staff_lock))
 
         # any xblock with visible_to_staff_only set to True should not be visible to students.
         staff_lock = self._create_xblock_with_start_date(
             name + "_locked", start_date, publish, visible_to_staff_only=True
         )
-        self.assertFalse(utils.is_xblock_visible_to_students(staff_lock))
+        self.assertFalse(utils.is_currently_visible_to_students(staff_lock))
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""

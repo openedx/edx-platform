@@ -558,6 +558,55 @@ class TestEditItem(ItemTest):
         published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
         self.assertIsNone(published.due)
 
+    def test_republish(self):
+        """ Test republishing an item. """
+        new_display_name = 'New Display Name'
+        republish_data = {
+            'publish': 'republish',
+            'display_name': new_display_name
+        }
+
+        # When the problem is first created, it is only in draft (because of its category).
+        self.verify_publish_state(self.problem_usage_key, PublishState.private)
+
+        # Republishing when only in draft will update the draft but not cause a public item to be created.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'publish': 'republish',
+                'metadata': {
+                    'display_name': new_display_name
+                }
+            }
+        )
+        self.verify_publish_state(self.problem_usage_key, PublishState.private)
+        draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
+        self.assertEqual(draft.display_name, new_display_name)
+
+        # Publish the item
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+
+        # Now republishing should update the published version
+        new_display_name_2 = 'New Display Name 2'
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'publish': 'republish',
+                'metadata': {
+                    'display_name': new_display_name_2
+                }
+            }
+        )
+        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        published = modulestore().get_item(
+            self.problem_usage_key,
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
+        self.assertEqual(published.display_name, new_display_name_2)
+
     def _make_draft_content_different_from_published(self):
         """
         Helper method to create different draft and published versions of a problem.
