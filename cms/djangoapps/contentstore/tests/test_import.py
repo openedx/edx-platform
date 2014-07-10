@@ -9,16 +9,11 @@ from django.test.utils import override_settings
 from django.conf import settings
 import copy
 
-from django.contrib.auth.models import User
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.contentstore.django import _CONTENTSTORE
-
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
 
@@ -37,10 +32,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         
         self.client = Client()
         self.client.login(username=self.user.username, password=password)
-
-    def tearDown(self):
-        contentstore().drop_database()
-        _CONTENTSTORE.clear()
 
     def load_test_import_course(self):
         '''
