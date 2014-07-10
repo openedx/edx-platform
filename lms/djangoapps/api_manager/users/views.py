@@ -1,5 +1,6 @@
 """ API implementation for user-oriented interactions. """
 
+import json
 import logging
 from requests.exceptions import ConnectionError
 
@@ -980,13 +981,13 @@ class UsersSocialMetrics(SecureListAPIView):
         comment_user.course_id = course_id
 
         try:
-            data = comment_user.social_stats()
+            data = (comment_user.social_stats())[user_id]
             http_status = status.HTTP_200_OK
         except (CommentClientRequestError, ConnectionError), error:
             data = {
                 "err_msg": str(error)
             }
-            http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+            status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(data, http_status)
 

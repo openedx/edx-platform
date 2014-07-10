@@ -33,6 +33,9 @@ from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from .serializers import CourseModuleCompletionSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
+from lms.lib.comment_client.user import get_course_social_stats
+from lms.lib.comment_client.utils import CommentClientRequestError
+
 log = logging.getLogger(__name__)
 
 
@@ -1560,3 +1563,25 @@ class CoursesWorkgroupsList(SecureListAPIView):
 
         queryset = Workgroup.objects.filter(project__course_id=course_id)
         return queryset
+
+
+class CoursesSocialMetrics(SecureListAPIView):
+    """
+    ### The CoursesSocialMetrics view allows clients to query about the activity of all users in the
+    forums
+    - URI: ```/api/users/{course_id}/metrics/social/```
+    - GET: Returns a list of social metrics for users in the specified course
+    """
+
+    def get(self, request, course_id): # pylint: disable=W0613
+
+        try:
+            data = get_course_social_stats(course_id)
+            http_status = status.HTTP_200_OK
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, http_status)
