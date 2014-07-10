@@ -111,11 +111,15 @@
       &.staff-only,
       &.is-staff-only {
         @extend %bar-module-black;
+
+        &.is-scheduled .wrapper-release .copy {
+          text-decoration: line-through;
+        }
       }
 
       .bar-mod-content {
         border: 0;
-        padding: ($baseline/2) ($baseline*.75) ($baseline*.75) ($baseline*.75);
+        padding: ($baseline/2) ($baseline*.75) ($baseline/4) ($baseline*.75);
 
         .title {
           margin-bottom: ($baseline/10);
@@ -123,7 +127,6 @@
       }
 
       .wrapper-last-draft {
-        padding: ($baseline*.75) ($baseline*.75) ($baseline/4) ($baseline*.75);
 
         .date,
         .user {
@@ -145,9 +148,9 @@
           font-weight: 600;
         }
 
-        .action-inline [class^="icon-"] {
-          margin: 0 ($baseline/4);
-
+        [class^="icon-"] {
+          margin-left: ($baseline/4);
+          color: $gray-d1;
         }
       }
 
@@ -215,107 +218,7 @@
       }
 
       .wrapper-unit-tree-location {
-
-        .draggable-drop-indicator {
-          display: none;
-        }
-
-        // need to explicitly set this since the html structure is different than the others
-        .section-name:hover {
-          background: $blue-l5;
-          color: $blue;
-        }
-
-        .subsection,
-        .courseware-unit {
-          margin: ($baseline/4) 0 0 ($baseline*.75);
-        }
-
-        .courseware-unit .section-item {
-          background-color: transparent;
-        }
-
-        .section-item {
-          @include transition(background $tmg-avg ease-in-out 0);
-          @include box-sizing(border-box);
-          @extend %t-copy-sub2;
-          width: 100%;
-          display: inline-block;
-          vertical-align: top;
-          overflow: hidden;
-          padding: 6px 8px 8px 16px;
-          background: $gray-l5;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          color: $gray;
-
-          &:hover {
-            background: $blue-l5;
-            color: $blue;
-          }
-
-          &.editing {
-            background-color: $orange-l3;
-          }
-
-          // TODO: update these once we have different pub states
-          .public-item {
-            color: $black;
-          }
-
-          .private-item {
-            color: $gray-l1;
-          }
-
-          .draft-item {
-            color: $yellow-d1;
-          }
-
-          .public-item:hover,
-          .private-item:hover,
-          .draft-item:hover {
-            color: $blue;
-          }
-
-          .draft-item:after,
-          .public-item:after,
-          .private-item:after {
-            @include font-size(9);
-            margin-left: 3px;
-            font-weight: 600;
-            text-transform: uppercase;
-          }
-
-          .draft-item:after {
-            content: "- draft";
-          }
-
-          .private-item:after {
-            content: "- private";
-          }
-        }
-
-        .subsection > .section-item:hover {
-          background-color: $gray-l5;
-          color: inherit;
-        }
-
-        .new-unit-item {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action4;
-          width: 90%;
-          margin: 0 0 ($baseline/2) ($baseline/4);
-          border: 1px solid transparent;
-          padding: ($baseline/4) ($baseline/2);
-          font-weight: normal;
-          color: $gray-l2;
-          text-align: left;
-
-          &:hover {
-            box-shadow: none;
-            background-image: none;
-          }
-        }
+        // tree location-specific styles should go here
       }
     }
   }
