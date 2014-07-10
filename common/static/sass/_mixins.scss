@@ -90,11 +90,16 @@
 // extends - UI - window
 %ui-window {
   @include clearfix();
-  border-radius: 3px;
-  box-shadow: 0 1px 1px $shadow-l1;
+  border-radius: ($baseline/10);
+  box-shadow: 0 1px 1px $shadow-l2;
   margin-bottom: $baseline;
   border: 1px solid $gray-l2;
   background: $white;
+
+  // STATE: hover/active
+  &:hover, &:active {
+    box-shadow: 0 1px 1px $shadow;
+  }
 }
 
 // extends - UI - visual link
@@ -226,7 +231,6 @@
   border-radius: ($baseline/4);
   border: 1px solid $blue-l2;
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: $white;
   color: $blue-l2;
 
   &:hover, &:focus {
