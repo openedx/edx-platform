@@ -293,7 +293,6 @@ class CourseTestCase(ModuleStoreTestCase):
         for descriptor in items:
             resp = self.client.get_html(get_url('unit_handler', descriptor.location))
             self.assertEqual(resp.status_code, 200)
-            test_no_locations(self, resp)
 
     def assertAssetsEqual(self, asset_key, course1_id, course2_id):
         """Verifies the asset of the given key has the same attributes in both given courses."""
@@ -308,22 +307,6 @@ class CourseTestCase(ModuleStoreTestCase):
                 pass
             else:
                 self.assertEqual(value, course2_asset_attrs[key])
-
-
-def test_no_locations(test, resp, status_code=200, html=True):
-    """
-    Verifies that "i4x", which appears in old locations, but not
-    new locators, does not appear in the HTML response output.
-    Used to verify that database refactoring is complete.
-    """
-    test.assertNotContains(resp, 'i4x', status_code=status_code, html=html)
-    if html:
-        # For HTML pages, it is nice to call the method with html=True because
-        # it checks that the HTML properly parses. However, it won't find i4x usages
-        # in JavaScript blocks.
-        content = resp.content
-        hits = len(re.findall(r"(?<!jump_to/)i4x://", content))
-        test.assertEqual(hits, 0, "i4x found outside of LMS jump-to links")
 
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):

@@ -363,11 +363,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
-<<<<<<< HEAD
-            xml_store.create_course("org", "course/run", self.user_id)
-=======
-            xml_store.create_course("org", "course", "run", 999)
->>>>>>> Fix up the signature to use course and run instead of just offering
+            xml_store.create_course("org", "course", "run", self.user_id)
 
     @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):
