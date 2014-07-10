@@ -1,9 +1,11 @@
+"""Provides factories for Split."""
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.course_module import CourseDescriptor
 from xmodule.x_module import XModuleDescriptor
 import factory
 from factory.helpers import lazy_attribute
-
+# Factories don't have __init__ methods, and are self documenting
+# pylint: disable=W0232, C0111
 
 class SplitFactory(factory.Factory):
     """

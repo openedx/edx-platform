@@ -459,8 +459,8 @@ class ModuleStoreReadBase(ModuleStoreRead):
             return next(
                 (
                     c.id for c in self.get_courses()
-                    if c.id.org.lower() == course_id.org.lower() and \
-                    c.id.course.lower() == course_id.course.lower() and \
+                    if c.id.org.lower() == course_id.org.lower() and
+                    c.id.course.lower() == course_id.course.lower() and
                     c.id.run.lower() == course_id.run.lower()
                 ),
                 None
