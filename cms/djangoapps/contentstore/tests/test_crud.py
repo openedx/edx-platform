@@ -162,7 +162,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(self.split_store.get_course(id_locator), CourseDescriptor)
         # and by guid
         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
-        self.split_store.delete_course(id_locator)
+        self.split_store.delete_course(id_locator, ModuleStoreEnum.UserID.test)
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, self.split_store.get_course, id_locator)
         # but can by guid

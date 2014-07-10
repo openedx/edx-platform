@@ -229,16 +229,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_id)
         return store.has_course(course_id, ignore_case)
 
-    def delete_course(self, course_key, user_id=None):
+    def delete_course(self, course_key, user_id):
         """
         See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
         assert(isinstance(course_key, CourseKey))
         store = self._get_modulestore_for_courseid(course_key)
-        if hasattr(store, 'delete_course'):
-            return store.delete_course(course_key, user_id)
-        else:
-            raise NotImplementedError(u"Cannot delete a course on store {}".format(store))
+        return store.delete_course(course_key, user_id)
 
     def get_parent_location(self, location, **kwargs):
         """
@@ -290,10 +287,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
         """
         store = self._get_modulestore_for_courseid(None)
-
-        if not hasattr(store, 'create_course'):
-            raise NotImplementedError(u"Cannot create a course on store {}".format(store))
-
         return store.create_course(org, offering, user_id, fields, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
@@ -456,13 +449,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         course_id = xblock.scope_ids.usage_id.course_key
         store = self._get_modulestore_for_courseid(course_id)
-        if hasattr(store, 'compute_publish_state'):
-            return store.compute_publish_state(xblock)
-        elif hasattr(store, 'publish'):
-            raise NotImplementedError(u"Cannot compute_publish_state on store {}".format(store))
-        else:
-            # read-only store; so, everything's public
-            return PublishState.public
+        return store.compute_publish_state(xblock)
 
     def publish(self, location, user_id):
         """

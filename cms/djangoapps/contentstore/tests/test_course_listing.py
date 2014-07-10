@@ -145,7 +145,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now delete this course and re-add user to instructor group of this course
-        delete_course_and_groups(course_key, commit=True)
+        delete_course_and_groups(course_key, self.user.id)
 
         CourseInstructorRole(course_key).add_users(self.user)
 
@@ -237,7 +237,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(courses_list_by_groups), 2)
 
         # now delete first course (course_location_caps) and check that it is no longer accessible
-        delete_course_and_groups(course_location_caps, commit=True)
+        delete_course_and_groups(course_location_caps, self.user.id)
 
         # test that get courses through iterating all courses now returns one course
         courses_list = _accessible_courses_list(self.request)
@@ -269,7 +269,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         course_location = SlashSeparatedCourseKey('testOrg', 'doomedCourse', 'RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)
-        store.delete_course(course_location)
+        store.delete_course(course_location, self.user.id)
 
         course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
         course = self._create_course_with_access_groups(course_location, self.user)

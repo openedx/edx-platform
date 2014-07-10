@@ -72,6 +72,21 @@ class ModuleStoreEnum(object):
         draft = 'draft-branch'
         published = 'published-branch'
 
+    class UserID(object):
+        """
+        Values for user ID defaults
+        """
+        # Note: we use negative values here to (try to) not conflict
+        # with user identifiers provided by an actual user service.
+
+        # user ID to use for all management commands
+        mgmt_command = -1
+
+        # user ID to use for primitive commands
+        primitive_command = -2
+
+        # user ID to use for tests that do not have a django user available
+        test = -3
 
 class PublishState(object):
     """
@@ -270,6 +285,18 @@ class ModuleStoreRead(object):
         """
         pass
 
+    @abstractmethod
+    def compute_publish_state(self, xblock):
+        """
+        Returns whether this xblock is draft, public, or private.
+
+        Returns:
+            PublishState.draft - content is in the process of being edited, but still has a previous
+                version deployed to LMS
+            PublishState.public - content is locked and deployed to LMS
+            PublishState.private - content is editable and not deployed to LMS
+        """
+        pass
 
 class ModuleStoreWrite(ModuleStoreRead):
     """
@@ -348,7 +375,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def delete_course(self, course_key, user_id=None):
+    def delete_course(self, course_key, user_id):
         """
         Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
         depending on the persistence layer and how tightly bound the xblocks are to the course.
@@ -440,6 +467,12 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 (c.id for c in self.get_courses() if c.id == course_id),
                 None
             )
+
+    def compute_publish_state(self, xblock):
+        """
+        Returns PublishState.public since this is a read-only store.
+        """
+        return PublishState.public
 
     def heartbeat(self):
         """
@@ -552,6 +585,15 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
         super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
         return dest_course_id
+
+    def delete_course(self, course_key, user_id):
+        """
+        This base method just deletes the assets. The lower level impls must do the actual deleting of
+        content.
+        """
+        # delete the assets
+        self.contentstore.delete_all_course_assets(course_key)
+        super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
 
     @contextmanager
     def bulk_write_operations(self, course_id):
