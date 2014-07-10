@@ -16,7 +16,10 @@ def click_css(page, css, source_index=0, require_notification=True):
     """
     buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
     target = buttons[source_index]
-    ActionChains(page.browser).click(target).release().perform()
+    # target.click()
+    # target.release()
+    # this should be the same
+    ActionChains(page.browser).click(target).perform()
     if require_notification:
         wait_for_notification(page)
 
