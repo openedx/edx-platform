@@ -37,6 +37,14 @@ class Workgroup(TimeStampedModel):
     users = models.ManyToManyField(User, related_name="workgroups", blank=True, null=True)
     groups = models.ManyToManyField(Group, related_name="workgroups", blank=True, null=True)
 
+    @property
+    def cohort_name(self):
+        return 'Group Project {} Workgroup {} ({})'.format(
+            self.project.id,
+            self.id,
+            self.name
+        )
+
 
 class WorkgroupReview(TimeStampedModel):
     """

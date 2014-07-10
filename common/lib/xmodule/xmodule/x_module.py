@@ -1248,8 +1248,10 @@ class DiscussionService(object):
         from django_comment_client.forum.views import get_threads
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
+        from course_groups.models import CourseUserGroup
         from course_groups.cohorts import (
             is_course_cohorted,
+            get_cohort,
             get_cohort_id,
             get_cohorted_commentables,
             get_course_cohorts
@@ -1263,18 +1265,25 @@ class DiscussionService(object):
         user_info = cc.User.from_django_user(self.runtime.user).to_dict()
         course_id = self.runtime.course_id
         course = get_course_with_access(self.runtime.user, 'load_forum', course_id)
-        user_cohort_id = get_cohort_id(user, course_id)
+        user_cohorts = get_cohort(user, course_id,
+                                  group_type=CourseUserGroup.ANY, allow_multiple=True)
+        user_cohort_ids = [cohort.id for cohort in user_cohorts]
 
         unsafethreads, query_params = get_threads(request, course_id)
         threads = [utils.safe_content(thread) for thread in unsafethreads]
 
+        is_moderator = cached_has_permission(user, "see_all_cohorts", course_id)
         flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or \
                          has_access(user, 'staff', course)
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
         category_map = utils.get_discussion_category_map(course)
 
-        cohorts = get_course_cohorts(course_id)
+        if is_moderator:
+            cohorts = get_course_cohorts(course_id, group_type=CourseUserGroup.ANY)
+        else:
+            cohorts = user_cohorts
+
         cohorted_commentables = get_cohorted_commentables(course_id)
 
         context = {
@@ -1288,9 +1297,9 @@ class DiscussionService(object):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-            'is_moderator': cached_has_permission(user, "see_all_cohorts", course_id),
+            'is_moderator': is_moderator,
             'cohorts': cohorts,
-            'user_cohort': user_cohort_id,
+            'user_cohorts': user_cohort_ids,
             'cohorted_commentables': cohorted_commentables,
             'is_course_cohorted': is_course_cohorted(course_id),
             'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),

@@ -22,6 +22,10 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore import Location, InvalidLocationError
 from xmodule.modulestore.django import modulestore
+from course_groups.cohorts import (add_cohort, add_user_to_cohort, get_cohort_by_name,
+                                   remove_user_from_cohort)
+from course_groups.models import CourseUserGroup
+from xmodule.modulestore import Location
 
 from .models import Project, Workgroup, WorkgroupSubmission
 from .models import WorkgroupReview, WorkgroupSubmissionReview, WorkgroupPeerReview
@@ -111,6 +115,20 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
     serializer_class = WorkgroupSerializer
     model = Workgroup
 
+    def create(self, request):
+        """
+        Create a new workgroup and its cohort.
+        """
+        response = super(WorkgroupsViewSet, self).create(request)
+
+        if response.status_code == status.HTTP_201_CREATED:
+            # create the workgroup cohort
+            workgroup = self.object
+
+            add_cohort(workgroup.project.course_id, workgroup.cohort_name, CourseUserGroup.WORKGROUP)
+
+        return response
+
     @action(methods=['get', 'post'])
     def groups(self, request, pk):
         """
@@ -159,17 +177,24 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
             workgroup = self.get_object()
             workgroup.users.add(user)
+            # add user to the workgroup cohort
+            cohort = get_cohort_by_name(workgroup.project.course_id,
+                                        workgroup.cohort_name, CourseUserGroup.WORKGROUP)
+            add_user_to_cohort(cohort, user.username)
             workgroup.save()
             return Response({}, status=status.HTTP_201_CREATED)
         else:
             user_id = request.DATA.get('id')
+            workgroup = self.get_object()
+            cohort = get_cohort_by_name(workgroup.project.course_id,
+                                        workgroup.cohort_name, CourseUserGroup.WORKGROUP)
             try:
                 user = User.objects.get(id=user_id)
             except ObjectDoesNotExist:
                 message = 'User {} does not exist'.format(user_id)
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
-            workgroup = self.get_object()
             workgroup.users.remove(user)
+            remove_user_from_cohort(cohort, user.username, CourseUserGroup.WORKGROUP)
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     @link()

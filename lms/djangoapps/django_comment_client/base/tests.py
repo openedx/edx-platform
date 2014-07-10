@@ -569,6 +569,65 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
         assert_equal(response.status_code, 200)
 
+    def test_create_thread_cohort(self, mock_request):
+        # Make the course cohorted...
+        self.course.cohort_config = {
+            "cohorted": True,
+            "cohorted_discussions": ['i4x-MITx-999-course-Robot_Super_Course']
+        }
+        self.update_course(self.course)
+
+        def do_post_request(group_id=None):
+            thread = {"body": ["this is a post"],
+                      "anonymous_to_peers": ["false"],
+                      "auto_subscribe": ["false"],
+                      "anonymous": ["false"],
+                      "title": ["Hello"],
+                }
+
+            if group_id:
+                thread["group_id"] = group_id
+
+            url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
+                                                   'course_id': self.course_id})
+            response = self.client.post(url, data=thread)
+            assert_true(mock_request.called)
+            assert_equal(response.status_code, 200)
+            return response
+
+        # Specifying an invalid group_id for should be posted to no group
+        response = do_post_request(group_id=444)
+        self.assertNotIn('group_id', response.content)
+
+        # Create a cohorts
+        cohort = CourseUserGroup.objects.create(name="TestCohort",
+                                                course_id=self.course_id,
+                                                group_type=CourseUserGroup.COHORT)
+        cohort2 = CourseUserGroup.objects.create(name="TestCohort2",
+                                                 course_id=self.course_id,
+                                                 group_type=CourseUserGroup.WORKGROUP)
+
+        # Specifying a group_id for a user that is not in any cohort should be posted to no group
+        response = do_post_request(group_id=cohort.id)
+        self.assertNotIn('group_id', response.content)
+
+        # Add the student in a workgroup cohort
+        cohort2.users.add(self.student)
+
+        # Specifying a group_id for a user that is in another cohort should be posted to his first
+        # cohort he is in
+        response = do_post_request(group_id=cohort.id)
+        data = json.loads(response.content)
+        self.assertIn('group_id', data)
+        assert_equal(data['group_id'], cohort2.id)
+
+        # Specifying a group_id that the user is in should be posted to that group
+        response = do_post_request(group_id=cohort2.id)
+        data = json.loads(response.content)
+        self.assertIn('group_id', data)
+        assert_equal(data['group_id'], cohort2.id)
+
+
 @patch("lms.lib.comment_client.utils.requests.request")
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
