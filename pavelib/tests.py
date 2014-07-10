@@ -50,7 +50,7 @@ def test_system(options):
             system = test_id.split('/')[0]
         opts['test_id'] = test_id
 
-    if test_id or system:
+    if test_id and system:
         system_tests = [suites.SystemTestSuite(system, **opts)]
     else:
         system_tests = []
