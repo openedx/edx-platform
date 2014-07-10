@@ -238,13 +238,11 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       MarkdownEditingDescriptor.itemFeedbackTruthValue = [];
 
       // group multiple choice answers
-      confirm('group multiple choice answers :' + xml);
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
-        confirm('multiplechoiceresponse');
-        var choices = '';
-        var shuffle = false;
-        var options = match.split('\n');
-        for(var i = 0; i < options.length; i++) {
+      var choices = '';
+      var shuffle = false;
+      var options = match.split('\n');
+      for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
 
             options[i] = MarkdownEditingDescriptor.findTargetedFeedbackItem(options[i], i);
@@ -258,7 +256,11 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
             var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
             var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
-            var correct = /x/i.test(inparens);
+            var correct = 'False';
+            if(/x/i.test(inparens)) {
+              correct = 'True';
+            }
+
             var fixed = '';
             if(/@/.test(inparens)) {
               fixed = ' fixed="true"';
