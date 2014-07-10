@@ -93,25 +93,19 @@ class CMSVideoBaseTest(UniqueCourseTest):
 
     def edit_component(self):
         """
-        Make component editable and open components Edit Dialog.
-
-        Arguments:
-            handout_filename (str): handout file name to be uploaded
-            save_settings (bool): save settings or not
-
+        Open component Edit Dialog for first component on page.
         """
-        self.unit_page.set_unit_visibility('private')
-        self.unit_page.components[0].edit()
+        self.unit_page.xblocks[0].edit()
 
     def open_advanced_tab(self):
         """
         Open components advanced tab.
         """
-        self.unit_page.components[0].open_advanced_tab()
+        self.unit_page.xblocks[0].open_advanced_tab()
 
     def save_unit_settings(self):
         """
         Save component settings.
         """
-        self.unit_page.components[0].save_settings()
+        self.unit_page.xblocks[0].save_settings()
 
