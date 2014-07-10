@@ -38,7 +38,7 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              * If true, only course staff can see the xblock regardless of publish status or
              * release date status.
              */
-            "locked": null,
+            "visible_to_staff_only": null,
             /**
              * Date of the last edit to this xblock or any of its descendants.
              */
@@ -69,7 +69,12 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              * this will either be the parent subsection or the grandparent section.
              * This can be null if the release date is unscheduled.
              */
-            "release_date_from":null
+            "release_date_from":null,
+            /**
+             * True if this xblock is currently visible to students. This is computed server-side
+             * so that the logic isn't duplicated on the client.
+             */
+            "currently_visible_to_students": null
         },
 
         parse: function(response) {

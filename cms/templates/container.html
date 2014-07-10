@@ -25,7 +25,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
     "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline"]
+    "unit-outline", "container-message"]
 %>
 <%block name="header_extras">
 % for template_name in templates:
@@ -116,16 +116,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
         <section class="content-area">
 
             <article class="content-primary">
-                % if is_visible_to_students:
-                    <div class="container-message wrapper-message">
-                        <div class="message has-warnings">
-                            <p class="warning">
-                                <i class="icon-warning-sign"></i>
-                                ${_("This content is live for students. Edit with caution.")}
-                            </p>
-                        </div>
-                    </div>
-                % endif
+                <div class="container-message wrapper-message"></div>
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
