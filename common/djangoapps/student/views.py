@@ -30,6 +30,9 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -42,7 +45,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory
+    create_comments_service_user, PasswordHistory, UserSignupSource
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -1020,6 +1023,21 @@ class AccountValidationError(Exception):
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
+
+
+@receiver(post_save, sender=User)
+def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+    """
+    handler that saves the user Signup Source
+    when the user is created
+    """
+    if 'created' in kwargs and kwargs['created']:
+        site = microsite.get_value('SITE_NAME')
+        if site:
+            user_signup_source = UserSignupSource(user_id=kwargs['instance'], site=site)
+            user_signup_source.save()
+            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+
 
 def _do_create_account(post_vars):
     """
