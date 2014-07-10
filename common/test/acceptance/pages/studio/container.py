@@ -215,6 +215,10 @@ class XBlockWrapper(PageObject):
     url = None
     BODY_SELECTOR = '.studio-xblock-wrapper'
     NAME_SELECTOR = '.xblock-display-name'
+    COMPONENT_BUTTONS = {
+        'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
+        'save_settings': '.action-save',
+    }
 
     def __init__(self, browser, locator):
         super(XBlockWrapper, self).__init__(browser)
@@ -274,9 +278,32 @@ class XBlockWrapper(PageObject):
         """
         return _click_edit(self, self._bounded_selector)
 
+    def open_advanced_tab(self):
+        """
+        Click on Advanced Tab.
+        """
+        self._click_button('advanced_tab')
+
+    def save_settings(self):
+        """
+        Click on settings Save button.
+        """
+        self._click_button('save_settings')
+
     @property
     def editor_selector(self):
         return '.xblock-studio_view'
+
+    def _click_button(self, button_name):
+        """
+        Click on a button as specified by `button_name`
+
+        Arguments:
+            button_name (str): button name
+
+        """
+        self.q(css=self.COMPONENT_BUTTONS[button_name]).first.click()
+        self.wait_for_ajax()
 
 
 def _click_edit(page_object, bounded_selector=lambda(x): x):
