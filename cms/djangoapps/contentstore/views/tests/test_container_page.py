@@ -20,16 +20,11 @@ class ContainerPageTestCase(StudioPageTestCase):
 
     def setUp(self):
         super(ContainerPageTestCase, self).setUp()
-        self.vertical = ItemFactory.create(parent_location=self.sequential.location,
-                                           category='vertical', display_name='Unit')
-        self.html = ItemFactory.create(parent_location=self.vertical.location,
-                                        category="html", display_name="HTML")
-        self.child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                  category='split_test', display_name='Split Test')
-        self.child_vertical = ItemFactory.create(parent_location=self.child_container.location,
-                                                 category='vertical', display_name='Child Vertical')
-        self.video = ItemFactory.create(parent_location=self.child_vertical.location,
-                                        category="video", display_name="My Video")
+        self.vertical = self._create_item(self.sequential.location, 'vertical', 'Unit')
+        self.html = self._create_item(self.vertical.location, "html", "HTML")
+        self.child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        self.child_vertical = self._create_item(self.child_container.location, 'vertical', 'Child Vertical')
+        self.video = self._create_item(self.child_vertical.location, "video", "My Video")
         self.store = modulestore()
 
     def test_container_html(self):
@@ -51,14 +46,8 @@ class ContainerPageTestCase(StudioPageTestCase):
         Create the scenario of an xblock with children (non-vertical) on the container page.
         This should create a container page that is a child of another container page.
         """
-        draft_container = ItemFactory.create(
-            parent_location=self.child_container.location,
-            category="wrapper", display_name="Wrapper"
-        )
-        ItemFactory.create(
-            parent_location=draft_container.location,
-            category="html", display_name="Child HTML"
-        )
+        draft_container = self._create_item(self.child_container.location, "wrapper", "Wrapper")
+        self._create_item(draft_container.location, "html", "Child HTML")
 
         def test_container_html(xblock):
             self._test_html_content(
@@ -135,9 +124,8 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
-        published_empty_child_container = self.store.publish(empty_child_container.location, '**replace_user**')
+        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view,
                                    can_reorder=False, can_edit=False, can_add=False)
 
@@ -145,7 +133,18 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
+        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view,
                                    can_reorder=True, can_edit=True, can_add=False)
+
+    def _create_item(self, parent_location, category, display_name, **kwargs):
+        """
+        creates an item in the module store, without publishing it.
+        """
+        return ItemFactory.create(
+            parent_location=parent_location,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            **kwargs
+        )

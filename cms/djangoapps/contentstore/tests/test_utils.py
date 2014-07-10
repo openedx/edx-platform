@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
@@ -193,7 +194,7 @@ class XBlockVisibilityTestCase(TestCase):
     """Tests for xblock visibility for students."""
 
     def setUp(self):
-        self.dummy_user = 123
+        self.dummy_user = ModuleStoreEnum.UserID.test
         self.past = datetime(1970, 1, 1)
         self.future = datetime.now(UTC) + timedelta(days=1)
 

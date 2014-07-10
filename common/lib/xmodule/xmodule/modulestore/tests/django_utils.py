@@ -4,8 +4,10 @@ Modulestore configuration for test cases.
 
 from uuid import uuid4
 from django.test import TestCase
+from django.contrib.auth.models import User
 from xmodule.modulestore.django import (
-    modulestore, clear_existing_modulestores, loc_mapper)
+    modulestore, clear_existing_modulestores, loc_mapper
+)
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -126,18 +128,62 @@ class ModuleStoreTestCase(TestCase):
           `clear_existing_modulestores()` directly in
           your `setUp()` method.
     """
+    def setUp(self, **kwargs):
+        """
+        Creates a test User if `create_user` is True.
+        Returns the password for the test User.
 
-    @staticmethod
-    def update_course(course):
+        Args:
+            create_user - specifies whether or not to create a test User.  Default is True.
+        """
+        super(ModuleStoreTestCase, self).setUp()
+
+        self.store = modulestore()
+
+        uname = 'testuser'
+        email = 'test+courses@edx.org'
+        password = 'foo'
+
+        if kwargs.pop('create_user', True):
+            # Create the user so we can log them in.
+            self.user = User.objects.create_user(uname, email, password)
+
+            # Note that we do not actually need to do anything
+            # for registration if we directly mark them active.
+            self.user.is_active = True
+
+            # Staff has access to view all courses
+            self.user.is_staff = True
+            self.user.save()
+
+        return password
+
+    def create_non_staff_user(self):
+        """
+        Creates a non-staff test user.
+        Returns the non-staff test user and its password.
+        """
+        uname = 'teststudent'
+        password = 'foo'
+        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        nonstaff_user.is_active = True
+        nonstaff_user.is_staff = False
+        nonstaff_user.save()
+        return nonstaff_user, password
+
+    def update_course(self, course, user_id):
         """
         Updates the version of course in the modulestore
 
         'course' is an instance of CourseDescriptor for which we want
         to update metadata.
         """
-        store = modulestore()
-        store.update_item(course, '**replace_user**')
-        updated_course = store.get_course(course.id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.update_item(course, user_id)
+        updated_course = self.store.get_course(course.id)
         return updated_course
 
     @staticmethod

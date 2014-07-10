@@ -54,7 +54,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp()
+        super(SysadminBaseTestCase, self).setUp(create_user=False)
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
@@ -128,6 +128,9 @@ class TestSysadmin(SysadminBaseTestCase):
         for view in test_views:
             response = self.client.get(reverse(view))
             self.assertEqual(response.status_code, 302)
+
+        self.user.is_staff = False
+        self.user.save()
 
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')

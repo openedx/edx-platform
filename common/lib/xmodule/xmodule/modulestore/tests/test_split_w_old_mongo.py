@@ -10,7 +10,6 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import MongoModuleStore, DraftMongoModuleStore
 from xmodule.modulestore.mongo.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore import ModuleStoreEnum
-from mock import Mock
 
 
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
@@ -138,6 +137,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.split_mongo.create_course(
                 self.split_course_key.org, self.split_course_key.offering, self.userid, fields=fields, root_block_id='runid'
             )
-        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', fields=fields)
+        old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', self.userid, fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

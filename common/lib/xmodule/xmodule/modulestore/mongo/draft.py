@@ -144,6 +144,18 @@ class DraftModuleStore(MongoModuleStore):
             del key['_id.revision']
             return self.collection.find(key).count() > 0
 
+    def delete_course(self, course_key, user_id):
+        """
+        :param course_key: which course to delete
+        :param user_id: id of the user deleting the course
+        """
+        # delete the assets
+        super(DraftModuleStore, self).delete_course(course_key, user_id)
+
+        # delete all of the db records for the course
+        course_query = self._course_key_to_son(course_key)
+        self.collection.remove(course_query, multi=True)
+
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
         Only called if cloning within this store or if env doesn't set up mixed.
@@ -419,7 +431,7 @@ class DraftModuleStore(MongoModuleStore):
         # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
         return self.get_item(location)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not

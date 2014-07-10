@@ -62,7 +62,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # check that user has his default "Student" forum role for this course
         self.assertTrue(self.user.roles.filter(name="Student", course_id=self.course_key))  # pylint: disable=no-member
 
-        delete_course_and_groups(self.course_key, commit=True)
+        delete_course_and_groups(self.course_key, self.user.id)
 
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
@@ -80,7 +80,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self.assertTrue(self.user.roles.filter(name="Student", course_id=self.course_key))  # pylint: disable=no-member
 
         # delete this course and recreate this course with same user
-        delete_course_and_groups(self.course_key, commit=True)
+        delete_course_and_groups(self.course_key, self.user.id)
         resp = self._create_course_with_given_location(self.course_key)
         self.assertEqual(resp.status_code, 200)
 
@@ -98,7 +98,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # check that user has enrollment and his default "Student" forum role for this course
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
         # delete this course and recreate this course with same user
-        delete_course_and_groups(self.course_key, commit=True)
+        delete_course_and_groups(self.course_key, self.user.id)
 
         # now create same course with different name case ('uppercase')
         new_course_key = self.course_key.replace(course=self.course_key.course.upper())

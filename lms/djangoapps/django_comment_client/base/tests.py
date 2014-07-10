@@ -41,7 +41,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(ViewsTestCase, self).setUp()
+        super(ViewsTestCase, self).setUp(create_user=False)
 
         # create a course
         self.course = CourseFactory.create(org='MITx', course='999',

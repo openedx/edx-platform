@@ -134,10 +134,6 @@ def section_location(course_num):
     return world.scenario_dict['SECTION'].location.replace(course=course_num)
 
 
-def publish(location):
-    modulestore().publish(location, '**replace_user**')
-
-
 def visit_scenario_item(item_key):
     """
     Go to the courseware page containing the item stored in `world.scenario_dict`

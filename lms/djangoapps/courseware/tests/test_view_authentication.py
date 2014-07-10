@@ -110,6 +110,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return super(TestViewAuth, self).login(user.email, 'test')
 
     def setUp(self):
+        super(TestViewAuth, self).setUp()
 
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
@@ -296,8 +297,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         tomorrow = now + datetime.timedelta(days=1)
         self.course.start = tomorrow
         self.test_course.start = tomorrow
-        self.course = self.update_course(self.course)
-        self.test_course = self.update_course(self.test_course)
+        self.course = self.update_course(self.course, self.user.id)
+        self.test_course = self.update_course(self.test_course, self.user.id)
 
         self.assertFalse(self.course.has_started())
         self.assertFalse(self.test_course.has_started())
@@ -321,8 +322,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         tomorrow = now + datetime.timedelta(days=1)
         self.course.start = tomorrow
         self.test_course.start = tomorrow
-        self.course = self.update_course(self.course)
-        self.test_course = self.update_course(self.test_course)
+        self.course = self.update_course(self.course, self.user.id)
+        self.test_course = self.update_course(self.test_course, self.user.id)
 
         self.login(self.instructor_user)
         # Enroll in the classes---can't see courseware otherwise.
@@ -345,8 +346,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.course.start = tomorrow
         self.test_course.start = tomorrow
-        self.course = self.update_course(self.course)
-        self.test_course = self.update_course(self.test_course)
+        self.course = self.update_course(self.course, self.user.id)
+        self.test_course = self.update_course(self.test_course, self.user.id)
 
         self.login(self.global_staff_user)
         self.enroll(self.course, True)
@@ -373,8 +374,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # test_course course's has
         self.test_course.enrollment_start = yesterday
         self.test_course.enrollment_end = tomorrow
-        self.course = self.update_course(self.course)
-        self.test_course = self.update_course(self.test_course)
+        self.course = self.update_course(self.course, self.user.id)
+        self.test_course = self.update_course(self.test_course, self.user.id)
 
         # First, try with an enrolled student
         self.login(self.unenrolled_user)

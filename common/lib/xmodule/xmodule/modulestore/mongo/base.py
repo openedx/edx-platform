@@ -841,7 +841,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, offering, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
@@ -891,15 +891,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         )
 
         return course
-
-    def delete_course(self, course_key, user_id=None):
-        """
-        The impl removes all of the db records for the course.
-        :param course_key:
-        :param user_id:
-        """
-        course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
         """
@@ -992,7 +983,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             self._update_single_item(parent, update)
             self._update_ancestors(parent, update)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False,
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,
                     is_publish_root=True):
         """
         Update the persisted version of xblock to reflect its current values.
