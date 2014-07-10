@@ -58,7 +58,11 @@ class UsersApiTests(TestCase):
         self.test_bogus_content_id = 'i4x://foo/bar/baz/Chapter1'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            display_name="TEST COURSE",
+            start="2014-06-16T14:30:00Z",
+            end="2015-01-16T14:30:00Z"
+        )
         self.course_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.course.location,
@@ -573,7 +577,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_post(self):
-        course = CourseFactory.create()
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -614,7 +617,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_get(self):
-        course = CourseFactory.create(display_name="TEST COURSE")
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -625,6 +627,13 @@ class UsersApiTests(TestCase):
         data = {'course_id': unicode(course.id)}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
+        confirm_uri = self.test_server_prefix + test_uri + '/' + self.course.id
+
+        course_with_out_date_values = CourseFactory.create()
+        data = {'course_id': course_with_out_date_values.id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = self.test_server_prefix + test_uri + '/' + unicode(course.id)
@@ -632,6 +641,10 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data[0]['id'], unicode(course.id))
         self.assertTrue(response.data[0]['is_active'])
         self.assertEqual(response.data[0]['name'], course.display_name)
+        self.assertEqual(response.data[0]['start'], course_with_out_date_values.start)
+        self.assertEqual(response.data[0]['end'], course_with_out_date_values.end)
+        self.assertEqual(response.data[1]['start'], course.start)
+        self.assertEqual(response.data[1]['end'], course.end)
 
     def test_user_courses_list_get_undefined_user(self):
         test_uri = '/api/users/2134234/courses'

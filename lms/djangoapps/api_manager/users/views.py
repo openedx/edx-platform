@@ -637,6 +637,8 @@ class UsersCoursesList(SecureAPIView):
                     "uri": '{}/{}'.format(base_uri, unicode(course_key)),
                     "is_active": enrollment.is_active,
                     "name": course_descriptor.display_name
+                    "start": getattr(course_descriptor, 'start', None),
+                    "end": getattr(course_descriptor, 'end', None)
                 }
                 response_data.append(course_data)
             else:
