@@ -11,7 +11,7 @@ import logging
 
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import PublishState, ModuleStoreEnum, compute_location_from_args
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, InvalidBranchSetting, DuplicateCourseError
 )
@@ -54,7 +54,6 @@ class DraftModuleStore(MongoModuleStore):
                 This should be an attribute from ModuleStoreEnum.Branch
         """
         super(DraftModuleStore, self).__init__(*args, **kwargs)
-        self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
 
     def get_item(self, usage_key, depth=0, revision=None):
         """
@@ -287,7 +286,7 @@ class DraftModuleStore(MongoModuleStore):
                 else ModuleStoreEnum.RevisionOption.draft_preferred
         return super(DraftModuleStore, self).get_parent_location(location, revision, **kwargs)
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
+    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator if
         the category allows drafts. If the category does not allow drafts, just creates a published module.
@@ -305,6 +304,35 @@ class DraftModuleStore(MongoModuleStore):
         return wrap_draft(
             super(DraftModuleStore, self).create_xmodule(location, definition_data, metadata, runtime, fields)
         )
+
+    def create_item(self, user_id, location=None, parent_location=None, **kwargs):
+        """
+        Creates and saves a new item.
+        Either location or (category, parent_location) or both must be provided.
+        If parent_location is provided, a new item of the given category is added as a child.
+        If location is not provided, a new item with the given category and given block_id
+          is added to the parent_location.  If the block_id is not provided, a unique name
+          is automatically generated.
+
+        Returns the newly created item.
+
+        :param user_id: ID of the user creating and saving the xmodule
+        :param location: a Location--must have a category
+        :param parent_location: optional parameter, specifying the Location of the parent item
+        :param category: optional parameter for the category of the new item
+        :param block_id: a unique identifier for the new item
+        """
+        location = compute_location_from_args(location, parent_location, **kwargs)
+        xblock = self.create_xmodule(location, **kwargs)
+        self.update_item(xblock, user_id, allow_not_found=True)
+
+        # attach to parent if given
+        if parent_location is not None and not 'detached' in xblock._class_tags:
+            parent = self.get_item(parent_location)
+            parent.children.append(location)
+            self.update_item(parent, user_id)
+
+        return xblock
 
     def get_items(self, course_key, settings=None, content=None, revision=None, **kwargs):
         """

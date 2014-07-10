@@ -23,7 +23,7 @@ from xblock.plugin import Plugin
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
+from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from opaque_keys.edx.keys import UsageKey
@@ -148,7 +148,7 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_greater(len(ids), 12)
 
     def test_mongo_modulestore_type(self):
-        store = MongoModuleStore(
+        store = DraftModuleStore(
             None,
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
@@ -390,13 +390,13 @@ class TestMongoModuleStore(unittest.TestCase):
         def setup_test():
             course = self.draft_store.get_course(course_key)
             # can't use item factory as it depends on django settings
-            p1ele = self.draft_store.create_and_save_xmodule(
-                course.id.make_usage_key('problem', 'p1'), 99, runtime=course.runtime)
-            p2ele = self.draft_store.create_and_save_xmodule(
-                course.id.make_usage_key('problem', 'p2'), 99, runtime=course.runtime)
+            p1ele = self.draft_store.create_item(
+                99, course.id.make_usage_key('problem', 'p1'), runtime=course.runtime)
+            p2ele = self.draft_store.create_item(
+                99, course.id.make_usage_key('problem', 'p2'), runtime=course.runtime)
             self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
-            self.draft_store.create_and_save_xmodule(
-                self.refloc, 99, runtime=course.runtime, fields={
+            self.draft_store.create_item(
+                99,self.refloc,  runtime=course.runtime, fields={
                     'reference_link': p1ele.location,
                     'reference_list': [p1ele.location, p2ele.location],
                     'reference_dict': {'p1': p1ele.location, 'p2': p2ele.location},
@@ -501,8 +501,8 @@ class TestMongoModuleStore(unittest.TestCase):
         chapter_location = Location('edx', 'direct', '2012_Fall', 'chapter', 'test_chapter')
 
         # Create dummy direct only xblocks
-        self.draft_store.create_and_save_xmodule(course_location, user_id=self.dummy_user)
-        self.draft_store.create_and_save_xmodule(chapter_location, user_id=self.dummy_user)
+        self.draft_store.create_item(self.dummy_user, course_location)
+        self.draft_store.create_item(self.dummy_user, chapter_location)
 
         # Check that neither xblock has changes
         self.assertFalse(self.draft_store.has_changes(course_location))
@@ -515,7 +515,7 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'changes', '2012_Fall', 'vertical', 'test_vertical')
 
         # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        self.draft_store.create_item(self.dummy_user, location)
 
         # Not yet published, so changes are present
         self.assertTrue(self.draft_store.has_changes(location))
@@ -570,7 +570,7 @@ class TestMongoModuleStore(unittest.TestCase):
         }
 
         for key in locations:
-            self.draft_store.create_and_save_xmodule(locations[key], user_id=user_id)
+            self.draft_store.create_item(user_id, locations[key])
 
         grandparent = self.draft_store.get_item(locations['grandparent'])
         grandparent.children += [locations['parent_sibling'], locations['parent']]
@@ -663,7 +663,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Create a new child and attach it to parent
         new_child_location = Location('edX', 'tree', 'has_changes_add_remove_child', 'vertical', 'new_child')
-        self.draft_store.create_and_save_xmodule(new_child_location, user_id=self.dummy_user)
+        self.draft_store.create_item(self.dummy_user, new_child_location)
         parent = self.draft_store.get_item(locations['parent'])
         parent.children += [new_child_location]
         self.draft_store.update_item(parent, user_id=self.dummy_user)
@@ -688,8 +688,8 @@ class TestMongoModuleStore(unittest.TestCase):
         parent_location = Location('edX', 'test', 'non_direct_only_children', 'vertical', 'parent')
         child_location = Location('edX', 'test', 'non_direct_only_children', 'html', 'child')
 
-        parent = self.draft_store.create_and_save_xmodule(parent_location, user_id=self.dummy_user)
-        child = self.draft_store.create_and_save_xmodule(child_location, user_id=self.dummy_user)
+        parent = self.draft_store.create_item(self.dummy_user, parent_location)
+        child = self.draft_store.create_item(self.dummy_user, child_location)
         parent.children += [child_location]
         self.draft_store.update_item(parent, user_id=self.dummy_user)
         self.draft_store.publish(parent_location, self.dummy_user)
@@ -760,7 +760,7 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'editInfoTest', '2012_Fall', 'html', 'test_html')
 
         # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        self.draft_store.create_item(self.dummy_user, location)
 
         # Store the current edit time and verify that dummy_user created the component
         component = self.draft_store.get_item(location)
@@ -785,7 +785,7 @@ class TestMongoModuleStore(unittest.TestCase):
         publish_user = 456
 
         # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=create_user)
+        self.draft_store.create_item(create_user, location)
 
         # Store the current time, then publish
         old_time = datetime.now(UTC)

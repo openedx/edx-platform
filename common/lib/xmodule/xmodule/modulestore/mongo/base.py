@@ -34,6 +34,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
@@ -335,7 +336,7 @@ def as_published(location):
     return location.replace(revision=MongoRevisionKey.published)
 
 
-class MongoModuleStore(ModuleStoreWriteBase):
+class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
@@ -353,7 +354,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(MongoModuleStore, self).__init__(contentstore, **kwargs)
+        super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)
 
         def do_connection(
             db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
@@ -903,7 +904,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 ]))
 
         location = course_id.make_usage_key('course', course_id.run)
-        course = self.create_and_save_xmodule(location, user_id, fields=fields, **kwargs)
+        course = self.create_item(user_id, location, fields=fields, **kwargs)
 
         # clone a default 'about' overview module as well
         about_location = location.replace(
@@ -911,16 +912,16 @@ class MongoModuleStore(ModuleStoreWriteBase):
             name='overview'
         )
         overview_template = AboutDescriptor.get_template('overview.yaml')
-        self.create_and_save_xmodule(
-            about_location,
+        self.create_item(
             user_id,
+            about_location,
             definition_data=overview_template.get('data'),
             runtime=course.system
         )
 
         return course
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
+    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module.
 
@@ -1161,7 +1162,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
     def get_orphans(self, course_key):
         """
-        Return an array of all of the locations (deprecated string format) for orphans in the course.
+        Return an array of all of the locations for orphans in the course.
         """
         course_key = self.fill_in_run(course_key)
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
@@ -1178,7 +1179,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
-        return list(item_locs)
+        return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
 
     def get_courses_for_wiki(self, wiki_slug):
         """

@@ -575,7 +575,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         location = course.id.make_usage_key('chapter', 'neuvo')
         # Ensure draft mongo store does not create drafts for things that shouldn't be draft
-        newobject = draft_store.create_and_save_xmodule(location, self.user.id)
+        newobject = draft_store.create_item(self.user.id, location)
         self.assertFalse(getattr(newobject, 'is_draft', False))
         with self.assertRaises(InvalidVersionError):
             draft_store.convert_to_draft(location, self.user.id)
@@ -1395,7 +1395,7 @@ class ContentStoreTest(ContentStoreTestCase):
         new_component_location = course.id.make_usage_key('discussion', 'new_component')
 
         # crate a new module and add it as a child to a vertical
-        self.store.create_and_save_xmodule(new_component_location, self.user.id)
+        self.store.create_item(self.user.id, new_component_location)
 
         new_discussion_item = self.store.get_item(new_component_location)
 
