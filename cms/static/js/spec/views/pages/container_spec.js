@@ -48,7 +48,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 );
             };
 
-            renderContainerPage = function(html, test, options) {
+            renderContainerPage = function(test, html, options) {
                 requests = create_sinon.requests(test);
                 containerPage = new ContainerPage(_.extend(options || {}, {
                     model: model,
@@ -70,7 +70,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Initial display", function() {
                 it('can render itself', function() {
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$('.xblock-header').length).toBe(9);
                     expect(containerPage.$('.wrapper-xblock .level-nesting')).not.toHaveClass('is-hidden');
                 });
@@ -84,7 +84,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('inline edits the display name when performing a new action', function() {
-                    renderContainerPage(mockContainerXBlockHtml, this, {
+                    renderContainerPage(this, mockContainerXBlockHtml, {
                         action: 'new'
                     });
                     expect(containerPage.$('.xblock-header').length).toBe(9);
@@ -106,8 +106,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 };
 
                 expectEditCanceled = function(test, options) {
-                    var initialRequests, displayNameWrapper;
-                    renderContainerPage(mockContainerXBlockHtml, test);
+                    var initialRequests, displayNameWrapper, displayNameInput;
+                    renderContainerPage(test, mockContainerXBlockHtml);
                     displayNameWrapper = getDisplayNameWrapper();
                     initialRequests = requests.length;
                     displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, options.newTitle);
@@ -125,7 +125,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('can edit itself', function() {
                     var editButtons, displayNameElement;
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     displayNameElement = containerPage.$('.page-header-title');
 
                     // Click the root edit button
@@ -162,7 +162,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('can inline edit the display name', function() {
                     var displayNameInput, displayNameWrapper;
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     displayNameWrapper = getDisplayNameWrapper();
                     displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
@@ -176,7 +176,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('does not change the title when a display name update fails', function() {
                     var initialRequests, displayNameInput, displayNameWrapper;
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     displayNameWrapper = getDisplayNameWrapper();
                     displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     initialRequests = requests.length;
@@ -190,7 +190,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('trims whitespace from the display name', function() {
                     var displayNameInput, displayNameWrapper;
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     displayNameWrapper = getDisplayNameWrapper();
                     displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName + ' ');
                     displayNameInput.change();
@@ -222,7 +222,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('can show an edit modal for a child xblock', function() {
                     var editButtons;
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     editButtons = containerPage.$('.wrapper-xblock .edit-button');
                     // The container should have rendered six mock xblocks
                     expect(editButtons.length).toBe(6);
@@ -258,7 +258,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('can save changes to settings', function() {
                     var editButtons, modal, mockUpdatedXBlockHtml;
                     mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
-                    renderContainerPage(mockContainerXBlockHtml, this);
+                    renderContainerPage(this, mockContainerXBlockHtml);
                     editButtons = containerPage.$('.wrapper-xblock .edit-button');
                     // The container should have rendered six mock xblocks
                     expect(editButtons.length).toBe(6);
@@ -346,24 +346,24 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     };
 
                     it("can delete the first xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         deleteComponentWithSuccess(0);
                     });
 
                     it("can delete a middle xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         deleteComponentWithSuccess(1);
                     });
 
                     it("can delete the last xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         deleteComponentWithSuccess(NUM_COMPONENTS_PER_GROUP - 1);
                     });
 
                     it('does not delete when clicking No in prompt', function () {
                         var numRequests;
 
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         numRequests = requests.length;
 
                         // click delete on the first component but press no
@@ -378,7 +378,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('shows a notification during the delete operation', function() {
                         var notificationSpy = edit_helpers.createNotificationSpy();
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickDelete(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
                         create_sinon.respondWithJson(requests, {});
@@ -387,7 +387,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('does not delete an xblock upon failure', function () {
                         var notificationSpy = edit_helpers.createNotificationSpy();
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickDelete(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
                         create_sinon.respondWithError(requests);
@@ -431,23 +431,23 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     };
 
                     it("can duplicate the first xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         duplicateComponentWithSuccess(0);
                     });
 
                     it("can duplicate a middle xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         duplicateComponentWithSuccess(1);
                     });
 
                     it("can duplicate the last xblock", function() {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         duplicateComponentWithSuccess(NUM_COMPONENTS_PER_GROUP - 1);
                     });
 
                     it('shows a notification when duplicating', function () {
                         var notificationSpy = edit_helpers.createNotificationSpy();
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickDuplicate(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
                         create_sinon.respondWithJson(requests, {"locator": "new_item"});
@@ -456,7 +456,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('does not duplicate an xblock upon failure', function () {
                         var notificationSpy = edit_helpers.createNotificationSpy();
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         refreshXBlockSpies = spyOn(containerPage, "refreshXBlock");
                         clickDuplicate(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
@@ -475,7 +475,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     };
 
                     it('sends the correct JSON to the server', function () {
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickNewComponent(0);
                         edit_helpers.verifyXBlockRequest(requests, {
                             "category": "discussion",
@@ -486,7 +486,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('shows a notification while creating', function () {
                         var notificationSpy = edit_helpers.createNotificationSpy();
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickNewComponent(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Adding/);
                         create_sinon.respondWithJson(requests, { });
@@ -495,7 +495,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('does not insert component upon failure', function () {
                         var requestCount;
-                        renderContainerPage(mockContainerXBlockHtml, this);
+                        renderContainerPage(this, mockContainerXBlockHtml);
                         clickNewComponent(0);
                         requestCount = requests.length;
                         create_sinon.respondWithError(requests);
@@ -514,7 +514,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                         verifyCreateHtmlComponent = function(test, templateIndex, expectedRequest) {
                             var xblockCount;
-                            renderContainerPage(mockContainerXBlockHtml, test);
+                            renderContainerPage(test, mockContainerXBlockHtml);
                             showTemplatePicker();
                             xblockCount = containerPage.$('.studio-xblock-wrapper').length;
                             containerPage.$('.new-component-html a')[templateIndex].click();

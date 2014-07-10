@@ -157,39 +157,3 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
-
-    def test_unreleased_private_container_messages(self):
-        """
-        Verify that an unreleased private container does not display messages.
-        """
-        self.validate_html_for_messages(self.unreleased_private_vertical, False)
-
-    def test_unreleased_public_container_messages(self):
-        """
-        Verify that an unreleased public container does not display messages.
-        """
-        self.validate_html_for_messages(self.unreleased_public_vertical, False)
-
-    def test_released_private_container_message(self):
-        """
-        Verify that a released private container does not display messages.
-        """
-        self.validate_html_for_messages(self.released_private_vertical, False)
-
-    def test_released_public_container_message(self):
-        """
-        Verify that a released public container does display messages.
-        """
-        self.validate_html_for_messages(self.released_public_vertical, True)
-
-    def validate_html_for_messages(self, xblock, has_messages):
-        """
-        Validate that the specified HTML has the appropriate messages for the current student visibility state.
-        """
-        # Verify that there are no warning messages for blocks that are not visible to students
-        html = self.get_page_html(xblock)
-        messages_html = '<div class="container-message wrapper-message">'
-        if has_messages:
-            self.assertIn(messages_html, html)
-        else:
-            self.assertNotIn(messages_html, html)
