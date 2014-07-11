@@ -136,8 +136,7 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
-FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
-FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
+FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
