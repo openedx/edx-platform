@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
-from util.json_request import JsonResponse
+from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
 from edxmako.shortcuts import render_to_response
 
@@ -833,18 +833,26 @@ def _config_course_advanced_components(request, course_module):
             component_types = tab_component_map.get(tab_type)
             found_ac_type = False
             for ac_type in component_types:
-                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]["value"] and ac_type in ADVANCED_COMPONENT_TYPES:
-                    # Add tab to the course if needed
-                    changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                    # If a tab has been added to the course, then send the
-                    # metadata along to CourseMetadata.update_from_json
-                    if changed:
-                        course_module.tabs = new_tabs
-                        request.json.update({'tabs': {'value': new_tabs}})
-                        # Indicate that tabs should not be filtered out of
-                        # the metadata
-                        filter_tabs = False  # Set this flag to avoid the tab removal code below.
-                    found_ac_type = True  # break
+
+                # Check if the user has incorrectly failed to put the value in an iterable.
+                new_advanced_component_list = request.json[ADVANCED_COMPONENT_POLICY_KEY]['value']
+                if hasattr(new_advanced_component_list, '__iter__'):
+                    if ac_type in new_advanced_component_list and ac_type in ADVANCED_COMPONENT_TYPES:
+
+                        # Add tab to the course if needed
+                        changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
+                        # If a tab has been added to the course, then send the
+                        # metadata along to CourseMetadata.update_from_json
+                        if changed:
+                            course_module.tabs = new_tabs
+                            request.json.update({'tabs': {'value': new_tabs}})
+                            # Indicate that tabs should not be filtered out of
+                            # the metadata
+                            filter_tabs = False  # Set this flag to avoid the tab removal code below.
+                        found_ac_type = True  # break
+                else:
+                    # If not iterable, return immediately and let validation handle.
+                    return
 
             # If we did not find a module type in the advanced settings,
             # we may need to remove the tab from the course.
@@ -890,12 +898,21 @@ def advanced_settings_handler(request, course_key_string):
             try:
                 # Whether or not to filter the tabs key out of the settings metadata
                 filter_tabs = _config_course_advanced_components(request, course_module)
-                return JsonResponse(CourseMetadata.update_from_json(
+
+                # validate data formats and update
+                is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
                     course_module,
                     request.json,
                     filter_tabs=filter_tabs,
                     user=request.user,
-                ))
+                )
+
+                if is_valid:
+                    return JsonResponse(updated_data)
+                else:
+                    return JsonResponseBadRequest(errors)
+
+            # Handle all errors that validation doesn't catch
             except (TypeError, ValueError) as err:
                 return HttpResponseBadRequest(
                     django.utils.html.escape(err.message),
