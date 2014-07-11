@@ -247,11 +247,13 @@
 // button with no button shell until hover for understated actions
 %ui-btn-non {
   @include transition(all .15s);
-  border: none;
-  border-radius: ($baseline/4);
-  background: none;
-  padding: 3px ($baseline/2);
+  @extend %ui-btn-pill;
+  @include transition(all $tmg-f2 linear 0s);
+  display: inline-block;
   vertical-align: middle;
+  border: none;
+  padding: 3px ($baseline/2);
+  background: none;
   color: $gray-l1;
 
   &:hover, &:focus {
@@ -261,6 +263,16 @@
 
   span {
     @extend %cont-text-sr;
+  }
+}
+
+// button with no button shell until hover for understated actions
+%ui-btn-non-blue {
+  @extend %ui-btn-non;
+
+  &:hover, &:focus {
+    background-color: $blue;
+    color: $white;
   }
 }
 
