@@ -103,14 +103,14 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_coupon(self.course_key, True)
         self.add_course_to_user_cart()
         non_existing_code = "non_existing_code"
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': non_existing_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': non_existing_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against coupon '{0}'.".format(non_existing_code), resp.content)
 
     def test_course_discount_inactive_coupon(self):
         self.add_coupon(self.course_key, False)
         self.add_course_to_user_cart()
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Coupon '{0}' is inactive.".format(self.coupon_code), resp.content)
 
@@ -119,7 +119,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_coupon(course_key, True)
         self.add_course_to_user_cart()
 
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Coupon '{0}' is not valid for any course in the shopping cart.".format(self.coupon_code), resp.content)
 
@@ -128,7 +128,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_coupon(self.course_key, True)
         self.add_course_to_user_cart()
 
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit price should be updated for that course
@@ -139,7 +139,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(self.cart.total_cost, self.get_discount())
 
         # now testing coupon code already used scenario, reusing the same coupon code
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Coupon '{0}' already used.".format(self.coupon_code), resp.content)
 
@@ -161,7 +161,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_coupon(self.course_key, True)
         reg_item = self.add_course_to_user_cart()
 
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
@@ -180,7 +180,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit_cost should be updated for that particular course for which coupon code is registered
@@ -224,7 +224,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         self.add_coupon(self.course_key, True)
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
@@ -354,7 +354,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_course_to_user_cart()
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         self.add_coupon(self.course_key, True)
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
@@ -376,7 +376,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_course_to_user_cart()
         self.add_coupon(self.course_key, True)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'cart_code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 

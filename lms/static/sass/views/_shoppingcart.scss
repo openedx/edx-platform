@@ -63,10 +63,6 @@
       height: 35px;
       border-bottom: 1px solid #BEBEBE;
 
-      th:nth-child(5),th:first-child{
-        text-align: center;
-        width: 120px;
-      }
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
@@ -75,17 +71,19 @@
           width: 100px;
         }
         &.u-pr {
-          width: 100px;
+          width: 70px;
         }
         &.prc {
           width: 150px;
         }
         &.cur {
           width: 100px;
+          text-align: center;
         }
         &.dsc{
           width: 640px;
           padding-right: 50px;
+          text-align: left;
         }
       }
     }
@@ -96,22 +94,25 @@
         position: relative;
         line-height: normal;
         span.old-price{
-          left: -75px;
           position: relative;
           text-decoration: line-through;
           color: red;
           font-size: 12px;
           top: -1px;
+          margin-left: 3px;
         }
       }
-      td:nth-child(5),td:first-child{
+      td:nth-child(3){
         text-align: center;
-
-
       }
-      td:nth-child(2){
+      td:last-child{
+        width: 50px;
+        text-align: center;
+      }
+      td:nth-child(1){
          line-height: 22px;
-        padding-right: 50px;
+         text-align: left;
+         padding-right: 20px;
       }
     }
     
