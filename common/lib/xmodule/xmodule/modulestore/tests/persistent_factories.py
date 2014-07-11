@@ -61,7 +61,7 @@ class ItemFactory(SplitFactory):
     # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, parent_location, category='chapter',
-                user_id=ModuleStoreEnum.UserID.test, block_id=None, definition_locator=None, force=False,
+                user_id=ModuleStoreEnum.UserID.test, definition_locator=None, force=False,
                 continue_version=False, **kwargs):
         """
         passes *kwargs* as the new item's field values:
@@ -74,8 +74,8 @@ class ItemFactory(SplitFactory):
         """
         modulestore = kwargs.pop('modulestore')
         return modulestore.create_item(
-            parent_location, category, user_id, definition_locator=definition_locator,
-            block_id=block_id, force=force, continue_version=continue_version, fields=kwargs
+            user_id, category=category, parent_location=parent_location, defintion_locator=definition_locator,
+            force=force, continue_version=continue_version, **kwargs
         )
 
     @classmethod

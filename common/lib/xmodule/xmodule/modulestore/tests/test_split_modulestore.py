@@ -493,7 +493,7 @@ class SplitModuleTest(unittest.TestCase):
             block_type='course',
             block_id="head23456"
         )
-        destination = CourseLocator(org="testx", offering="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
+        destination = CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
         split_store.copy("test@edx.org", to_publish, destination, [to_publish], None)
 
     def setUp(self):
@@ -976,7 +976,7 @@ class TestItemCrud(SplitModuleTest):
 
     def test_create_minimal_item(self):
         """
-        create_item(course_or_parent_locator, category, user, definition_locator=None, fields): new_desciptor
+        create_item(user, location, category, definition_locator=None, fields): new_desciptor
         """
         # grab link to course to ensure new versioning works
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
@@ -985,7 +985,7 @@ class TestItemCrud(SplitModuleTest):
         # add minimal one w/o a parent
         category = 'sequential'
         new_module = modulestore().create_item(
-            locator, category, 'user123',
+            'user123', parent_location=locator, category=category,
             fields={'display_name': 'new sequential'}
         )
         # check that course version changed and course's previous is the other one
@@ -1026,7 +1026,7 @@ class TestItemCrud(SplitModuleTest):
         premod_course = modulestore().get_course(locator.course_key)
         category = 'chapter'
         new_module = modulestore().create_item(
-            locator, category, 'user123',
+            'user123', parent_location=locator, category=category,
             fields={'display_name': 'new chapter'},
             definition_locator=original.definition_locator
         )
@@ -1055,12 +1055,12 @@ class TestItemCrud(SplitModuleTest):
         category = 'problem'
         new_payload = "<problem>empty</problem>"
         new_module = modulestore().create_item(
-            locator, category, 'anotheruser',
+            'anotheruser', parent_location=locator, category=category,
             fields={'display_name': 'problem 1', 'data': new_payload},
         )
         another_payload = "<problem>not empty</problem>"
         another_module = modulestore().create_item(
-            locator, category, 'anotheruser',
+            'anotheruser', parent_location=locator, category=category,
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
@@ -1087,7 +1087,7 @@ class TestItemCrud(SplitModuleTest):
         parent_locator = BlockUsageLocator(course_key, 'course', block_id="head345679")
         chapter_locator = BlockUsageLocator(course_key, 'chapter', block_id="foo.bar_-~:0")
         modulestore().create_item(
-            parent_locator, 'chapter', 'anotheruser',
+            'anotheruser', parent_location=parent_locator, category='chapter',
             block_id=chapter_locator.block_id,
             fields={'display_name': 'chapter 99'},
         )
@@ -1098,7 +1098,7 @@ class TestItemCrud(SplitModuleTest):
         new_payload = "<problem>empty</problem>"
         problem_locator = BlockUsageLocator(course_key, 'problem', block_id="prob.bar_-~:99a")
         modulestore().create_item(
-            chapter_locator, 'problem', 'anotheruser',
+            'anotheruser', parent_location=chapter_locator, category='problem',
             block_id=problem_locator.block_id,
             fields={'display_name': 'chapter 99', 'data': new_payload},
         )
@@ -1124,7 +1124,7 @@ class TestItemCrud(SplitModuleTest):
 
         # positive simple case: no force, add chapter
         new_ele = modulestore().create_item(
-            new_course.location, 'chapter', user,
+            user, parent_location=new_course.location, category='chapter',
             fields={'display_name': 'chapter 1'},
             continue_version=True
         )
@@ -1142,7 +1142,7 @@ class TestItemCrud(SplitModuleTest):
         # try to create existing item
         with self.assertRaises(DuplicateItemError):
             _fail = modulestore().create_item(
-                new_course.location, 'chapter', user,
+                user, parent_location=new_course.location, category='chapter',
                 block_id=new_ele.location.block_id,
                 fields={'display_name': 'chapter 2'},
                 continue_version=True
@@ -1150,7 +1150,7 @@ class TestItemCrud(SplitModuleTest):
 
         # start a new transaction
         new_ele = modulestore().create_item(
-            new_course.location, 'chapter', user,
+            user, parent_location=new_course.location, category='chapter',
             fields={'display_name': 'chapter 2'},
             continue_version=False
         )
@@ -1158,7 +1158,7 @@ class TestItemCrud(SplitModuleTest):
         # ensure force w/ continue gives exception
         with self.assertRaises(VersionConflictError):
             _fail = modulestore().create_item(
-                new_course.location, 'chapter', user,
+                user, parent_location=new_course.location, category='chapter',
                 fields={'display_name': 'chapter 2'},
                 force=True, continue_version=True
             )
@@ -1166,7 +1166,7 @@ class TestItemCrud(SplitModuleTest):
         # ensure trying to continue the old one gives exception
         with self.assertRaises(VersionConflictError):
             _fail = modulestore().create_item(
-                new_course.location, 'chapter', user,
+                user, parent_location=new_course.location, category='chapter',
                 fields={'display_name': 'chapter 3'},
                 continue_version=True
             )
@@ -1174,7 +1174,7 @@ class TestItemCrud(SplitModuleTest):
         # add new child to old parent in continued (leave off version_guid)
         course_module_locator = new_course.location.version_agnostic()
         new_ele = modulestore().create_item(
-            course_module_locator, 'chapter', user,
+            user, parent_location=course_module_locator, category='chapter',
             fields={'display_name': 'chapter 4'},
             continue_version=True
         )
@@ -1284,12 +1284,12 @@ class TestItemCrud(SplitModuleTest):
         category = 'problem'
         new_payload = "<problem>empty</problem>"
         modulestore().create_item(
-            locator, category, 'test_update_manifold',
+            'test_update_manifold', parent_location=locator, category=category,
             fields={'display_name': 'problem 1', 'data': new_payload},
         )
         another_payload = "<problem>not empty</problem>"
         modulestore().create_item(
-            locator, category, 'test_update_manifold',
+            'test_update_manifold', parent_location=locator, category=category,
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
@@ -1368,7 +1368,9 @@ class TestItemCrud(SplitModuleTest):
         """
         if not category_queue:
             return
-        node = modulestore().create_item(parent.version_agnostic(), category_queue[0], 'deleting_user')
+        node = modulestore().create_item(
+            'deleting_user', parent_location=parent.version_agnostic(), category=category_queue[0]
+        )
         node_loc = node.location.map_into_course(parent.course_key)
         for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
@@ -1432,7 +1434,7 @@ class TestCourseCreation(SplitModuleTest):
         # changing this course will not change the original course
         # using new_draft.location will insert the chapter under the course root
         new_item = modulestore().create_item(
-            new_draft.location, 'chapter', 'leech_master',
+            'leech_master', parent_location=new_draft.location, category='chapter',
             fields={'display_name': 'new chapter'}
         )
         new_draft_locator = new_draft_locator.course_key.version_agnostic()
@@ -1594,7 +1596,7 @@ class TestPublish(SplitModuleTest):
         )
         # add a child under chapter1
         new_module = modulestore().create_item(
-            chapter1, "sequential", self.user_id,
+            self.user_id, parent_location=chapter1, category="sequential",
             fields={'display_name': 'new sequential'},
         )
         # remove chapter1 from expected b/c its pub'd version != the source anymore since source changed
@@ -1612,7 +1614,7 @@ class TestPublish(SplitModuleTest):
         )
         # ensure intentionally orphaned blocks work (e.g., course_info)
         new_module = modulestore().create_item(
-            source_course, "course_info", self.user_id, block_id="handouts"
+            self.user_id, parent_location=source_course, category="course_info", block_id="handouts"
         )
         # publish it
         modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)

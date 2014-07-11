@@ -16,10 +16,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     def __init__(self, **kwargs):
         super(DraftVersioningModuleStore, self).__init__(**kwargs)
 
-    def create_course(self, org, offering, user_id, **kwargs):
+    def create_course(self, org, course, run, user_id, **kwargs):
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         return super(DraftVersioningModuleStore, self).create_course(
-            org, offering, user_id, master_branch, **kwargs
+            org, course, run, user_id, master_branch, **kwargs
         )
 
     def get_courses(self):

@@ -36,7 +36,7 @@ def get_course_updates(location, provided_id, user_id):
     try:
         course_updates = modulestore().get_item(location)
     except ItemNotFoundError:
-        course_updates = modulestore().create_and_save_xmodule(location, user_id)
+        course_updates = modulestore().create_item(user_id, location)
 
     course_update_items = get_course_update_items(course_updates, provided_id)
     return _get_visible_update(course_update_items)
@@ -51,7 +51,7 @@ def update_course_updates(location, update, passed_id=None, user=None):
     try:
         course_updates = modulestore().get_item(location)
     except ItemNotFoundError:
-        course_updates = modulestore().create_and_save_xmodule(location, user.id)
+        course_updates = modulestore().create_item(user.id, location)
 
     course_update_items = list(reversed(get_course_update_items(course_updates)))
 

@@ -64,7 +64,9 @@ from opaque_keys.edx.locator import (
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
-from xmodule.modulestore import inheritance, ModuleStoreWriteBase, ModuleStoreEnum, PublishState
+from xmodule.modulestore import (
+    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, compute_location_from_args
+)
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
@@ -520,7 +522,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if block_data['category'] in detached_categories:
                 items.discard(decode_key_from_mongo(block_id))
         return [
-            BlockUsageLocator(course_key=course_key, block_type=blocks[block_id]['category'], block_id=block_id)
+            BlockUsageLocator(
+                course_key=course_key, block_type=blocks[block_id]['category'], block_id=block_id
+            ).version_agnostic()
             for block_id in items
         ]
 
@@ -753,10 +757,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
     # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
     # validation behavior a responsibility of the model layer rather than the persistence layer.
-    def create_item(
-        self, course_or_parent_locator, category, user_id,
-        block_id=None, definition_locator=None, fields=None,
-        force=False, continue_version=False
+    def create_item(self, user_id, location=None, parent_location=None,
+        definition_locator=None, force=False, continue_version=False, **kwargs
     ):
         """
         Add a descriptor to persistence as the last child of the optional parent_location or just as an element
@@ -804,10 +806,22 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
-        # find course_index entry if applicable and structures entry
-        index_entry = self._get_index_if_valid(course_or_parent_locator, force, continue_version)
-        structure = self._lookup_course(course_or_parent_locator)['structure']
+        location = compute_location_from_args(location, parent_location, **kwargs)
 
+        if not isinstance(location, (CourseLocator, BlockUsageLocator)):
+            raise ValueError(u"Cannot create item {} in split. Wrong repr.".format(location))
+
+        # convert fields into a single dict if separated by scope
+        fields = kwargs.get('fields', {})
+        fields.update(kwargs.pop('metadata', {}))
+        fields.update(kwargs.pop('definition_data', {}))
+        kwargs['fields'] = fields
+
+        # find course_index entry if applicable and structures entry
+        index_entry = self._get_index_if_valid(location, force, continue_version)
+        structure = self._lookup_course(location)['structure']
+
+        category = location.block_type
         partitioned_fields = self.partition_fields_by_scope(category, fields)
         new_def_data = partitioned_fields.get(Scope.content, {})
         # persist the definition if persisted != passed
@@ -825,6 +839,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         new_id = new_structure['_id']
 
         # generate usage id
+        block_id = kwargs.pop('block_id', location.block_id)
         if block_id is not None:
             if encode_key_for_mongo(block_id) in new_structure['blocks']:
                 raise DuplicateItemError(block_id, self, 'structures')
@@ -850,8 +865,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         # if given parent, add new block as child and update parent's version
         parent = None
-        if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.block_id is not None:
-            encoded_block_id = encode_key_for_mongo(course_or_parent_locator.block_id)
+        if isinstance(parent_location, BlockUsageLocator) and parent_location.block_id is not None:
+            encoded_block_id = encode_key_for_mongo(parent_location.block_id)
             parent = new_structure['blocks'][encoded_block_id]
             parent['fields'].setdefault('children', []).append(new_block_id)
             if not continue_version or parent['edit_info']['update_version'] != structure['_id']:
@@ -870,9 +885,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # update the index entry if appropriate
         if index_entry is not None:
             if not continue_version:
-                self._update_head(index_entry, course_or_parent_locator.branch, new_id)
+                self._update_head(index_entry, location.branch, new_id)
             item_loc = BlockUsageLocator(
-                course_or_parent_locator.version_agnostic(),
+                location.version_agnostic(),
                 block_type=category,
                 block_id=new_block_id,
             )
@@ -901,7 +916,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         )
 
     def create_course(
-        self, org, course, run, user_id, master_branch, fields=None,
+        self, org, course, run, user_id, master_branch=None, fields=None,
         versions_dict=None, root_category='course',
         root_block_id='course', **kwargs
     ):

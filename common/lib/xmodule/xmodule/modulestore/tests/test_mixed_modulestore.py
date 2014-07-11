@@ -124,11 +124,11 @@ class TestMixedModuleStore(unittest.TestCase):
         Create a course w/ one item in the persistence store using the given course & item location.
         """
         course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
-        category = self.writable_chapter_location.category
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
-            course.location, category, self.user_id, location=self.writable_chapter_location, block_id=block_id
+            self.user_id, self.writable_chapter_location,
+            parent_location=course.location, block_id=block_id
         )
         if isinstance(course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
@@ -180,7 +180,10 @@ class TestMixedModuleStore(unittest.TestCase):
         ]
 
         def create_sub_tree(parent, block_info):
-            block = self.store.create_item(parent.location, block_info.category, self.user_id, block_id=block_info.display_name)
+            block = self.store.create_item(
+                self.user_id, parent_location=parent.location,
+                category=block_info.category, block_id=block_info.display_name
+            )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
             # reload the block to update its children field
@@ -232,8 +235,6 @@ class TestMixedModuleStore(unittest.TestCase):
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
-
-
         self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
 
     @ddt.data('draft', 'split')
@@ -331,11 +332,12 @@ class TestMixedModuleStore(unittest.TestCase):
         # create and delete a private vertical with private children
         private_vert = self.store.create_item(
             # don't use course_location as it may not be the repr
-            self.course_locations[self.MONGO_COURSEID], 'vertical', user_id=self.user_id, block_id='private'
+            self.user_id, parent_location=self.course_locations[self.MONGO_COURSEID],
+            category='vertical', block_id='private'
         )
         private_leaf = self.store.create_item(
             # don't use course_location as it may not be the repr
-            private_vert.location, 'html', user_id=self.user_id, block_id='private_leaf'
+            self.user_id, parent_location=private_vert.location, category='html', block_id='private_leaf'
         )
 
         # verify pre delete state (just to verify that the test is valid)
@@ -581,12 +583,10 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         # create an orphan
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        orphan = self.store.create_item(course_id, 'problem', self.user_id, block_id='orphan')
+        orphan_location = course_id.make_usage_key('problem', 'orphan')
+        orphan = self.store.create_item(self.user_id, orphan_location)
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        if default_ms == 'split':
-            self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
-        else:
-            self.assertEqual(found_orphans, [orphan.location.to_deprecated_string()])
+        self.assertEqual(found_orphans, [orphan_location])
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
@@ -595,7 +595,10 @@ class TestMixedModuleStore(unittest.TestCase):
         new location for the child
         """
         self.initdb(default_ms)
-        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', self.user_id, block_id='orphan')
+        self.store.create_item(
+            self.user_id, parent_location=self.course_locations[self.MONGO_COURSEID],
+            category='problem', block_id='orphan'
+        )
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 

@@ -191,12 +191,12 @@ class TemplateTests(unittest.TestCase):
         self.assertIsNotNone(updated_problem.previous_version)
         self.assertEqual(updated_problem.previous_version, first_problem.update_version)
         self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
-        updated_loc = self.split_store.delete_item(updated_problem.location, ModuleStoreEnum.UserID.test, 'testbot')
+        self.split_store.delete_item(updated_problem.location, ModuleStoreEnum.UserID.test, 'testbot')
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
             parent_location=BlockUsageLocator.make_relative(
-                updated_loc, block_type='problem', block_id=sub.location.block_id
+                test_course.location.version_agnostic(), block_type='problem', block_id=sub.location.block_id
             ),
             user_id='testbot', category='problem',
             data="<problem></problem>"

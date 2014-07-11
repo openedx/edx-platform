@@ -7,6 +7,7 @@ import logging
 import re
 import json
 import datetime
+from uuid import uuid4
 
 from collections import namedtuple, defaultdict
 import collections
@@ -560,6 +561,25 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
+    def create_item(self, user_id, location, parent_location=None, category=None, **kwargs):
+        """
+        Creates and saves a new item.
+        Either location or (category, parent_location) or both must be provided.
+        If parent_location is provided, a new item of the given category is added as a child.
+        If location is not provided, a new item with the given category and given block_id
+          is added to the parent_location.  If the block_id is not provided, a unique name
+          is automatically generated.
+
+        Returns the newly created item.
+
+        :param user_id: ID of the user creating and saving the xmodule
+        :param location: a Location--must have a category
+        :param parent_location: optional parameter, specifying the Location of the parent item
+        :param category: optional parameter for the category of the new item
+        :param block_id: a unique identifier for the new item
+        """
+        raise NotImplementedError
+
     def update_item(self, xblock, user_id, allow_not_found=False, force=False):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
@@ -588,21 +608,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
-
-    def create_and_save_xmodule(self, location, user_id, definition_data=None, metadata=None, runtime=None, fields={}):
-        """
-        Create the new xmodule and save it.
-
-        :param location: a Location--must have a category
-        :param user_id: ID of the user creating and saving the xmodule
-        :param definition_data: can be empty. The initial definition_data for the kvs
-        :param metadata: can be empty, the initial metadata for the kvs
-        :param runtime: if you already have an xblock from the course, the xblock.runtime value
-        :param fields: a dictionary of field names and values for the new xmodule
-        """
-        new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
-        self.update_item(new_object, user_id, allow_not_found=True)
-        return new_object
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
@@ -694,3 +699,18 @@ class EdxJSONEncoder(json.JSONEncoder):
                 return obj.isoformat()
         else:
             return super(EdxJSONEncoder, self).default(obj)
+
+
+def compute_location_from_args(location=None, parent_location=None, **kwargs):
+    """
+    Returns a Location object that is generated from the given arguments, as follows:
+        If location is provided, returns it.
+        If location is not provided, returns a location with the given category and given block_id.
+        If the block_id is not provided, a unique name is automatically generated.
+    """
+    if location is None:
+        block_id = kwargs.get('block_id', kwargs.get('name', kwargs.get('display_name', uuid4().hex)))
+        category = kwargs.pop('category')
+        course_key = getattr(parent_location, 'course_key', parent_location)
+        location = course_key.make_usage_key(category, Location.clean(block_id))
+    return location
