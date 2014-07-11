@@ -1763,8 +1763,13 @@ def get_survey(request, course_id):  # pylint: disable=W0613
     ))
 
     if len(submissions) > 0:
-        keys = sorted(submissions[0].get_survey_answer().keys())
+        # NOTE: eliminate duplication of question names
+        keyset = set()
+        for s in submissions:
+            keyset.update(s.get_survey_answer().keys())
+        keys = sorted(keyset)
         header.extend(keys)
+
         for s in submissions:
             row = [s.unit_id, s.survey_name, s.created, s.username]
             row.append(dict(UserProfile.GENDER_CHOICES).get(s.gender, s.gender) or '')
@@ -1772,7 +1777,7 @@ def get_survey(request, course_id):  # pylint: disable=W0613
             row.append(dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES).get(s.level_of_education, s.level_of_education) or '')
             row.append(s.account_status if s.account_status == UserStanding.ACCOUNT_DISABLED else '')
             for key in keys:
-                value = s.get_survey_answer().get(key)
+                value = s.get_survey_answer().get(key, '')
                 # NOTE: replace list into commified str
                 if isinstance(value, list):
                     value = ','.join(value)
