@@ -628,7 +628,7 @@ class OpenEndedGradingTab(AuthenticatedCourseTab, GradingTab):
 
     def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
         super(OpenEndedGradingTab, self).__init__(
-            # Translators: "Open Ended Panel" appears on a tab that, when clicked, opens up a panel that
+            # Translators: "Assessment Panel" appears on a tab that, when clicked, opens up a panel that
             # displays information about open-ended problems that a user has submitted or needs to grade
             name=_("Assessment Panel"),
             tab_id=self.type,
