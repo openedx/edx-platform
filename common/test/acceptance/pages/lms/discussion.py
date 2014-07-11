@@ -267,6 +267,9 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
             "Thread expanded"
         ).fulfill()
 
+    def is_thread_anonymous(self):
+        return not self.q(css=".posted-details > .username").present
+
 
 class DiscussionUserProfilePage(CoursePage):
 
