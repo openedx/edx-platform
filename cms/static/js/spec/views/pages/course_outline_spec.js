@@ -244,6 +244,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             });
 
             describe("Section", function() {
+                var getDisplayNameWrapper;
+
+                getDisplayNameWrapper = function() {
+                    return getHeaderElement('.outline-item-section').find('.wrapper-xblock-field').first();
+                };
+
                 it('can be deleted', function() {
                     var promptSpy = view_helpers.createPromptSpy(), requestCount;
                     createCourseOutlinePage(this, createMockCourseJSON('mock-course', 'Mock Course', [
@@ -306,17 +312,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
                 it('can be renamed inline', function() {
                     var updatedDisplayName = 'Updated Section Name',
-                        displayNameElement,
+                        displayNameWrapper,
                         sectionModel;
                     createCourseOutlinePage(this, mockCourseJSON);
-                    displayNameElement = getHeaderElement('.outline-item-section').find('.xblock-field-value');
-                    displayNameInput = view_helpers.inlineEdit(displayNameElement, updatedDisplayName);
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = view_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
                     create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    view_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
+                    view_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     sectionModel = outlinePage.model.get('child_info').children[0];
                     expect(sectionModel.get('display_name')).toBe(updatedDisplayName);
                 });
@@ -330,6 +336,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             });
 
             describe("Subsection", function() {
+                var getDisplayNameWrapper;
+
+                getDisplayNameWrapper = function() {
+                    return getHeaderElement('.outline-item-subsection').find('.wrapper-xblock-field').first();
+                };
+
                 it('can be deleted', function() {
                     var promptSpy = view_helpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
@@ -361,11 +373,11 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
                 it('can be renamed inline', function() {
                     var updatedDisplayName = 'Updated Subsection Name',
-                        displayNameElement,
+                        displayNameWrapper,
                         subsectionModel;
                     createCourseOutlinePage(this, mockCourseJSON);
-                    displayNameElement = getHeaderElement('.outline-item-subsection').find('.xblock-field-value');
-                    displayNameInput = view_helpers.inlineEdit(displayNameElement, updatedDisplayName);
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = view_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, { });
@@ -375,8 +387,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             createMockSubsectionJSON('mock-subsection', updatedDisplayName, [])
                         ]));
                     // Find the display name again in the refreshed DOM and verify it
-                    displayNameElement = getHeaderElement('.outline-item-subsection').find('.xblock-field-value');
-                    view_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
+                    displayNameWrapper = getHeaderElement('.outline-item-subsection').find('.wrapper-xblock-field').first();
+                    view_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     subsectionModel = outlinePage.model.get('child_info').children[0].get('child_info').children[0];
                     expect(subsectionModel.get('display_name')).toBe(updatedDisplayName);
                 });

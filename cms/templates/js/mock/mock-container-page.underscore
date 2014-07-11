@@ -6,8 +6,8 @@
                 <small class="navigation navigation-parents subtitle">
                     <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
                 </small>
-                <div class="wrapper-xblock-field" data-field="display_name">
-                    <h1 class="page-header-title is-editable xblock-field-value">Test Container</h1>
+                <div class="wrapper-xblock-field is-editable" data-field="display_name">
+                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
                 </div>
             </div>
 

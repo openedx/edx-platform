@@ -10,7 +10,8 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
 
         var XBlockStringFieldEditor = BaseView.extend({
             events: {
-                'click .xblock-field-value': 'showInput',
+                'click .xblock-field-value-edit': 'showInput',
+                'click button[type=submit]': 'onClickSubmit',
                 'change .xblock-field-input': 'updateField',
                 'focusout .xblock-field-input': 'onInputFocusLost',
                 'keyup .xblock-field-input': 'handleKeyUp'
@@ -21,6 +22,7 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.fieldName = this.$el.data('field');
+                this.fieldDisplayName = this.$el.data('field-display-name');
                 this.template = this.loadTemplate('xblock-string-field-editor');
                 this.model.on('change:' + this.fieldName, this.onChangeField, this);
             },
@@ -28,7 +30,8 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
             render: function() {
                 this.$el.append(this.template({
                     value: this.model.get(this.fieldName),
-                    fieldName: this.fieldName
+                    fieldName: this.fieldName,
+                    fieldDisplayName: this.fieldDisplayName
                 }));
                 return this;
             },
@@ -48,6 +51,11 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 }
             },
 
+            onClickSubmit: function(event) {
+                event.preventDefault();
+                this.updateField();
+            },
+
             onChangeField: function() {
                 var value = this.model.get(this.fieldName);
                 this.getLabel().text(value);
@@ -58,14 +66,12 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
             showInput: function(event) {
                 var input = this.getInput();
                 event.preventDefault();
-                this.getLabel().addClass('is-hidden');
-                input.removeClass('is-hidden');
+                this.$el.addClass('is-editing');
                 input.focus();
             },
 
             hideInput: function() {
-                this.getLabel().removeClass('is-hidden');
-                this.getInput().addClass('is-hidden');
+                this.$el.removeClass('is-editing');
             },
 
             cancelInput: function() {
