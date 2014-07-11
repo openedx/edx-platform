@@ -54,6 +54,7 @@
 @import "discussion/views/new-post";
 @import "discussion/elements/editor";
 @import "discussion/elements/navigation";
+@import "discussion/views/thread";
 @import 'discussion/utilities/developer';
 @import 'discussion/utilities/shame';
 
