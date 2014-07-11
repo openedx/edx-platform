@@ -14,6 +14,7 @@ class CourseOutlineItem(object):
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
     BODY_SELECTOR = None
+    EDIT_BUTTON_SELECTOR = '.xblock-title .xblock-field-value-edit'
     NAME_SELECTOR = '.xblock-title .xblock-field-value'
     NAME_INPUT_SELECTOR = '.xblock-title .xblock-field-input'
 
@@ -45,7 +46,7 @@ class CourseOutlineItem(object):
         """
         Changes the container's name.
         """
-        self.q(css=self._bounded_selector(self.NAME_SELECTOR)).first.click()
+        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
         self.wait_for_ajax()
 

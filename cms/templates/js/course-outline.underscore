@@ -14,8 +14,8 @@
                 <% if (xblockInfo.get('category') === 'vertical') { %>
                     <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
                 <% } else { %>
-                    <span class="wrapper-xblock-field" data-field="display_name">
-                        <span class="is-editable xblock-field-value"><%= xblockInfo.get('display_name') %></span>
+                    <span class="wrapper-xblock-field is-editable" data-field="display_name" data-field-display-name="<%= gettext("Display Name") %>">
+                        <span class="xblock-field-value"><%= xblockInfo.get('display_name') %></span>
                     </span>
                 <% } %>
             </h3>
