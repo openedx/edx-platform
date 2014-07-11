@@ -16,19 +16,25 @@
       border-bottom: none;
       padding-bottom: 0;
 
-      .page-header-title {
-        @extend %t-title;
-        @include font-size(28);
-        @include line-height(32);
-        font-weight: 600;
-      }
+      .page-header {
 
-      .xblock-title .xblock-field-input {
-        @extend %t-title4;
-        background: none repeat scroll 0 0 white;
-        border: 0;
-        box-shadow: 0 0 2px 2px $shadow inset;
-        font-weight: 600;
+        .page-header-title {
+          @extend %t-title;
+          @include font-size(28);
+          @include line-height(32);
+          font-weight: 600;
+        }
+
+        .is-editable {
+
+          .incontext-editor-input {
+            @extend %t-title4;
+            background: none repeat scroll 0 0 white;
+            border: 0;
+            box-shadow: 0 0 2px 2px $shadow inset;
+            font-weight: 600;
+          }
+        }
       }
 
       &.has-actions {
@@ -49,18 +55,11 @@
 
     .no-container-content {
       @extend %no-content;
+      padding: ($baseline*1.5) ($baseline*2);
 
       // custom rules to reuse xblock validation styling in ui-well context
       .icon-warning-sign {
         display: none;
-      }
-
-      .edit-button {
-        @include green-button;
-        @extend %t-action4;
-        padding: 8px 20px 10px;
-        text-align: center;
-        margin: ($baseline/2) 0 ($baseline/2) $baseline;
       }
     }
 

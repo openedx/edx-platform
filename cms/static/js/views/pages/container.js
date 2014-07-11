@@ -24,7 +24,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 if (this.options.action === 'new') {
                     this.nameEditor.$('.xblock-field-value').click();
                 }
-                this.model.on('sync', this.onSync, this);
                 this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
@@ -57,12 +56,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         model: this.model
                     });
                     this.unitOutlineView.render();
-                }
-            },
-
-            onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, ['display_name'])) {
-                    this.render();
                 }
             },
 
