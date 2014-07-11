@@ -10,6 +10,7 @@ from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
+from ..pages.studio.html_component_editor import HtmlComponentEditorView
 from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.staff_view import StaffPage
@@ -427,6 +428,9 @@ class UnitPublishingTest(ContainerBase):
     LOCKED_STATUS = "Publishing Status\nUnpublished (Staff only)"
     RELEASE_TITLE_RELEASED = "RELEASED:"
 
+    LAST_PUBLISHED = 'Last published'
+    LAST_SAVED = 'Draft saved on'
+
     def setup_fixtures(self):
         """
         Sets up a course structure with a unit and a single HTML child.
@@ -476,11 +480,16 @@ class UnitPublishingTest(ContainerBase):
             When I go to the unit page in Studio
             Then the title in the Publish information box is "Published"
             And the Publish button is disabled
+            And the last published text contains "Last published"
+            And the last saved text contains "Last published"
             And when I add a component to the unit
             Then the title in the Publish information box is "Draft (Unpublished changes)"
+            And the last saved text contains "Draft saved on"
             And the Publish button is enabled
             And when I click the Publish button
             Then the title in the Publish information box is "Published"
+            And the last published text contains "Last published"
+            And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
@@ -488,15 +497,18 @@ class UnitPublishingTest(ContainerBase):
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC with Section "Test Section"'
         )
+        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
         # Should not be able to click on Publish action -- but I don't know how to test that it is not clickable.
         # TODO: continue discussion with Muhammad and Jay about this.
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
         self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
         """
@@ -648,6 +660,54 @@ class UnitPublishingTest(ContainerBase):
         # Switch to student view and verify visible.
         self._verify_student_view_visible(['discussion'])
 
+    def test_published_unit_with_draft_child(self):
+        """
+        Scenario: A published unit with a draft child can be published
+            Given I have a published unit with no unpublished changes
+            When I go to the unit page in Studio
+            And edit the content of the only component
+            Then the content changes
+            And the title in the Publish information box is "Draft (Unpublished changes)"
+            And when I click the Publish button
+            Then the title in the Publish information box is "Published"
+            And when I click the View Live button
+            Then I see the changed content in LMS
+        """
+        modified_content = 'modified content'
+
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
+        component.edit()
+        HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
+        self.assertEqual(component.student_content, modified_content)
+        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.publish_action.click()
+        unit.wait_for_ajax()
+        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.view_published_version()
+        self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
+
+    def test_delete_child_in_published_unit(self):
+        """
+        Scenario: A published unit can be published again after deleting a child
+            Given I have a published unit with no unpublished changes
+            When I go to the unit page in Studio
+            And delete the only component
+            Then the title in the Publish information box is "Draft (Unpublished changes)"
+            And when I click the Publish button
+            Then the title in the Publish information box is "Published"
+            And when I click the View Live button
+            Then I see an empty unit in LMS
+        """
+        unit = self.go_to_unit_page()
+        unit.delete(0)
+        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.publish_action.click()
+        unit.wait_for_ajax()
+        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.view_published_version()
+        self.assertEqual(0, self.courseware.num_xblock_components)
+
     def _verify_student_view_locked(self):
         """
         Verifies no component is visible when viewing as a student.
@@ -685,6 +745,13 @@ class UnitPublishingTest(ContainerBase):
             return (unit.publish_title == expected_title, unit.publish_title)
 
         Promise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()
+
+    def _verify_last_published_and_saved(self, unit, expected_published_prefix, expected_saved_prefix):
+        """
+        Verifies that last published and last saved messages respectively contain the given strings.
+        """
+        self.assertTrue(expected_published_prefix in unit.last_published_text)
+        self.assertTrue(expected_saved_prefix in unit.last_saved_text)
 
     # TODO: need to work with Jay/Christine to get testing of "Preview" working.
     # def test_preview(self):
