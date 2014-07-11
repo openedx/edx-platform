@@ -101,25 +101,22 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
             delete window.course_location_analytics;
         };
 
-        inlineEdit = function(element, newValue) {
-            var inputField;
-            element.click();
-            expect(element).toHaveClass('is-hidden');
-            inputField = element.next().find('.xblock-field-input');
-            expect(inputField).not.toHaveClass('is-hidden');
+        inlineEdit = function(editorWrapper, newValue) {
+            var inputField = editorWrapper.find('.xblock-field-input'),
+                editButton = editorWrapper.find('.xblock-field-value-edit');
+            editButton.click();
+            expect(editorWrapper).toHaveClass('is-editing');
             inputField.val(newValue);
             return inputField;
         };
 
-        verifyInlineEditChange = function(element, expectedValue, failedValue) {
-            var inputField = element.next().find('.xblock-field-input');
-            expect(element.text()).toBe(expectedValue);
+        verifyInlineEditChange = function(editorWrapper, expectedValue, failedValue) {
+            var displayName = editorWrapper.find('.xblock-field-value');
+            expect(displayName.text()).toBe(expectedValue);
             if (failedValue) {
-                expect(element).toHaveClass('is-hidden');
-                expect(inputField).not.toHaveClass('is-hidden');
+                expect(editorWrapper).toHaveClass('is-editing');
             } else {
-                expect(element).not.toHaveClass('is-hidden');
-                expect(inputField).toHaveClass('is-hidden');
+                expect(editorWrapper).not.toHaveClass('is-editing');
             }
         };
 
