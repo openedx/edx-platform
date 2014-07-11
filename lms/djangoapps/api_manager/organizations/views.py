@@ -1,3 +1,5 @@
+# pylint: disable=C0103
+
 """ ORGANIZATIONS API VIEWS """
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -29,7 +31,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             if users:
                 for user in users:
                     serializer = UserSerializer(user)
-                    response_data.append(serializer.data)
+                    response_data.append(serializer.data)  # pylint: disable=E1101
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             user_id = request.DATA.get('id')

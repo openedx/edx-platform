@@ -11,11 +11,9 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'CourseContentGroupRelationship', fields ['course_id', 'content_id', 'group']
         db.create_unique('api_manager_coursecontentgrouprelationship', ['course_id', 'content_id', 'group_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'CourseContentGroupRelationship', fields ['course_id', 'content_id', 'group']
         db.delete_unique('api_manager_coursecontentgrouprelationship', ['course_id', 'content_id', 'group_id'])
-
 
     models = {
         'api_manager.coursecontentgrouprelationship': {

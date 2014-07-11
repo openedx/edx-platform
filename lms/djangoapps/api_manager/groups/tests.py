@@ -4,9 +4,11 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_group_views.py]
 """
+from datetime import datetime
 from random import randint
 import uuid
 import json
+from urllib import urlencode
 
 from django.core.cache import cache
 from django.test import Client
@@ -45,26 +47,26 @@ class GroupsApiTests(ModuleStoreTestCase):
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
-        self.test_course_id = self.course.id
+        self.test_course_id = unicode(self.course.id)
         self.course_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.course.location,
             data=self.test_course_data,
-            due="2016-05-16T14:30:00Z",
+            due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence"
         )
 
         self.test_organization = Organization.objects.create(
             name="Test Organization",
-            display_name = 'Test Org',
-            contact_name = 'John Org',
-            contact_email = 'john@test.org',
-            contact_phone = '+1 332 232 24234'
+            display_name='Test Org',
+            contact_name='John Org',
+            contact_email='john@test.org',
+            contact_phone='+1 332 232 24234'
         )
 
         self.test_project = Project.objects.create(
-            course_id=self.course.id,
-            content_id=self.course_content.id
+            course_id=unicode(self.course.id),
+            content_id=unicode(self.course_content.scope_ids.usage_id)
         )
 
         self.client = SecureClient()
@@ -820,7 +822,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         data = {'course_id': self.test_course_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-        confirm_uri = test_uri + '/' + self.course.id
+        confirm_uri = test_uri + '/' + unicode(self.course.id)
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['group_id'], str(group_id))
         self.assertEqual(response.data['course_id'], self.test_course_id)
@@ -847,7 +849,13 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses'
-        data = {'course_id': "987/23/896"}
+        data = {'course_id': "slashes:invalid+course+id"}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+        data = {'course_id': "invalid/course/id"}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+        data = {'course_id': "really-invalid-course-id"}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
@@ -860,7 +868,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         data = {'course_id': self.test_course_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-        confirm_uri = test_uri + '/' + self.course.id
+        confirm_uri = test_uri + '/' + unicode(self.course.id)
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['group_id'], str(group_id))
         self.assertEqual(response.data['course_id'], self.test_course_id)
@@ -885,6 +893,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/{}/courses/{}'.format(self.base_groups_uri, group_id, self.test_course_id)
+        print test_uri
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = '{}{}/{}/courses/{}'.format(
@@ -930,7 +939,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}/courses/{}'.format(response.data['uri'], self.course.id)
+        test_uri = '{}/courses/{}'.format(response.data['uri'], unicode(self.course.id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -941,14 +950,13 @@ class GroupsApiTests(ModuleStoreTestCase):
         group_id = response.data['id']
         self.test_organization.groups.add(group_id)
         test_uri = response.data['uri'] + '/organizations/'
-        confirm_uri = test_uri + '/' + str(self.test_organization.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.test_organization.id)
         self.assertEqual(response.data[0]['name'], self.test_organization.name)
 
-    def test_group_courses_list_get_invalid_group(self):
+    def test_group_organizations_list_get_invalid_group(self):
         test_uri = self.base_groups_uri + '/1231241/organizations/'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
@@ -981,7 +989,8 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['num_pages'], 2)
 
         # test with course_id filter
-        response = self.do_get('/api/groups/{}/workgroups/?course_id={}'.format(group_id, self.course.id))
+        course_id = {'course_id': unicode(self.course.id)}
+        response = self.do_get('/api/groups/{}/workgroups/?{}'.format(group_id, urlencode(course_id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 11)
         self.assertIsNotNone(response.data['results'][0]['name'])
