@@ -38,6 +38,13 @@ edX Learning Management System
   in the discussion forum topic list sometimes appeared with unexpected
   formatting. This bug has been fixed. (FOR-578)
 
+* The Discussions user interface is updated to include labels for pinned and
+  staff-initiated threads in the discussion list, as shown in the following
+  example:
+
+  .. image:: images/discussion_labels.png
+   :alt: Image of discussions with Pinned and By: Staff labels
+
 **************************
 edX Documentation
 **************************
