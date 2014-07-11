@@ -11,6 +11,9 @@
     if runtime? and version? and initFnName?
       runtime = new window[runtime]["v#{version}"]
       initFn = window[initFnName]
+      if( initFn == undefined ) {
+        console.log("ERROR: window['"+initFnName+"'] not defined.  Are you using \"use strict\"; in your javascript code?");
+      }
       block = initFn(runtime, element) ? {}
       block.runtime = runtime
     else
