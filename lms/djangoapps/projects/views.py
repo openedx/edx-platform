@@ -13,15 +13,79 @@ from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
 
+
+from courseware import module_render
 from courseware.courses import get_course
 from courseware.model_data import FieldDataCache
-from xmodule.modulestore import Location
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from xmodule.modulestore import Location, InvalidLocationError
+from xmodule.modulestore.django import modulestore
 
 from .models import Project, Workgroup, WorkgroupSubmission
 from .models import WorkgroupReview, WorkgroupSubmissionReview, WorkgroupPeerReview
 from .serializers import UserSerializer, GroupSerializer
 from .serializers import ProjectSerializer, WorkgroupSerializer, WorkgroupSubmissionSerializer
 from .serializers import WorkgroupReviewSerializer, WorkgroupSubmissionReviewSerializer, WorkgroupPeerReviewSerializer
+
+
+def _get_course(request, user, course_id, depth=0):
+    """
+    Utility method to obtain course components
+    """
+    course_descriptor = None
+    course_key = None
+    course_content = None
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        try:
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        except InvalidKeyError:
+            pass
+    if course_key:
+        try:
+            course_descriptor = get_course(course_key, depth=depth)
+        except ValueError:
+            pass
+    if course_descriptor:
+        field_data_cache = FieldDataCache([course_descriptor], course_key, user)
+        course_content = module_render.get_module(
+            user,
+            request,
+            course_descriptor.location,
+            field_data_cache,
+            course_key)
+    return course_descriptor, course_key, course_content
+
+
+def _get_course_child(request, user, course_key, content_id):
+    """
+    Return a course xmodule/xblock to the caller
+    """
+    content_descriptor = None
+    content_key = None
+    content = None
+    try:
+        content_key = UsageKey.from_string(content_id)
+    except InvalidKeyError:
+        try:
+            content_key = Location.from_deprecated_string(content_id)
+        except (InvalidKeyError, InvalidLocationError):
+            pass
+    if content_key:
+        store = modulestore()
+        content_descriptor = store.get_item(content_key)
+    if content_descriptor:
+        field_data_cache = FieldDataCache([content_descriptor], course_key, user)
+        content = module_render.get_module(
+            user,
+            request,
+            content_key,
+            field_data_cache,
+            course_key)
+    return content_descriptor, content_key, content
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -58,7 +122,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             if groups:
                 for group in groups:
                     serializer = GroupSerializer(group)
-                    response_data.append(serializer.data)
+                    response_data.append(serializer.data)  # pylint: disable=E1101
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             group_id = request.DATA.get('id')
@@ -84,7 +148,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             if users:
                 for user in users:
                     serializer = UserSerializer(user)
-                    response_data.append(serializer.data)
+                    response_data.append(serializer.data)  # pylint: disable=E1101
             return Response(response_data, status=status.HTTP_200_OK)
         elif request.method == 'POST':
             user_id = request.DATA.get('id')
@@ -118,7 +182,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         if peer_reviews:
             for peer_review in peer_reviews:
                 serializer = WorkgroupPeerReviewSerializer(peer_review)
-                response_data.append(serializer.data)
+                response_data.append(serializer.data)  # pylint: disable=E1101
         return Response(response_data, status=status.HTTP_200_OK)
 
     @link()
@@ -131,7 +195,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         if workgroup_reviews:
             for workgroup_review in workgroup_reviews:
                 serializer = WorkgroupReviewSerializer(workgroup_review)
-                response_data.append(serializer.data)
+                response_data.append(serializer.data)  # pylint: disable=E1101
         return Response(response_data, status=status.HTTP_200_OK)
 
     @link()
@@ -144,7 +208,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         if submissions:
             for submission in submissions:
                 serializer = WorkgroupSubmissionSerializer(submission)
-                response_data.append(serializer.data)
+                response_data.append(serializer.data)  # pylint: disable=E1101
         return Response(response_data, status=status.HTTP_200_OK)
 
     @action()
@@ -156,15 +220,15 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         course_id = request.DATA.get('course_id')
         if course_id is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            course_descriptor = get_course(course_id)
-        except ValueError:
-            course_descriptor = None
+        course_descriptor, course_key, course_content = _get_course(request, request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         content_id = request.DATA.get('content_id')
         if content_id is None:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        content_descriptor, content_key, content = _get_course_child(request, request.user, course_key, content_id)  # pylint: disable=W0612
+        if content_descriptor is None:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         grade = request.DATA.get('grade')
@@ -182,10 +246,10 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             key = KeyValueStore.Key(
                 scope=Scope.user_state,
                 user_id=user.id,
-                block_scope_id=Location(content_id),
+                block_scope_id=content_key,
                 field_name='grade'
             )
-            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
+            field_data_cache = FieldDataCache([course_descriptor], course_key, user)
             student_module = field_data_cache.find_or_create(key)
             student_module.grade = grade
             student_module.max_grade = max_grade
@@ -211,7 +275,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             if workgroups:
                 for workgroup in workgroups:
                     serializer = WorkgroupSerializer(workgroup)
-                    response_data.append(serializer.data)
+                    response_data.append(serializer.data)  # pylint: disable=E1101
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             workgroup_id = request.DATA.get('id')

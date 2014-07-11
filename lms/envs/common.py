@@ -286,6 +286,8 @@ FEATURES = {
     # when the styles appropriately match the edX.org website.
     'ENABLE_NEW_EDX_HEADER': False,
 
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False
 }
 
 # Ignore static asset files on import which match this pattern

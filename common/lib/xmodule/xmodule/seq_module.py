@@ -60,7 +60,14 @@ class SequenceModule(SequenceFields, XModule):
 
         # if position is specified in system, then use that instead
         if getattr(self.system, 'position', None) is not None:
-            self.position = int(self.system.position)
+            # (mattdrayer) Added try/except here due to self.system.position being a SlashSeparatedCourseKey
+            # Observed during execution of api_manager/users/tests.py
+            try:
+                self.position = int(self.system.position)
+            except TypeError:
+                if not self.position:
+                    self.position = 1
+
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.

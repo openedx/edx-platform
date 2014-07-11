@@ -1,23 +1,20 @@
 """ API implementation for group-oriented interactions. """
 import uuid
 import json
-from collections import OrderedDict
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.response import Response
 
+from api_manager.courseware_access import get_course
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import str2bool, generate_base_uri
 from api_manager.organizations import serializers
 from projects.serializers import BasicWorkgroupSerializer
-from xmodule.modulestore import Location, InvalidLocationError
-from xmodule.modulestore.django import modulestore
 
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
@@ -317,7 +314,7 @@ class GroupsUsersDetail(SecureAPIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, group_id, user_id):
+    def delete(self, request, group_id, user_id):  # pylint: disable=W0612,W0613
         """
         DELETE removes/inactivates/etc. an existing group-user relationship
         """
@@ -470,7 +467,7 @@ class GroupsGroupsDetail(SecureAPIView):
                     response_status = status.HTTP_200_OK
         return Response(response_data, response_status)
 
-    def delete(self, request, group_id, related_group_id):
+    def delete(self, request, group_id, related_group_id):  # pylint: disable=W0613
         """
         DELETE /api/groups/{group_id}/groups/{related_group_id}
         """
@@ -481,7 +478,6 @@ class GroupsGroupsDetail(SecureAPIView):
         try:
             to_group_relationship = GroupRelationship.objects.get(group__id=related_group_id)
         except ObjectDoesNotExist:
-            to_group = None
             to_group_relationship = None
         if from_group_relationship:
             if to_group_relationship:
@@ -524,13 +520,12 @@ class GroupsCoursesList(SecureAPIView):
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
-        store = modulestore()
         course_id = request.DATA['course_id']
 
         base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
 
-        existing_course = store.get_course(course_id)
+        existing_course, course_key, course_content = get_course(request, request.user, course_id)  # pylint: disable=W0612
         if not existing_course:
             return Response({}, status.HTTP_404_NOT_FOUND)
 
@@ -558,11 +553,10 @@ class GroupsCoursesList(SecureAPIView):
             existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
-        store = modulestore()
         members = CourseGroupRelationship.objects.filter(group=existing_group)
         response_data = []
         for member in members:
-            course = store.get_course(member.course_id)
+            course, course_key, course_content = get_course(request, request.user, member.course_id)  # pylint: disable=W0612
             course_data = {
                 'course_id': member.course_id,
                 'display_name': course.display_name
@@ -607,7 +601,7 @@ class GroupsCoursesDetail(SecureAPIView):
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
-    def delete(self, request, group_id, course_id):
+    def delete(self, request, group_id, course_id):  # pylint: disable=W0613
         """
         DELETE /api/groups/{group_id}/courses/{course_id}
         """
@@ -630,7 +624,7 @@ class GroupsOrganizationsList(SecureAPIView):
     * View all of the Organizations related to a particular Program (currently modeled as a Group entity)
     """
 
-    def get(self, request, group_id):
+    def get(self, request, group_id):  # pylint: disable=W0613
         """
         GET /api/groups/{group_id}/organizations/
         """
@@ -642,7 +636,7 @@ class GroupsOrganizationsList(SecureAPIView):
         response_data = []
         for org in existing_group.organizations.all():
             serializer = serializers.OrganizationSerializer(org)
-            response_data.append(serializer.data)
+            response_data.append(serializer.data)  # pylint: disable=E1101
         return Response(response_data, status=status.HTTP_200_OK)
 
 

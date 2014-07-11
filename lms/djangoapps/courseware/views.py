@@ -221,7 +221,7 @@ def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
-    print child_name
+
     for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.location.name == child_name:
             # Only save if position changed

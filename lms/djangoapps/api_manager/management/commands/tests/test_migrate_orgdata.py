@@ -1,3 +1,7 @@
+"""
+Run these tests @ Devstack:
+    rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
+"""
 import json
 import uuid
 
@@ -9,9 +13,9 @@ from api_manager.models import GroupProfile, GroupRelationship, Organization
 
 
 class MigrateOrgDataTests(TestCase):
-
-    def setUp(self):
-        setup = True
+    """
+    Test suite for data migration script
+    """
 
     def test_migrate_orgdata(self):
         """
@@ -20,7 +24,6 @@ class MigrateOrgDataTests(TestCase):
 
         # Create some old-style Group organizations to migrate
         group_name = str(uuid.uuid4())
-        group_profile_name = "Group 1 Name"
         group_type = "organization"
         groupdata = {}
         groupdata['name'] = "Group 1 Data Name"
@@ -29,8 +32,8 @@ class MigrateOrgDataTests(TestCase):
         groupdata['contact_email'] = "Group 1 Data Contact Email"
         groupdata['contact_phone'] = "Group 1 Data Contact Phone"
         group = Group.objects.create(name=group_name)
-        group_relationship = GroupRelationship.objects.create(group_id=group.id)
-        profile, _ = GroupProfile.objects.get_or_create(
+        GroupRelationship.objects.create(group_id=group.id)
+        GroupProfile.objects.get_or_create(
             group_id=group.id,
             group_type=group_type,
             name=groupdata['name'],
@@ -43,7 +46,6 @@ class MigrateOrgDataTests(TestCase):
         group.grouprelationship.add_linked_group_relationship(linked_group_relationship)
 
         group2_name = str(uuid.uuid4())
-        group2_profile_name = "Group 2 Name"
         group2_type = "organization"
         groupdata = {}
         groupdata['name'] = "Group 2 Data Name"
@@ -52,8 +54,8 @@ class MigrateOrgDataTests(TestCase):
         groupdata['contact_email'] = "Group 2 Data Contact Email"
         groupdata['contact_phone'] = "Group 2 Data Contact Phone"
         group2 = Group.objects.create(name=group2_name)
-        grouprelattionship2 = GroupRelationship.objects.create(group_id=group2.id)
-        profile2, _ = GroupProfile.objects.get_or_create(
+        GroupRelationship.objects.create(group_id=group2.id)
+        GroupProfile.objects.get_or_create(
             group_id=group2.id,
             group_type=group2_type,
             name=groupdata['name'],
