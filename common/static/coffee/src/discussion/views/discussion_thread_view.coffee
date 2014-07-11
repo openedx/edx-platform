@@ -13,6 +13,9 @@ if Backbone?
     $: (selector) ->
       @$el.find(selector)
 
+    isQuestion: ->
+      @model.get("thread_type") == "question"
+
     initialize: (options) ->
       super()
       @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
@@ -21,6 +24,8 @@ if Backbone?
       @createShowView()
       @responses = new Comments()
       @loadedResponses = false
+      if @isQuestion()
+        @markedAnswers = new Comments()
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -36,7 +41,9 @@ if Backbone?
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderAddResponseButton()
-      @responses.on("add", @renderResponse)
+      @responses.on("add", (response) => @renderResponseToList(response, ".js-response-list"))
+      if @isQuestion()
+        @markedAnswers.on("add", (response) => @renderResponseToList(response, ".js-marked-answer-list"))
       if @mode == "tab"
         # Without a delay, jQuery doesn't add the loading extension defined in
         # utils.coffee before safeAjax is invoked, which results in an error
@@ -93,8 +100,18 @@ if Backbone?
           @responseRequest = null
         success: (data, textStatus, xhr) =>
           Content.loadContentInfos(data['annotated_content_info'])
-          @responses.add(data['content']['children'])
-          @renderResponseCountAndPagination(data['content']['resp_total'])
+          if @isQuestion()
+            @markedAnswers.add(data["content"]["endorsed_responses"])
+          @responses.add(
+            if @isQuestion()
+            then data["content"]["non_endorsed_responses"]
+            else data["content"]["children"]
+          )
+          @renderResponseCountAndPagination(
+            if @isQuestion()
+            then data["content"]["non_endorsed_resp_total"]
+            else data["content"]["resp_total"]
+          )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
         error: (xhr) =>
@@ -115,16 +132,24 @@ if Backbone?
             )
 
     loadInitialResponses: () ->
-      @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true)
+      @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".js-response-list"), true)
 
     renderResponseCountAndPagination: (responseTotal) =>
+      if @isQuestion() && @markedAnswers.length != 0
+        responseCountFormat = ngettext(
+          "%(numResponses)s other response",
+          "%(numResponses)s other responses",
+          responseTotal
+        )
+      else
+        responseCountFormat = ngettext(
+          "%(numResponses)s response",
+          "%(numResponses)s responses",
+          responseTotal
+        )
       @$el.find(".response-count").html(
         interpolate(
-          ngettext(
-            "%(numResponses)s response",
-            "%(numResponses)s responses",
-            responseTotal
-          ),
+          responseCountFormat,
           {numResponses: responseTotal},
           true
         )
@@ -166,13 +191,13 @@ if Backbone?
           loadMoreButton.click((event) => @loadResponses(responseLimit, loadMoreButton))
           responsePagination.append(loadMoreButton)
 
-    renderResponse: (response) =>
+    renderResponseToList: (response, listSelector) =>
         response.set('thread', @model)
         view = new ThreadResponseView(model: response)
         view.on "comment:add", @addComment
         view.on "comment:endorse", @endorseThread
         view.render()
-        @$el.find(".responses").append(view.el)
+        @$el.find(listSelector).append(view.el)
         view.afterInsert()
 
     renderAddResponseButton: ->
@@ -202,7 +227,7 @@ if Backbone?
       @setWmdContent("reply-body", "")
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
-      @renderResponse(comment)
+      @renderResponseToList(comment, ".js-response-list")
       @model.addComment()
       @renderAddResponseButton()
 
