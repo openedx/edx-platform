@@ -5,7 +5,7 @@ displaying containers within units.
 """
 
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.outline import CourseOutlinePage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from ..helpers import UniqueCourseTest

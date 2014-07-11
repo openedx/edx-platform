@@ -16,7 +16,7 @@ from ...pages.studio.howitworks import HowitworksPage
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.login import LoginPage
 from ...pages.studio.manage_users import CourseTeamPage
-from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.outline import CourseOutlinePage
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_graders import GradingPage
@@ -132,7 +132,7 @@ class CoursePagesTest(UniqueCourseTest):
             page.visit()
 
 
-class CourseSectionTest(UniqueCourseTest):
+class CourseOutlineTest(UniqueCourseTest):
     """
     Tests that verify the sections name editable only inside headers in Studio Course Outline that you can get to
     when logged in and have a course.
@@ -144,11 +144,13 @@ class CourseSectionTest(UniqueCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(CourseSectionTest, self).setUp()
+        super(CourseOutlineTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True).visit()
         self.course_outline_page = CourseOutlinePage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
+
+    def installCourse(self):
         # Install a course with sections/problems, tabs, updates, and handouts
         course_fix = CourseFixture(
             self.course_info['org'], self.course_info['number'],
@@ -158,12 +160,18 @@ class CourseSectionTest(UniqueCourseTest):
             XBlockFixtureDesc('chapter', 'Test Section')
         ).install()
 
-        self.course_outline_page.visit()
 
+class CourseSectionTest(CourseOutlineTest):
+    """
+    Tests that verify the sections name editable only inside headers in Studio Course Outline that you can get to
+    when logged in and have a course.
+    """
     def test_section_name_editable_in_course_outline(self):
         """
         Check that section name is editable on course outline page.
         """
+        self.course_outline_page.visit()
+        self.installCourse()
         new_name = u"Test Section New"
         section = self.course_outline_page.section_at(0)
         self.assertEqual(section.name, u"Test Section")
