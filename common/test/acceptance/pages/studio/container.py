@@ -93,6 +93,20 @@ class ContainerPage(PageObject):
         return self.q(css='.wrapper-release .copy').first.text[0]
 
     @property
+    def last_saved_text(self):
+        """
+        Returns the last saved message as displayed in the publishing sidebar component.
+        """
+        return self.q(css='.wrapper-last-draft').first.text[0]
+
+    @property
+    def last_published_text(self):
+        """
+        Returns the last published message as displayed in the sidebar.
+        """
+        return self.q(css='.wrapper-last-publish').first.text[0]
+
+    @property
     def currently_visible_to_students(self):
         """
         Returns True if the unit is marked as currently visible to students
@@ -247,6 +261,13 @@ class XBlockWrapper(PageObject):
             self.locator,
             selector
         )
+
+    @property
+    def student_content(self):
+        """
+        Returns the text content of the xblock as displayed on the container page.
+        """
+        return self.q(css=self._bounded_selector('.xblock-student_view'))[0].text
 
     @property
     def name(self):
