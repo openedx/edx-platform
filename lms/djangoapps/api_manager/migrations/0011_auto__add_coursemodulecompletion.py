@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    def forwards(self, orm):      
+    def forwards(self, orm):
 
         # Adding M2M table for field groups on 'Organization'
         db.create_table('api_manager_organization_groups', (
@@ -17,12 +17,10 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('api_manager_organization_groups', ['organization_id', 'group_id'])
 
-
     def backwards(self, orm):
-      
+
         # Removing M2M table for field groups on 'Organization'
         db.delete_table('api_manager_organization_groups')
-
 
     models = {
         'api_manager.coursecontentgrouprelationship': {

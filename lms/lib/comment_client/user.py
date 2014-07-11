@@ -180,6 +180,17 @@ class User(models.Model):
         self._update_from_response(response)
 
 
+def get_course_social_stats(course_id):
+
+    url = _url_for_course_social_stats()
+    params = {'course_id': course_id}
+    response = perform_request(
+        'get',
+        url,
+        params
+    )
+    return response
+
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
 
@@ -206,6 +217,10 @@ def _url_for_user_stats(user_id,course_id):
 
 def _url_for_user_social_stats(user_id):
     return "{prefix}/users/{user_id}/social_stats".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_course_social_stats():
+    return "{prefix}/users/*/social_stats".format(prefix=settings.PREFIX)
 
 
 def _url_for_read(user_id):

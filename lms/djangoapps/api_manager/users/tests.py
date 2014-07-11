@@ -1,24 +1,30 @@
+# pylint: disable=E1101
 # pylint: disable=E1103
 
 """
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_user_views.py]
 """
+from datetime import datetime
 from random import randint
 import json
-import unittest
 import uuid
+from urllib import urlencode
 from mock import patch
+
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
+
+from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from projects.models import Project
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
-from projects.models import Project
-
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import Location
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -51,24 +57,38 @@ class UsersApiTests(TestCase):
         self.test_last_name = str(uuid.uuid4())
         self.test_city = str(uuid.uuid4())
         self.org_base_uri = '/api/organizations/'
+        self.test_bogus_course_id = 'foo/bar/baz'
+        self.test_bogus_content_id = 'i4x://foo/bar/baz/Chapter1'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            display_name="TEST COURSE",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30)
+        )
         self.course_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.course.location,
             data=self.test_course_data,
-            due="2016-05-16T14:30:00Z",
+            due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence"
         )
         self.test_project = Project.objects.create(
-            course_id=self.course.id,
-            content_id=self.course_content.id
+            course_id=unicode(self.course.id),
+            content_id=unicode(self.course_content.scope_ids.usage_id)
         )
 
+        self.course2 = CourseFactory.create(display_name="TEST COURSE2", org='TESTORG2')
+        self.course2_content = ItemFactory.create(
+            category="videosequence",
+            parent_location=self.course2.location,
+            data=self.test_course_data,
+            due=datetime(2016, 5, 16, 14, 30),
+            display_name="View_Sequence2"
+        )
         self.second_test_project = Project.objects.create(
-            course_id=self.course.id + 'b2',
-            content_id=self.course_content.id + 'b2'
+            course_id=unicode(self.course2.id),
+            content_id=unicode(self.course2_content.scope_ids.usage_id)
         )
 
         self.user = UserFactory()
@@ -245,7 +265,7 @@ class UsersApiTests(TestCase):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email,
-                'username': local_username, 'password':self.test_password,
+                'username': local_username, 'password': self.test_password,
                 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -428,7 +448,6 @@ class UsersApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
-        user_id = response.data['id']
         test_uri = test_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
         test_uri = test_uri + '/groups'
@@ -561,7 +580,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_post(self):
-        course = CourseFactory.create()
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -569,12 +587,12 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(self.course.id)}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-        confirm_uri = self.test_server_prefix + test_uri + '/' + course.id
+        confirm_uri = self.test_server_prefix + test_uri + '/' + unicode(self.course.id)
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertEqual(response.data['id'], course.id)
+        self.assertEqual(response.data['id'], unicode(self.course.id))
         self.assertTrue(response.data['is_active'])
 
     def test_user_courses_list_post_undefined_user(self):
@@ -582,7 +600,7 @@ class UsersApiTests(TestCase):
         test_uri = '/api/users'
         user_id = '234234'
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(course.id)}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
@@ -594,12 +612,14 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
-        data = {'course_id': '234asdfapsdf'}
+        data = {'course_id': 'slashes:234asdfapsdf+2sdfs+sdf'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+        data = {'course_id': 'really-invalid-course-id-oh-boy-watch-out'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_get(self):
-        course = CourseFactory.create(display_name="TEST COURSE")
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -607,16 +627,28 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
-        data = {'course_id': course.id}
+
+        data = {'course_id': unicode(self.course.id)}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
+        confirm_uri = self.test_server_prefix + test_uri + '/' + unicode(self.course.id)
+
+        course_with_out_date_values = CourseFactory.create()
+        data = {'course_id': unicode(course_with_out_date_values.id)}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        confirm_uri = self.test_server_prefix + test_uri + '/' + course.id
+        confirm_uri = self.test_server_prefix + test_uri + '/' + unicode(course_with_out_date_values.id)
         self.assertEqual(response.data[0]['uri'], confirm_uri)
-        self.assertEqual(response.data[0]['id'], course.id)
+        self.assertEqual(response.data[0]['id'], unicode(course_with_out_date_values.id))
         self.assertTrue(response.data[0]['is_active'])
-        self.assertEqual(response.data[0]['name'], course.display_name)
+        self.assertEqual(response.data[0]['name'], course_with_out_date_values.display_name)
+        self.assertEqual(response.data[0]['start'], course_with_out_date_values.start)
+        self.assertEqual(response.data[0]['end'], course_with_out_date_values.end)
+        self.assertEqual(datetime.strftime(response.data[1]['start'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.start, '%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(datetime.strftime(response.data[1]['end'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.end, '%Y-%m-%d %H:%M:%S'))
 
     def test_user_courses_list_get_undefined_user(self):
         test_uri = '/api/users/2134234/courses'
@@ -644,6 +676,37 @@ class UsersApiTests(TestCase):
             data=test_data,
             display_name="Chapter 3"
         )
+        sequential1 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 1"
+        )
+        sequential2 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 2"
+        )
+        vertical1 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 1"
+        )
+        vertical2 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 2"
+        )
+        vertical3 = ItemFactory.create(
+            category="vertical",
+            parent_location=sequential2.location,
+            data=test_data,
+            display_name="Vertical 3"
+        )
+
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -651,19 +714,47 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(course.id)}
         response = self.do_post(test_uri, data)
-        test_uri = test_uri + '/' + str(course.id)
+        test_uri = test_uri + '/' + unicode(course.id)
         self.assertEqual(response.status_code, 201)
+
         position_data = {
             'position': {
-                'parent_content_id': str(course.id),
+                'parent_content_id': unicode(course.id),
                 'child_content_id': str(chapter3.location)
-
             }
         }
         response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], chapter3.id)
+        self.assertEqual(response.data['position'], unicode(chapter3.scope_ids.usage_id))
+
+        position_data = {
+            'position': {
+                'parent_content_id': unicode(chapter3.scope_ids.usage_id),
+                'child_content_id': str(sequential2.location)
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.data['position'], unicode(sequential2.scope_ids.usage_id))
+
+        position_data = {
+            'position': {
+                'parent_content_id': unicode(sequential2.scope_ids.usage_id),
+                'child_content_id': str(vertical3.location)
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.data['position'], unicode(vertical3.scope_ids.usage_id))
+
+        response = self.do_get(response.data['uri'])
+        self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter3.scope_ids.usage_id))
+        self.assertEqual(response.data['position_tree']['sequential']['id'], unicode(sequential2.scope_ids.usage_id))
+        self.assertEqual(response.data['position_tree']['vertical']['id'], unicode(vertical3.scope_ids.usage_id))
+
+    def test_user_courses_detail_post_invalid_course(self):
+        test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
+        response = self.do_post(test_uri, data={})
+        self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_post_position_invalid_user(self):
         course = CourseFactory.create()
@@ -703,7 +794,7 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(course.id)}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(course.id)
         self.assertEqual(response.status_code, 201)
@@ -715,7 +806,22 @@ class UsersApiTests(TestCase):
             }
         }
         response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], chapter1.id)
+        self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
+
+    def test_user_courses_detail_post_position_invalid_course(self):
+        test_uri = '/api/users/{}/courses'.format(self.user.id)
+        data = {'course_id': unicode(self.course.id)}
+        response = self.do_post(test_uri, data)
+        test_uri = test_uri + '/' + unicode(self.course.id)
+        self.assertEqual(response.status_code, 201)
+        position_data = {
+            'position': {
+                'parent_content_id': self.test_bogus_course_id,
+                'child_content_id': self.test_bogus_content_id
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.status_code, 400)
 
     def test_user_courses_detail_get(self):
         course = CourseFactory.create()
@@ -733,25 +839,33 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = test_uri + '/' + str(user_id) + '/courses'
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(course.id)}
         response = self.do_post(test_uri, data)
-        test_uri = test_uri + '/' + str(course.id)
+        test_uri = test_uri + '/' + unicode(course.id)
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = self.test_server_prefix + test_uri
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertEqual(response.data['course_id'], course.id)
+        self.assertEqual(response.data['course_id'], unicode(course.id))
         self.assertEqual(response.data['user_id'], user_id)
         position_data = {
             'position': {
-                'parent_content_id': str(course.location),
-                'child_content_id': str(chapter1.location)
+                'parent_content_id': unicode(course.id),
+                'child_content_id': unicode(chapter1.scope_ids.usage_id)
 
             }
         }
         response = self.do_post(confirm_uri, data=position_data)
-        self.assertEqual(response.data['position'], chapter1.id)
+        self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
+        response = self.do_get(confirm_uri)
+        self.assertGreater(response.data['position'], 0) # Position in the GET response is an integer!
+        self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter1.scope_ids.usage_id))
+
+    def test_user_courses_detail_get_invalid_course(self):
+        test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_get_undefined_user(self):
         test_uri = '/api/users/2134234/courses/a8df7/asv/d98'
@@ -779,7 +893,7 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         post_uri = test_uri + '/' + str(user_id) + '/courses'
-        data = {'course_id': course.id}
+        data = {'course_id': unicode(course.id)}
         response = self.do_post(post_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = post_uri + '/' + str(course.id)
@@ -808,25 +922,13 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_user_courses_detail_delete_undefined_course(self):
-        test_uri = '/api/users'
-        local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
-        response = self.do_post(test_uri, data)
-        user_id = response.data['id']
-        test_uri = '{}/{}/oasdf987sdf'.format(test_uri, str(user_id))
+        test_uri = '/api/users/{}/courses/{}'.format(str(self.user.id), self.test_bogus_course_id)
         response = self.do_delete(test_uri)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 204)
 
     def test_user_course_grades_course_not_found(self):
-        test_uri = '/api/users'
-        local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
-        response = self.do_post(test_uri, data)
-        user_id = response.data['id']
         test_uri = '/api/users/{}/courses/{}/grades'.format(
-            user_id, 'some/unknown/course')
+            self.user.id, 'slashes:some+unknown+course')
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -837,12 +939,12 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_user_preferences_user_not_found(self):
+    def test_user_preferences_user_list_get_not_found(self):
         test_uri = '/api/users/{}/preferences'.format('999999')
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_user_preferences_default(self):
+    def test_user_preferences_list_get_default(self):
         # By default newly created users will have one initial preference settings:
         # 'pref-lang' = 'en'
         user_id = self._create_test_user()
@@ -852,12 +954,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data['pref-lang'], 'en')
 
-    def test_post_user_preferences_user_not_found(self):
+    def test_user_preferences_list_post_user_not_found(self):
         test_uri = '/api/users/{}/preferences'.format('999999')
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 404)
 
-    def test_post_user_preferences_bad_request(self):
+    def test_user_preferences_list_post_bad_request(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {})
@@ -872,7 +974,7 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, {"a_boolean": False})
         self.assertEqual(response.status_code, 400)
 
-    def test_post_user_preferences(self):
+    def test_user_preferences_list_post(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
@@ -883,7 +985,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'bar')
 
-    def test_update_user_preferences(self):
+    def test_user_preferences_list_update(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
@@ -896,13 +998,41 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'updated')
 
+    def test_user_preferences_detail_get(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}/{}'.format(test_uri, 'foo')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['foo'], 'bar')
+
+    def test_user_preferences_detail_get_invalid_user(self):
+        test_uri = '/api/users/12345/preferences/foo'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_preferences_detail_delete(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}/{}'.format(test_uri, 'foo')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_preferences_detail_delete_invalid_user(self):
+        test_uri = '/api/users/12345/preferences/foo'
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 404)
+
     def test_course_grades(self):
-        test_uri = '/api/users'
-        local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
-        response = self.do_post(test_uri, data)
-        user_id = response.data['id']
+        user_id = self.user.id
 
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -931,8 +1061,35 @@ class UsersApiTests(TestCase):
             display_name="Sequence 2",
         )
 
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 1",
+            max_grade=45
+        )
+
+        problem = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 2"
+        )
+
+        StudentModuleFactory.create(
+            grade=1,
+            max_grade=1,
+            student=self.user,
+            course_id=course.id,
+            module_state_key=problem.location,
+            state=json.dumps({'attempts': 3}),
+            module_type='mentoring'
+        )
+
         test_uri = '/api/users/{}/courses/{}/grades'.format(
-            user_id, course.id)
+            user_id, unicode(course.id))
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -948,7 +1105,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(sections[0]['graded'], False)
 
         sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 1)
+        self.assertEqual(len(sections), 3)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
 
@@ -957,6 +1114,9 @@ class UsersApiTests(TestCase):
         grading_policy = response.data['grading_policy']
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+
+        self.assertEqual(response.data['current_grade'], 50)
+        self.assertEqual(response.data['pro_forma_grade'], 100)
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
@@ -1029,7 +1189,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['num_pages'], 2)
 
         # test with course_id filter and integer user id
-        response = self.do_get('/api/users/{}/workgroups/?course_id={}'.format(user_id, self.course.id))
+        course_id = {'course_id': unicode(self.course.id)}
+        response = self.do_get('/api/users/{}/workgroups/?{}'.format(user_id, urlencode(course_id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 7)
         self.assertEqual(len(response.data['results']), 7)
@@ -1050,44 +1211,53 @@ class UsersApiTests(TestCase):
     def test_user_completions_list(self):
         user_id = self.user.id
         another_user_id = UserFactory().id
-        completion_uri = '/api/courses/{}/completions/'.format(self.course.id)
+        completion_uri = '/api/courses/{}/completions/'.format(unicode(self.course.id))
 
-        for i in xrange(1, 17):
-            if i > 7:
+        for i in xrange(1, 26):
+            if i > 12:
                 course_user_id = another_user_id
             else:
                 course_user_id = user_id
-            completions_data = {'content_id': '{}_{}'.format(self.course_content.id, i), 'user_id': course_user_id}
+            local_content_name = 'Video_Sequence{}'.format(i)
+            local_content = ItemFactory.create(
+                category="videosequence",
+                parent_location=self.course_content.location,
+                data=str(uuid.uuid4()),
+                display_name=local_content_name
+            )
+            completions_data = {'content_id': unicode(local_content.scope_ids.usage_id), 'user_id': course_user_id}
             response = self.do_post(completion_uri, completions_data)
             self.assertEqual(response.status_code, 201)
 
         # Get course module completion by user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/?page_size=5'.format(user_id, self.course.id)
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?page_size=6'.format(user_id, unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 7)
-        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(response.data['count'], 12)
+        self.assertEqual(len(response.data['results']), 6)  # 12 matches, but only 6 per page
         self.assertEqual(response.data['results'][0]['user_id'], user_id)
-        self.assertEqual(response.data['results'][0]['course_id'], self.course.id)
+        self.assertEqual(response.data['results'][0]['course_id'], unicode(self.course.id))
         self.assertEqual(response.data['num_pages'], 2)
 
         # Get course module completion by other user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format(another_user_id, self.course.id)
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format(another_user_id, unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 9)
+        self.assertEqual(response.data['count'], 13)
 
-        # Get course module completion by other user and course module id
-        completion_list_uri = '/api/users/{}/courses/{}/completions/?content_id={}'.format(
-            another_user_id,
-            self.course.id,
-            '{}_{}'.format(self.course_content.id, 10))
+        # Get course module completion by other user and course module id (content_id)
+        content_id = {'content_id': unicode(local_content.scope_ids.usage_id)}
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?{}'.format(
+            course_user_id,
+            unicode(self.course.id),
+            urlencode(content_id)
+        )
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
 
         # Get course module completion by bogus user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', self.course.id)
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -1130,3 +1300,13 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['city'], 'New York City')
         self.assertEqual(response.data['results'][0]['count'], 6)
+
+    def test_users_social_metrics_get_service_unavailable(self):
+        test_uri = '/api/users/{}/courses/{}/metrics/social/'.format(self.user.id, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 500)
+
+    def test_users_social_metrics_get_invalid_user(self):
+        test_uri = '/api/users/{}/courses/{}/metrics/social/'.format(12345, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)

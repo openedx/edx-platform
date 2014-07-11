@@ -6,10 +6,8 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_session_views.py]
 """
 from random import randint
-import unittest
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client

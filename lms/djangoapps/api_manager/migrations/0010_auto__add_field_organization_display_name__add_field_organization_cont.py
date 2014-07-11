@@ -28,7 +28,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'Organization.display_name'
         db.delete_column('api_manager_organization', 'display_name')
@@ -41,7 +40,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Organization.contact_phone'
         db.delete_column('api_manager_organization', 'contact_phone')
-
 
     models = {
         'api_manager.coursecontentgrouprelationship': {
