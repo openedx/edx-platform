@@ -18,6 +18,7 @@ from logsettings import get_logger_config
 import os
 
 from path import path
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -324,7 +325,7 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
-MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
+MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})

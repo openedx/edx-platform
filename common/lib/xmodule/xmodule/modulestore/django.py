@@ -18,7 +18,6 @@ from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # We may not always have the request_cache module available
 try:
@@ -86,7 +85,6 @@ def modulestore():
     """
     global _MIXED_MODULESTORE  # pylint: disable=global-statement
     if _MIXED_MODULESTORE is None:
-        settings.MODULESTORE = convert_module_store_setting_if_needed(settings.MODULESTORE)
         _MIXED_MODULESTORE = create_modulestore_instance(
             settings.MODULESTORE['default']['ENGINE'],
             contentstore(),
