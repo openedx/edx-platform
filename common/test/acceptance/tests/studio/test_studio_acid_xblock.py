@@ -5,10 +5,10 @@ from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
 
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.studio.overview import CourseOutlinePage
-from ..pages.xblock.acid import AcidView
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.xblock.acid import AcidView
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class XBlockAcidBase(WebAppTest):
