@@ -534,6 +534,20 @@ class TestMongoModuleStore(unittest.TestCase):
         self.draft_store.publish(location, self.dummy_user)
         self.assertFalse(self.draft_store.has_changes(location))
 
+    def test_has_changes_missing_child(self):
+        """
+        Tests that has_changes() returns False when a published parent points to a child that doesn't exist.
+        """
+        location = Location('edX', 'missing', '2012_Fall', 'sequential', 'parent')
+
+        # Create the parent and point it to a fake child
+        parent = self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        parent.children += [Location('edX', 'missing', '2012_Fall', 'vertical', 'does_not_exist')]
+        self.draft_store.update_item(parent, self.dummy_user)
+
+        # Check the parent for changes should return False and not throw an exception
+        self.assertFalse(self.draft_store.has_changes(location))
+
     def _create_test_tree(self, name, user_id=None):
         """
         Creates and returns a tree with the following structure:
