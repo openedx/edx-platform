@@ -9,11 +9,13 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
 from projects.models import Project, Workgroup
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -29,7 +31,7 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class PeerReviewsApiTests(TestCase):
+class PeerReviewsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
@@ -40,7 +42,17 @@ class PeerReviewsApiTests(TestCase):
         self.test_projects_uri = '/api/projects/'
         self.test_peer_reviews_uri = '/api/peer_reviews/'
 
-        self.test_course_id = 'edx/demo/course'
+        self.course = CourseFactory.create()
+        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+
+        self.chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            display_name="Overview"
+        )
+
+        self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_content_id = "i4x://blah"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
@@ -59,7 +71,7 @@ class PeerReviewsApiTests(TestCase):
             username="reviewer",
             is_active=True
         )
-        self.anonymous_user_id = anonymous_id_for_user(self.test_reviewer_user, self.test_course_id)
+        self.anonymous_user_id = anonymous_id_for_user(self.test_reviewer_user, self.course.id)
 
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,

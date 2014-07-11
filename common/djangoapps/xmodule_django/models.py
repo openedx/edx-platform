@@ -6,6 +6,7 @@ import warnings
 from django.db import models
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class NoneToEmptyManager(models.Manager):
@@ -104,7 +105,7 @@ class OpaqueKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return self.KEY_CLASS.from_string(value)
+            return SlashSeparatedCourseKey.from_deprecated_string(value)
         else:
             return value
 
@@ -147,7 +148,6 @@ class CourseKeyField(OpaqueKeyField):
     """
     description = "A CourseKey object, saved to the DB in the form of a string"
     KEY_CLASS = CourseKey
-
 
 class UsageKeyField(OpaqueKeyField):
     """

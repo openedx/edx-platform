@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='projects', null=True, on_delete=models.SET_NULL, to=orm['api_manager.Organization']),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'Project.organization'
         db.delete_column('projects_project', 'organization_id')
-
 
     models = {
         'api_manager.organization': {

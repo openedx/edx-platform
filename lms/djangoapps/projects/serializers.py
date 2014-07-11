@@ -83,7 +83,7 @@ class WorkgroupReviewSerializer(serializers.HyperlinkedModelSerializer):
         model = WorkgroupReview
         fields = (
             'id', 'url', 'created', 'modified', 'question', 'answer',
-            'workgroup', 'reviewer'
+            'workgroup', 'reviewer', 'content_id'
         )
 
 
@@ -96,7 +96,7 @@ class WorkgroupSubmissionReviewSerializer(serializers.HyperlinkedModelSerializer
         model = WorkgroupSubmissionReview
         fields = (
             'id', 'url', 'created', 'modified', 'question', 'answer',
-            'submission', 'reviewer'
+            'submission', 'reviewer', 'content_id'
         )
 
 

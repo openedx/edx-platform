@@ -1,6 +1,10 @@
+# pylint: disable=W0612
+"""
+Run these tests @ Devstack:
+    rake fasttest_lms[common/djangoapps/api_manager/sessions/test_login_ratelimit.py]
+"""
 import json
 import uuid
-import unittest
 from mock import patch
 from datetime import datetime, timedelta
 from freezegun import freeze_time
@@ -10,7 +14,6 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from django.core.cache import cache
 from student.tests.factories import UserFactory
 

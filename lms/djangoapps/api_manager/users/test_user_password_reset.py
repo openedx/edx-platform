@@ -153,7 +153,6 @@ class UserPasswordResetTest(TestCase):
         )
         self._assert_response(response, status=403, message=message)
 
-
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 1})
     def test_is_password_reset_too_frequent(self):
         """

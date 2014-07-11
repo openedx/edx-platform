@@ -562,10 +562,20 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             usage_id=unicode(descriptor.location)
         )
 
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
+        )
+
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
             handle_grade_event(block, event_type, event)
+        elif event_type == 'progress':
+            # expose another special case event type which gets sent
+            # into the CourseCompletions models
+            handle_progress_event(block, event_type, event)
         else:
             aside_context = {}
             for aside in block.runtime.get_asides(block):
