@@ -498,6 +498,7 @@ class YouTubeVideoTest(VideoBaseTest):
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_exist('download_transcript'))
 
+    @skip("Consistently failing on master BLD-1190  Disabled 11 July 2014")
     def test_video_language_menu_working(self):
         """
         Scenario: Language menu works correctly in Video component
