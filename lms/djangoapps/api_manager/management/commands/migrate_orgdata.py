@@ -10,6 +10,7 @@ from api_manager.models import GroupProfile
 from organizations.models import Organization
 
 
+
 class Command(BaseCommand):
     """
     Migrates legacy organization data and user relationships from older Group model approach to newer concrete Organization model

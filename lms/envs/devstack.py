@@ -108,6 +108,9 @@ CC_PROCESSOR = {
 
 FEATURES['API'] = True
 
+########################## USER API ########################
+EDX_API_KEY = None
+
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True

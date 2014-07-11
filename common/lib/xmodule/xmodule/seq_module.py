@@ -71,19 +71,9 @@ class SequenceModule(SequenceFields, XModule):
     def __init__(self, *args, **kwargs):
         super(SequenceModule, self).__init__(*args, **kwargs)
 
-        # If position is specified in system, then use that instead.
-        position = getattr(self.system, 'position', None)
-        if position is not None:
-            try:
-                self.position = int(self.system.position)
-            except (ValueError, TypeError):
-                # Check for https://openedx.atlassian.net/browse/LMS-6496
-                warnings.warn(
-                    "Sequential position cannot be converted to an integer: {pos!r}".format(
-                        pos=self.system.position,
-                    ),
-                    RuntimeWarning,
-                )
+        # if position is specified in system, then use that instead
+        if getattr(self.system, 'position', None) is not None:
+            self.position = int(self.system.position)
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.

@@ -7,6 +7,7 @@ import warnings
 from django.db import models
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
 from opaque_keys.edx.locator import Locator
 
@@ -105,7 +106,7 @@ class OpaqueKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return self.KEY_CLASS.from_string(value)
+            return SlashSeparatedCourseKey.from_deprecated_string(value)
         else:
             return value
 
@@ -167,12 +168,10 @@ class LocationKeyField(UsageKeyField):
         super(LocationKeyField, self).__init__(*args, **kwargs)
 
 
-class BlockTypeKeyField(OpaqueKeyField):
-    """
-    A django Field that stores a BlockTypeKey object as a string.
-    """
-    description = "A BlockTypeKey object, saved to the DB in the form of a string."
-    KEY_CLASS = BlockTypeKey
+        if isinstance(value, basestring):
+            return Location.from_deprecated_string(value)
+        else:
+            return value
 
 
 add_introspection_rules([], [r"^xmodule_django\.models\.CourseKeyField"])
