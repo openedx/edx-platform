@@ -48,6 +48,9 @@ def test_system(options):
     if test_id:
         if not system:
             system = test_id.split('/')[0]
+            if system == 'common':
+                # since the system must either be lms or cms, pick lms as default
+                system = 'lms'
         opts['test_id'] = test_id
 
     if test_id or system:
