@@ -8,6 +8,7 @@ from collections import namedtuple
 
 
 from django.core.management.base import BaseCommand, CommandError
+from student.models import UserSignupSource
 
 from mailsnake import MailSnake
 
@@ -61,7 +62,8 @@ class Command(BaseCommand):
 
 
 def get_enrolled():
-    return User.objects.all()
+    # cdodge: filter out all users who signed up via a Microsite, which UserSignupSource tracks
+    return User.objects.exclude(id__in = UserSignupSource.values_list('user_id', flat=True))
 
 
 def get_data(users, exclude=None):
