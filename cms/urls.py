@@ -93,8 +93,11 @@ urlpatterns += patterns(
 )
 
 if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
-    urlpatterns += (url(r'^group_configurations/(?P<course_key_string>[^/]+)$',
-                        'contentstore.views.group_configurations_list_handler'),)
+    urlpatterns += patterns('contentstore.views',
+        url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
+        url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)/?$'.format(settings.COURSE_KEY_PATTERN),
+            'group_configurations_detail_handler'),
+    )
 
 js_info_dict = {
     'domain': 'djangojs',

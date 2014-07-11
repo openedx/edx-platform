@@ -16,7 +16,8 @@ import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
-from opaque_keys.edx.locations import i4xEncoder, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey
 import json
 
 log = logging.getLogger(__name__)
@@ -314,7 +315,7 @@ def render_mustache(template_name, dictionary, *args, **kwargs):
 
 
 def permalink(content):
-    if isinstance(content['course_id'], SlashSeparatedCourseKey):
+    if isinstance(content['course_id'], CourseKey):
         course_id = content['course_id'].to_deprecated_string()
     else:
         course_id = content['course_id']

@@ -67,6 +67,7 @@ else:
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
+        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -409,6 +410,9 @@ def _get_item_in_course(request, usage_key):
 
     Verifies that the caller has permission to access this item.
     """
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+
     course_key = usage_key.course_key
 
     if not has_course_access(request.user, course_key):

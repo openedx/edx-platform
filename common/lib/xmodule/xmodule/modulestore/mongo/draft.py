@@ -50,7 +50,8 @@ class DraftModuleStore(MongoModuleStore):
     def __init__(self, *args, **kwargs):
         """
         Args:
-            branch_setting_func: a function that returns the branch setting to use for this store's operations
+            branch_setting_func: a function that returns the branch setting to use for this store's operations.
+                This should be an attribute from ModuleStoreEnum.Branch
         """
         super(DraftModuleStore, self).__init__(*args, **kwargs)
         self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
@@ -184,7 +185,7 @@ class DraftModuleStore(MongoModuleStore):
         new_course = self.get_course(dest_course_id)
         if new_course is None:
             # create_course creates the about overview
-            new_course = self.create_course(dest_course_id.org, dest_course_id.offering, user_id)
+            new_course = self.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
 
         # Get all modules under this namespace which is (tag, org, course) tuple
         modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
@@ -371,7 +372,11 @@ class DraftModuleStore(MongoModuleStore):
             DuplicateItemError: if the source or any of its descendants already has a draft copy
         """
         # delegating to internal b/c we don't want any public user to use the kwargs on the internal
-        return self._convert_to_draft(location, user_id)
+        self._convert_to_draft(location, user_id)
+
+        # return the new draft item (does another fetch)
+        # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
+        return self.get_item(location)
 
     def _convert_to_draft(self, location, user_id, delete_published=False, ignore_if_draft=False):
         """
@@ -426,10 +431,6 @@ class DraftModuleStore(MongoModuleStore):
 
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
-
-        # return the new draft item (does another fetch)
-        # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
-        return self.get_item(location)
 
     def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False):
         """
@@ -506,15 +507,13 @@ class DraftModuleStore(MongoModuleStore):
         #   Case 1: the draft item moved from one parent to another
         #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
         for parent_location in parent_locations:
-            # don't remove from direct_only parent if other versions of this still exists
+            # don't remove from direct_only parent if other versions of this still exists (this code
+            # assumes that there's only one parent_location in this case)
             if not is_item_direct_only and parent_location.category in DIRECT_ONLY_CATEGORIES:
-                # see if other version of root exists
-                alt_location = location.replace(
-                    revision=MongoRevisionKey.published
-                    if location.revision == MongoRevisionKey.draft
-                    else MongoRevisionKey.draft
-                )
-                if super(DraftModuleStore, self).has_item(alt_location):
+                # see if other version of to-be-deleted root exists
+                query = location.to_deprecated_son(prefix='_id.')
+                del query['_id.revision']
+                if self.collection.find(query).count() > 1:
                     continue
 
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
@@ -553,6 +552,8 @@ class DraftModuleStore(MongoModuleStore):
 
         first_tier = [as_func(location) for as_func in as_functions]
         self._breadth_first(_delete_item, first_tier)
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.refresh_cached_metadata_inheritance_tree(location.course_key)
 
     def _breadth_first(self, function, root_usages):
         """
@@ -581,8 +582,6 @@ class DraftModuleStore(MongoModuleStore):
 
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
         self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(root_usages[0].course_key)
 
     def has_changes(self, location):
         """
@@ -591,7 +590,11 @@ class DraftModuleStore(MongoModuleStore):
         :return: True if the draft and published versions differ
         """
 
-        item = self.get_item(location)
+        try:
+            item = self.get_item(location)
+        # defensively check that the parent's child actually exists
+        except ItemNotFoundError:
+            return False
 
         # don't check children if this block has changes (is not public)
         if self.compute_publish_state(item) != PublishState.public:
@@ -680,7 +683,7 @@ class DraftModuleStore(MongoModuleStore):
         to remove things from the published version
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
-        return self._convert_to_draft(location, user_id, delete_published=True)
+        self._convert_to_draft(location, user_id, delete_published=True)
 
     def revert_to_published(self, location, user_id=None):
         """

@@ -11,8 +11,7 @@ from contextlib import contextmanager
 from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
-from xmodule.modulestore import PublishState, ModuleStoreEnum, split_migrator
-from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
+from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -20,6 +19,7 @@ from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 import itertools
+from xmodule.modulestore.split_migrator import SplitMigrator
 
 
 log = logging.getLogger(__name__)
@@ -29,12 +29,15 @@ class MixedModuleStore(ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, contentstore, mappings, stores, i18n_service=None, **kwargs):
+    def __init__(self, contentstore, mappings, stores, i18n_service=None, create_modulestore_instance=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
         """
         super(MixedModuleStore, self).__init__(contentstore, **kwargs)
+
+        if create_modulestore_instance is None:
+            raise ValueError('MixedModuleStore constructor must be passed a create_modulestore_instance function')
 
         self.modulestores = []
         self.mappings = {}
@@ -66,8 +69,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
             )
-            if key == 'split':
-                store.loc_mapper = loc_mapper()
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
                 if store_name == key:
@@ -83,8 +84,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         if hasattr(course_id, 'version_agnostic'):
             course_id = course_id.version_agnostic()
-        if hasattr(course_id, 'branch_agnostic'):
-            course_id = course_id.branch_agnostic()
+        if hasattr(course_id, 'branch'):
+            course_id = course_id.replace(branch=None)
         return course_id
 
     def _get_modulestore_for_courseid(self, course_id=None):
@@ -118,6 +119,17 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 return store
         return None
 
+    def fill_in_run(self, course_key):
+        """
+        Some course_keys are used without runs. This function calls the corresponding
+        fill_in_run function on the appropriate modulestore.
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        if not hasattr(store, 'fill_in_run'):
+            return course_key
+        return store.fill_in_run(course_key)
+
+
     def has_item(self, usage_key, **kwargs):
         """
         Does the course include the xblock who's id is reference?
@@ -127,8 +139,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
     def get_item(self, usage_key, depth=0, **kwargs):
         """
-        This method is explicitly not implemented as we need a course_id to disambiguate
-        We should be able to fix this when the data-model rearchitecting is done
+        see parent doc
         """
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.get_item(usage_key, depth, **kwargs)
@@ -175,26 +186,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
             # check if the course is not None - possible if the mappings file is outdated
             # TODO - log an error if the course is None, but move it to an initialization method to keep it less noisy
             if course is not None:
-                courses[course_id] = store.get_course(course_id)
+                courses[course_id] = course
 
-        has_locators = any(issubclass(CourseLocator, store.reference_type) for store in self.modulestores)
         for store in self.modulestores:
 
             # filter out ones which were fetched from earlier stores but locations may not be ==
             for course in store.get_courses():
                 course_id = self._clean_course_id_for_mapping(course.id)
                 if course_id not in courses:
-                    if has_locators and isinstance(course_id, SlashSeparatedCourseKey):
-
-                        # see if a locator version of course is in the result
-                        try:
-                            course_locator = loc_mapper().translate_location_to_course_locator(course_id)
-                            if course_locator in courses:
-                                continue
-                        except ItemNotFoundError:
-                            # if there's no existing mapping, then the course can't have been in split
-                            pass
-
                     # course is indeed unique. save it in result
                     courses[course_id] = course
 
@@ -273,13 +272,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, org, offering, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -287,7 +287,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
         """
         store = self._get_modulestore_for_courseid(None)
-        return store.create_course(org, offering, user_id, fields, **kwargs)
+        if not hasattr(store, 'create_course'):
+            raise NotImplementedError(u"Cannot create a course on store {}".format(store))
+
+        return store.create_course(org, course, run, user_id, fields, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
@@ -311,12 +314,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
 
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
-            if not hasattr(self, 'split_migrator'):
-                self.split_migrator = split_migrator.SplitMigrator(
-                    dest_modulestore, source_modulestore, loc_mapper()
-                )
-            self.split_migrator.migrate_mongo_course(
-                source_course_id, user_id, dest_course_id.org, dest_course_id.offering
+            split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
+            split_migrator.migrate_mongo_course(
+                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run
             )
 
     def create_item(self, course_or_parent_loc, category, user_id, **kwargs):
@@ -395,11 +395,18 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Close all db connections
         """
-        for mstore in self.modulestores:
-            if hasattr(mstore, 'database'):
-                mstore.database.connection.close()
-            elif hasattr(mstore, 'db'):
-                mstore.db.connection.close()
+        for modulestore in self.modulestores:
+            modulestore.close_connections()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop all databases and close all db connections.
+        Intended to be used by test code for cleanup.
+        """
+        for modulestore in self.modulestores:
+            # drop database if the store supports it (read-only stores do not)
+            if hasattr(modulestore, '_drop_database'):
+                modulestore._drop_database()  # pylint: disable=protected-access
 
     def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
         """

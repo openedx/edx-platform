@@ -1,0 +1,92 @@
+<problem display_name="JSDraw Input" markdown="null">
+  <p>
+    A JSDraw problem lets the user use the JSDraw editor component to draw a
+    new molecule or update an existing drawing and then submit their work.  
+    Answers are specified as SMILES strings.
+  </p>
+  <p>
+    I was trying to draw my favorite molecule, caffeine. Unfortunately,
+    I'm not a very good biochemist. Can you correct my molecule?
+  </p>
+  <jsdrawresponse>
+    <jsdraw>
+      <initial-state>
+            JSDraw201081410342D
+
+             12 13  0  0  0  0              0 V2000
+               12.0000   -6.7600    0.0000 N   0  0  0  0  0  0  0
+               10.6490   -5.9800    0.0000 C   0  0  0  0  0  0  0
+               10.6490   -4.4200    0.0000 N   0  0  0  0  0  0  0
+               12.0000   -3.6400    0.0000 C   0  0  0  0  0  0  0
+               13.3510   -4.4200    0.0000 C   0  0  0  0  0  0  0
+               13.3510   -5.9800    0.0000 C   0  0  0  0  0  0  0
+               14.8347   -6.4620    0.0000 N   0  0  0  0  0  0  0
+               15.7515   -5.1998    0.0000 C   0  0  0  0  0  0  0
+               14.8346   -3.9379    0.0000 N   0  0  0  0  0  0  0
+               15.3166   -2.4542    0.0000 C   0  0  0  0  0  0  0
+                9.2980   -3.6400    0.0000 C   0  0  0  0  0  0  0
+                9.2980   -6.7600    0.0000 O   0  0  0  0  0  0  0
+              1  2  1  0  0  0  0
+              2  3  1  0  0  0  0
+              3  4  1  0  0  0  0
+              4  5  1  0  0  0  0
+              5  6  2  0  0  0  0
+              6  1  1  0  0  0  0
+              6  7  1  0  0  0  0
+              7  8  1  0  0  0  0
+              8  9  1  0  0  0  0
+              9  5  1  0  0  0  0
+              9 10  1  0  0  0  0
+              3 11  1  0  0  0  0
+              2 12  1  0  0  0  0
+            M  END
+        </initial-state>
+      <answer>
+            JSDraw203201413042D
+
+             14 15  0  0  0  0              0 V2000
+               12.9049   -6.2400    0.0000 N   0  0  0  0  0  0  0
+               11.5539   -5.4600    0.0000 C   0  0  0  0  0  0  0
+               11.5539   -3.9000    0.0000 N   0  0  0  0  0  0  0
+               12.9049   -3.1200    0.0000 C   0  0  0  0  0  0  0
+               14.2558   -3.9000    0.0000 C   0  0  0  0  0  0  0
+               14.2558   -5.4600    0.0000 C   0  0  0  0  0  0  0
+               15.7395   -5.9420    0.0000 N   0  0  0  0  0  0  0
+               16.6563   -4.6798    0.0000 C   0  0  0  0  0  0  0
+               15.7394   -3.4179    0.0000 N   0  0  0  0  0  0  0
+               16.2214   -1.9342    0.0000 C   0  0  0  0  0  0  0
+               10.2029   -3.1200    0.0000 C   0  0  0  0  0  0  0
+               10.2029   -6.2400    0.0000 O   0  0  0  0  0  0  0
+               12.9049   -7.8000    0.0000 C   0  0  0  0  0  0  0
+               12.9050   -1.5600    0.0000 O   0  0  0  0  0  0  0
+              1  2  1  0  0  0  0
+              2  3  1  0  0  0  0
+              3  4  1  0  0  0  0
+              4  5  1  0  0  0  0
+              5  6  2  0  0  0  0
+              6  1  1  0  0  0  0
+              6  7  1  0  0  0  0
+              7  8  2  0  0  0  0
+              8  9  1  0  0  0  0
+              9  5  1  0  0  0  0
+              9 10  1  0  0  0  0
+              3 11  1  0  0  0  0
+              2 12  2  0  0  0  0
+              1 13  1  0  0  0  0
+              4 14  2  0  0  0  0
+            M  END
+        </answer>
+    </jsdraw>
+    <answer>C8H10N4O2</answer>
+  </jsdrawresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>
+        Some scholars have hypothesized that the renaissance was made possible
+        by the introduction of coffee to Italy.  Likewise scholars have linked
+        the Enlightenment with the rise of coffee houses in England.  
+      </p>
+    </div>
+  </solution>
+</problem>

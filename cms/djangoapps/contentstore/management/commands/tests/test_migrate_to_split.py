@@ -56,7 +56,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         password = 'foo'
         self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
 
     def test_user_email(self):
@@ -84,6 +84,6 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             str(self.user.id),
             "org.dept+name.run",
         )
-        locator = CourseLocator(org="org.dept", offering="name.run", branch=ModuleStoreEnum.RevisionOption.published_only)
+        locator = CourseLocator(org="org.dept", course="name", run="run", branch=ModuleStoreEnum.RevisionOption.published_only)
         course_from_split = modulestore('split').get_course(locator)
         self.assertIsNotNone(course_from_split)

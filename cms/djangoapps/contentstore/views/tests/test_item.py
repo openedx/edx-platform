@@ -158,7 +158,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/location:MITx\+999\+Robot_Super_Course\+wrapper\+\w+" class="action-button">\s*'
+            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 

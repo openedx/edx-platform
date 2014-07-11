@@ -10,7 +10,6 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -23,8 +22,6 @@ from opaque_keys import InvalidKeyError
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
                                                     mixed_store_config)
 from xmodule.modulestore.tests.factories import CourseFactory

@@ -51,6 +51,11 @@ class InheritanceMixin(XBlockMixin):
         default=None,
         scope=Scope.user_state,
     )
+    visible_to_staff_only = Boolean(
+        help=_("If true, can be seen only by course staff, regardless of start date."),
+        default=False,
+        scope=Scope.settings,
+    )
     course_edit_method = String(
         display_name=_("Course Editor"),
         help=_("Enter the method by which this course is edited (\"XML\" or \"Studio\")."),

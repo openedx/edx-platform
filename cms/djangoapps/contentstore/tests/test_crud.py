@@ -4,8 +4,7 @@ from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores, _MIXED_MODULESTORE, \
-    loc_mapper, _loc_singleton
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId
@@ -21,7 +20,7 @@ class TemplateTests(unittest.TestCase):
 
     def setUp(self):
         clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
         self.split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
@@ -57,14 +56,15 @@ class TemplateTests(unittest.TestCase):
 
     def test_factories(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            offering='tempcourse', org='testx',
+            course='course', run='2014', org='testx',
             display_name='fun test course', user_id='testbot'
         )
         self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
         index_info = self.split_store.get_course_index_info(test_course.id)
         self.assertEqual(index_info['org'], 'testx')
-        self.assertEqual(index_info['offering'], 'tempcourse')
+        self.assertEqual(index_info['course'], 'course')
+        self.assertEqual(index_info['run'], '2014')
 
         test_chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
@@ -75,7 +75,7 @@ class TemplateTests(unittest.TestCase):
 
         with self.assertRaises(DuplicateCourseError):
             persistent_factories.PersistentCourseFactory.create(
-                offering='tempcourse', org='testx',
+                course='course', run='2014', org='testx',
                 display_name='fun test course', user_id='testbot'
             )
 
@@ -84,7 +84,7 @@ class TemplateTests(unittest.TestCase):
         Test create_xblock to create non persisted xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            offering='tempcourse', org='testx',
+            course='course', run='2014', org='testx',
             display_name='fun test course', user_id='testbot'
         )
 
@@ -111,7 +111,7 @@ class TemplateTests(unittest.TestCase):
         try saving temporary xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            offering='tempcourse', org='testx',
+            course='course', run='2014', org='testx',
             display_name='fun test course', user_id='testbot'
         )
         test_chapter = self.split_store.create_xblock(
@@ -150,7 +150,7 @@ class TemplateTests(unittest.TestCase):
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            offering='history.doomed', org='edu.harvard',
+            course='history', run='doomed', org='edu.harvard',
             display_name='doomed test course',
             user_id='testbot')
         persistent_factories.ItemFactory.create(display_name='chapter 1',
@@ -173,7 +173,7 @@ class TemplateTests(unittest.TestCase):
         Test get_block_generations
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            offering='history.hist101', org='edu.harvard',
+            course='history', run='hist101', org='edu.harvard',
             display_name='history test course',
             user_id='testbot'
         )
@@ -224,38 +224,3 @@ class TemplateTests(unittest.TestCase):
 
         version_history = self.split_store.get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
-
-
-class SplitAndLocMapperTests(unittest.TestCase):
-    """
-    Test injection of loc_mapper into Split
-    """
-    def test_split_inject_loc_mapper(self):
-        """
-        Test loc_mapper created before split
-        """
-        # ensure modulestore is not instantiated
-        self.assertIsNone(_MIXED_MODULESTORE)
-
-        # instantiate location mapper before split
-        mapper = loc_mapper()
-
-        # instantiate mixed modulestore and thus split
-        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-
-        # split must inject the same location mapper object since the mapper existed before it did
-        self.assertEqual(split_store.loc_mapper, mapper)
-
-    def test_loc_inject_into_split(self):
-        """
-        Test split created before loc_mapper
-        """
-        # ensure loc_mapper is not instantiated
-        self.assertIsNone(_loc_singleton)
-
-        # instantiate split before location mapper
-        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-
-        # split must have instantiated loc_mapper
-        mapper = loc_mapper()
-        self.assertEqual(split_store.loc_mapper, mapper)

@@ -18,6 +18,7 @@ from logsettings import get_logger_config
 import os
 
 from path import path
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -311,6 +312,10 @@ if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
+
+# Specific setting for the File Upload Service to store media in a bucket.
+FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
+FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads

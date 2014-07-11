@@ -3,24 +3,24 @@
 <%inherit file="main.html" />
 <script>
 function name_confirm(id) {
-  postJSON('/accept_name_change',{"id":id},
+  $.post('/accept_name_change',{"id":id},
             function(data){
           if(data.success){
-            $("#div"+id).html(${_("Accepted")});
+            $("#div"+id).html("${_('Accepted')}");
           } else {
-            alert(${_('Error')});
-}          }
+            alert("${_('Error')}");
+          }
      });
 }
 
 function name_deny(id) {
-  postJSON('/reject_name_change',{"id":id},
+  $.post('/reject_name_change',{"id":id},
             function(data){
           if(data.success){
-            $("#div"+id).html(${_("Rejected")});
+            $("#div"+id).html("${_('Rejected')}");
           } else {
-            alert(${_('Error')});
-}          }
+            alert("${_('Error')}");
+          }
      });
 }
 </script>
@@ -32,12 +32,12 @@ function name_deny(id) {
   <table>
   % for s in students:
   <tr>
-    <td><a href=/profile/${s['uid']}/>${s['old_name']}</td>
+    <td><a href="/profile/${s['uid']}"/>${s['old_name']}</td>
     <td>${s['new_name']|h}</td>
     <td>${s['email']|h}</td>
     <td>${s['rationale']|h}</td>
     <td><span id="div${s['cid']}"><span onclick="name_confirm(${s['cid']});">[${_("Confirm")}]</span>
-    <span onclick="name_deny(${s['cid']});">${_("[Reject]")}</span></span></td></tr>
+    <span onclick="name_deny(${s['cid']});">[${_("Reject")}]</span></span></td></tr>
   % endfor
   </table>
   </section>

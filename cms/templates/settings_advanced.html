@@ -4,6 +4,7 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from django.utils.html import escapejs
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
@@ -40,12 +41,12 @@ require(["domReady!", "jquery", "gettext", "js/models/settings/advanced", "js/vi
       var deprecatedSettingsLabel = $('.deprecated-settings-label');
       if ($this.is(':checked')) {
           wrapperDeprecatedSetting.addClass('is-set');
-          deprecatedSettingsLabel.text('${_('Hide Deprecated Settings') | h}');
+          deprecatedSettingsLabel.text('${escapejs(_('Hide Deprecated Settings'))}');
           editor.render_deprecated = true;
       }
       else {
           wrapperDeprecatedSetting.removeClass('is-set');
-          deprecatedSettingsLabel.text('${_('Show Deprecated Settings') | h}');
+          deprecatedSettingsLabel.text('${escapejs(_('Show Deprecated Settings'))}');
           editor.render_deprecated = false;
       }
 

@@ -39,9 +39,9 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/slashes:org+num+name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/org/num/name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/location:org+num+name+course+name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/i4x://org/num/course/name".format(CMS_BASE_TEST)
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
 

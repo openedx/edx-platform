@@ -4,15 +4,12 @@ Utilities for contentstore tests
 '''
 
 import json
-import re
 
 from django.test.client import Client
 from django.contrib.auth.models import User
 
 from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import PublishState, ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import PublishState, ModuleStoreEnum, mongo
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -20,6 +17,9 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from contentstore.utils import reverse_url
+from xmodule.modulestore.mongo.draft import DraftModuleStore
+from xblock.fields import Scope
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 
 
 def parse_json(response):
@@ -249,14 +249,24 @@ class CourseTestCase(ModuleStoreTestCase):
         for course1_item in course1_items:
             course2_item_location = course1_item.location.map_into_course(course2_id)
             if course1_item.location.category == 'course':
-                course2_item_location = course2_item_location.replace(name=course2_item_location.run)
+                # mongo uses the run as the name, split uses 'course'
+                store = self.store._get_modulestore_for_courseid(course2_id)  # pylint: disable=protected-access
+                new_name = 'course' if isinstance(store, SplitMongoModuleStore) else course2_item_location.run
+                course2_item_location = course2_item_location.replace(name=new_name)
             course2_item = self.store.get_item(course2_item_location)
 
-            # compare published state
-            self.assertEqual(
-                self.store.compute_publish_state(course1_item),
-                self.store.compute_publish_state(course2_item)
-            )
+            try:
+                # compare published state
+                self.assertEqual(
+                    self.store.compute_publish_state(course1_item),
+                    self.store.compute_publish_state(course2_item)
+                )
+            except AssertionError:
+                # old mongo calls things draft if draft exists even if it's != published; so, do more work
+                self.assertEqual(
+                    self.compute_real_state(course1_item),
+                    self.compute_real_state(course2_item)
+                )
 
             # compare data
             self.assertEqual(hasattr(course1_item, 'data'), hasattr(course2_item, 'data'))
@@ -274,17 +284,18 @@ class CourseTestCase(ModuleStoreTestCase):
                     expected_children.append(
                         course1_item_child.map_into_course(course2_id)
                     )
-                self.assertEqual(expected_children, course2_item.children)
+                # also process course2_children just in case they have version guids
+                course2_children = [child.version_agnostic() for child in course2_item.children]
+                self.assertEqual(expected_children, course2_children)
 
         # compare assets
-        content_store = contentstore()
+        content_store = self.store.contentstore
         course1_assets, count_course1_assets = content_store.get_all_content_for_course(course1_id)
         _, count_course2_assets = content_store.get_all_content_for_course(course2_id)
         self.assertEqual(count_course1_assets, count_course2_assets)
         for asset in course1_assets:
-            asset_id = asset.get('content_son', asset['_id'])
-            asset_key = StaticContent.compute_location(course1_id, asset_id['name'])
-            self.assertAssetsEqual(asset_key, course1_id, course2_id)
+            asset_son = asset.get('content_son', asset['_id'])
+            self.assertAssetsEqual(asset_son, course1_id, course2_id)
 
     def check_verticals(self, items):
         """ Test getting the editing HTML for each vertical. """
@@ -293,37 +304,47 @@ class CourseTestCase(ModuleStoreTestCase):
         for descriptor in items:
             resp = self.client.get_html(get_url('unit_handler', descriptor.location))
             self.assertEqual(resp.status_code, 200)
-            test_no_locations(self, resp)
 
-    def assertAssetsEqual(self, asset_key, course1_id, course2_id):
+    def assertAssetsEqual(self, asset_son, course1_id, course2_id):
         """Verifies the asset of the given key has the same attributes in both given courses."""
         content_store = contentstore()
-        course1_asset_attrs = content_store.get_attrs(asset_key.map_into_course(course1_id))
-        course2_asset_attrs = content_store.get_attrs(asset_key.map_into_course(course2_id))
+        category = asset_son.block_type if hasattr(asset_son, 'block_type') else asset_son['category']
+        filename = asset_son.block_id if hasattr(asset_son, 'block_id') else asset_son['name']
+        course1_asset_attrs = content_store.get_attrs(course1_id.make_asset_key(category, filename))
+        course2_asset_attrs = content_store.get_attrs(course2_id.make_asset_key(category, filename))
         self.assertEqual(len(course1_asset_attrs), len(course2_asset_attrs))
         for key, value in course1_asset_attrs.iteritems():
-            if key == '_id':
-                self.assertEqual(value['name'], course2_asset_attrs[key]['name'])
-            elif key == 'filename' or key == 'uploadDate' or key == 'content_son' or key == 'thumbnail_location':
+            if key in ['_id', 'filename', 'uploadDate', 'content_son', 'thumbnail_location']:
                 pass
             else:
                 self.assertEqual(value, course2_asset_attrs[key])
 
-
-def test_no_locations(test, resp, status_code=200, html=True):
-    """
-    Verifies that "i4x", which appears in old locations, but not
-    new locators, does not appear in the HTML response output.
-    Used to verify that database refactoring is complete.
-    """
-    test.assertNotContains(resp, 'i4x', status_code=status_code, html=html)
-    if html:
-        # For HTML pages, it is nice to call the method with html=True because
-        # it checks that the HTML properly parses. However, it won't find i4x usages
-        # in JavaScript blocks.
-        content = resp.content
-        hits = len(re.findall(r"(?<!jump_to/)i4x://", content))
-        test.assertEqual(hits, 0, "i4x found outside of LMS jump-to links")
+    def compute_real_state(self, item):
+        """
+        In draft mongo, compute_published_state can return draft when the draft == published, but in split,
+        it'll return public in that case
+        """
+        supposed_state = self.store.compute_publish_state(item)
+        if supposed_state == PublishState.draft and isinstance(item.runtime.modulestore, DraftModuleStore):
+            # see if the draft differs from the published
+            published = self.store.get_item(item.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+            if item.get_explicitly_set_fields_by_scope() != published.get_explicitly_set_fields_by_scope():
+                return supposed_state
+            if item.get_explicitly_set_fields_by_scope(Scope.settings) != published.get_explicitly_set_fields_by_scope(Scope.settings):
+                return supposed_state
+            if item.has_children and item.children != published.children:
+                return supposed_state
+            return PublishState.public
+        elif supposed_state == PublishState.public and item.location.category in mongo.base.DIRECT_ONLY_CATEGORIES:
+            if not all([
+                self.store.has_item(child_loc, revision=ModuleStoreEnum.RevisionOption.draft_only)
+                for child_loc in item.children
+            ]):
+                return PublishState.draft
+            else:
+                return supposed_state
+        else:
+            return supposed_state
 
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):

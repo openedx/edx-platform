@@ -39,6 +39,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
 
 log = logging.getLogger(__name__)
@@ -53,6 +54,9 @@ SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
 # sort order that returns PUBLISHED items first
 SORT_REVISION_FAVOR_PUBLISHED = ('_id.revision', pymongo.ASCENDING)
 
+BLOCK_TYPES_WITH_CHILDREN = list(set(
+    name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
+))
 
 class MongoRevisionKey(object):
     """
@@ -174,7 +178,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         Return an XModule instance for the specified location
         """
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
@@ -262,7 +266,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         Convert a single serialized UsageKey string in a ReferenceField into a UsageKey.
         """
         key = Location.from_deprecated_string(ref_string)
-        return key.replace(run=self.modulestore._fill_in_run(key.course_key).run)
+        return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
+
+    def __setattr__(self, name, value):
+        return super(CachingDescriptorSystem, self).__setattr__(name, value)
 
     def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
         """
@@ -390,6 +397,24 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.ignore_write_events_on_courses = set()
         self._course_run_cache = {}
 
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying database
+        """
+        self.collection.database.connection.close()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        # drop the assets
+        super(MongoModuleStore, self)._drop_database()
+
+        connection = self.collection.database.connection
+        connection.drop_database(self.collection.database)
+        connection.close()
+
     def _begin_bulk_write_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course
@@ -405,7 +430,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
             self.ignore_write_events_on_courses.remove(course_id)
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
-    def _fill_in_run(self, course_key):
+    def fill_in_run(self, course_key):
+        """
+        In mongo some course_keys are used without runs. This helper function returns
+        a course_key with the run filled in, if the course does actually exist.
+        """
         if course_key.run is not None:
             return course_key
 
@@ -433,15 +462,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # get all collections in the course, this query should not return any leaf nodes
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
 
-        course_id = self._fill_in_run(course_id)
-        block_types_with_children = set(
-            name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
-        )
+        course_id = self.fill_in_run(course_id)
         query = SON([
             ('_id.tag', 'i4x'),
             ('_id.org', course_id.org),
             ('_id.course', course_id.course),
-            ('_id.category', {'$in': list(block_types_with_children)})
+            ('_id.category', {'$in': BLOCK_TYPES_WITH_CHILDREN})
         ])
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
@@ -470,7 +496,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
-                results_by_url[location_url].setdefault('definition', {})['children'] = total_children
+                # use set to get rid of duplicates. We don't care about order; so, it shouldn't matter.
+                results_by_url[location_url].setdefault('definition', {})['children'] = set(total_children)
             else:
                 results_by_url[location_url] = result
             if location.category == 'course':
@@ -509,11 +536,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         tree = {}
 
-        course_id = self._fill_in_run(course_id)
+        course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and course_id in self.request_cache.data.get('metadata_inheritance', {}):
-                return self.request_cache.data['metadata_inheritance'][course_id]
+            if self.request_cache is not None and unicode(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
+                return self.request_cache.data['metadata_inheritance'][unicode(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
@@ -540,7 +567,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # defined
             if 'metadata_inheritance' not in self.request_cache.data:
                 self.request_cache.data['metadata_inheritance'] = {}
-            self.request_cache.data['metadata_inheritance'][course_id] = tree
+            self.request_cache.data['metadata_inheritance'][unicode(course_id)] = tree
 
         return tree
 
@@ -552,6 +579,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If given a runtime, it replaces the cached_metadata in that runtime. NOTE: failure to provide
         a runtime may mean that some objects report old values for inherited data.
         """
+        course_id = course_id.for_branch(None)
         if course_id not in self.ignore_write_events_on_courses:
             # below is done for side effects when runtime is None
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
@@ -588,7 +616,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         data = {}
         to_process = list(items)
-        course_key = self._fill_in_run(course_key)
+        course_key = self.fill_in_run(course_key)
         while to_process and depth is None or depth >= 0:
             children = []
             for item in to_process:
@@ -616,7 +644,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        course_key = self._fill_in_run(course_key)
+        course_key = self.fill_in_run(course_key)
         location = Location._from_deprecated_son(item['location'], course_key.run)
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
@@ -653,7 +681,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Load a list of xmodules from the data in items, with children cached up
         to specified depth
         """
-        course_key = self._fill_in_run(course_key)
+        course_key = self.fill_in_run(course_key)
         data_cache = self._cache_children(course_key, items, depth)
 
         # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
@@ -693,7 +721,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''Look for a given location in the collection. If the item is not present, raise
         ItemNotFoundError.
         '''
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         item = self.collection.find_one(
             {'_id': location.to_deprecated_son()}
         )
@@ -705,8 +733,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Get the course with the given courseid (org/course/run)
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
-        course_key = self._fill_in_run(course_key)
+        assert(isinstance(course_key, CourseKey))
+        course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:
             return self.get_item(location, depth=depth)
@@ -722,8 +750,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If ignore_case is True, do a case insensitive search,
         otherwise, do a case sensitive search
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
-        course_key = self._fill_in_run(course_key)
+        assert(isinstance(course_key, CourseKey))
+        course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
             course_query = location.to_deprecated_son('_id.')
@@ -841,13 +869,14 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-    def create_course(self, org, offering, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -855,9 +884,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Returns: a CourseDescriptor
 
         Raises:
-            InvalidLocationError: If a course with the same org and offering already exists
+            InvalidLocationError: If a course with the same org, course, and run already exists
         """
-        course, _, run = offering.partition('/')
         course_id = SlashSeparatedCourseKey(org, course, run)
 
         # Check if a course with this org/course has been defined before (case-insensitive)
@@ -902,7 +930,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param runtime: if you already have an xblock from the course, the xblock.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        location = location.replace(run=self._fill_in_run(location.course_key).run)
+        location = location.replace(run=self.fill_in_run(location.course_key).run)
         # differs from split mongo in that I believe most of this logic should be above the persistence
         # layer but added it here to enable quick conversion. I'll need to reconcile these.
         if metadata is None:
@@ -1056,7 +1084,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     ]
                 elif isinstance(xblock.fields[field_name], ReferenceValueDict):
                     for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, Location)
+                        assert isinstance(subvalue, UsageKey)
                         value[key] = subvalue.to_deprecated_string()
         return jsonfields
 
@@ -1135,7 +1163,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Return an array of all of the locations (deprecated string format) for orphans in the course.
         """
-        course_key = self._fill_in_run(course_key)
+        course_key = self.fill_in_run(course_key)
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         query = self._course_key_to_son(course_key)
         query['_id.category'] = {'$nin': detached_categories}

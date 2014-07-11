@@ -1,0 +1,20 @@
+<problem display_name="Chemical Equation" markdown="null">
+  <startouttext/>
+  <p>Some problems may ask for a particular chemical equation. You can practice this technique by writing out the following reaction in the box below.</p>
+  <center>\( \text{H}_2\text{SO}_4 \longrightarrow \text{ H}^+ + \text{ HSO}_4^-\)</center>
+  <br/>
+  <customresponse>
+    <chemicalequationinput size="50"/>
+    <answer type="loncapa/python">
+
+if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -&gt; H^+ + HSO4^-'): 
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+
+</answer>
+  </customresponse>
+  <p> Some tips:<ul><li>Only real element symbols are permitted.</li><li>Subscripts are entered with plain text.</li><li>Superscripts are indicated with a caret (^).</li><li>The reaction arrow (\(\longrightarrow\)) is indicated with "-&gt;".</li></ul>
+	 So, you can enter "H2SO4 -&gt; H^+ + HSO4^-".</p>
+  <endouttext/>
+</problem>

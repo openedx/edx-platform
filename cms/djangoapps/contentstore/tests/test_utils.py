@@ -200,33 +200,27 @@ class XBlockVisibilityTestCase(TestCase):
 
     def test_private_unreleased_xblock(self):
         """Verifies that a private unreleased xblock is not visible"""
-        vertical = self._create_xblock_with_start_date('private_unreleased', self.future)
-        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+        self._test_visible_to_students(False, 'private_unreleased', self.future)
 
     def test_private_released_xblock(self):
         """Verifies that a private released xblock is not visible"""
-        vertical = self._create_xblock_with_start_date('private_released', self.past)
-        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+        self._test_visible_to_students(False, 'private_released', self.past)
 
     def test_public_unreleased_xblock(self):
         """Verifies that a public (published) unreleased xblock is not visible"""
-        vertical = self._create_xblock_with_start_date('public_unreleased', self.future, publish=True)
-        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+        self._test_visible_to_students(False, 'public_unreleased', self.future, publish=True)
 
     def test_public_released_xblock(self):
-        """Verifies that public (published) released xblock is visible"""
-        vertical = self._create_xblock_with_start_date('public_released', self.past, publish=True)
-        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+        """Verifies that public (published) released xblock is visible if staff lock is not enabled."""
+        self._test_visible_to_students(True, 'public_released', self.past, publish=True)
 
     def test_private_no_start_xblock(self):
         """Verifies that a private xblock with no start date is not visible"""
-        vertical = self._create_xblock_with_start_date('private_no_start', None)
-        self.assertFalse(utils.is_xblock_visible_to_students(vertical))
+        self._test_visible_to_students(False, 'private_no_start', None)
 
     def test_public_no_start_xblock(self):
-        """Verifies that a public (published) xblock with no start date is visible"""
-        vertical = self._create_xblock_with_start_date('public_no_start', None, publish=True)
-        self.assertTrue(utils.is_xblock_visible_to_students(vertical))
+        """Verifies that a public (published) xblock with no start date is visible unless staff lock is enabled"""
+        self._test_visible_to_students(True, 'public_no_start', None, publish=True)
 
     def test_draft_released_xblock(self):
         """Verifies that a xblock with an unreleased draft and a released published version is visible"""
@@ -238,12 +232,28 @@ class XBlockVisibilityTestCase(TestCase):
 
         self.assertTrue(utils.is_xblock_visible_to_students(vertical))
 
-    def _create_xblock_with_start_date(self, name, start_date, publish=False):
+    def _test_visible_to_students(self, expected_visible_without_lock, name, start_date, publish=False):
+        """
+        Helper method that checks that is_xblock_visible_to_students returns the correct value both
+        with and without visible_to_staff_only set.
+        """
+        no_staff_lock = self._create_xblock_with_start_date(name, start_date, publish, visible_to_staff_only=False)
+        self.assertEqual(expected_visible_without_lock, utils.is_xblock_visible_to_students(no_staff_lock))
+
+        # any xblock with visible_to_staff_only set to True should not be visible to students.
+        staff_lock = self._create_xblock_with_start_date(
+            name + "_locked", start_date, publish, visible_to_staff_only=True
+        )
+        self.assertFalse(utils.is_xblock_visible_to_students(staff_lock))
+
+    def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
         location = Location('edX', 'visibility', '2012_Fall', 'vertical', name)
 
         vertical = modulestore().create_xmodule(location)
         vertical.start = start_date
+        if visible_to_staff_only:
+            vertical.visible_to_staff_only = visible_to_staff_only
         modulestore().update_item(vertical, self.dummy_user, allow_not_found=True)
 
         if publish:

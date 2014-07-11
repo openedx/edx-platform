@@ -20,24 +20,21 @@ To create an annotation problem, you'll add the Annotation advanced component to
 
 #. Add the Annotation advanced component. 
 
-    #. On the **Settings** menu, click **Advanced Settings**.
+    #. From the **Settings** menu select **Advanced Settings**.
 
-    #. On the **Advanced Settings** page, locate the **Manual Policy Definition** section, and then locate the **advanced_modules** policy key (this key is at the top of the list).
+    #. In the field for the **Advanced Module List** policy key, place your
+       cursor between the brackets.
 
-    .. image:: /Images/AdvancedModulesEmpty.png
-         :alt: Image of the Manual Policy Definition section of the Advanced Settings page
-
-    3. Under **Policy Value**, place your cursor between the brackets, and
-       then enter the following. Make sure to include the quotation marks.
+    #. Enter the following value. Make sure to include the quotation marks.
 
        ``"annotatable"``
 
-    #. At the bottom of the page, click **Save Changes**.
+    4. At the bottom of the page, click **Save Changes**.
 
        The page refreshes automatically. At the top of the page, you see a
        notification that your changes have been saved.
 
-    #. Return to the unit where you want to add the specialized problem. The
+    5. Return to the unit where you want to add the specialized problem. The
        list of possible components now contains an Advanced component.
 
        .. image:: /Images/AdvancedComponent.png
@@ -46,8 +43,8 @@ To create an annotation problem, you'll add the Annotation advanced component to
 2. Add the **Instructions** and **Guided Discussion** segments of the
 problem.
 
-    #. In the unit where you want to create the problem, click **Advanced**
-       under **Add New Component**.
+    #. In the unit where you want to create the problem, under **Add New
+       Component** click **Advanced**.
     #. In the list of problem types, click **Annotation**.
     #. In the component that appears, click **Edit**.
     #. In the component editor, replace the example code with your own code.

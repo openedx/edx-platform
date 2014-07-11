@@ -1,9 +1,10 @@
 import pymongo
 from uuid import uuid4
 import ddt
-from mock import patch, Mock
+from mock import patch
 from importlib import import_module
 from collections import namedtuple
+import unittest
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
@@ -11,19 +12,19 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
+# TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
 
 
 @ddt.ddt
-class TestMixedModuleStore(LocMapperSetupSansDjango):
+class TestMixedModuleStore(unittest.TestCase):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -66,7 +67,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             },
             {
                 'NAME': 'split',
-                'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+                'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                 'OPTIONS': modulestore_options
             },
@@ -103,13 +104,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.addCleanup(self.connection.close)
         super(TestMixedModuleStore, self).setUp()
 
-        patcher = patch.multiple(
-            'xmodule.modulestore.mixed',
-            loc_mapper=Mock(return_value=LocMapperSetupSansDjango.loc_store),
-            create_modulestore_instance=create_modulestore_instance,
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
         self.addTypeEqualityFunc(CourseLocator, '_compareIgnoreVersion')
         # define attrs which get set in initdb to quell pylint
@@ -123,11 +117,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
-        if default == 'split':
-            offering = course_key.offering.replace('/', '.')
-        else:
-            offering = course_key.offering
-        course = self.store.create_course(course_key.org, offering, self.user_id)
+        course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
         category = self.writable_chapter_location.category
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
@@ -211,7 +201,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(None, **self.options)
+        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
         self.addCleanup(self.store.close_all_connections)
 
         # convert to CourseKeys
@@ -224,7 +214,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+        if default == 'split':
+            self.fake_location = CourseLocator(
+                'foo', 'bar', 'slowly', branch=ModuleStoreEnum.BranchName.draft
+            ).make_usage_key('vertical', 'baz')
+        else:
+            self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
         self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
@@ -232,9 +227,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             category='chapter', name='Overview'
         )
 
-        # get Locators and set up the loc mapper if app is Locator based
-        if default == 'split':
-            self.fake_location = loc_mapper().translate_location(self.fake_location)
 
         self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
 
@@ -330,6 +322,42 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
 
+        # create and delete a private vertical with private children
+        private_vert = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            self.course_locations[self.MONGO_COURSEID], 'vertical', user_id=self.user_id, block_id='private'
+        )
+        private_leaf = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            private_vert.location, 'html', user_id=self.user_id, block_id='private_leaf'
+        )
+
+        # verify pre delete state (just to verify that the test is valid)
+        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == ModuleStoreEnum.BranchName.draft)
+        if hasattr(private_vert.location, 'version_guid'):
+            # change to the HEAD version
+            vert_loc = private_vert.location.for_version(private_leaf.location.version_guid)
+        else:
+            vert_loc = private_vert.location
+        self.assertTrue(self.store.has_item(vert_loc))
+        self.assertTrue(self.store.has_item(private_leaf.location))
+        course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
+        self.assertIn(vert_loc, course.children)
+
+        # delete the vertical and ensure the course no longer points to it
+        self.store.delete_item(vert_loc, self.user_id)
+        course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
+        if hasattr(private_vert.location, 'version_guid'):
+            # change to the HEAD version
+            vert_loc = private_vert.location.for_version(course.location.version_guid)
+            leaf_loc = private_leaf.location.for_version(course.location.version_guid)
+        else:
+            vert_loc = private_vert.location
+            leaf_loc = private_leaf.location
+        self.assertFalse(self.store.has_item(vert_loc))
+        self.assertFalse(self.store.has_item(leaf_loc))
+        self.assertNotIn(vert_loc, course.children)
+
     @ddt.data('draft', 'split')
     def test_get_courses(self, default_ms):
         self.initdb(default_ms)
@@ -367,7 +395,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
-            xml_store.create_course("org", "course/run", self.user_id)
+            xml_store.create_course("org", "course", "run", self.user_id)
 
     @ddt.data('draft', 'split')
     def test_get_course(self, default_ms):

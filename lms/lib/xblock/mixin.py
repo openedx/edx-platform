@@ -49,3 +49,8 @@ class LmsBlockMixin(XBlockMixin):
         scope=Scope.settings,
         deprecated=True
     )
+    visible_to_staff_only = Boolean(
+        help=_("If true, can be seen only by course staff, regardless of start date."),
+        default=False,
+        scope=Scope.settings,
+    )

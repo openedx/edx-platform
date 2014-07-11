@@ -708,7 +708,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
@@ -1034,7 +1034,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
     if 'created' in kwargs and kwargs['created']:
         site = microsite.get_value('SITE_NAME')
         if site:
-            user_signup_source = UserSignupSource(user_id=kwargs['instance'], site=site)
+            user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
             user_signup_source.save()
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 

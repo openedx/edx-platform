@@ -57,7 +57,7 @@ class TestContentstore(unittest.TestCase):
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         self.contentstore = MongoContentStore(HOST, DB, port=PORT)
-        self.addCleanup(self.contentstore.drop_database)
+        self.addCleanup(self.contentstore._drop_database)  # pylint: disable=protected-access
 
         setattr(AssetLocation, 'deprecated', deprecated)
         setattr(SlashSeparatedCourseKey, 'deprecated', deprecated)

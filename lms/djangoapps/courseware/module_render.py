@@ -504,7 +504,15 @@ def get_module_system_for_user(user, field_data_cache,
     )
 
     # pass position specified in URL to module through ModuleSystem
+    if position is not None:
+        try:
+            position = int(position)
+        except (ValueError, TypeError):
+            log.exception('Non-integer %r passed as position.', position)
+            position = None
+
     system.set('position', position)
+
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData

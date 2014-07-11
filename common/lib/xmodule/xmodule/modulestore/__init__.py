@@ -298,6 +298,14 @@ class ModuleStoreRead(object):
         """
         pass
 
+    @abstractmethod
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        pass
+
+
 class ModuleStoreWrite(ModuleStoreRead):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -317,7 +325,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
@@ -336,19 +344,20 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def create_course(self, org, offering, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -386,6 +395,14 @@ class ModuleStoreWrite(ModuleStoreRead):
         """
         pass
 
+    @abstractmethod
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        pass
+
 
 class ModuleStoreReadBase(ModuleStoreRead):
     '''
@@ -395,6 +412,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
 
     def __init__(
         self,
+        contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
         xblock_mixins=(), xblock_select=None,
@@ -411,6 +429,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.contentstore = contentstore
 
     def get_course_errors(self, course_key):
         """
@@ -458,7 +477,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
             return next(
                 (
                     c.id for c in self.get_courses()
-                    if c.id.org.lower() == course_id.org.lower() and c.id.offering.lower() == course_id.offering.lower()
+                    if c.id.org.lower() == course_id.org.lower() and
+                    c.id.course.lower() == course_id.course.lower() and
+                    c.id.run.lower() == course_id.run.lower()
                 ),
                 None
             )
@@ -480,6 +501,14 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         # default is to say yes by not raising an exception
         return {'default_impl': True}
+
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        if self.contentstore:
+            self.contentstore.close_connections()
+        super(ModuleStoreReadBase, self).close_connections()
 
     @contextmanager
     def default_store(self, store_type):
@@ -508,9 +537,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     Implement interface functionality that can be shared.
     '''
     def __init__(self, contentstore, **kwargs):
-        super(ModuleStoreWriteBase, self).__init__(**kwargs)
+        super(ModuleStoreWriteBase, self).__init__(contentstore=contentstore, **kwargs)
 
-        self.contentstore = contentstore
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by partition_fields_by_scope, which is only needed because
         # the split mongo store is used for item creation as well as item persistence
@@ -542,7 +570,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
@@ -556,7 +584,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
@@ -582,8 +610,9 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         content.
         """
         # copy the assets
-        self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
-        super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
+        if self.contentstore:
+            self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+            super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
         return dest_course_id
 
     def delete_course(self, course_key, user_id):
@@ -592,8 +621,18 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         content.
         """
         # delete the assets
-        self.contentstore.delete_all_course_assets(course_key)
+        if self.contentstore:
+            self.contentstore.delete_all_course_assets(course_key)
         super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        if self.contentstore:
+            self.contentstore._drop_database()  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database()  # pylint: disable=protected-access
 
     @contextmanager
     def bulk_write_operations(self, course_id):

@@ -33,10 +33,6 @@ Modulestore Helpers
 These packages provide utilities for easier use of modulestores,
 and migrating data between modulestores.
 
-.. automodule:: xmodule.modulestore.loc_mapper_store
-    :members:
-    :show-inheritance:
-
 .. automodule:: xmodule.modulestore.search
     :members:
     :show-inheritance:

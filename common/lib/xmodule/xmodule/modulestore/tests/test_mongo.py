@@ -26,6 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
@@ -73,7 +74,6 @@ class TestMongoModuleStore(unittest.TestCase):
             tz_aware=True,
             document_class=dict,
         )
-        cls.connection.drop_database(DB)
 
         # NOTE: Creating a single db for all the tests to save time.  This
         # is ok only as long as none of the tests modify the db.
@@ -407,20 +407,20 @@ class TestMongoModuleStore(unittest.TestCase):
         def check_xblock_fields():
             def check_children(xblock):
                 for child in xblock.children:
-                    assert_is_instance(child, Location)
+                    assert_is_instance(child, UsageKey)
 
             course = self.draft_store.get_course(course_key)
             check_children(course)
 
             refele = self.draft_store.get_item(self.refloc)
             check_children(refele)
-            assert_is_instance(refele.reference_link, Location)
+            assert_is_instance(refele.reference_link, UsageKey)
             assert_greater(len(refele.reference_list), 0)
             for ref in refele.reference_list:
-                assert_is_instance(ref, Location)
+                assert_is_instance(ref, UsageKey)
             assert_greater(len(refele.reference_dict), 0)
             for ref in refele.reference_dict.itervalues():
-                assert_is_instance(ref, Location)
+                assert_is_instance(ref, UsageKey)
 
         def check_mongo_fields():
             def get_item(location):
@@ -532,6 +532,20 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Publish and verify again
         self.draft_store.publish(location, self.dummy_user)
+        self.assertFalse(self.draft_store.has_changes(location))
+
+    def test_has_changes_missing_child(self):
+        """
+        Tests that has_changes() returns False when a published parent points to a child that doesn't exist.
+        """
+        location = Location('edX', 'missing', '2012_Fall', 'sequential', 'parent')
+
+        # Create the parent and point it to a fake child
+        parent = self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        parent.children += [Location('edX', 'missing', '2012_Fall', 'vertical', 'does_not_exist')]
+        self.draft_store.update_item(parent, self.dummy_user)
+
+        # Check the parent for changes should return False and not throw an exception
         self.assertFalse(self.draft_store.has_changes(location))
 
     def _create_test_tree(self, name, user_id=None):

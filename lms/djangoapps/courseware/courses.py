@@ -187,7 +187,6 @@ def get_course_about_section(course, section_key):
                 request,
                 loc,
                 field_data_cache,
-                course.id,
                 log_if_not_found=False,
                 wrap_xmodule_display=False,
                 static_asset_path=course.static_asset_path
@@ -241,7 +240,6 @@ def get_course_info_section(request, course, section_key):
         request,
         usage_key,
         field_data_cache,
-        course.id,
         log_if_not_found=False,
         wrap_xmodule_display=False,
         static_asset_path=course.static_asset_path

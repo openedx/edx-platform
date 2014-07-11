@@ -43,16 +43,20 @@ levels of interaction.
   directly to a post to provide a solution or continue the conversation.
 
 * A *comment* is the third level of interaction. A comment is often a
-  clarification or side note made to a specific reponse, rather than to the
+  clarification or side note made to a specific response, rather than to the
   post as a whole.
  
 The dialog created by a post, its responses, and the comments on those
 repsonses is called a *thread*.
 
-All course staff members and enrolled students can add posts, reponses, and
+All course staff members and enrolled students can add posts, responses, and
 comments, and view all of the posts, responses, and comments made by other
 course participants. Discussion threads are saved as part of the course
 history.
+
+..note:: 
+ The :ref:`Discussions for Students and Staff` section describes features that
+ are available to all discussion participants. 
 
 .. _Organizing_discussions:
 

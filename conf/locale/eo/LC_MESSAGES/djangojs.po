@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 12:36-0400\n"
-"PO-Revision-Date: 2014-07-07 16:38:22.768763\n"
+"POT-Creation-Date: 2014-07-14 09:10-0400\n"
+"PO-Revision-Date: 2014-07-14 13:11:26.464876\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,7 @@ msgstr "ÖK Ⱡ'#"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
@@ -824,6 +825,7 @@ msgid "Reply"
 msgstr "Réplý Ⱡ'σяєм ι#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -1041,6 +1043,7 @@ msgid "<%= num_students %> students scored."
 msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
 msgstr "Löädïng... Ⱡ#"
 
@@ -1846,6 +1849,22 @@ msgstr "Löökïng för Hélp wïth Stüdïö? Ⱡ'σяєм #"
 msgid "You must specify a name"
 msgstr "Ýöü müst spéçïfý ä nämé Ⱡ'σяє#"
 
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr "Gröüp nämé ïs réqüïréd Ⱡ'σяє#"
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr "Gröüp Çönfïgürätïön nämé ïs réqüïréd Ⱡ'σяєм ιρ#"
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr "Pléäsé ädd ät léäst öné gröüp Ⱡ'σяєм #"
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr "Àll gröüps müst hävé ä nämé Ⱡ'σяєм#"
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -1979,6 +1998,14 @@ msgstr "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρ#"
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr "Sävïng Ⱡ'σяєм ιρѕ#"
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] "Çöntäïns %(count)s gröüp Ⱡ'σ#"
+msgstr[1] "Çöntäïns %(count)s gröüps Ⱡ'σя#"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -2115,6 +2142,7 @@ msgid "Editor"
 msgstr "Édïtör Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/views/xblock_editor.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr "Séttïngs #"
 
@@ -2123,6 +2151,7 @@ msgid "Adding&hellip;"
 msgstr "Àddïng&hellip; #"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -2135,6 +2164,10 @@ msgstr "Çömpönént #"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "Édïtïng: %(title)s Ⱡ#"
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
+msgstr "Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö  Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -2305,6 +2338,10 @@ msgid "total exercises that won't be graded"
 msgstr "tötäl éxérçïsés thät wön't ßé grädéd Ⱡ'σяєм ιρ#"
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr "Çöürsé Händöüts Ⱡ'#"
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr "Ýöü hävé nö händöüts défïnéd Ⱡ'σяєм #"
 
@@ -2384,6 +2421,10 @@ msgstr "Çhäptér ïnförmätïön Ⱡ'σя#"
 msgid "Add a Chapter"
 msgstr "Àdd ä Çhäptér Ⱡ'#"
 
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr "ÌD Ⱡ'#"
+
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
@@ -2411,6 +2452,10 @@ msgstr "Répläçé #"
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "Döwnlöäd #"
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr "Ýöü hävén't çréätéd äný gröüp çönfïgürätïöns ýét. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -2441,6 +2486,10 @@ msgstr "Vïéw Lïvé #"
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "Fïlé üplöäd süççéédéd Ⱡ'σя#"
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
+msgstr "Gröüp Çönfïgürätïöns Ⱡ'σя#"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

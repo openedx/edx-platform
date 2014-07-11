@@ -34,11 +34,16 @@ Step 1. Obtain Information from VitalSource
 
 To create a VitalSource Bookshelf e-reader, you need the following information from Vital Source:
 
-- The **lti_passports** policy key. This policy key enables you to create an LTI component for the VitalSource Bookshelf e-reader. For more information about the **lti_passports** policy key, see :ref:`LTI Information` in :ref:`LTI Component`.
+- The **LTI Passports** policy key. This policy key enables you to create an
+  LTI component for the VitalSource Bookshelf e-reader. For more information
+  about the **LTI Passports** policy key, see :ref:`LTI Information` in
+  :ref:`LTI Component`.
 
 - The Vital Souce Book ID (VBID) for your e-book. This is a specific code that Vital Source creates for the book when Vital Source adds the e-book to its inventory.
 
-To obtain this information, your course team selects a member point person (MPP) to work with Vital Source. Vital Source delivers the **lti_passports** policy key and VBID to the MPP.
+To obtain this information, your course team selects a member point person
+(MPP) to work with Vital Source. Vital Source delivers the **LTI Passports**
+policy key and VBID to the MPP.
 
 
 .. _VS Modify Advanced Settings:
@@ -47,30 +52,36 @@ To obtain this information, your course team selects a member point person (MPP)
 Step 1. Modify the Course's Advanced Settings
 =============================================
 
-In this step, you'll modify the course's advanced settings to allow you to create an LTI component and add the **lti_passports** policy key for Vital Source. 
+In this step, you'll modify the course's advanced settings to allow you to
+create an LTI component and add the **LTI Passports** policy key for Vital
+Source.
 
 #. In Studio, click the **Settings** menu, and then click **Advanced Settings**.
 
-#. On the **Advanced Settings** page, locate the **advanced_modules** policy key.
+#. In the field for the  **Advanced Module List** policy key, place your cursor
+   between the brackets.
 
-#. Under **Policy Value**, place your cursor between the brackets, and then enter ``“lti”``. Make sure to include the quotation marks, but not the period.
+#. Enter ``“lti”``. Make sure to include the quotation marks, but not the
+   period.
 
    .. image:: /Images/LTIPolicyKey.png
-    :alt: Image of the advanced_modules key in the Advanced Settings page, with the LTI value added
+    :alt: Image of the Advanced Module List key in the Advanced Settings page, with the LTI value added
 
-   **Note** If the **Policy Value** field already contains text, place your cursor directly after the closing quotation mark for the final item, and then enter a comma followed by ``“lti”`` (make sure that you include the quotation marks). For example, the text in the **Policy Value** field may resemble the following:
+  .. note:: If the value field already contains text, place your cursor directly after the closing quotation mark for the final item, and then enter a comma followed by ``“lti”`` (make sure that you include the quotation marks). For example, the value for **Advanced Module List** may resemble the following:
 
    ``["value_1","lti"]``
 
-4. Scroll down to the **lti_passports** policy key.
+4. Scroll down to the **LTI Passports** policy key.
 
-#. Under **Policy Value**, place your cursor between the brackets, and then enter the value for the **lti_passports** policy key that you obtained from Vital Source. Make sure to surround the value with quotation marks.
+#. In the policy value field, place your cursor between the brackets, and then
+   enter the value for the **LTI Passports** policy key that you obtained from
+   Vital Source. Make sure to surround the value with quotation marks.
 
-    For example, the value in this field may resemble the following:
+   For example, the value in this field may resemble the following:
 
-    ``"id_21441:b289378-ctools.school.edu:23746387264"``
+   ``"id_21441:b289378-ctools.school.edu:23746387264"``
 
-#. At the bottom of the page, click **Save Changes**.
+6. At the bottom of the page, click **Save Changes**.
 
 The page refreshes automatically. At the top of the page, you see a notification that your changes have been saved.
 
