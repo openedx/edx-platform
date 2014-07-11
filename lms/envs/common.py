@@ -260,7 +260,7 @@ FEATURES = {
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 
     # Log session related activities like sessions of requests, session creation and deletion etc.
-    'ENABLE_VERBOSE_LOGGING_FOR_SESSIONS': False,
+    'ENABLE_VERBOSE_LOGGING_FOR_SESSIONS': True,
 }
 
 # Used for A/B testing
