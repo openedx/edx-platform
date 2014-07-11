@@ -95,18 +95,22 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Editing the container", function() {
                 var updatedDisplayName = 'Updated Test Container',
-                    expectEditCanceled;
+                    expectEditCanceled, getDisplayNameWrapper;
 
                 afterEach(function() {
                     edit_helpers.cancelModalIfShowing();
                 });
 
+                getDisplayNameWrapper = function() {
+                    return containerPage.$('.wrapper-xblock-field');
+                };
+
                 expectEditCanceled = function(test, options) {
-                    var initialRequests, displayNameElement, displayNameInput;
+                    var initialRequests, displayNameWrapper;
                     renderContainerPage(mockContainerXBlockHtml, test);
+                    displayNameWrapper = getDisplayNameWrapper();
                     initialRequests = requests.length;
-                    displayNameElement = containerPage.$('.page-header-title');
-                    displayNameInput = edit_helpers.inlineEdit(displayNameElement, options.newTitle);
+                    displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, options.newTitle);
                     if (options.pressEscape) {
                         displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
                         displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
@@ -115,7 +119,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     }
                     // No requests should be made when the edit is cancelled client-side
                     expect(initialRequests).toBe(requests.length);
-                    edit_helpers.verifyInlineEditChange(displayNameElement, initialDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameWrapper, initialDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 };
 
@@ -157,44 +161,44 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('can inline edit the display name', function() {
-                    var displayNameElement, displayNameInput;
+                    var displayNameInput, displayNameWrapper;
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    displayNameElement = containerPage.$('.page-header-title');
-                    displayNameInput = edit_helpers.inlineEdit(displayNameElement, updatedDisplayName);
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
                     create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    edit_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
                 });
 
                 it('does not change the title when a display name update fails', function() {
-                    var initialRequests, displayNameElement, displayNameInput;
+                    var initialRequests, displayNameInput, displayNameWrapper;
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    displayNameElement = containerPage.$('.page-header-title');
-                    displayNameInput = edit_helpers.inlineEdit(displayNameElement, updatedDisplayName);
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     initialRequests = requests.length;
                     displayNameInput.change();
                     create_sinon.respondWithError(requests);
                     // No fetch operation should occur.
                     expect(initialRequests + 1).toBe(requests.length);
-                    edit_helpers.verifyInlineEditChange(displayNameElement, initialDisplayName, updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameWrapper, initialDisplayName, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(initialDisplayName);
                 });
 
                 it('trims whitespace from the display name', function() {
-                    var displayNameElement, displayNameInput;
+                    var displayNameInput, displayNameWrapper;
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    displayNameElement = containerPage.$('.page-header-title');
-                    displayNameInput = edit_helpers.inlineEdit(displayNameElement, updatedDisplayName + ' ');
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName + ' ');
                     displayNameInput.change();
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
                     create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    edit_helpers.verifyInlineEditChange(displayNameElement, updatedDisplayName);
+                    edit_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
                 });
 
