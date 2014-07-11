@@ -24,14 +24,35 @@ from student.models import (
 )
 AUDIT_LOG = logging.getLogger("audit")
 
+
 class SessionsList(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    **Use Case**
+
+        SessionsList creates a new session with the edX LMS. 
+
+    **Example Request**
+
+        POST  {"username": "staff", "password": "edx"}
+
+    **Response Values**
+
+        * token: A unique token value for the session created.
+        * expires: The number of seconds until the new session expires.
+        * user: The following data about the user for whom the session is
+          created.
+            * id: The unique user identifier.
+            * email: The user's email address.
+            * username: The user's edX username.
+            * first_name: The user's first name, if defined.
+            * last_name: The user's last name, if defined.
+            * creaed:  The time and date the user account was created.
+            * organizations: An array of organizations the user is associated
+              with.
+        * uri: The URI to use to get details about the new session.
+    """
 
     def post(self, request):
-        """
-        POST creates a new system session, supported authentication modes:
-        1. Open edX username/password
-        """
         response_data = {}
         # Add some rate limiting here by re-using the RateLimitMixin as a helper class
         limiter = BadRequestRateLimiter()
@@ -98,12 +119,28 @@ class SessionsList(SecureAPIView):
 
 
 class SessionsDetail(SecureAPIView):
-    """ Inherit with SecureAPIView """
+    """
+    **Use Case**
+
+        SessionsDetail gets a details about a specific API session, as well as
+        enables you to delete an API session.
+
+
+    **Example Requests**
+
+        GET /api/session/{session_id}
+
+        DELETE /api/session/{session_id}/delete
+
+    **GET Response Values**
+
+        * token: A unique token value for the session.
+        * expires: The number of seconds until the session expires.
+        * user_id: The unique user identifier.
+        * uri: The URI to use to get details about the session.     
+    """
 
     def get(self, request, session_id):
-        """
-        GET retrieves an existing system session
-        """
         response_data = {}
         base_uri = generate_base_uri(request)
         engine = import_module(settings.SESSION_ENGINE)
@@ -125,9 +162,6 @@ class SessionsDetail(SecureAPIView):
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, session_id):
-        """
-        DELETE flushes an existing system session from the system
-        """
         response_data = {}
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)

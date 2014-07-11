@@ -1,9 +1,14 @@
+"""
+One-time data migration script -- shoulen't need to run it again
+"""
 import json
 
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
 from api_manager.models import GroupProfile, Organization
+
+
 
 class Command(BaseCommand):
     """
@@ -40,6 +45,6 @@ class Command(BaseCommand):
                 migrated_org.users.add(user)
             linked_groups = group.grouprelationship.get_linked_group_relationships()
             for linked_group in linked_groups:
-                if linked_group.to_group_relationship_id is not org.id: # Don't need to carry the symmetrical component
+                if linked_group.to_group_relationship_id is not org.id:  # Don't need to carry the symmetrical component
                     actual_group = Group.objects.get(id=linked_group.to_group_relationship_id)
                     migrated_org.groups.add(actual_group)

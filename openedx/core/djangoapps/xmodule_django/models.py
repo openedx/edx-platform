@@ -7,7 +7,6 @@ import warnings
 from django.core.exceptions import ValidationError
 from django.db import models
 from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
-
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -168,7 +167,6 @@ class CourseKeyField(OpaqueKeyField):
     """
     description = "A CourseKey object, saved to the DB in the form of a string"
     KEY_CLASS = CourseKey
-
 
 class UsageKeyField(OpaqueKeyField):
     """

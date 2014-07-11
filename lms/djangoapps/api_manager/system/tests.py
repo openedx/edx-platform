@@ -4,10 +4,8 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_views.py]
 """
-import unittest
 import uuid
 
-from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
@@ -77,4 +75,3 @@ class SystemApiTests(TestCase):
         self.assertIsNotNone(response.data['description'])
         self.assertGreater(len(response.data['description']), 0)
         self.assertIsNotNone(response.data['resources'])
-

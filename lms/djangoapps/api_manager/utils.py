@@ -1,6 +1,5 @@
 """ API implementation for Secure api calls. """
 
-
 import socket
 import struct
 
@@ -55,3 +54,5 @@ def is_int(value):
         return True
     except ValueError:
         return False
+
+

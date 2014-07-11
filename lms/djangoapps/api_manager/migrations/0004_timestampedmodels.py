@@ -70,7 +70,6 @@ class Migration(SchemaMigration):
                       self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Adding field 'GroupRelationship.record_date_created'
         db.add_column('api_manager_grouprelationship', 'record_date_created',
@@ -121,7 +120,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'LinkedGroupRelationship.modified'
         db.delete_column('api_manager_linkedgrouprelationship', 'modified')
-
 
     models = {
         'api_manager.coursegrouprelationship': {

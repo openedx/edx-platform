@@ -3,10 +3,8 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_permissions.py]
 """
 from random import randint
-import unittest
 import uuid
 
-from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -78,4 +76,3 @@ class PermissionsTests(TestCase):
         ip_address = kwargs.get('ip_address', {})
         response = self.client.post(uri, headers=headers, data=data, **ip_address)
         return response
-

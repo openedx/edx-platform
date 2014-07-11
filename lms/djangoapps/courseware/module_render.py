@@ -537,17 +537,16 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             content_id=unicode(descriptor.location)
         )
 
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
+        )
+
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-            )
+            handle_grade_event(block, event_type, event)
         elif event_type == 'progress':
             # expose another special case event type which gets sent
             # into the CourseCompletions models
