@@ -3,7 +3,7 @@ Tests for testing the modulestore settings migration code.
 """
 import copy
 from django.test import TestCase
-from lms.envs.modulestore_settings import convert_module_store_setting_if_needed
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 
 class ModuleStoreSettingsMigration(TestCase):

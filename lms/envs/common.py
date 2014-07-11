@@ -33,7 +33,7 @@ from path import path
 from warnings import simplefilter
 
 from .discussionsettings import *
-from .modulestore_settings import *
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
