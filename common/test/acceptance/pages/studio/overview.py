@@ -20,7 +20,7 @@ class CourseOutlineItem(object):
     """
     BODY_SELECTOR = None
     EDIT_BUTTON_SELECTOR = '.xblock-field-value-edit'
-    NAME_SELECTOR = '.xblock-title .xblock-field-value'
+    NAME_SELECTOR = '.item-title'
     NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
     STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
@@ -30,7 +30,10 @@ class CourseOutlineItem(object):
         # CourseOutlineItem is also used as a mixin for CourseOutlinePage, which doesn't have a locator
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
-        return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator if hasattr(self, 'locator') else None)
+        try:
+            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
+        except AttributeError:
+            return "{}(<browser>)".format(self.__class__.__name__)
 
     def _bounded_selector(self, selector):
         """
