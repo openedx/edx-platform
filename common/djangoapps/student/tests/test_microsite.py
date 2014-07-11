@@ -5,7 +5,7 @@ from django.test import TestCase
 from student.models import UserSignupSource
 import mock
 from django.core.urlresolvers import reverse
-
+from django.contrib.auth.models import User
 
 def fake_site_name(name, default=None):  # pylint: disable=W0613
     """
@@ -40,6 +40,7 @@ class TestMicrosite(TestCase):
         response = self.client.post(self.url, self.params)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
+        self.assertEqual(len(User.objects.exclude(id__in = UserSignupSource.objects.all().values_list('user_id', flat=True))), 0)
 
     def test_user_signup_from_non_micro_site(self):
         """
@@ -49,3 +50,4 @@ class TestMicrosite(TestCase):
         response = self.client.post(self.url, self.params)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
+        self.assertEqual(len(User.objects.exclude(id__in = UserSignupSource.objects.all().values_list('user_id', flat=True))), 1)
