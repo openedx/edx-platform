@@ -94,7 +94,6 @@ class OrganizationsApiTests(TestCase):
             self.assertEqual(response.status_code, 201)
             users.append(response.data['id'])
 
-
         data = {
             'name': self.test_organization_name,
             'display_name': self.test_organization_display_name,

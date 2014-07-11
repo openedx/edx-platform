@@ -14,6 +14,8 @@ from django.test.utils import override_settings
 
 from projects.models import Project, Workgroup, WorkgroupSubmission
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -29,18 +31,29 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class WorkgroupReviewsApiTests(TestCase):
+class WorkgroupReviewsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
     def setUp(self):
+        super(WorkgroupReviewsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_users_uri = '/api/users/'
         self.test_workgroups_uri = '/api/workgroups/'
         self.test_projects_uri = '/api/projects/'
         self.test_workgroup_reviews_uri = '/api/workgroup_reviews/'
 
-        self.test_course_id = 'edx/demo/course'
+        self.course = CourseFactory.create()
+        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+
+        self.chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            display_name="Overview"
+        )
+
+        self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_content_id = "i4x://blah"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
@@ -53,7 +66,7 @@ class WorkgroupReviewsApiTests(TestCase):
             username="testing",
             is_active=True
         )
-        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.test_course_id)
+        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.course.id)
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,
             content_id=self.test_course_content_id,
@@ -112,6 +125,7 @@ class WorkgroupReviewsApiTests(TestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id,
         }
         response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -127,6 +141,7 @@ class WorkgroupReviewsApiTests(TestCase):
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -136,6 +151,7 @@ class WorkgroupReviewsApiTests(TestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id,
         }
         response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -153,6 +169,7 @@ class WorkgroupReviewsApiTests(TestCase):
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 

@@ -70,6 +70,8 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
+from api_manager.models import CourseModuleCompletion
+
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
@@ -484,10 +486,20 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             usage_id=unicode(descriptor.location)
         )
 
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
+        )
+
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade':
             handle_grade_event(block, event_type, event)
+        elif event_type == 'progress':
+            # expose another special case event type which gets sent
+            # into the CourseCompletions models
+            handle_progress_event(block, event_type, event)
         else:
             track_function(event_type, event)
 

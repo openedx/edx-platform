@@ -421,6 +421,9 @@ FEATURES = {
 
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
+
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False
 }
 
 # Ignore static asset files on import which match this pattern
