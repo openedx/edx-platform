@@ -138,8 +138,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
     def get_item(self, usage_key, depth=0, **kwargs):
         """
-        This method is explicitly not implemented as we need a course_id to disambiguate
-        We should be able to fix this when the data-model rearchitecting is done
+        see parent doc
         """
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.get_item(usage_key, depth, **kwargs)

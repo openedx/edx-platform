@@ -506,15 +506,13 @@ class DraftModuleStore(MongoModuleStore):
         #   Case 1: the draft item moved from one parent to another
         #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
         for parent_location in parent_locations:
-            # don't remove from direct_only parent if other versions of this still exists
+            # don't remove from direct_only parent if other versions of this still exists (this code
+            # assumes that there's only one parent_location in this case)
             if not is_item_direct_only and parent_location.category in DIRECT_ONLY_CATEGORIES:
-                # see if other version of root exists
-                alt_location = location.replace(
-                    revision=MongoRevisionKey.published
-                    if location.revision == MongoRevisionKey.draft
-                    else MongoRevisionKey.draft
-                )
-                if super(DraftModuleStore, self).has_item(alt_location):
+                # see if other version of to-be-deleted root exists
+                query = location.to_deprecated_son(prefix='_id.')
+                del query['_id.revision']
+                if self.collection.find(query).count() > 1:
                     continue
 
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
