@@ -47,5 +47,9 @@ Sessions
 
    * - Goal
      - Resource
-   * - 
-     - 
+   * - :ref:`Create a Session`
+     - POST  {"username": "name", "password": "password"}
+   * - :ref:`Get Session Details`
+     - GET /api/sessions/{session_id}
+   * - :ref:`Delete a Session`
+     - DELETE /api/sessions/{session_id}

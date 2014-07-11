@@ -11,7 +11,7 @@ class CourseModuleCompletionSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = CourseModuleCompletion
-        fields = ('id', 'user_id', 'course_id', 'content_id', 'created', 'modified')
+        fields = ('id', 'user_id', 'course_id', 'content_id', 'stage', 'created', 'modified')
         read_only = ('id', 'created')
 
 

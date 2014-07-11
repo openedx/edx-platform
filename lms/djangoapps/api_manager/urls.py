@@ -1,3 +1,4 @@
+# pylint: disable=C0103
 """
     The URI scheme for resources is as follows:
         Resource type: /api/{resource_type}

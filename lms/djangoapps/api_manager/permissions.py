@@ -105,6 +105,9 @@ class CustomPaginationSerializer(pagination.PaginationSerializer):
 
 
 class SecureAPIView(APIView):
+    """
+    View used for protecting access to specific workflows
+    """
     permission_classes = (ApiKeyHeaderPermission, )
 
 

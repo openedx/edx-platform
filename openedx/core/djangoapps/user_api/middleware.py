@@ -20,20 +20,22 @@ class UserTagsEventContextMiddleware(object):
         """
         Add a user's tags to the tracking event context.
         """
-        match = COURSE_REGEX.match(request.build_absolute_uri())
-        course_id = None
+        match = COURSE_REGEX.match(request.path)
+        course_key = None
         if match:
-            course_id = match.group('course_id')
+            course_key = match.group('course_id')
             try:
-                course_key = CourseKey.from_string(course_id)
+                course_key = CourseKey.from_string(course_key)
             except InvalidKeyError:
-                course_id = None
                 course_key = None
 
         context = {}
 
-        if course_id:
-            context['course_id'] = course_id
+        if course_key:
+            try:
+                context['course_id'] = course_key.to_deprecated_string()
+            except AttributeError:
+                context['course_id'] = unicode(course_key)
 
             if request.user.is_authenticated():
                 context['course_user_tags'] = dict(

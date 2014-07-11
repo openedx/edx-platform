@@ -12,6 +12,9 @@ class SystemDetail(SecureAPIView):
     """Manages system-level information about the Open edX API"""
 
     def get(self, request):
+        """
+        GET /api/system/
+        """
         base_uri = generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX System API"
@@ -25,6 +28,9 @@ class ApiDetail(SecureAPIView):
     """Manages top-level information about the Open edX API"""
 
     def get(self, request):
+        """
+        GET /api/
+        """
         base_uri = generate_base_uri(request)
         response_data = {}
         response_data['name'] = "Open edX API"

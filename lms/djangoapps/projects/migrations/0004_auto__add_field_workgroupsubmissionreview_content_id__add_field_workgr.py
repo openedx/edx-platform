@@ -8,14 +8,24 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'WorkgroupSubmission.document_filename'
-        db.add_column('projects_workgroupsubmission', 'document_filename',
+        # Adding field 'WorkgroupSubmissionReview.content_id'
+        db.add_column('projects_workgroupsubmissionreview', 'content_id',
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'WorkgroupReview.content_id'
+        db.add_column('projects_workgroupreview', 'content_id',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
+
+
     def backwards(self, orm):
-        # Deleting field 'WorkgroupSubmission.document_filename'
-        db.delete_column('projects_workgroupsubmission', 'document_filename')
+        # Deleting field 'WorkgroupSubmissionReview.content_id'
+        db.delete_column('projects_workgroupsubmissionreview', 'content_id')
+
+        # Deleting field 'WorkgroupReview.content_id'
+        db.delete_column('projects_workgroupreview', 'content_id')
+
 
     models = {
         'api_manager.organization': {
@@ -101,6 +111,7 @@ class Migration(SchemaMigration):
         'projects.workgroupreview': {
             'Meta': {'object_name': 'WorkgroupReview'},
             'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
@@ -123,6 +134,7 @@ class Migration(SchemaMigration):
         'projects.workgroupsubmissionreview': {
             'Meta': {'object_name': 'WorkgroupSubmissionReview'},
             'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
