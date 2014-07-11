@@ -54,8 +54,12 @@ if Backbone?
     initialize: ->
       Content.addContent @id, @
       userId = @get('user_id')
-      @set('staff_authored', DiscussionUtil.isStaff(userId))
-      @set('community_ta_authored', DiscussionUtil.isTA(userId))
+      if userId?
+        @set('staff_authored', DiscussionUtil.isStaff(userId))
+        @set('community_ta_authored', DiscussionUtil.isTA(userId))
+      else
+        @set('staff_authored', false)
+        @set('community_ta_authored', false)
       if Content.getInfo(@id)
         @updateInfo(Content.getInfo(@id))
       @set 'user_url', DiscussionUtil.urlFor('user_profile', userId)
