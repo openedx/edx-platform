@@ -473,10 +473,7 @@ body.discussion {
   }
 
   .discussion-post {
-    padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
-    box-shadow: 0 1px 3px $shadow;
-    background-color: $white;
-    border-radius: 3px 3px 0 0;
+    padding: ($baseline*2) ($baseline*2) 0 ($baseline*2);
 
     > header .vote-btn {
       position: relative;
@@ -497,6 +494,10 @@ body.discussion {
   }
 
   .responses {
+    &:empty {
+      display: none;
+    }
+
     list-style: none;
     margin-top: $baseline;
     padding: 0px ($baseline*2);
@@ -1236,7 +1237,11 @@ body.discussion {
 }
 
 .discussion-user-threads {
-  @extend .discussion-module
+  @extend .discussion-module;
+
+  .discussion-post {
+    padding-bottom: $baseline !important;
+  }
 }
 
 // post actions - pinning

@@ -1,0 +1,12 @@
+.forum-thread-main-wrapper {
+  border-bottom: 1px solid $white; // Prevent collapsing margins
+  border-radius: 3px 3px 0 0;
+  background-color: $white;
+}
+
+body.discussion, .discussion-thread.expanded {
+  .forum-thread-main-wrapper {
+    margin-bottom: $baseline;
+    box-shadow: 0 1px 3px $shadow;
+  }
+}
