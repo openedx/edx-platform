@@ -478,7 +478,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
-                results_by_url[location_url].setdefault('definition', {})['children'] = total_children
+                # use set to get rid of duplicates. We don't care about order; so, it shouldn't matter.
+                results_by_url[location_url].setdefault('definition', {})['children'] = set(total_children)
             else:
                 results_by_url[location_url] = result
             if location.category == 'course':
@@ -520,8 +521,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and course_id in self.request_cache.data.get('metadata_inheritance', {}):
-                return self.request_cache.data['metadata_inheritance'][course_id]
+            if self.request_cache is not None and unicode(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
+                return self.request_cache.data['metadata_inheritance'][unicode(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
@@ -548,7 +549,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # defined
             if 'metadata_inheritance' not in self.request_cache.data:
                 self.request_cache.data['metadata_inheritance'] = {}
-            self.request_cache.data['metadata_inheritance'][course_id] = tree
+            self.request_cache.data['metadata_inheritance'][unicode(course_id)] = tree
 
         return tree
 
@@ -560,6 +561,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If given a runtime, it replaces the cached_metadata in that runtime. NOTE: failure to provide
         a runtime may mean that some objects report old values for inherited data.
         """
+        course_id = course_id.for_branch(None)
         if course_id not in self.ignore_write_events_on_courses:
             # below is done for side effects when runtime is None
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
