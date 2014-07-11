@@ -125,6 +125,7 @@ class WorkgroupReviewsApiTests(TestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id,
         }
         response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -140,6 +141,7 @@ class WorkgroupReviewsApiTests(TestCase):
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -149,6 +151,7 @@ class WorkgroupReviewsApiTests(TestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id,
         }
         response = self.do_post(self.test_workgroup_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -166,6 +169,7 @@ class WorkgroupReviewsApiTests(TestCase):
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 

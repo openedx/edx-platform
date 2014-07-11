@@ -57,6 +57,7 @@ class WorkgroupReview(TimeStampedModel):
     reviewer = models.CharField(max_length=255)  # AnonymousUserId
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
+    content_id = models.CharField(max_length=255, null=True, blank=True)
 
 
 class WorkgroupSubmission(TimeStampedModel):
@@ -84,6 +85,7 @@ class WorkgroupSubmissionReview(TimeStampedModel):
     reviewer = models.CharField(max_length=255)  # AnonymousUserId
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
+    content_id = models.CharField(max_length=255, null=True, blank=True)
 
 
 class WorkgroupPeerReview(TimeStampedModel):
