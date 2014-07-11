@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'WorkgroupSubmission.document_filename'
         db.delete_column('projects_workgroupsubmission', 'document_filename')
-
 
     models = {
         'api_manager.organization': {

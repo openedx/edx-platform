@@ -1,3 +1,4 @@
+# pylint: disable=W0612
 """
 Tests for session api with advance security features
 """

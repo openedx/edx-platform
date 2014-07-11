@@ -97,7 +97,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('projects', ['WorkgroupPeerReview'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Project', fields ['course_id', 'content_id']
         db.delete_unique('projects_project', ['course_id', 'content_id'])
@@ -125,7 +124,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'WorkgroupPeerReview'
         db.delete_table('projects_workgrouppeerreview')
-
 
     models = {
         'auth.group': {

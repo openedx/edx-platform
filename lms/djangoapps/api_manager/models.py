@@ -4,7 +4,7 @@
 
 from django.contrib.auth.models import Group, User
 from django.db import models
-from django.utils import timezone
+
 from model_utils.models import TimeStampedModel
 from .utils import is_int
 
@@ -102,6 +102,9 @@ class GroupProfile(TimeStampedModel):
     """
 
     class Meta:
+        """
+        Meta class for modifying things like table name
+        """
         db_table = "auth_groupprofile"
 
     group = models.OneToOneField(Group, db_index=True)

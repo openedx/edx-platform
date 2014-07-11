@@ -12,8 +12,10 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project, Workgroup, WorkgroupSubmission
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -28,6 +30,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class SubmissionReviewsApiTests(TestCase):
 
@@ -40,7 +43,17 @@ class SubmissionReviewsApiTests(TestCase):
         self.test_projects_uri = '/api/projects/'
         self.test_submission_reviews_uri = '/api/submission_reviews/'
 
-        self.test_course_id = 'edx/demo/course'
+        self.course = CourseFactory.create()
+        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+
+        self.chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            display_name="Overview"
+        )
+
+        self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_content_id = "i4x://blah"
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
@@ -53,7 +66,7 @@ class SubmissionReviewsApiTests(TestCase):
             username="testing",
             is_active=True
         )
-        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.test_course_id)
+        self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.course.id)
 
         self.test_project = Project.objects.create(
             course_id=self.test_course_id,

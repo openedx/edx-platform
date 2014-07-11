@@ -1,11 +1,12 @@
 """ API implementation for user-oriented interactions. """
 
 import logging
+from requests.exceptions import ConnectionError
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.http import Http404
@@ -13,23 +14,18 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
 
-from django.db.models import Q
-
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.utils import generate_base_uri
+from api_manager.utils import generate_base_uri, get_course, get_course_child
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer
 
-from courseware import module_render
-from courseware.model_data import FieldDataCache
-from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
+from courseware.views import save_child_position, get_current_child
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from user_api.models import UserPreference
-from xmodule.modulestore.django import modulestore
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
@@ -37,7 +33,6 @@ from util.password_policy_validators import (
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from courseware import grades
-from courseware.courses import get_course
 
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
@@ -75,38 +70,23 @@ def _serialize_user(response_data, user):
     return response_data
 
 
-def _save_content_position(request, user, course_id, course_descriptor, position):
+def _save_content_position(request, user, course_key, position):
     """
     Records the indicated position for the specified course
     Really no reason to generalize this out of user_courses_detail aside from pylint complaining
     """
-    field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-    if course_id == position['parent_content_id']:
-        parent_content = get_module_for_descriptor(
-            user,
-            request,
-            course_descriptor,
-            field_data_cache,
-            course_id
-        )
+    parent_content_id = position['parent_content_id']
+    child_content_id = position['child_content_id']
+    if unicode(course_key) == parent_content_id:
+        parent_descriptor, parent_key, parent_content = get_course(request, user, parent_content_id)  # pylint: disable=W0612
     else:
-        parent_content = module_render.get_module(
-            user,
-            request,
-            position['parent_content_id'],
-            field_data_cache,
-            course_id
-        )
-    child_content = module_render.get_module(
-        user,
-        request,
-        position['child_content_id'],
-        field_data_cache,
-        course_id
-    )
+        parent_descriptor, parent_key, parent_content = get_course_child(request, user, course_key, parent_content_id)  # pylint: disable=W0612
+    child_descriptor, child_key, child_content = get_course_child(request, user, course_key, child_content_id)  # pylint: disable=W0612
+    if not child_descriptor:
+        return None
     save_child_position(parent_content, child_content.location.name)
     saved_content = get_current_child(parent_content)
-    return saved_content.id
+    return unicode(saved_content.scope_ids.usage_id)
 
 
 class UsersList(SecureListAPIView):
@@ -426,14 +406,14 @@ class UsersDetail(SecureAPIView):
                 err_msg = _(
                     "You are re-using a password that you have used recently. You must "
                     "have {0} distinct password(s) before reusing a previous password."
-                ).format(num_distinct)
+                ).format(num_distinct)  # pylint: disable=E1101
             # also, check to see if passwords are getting reset too frequent
             if PasswordHistory.is_password_reset_too_soon(existing_user):
                 num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
                 err_msg = _(
                     "You are resetting passwords too frequently. Due to security policies, "
                     "{0} day(s) must elapse between password resets"
-                ).format(num_days)
+                ).format(num_days)  # pylint: disable=E1101
 
             if err_msg:
                 # We have an password reset attempt which violates some security policy,
@@ -522,7 +502,7 @@ class UsersGroupsList(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         try:
-            existing_relationship = existing_user.groups.get(id=existing_group.id)
+            existing_user.groups.get(id=existing_group.id)
             response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
             response_data['message'] = "Relationship already exists."
             return Response(response_data, status=status.HTTP_409_CONFLICT)
@@ -584,7 +564,7 @@ class UsersGroupsDetail(SecureAPIView):
         response_data['uri'] = generate_base_uri(request)
         return Response(response_data, status=status.HTTP_200_OK)
 
-    def delete(self, request, user_id, group_id):
+    def delete(self, request, user_id, group_id):  # pylint: disable=W0612,W0613
         """
         DELETE /api/users/{user_id}/groups/{group_id}
         """
@@ -615,19 +595,20 @@ class UsersCoursesList(SecureAPIView):
         """
         POST /api/users/{user_id}/courses/
         """
-        store = modulestore()
         response_data = {}
         user_id = user_id
         course_id = request.DATA['course_id']
         try:
             user = User.objects.get(id=user_id)
-            course_descriptor = store.get_course(course_id)
+            course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+            if not course_descriptor:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
         except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         base_uri = generate_base_uri(request)
-        course_enrollment = CourseEnrollment.enroll(user, course_id)
+        course_enrollment = CourseEnrollment.enroll(user, course_key)
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
-        response_data['id'] = course_id
+        response_data['id'] = unicode(course_key)
         response_data['name'] = course_descriptor.display_name
         response_data['is_active'] = course_enrollment.is_active
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -636,7 +617,6 @@ class UsersCoursesList(SecureAPIView):
         """
         GET /api/users/{user_id}/courses/
         """
-        store = modulestore()
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id)
@@ -645,19 +625,19 @@ class UsersCoursesList(SecureAPIView):
         enrollments = CourseEnrollment.enrollments_for_user(user=user)
         response_data = []
         for enrollment in enrollments:
-            descriptor = store.get_course(enrollment.course_id)
+            course_descriptor, course_key, course_content = get_course(request, user, unicode(enrollment.course_id))  # pylint: disable=W0612
             # NOTE: It is possible that a course has been hard deleted from the courseware
             # database, but the enrollment row in the SQL database still exists
-            if descriptor:
+            if course_descriptor:
                 course_data = {
-                    "id": enrollment.course_id,
-                    "uri": '{}/{}'.format(base_uri, enrollment.course_id),
+                    "id": unicode(course_key),
+                    "uri": '{}/{}'.format(base_uri, unicode(course_key)),
                     "is_active": enrollment.is_active,
-                    "name": descriptor.display_name
+                    "name": course_descriptor.display_name
                 }
                 response_data.append(course_data)
             else:
-                log.warning("User {0} enrolled in course_id {1}, but course could not be found.".format(user_id, enrollment.course_id))
+                log.warning("User {0} enrolled in course_id {1}, but course could not be found.".format(user_id, unicode(enrollment.course_id)))
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -692,52 +672,49 @@ class UsersCoursesDetail(SecureAPIView):
         """
         POST /api/users/{user_id}/courses/{course_id}
         """
-        store = modulestore()
         base_uri = generate_base_uri(request)
         response_data = {}
         response_data['uri'] = base_uri
         try:
-            user = User.objects.get(id=user_id)
-            course_descriptor = store.get_course(course_id)
-        except (ObjectDoesNotExist, ValueError):
-            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.get(id=user_id, is_active=True)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
         if request.DATA['position']:
-            response_data['position'] = _save_content_position(
+            content_position = _save_content_position(
                 request,
                 user,
-                course_id,
-                course_descriptor,
+                course_key,
                 request.DATA['position']
             )
+            if not content_position:
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            response_data['position'] = content_position
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, user_id, course_id):
         """
         GET /api/users/{user_id}/courses/{course_id}
         """
-        store = modulestore()
         response_data = {}
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
-            course_descriptor = store.get_course(course_id)
-        except (ObjectDoesNotExist, ValueError):
+        except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        if not CourseEnrollment.is_enrolled(user, course_id):
+        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if not CourseEnrollment.is_enrolled(user, course_key):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
         response_data['uri'] = base_uri
-        field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-        course_content = module_render.get_module(
-            user,
-            request,
-            course_descriptor.location,
-            field_data_cache,
-            course_id)
-        response_data['position'] = course_content.position
+        response_data['position'] = course_descriptor.position
         return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, course_id):
@@ -748,7 +725,10 @@ class UsersCoursesDetail(SecureAPIView):
             user = User.objects.get(id=user_id, is_active=True)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
-        CourseEnrollment.unenroll(user, course_id)
+        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        CourseEnrollment.unenroll(user, course_key)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -767,18 +747,6 @@ class UsersCoursesGradesDetail(SecureAPIView):
         GET /api/users/{user_id}/courses/{course_id}/grades
         """
 
-        # @TODO: Add authorization check here once we get caller identity
-        # Only student can get his/her own information *or* course staff
-        # can get everyone's grades
-
-        try:
-            # get the full course tree with depth=None which reduces the number of
-            # round trips to the database
-            course = get_course(course_id, depth=None)
-        except ValueError:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-
         # The pre-fetching of groups is done to make auth checks not require an
         # additional DB lookup (this kills the Progress page in particular).
         try:
@@ -786,9 +754,18 @@ class UsersCoursesGradesDetail(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        courseware_summary = grades.progress_summary(student, request, course)
-        grade_summary = grades.grade(student, request, course)
-        grading_policy = course.grading_policy
+        # @TODO: Add authorization check here once we get caller identity
+        # Only student can get his/her own information *or* course staff
+        # can get everyone's grades
+        # get the full course tree with depth=None which reduces the number of
+        # round trips to the database
+        course_descriptor, course_key, course_content = get_course(request, student, course_id, depth=None)  # pylint: disable=W0612
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        courseware_summary = grades.progress_summary(student, request, course_descriptor)  # pylint: disable=W0612
+        grade_summary = grades.grade(student, request, course_descriptor)
+        grading_policy = course_descriptor.grading_policy
 
         response_data = {
             'courseware_summary': courseware_summary,
@@ -960,8 +937,7 @@ class UsersSocialMetrics(SecureListAPIView):
     - GET: Returns a list of social metrics for that user in the specified course
     """
 
-    def get(self, request, user_id, course_id): # pylint: disable=W0613
-
+    def get(self, request, user_id, course_id):  # pylint: disable=W0613,W0221
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
@@ -973,9 +949,9 @@ class UsersSocialMetrics(SecureListAPIView):
         try:
             data = comment_user.social_stats()
             http_status = status.HTTP_200_OK
-        except CommentClientRequestError, e:
+        except (CommentClientRequestError, ConnectionError), error:
             data = {
-                "err_msg": str(e)
+                "err_msg": str(error)
             }
             http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
 

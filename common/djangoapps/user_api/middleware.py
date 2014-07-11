@@ -5,6 +5,7 @@ Adds user's tags to tracking event context.
 from track.contexts import COURSE_REGEX
 from eventtracking import tracker
 from user_api.models import UserCourseTag
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -16,16 +17,22 @@ class UserTagsEventContextMiddleware(object):
         """
         Add a user's tags to the tracking event context.
         """
-        match = COURSE_REGEX.match(request.build_absolute_uri())
-        course_id = None
+        match = COURSE_REGEX.match(request.path)
+        course_key = None
         if match:
             course_id = match.group('course_id')
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            try:
+                course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            except InvalidKeyError:
+                pass # REGEX (currently) matches slash-separated course keys only...
 
         context = {}
 
-        if course_id:
-            context['course_id'] = course_id
+        if course_key:
+            try:
+                context['course_id'] = course_key.to_deprecated_string()
+            except AttributeError:
+                context['course_id'] = unicode(course_key)
 
             if request.user.is_authenticated():
                 context['course_user_tags'] = dict(

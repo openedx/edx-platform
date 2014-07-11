@@ -14,11 +14,9 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'GroupProfile', fields ['group']
         db.create_unique('auth_groupprofile', ['group_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'GroupProfile', fields ['group']
         db.delete_unique('auth_groupprofile', ['group_id'])
-
 
         # Changing field 'GroupProfile.group'
         db.alter_column('auth_groupprofile', 'group_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group']))

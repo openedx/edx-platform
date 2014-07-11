@@ -19,11 +19,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('api_manager', ['CourseModuleCompletion'])
 
-
     def backwards(self, orm):
         # Deleting model 'CourseModuleCompletion'
         db.delete_table('api_manager_coursemodulecompletion')
-
 
     models = {
         'api_manager.coursecontentgrouprelationship': {

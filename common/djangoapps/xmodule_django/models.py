@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from south.modelsinspector import add_introspection_rules
@@ -60,7 +62,10 @@ class CourseKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(value)
+            try:
+                return CourseKey.from_string(value)
+            except InvalidKeyError:
+                return SlashSeparatedCourseKey.from_deprecated_string(value)
         else:
             return value
 
@@ -110,7 +115,10 @@ class LocationKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return Location.from_deprecated_string(value)
+            try:
+                UsageKey.from_string(value)
+            except InvalidKeyError:
+                return Location.from_deprecated_string(value)
         else:
             return value
 

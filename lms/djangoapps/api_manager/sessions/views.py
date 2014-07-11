@@ -24,6 +24,7 @@ from student.models import (
 )
 AUDIT_LOG = logging.getLogger("audit")
 
+
 class SessionsList(SecureAPIView):
     """ Inherit with SecureAPIView """
 

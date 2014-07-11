@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group, User
 from django.db import models
 
 from model_utils.models import TimeStampedModel
-from student.models import AnonymousUserId
 
 
 class Project(TimeStampedModel):
@@ -14,8 +13,13 @@ class Project(TimeStampedModel):
     """
     course_id = models.CharField(max_length=255)
     content_id = models.CharField(max_length=255)
-    organization = models.ForeignKey('api_manager.Organization', blank=True, null=True, related_name="projects"
-                                     , on_delete=models.SET_NULL)
+    organization = models.ForeignKey(
+        'api_manager.Organization',
+        blank=True,
+        null=True,
+        related_name="projects",
+        on_delete=models.SET_NULL
+    )
 
     class Meta:
         """ Meta class for defining additional model characteristics """
