@@ -591,7 +591,11 @@ class DraftModuleStore(MongoModuleStore):
         :return: True if the draft and published versions differ
         """
 
-        item = self.get_item(location)
+        try:
+            item = self.get_item(location)
+        # defensively check that the parent's child actually exists
+        except ItemNotFoundError:
+            return False
 
         # don't check children if this block has changes (is not public)
         if self.compute_publish_state(item) != PublishState.public:
