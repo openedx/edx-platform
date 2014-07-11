@@ -1,9 +1,11 @@
+"""Provides factories for Split."""
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.course_module import CourseDescriptor
 from xmodule.x_module import XModuleDescriptor
 import factory
 from factory.helpers import lazy_attribute
-
+# Factories don't have __init__ methods, and are self documenting
+# pylint: disable=W0232, C0111
 
 class SplitFactory(factory.Factory):
     """
@@ -33,14 +35,14 @@ class PersistentCourseFactory(SplitFactory):
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, offering='999', org='testX', user_id=ModuleStoreEnum.UserID.test,
+    def _create(cls, target_class, course='999', run='run', org='testX', user_id=ModuleStoreEnum.UserID.test,
                 master_branch=ModuleStoreEnum.BranchName.draft, **kwargs):
 
         modulestore = kwargs.pop('modulestore')
         root_block_id = kwargs.pop('root_block_id', 'course')
         # Write the data to the mongo datastore
         new_course = modulestore.create_course(
-            org, offering, user_id, fields=kwargs,
+            org, course, run, user_id, fields=kwargs,
             master_branch=master_branch, root_block_id=root_block_id
         )
 

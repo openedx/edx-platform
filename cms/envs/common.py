@@ -33,6 +33,7 @@ from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE
 )
 from path import path
+from warnings import simplefilter
 from lms.envs.modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
@@ -182,6 +183,10 @@ XQUEUE_INTERFACE = {
     'basic_auth': None,
 }
 
+################################# Deprecation warnings #####################
+
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
+simplefilter('ignore')
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in

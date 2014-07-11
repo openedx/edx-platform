@@ -336,7 +336,8 @@ def create_new_course(request):
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
         new_course = modulestore().create_course(
             course_key.org,
-            course_key.offering,
+            course_key.course,
+            course_key.run,
             request.user.id,
             fields=fields,
         )

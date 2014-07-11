@@ -78,7 +78,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_typo(self):
         # Munge course id
-        bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), '', self.course.id.run + '_typo')
+        bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
 
         form_data = {'course_id': bad_id.to_deprecated_string(), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)

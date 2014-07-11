@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
 from decorator import contextmanager
@@ -150,7 +151,7 @@ class ItemFactory(XModuleFactory):
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
 
-        assert isinstance(location, Location)
+        assert isinstance(location, UsageKey)
         assert location != parent_location
 
         store = kwargs.pop('modulestore')

@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^xmodule_django\.models\.CourseKeyField"])
@@ -54,7 +55,7 @@ class CourseKeyField(models.CharField):
         if value is self.Empty or value is None:
             return None
 
-        assert isinstance(value, (basestring, SlashSeparatedCourseKey))
+        assert isinstance(value, (basestring, CourseKey))
         if value == '':
             # handle empty string for models being created w/o fields populated
             return None
@@ -74,7 +75,7 @@ class CourseKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, SlashSeparatedCourseKey)
+        assert isinstance(value, CourseKey)
         return value.to_deprecated_string()
 
     def validate(self, value, model_instance):
@@ -104,7 +105,7 @@ class LocationKeyField(models.CharField):
         if value is self.Empty or value is None:
             return value
 
-        assert isinstance(value, (basestring, Location))
+        assert isinstance(value, (basestring, UsageKey))
 
         if value == '':
             return None
@@ -124,7 +125,7 @@ class LocationKeyField(models.CharField):
         if value is self.Empty:
             return ''
 
-        assert isinstance(value, Location)
+        assert isinstance(value, UsageKey)
         return value.to_deprecated_string()
 
     def validate(self, value, model_instance):

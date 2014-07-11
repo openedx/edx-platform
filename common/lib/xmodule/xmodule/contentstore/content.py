@@ -111,7 +111,7 @@ class StaticContent(object):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        # TODO OpaqueKey - change to from_string once opaque keys lands
+        # TODO OpaqueKeys after opaque keys deprecation is working
         # return AssetLocation.from_string(path)
         return AssetLocation.from_deprecated_string(path)
 

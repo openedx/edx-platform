@@ -34,5 +34,5 @@ class CoursePage(PageObject):
         """
         Construct a URL to the page within the course.
         """
-        course_key = "slashes:{course_org}+{course_num}+{course_run}".format(**self.course_info)
+        course_key = "{course_org}/{course_num}/{course_run}".format(**self.course_info)
         return "/".join([BASE_URL, self.url_path, course_key])

@@ -738,7 +738,7 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
+            assert(isinstance(self.course_id, CourseKey))
             data = {
                 'user_id': self.user.id,
                 'course_id': self.course_id.to_deprecated_string(),
@@ -884,7 +884,7 @@ class CourseEnrollment(models.Model):
 
         `course_id_partial` (CourseKey) is missing the run component
         """
-        assert isinstance(course_id_partial, SlashSeparatedCourseKey)
+        assert isinstance(course_id_partial, CourseKey)
         assert not course_id_partial.run  # None or empty string
         course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
         querystring = unicode(course_key.to_deprecated_string())

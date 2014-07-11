@@ -266,14 +266,14 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course.
         """
-        return "slashes:{org}+{number}+{run}".format(**self._course_dict)
+        return "{org}/{number}/{run}".format(**self._course_dict)
 
     @property
     def _course_location(self):
         """
         Return the locator string for the course.
         """
-        return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
+        return "i4x://{org}/{number}/course/{run}".format(**self._course_dict)
 
     @property
     def _assets_url(self):
@@ -287,7 +287,7 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course handouts
         """
-        return "location:{org}+{number}+{run}+course_info+handouts".format(**self._course_dict)
+        return "i4x://{org}/{number}/course_info/handouts".format(**self._course_dict)
 
     def _create_course(self):
         """

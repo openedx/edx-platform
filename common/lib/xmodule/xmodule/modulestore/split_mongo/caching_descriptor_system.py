@@ -68,7 +68,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # deeper than initial descendant fetch or doesn't exist
             course_info = course_entry_override or self.course_entry
             course_key = CourseLocator(
-                course_info.get('org'), course_info.get('offering'), course_info.get('branch'),
+                course_info.get('org'), course_info.get('course'), course_info.get('run'), course_info.get('branch'),
                 course_info['structure']['_id']
             )
             self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
@@ -97,7 +97,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry['branch'] = course_entry_override['branch']
             self.course_entry['org'] = course_entry_override['org']
-            self.course_entry['offering'] = course_entry_override['offering']
+            self.course_entry['course'] = course_entry_override['course']
+            self.course_entry['run'] = course_entry_override['run']
         # most likely a lazy loader or the id directly
         definition = json_data.get('definition', {})
         definition_id = self.modulestore.definition_locator(definition)
@@ -110,7 +111,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             CourseLocator(
                 version_guid=course_entry_override['structure']['_id'],
                 org=course_entry_override.get('org'),
-                offering=course_entry_override.get('offering'),
+                course=course_entry_override.get('course'),
+                run=course_entry_override.get('run'),
                 branch=course_entry_override.get('branch'),
             ),
             block_type=json_data.get('category'),
