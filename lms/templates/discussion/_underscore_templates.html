@@ -5,7 +5,12 @@
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-wrapper">
-            <div class="thread-content-wrapper"></div>
+            <div class="forum-thread-main-wrapper">
+                <div class="thread-content-wrapper"></div>
+                <div class="post-extended-content">
+                    <ol class="responses js-marked-answer-list"></ol>
+                </div>
+            </div>
             <div class="post-extended-content">
                 <div class="response-count"/>
                 <div class="add-response">
@@ -14,7 +19,7 @@
                         <span class="add-response-btn-text">${_('Add A Response')}</span>
                     </button>
                 </div>
-                <ol class="responses"/>
+                <ol class="responses js-response-list"/>
                 <div class="response-pagination"/>
                 <div class="post-status-closed bottom-post-status" style="display: none">
                   ${_("This thread is closed.")}
@@ -53,7 +58,15 @@
               ${"<% } else { %>"}
               ${_('anonymous') | h}
               ${"<% } %>"}
-              <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
+              ## This part is incredibly gross but necessary to combine i18n in
+              ## mako with logic in underscore.
+              ## Translators: post_type describes the kind of post this is
+              ## (e.g. "question" or "discussion"); time_ago is how much time
+              ## has passed since the post was created (e.g. "4 hours ago")
+              ${"{post_type} posted {time_ago}".format(
+                  post_type="<%- thread_type %>",
+                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>"
+              )}
 
               <span class="post-status-closed top-post-status" style="display: none">
                 ${_("&bull; This thread is closed.")}
