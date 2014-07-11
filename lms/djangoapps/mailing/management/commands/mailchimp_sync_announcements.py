@@ -63,7 +63,7 @@ class Command(BaseCommand):
 
 def get_enrolled():
     # cdodge: filter out all users who signed up via a Microsite, which UserSignupSource tracks
-    return User.objects.exclude(id__in = UserSignupSource.values_list('user_id', flat=True))
+    return User.objects.exclude(id__in = UserSignupSource.objects.all().values_list('user_id', flat=True))
 
 
 def get_data(users, exclude=None):
