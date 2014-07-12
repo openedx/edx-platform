@@ -6,6 +6,7 @@ import logging
 import re
 import uuid
 import time
+import json
 from collections import defaultdict
 from pytz import UTC
 
@@ -1039,7 +1040,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
-def _do_create_account(post_vars):
+def _do_create_account(post_vars, extended_profile=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -1089,6 +1090,10 @@ def _do_create_account(post_vars):
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
 
+    # add any extended profile information in the denormalized 'meta' field in the profile
+    if extended_profile:
+        profile.meta = json.dumps(extended_profile)
+
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
@@ -1115,7 +1120,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     js = {'success': False}  # pylint: disable-msg=invalid-name
 
     post_vars = post_override if post_override else request.POST
-    extra_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+
+    # allow for microsites to define their own set of required/optional/hidden fields
+    extra_fields = microsite.get_value(
+        'REGISTRATION_EXTRA_FIELDS',
+        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+    )
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
         post_vars = dict(post_vars.items())
@@ -1188,7 +1198,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         else:
             min_length = 2
 
-        if len(post_vars[field_name]) < min_length:
+        if field_name not in post_vars or len(post_vars[field_name]) < min_length:
             error_str = {
                 'username': _('Username must be minimum of two characters long'),
                 'email': _('A properly formatted e-mail is required'),
@@ -1204,7 +1214,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
                 'city': _('A city is required'),
                 'country': _('A country is required')
             }
-            js['value'] = error_str[field_name]
+
+            if field_name in error_str:
+                js['value'] = error_str[field_name]
+            else:
+                js['value'] = _('You are missing one or more required fields')
+
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
@@ -1248,10 +1263,22 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['field'] = 'password'
             return JsonResponse(js, status=400)
 
+    # allow microsites to define 'extended profile fields' which are
+    # captured on user signup (for example via an overriden registration.html)
+    # and then stored in the UserProfile
+    extended_profile_fields = microsite.get_value('extended_profile_fields', [])
+    extended_profile = None
+
+    for field in extended_profile_fields:
+        if field in post_vars:
+            if not extended_profile:
+                extended_profile = {}
+            extended_profile[field] = post_vars[field]
+
     # Ok, looks like everything is legit.  Create the account.
     try:
         with transaction.commit_on_success():
-            ret = _do_create_account(post_vars)
+            ret = _do_create_account(post_vars, extended_profile)
     except AccountValidationError as e:
         return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
 
