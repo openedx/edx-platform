@@ -63,7 +63,7 @@ class Command(BaseCommand):
 
 def get_enrolled():
     # cdodge: filter out all users who signed up via a Microsite, which UserSignupSource tracks
-    return User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
+    return User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id_id from student_usersignupsource)')
 
 
 def get_data(users, exclude=None):
