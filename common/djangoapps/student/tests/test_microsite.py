@@ -54,4 +54,4 @@ class TestMicrosite(TestCase):
         self.assertEqual(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
         # check to see if the mailchimp synchronization will filter out this microsite user
         users = User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
-        self.assertEqual(len(list(users.count)), 1)
+        self.assertEqual(len(list(users)), 1)
