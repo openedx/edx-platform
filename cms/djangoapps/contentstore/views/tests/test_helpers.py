@@ -22,7 +22,7 @@ class HelpersTestCase(CourseTestCase):
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter',
                                      display_name="Week 1")
         self.assertEqual(xblock_studio_url(chapter),
-                         u'/course/slashes:MITx+999+Robot_Super_Course')
+                         u'/course/MITx/999/Robot_Super_Course')
 
         # Verify lesson URL
         sequential = ItemFactory.create(parent_location=chapter.location, category='sequential',
