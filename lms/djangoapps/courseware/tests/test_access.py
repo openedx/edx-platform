@@ -1,6 +1,7 @@
 import courseware.access as access
 import datetime
 
+import mock
 from mock import Mock
 
 from django.test import TestCase
@@ -93,6 +94,50 @@ class AccessTestCase(TestCase):
         self.assertTrue(access._has_access_descriptor(user, 'instructor', date))
         with self.assertRaises(ValueError):
             access._has_access_descriptor(user, 'not_load_or_staff', date)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test__has_access_descriptor_staff_lock(self):
+        """
+        Tests that "visible_to_staff_only" overrides start date.
+        """
+        mock_unit = Mock()
+        mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
+
+        def verify_access(student_should_have_access):
+            """ Verify the expected result from _has_access_descriptor """
+            self.assertEqual(student_should_have_access, access._has_access_descriptor(
+                self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
+            )
+            # staff always has access
+            self.assertTrue(access._has_access_descriptor(
+                self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
+            )
+
+        # No start date, staff lock on
+        mock_unit.visible_to_staff_only = True
+        verify_access(False)
+
+        # No start date, staff lock off.
+        mock_unit.visible_to_staff_only = False
+        verify_access(True)
+
+        # Start date in the past, staff lock on.
+        mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        mock_unit.visible_to_staff_only = True
+        verify_access(False)
+
+        # Start date in the past, staff lock off.
+        mock_unit.visible_to_staff_only = False
+        verify_access(True)
+
+        # Start date in the future, staff lock on.
+        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
+        mock_unit.visible_to_staff_only = True
+        verify_access(False)
+
+        # Start date in the future, staff lock off.
+        mock_unit.visible_to_staff_only = False
+        verify_access(False)
 
     def test__has_access_course_desc_can_enroll(self):
         user = Mock()
