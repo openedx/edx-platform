@@ -17,11 +17,13 @@ from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from projects.models import Project
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
-from projects.models import Project
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import Location
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -1024,12 +1026,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_course_grades(self):
-        test_uri = '/api/users'
-        local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
-        response = self.do_post(test_uri, data)
-        user_id = response.data['id']
+        user_id = self.user.id
 
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -1058,6 +1055,33 @@ class UsersApiTests(TestCase):
             display_name="Sequence 2",
         )
 
+        ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 1",
+            max_grade=45
+        )
+
+        problem = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            metadata={'rerandomize': 'always'},
+            display_name="test problem 2"
+        )
+
+        StudentModuleFactory.create(
+            grade=1,
+            max_grade=1,
+            student=self.user,
+            course_id=course.id,
+            module_state_key=Location(problem.location).url(),
+            state=json.dumps({'attempts': 3}),
+            module_type='mentoring'
+        )
+
         test_uri = '/api/users/{}/courses/{}/grades'.format(
             user_id, unicode(course.id))
 
@@ -1075,7 +1099,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(sections[0]['graded'], False)
 
         sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 1)
+        self.assertEqual(len(sections), 3)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
 
@@ -1084,6 +1108,9 @@ class UsersApiTests(TestCase):
         grading_policy = response.data['grading_policy']
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+
+        self.assertEqual(response.data['current_grade'], 50)
+        self.assertEqual(response.data['pro_forma_grade'], 100)
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """

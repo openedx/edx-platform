@@ -7,7 +7,7 @@ from requests.exceptions import ConnectionError
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.http import Http404
@@ -19,13 +19,14 @@ from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.utils import generate_base_uri, get_course, get_course_child
+from api_manager.utils import generate_base_uri, get_course, get_course_child, get_course_total_score
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer
 
 from courseware import module_render
 from courseware.courses import get_course
 from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
@@ -801,10 +802,30 @@ class UsersCoursesGradesDetail(SecureAPIView):
         grade_summary = grades.grade(student, request, course_descriptor)
         grading_policy = course_descriptor.grading_policy
 
+        queryset = StudentModule.objects.filter(
+            course_id__exact=course_id,
+            max_grade__isnull=False,
+            max_grade__gt=0
+        )
+
+        total_score = get_course_total_score(courseware_summary)
+        user_queryset = queryset.filter(grade__isnull=False, student=student)
+        comp_modules = user_queryset.aggregate(Sum('grade'))
+        score_of_comp_module = comp_modules['grade__sum'] or 0
+        max_possible_score = user_queryset.aggregate(Sum('max_grade'))
+        current_grade = 0
+        pro_forma_grade = 0
+        if total_score:
+            current_grade = score_of_comp_module / float(total_score) * 100
+
+        if max_possible_score['max_grade__sum']:
+            pro_forma_grade = score_of_comp_module / float(max_possible_score['max_grade__sum']) * 100
         response_data = {
             'courseware_summary': courseware_summary,
             'grade_summary': grade_summary,
-            'grading_policy': grading_policy
+            'grading_policy': grading_policy,
+            'current_grade': current_grade,
+            'pro_forma_grade': pro_forma_grade
         }
 
         return Response(response_data)

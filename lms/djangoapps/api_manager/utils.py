@@ -123,3 +123,15 @@ def get_course_child(request, user, course_key, content_id):
                 field_data_cache,
                 course_key)
     return content_descriptor, content_key, content
+
+
+def get_course_total_score(course_summary):
+    """
+    Traverse course summary to calculate max possible score for a course
+    """
+    score = 0
+    for chapter in course_summary:  # accumulate score of each chapter
+        for section in chapter['sections']:
+            if section['section_total']:
+                score += section['section_total'][1]
+    return score
