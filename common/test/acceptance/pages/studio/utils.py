@@ -15,7 +15,8 @@ def click_css(page, css, source_index=0, require_notification=True):
     """
     css_for_button_that_we_care_about = \
         ':nth-of-type({source_index}){{{css}}}'.format(source_index=source_index, css=css)
-    target = page.wait_for_element_visibility(css_for_button_that_we_care_about, "Target not visible")
+    page.wait_for_element_visibility(css_for_button_that_we_care_about, "Target not visible")
+    target = page.q(css=css_for_button_that_we_care_about)
     target.click()
     if require_notification:
         wait_for_notification(page)
