@@ -77,9 +77,21 @@
             vertical-align: baseline;
           }
 
-          &.new-button {
+          // CASE: new/create button
+          &.new-button, &.button-new {
             @extend %btn-primary-green;
             @extend %sizing;
+          }
+
+          // CASE: toggle button
+          &.button-toggle {
+            @extend %btn-secondary-gray;
+            @extend %sizing;
+          }
+
+          // CASE: view live button
+          &.button-view, &.view-button {
+
           }
         }
       }
