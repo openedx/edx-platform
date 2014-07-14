@@ -541,7 +541,7 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'missing', '2012_Fall', 'sequential', 'parent')
 
         # Create the parent and point it to a fake child
-        parent = self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        parent = self.draft_store.create_item(self.dummy_user, location)
         parent.children += [Location('edX', 'missing', '2012_Fall', 'vertical', 'does_not_exist')]
         self.draft_store.update_item(parent, self.dummy_user)
 

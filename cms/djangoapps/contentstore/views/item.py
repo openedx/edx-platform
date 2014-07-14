@@ -529,7 +529,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_course_access(request.user, course_usage_key):
-            return JsonResponse(modulestore().get_orphans(course_usage_key))
+            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -539,7 +539,7 @@ def orphan_handler(request, course_key_string):
             for itemloc in items:
                 # need to delete all versions
                 store.delete_item(itemloc, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
-            return JsonResponse({'deleted': items})
+            return JsonResponse({'deleted': [unicode(item) for item in items]})
         else:
             raise PermissionDenied()
 

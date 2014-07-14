@@ -8,7 +8,7 @@ import unittest
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
@@ -117,21 +117,19 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
-        course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
+        self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
+        self.writable_chapter_location = self.course.id.make_usage_key('chapter', 'Overview').version_agnostic()
         block_id = self.writable_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
             self.user_id, self.writable_chapter_location,
-            parent_location=course.location, block_id=block_id
+            parent_location=self.course.location, block_id=block_id
         )
-        if isinstance(course.id, CourseLocator):
-            self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
-            self.writable_chapter_location = chapter.location.version_agnostic()
+        if isinstance(self.course.id, CourseLocator):
+            self.course_locations[self.MONGO_COURSEID] = self.course.location.version_agnostic()
         else:
-            self.assertEqual(course.id, course_key)
+            self.assertEqual(self.course.id, course_key)
             self.assertEqual(chapter.location, self.writable_chapter_location)
-
-        self.course = course
 
     def _create_block_hierarchy(self):
         """
@@ -150,6 +148,7 @@ class TestMixedModuleStore(unittest.TestCase):
                                     BlockInfo('problem_x1a_1', 'problem', 'Problem_x1a_1', []),
                                     BlockInfo('problem_x1a_2', 'problem', 'Problem_x1a_2', []),
                                     BlockInfo('problem_x1a_3', 'problem', 'Problem_x1a_3', []),
+                                    BlockInfo('html_x1a_1', 'html', 'HTML_x1a_1', []),
                                 ]
                             )
                         ]
@@ -175,13 +174,13 @@ class TestMixedModuleStore(unittest.TestCase):
 
         def create_sub_tree(parent, block_info):
             block = self.store.create_item(
-                self.user_id, parent_location=parent.location,
+                self.user_id, parent_location=parent.location.version_agnostic(),
                 category=block_info.category, block_id=block_info.display_name
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
             # reload the block to update its children field
-            block = self.store.get_item(block.location)
+            block = self.store.get_item(block.location.version_agnostic())
             setattr(self, block_info.field_name, block)
 
         for tree in trees:
@@ -209,7 +208,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # convert to CourseKeys
         self.course_locations = {
-            course_id: SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id: CourseLocator.from_string(course_id)
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         # and then to the root UsageKey
@@ -223,9 +222,6 @@ class TestMixedModuleStore(unittest.TestCase):
             ).make_usage_key('vertical', 'baz')
         else:
             self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
-        self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
-            category='chapter', name='Overview'
-        )
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
@@ -321,7 +317,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.delete_item(self.writable_chapter_location, self.user_id)
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.writable_chapter_location)
+            self.store.get_item(self.writable_chapter_location.version_agnostic())
 
         # create and delete a private vertical with private children
         private_vert = self.store.create_item(
@@ -520,22 +516,24 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
+        vertical_children_num = len(self.vertical_x1a.children)
+
         self.store.publish(self.course.location, self.user_id)
 
         # delete leaf problem (will make parent vertical a draft)
         self.store.delete_item(self.problem_x1a_1.location, self.user_id)
 
         draft_parent = self.store.get_item(self.vertical_x1a.location)
-        self.assertEqual(2, len(draft_parent.children))
+        self.assertEqual(vertical_children_num - 1, len(draft_parent.children))
         published_parent = self.store.get_item(
             self.vertical_x1a.location,
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
-        self.assertEqual(3, len(published_parent.children))
+        self.assertEqual(vertical_children_num, len(published_parent.children))
 
         self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
         reverted_parent = self.store.get_item(self.vertical_x1a.location)
-        self.assertEqual(3, len(published_parent.children))
+        self.assertEqual(vertical_children_num, len(published_parent.children))
         self.assertEqual(reverted_parent, published_parent)
 
     @ddt.data('draft')
@@ -596,12 +594,28 @@ class TestMixedModuleStore(unittest.TestCase):
     @ddt.data('draft', 'split')
     def test_get_orphans(self, default_ms):
         self.initdb(default_ms)
-        # create an orphan
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        orphan_location = course_id.make_usage_key('problem', 'orphan')
-        orphan = self.store.create_item(self.user_id, orphan_location)
+
+        # orphans
+        orphan_locations = [
+            course_id.make_usage_key('chapter', 'OrphanChapter'),
+            course_id.make_usage_key('vertical', 'OrphanVertical'),
+            course_id.make_usage_key('problem', 'OrphanProblem'),
+            course_id.make_usage_key('html', 'OrphanHTML'),
+        ]
+
+        # detached items (not considered as orphans)
+        detached_locations = [
+            course_id.make_usage_key('static_tab', 'StaticTab'),
+            course_id.make_usage_key('about', 'overview'),
+            course_id.make_usage_key('course_info', 'updates'),
+        ]
+
+        for location in (orphan_locations + detached_locations):
+            self.store.create_item(self.user_id, location)
+
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        self.assertEqual(found_orphans, [orphan_location])
+        self.assertEqual(set(found_orphans), set(orphan_locations))
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
@@ -634,6 +648,38 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
+    @ddt.data('draft', 'split')
+    def test_unpublish(self, default_ms):
+        """
+        Test calling unpublish
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        # publish
+        self.store.publish(self.course.location, self.user_id)
+        published_xblock = self.store.get_item(
+            self.vertical_x1a.location.replace(branch=None),
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
+        self.assertIsNotNone(published_xblock)
+
+        # unpublish
+        self.store.unpublish(self.vertical_x1a.location, self.user_id)
+
+        with self.assertRaises(ItemNotFoundError):
+            self.store.get_item(
+                self.vertical_x1a.location.replace(branch=None),
+                revision=ModuleStoreEnum.RevisionOption.published_only
+            )
+
+        draft_xblock_from_get_item = self.store.get_item(
+            self.vertical_x1a.location.replace(branch=None),
+            revision=ModuleStoreEnum.RevisionOption.draft_only
+        )
+        self.assertEquals(
+            published_xblock.location.version_agnostic().replace(branch=None),
+            draft_xblock_from_get_item.location.version_agnostic().replace(branch=None)
+        )
 
 #=============================================================================================================
 # General utils for not using django settings
