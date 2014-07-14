@@ -1034,7 +1034,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
     if 'created' in kwargs and kwargs['created']:
         site = microsite.get_value('SITE_NAME')
         if site:
-            user_signup_source = UserSignupSource(user_id=kwargs['instance'], site=site)
+            user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
             user_signup_source.save()
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
