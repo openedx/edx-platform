@@ -282,6 +282,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             'active_groups_preview': active_groups_preview,
             'inactive_groups_preview': inactive_groups_preview,
         }))
+        fragment.add_css('.add-missing-groups-button { display: none; }')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_author_view.js'))
         fragment.initialize_js('SplitTestAuthorView')
 
