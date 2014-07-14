@@ -155,6 +155,7 @@ class TestMixedModuleStore(unittest.TestCase):
                                     BlockInfo('problem_x1a_1', 'problem', 'Problem_x1a_1', []),
                                     BlockInfo('problem_x1a_2', 'problem', 'Problem_x1a_2', []),
                                     BlockInfo('problem_x1a_3', 'problem', 'Problem_x1a_3', []),
+                                    BlockInfo('html_x1a_1', 'html', 'HTML_x1a_1', []),
                                 ]
                             )
                         ]
@@ -580,12 +581,35 @@ class TestMixedModuleStore(unittest.TestCase):
     @ddt.data('draft', 'split')
     def test_get_orphans(self, default_ms):
         self.initdb(default_ms)
-        # create an orphan
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        orphan_location = course_id.make_usage_key('problem', 'orphan')
-        orphan = self.store.create_item(self.user_id, orphan_location)
+
+        # orphans
+        orphan_locations = [
+            course_id.make_usage_key('chapter', 'OrphanChapter'),
+            course_id.make_usage_key('vertical', 'OrphanVertical'),
+            course_id.make_usage_key('problem', 'OrphanProblem'),
+            course_id.make_usage_key('html', 'OrphanHTML'),
+        ]
+
+        # detached items (not considered as orphans)
+        detached_locations = [
+            course_id.make_usage_key('static_tab', 'StaticTab'),
+            course_id.make_usage_key('about', 'overview'),
+            course_id.make_usage_key('course_info', 'updates'),
+        ]
+
+        non_orphan_locations = [
+            course_id.make_usage_key('chapter', 'Chapter_x'),
+            course_id.make_usage_key('vertical', 'Vertical_x1a'),
+            course_id.make_usage_key('problem', 'Problem_x1a_1'),
+            course_id.make_usage_key('html', 'HTML_x1a_1'),
+        ]
+
+        for location in (orphan_locations + detached_locations):
+            self.store.create_item(self.user_id, location)
+
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        self.assertEqual(found_orphans, [orphan_location])
+        self.assertEqual(set(found_orphans), set(orphan_locations))
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
