@@ -28,7 +28,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata, compute_inherited_metadata
 from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 FILTER_LIST = ['xml_attributes', 'checklists']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes', 'checklists']
@@ -71,12 +71,7 @@ class Command(BaseCommand):
             raise CommandError("course_id not specified")
 
         # Get the modulestore
-
-        try:
-            name = options['modulestore']
-            store = modulestore(name)
-        except KeyError:
-            raise CommandError("Unknown modulestore {}".format(name))
+        store = modulestore()
 
         # Get the course data
 

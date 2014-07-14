@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from courseware.courses import get_course_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 

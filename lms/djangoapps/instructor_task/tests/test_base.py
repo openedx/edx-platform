@@ -13,10 +13,10 @@ from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
@@ -105,7 +105,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
 
     def initialize_course(self):
         """Create a course in the store, with a chapter and section."""
-        self.module_store = editable_modulestore()
+        self.module_store = modulestore()
 
         # Create the course
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,

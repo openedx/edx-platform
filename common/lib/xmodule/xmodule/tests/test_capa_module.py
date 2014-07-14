@@ -24,7 +24,7 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

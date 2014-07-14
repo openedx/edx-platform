@@ -22,7 +22,7 @@ h2 {
  // Problem Header
 div.name{
   padding-bottom: 15px;
-  
+
   h2 {
     display: inline;
   }
@@ -40,7 +40,7 @@ div.name{
 
 section.combined-open-ended {
   @include clearfix;
-  
+
   .written-feedback {
     position: relative;
     margin: 0px;
@@ -50,7 +50,7 @@ section.combined-open-ended {
     resize: vertical;
     width: 99%;
     overflow: auto;
-    
+
     .del {
       text-decoration: line-through;
       background-color: #ffc3c3;
@@ -69,7 +69,7 @@ div.problemwrapper {
   .status-bar {
     background-color: #eee;
     border-radius: $baseline/2 $baseline/2 0 0;
-    border-bottom: 1px solid lightgray; 
+    border-bottom: 1px solid lightgray;
 
     .statustable {
       width: 100%;
@@ -155,7 +155,7 @@ section.combined-open-ended-status {
     &:only-child {
       border-radius: $baseline/4;
     }
-  
+
     .show-results {
       margin-top: .3em;
       text-align:right;
@@ -168,12 +168,12 @@ section.combined-open-ended-status {
 
  .statusitem-current {
     background-color: #fff;
-    color: #222; 
+    color: #222;
  }
 
   span {
     &.unanswered {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       float: right;
       width: 14px;
@@ -182,7 +182,7 @@ section.combined-open-ended-status {
     }
 
     &.correct {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       float: right;
       width: 25px;
@@ -191,7 +191,7 @@ section.combined-open-ended-status {
     }
 
     &.incorrect {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       float: right;
       width: 20px;
@@ -212,14 +212,14 @@ section.combined-open-ended-status {
 .visibility-control, .visibility-control-prompt {
   display: block;
   width: 100%;
-  height: 40px; 
+  height: 40px;
 
   .inner {
     float: left;
     margin-top: $baseline;
     width: 85%;
     height: 5px;
-    border-top: 1px dotted #ddd; 
+    border-top: 1px dotted #ddd;
   }
 }
 
@@ -234,7 +234,7 @@ section.combined-open-ended-status {
 
 // Rubric Styling
 
-.wrapper-score-selection { 
+.wrapper-score-selection {
   display: table-cell;
   padding: 0 $baseline/2;
   width: 20px;
@@ -277,7 +277,7 @@ div.combined-rubric-container {
     margin: 0 $baseline $baseline/2 $baseline;
     padding: 0;
     list-style-type: none;
-    
+
     li {
 
       &.rubric-list-item {
@@ -325,7 +325,7 @@ div.combined-rubric-container {
       padding: 5px;
     }
 }
-  
+
 div.result-container {
   padding-top: $baseline/2;
   padding-bottom: $baseline/4;
@@ -343,7 +343,7 @@ div.result-container {
 
   .evaluation-response {
     margin-bottom: 2px;
-    
+
     header {
       a {
         font-size: .85em;
@@ -403,7 +403,7 @@ div.result-container {
           margin: $baseline/4;
           padding: $baseline/2 $baseline/2 $baseline/2 $baseline*2;
           background: url('../images/incorrect-icon.png') center left no-repeat;
-          
+
           li {
             color: #B00;
           }
@@ -481,7 +481,7 @@ div.rubric {
           background-color: #eee;
         }
 
-        .wrapper-score-selection { 
+        .wrapper-score-selection {
           display: table-cell;
           padding: 0 $baseline/2;
           width: 20px;
@@ -561,7 +561,7 @@ section.open-ended-child {
 
   div.unanswered {
     p.status {
-      @include inline-block();
+      display: inline-block;
       width: 14px;
       height: 14px;
       background: url('../images/unanswered-icon.png') center center no-repeat;
@@ -570,7 +570,7 @@ section.open-ended-child {
 
   div.correct, div.ui-icon-check {
     p.status {
-      @include inline-block();
+      display: inline-block;
       width: 25px;
       height: 20px;
       background: url('../images/correct-icon.png') center center no-repeat;
@@ -583,7 +583,7 @@ section.open-ended-child {
 
   div.processing {
     p.status {
-      @include inline-block();
+      display: inline-block;
       width: 20px;
       height: 20px;
       background: url('../images/spinner.gif') center center no-repeat;
@@ -596,7 +596,7 @@ section.open-ended-child {
 
   div.incorrect, div.ui-icon-close {
     p.status {
-      @include inline-block();
+      display: inline-block;
       width: 20px;
       height: 20px;
       background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -614,7 +614,7 @@ section.open-ended-child {
   }
 
   p.answer {
-    @include inline-block();
+    display: inline-block;
     margin-bottom: 0;
     margin-left: $baseline/2;
 
@@ -633,7 +633,7 @@ section.open-ended-child {
 
   span {
     &.unanswered, &.ui-icon-bullet {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       top: 4px;
       width: 14px;
@@ -642,7 +642,7 @@ section.open-ended-child {
     }
 
     &.processing, &.ui-icon-processing {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       top: 6px;
       width: 25px;
@@ -651,7 +651,7 @@ section.open-ended-child {
     }
 
     &.correct, &.ui-icon-check {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       top: 6px;
       width: 25px;
@@ -660,7 +660,7 @@ section.open-ended-child {
     }
 
     &.incorrect, &.ui-icon-close {
-      @include inline-block();
+      display: inline-block;
       position: relative;
       top: 6px;
       width: 20px;
@@ -826,7 +826,7 @@ section.open-ended-child {
     }
 
     .submission_feedback {
-      @include inline-block;
+      display: inline-block;
       margin: 8px 0 0 $baseline/2;
       color: #777;
       font-style: italic;
@@ -944,7 +944,7 @@ section.open-ended-child {
     margin: $baseline/2;
   }
   .reset-button {
-    vertical-align: middle; 
+    vertical-align: middle;
   }
 }
 
@@ -959,7 +959,7 @@ section.open-ended-child {
 
 .staff-grading {
 
-  .breadcrumbs { 
+  .breadcrumbs {
     padding: $baseline/10;
     background-color: #f6f6f6;
     border-radius: 5px;

@@ -19,7 +19,7 @@ from django.test.utils import override_settings
 from courseware import grades
 from courseware.models import StudentModule
 
-from xmodule.modulestore.django import modulestore, editable_modulestore
+from xmodule.modulestore.django import modulestore
 
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -230,7 +230,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         self.course.grading_policy = grading_policy
-        store = editable_modulestore()
+        store = modulestore()
         store.update_item(self.course, '**replace_user**')
         self.refresh_course()
 

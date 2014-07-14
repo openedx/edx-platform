@@ -21,8 +21,17 @@ define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
 
     var urls = ${urls};
     var head = $("head");
-    $.each(urls, function(i, url) {
+    var deferred = $.Deferred();
+    var numResources = urls.length;
+    $.each(urls, function (i, url) {
         head.append($("<script/>", {src: url}));
+        // Wait for all the scripts to execute.
+        require([url], function () {
+            if (i === numResources - 1) {
+               deferred.resolve();
+            }
+        });
     });
-    return window.XModule;
+
+    return deferred.promise();
 });

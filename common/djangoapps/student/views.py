@@ -23,6 +23,7 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          Http404)
 from django.shortcuts import redirect
+from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
@@ -51,8 +52,8 @@ from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
@@ -484,7 +485,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -768,7 +769,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
@@ -866,7 +867,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "success": False,
             "value": _('Your password has expired due to password policy on this account. You must '
                        'reset your password before you can log in again. Please click the '
-                       'Forgot Password" link on this page to reset your password before logging in again.'),
+                       '"Forgot Password" link on this page to reset your password before logging in again.'),
         })  # TODO: this should be status code 403  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
@@ -1334,7 +1335,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             else:
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
-            log.warning('Unable to send activation email to user', exc_info=True)
+            log.error('Unable to send activation email to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
             # What is the correct status code to use here? I think it's 500, because
             # the problem is on the server's end -- but also, the account was created.
@@ -1591,14 +1592,20 @@ def password_reset_confirm_wrapper(
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
             else:
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-            err_msg = _("You are re-using a password that you have used recently. You must "
-                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+            err_msg = ungettext(
+                "You are re-using a password that you have used recently. You must have {num} distinct password before reusing a previous password.",
+                "You are re-using a password that you have used recently. You must have {num} distinct passwords before reusing a previous password.",
+                num_distinct
+            ).format(num=num_distinct)
 
         # also, check to see if passwords are getting reset too frequent
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
-                        "{0} day(s) must elapse between password resets").format(num_days)
+            err_msg = ungettext(
+                "You are resetting passwords too frequently. Due to security policies, {num} day must elapse between password resets.",
+                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets.",
+                num_days
+            ).format(num=num_days)
 
     if err_msg:
         # We have an password reset attempt which violates some security policy, use the
@@ -1658,7 +1665,7 @@ def reactivation_email_for_user(user):
     try:
         user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except Exception:  # pylint: disable=broad-except
-        log.warning('Unable to send reactivation email', exc_info=True)
+        log.error('Unable to send reactivation email from "{from_address}"'.format(from_address=settings.DEFAULT_FROM_EMAIL), exc_info=True)
         return JsonResponse({
             "success": False,
             "error": _('Unable to send reactivation email')
@@ -1732,8 +1739,14 @@ def change_email_request(request):
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )
-
-    send_mail(subject, message, from_address, [pec.new_email])
+    try:
+        send_mail(subject, message, from_address, [pec.new_email])
+    except Exception:  # pylint: disable=broad-except
+        log.error('Unable to send email activation link to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
+        return JsonResponse({
+            "success": False,
+            "error": _('Unable to send email activation link. Please try again later.')
+        })
 
     return JsonResponse({"success": True})
 

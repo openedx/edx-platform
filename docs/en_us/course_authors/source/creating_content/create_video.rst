@@ -19,6 +19,7 @@ video to your course has several steps.
 
 Also see:
 
+* :ref:`Video TOC`
 * :ref:`Additional Transcripts`
 * :ref:`Steps for sjson files`
 
@@ -91,7 +92,7 @@ When you create your video, edX recommends the following compression specs.
 Video Formats
 ==================
 
-The edX video player supports videos in .mp4, .mpeg, .ogg, and .webm format.
+The edX video player supports videos in .mp4, .webm, .mpeg, and .ogg format. **However, to help make sure all standard browsers can play your video, we strongly recommend that you use the .mp4 or .webm format.**
 
 .. _Create Transcript:
 
@@ -167,7 +168,7 @@ You can use any video backup site that you want. However, keep in mind that the
 site where you post the videos may have to handle a lot of traffic.
 
 .. note:: The URL for the video that you post on a third-party site must end in
- .mp4, .mpeg, .ogg, or .webm. EdX can't support videos that you post on sites
+ .mp4, .webm, .mpeg, or .ogg. (To help make sure all standard browsers can play your video, we **strongly** recommend that you use .mp4 or .webm format.) EdX can't support videos that you post on sites
  such as Vimeo.
 
 .. _Create a Video Component:
@@ -272,13 +273,47 @@ The following options appear on the **Advanced** tab in the Video component.
     * - **Video Download Allowed**
       - Specifies whether students can download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. If you set this value to **True**, you must add at least one non-YouTube URL in the **Video File URLs** field. 
     * - **Video File URLs**
-      - The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, you must set **Video Download Allowed** to **True**.
+      - The URL or URLs where you've posted non-YouTube versions of the video. Every URL should end in .mpeg, .webm, .mp4, or .ogg and cannot be a YouTube URL. Each student will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, you must set **Video Download Allowed** to **True**.
+
+        .. note:: To help make sure all standard browsers can play your video, we **strongly** recommend that you use the .mp4 or .webm format.
+
     * - **Video Start Time**
       - The time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59.
     * - **Video Stop Time**
       - The time you want the video to stop if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59.
     * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
       - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields. These settings are optional, for older browsers.
+
+
+.. _Video TOC:
+
+***************************
+Video Table of Contents
+***************************
+
+You can add a table of contents for your video by adding an .srt transcript file that contains clickable links to different parts of the video. When your students view the video, they can click the **CC** button at the bottom of the video player to switch between the main transcript for the video and the table of contents. 
+
+To add a table of contents, you'll work with a third-party service to create the .srt transcript file. Then, you'll use the **Transcript Languages** setting in the Video component to associate the .srt file with the video.
+
+.. image:: /Images/VideoTOC.png
+   :alt: Image of a video with a transcript that has links to different parts of the video
+   :width: 500
+
+#. After you've obtained the .srt transcript file that will function as the table of contents, open the Video component for the video.
+
+#. On the **Advanced** tab, scroll down to **Transcript Languages**, and then
+   click **Add**. 
+
+#. In the drop-down list that appears, select **Table of Contents**. 
+
+   An **Upload** button appears.
+
+#. Click **Upload**, browse to the .srt file for the transcript, and then click **Open**.
+
+#. In the **Upload translation** dialog box, click **Upload**.
+
+
+
 
 .. _Additional Transcripts:
 
@@ -307,7 +342,6 @@ To add a downloadable transcript by using the **Upload Handout** field:
 #. In the dialog box, select the file on your computer, and then click **Open**.
 #. In the **Upload File** dialog box, click **Upload**.
 
-
 Before Studio added the **Upload Handout** feature, some courses posted transcript files on the **Files & Uploads** page or on the Internet, and then added a link to those files in the Video component. **We no longer recommend this method.**  When you use this method, the **Download Transcript** button appears, but only the transcript that you add is available for download. The .srt and .txt transcripts become unavailable. 
 
 .. image:: /Images/Video_DownTrans_other.png
@@ -328,7 +362,7 @@ each language, and then associate the .srt file with the video in Studio.
 
 #. After you've obtained the .srt files for additional languages, open the Video component for the video.
 
-#. On the **Advanced** tab, scroll down to **Transcript Translations**, and then
+#. On the **Advanced** tab, scroll down to **Transcript Languages**, and then
    click **Add**. 
 
 #. In the drop-down list that appears, select the language for the transcript that you want to add. 

@@ -28,6 +28,13 @@ Feature: CMS.Create Section
     Then the section release date is updated
     And I see a "saving" notification
 
+  Scenario: Section name not clickable on editing release date
+    Given I have opened a new course in Studio
+    And I have added a new section
+    When I click the Edit link for the release date
+    And I click on section name in Section Release Date modal
+    Then I see no form for editing section name in modal
+
   Scenario: Delete section
     Given I have opened a new course in Studio
     And I have added a new section

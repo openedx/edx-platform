@@ -20,7 +20,3 @@ class WrapperDescriptor(VerticalDescriptor):
     module_class = WrapperModule
 
     has_children = True
-
-    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
-    js_module_name = "VerticalDescriptor"
-

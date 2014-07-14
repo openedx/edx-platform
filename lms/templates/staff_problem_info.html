@@ -63,11 +63,13 @@ ${block_content}
       </div>
       <div data-location="${location.to_deprecated_string()}" data-location-name="${location.name}">
         [
-        <a href="#" id="staff-debug-reset" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
+        <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
+        % if has_instructor_access:
         |
-        <a href="#" id="staff-debug-sdelete" class="staff-debug-sdelete">${_('Delete Student State')}</a>
+        <a href="#" class="staff-debug-sdelete">${_('Delete Student State')}</a>
         |
-        <a href="#" id="staff-debug-rescore" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+        <a href="#" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+        % endif
         ]
       </div>
       <div id="result_${location.name}"/>

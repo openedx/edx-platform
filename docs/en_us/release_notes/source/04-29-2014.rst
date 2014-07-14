@@ -46,7 +46,7 @@ The following documentation is available:
     students to `Student Data`_.
       
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
   
   Added new event types to `Tracking Logs`_ for interactions with PDF files.
 

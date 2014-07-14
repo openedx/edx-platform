@@ -9,7 +9,7 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 from xmodule.modulestore.django import ModuleI18nService
 

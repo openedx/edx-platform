@@ -52,8 +52,9 @@
             "OPTIONS": {
                 "mappings": {},
                 "reference_type": "Location",
-                "stores": {
-                    "default": {
+                "stores": [
+                    {
+                        "NAME": "draft",
                         "DOC_STORE_CONFIG": {
                             "collection": "modulestore",
                             "db": "test",
@@ -64,7 +65,7 @@
                             "port": 27017,
                             "user": "edxapp"
                         },
-                        "ENGINE": "xmodule.modulestore.mongo.MongoModuleStore",
+                        "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
                         "OPTIONS": {
                             "collection": "modulestore",
                             "db": "test",
@@ -79,14 +80,15 @@
                             "user": "edxapp"
                         }
                     },
-                    "xml": {
+                    {
+                        "NAME": "xml",
                         "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
                         "OPTIONS": {
                             "data_dir": "** OVERRIDDEN **",
                             "default_class": "xmodule.hidden_module.HiddenDescriptor"
                         }
                     }
-                }
+                ]
             }
         }
     },

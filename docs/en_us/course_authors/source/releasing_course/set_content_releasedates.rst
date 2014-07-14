@@ -29,9 +29,10 @@ After the course start date has passed, whether a student can see your course ma
   of a section or subsection is before the release date, the content of that course element is
   not yet published, and not visible to students. 
   
-  For a student to view a subsection, both it and its containing section must be have a release date
-  earlier than the current date.  It is possible that a section is released, but a subsection within it
-  is not released. In this case, students cannot view that subsection.
+  For a student to view a subsection, both it and its containing section must
+  have a release date that is earlier than the current date. It is possible to
+  have a section that is released, but a subsection within that section that is
+  not released. In this case, students cannot view that subsection.
   
   Course staff can see sections and subsections before the release date in the LMS.
   

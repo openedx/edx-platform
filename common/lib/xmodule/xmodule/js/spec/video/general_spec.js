@@ -79,53 +79,6 @@
                         expect(state.videos).toBeUndefined();
                     });
 
-                    it('parse Html5 sources', function () {
-                        var html5Sources = {
-                                mp4: null,
-                                webm: null,
-                                ogg: null
-                            }, v = document.createElement('video');
-
-                        if (
-                            !!(
-                                v.canPlayType &&
-                                v.canPlayType(
-                                    'video/webm; codecs="vp8, vorbis"'
-                                ).replace(/no/, '')
-                            )
-                        ) {
-                            html5Sources['webm'] =
-                                'xmodule/include/fixtures/test.webm';
-                        }
-
-                        if (
-                            !!(
-                                v.canPlayType &&
-                                v.canPlayType(
-                                    'video/mp4; codecs="avc1.42E01E, ' +
-                                    'mp4a.40.2"'
-                                ).replace(/no/, '')
-                            )
-                        ) {
-                            html5Sources['mp4'] =
-                                'xmodule/include/fixtures/test.mp4';
-                        }
-
-                        if (
-                            !!(
-                                v.canPlayType &&
-                                v.canPlayType(
-                                    'video/ogg; codecs="theora"'
-                                ).replace(/no/, '')
-                            )
-                        ) {
-                            html5Sources['ogg'] =
-                                'xmodule/include/fixtures/test.ogv';
-                        }
-
-                        expect(state.html5Sources).toEqual(html5Sources);
-                    });
-
                     it('parse available video speeds', function () {
                         var speeds = jasmine.stubbedHtml5Speeds;
 

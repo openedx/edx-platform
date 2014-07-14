@@ -35,14 +35,16 @@ from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
+
+from certificates.models import GeneratedCertificate
+from course_modes.models import CourseMode
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -68,12 +70,15 @@ class AnonymousUserId(models.Model):
     unique_together = (user, course_id)
 
 
-def anonymous_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id, save=True):
     """
     Return a unique id for a (user, course) pair, suitable for inserting
     into e.g. personalized survey links.
 
     If user is an `AnonymousUser`, returns `None`
+
+    Keyword arguments:
+    save -- Whether the id should be saved in an AnonymousUserId object.
     """
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     if user.is_anonymous():
@@ -90,6 +95,14 @@ def anonymous_id_for_user(user, course_id):
     if course_id:
         hasher.update(course_id.to_deprecated_string())
     digest = hasher.hexdigest()
+
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}  # pylint: disable=protected-access
+
+    user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
+
+    if save is False:
+        return digest
 
     try:
         anonymous_user_id, __ = AnonymousUserId.objects.get_or_create(
@@ -111,11 +124,6 @@ def anonymous_id_for_user(user, course_id):
         # Another thread has already created this entry, so
         # continue
         pass
-
-    if not hasattr(user, '_anonymous_id'):
-        user._anonymous_id = {}
-
-    user._anonymous_id[course_id] = digest
 
     return digest
 
@@ -198,7 +206,8 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range(this_year, this_year - 120, -1)
+    #VALID_YEARS = range(this_year, this_year - 120, -1) 
+    VALID_YEARS = range(this_year - 13, this_year - 100, -1) # changed valid years to be between 100 and 13 years ago.
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -298,14 +307,17 @@ class UserProfile(models.Model):
         self.save()
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, save=True):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
+
+    Keyword arguments:
+    save -- Whether the id should be saved in an AnonymousUserId object.
     """
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
-    return anonymous_id_for_user(user, None)
+    return anonymous_id_for_user(user, None, save=save)
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly
@@ -969,9 +981,21 @@ class CourseEnrollment(models.Model):
 
     def refundable(self):
         """
-        For paid/verified certificates, students may receive a refund IFF they have
+        For paid/verified certificates, students may receive a refund if they have
         a verified certificate and the deadline for refunds has not yet passed.
         """
+        # In order to support manual refunds past the deadline, set can_refund on this object.
+        # On unenrolling, the "unenroll_done" signal calls CertificateItem.refund_cert_callback(),
+        # which calls this method to determine whether to refund the order.
+        # This can't be set directly because refunds currently happen as a side-effect of unenrolling.
+        # (side-effects are bad)
+        if getattr(self, 'can_refund', None) is not None:
+            return True
+
+        # If the student has already been given a certificate they should not be refunded
+        if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
+            return False
+
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:
             return False

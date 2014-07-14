@@ -11,7 +11,6 @@ from django.test.client import RequestFactory
 from mock import Mock, patch
 from django.http import Http404, HttpResponse
 from django.conf import settings
-from nose.plugins.skip import SkipTest
 from edxmako.shortcuts import render_to_string
 from util.request import safe_get_host
 from textwrap import dedent

@@ -3,7 +3,7 @@ import textwrap
 from lettuce import world, steps
 from nose.tools import assert_in, assert_equals, assert_true
 
-from common import i_am_registered_for_the_course, visit_scenario_item
+from common import i_am_registered_for_the_course, visit_scenario_item, publish
 
 DATA_TEMPLATE = textwrap.dedent("""\
     <annotatable>
@@ -79,6 +79,8 @@ class AnnotatableSteps(object):
             data=DATA_TEMPLATE.format("\n".join(ANNOTATION_TEMPLATE.format(i) for i in xrange(count)))
         )
 
+        publish(world.scenario_dict['ANNOTATION_VERTICAL'].location)
+
         self.annotations_count = count
 
     def view_component(self, step):
@@ -123,6 +125,7 @@ class AnnotatableSteps(object):
                     )
                 )
             )
+        publish(world.scenario_dict['ANNOTATION_VERTICAL'].location)
 
     def click_reply(self, step, problem):
         r"""I click "Reply to annotation" on passage (?P<problem>\d+)$"""

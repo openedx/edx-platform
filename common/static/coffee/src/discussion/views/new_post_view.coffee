@@ -51,7 +51,7 @@ if Backbone?
 
           # Set here because 1) the window might get resized and things could
           # change and 2) can't set in initialize because the button is hidden
-          @maxNameWidth = @dropdownButton.width() * 0.9
+          @maxNameWidth = @dropdownButton.width() - 40
 
       # Need a fat arrow because hideTopicDropdown is passed as a callback to bind
       hideTopicDropdown: () =>
@@ -81,7 +81,7 @@ if Backbone?
       getFullTopicName: (topicElement) ->
           name = topicElement.html()
           topicElement.parents('ul').not('.topic_menu').each ->
-              name = $(this).siblings('a').html() + ' / ' + name
+              name = $(this).siblings('a').text() + ' / ' + name
           return name
 
       getNameWidth: (name) ->

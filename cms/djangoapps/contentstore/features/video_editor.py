@@ -4,7 +4,7 @@
 
 import requests
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from django.conf import settings
 from common import upload_file, attach_file
@@ -17,6 +17,10 @@ LANGUAGES = {
     lang: NATIVE_LANGUAGES.get(lang, display)
     for lang, display in settings.ALL_LANGUAGES
 }
+
+LANGUAGES.update({
+    'table': 'Table of Contents'
+})
 
 TRANSLATION_BUTTONS = {
     'add': '.metadata-video-translations .create-action',
@@ -306,3 +310,11 @@ def i_see_correct_langs(_step, langs):
     for lang_code, label in translations.items():
         assert_true(any([i.text == label for i in items]))
         assert_true(any([i['data-lang-code'] == lang_code for i in items]))
+
+
+@step('video language with code "([^"]*)" at position "(\d+)"$')
+def i_see_lang_at_position(_step, code, position):
+    menu_name = 'language'
+    open_menu(menu_name)
+    item = world.css_find(VIDEO_MENUS[menu_name] + ' li')[int(position)]
+    assert_equal(item['data-lang-code'], code)

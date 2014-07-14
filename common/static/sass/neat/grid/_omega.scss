@@ -9,6 +9,10 @@
     $direction: get-direction($layout-direction, $default-layout-direction);
   }
 
+  @if $table {
+    @warn "The omega mixin no longer removes padding in table layouts."
+  }
+
   @if length($query) == 1 {
     @if $auto {
       &:last-child {
@@ -16,14 +20,8 @@
       }
     }
 
-    @else if contains-display-value($query) {
-      @if $table {
-        padding-#{$direction}: 0;
-      }
-
-      @else {
-        margin-#{$direction}: 0;
-      }
+    @else if contains-display-value($query) and $table == false {
+      margin-#{$direction}: 0;
     }
 
     @else {
@@ -32,30 +30,14 @@
   }
 
   @else if length($query) == 2 {
-    @if $table {
-      @if $auto {
-        &:last-child {
-          padding-#{$direction}: 0;
-        }
-      }
-
-      @else {
-        &:nth-child(#{nth($query, 1)}) {
-          padding-#{$direction}: 0;
-        }
+    @if $auto {
+      &:last-child {
+        margin-#{$direction}: 0;
       }
     }
 
     @else {
-      @if $auto {
-        &:last-child {
-          margin-#{$direction}: 0;
-        }
-      }
-
-      @else {
-        @include nth-child(nth($query, 1), $direction);
-      }
+      @include nth-child(nth($query, 1), $direction);
     }
   }
 

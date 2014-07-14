@@ -221,6 +221,12 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
             format_str % args
         )
 
+    def do_HEAD(self):
+        """
+        Respond to an HTTP HEAD request
+        """
+        self.send_response(200)
+
 
 class StubHttpService(HTTPServer, object):
     """

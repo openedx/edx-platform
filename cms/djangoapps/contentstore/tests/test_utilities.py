@@ -1,6 +1,6 @@
 """ Unit tests for utility methods in views.py. """
 from django.conf import settings
-from contentstore.utils import get_modulestore
+from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 from contentstore.views.utility import expand_utility_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -49,8 +49,7 @@ class UtilitiesTestCase(CourseTestCase):
         # Now delete the utilities from the course and verify they get repopulated (for courses
         # created before utilities were introduced).
         with mock.patch('django.conf.settings.COURSE_UTILITIES', []):
-            modulestore = get_modulestore(self.course.location)
-            modulestore.update_item(self.course, self.user.id)
+            modulestore().update_item(self.course, self.user.id)
             self.assertEqual(self.get_persisted_utilities(), [])
 
     def test_get_utilities_html(self):

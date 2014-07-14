@@ -9,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
@@ -23,7 +23,7 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -325,8 +325,9 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
 
     checkers = {
         'load': can_load,
-        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_key)
-        }
+        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_key),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, descriptor, course_key)
+    }
 
     return _dispatch(checkers, action, user, descriptor)
 

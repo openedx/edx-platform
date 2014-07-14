@@ -1,8 +1,8 @@
-$border-color: #C8C8C8;
+$sequence--border-color: #C8C8C8;
 
 // repeated extends - needed since LMS styling was referenced
 .block-link {
-  border-left: 1px solid lighten($border-color, 10%);
+  border-left: 1px solid lighten($sequence--border-color, 10%);
   display: block;
 
   &:hover, &:focus {
@@ -12,7 +12,7 @@ $border-color: #C8C8C8;
 
 .topbar {
   @include clearfix();
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid $sequence--border-color;
 
   @media print {
     display: none;
@@ -20,7 +20,7 @@ $border-color: #C8C8C8;
 
   a {
     &.block-link {
-      border-left: 1px solid lighten($border-color, 10%);
+      border-left: 1px solid lighten($sequence--border-color, 10%);
       display: block;
 
       &:hover, &:focus {
@@ -330,7 +330,7 @@ nav.sequence-bottom {
 
   ul {
     @include clearfix();
-    @include inline-block();
+    display: inline-block;
 
     li {
       float: left;

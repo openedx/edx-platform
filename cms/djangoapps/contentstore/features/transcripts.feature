@@ -1,4 +1,4 @@
-@shard_3
+@shard_3 @requires_stub_youtube
 Feature: CMS Transcripts
   As a course author, I want to be able to create video components
 
@@ -34,14 +34,22 @@ Feature: CMS Transcripts
         And I expect inputs are enabled
 
         #User input URL with incorrect format
-        And I enter a "htt://link.c" source to field number 1
+        And I enter a "http://link.c" source to field number 1
         Then I see error message "url_format"
         # Currently we are working with 1st field. It means, that if 1st field
         # contain incorrect value, 2nd and 3rd fields should be disabled until
         # 1st field will be filled by correct correct value
         And I expect 2, 3 inputs are disabled
-        # We are not clearing fields here,
-        # Because we changing same field.
+
+        #User input URL with incorrect format
+        And I enter a "http://goo.gl/pxxZrg" source to field number 1
+        And I enter a "http://goo.gl/pxxZrg" source to field number 2
+        Then I see error message "links_duplication"
+        And I expect 1, 3 inputs are disabled
+
+        And I clear fields
+        And I expect inputs are enabled
+
         And I enter a "http://youtu.be/t_not_exist" source to field number 1
         Then I do not see error message
         And I expect inputs are enabled
@@ -693,6 +701,40 @@ Feature: CMS Transcripts
         And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I see value "video_name_1.1.2" in the field "Default Timed Transcript"
+
+        And I save changes
+        Then when I view the video it does show the captions
+
+        And I edit the component
+        Then I see status message "found"
+
+    #37 Uploading subtitles with different file name than file
+    Scenario: Shortened link: File name and name of subs are different
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a "http://goo.gl/pxxZrg" source to field number 1
+        And I see status message "not found"
+        And I upload the transcripts file "uk_transcripts.srt"
+        Then I see status message "uploaded_successfully"
+        And I see value "pxxZrg" in the field "Default Timed Transcript"
+
+        And I save changes
+        Then when I view the video it does show the captions
+
+        And I edit the component
+        Then I see status message "found"
+
+    #38 Uploading subtitles with different file name than file
+    Scenario: Relative link: File name and name of subs are different
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a "/gizmo.webm" source to field number 1
+        And I see status message "not found"
+        And I upload the transcripts file "uk_transcripts.srt"
+        Then I see status message "uploaded_successfully"
+        And I see value "gizmo" in the field "Default Timed Transcript"
 
         And I save changes
         Then when I view the video it does show the captions

@@ -63,25 +63,28 @@ class Thread(models.Model):
             course_id = query_params['course_id']
             requested_page = params['page']
             total_results = response.get('total_results')
+            corrected_text = response.get('corrected_text')
             # Record search result metric to allow search quality analysis.
             # course_id is already included in the context for the event tracker
             tracker.emit(
                 'edx.forum.searched',
                 {
                     'query': search_query,
+                    'corrected_text': corrected_text,
                     'page': requested_page,
                     'total_results': total_results,
                 }
             )
             log.info(
-                'forum_text_search query="{search_query}" course_id={course_id} page={requested_page} total_results={total_results}'.format(
+                'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} page={requested_page} total_results={total_results}'.format(
                     search_query=search_query,
+                    corrected_text=corrected_text,
                     course_id=course_id,
                     requested_page=requested_page,
                     total_results=total_results
                 )
             )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1), response.get('corrected_text')
 
     @classmethod
     def url_for_threads(cls, params={}):

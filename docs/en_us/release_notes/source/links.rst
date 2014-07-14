@@ -18,9 +18,15 @@
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
 
-.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
+.. _Installing, Configuring, and Running the edX Platform: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/
 
-.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _Installing the edX Production Stack: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/prodstack/install_prodstack.html
+
+.. _Creating Peer Assessments: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
+
+.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
+
+.. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 
@@ -146,8 +152,6 @@
 
 .. _Zooming Image Tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/zooming_image.html
 
-.. _Problem with Adaptive Hint: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_with_hint.html
-
 .. _IFrame Tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/iframe.html
 
 .. _Drag and Drop Problem: http://ca.readthedocs.org/en/latest/exercises_tools/drag_and_drop.html
@@ -158,6 +162,18 @@
 .. _LTI Component: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html
 
 .. _VitalSource E-Reader Tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/vitalsource.html
+
+.. _Problem with Adaptive Hint: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_with_hint.html#problem-with-adaptive-hint
+
+
+.. _Student Grades and Grading: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#grades
+
+.. _Answer Data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_answers.html#review-answers
+
+.. _Assign Final Grades and Issue Certificates: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/checking_student_progress.html#checking-student-progress-and-issuing-certificates
+
+
+.. _Review Grades for Enrolled Students (Small Courses): http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#gradebook
 
 .. DATA DOCUMENTATION
 
@@ -186,3 +202,5 @@
 .. _edX XBlock Documentation: http://edx.readthedocs.org/projects/xblock/en/latest/
 
 .. _Analytics: http://edx.readthedocs.org/projects/userdocs/en/latest/analytics.html
+
+.. _Opaque Keys: https://github.com/edx/edx-platform/wiki/Opaque-Keys

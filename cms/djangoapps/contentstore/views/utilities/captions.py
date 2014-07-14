@@ -17,8 +17,8 @@ from opaque_keys import InvalidKeyError
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.video_module.transcripts_utils import (
                                     GetTranscriptsFromYouTubeException,
                                     TranscriptsRequestValidationException,

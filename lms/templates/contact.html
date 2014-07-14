@@ -28,10 +28,10 @@
 	'discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may '
 	'not have a chance to respond to every email, we take all feedback into consideration.').format(
             platform_name=settings.PLATFORM_NAME,
-            contact_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.CONTACT_EMAIL),
+            contact_email=u'<a href="mailto:{email}">{email}</a>'.format(email=settings.CONTACT_EMAIL),
             faq_link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
             faq_link_end='</a>',
-            fb_link_start='<a href="http://www.facebook.com/EdxOnline">',
+            fb_link_start='<a href="{url}">'.format(url=settings.PLATFORM_FACEBOOK_ACCOUNT),
             fb_link_end='</a>'
 	)}
       </p>
@@ -54,13 +54,13 @@
       <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.').format(
         link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
         link_end='</a>',
-        email=u'<a href="mailto:press@edx.org">press@edx.org</a>',
+        email=u'<a href="mailto:{email}">{email}/a>'.format(email=settings.PRESS_EMAIL),
         )}</p>
 
       <h2>${_("Universities")}</h2>
       <p>
 	${_('If you are a university wishing to collaborate with or if you have questions about {platform_name}, please email {email}.').format(
-	    email=u'<a href="mailto:university@edx.org">university@edx.org</a>',
+	    email=u'<a href="mailto:{url}">{url}</a>'.format(url=settings.UNIVERSITY_EMAIL),
     	    platform_name=settings.PLATFORM_NAME
 	)}
       </p>

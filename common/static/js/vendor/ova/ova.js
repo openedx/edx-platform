@@ -1,6 +1,6 @@
 /* 
 Open Video Annotation v1.0 (http://openvideoannotation.org/)
-Copyright (C) 2014 CHS (Harvard University), Daniel Cebri‡n Robles and Phil Desenne 
+Copyright (C) 2014 CHS (Harvard University), Daniel Cebrian Robles and Phil Desenne 
 License: https://github.com/CtrHellenicStudies/OpenVideoAnnotation/blob/master/License.rst
 
 This program is free software; you can redistribute it and/or
@@ -2389,17 +2389,8 @@ OpenVideoAnnotation.Annotator = function (element, options) {
 	if (typeof options.optionsAnnotator.highlightTags!='undefined')
 		this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
 
-         
-	/*
-	this.annotator.addPlugin("Filter", {
-	  filters: [
-		{
-		  label: 'Media',
-		  property: 'media'
-		}
-	  ]
-	});//it is obligatory to have
-	*/
+    if (typeof options.optionsAnnotator.diacriticMarks != 'undefined' && typeof Annotator.Plugin["Diacritics"] === 'function')
+    	this.annotator.addPlugin("Diacritics", options.optionsAnnotator.diacriticMarks);
 	
     if (typeof Annotator.Plugin["Geolocation"] === 'function') 
 		this.annotator.addPlugin("Geolocation",options.optionsAnnotator.geolocation);
@@ -2415,7 +2406,7 @@ OpenVideoAnnotation.Annotator = function (element, options) {
 	if (typeof Annotator.Plugin["Reply"] === 'function') 
 		this.annotator.addPlugin("Reply");
             
-        if (typeof Annotator.Plugin["Flagging"] === 'function') 
+    if (typeof Annotator.Plugin["Flagging"] === 'function') 
 		this.annotator.addPlugin("Flagging");
 		
 	//Will be add the player and the annotations plugin for video-js in the annotator

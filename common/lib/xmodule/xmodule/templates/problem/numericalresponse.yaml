@@ -2,12 +2,9 @@
 metadata:
     display_name: Numerical Input
     markdown: |
-       A numerical input problem accepts a line of text input from the
-       student, and evaluates the input for correctness based on its
-       numerical value.
+       A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
 
-       The answer is correct if it is within a specified numerical tolerance
-       of the expected answer.
+       The answer is correct if it is within a specified numerical tolerance of the expected answer.
 
        >>Enter the numerical value of Pi:<<
        = 3.14159 +- .02
@@ -19,12 +16,9 @@ metadata:
        = 5
 
        [explanation]
-       Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number 
-       known to extreme precision. It is value is approximately equal to 3.14.
+       Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.
 
-       Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 
-       500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you 
-       can use any estimation technique that you like.
+       Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.
 
        If you look at your hand, you can count that you have five fingers.
        [explanation]

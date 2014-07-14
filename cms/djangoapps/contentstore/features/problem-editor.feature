@@ -118,6 +118,16 @@ Feature: CMS.Problem Editor
     And I can edit the problem
     Then I can see cheatsheet
 
+  Scenario: Reply on Annotation and Return to Annotation link works for Annotation problem
+    Given I have created a unit with advanced module "annotatable"
+    And I have created an advanced component "Annotation" of type "annotatable"
+    And I have created an advanced problem of type "Blank Advanced Problem"
+    And I edit first blank advanced problem for annotation response
+    When I mouseover on "annotatable-span"
+    Then I can see Reply to Annotation link
+    And I see that page has scrolled "down" when I click on "annotatable-reply" link
+    And I see that page has scrolled "up" when I click on "annotation-return" link
+
   # Disabled 11/13/2013 after failing in master
   # The screenshot showed that the LaTeX editor had the text "hi",
   # but Selenium timed out waiting for the text to appear.

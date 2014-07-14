@@ -4,7 +4,8 @@ from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
-from xmodule.modulestore import InvalidLocationError, InvalidKeyError
+from xmodule.modulestore import InvalidLocationError
+from opaque_keys import InvalidKeyError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 

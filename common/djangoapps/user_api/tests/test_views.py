@@ -9,7 +9,7 @@ from unittest import SkipTest
 from user_api.models import UserPreference
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 TEST_API_KEY = "test_api_key"

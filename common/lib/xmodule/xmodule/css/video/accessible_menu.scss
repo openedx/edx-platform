@@ -1,9 +1,9 @@
-$gray: rgb(127, 127, 127);
-$blue: rgb(0, 159, 230);
-$gray-d1: shade($gray,20%);
-$gray-l2: tint($gray,40%);
-$gray-l3: tint($gray,60%);
-$blue-s1: saturate($blue,15%);
+$a11y--gray: rgb(127, 127, 127);
+$a11y--blue: rgb(0, 159, 230);
+$a11y--gray-d1: shade($gray,20%);
+$a11y--gray-l2: tint($gray,40%);
+$a11y--gray-l3: tint($gray,60%);
+$a11y--blue-s1: saturate($blue,15%);
 
 %use-font-awesome {
   font-family: FontAwesome;
@@ -44,18 +44,18 @@ $blue-s1: saturate($blue,15%);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: $gray-l2;
+        color: $a11y--gray-l2;
         font-size: 14px;
         line-height: 23px;
 
         &:hover, &:focus {
-          color: $gray-d1;
+          color: $a11y--gray-d1;
         }
       }
 
       &.active{
         a {
-          color: $blue;
+          color: $a11y--blue;
         }
       }
 
@@ -96,7 +96,7 @@ $blue-s1: saturate($blue,15%);
       border-radius: 0 3px 3px 0;
       background-color: $very-light-text;
       padding: ($baseline*.75 $baseline*1.25 $baseline*.75 $baseline*.75);
-      color: $gray-l2;
+      color: $a11y--gray-l2;
       min-width: 1.5em;
       line-height: 14px;
       text-align: center;

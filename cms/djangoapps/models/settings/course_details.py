@@ -4,9 +4,9 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from contentstore.utils import get_modulestore, course_image_url
+from contentstore.utils import course_image_url
 from models.settings import course_grading
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
@@ -34,7 +34,7 @@ class CourseDetails(object):
         """
         Fetch the course details for the given course from persistence and return a CourseDetails model.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
         course_details = cls(course_key.org, course_key.course, course_key.run)
 
         course_details.start_date = descriptor.start
@@ -46,31 +46,31 @@ class CourseDetails(object):
 
         temploc = course_key.make_usage_key('about', 'syllabus')
         try:
-            course_details.syllabus = get_modulestore(temploc).get_item(temploc).data
+            course_details.syllabus = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = course_key.make_usage_key('about', 'short_description')
         try:
-            course_details.short_description = get_modulestore(temploc).get_item(temploc).data
+            course_details.short_description = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = course_key.make_usage_key('about', 'overview')
         try:
-            course_details.overview = get_modulestore(temploc).get_item(temploc).data
+            course_details.overview = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = course_key.make_usage_key('about', 'effort')
         try:
-            course_details.effort = get_modulestore(temploc).get_item(temploc).data
+            course_details.effort = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = course_key.make_usage_key('about', 'video')
         try:
-            raw_video = get_modulestore(temploc).get_item(temploc).data
+            raw_video = modulestore().get_item(temploc).data
             course_details.intro_video = CourseDetails.parse_video_tag(raw_video)
         except ItemNotFoundError:
             pass
@@ -84,14 +84,14 @@ class CourseDetails(object):
         delete the about item.
         """
         temploc = course_key.make_usage_key('about', about_key)
-        store = get_modulestore(temploc)
+        store = modulestore()
         if data is None:
-            store.delete_item(temploc)
+            store.delete_item(temploc, user.id)
         else:
             try:
                 about_item = store.get_item(temploc)
             except ItemNotFoundError:
-                about_item = store.create_xmodule(temploc, system=course.runtime)
+                about_item = store.create_xmodule(temploc, runtime=course.runtime)
             about_item.data = data
             store.update_item(about_item, user.id)
 
@@ -100,7 +100,7 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        module_store = modulestore('direct')
+        module_store = modulestore()
         descriptor = module_store.get_course(course_key)
 
         dirty = False

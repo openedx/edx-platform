@@ -160,6 +160,9 @@ class CapaFields(object):
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
+    minutes_allowed = Integer(help=_("EXPERIMENTAL FEATURE: DO NOT USE.  Number of minutes allowed to finish this assessment. Set 0 for no time-limit"),
+                              default=0, scope=Scope.settings)
+    time_started = Date(help=_("time student started this assessment"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
         display_name=_("Timer Between Attempts"),
@@ -187,6 +190,15 @@ class CapaFields(object):
     use_latex_compiler = Boolean(
         help=_("Enable LaTeX templates?"),
         default=False,
+        scope=Scope.settings
+    )
+    matlab_api_key = String(
+        display_name="Matlab API key",
+        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+             "This key is granted for exclusive use by this course for the specified duration. "
+             "Please do not share the API key with other courses and notify MathWorks immediately "
+             "if you believe the key is exposed or compromised. To obtain a key for your course, "
+             "or to report and issue, please contact moocsupport@mathworks.com",
         scope=Scope.settings
     )
 
@@ -240,7 +252,11 @@ class CapaMixin(CapaFields):
                 # e.g. in the CMS
                 msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
                 msg += u'<p><pre>{tb}</pre></p>'.format(
-                    tb=cgi.escape(traceback.format_exc()))
+                    # just the traceback, no message - it is already present above
+                    tb=cgi.escape(
+                        u''.join(['Traceback (most recent call last):\n'] +
+                        traceback.format_tb(sys.exc_info()[2])))
+                    )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
@@ -292,6 +308,7 @@ class CapaMixin(CapaFields):
             seed=self.runtime.seed,      # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.xqueue,
+            matlab_api_key=self.matlab_api_key
         )
 
         ### @jbau 2-21-14 edx-west HACK for deanonymized email HERE ###
@@ -331,6 +348,12 @@ class CapaMixin(CapaFields):
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
+
+    def set_time_started(self):
+        """
+        Sets the time when the student started the module.
+        """
+        self.time_started = datetime.datetime.now(UTC())
 
     def set_last_submission_time(self):
         """
@@ -602,6 +625,21 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
+        problem_is_timed = self.minutes_allowed > 0
+
+        if problem_is_timed and not self.time_started:
+            self.set_time_started()
+
+        end_time_to_display = (self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
+                               if problem_is_timed
+                               else None)
+
+        # because we use self.due and not self.close_date below, this is not the actual end_time, but the
+        # end_time we want to display to the user
+        if self.due and end_time_to_display:
+            end_time_to_display = min(self.due, end_time_to_display)
+
+
         content = {
             'name': self.display_name_with_default,
             'html': html,
@@ -611,6 +649,9 @@ class CapaMixin(CapaFields):
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
+            'problem_is_timed': problem_is_timed,
+            'start_time': self.time_started,
+            'end_time_to_display': end_time_to_display,
             'check_button': check_button,
             'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
@@ -638,6 +679,17 @@ class CapaMixin(CapaFields):
 
         return html
 
+    def exceeded_time_limit(self):
+        """
+        Has student used up allotted time, if set
+        """
+        if self.minutes_allowed <= 0 or not self.time_started:
+            return False
+        now = datetime.datetime.now(UTC())
+        # built in hardcoded grace period of 5 min
+        time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed + 5))
+        return now > time_limit_end
+
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
@@ -652,6 +704,8 @@ class CapaMixin(CapaFields):
         if self.max_attempts is not None and self.attempts >= self.max_attempts:
             return True
         if self.is_past_due():
+            return True
+        if self.exceeded_time_limit():
             return True
 
         return False

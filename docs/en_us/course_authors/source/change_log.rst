@@ -3,6 +3,29 @@ Change Log
 ############
 
 ***********
+June, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 06/20/14
+     - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
+   * - 06/18/14    
+     - In the :ref:`View and download student data` section, updated the
+       example report to include the new User ID column.
+   * - 06/17/14   
+     - Added :ref:`Video TOC` section to :ref:`Working with Video Components`.
+   * - 06/06/14   
+     - Added a description of email task workflow states to the :ref:`Launch`
+       section.
+   * - 06/03/14   
+     - Added :ref:`gradebook` to the :ref:`Grades` section.
+
+***********
 May, 2014
 ***********
 
@@ -12,6 +35,12 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/30/14
+     - Update :ref:`Working with Video Components` to include recommendations to
+       use .mp4 and .webm video formats for browser compatibility
+   * - 05/27/14
+     - Based on the new requirement to specify the complete location identifier
+       of a problem to adjust student grades, revised the :ref:`Grades` section.
    * - 05/22/14
      - Reorganized, updated, and streamlined these sections in the :ref:`Running
        Your Course Index` chapter:

@@ -22,7 +22,7 @@ from instructor.enrollment import (
     send_beta_role_email,
     unenroll_email
 )
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user

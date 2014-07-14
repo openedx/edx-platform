@@ -7,15 +7,17 @@ import json
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.exceptions import InvalidLocationError
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 
 log = logging.getLogger(__name__)
 
@@ -107,11 +109,11 @@ def import_static_content(
 
 
 def import_from_xml(
-        store, data_dir, course_dirs=None,
+        store, user_id, data_dir, course_dirs=None,
         default_class='xmodule.raw_module.RawDescriptor',
         load_error_modules=True, static_content_store=None,
-        target_course_id=None, verbose=False, draft_store=None,
-        do_import_static=True, create_new_course=False):
+        target_course_id=None, verbose=False,
+        do_import_static=True, create_new_course_if_not_present=False):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -133,8 +135,8 @@ def import_from_xml(
         time the course is loaded. Static content for some courses may also be
         served directly by nginx, instead of going through django.
 
-    : create_new_course:
-        If True, then courses whose ids already exist in the store are not imported.
+    : create_new_course_if_not_present:
+        If True, then a new course is created if it doesn't already exist.
         The check for existing courses is case-insensitive.
     """
 
@@ -165,31 +167,19 @@ def import_from_xml(
         else:
             dest_course_id = course_key
 
-        if create_new_course:
-            # this tests if exactly this course (ignoring case) exists; so, it checks the run
-            if store.has_course(dest_course_id, ignore_case=True):
+        # Creates a new course if it doesn't already exist
+        if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
+            try:
+                store.create_course(dest_course_id.org, dest_course_id.offering)
+            except InvalidLocationError:
+                # course w/ same org and course exists 
                 log.debug(
                     "Skipping import of course with id, {0},"
                     "since it collides with an existing one".format(dest_course_id)
                 )
                 continue
-            else:
-                try:
-                    store.create_course(dest_course_id.org, dest_course_id.offering)
-                except InvalidLocationError:
-                    # course w/ same org and course exists and store is old mongo
-                    log.debug(
-                        "Skipping import of course with id, {0},"
-                        "since it collides with an existing one".format(dest_course_id)
-                    )
-                    continue
 
-        try:
-            # turn off all write signalling while importing as this
-            # is a high volume operation on stores that need it
-            if hasattr(store, 'ignore_write_events_on_courses'):
-                store.ignore_write_events_on_courses.add(dest_course_id)
-
+        with store_bulk_write_operations_on_course(store, dest_course_id):
             course_data_path = None
 
             if verbose:
@@ -216,8 +206,8 @@ def import_from_xml(
 
                     log.debug('course data_dir={0}'.format(module.data_dir))
 
-                    course = import_module(
-                        module, store,
+                    course = _import_module_and_update_references(
+                        module, store, user_id,
                         course_key,
                         dest_course_id,
                         do_import_static=do_import_static
@@ -256,9 +246,12 @@ def import_from_xml(
                     if course.tabs is None or len(course.tabs) == 0:
                         CourseTabList.initialize_default(course)
 
-                    store.update_item(course)
+                    store.update_item(course, user_id)
 
                     course_items.append(course)
+                    break
+
+            # TODO: shouldn't this raise an exception if course wasn't found?
 
             # then import all the static content
             if static_content_store is not None and do_import_static:
@@ -291,7 +284,7 @@ def import_from_xml(
                     dest_course_id, subpath=simport, verbose=verbose
                 )
 
-            # finally loop through all the modules
+            # now loop through all the modules
             for module in xml_module_store.modules[course_key].itervalues():
                 if module.scope_ids.block_type == 'course':
                     # we've already saved the course module up at the top
@@ -303,41 +296,36 @@ def import_from_xml(
                         loc=module.location
                     ))
 
-                import_module(
+                _import_module_and_update_references(
                     module, store,
+                    user_id,
                     course_key,
                     dest_course_id,
                     do_import_static=do_import_static,
-                    system=course.runtime
+                    runtime=course.runtime
                 )
 
-            # now import any 'draft' items
-            if draft_store is not None:
-                import_course_draft(
-                    xml_module_store,
-                    store,
-                    draft_store,
-                    course_data_path,
-                    static_content_store,
-                    course_key,
-                    dest_course_id,
-                    course.runtime
-                )
+            # finally, publish the course
+            store.publish(course.location, user_id)
 
-        finally:
-            # turn back on all write signalling on stores that need it
-            if (hasattr(store, 'ignore_write_events_on_courses') and
-                    dest_course_id in store.ignore_write_events_on_courses):
-                store.ignore_write_events_on_courses.remove(dest_course_id)
-                store.refresh_cached_metadata_inheritance_tree(dest_course_id)
+            # now import any DRAFT items
+            _import_course_draft(
+                xml_module_store,
+                store,
+                user_id,
+                course_data_path,
+                course_key,
+                dest_course_id,
+                course.runtime
+            )
 
     return xml_module_store, course_items
 
 
-def import_module(
-        module, store,
+def _import_module_and_update_references(
+        module, store, user_id,
         source_course_id, dest_course_id,
-        do_import_static=True, system=None):
+        do_import_static=True, runtime=None):
 
     logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
 
@@ -354,7 +342,7 @@ def import_module(
     new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
     if new_usage_key.category == 'course':
         new_usage_key = new_usage_key.replace(name=dest_course_id.run)
-    new_module = store.create_xmodule(new_usage_key, system=system)
+    new_module = store.create_xmodule(new_usage_key, runtime=runtime)
 
     def _convert_reference_fields_to_new_namespace(reference):
         """
@@ -398,14 +386,19 @@ def import_module(
                 setattr(new_module, field_name, value)
             else:
                 setattr(new_module, field_name, getattr(module, field_name))
-    store.update_item(new_module, '**replace_user**', allow_not_found=True)
+    store.update_item(new_module, user_id, allow_not_found=True)
     return new_module
 
 
-def import_course_draft(
-        xml_module_store, store, draft_store, course_data_path,
-        static_content_store, source_course_id,
-        target_course_id, mongo_runtime):
+def _import_course_draft(
+        xml_module_store,
+        store,
+        user_id,
+        course_data_path,
+        source_course_id,
+        target_course_id,
+        mongo_runtime
+):
     '''
     This will import all the content inside of the 'drafts' folder, if it exists
     NOTE: This is not a full course import, basically in our current
@@ -509,17 +502,17 @@ def import_course_draft(
                 course_key = descriptor.location.course_key
                 try:
                     def _import_module(module):
-                        # Update the module's location to "draft" revision
+                        # Update the module's location to DRAFT revision
                         # We need to call this method (instead of updating the location directly)
                         # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module.location.replace(revision='draft'))
+                        _update_module_location(module, module.location.replace(revision=MongoRevisionKey.draft))
 
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
                         # filtered out from the non-draft store export
                         if module.location.category == 'vertical':
-                            non_draft_location = module.location.replace(revision=None)
+                            non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -532,12 +525,13 @@ def import_course_draft(
 
                             if non_draft_location not in sequential.children:
                                 sequential.children.insert(index, non_draft_location)
-                                store.update_item(sequential, '**replace_user**')
+                                store.update_item(sequential, user_id)
 
-                        import_module(
-                            module, draft_store,
+                        _import_module_and_update_references(
+                            module, store, user_id,
                             source_course_id,
-                            target_course_id, system=mongo_runtime
+                            target_course_id,
+                            runtime=mongo_runtime,
                         )
                         for child in module.get_children():
                             _import_module(child)

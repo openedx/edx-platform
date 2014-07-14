@@ -87,6 +87,7 @@ define ["jquery", "js/spec_helpers/edit_helpers", "coffee/src/views/module_edit"
             expect($.ajax).toHaveBeenCalledWith(
               url: "/xblock/#{@moduleEdit.model.id}/student_view"
               type: "GET"
+              cache: false
               headers:
                 Accept: 'application/json'
               success: jasmine.any(Function)
@@ -107,6 +108,7 @@ define ["jquery", "js/spec_helpers/edit_helpers", "coffee/src/views/module_edit"
             expect($.ajax).not.toHaveBeenCalledWith(
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
+              cache : false
               headers:
                 Accept: 'application/json'
               success: jasmine.any(Function)
@@ -131,6 +133,7 @@ define ["jquery", "js/spec_helpers/edit_helpers", "coffee/src/views/module_edit"
             expect($.ajax).toHaveBeenCalledWith(
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
+              cache: false
               headers:
                 Accept: 'application/json'
               success: jasmine.any(Function)

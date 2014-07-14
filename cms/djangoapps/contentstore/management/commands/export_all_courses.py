@@ -19,7 +19,7 @@ class Command(BaseCommand):
         output_path = args[0]
 
         cs = contentstore()
-        ms = modulestore('direct')
+        ms = modulestore()
         root_dir = output_path
         courses = ms.get_courses()
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             if 1:
                 try:
                     course_dir = course_id.replace('/', '...')
-                    export_to_xml(ms, cs, course_id, root_dir, course_dir, modulestore())
+                    export_to_xml(ms, cs, course_id, root_dir, course_dir)
                 except Exception as err:
                     print("="*30 + "> Oops, failed to export %s" % course_id)
                     print("Error:")

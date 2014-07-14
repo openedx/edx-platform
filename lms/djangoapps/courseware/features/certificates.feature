@@ -71,7 +71,7 @@ Feature: LMS.Verified certificates
     Scenario: I can take a verified certificate course for free
         Given I am logged in
         And the course has an honor mode
-        When I give a reason why I cannot pay
+        When I select the honor code option
         Then I should see the course on my dashboard
         And a "edx.course.enrollment.activated" server event is emitted
 

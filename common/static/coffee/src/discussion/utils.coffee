@@ -73,6 +73,7 @@ class @DiscussionUtil
       downvote_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
       undo_vote_for_comment   : "/courses/#{$$course_id}/discussion/comments/#{param}/unvote"
       upload                  : "/courses/#{$$course_id}/discussion/upload"
+      users                   : "/courses/#{$$course_id}/discussion/users"
       search                  : "/courses/#{$$course_id}/discussion/forum/search"
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"

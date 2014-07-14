@@ -64,9 +64,9 @@ function () {
         state.videoQualityControl.el.on('click',
             state.videoQualityControl.toggleQuality
         );
-        state.el.on('play',
-            _.once(state.videoQualityControl.fetchAvailableQualities)
-        );
+        state.el.on('play', _.once(function () {
+            state.videoQualityControl.fetchAvailableQualities();
+        }));
     }
 
     // ***************************************************************

@@ -18,12 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.runtime import Runtime
+from xblock.runtime import Runtime, IdReader
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -31,6 +31,52 @@ from dogapi import dog_stats_api
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
+
+# xblock view names
+
+# This is the view that will be rendered to display the XBlock in the LMS.
+# It will also be used to render the block in "preview" mode in Studio, unless
+# the XBlock also implements author_view.
+STUDENT_VIEW = 'student_view'
+
+# An optional view of the XBlock similar to student_view, but with possible inline
+# editing capabilities. This view differs from studio_view in that it should be as similar to student_view
+# as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
+AUTHOR_VIEW = 'author_view'
+
+# The view used to render an editor in Studio. The editor rendering can be completely different
+# from the LMS student_view, and it is only shown when the author selects "Edit".
+STUDIO_VIEW = 'studio_view'
+
+# Views that present a "preview" view of an xblock (as opposed to an editing view).
+PREVIEW_VIEWS = [STUDENT_VIEW, AUTHOR_VIEW]
+
+
+class OpaqueKeyReader(IdReader):
+    """
+    IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
+    """
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
+
+        Args:
+            usage_id: The id of the usage to query
+
+        Returns:
+            The `definition_id` the usage is derived from
+        """
+        return usage_id.definition_key
+
+    def get_block_type(self, def_id):
+        """Retrieve the block_type of a particular definition
+
+        Args:
+            def_id: The id of the definition to query
+
+        Returns:
+            The `block_type` of the definition
+        """
+        return def_id.block_type
 
 
 def dummy_track(_event_type, _event):
@@ -208,6 +254,29 @@ class XModuleMixin(XBlockMixin):
             if (field.scope == scope and field.is_set_on(self)):
                 result[field.name] = field.read_json(self)
         return result
+
+    def has_children_at_depth(self, depth):
+        """
+        Returns true if self has children at the given depth. depth==0 returns
+        false if self is a leaf, true otherwise.
+
+                           SELF
+                            |
+                     [child at depth 0]
+                     /           \
+                 [depth 1]    [depth 1]
+                 /       \
+           [depth 2]   [depth 2]
+
+        So the example above would return True for `has_children_at_depth(2)`, and False
+        for depth > 2
+        """
+        if depth < 0:
+            raise ValueError("negative depth argument is invalid")
+        elif depth == 0:
+            return bool(self.get_children())
+        else:
+            return any(child.has_children_at_depth(depth - 1) for child in self.get_children())
 
     def get_content_titles(self):
         """
@@ -721,6 +790,24 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        This method is called when "Save" is pressed on the Studio editor.
+
+        Note that after this method is called, the modulestore update_item method will
+        be called on this xmodule. Therefore, any modifications to the xmodule that are
+        performed in editor_saved will automatically be persisted (calling update_item
+        from implementors of this method is not necessary).
+
+        Args:
+            user: the user who requested the save (as obtained from the request)
+            old_metadata (dict): the values of the fields with Scope.settings before the save was performed
+            old_content (dict): the values of the fields with Scope.content before the save was performed.
+                This will include 'data'.
+        """
+        pass
+
+
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         return (self.scope_ids == other.scope_ids and
@@ -747,7 +834,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
 
-
     @property
     def editable_metadata_fields(self):
         """
@@ -755,10 +841,31 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
         Can be limited by extending `non_editable_metadata_fields`.
         """
+        metadata_fields = {}
+
+        # Only use the fields from this class, not mixins
+        fields = getattr(self, 'unmixed_class', self.__class__).fields
+
+        for field in fields.values():
+
+            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+                continue
+
+            metadata_fields[field.name] = self._create_metadata_editor_info(field)
+
+        return metadata_fields
+
+    def _create_metadata_editor_info(self, field):
+        """
+        Creates the information needed by the metadata editor for a specific field.
+        """
         def jsonify_value(field, json_choice):
-            if isinstance(json_choice, dict) and 'value' in json_choice:
+            if isinstance(json_choice, dict):
                 json_choice = dict(json_choice)  # make a copy so below doesn't change the original
-                json_choice['value'] = field.to_json(json_choice['value'])
+                if 'display_name' in json_choice:
+                    json_choice['display_name'] = get_text(json_choice['display_name'])
+                if 'value' in json_choice:
+                    json_choice['value'] = field.to_json(json_choice['value'])
             else:
                 json_choice = field.to_json(json_choice)
             return json_choice
@@ -770,46 +877,36 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             else:
                 return self.runtime.service(self, "i18n").ugettext(value)
 
-        metadata_fields = {}
+        # gets the 'default_value' and 'explicitly_set' attrs
+        metadata_field_editor_info = self.runtime.get_field_provenance(self, field)
+        metadata_field_editor_info['field_name'] = field.name
+        metadata_field_editor_info['display_name'] = get_text(field.display_name)
+        metadata_field_editor_info['help'] = get_text(field.help)
+        metadata_field_editor_info['value'] = field.read_json(self)
 
-        # Only use the fields from this class, not mixins
-        fields = getattr(self, 'unmixed_class', self.__class__).fields
+        # We support the following editors:
+        # 1. A select editor for fields with a list of possible values (includes Booleans).
+        # 2. Number editors for integers and floats.
+        # 3. A generic string editor for anything else (editing JSON representation of the value).
+        editor_type = "Generic"
+        values = field.values
+        if isinstance(values, (tuple, list)) and len(values) > 0:
+            editor_type = "Select"
+            values = [jsonify_value(field, json_choice) for json_choice in values]
+        elif isinstance(field, Integer):
+            editor_type = "Integer"
+        elif isinstance(field, Float):
+            editor_type = "Float"
+        elif isinstance(field, List):
+            editor_type = "List"
+        elif isinstance(field, Dict):
+            editor_type = "Dict"
+        elif isinstance(field, RelativeTime):
+            editor_type = "RelativeTime"
+        metadata_field_editor_info['type'] = editor_type
+        metadata_field_editor_info['options'] = [] if values is None else values
 
-        for field in fields.values():
-
-            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
-                continue
-
-            # gets the 'default_value' and 'explicitly_set' attrs
-            metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
-            metadata_fields[field.name]['field_name'] = field.name
-            metadata_fields[field.name]['display_name'] = get_text(field.display_name)
-            metadata_fields[field.name]['help'] = get_text(field.help)
-            metadata_fields[field.name]['value'] = field.read_json(self)
-
-            # We support the following editors:
-            # 1. A select editor for fields with a list of possible values (includes Booleans).
-            # 2. Number editors for integers and floats.
-            # 3. A generic string editor for anything else (editing JSON representation of the value).
-            editor_type = "Generic"
-            values = field.values
-            if isinstance(values, (tuple, list)) and len(values) > 0:
-                editor_type = "Select"
-                values = [jsonify_value(field, json_choice) for json_choice in values]
-            elif isinstance(field, Integer):
-                editor_type = "Integer"
-            elif isinstance(field, Float):
-                editor_type = "Float"
-            elif isinstance(field, List):
-                editor_type = "List"
-            elif isinstance(field, Dict):
-                editor_type = "Dict"
-            elif isinstance(field, RelativeTime):
-                editor_type = "RelativeTime"
-            metadata_fields[field.name]['type'] = editor_type
-            metadata_fields[field.name]['options'] = [] if values is None else values
-
-        return metadata_fields
+        return metadata_field_editor_info
 
     # ~~~~~~~~~~~~~~~ XModule Indirection ~~~~~~~~~~~~~~~~
     @property
@@ -856,7 +953,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
     max_score = module_attr('max_score')
-    student_view = module_attr('student_view')
+    student_view = module_attr(STUDENT_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
 
@@ -1060,7 +1157,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         return result
 
     def render(self, block, view_name, context=None):
-        if view_name == 'student_view':
+        if view_name in PREVIEW_VIEWS:
             assert block.xmodule_runtime is not None
             if isinstance(block, (XModule, XModuleDescriptor)):
                 to_render = block._xmodule
@@ -1147,7 +1244,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            **kwargs):
+            user_location=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1243,6 +1340,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         self.xmodule_instance = None
 
         self.get_real_user = get_real_user
+        self.user_location = user_location
 
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime

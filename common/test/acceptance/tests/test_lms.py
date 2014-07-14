@@ -14,7 +14,7 @@ from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.progress import ProgressPage
 from ..pages.lms.dashboard import DashboardPage
-from ..pages.lms.video import VideoPage
+from ..pages.lms.video.video import VideoPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 

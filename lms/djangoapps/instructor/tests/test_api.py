@@ -7,6 +7,7 @@ import unittest
 import json
 import requests
 import datetime
+import ddt
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -40,7 +41,7 @@ from instructor.access import allow_access
 import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
 
@@ -252,6 +253,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
+@ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -286,9 +288,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.registration_url = 'https://{}/register'.format(self.site_name)
-        self.about_url = 'https://{}/courses/MITx/999/Robot_Super_Course/about'.format(self.site_name)
-        self.course_url = 'https://{}/courses/MITx/999/Robot_Super_Course/'.format(self.site_name)
+        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
+        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -424,9 +425,13 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_enroll_with_email(self):
+    @ddt.data('http', 'https')
+    def test_enroll_with_email(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True})
+        params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
+
         print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
@@ -472,15 +477,18 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "{course_url}\n\n----\n"
+            "{proto}://{site}{course_path}\n\n----\n"
             "This email was automatically sent from edx.org to NotEnrolled Student".format(
-                course_url=self.course_url
+                proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
 
-    def test_enroll_with_email_not_registered(self):
+    @ddt.data('http', 'https')
+    def test_enroll_with_email_not_registered(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -492,34 +500,41 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit {registration_url} and fill out the registration form "
-            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
+            "To finish your registration, please visit {proto}://{site}/register and fill out the "
+            "registration form making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
-            "visit {about_url} to join the course.\n\n----\n"
+            "visit {proto}://{site}{about_path} to join the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                registration_url=self.registration_url, about_url=self.about_url
+                proto=protocol, site=self.site_name, about_path=self.about_path
             )
         )
 
+    @ddt.data('http', 'https')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
-    def test_enroll_email_not_registered_mktgsite(self):
-        # Try with marketing site enabled
+    def test_enroll_email_not_registered_mktgsite(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "You can then enroll in Robot Super Course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                proto=protocol, site=self.site_name
+            )
         )
 
-    def test_enroll_with_email_not_registered_autoenroll(self):
+    @ddt.data('http', 'https')
+    def test_enroll_with_email_not_registered_autoenroll(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
@@ -532,11 +547,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit {registration_url} and fill out the registration form "
+            "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                registration_url=self.registration_url
+                proto=protocol, site=self.site_name
             )
         )
 
@@ -675,12 +690,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "This email was automatically sent from edx.org to robot-allowed@robot.org"
         )
 
+    @ddt.data('http', 'https')
     @patch('instructor.enrollment.uses_shib')
-    def test_enroll_with_email_not_registered_with_shib(self, mock_uses_shib):
+    def test_enroll_with_email_not_registered_with_shib(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -693,9 +711,9 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit {about_url} and register for the course.\n\n----\n"
+            "To access the course visit {proto}://{site}{about_path} and register for the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                about_url=self.about_url
+                proto=protocol, site=self.site_name, about_path=self.about_path
             )
         )
 
@@ -717,13 +735,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
+    @ddt.data('http', 'https')
     @patch('instructor.enrollment.uses_shib')
-    def test_enroll_with_email_not_registered_with_shib_autoenroll(self, mock_uses_shib):
-
+    def test_enroll_with_email_not_registered_with_shib_autoenroll(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
@@ -737,13 +757,14 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit {course_url} and login.\n\n----\n"
+            "To access the course visit {proto}://{site}{course_path} and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                course_url=self.course_url
+                proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
 
 
+@ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -773,7 +794,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_url = 'https://{}/courses/MITx/999/Robot_Super_Course/about'.format(self.site_name)
+        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
+        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -848,9 +870,12 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
-    def test_add_notenrolled_with_email(self):
+    @ddt.data('http', 'https')
+    def test_add_notenrolled_with_email(self, protocol):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
@@ -877,23 +902,25 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         self.assertEqual(
             mail.outbox[0].body,
-            u"Dear {0}\n\nYou have been invited to be a beta tester "
+            u"Dear {student_name}\n\nYou have been invited to be a beta tester "
             "for Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "Visit {1} to join "
+            "Visit {proto}://{site}{about_path} to join "
             "the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {2}".format(
-                self.notenrolled_student.profile.name,
-                self.about_url,
-                self.notenrolled_student.email
+            "This email was automatically sent from edx.org to {student_email}".format(
+                student_name=self.notenrolled_student.profile.name,
+                student_email=self.notenrolled_student.email,
+                proto=protocol,
+                site=self.site_name,
+                about_path=self.about_path
             )
         )
 
-    def test_add_notenrolled_with_email_autoenroll(self):
+    @ddt.data('http', 'https')
+    def test_add_notenrolled_with_email_autoenroll(self, protocol):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(
-            url,
-            {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True, 'auto_enroll': True}
-        )
+        params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True, 'auto_enroll': True}
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.get(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
@@ -920,13 +947,16 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         self.assertEqual(
             mail.outbox[0].body,
-            u"Dear {0}\n\nYou have been invited to be a beta tester "
+            u"Dear {student_name}\n\nYou have been invited to be a beta tester "
             "for Robot Super Course at edx.org by a member of the course staff.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course/\n\n----\n"
-            "This email was automatically sent from edx.org to {1}".format(
-                self.notenrolled_student.profile.name,
-                self.notenrolled_student.email
+            "{proto}://{site}{course_path}\n\n----\n"
+            "This email was automatically sent from edx.org to {student_email}".format(
+                student_name=self.notenrolled_student.profile.name,
+                student_email=self.notenrolled_student.email,
+                proto=protocol,
+                site=self.site_name,
+                course_path=self.course_path
             )
         )
 
@@ -944,7 +974,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             "Visit edx.org to enroll in the course and begin the beta test.\n\n----\n"
             "This email was automatically sent from edx.org to {1}".format(
                 self.notenrolled_student.profile.name,
-                self.notenrolled_student.email
+                self.notenrolled_student.email,
             )
         )
 
@@ -1334,7 +1364,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
-            '"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
             '\n"2","41","42"\n'
         ))
         self.assertTrue(body.endswith('"7","41","42"\n'))

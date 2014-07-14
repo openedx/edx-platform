@@ -36,7 +36,7 @@ Feature: CMS.Advanced (manual) course policy
   @skip_sauce
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
-    When I create a JSON object as a value for "discussion_topics"
+    When I create a JSON object as a value for "Discussion Topic Mapping"
     Then it is displayed as formatted
     And I reload the page
     Then it is displayed as formatted
@@ -45,7 +45,7 @@ Feature: CMS.Advanced (manual) course policy
   @skip_sauce
   Scenario: Test error if value supplied is of the wrong type
     Given I am on the Advanced Course Settings page in Studio
-    When I create a JSON object as a value for "display_name"
+    When I create a JSON object as a value for "Course Display Name"
     Then I get an error on save
     And I reload the page
     Then the policy key value is unchanged
@@ -67,3 +67,14 @@ Feature: CMS.Advanced (manual) course policy
     When I edit the value of a policy key
     And I press the "Save" notification button
     Then I see a confirmation that my changes have been saved
+
+  Scenario: Deprecated Settings are not shown by default
+    Given I am on the Advanced Course Settings page in Studio
+    Then deprecated settings are not shown
+
+  Scenario: Deprecated Settings can be toggled
+    Given I am on the Advanced Course Settings page in Studio
+    When I toggle the display of deprecated settings
+    Then deprecated settings are then shown
+    And I toggle the display of deprecated settings
+    Then deprecated settings are not shown

@@ -35,7 +35,7 @@ from instructor_task.subtasks import update_subtask_status, SubtaskStatus
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class TestTaskFailure(Exception):

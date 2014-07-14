@@ -2,12 +2,9 @@
 metadata:
     display_name: Text Input
     markdown: |
-        A text input problem accepts a line of text from the 
-        student, and evaluates the input for correctness based on an expected 
-        answer.
+        A text input problem accepts a line of text from the student, and evaluates the input for correctness based on an expected answer.
     
-        The answer is correct if it matches every character of the expected answer. This can be a problem with  
-        international spelling, dates, or anything where the format of the answer is not clear.
+        The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.
     
         >>Which US state has Lansing as its capital?<<
 
@@ -15,8 +12,7 @@ metadata:
         
 
         [explanation]
-        Lansing is the capital of Michigan, although it is not Michgan's largest city, 
-        or even the seat of the county in which it resides.
+        Lansing is the capital of Michigan, although it is not Michigan's largest city, or even the seat of the county in which it resides.
         [explanation]
 data: |
     <problem>
@@ -25,7 +21,8 @@ data: |
     A text input problem accepts a line of text from the
     student, and evaluates the input for correctness based on an expected
     answer.
-
+    </p>
+    <p>
     The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear. 
     </p>
 
@@ -36,7 +33,7 @@ data: |
         <solution>
             <div class="detailed-solution">
                 <p>Explanation</p>
-                <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
+                <p>Lansing is the capital of Michigan, although it is not Michigan's largest city, or even the seat of the county in which it resides.</p>
             </div>
         </solution>
     </problem>

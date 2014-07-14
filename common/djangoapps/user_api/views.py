@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference
 from django_comment_common.models import Role
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):

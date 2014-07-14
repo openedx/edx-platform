@@ -14,9 +14,7 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
-# Submissions is a Django app that is currently installed
-# from the edx-ora2 repo, although it will likely move in the future.
-from submissions import api as sub_api
+from submissions import api as sub_api  # installed from the edx-submissions repository
 from student.models import anonymous_id_for_user
 
 from microsite_configuration import microsite
@@ -223,7 +221,7 @@ def _reset_module_attempts(studentmodule):
     studentmodule.save()
 
 
-def get_email_params(course, auto_enroll):
+def get_email_params(course, auto_enroll, secure=True):
     """
     Generate parameters used when parsing email templates.
 
@@ -231,27 +229,32 @@ def get_email_params(course, auto_enroll):
     Returns a dict of parameters
     """
 
+    protocol = 'https' if secure else 'http'
+
     stripped_site_name = microsite.get_value(
         'SITE_NAME',
         settings.SITE_NAME
     )
-    # TODO: Use request.build_absolute_uri rather than 'https://{}{}'.format
+    # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
     # and check with the Services team that this works well with microsites
-    registration_url = u'https://{}{}'.format(
-        stripped_site_name,
-        reverse('student.views.register_user')
+    registration_url = u'{proto}://{site}{path}'.format(
+        proto=protocol,
+        site=stripped_site_name,
+        path=reverse('student.views.register_user')
     )
-    course_url = u'https://{}{}'.format(
-        stripped_site_name,
-        reverse('course_root', kwargs={'course_id': course.id.to_deprecated_string()})
+    course_url = u'{proto}://{site}{path}'.format(
+        proto=protocol,
+        site=stripped_site_name,
+        path=reverse('course_root', kwargs={'course_id': course.id.to_deprecated_string()})
     )
 
     # We can't get the url to the course's About page if the marketing site is enabled.
     course_about_url = None
     if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        course_about_url = u'https://{}{}'.format(
-            stripped_site_name,
-            reverse('about_course', kwargs={'course_id': course.id.to_deprecated_string()})
+        course_about_url = u'{proto}://{site}{path}'.format(
+            proto=protocol,
+            site=stripped_site_name,
+            path=reverse('about_course', kwargs={'course_id': course.id.to_deprecated_string()})
         )
 
     is_shib_course = uses_shib(course)

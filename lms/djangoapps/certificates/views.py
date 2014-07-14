@@ -13,7 +13,7 @@ from capa.xqueue_interface import XQUEUE_METRIC_NAME
 from student.models import UserProfile
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
 from certificates.queue import XQueueCertInterface

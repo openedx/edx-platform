@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):

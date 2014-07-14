@@ -261,7 +261,7 @@ def see_upsell_link_on_my_dashboard(step):
 @step(u'I do not see the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
     course_link_css = UPSELL_LINK_CSS
-    assert not world.is_css_present(course_link_css)
+    assert world.is_css_not_present(course_link_css)
 
 
 @step(u'I select the upsell link on my dashboard')
@@ -281,7 +281,7 @@ def see_that_i_am_on_the_verified_track(step):
 
 @step(u'I leave the flow and return$')
 def leave_the_flow_and_return(step):
-    world.visit('verify_student/verified/edx/999/Certificates')
+    world.visit('verify_student/verified/edx/999/Certificates/')
 
 
 @step(u'I am at the verified page$')
@@ -295,7 +295,7 @@ def edit_my_name(step):
     world.css_click(btn_css)
 
 
-@step(u'I give a reason why I cannot pay$')
+@step(u'I select the honor code option$')
 def give_a_reason_why_i_cannot_pay(step):
     register()
 
@@ -304,9 +304,6 @@ def give_a_reason_why_i_cannot_pay(step):
 
     cb_css = 'input#honor-code'
     world.css_click(cb_css)
-
-    text_css = 'li.field-explain textarea'
-    world.css_find(text_css).type('I cannot afford it.')
 
     btn_css = 'input[value="Select Certificate"]'
     world.css_click(btn_css)

@@ -1,11 +1,11 @@
-/* TODO: move top-level variables to a common _variables.scss. 
+/* TODO: move top-level variables to a common _variables.scss.
  * NOTE: These variables were only added here because when this was integrated with the CMS,
  * SASS compilation errors were triggered because the CMS didn't have the same variables defined
  * that the LMS did, so the quick fix was to localize the LMS variables not shared by the CMS.
  * -Abarrett and Vshnayder
  */
-$border-color: #C8C8C8;
-$body-font-size: em(14);
+$annotatable--border-color: #C8C8C8;
+$annotatable--body-font-size: em(14);
 
 .annotatable-wrapper {
   position: relative;
@@ -23,7 +23,7 @@ $body-font-size: em(14);
 .annotatable-section {
   position: relative;
   padding: .5em 1em;
-  border: 1px solid $border-color;
+  border: 1px solid $annotatable--border-color;
   border-radius: .5em;
   margin-bottom: .5em;
 
@@ -34,7 +34,7 @@ $body-font-size: em(14);
     a { font-weight: normal; }
   }
   .annotatable-section-body {
-    border-top: 1px solid $border-color;
+    border-top: 1px solid $annotatable--border-color;
     margin-top: .5em;
     padding-top: .5em;
     @include clearfix;
@@ -45,9 +45,9 @@ $body-font-size: em(14);
     margin-left: 4em;
     b { font-weight: bold; }
     i { font-style: italic; }
-    code { 
+    code {
       display: inline;
-      white-space: pre; 
+      white-space: pre;
       font-family: Courier New, monospace;
     }
   }
@@ -105,7 +105,7 @@ $body-font-size: em(14);
 }
 
 .ui-tooltip.qtip.ui-tooltip {
-  font-size: $body-font-size;
+  font-size: $annotatable--body-font-size;
   border: 1px solid #333;
   border-radius: 1em;
   background-color: rgba(0,0,0,.85);
@@ -123,7 +123,7 @@ $body-font-size: em(14);
       border-bottom: 2px solid #333;
       font-weight: bold;
     }
-    .ui-tooltip-icon { 
+    .ui-tooltip-icon {
       right: 10px;
       background: #333;
     }
@@ -140,16 +140,16 @@ $body-font-size: em(14);
     padding: 0 10px 10px 10px;
     background-color: transparent;
     border-color: transparent;
-  } 
-  p { 
-      color: inherit; 
+  }
+  p {
+      color: inherit;
       line-height: normal;
   }
 }
 
 .ui-tooltip.qtip.ui-tooltip-annotatable {
   max-width: 375px;
-  .ui-tooltip-content {  
+  .ui-tooltip-content {
     padding: 0 10px;
     .annotatable-comment {
       display: block;

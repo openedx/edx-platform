@@ -17,10 +17,10 @@ from student.views import _parse_course_id_from_string, _get_course_enrollment_d
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore.django import modulestore
 
 from external_auth.models import ExternalAuthMap
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
@@ -289,7 +289,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
     Tests how login_user() interacts with ExternalAuth, in particular Shib
     """
     def setUp(self):
-        self.store = editable_modulestore()
+        self.store = modulestore()
         self.course = CourseFactory.create(org='Stanford', number='456', display_name='NO SHIB')
         self.shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         self.shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'

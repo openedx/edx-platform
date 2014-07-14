@@ -48,55 +48,47 @@
     },
     "MODULESTORE": {
         "default": {
-            "DOC_STORE_CONFIG": {
-                "collection": "modulestore",
-                "db": "test",
-                "host": [
-                    "localhost"
-                ],
-                "password": "password",
-                "port": 27017,
-                "user": "edxapp"
-            },
-            "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
+            "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
-                "collection": "modulestore",
-                "db": "test",
-                "default_class": "xmodule.hidden_module.HiddenDescriptor",
-                "fs_root": "** OVERRIDDEN **",
-                "host": [
-                    "localhost"
-                ],
-                "password": "password",
-                "port": 27017,
-                "render_template": "edxmako.shortcuts.render_to_string",
-                "user": "edxapp"
-            }
-        },
-        "direct": {
-            "DOC_STORE_CONFIG": {
-                "collection": "modulestore",
-                "db": "test",
-                "host": [
-                    "localhost"
-                ],
-                "password": "password",
-                "port": 27017,
-                "user": "edxapp"
-            },
-            "ENGINE": "xmodule.modulestore.mongo.MongoModuleStore",
-            "OPTIONS": {
-                "collection": "modulestore",
-                "db": "test",
-                "default_class": "xmodule.hidden_module.HiddenDescriptor",
-                "fs_root": "** OVERRIDDEN **",
-                "host": [
-                    "localhost"
-                ],
-                "password": "password",
-                "port": 27017,
-                "render_template": "edxmako.shortcuts.render_to_string",
-                "user": "edxapp"
+                "mappings": {},
+                "reference_type": "Location",
+                "stores": [
+                    {
+                        "NAME": "draft",
+                        "DOC_STORE_CONFIG": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "host": [
+                                "localhost"
+                            ],
+                            "password": "password",
+                            "port": 27017,
+                            "user": "edxapp"
+                        },
+                        "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
+                        "OPTIONS": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor",
+                            "fs_root": "** OVERRIDDEN **",
+                            "host": [
+                                "localhost"
+                            ],
+                            "password": "password",
+                            "port": 27017,
+                            "render_template": "edxmako.shortcuts.render_to_string",
+                            "user": "edxapp"
+                        }
+                    },
+                    {
+                        "NAME": "xml",
+                        "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
+                        "OPTIONS": {
+                            "data_dir": "** OVERRIDDEN **",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor"
+                        }
+                    }
+                ]
             }
         }
     },

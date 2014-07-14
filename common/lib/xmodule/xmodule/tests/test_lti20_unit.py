@@ -36,6 +36,8 @@ class LTI20RESTResultServiceTest(LogicTest):
             (u"plaintext", u"plaintext"),
             (u"a <script>alert(3)</script>", u"a &lt;script&gt;alert(3)&lt;/script&gt;"),  # encodes scripts
             (u"<b>bold 包</b>", u"<b>bold 包</b>"),  # unicode, and <b> tags pass through
+            (u'<img src="image.jpg" alt="alt" title="title" height="50" width="50">',  # attributes are not identical
+             u'<img src="image.jpg" alt="alt" height="50" width="50" title="title">')  # b/c sanitizer changes order
         )
         for case in test_cases:
             self.xmodule.score_comment = case[0]

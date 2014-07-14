@@ -30,9 +30,9 @@ The following documentation is available:
   * Updated `Working with HTML Components`_ to reflect the new HTML editor.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
   *  Added the `Custom JavaScript Applications`_ chapter.
 

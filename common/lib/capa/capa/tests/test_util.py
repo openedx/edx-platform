@@ -1,9 +1,10 @@
-"""Tests capa util"""
-
+"""
+Tests capa util
+"""
 import unittest
 import textwrap
 from . import test_capa_system
-from capa.util import compare_with_tolerance
+from capa.util import compare_with_tolerance, sanitize_html
 
 
 class UtilTest(unittest.TestCase):
@@ -80,3 +81,18 @@ class UtilTest(unittest.TestCase):
         self.assertFalse(result)
         result = compare_with_tolerance(infinity, infinity, '1.0', False)
         self.assertTrue(result)
+
+
+    def test_sanitize_html(self):
+        """
+        Test for html sanitization with bleach.
+        """
+        allowed_tags = ['div', 'p', 'audio', 'pre', 'span']
+        for tag in allowed_tags:
+            queue_msg = "<{0}>Test message</{0}>".format(tag)
+            self.assertEqual(sanitize_html(queue_msg), queue_msg)
+
+        not_allowed_tag = 'script'
+        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        self.assertEqual(sanitize_html(queue_msg), expected)

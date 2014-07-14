@@ -41,18 +41,13 @@ def user_track(request):
     except:
         username = "anonymous"
 
-    try:
-        scookie = request.META['HTTP_COOKIE']  # Get cookies
-        scookie = ";".join([c.split('=')[1] for c in scookie.split(";") if "sessionid" in c]).strip()  # Extract session ID
-    except:
-        scookie = ""
-
     page = request.REQUEST['page']
 
     with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
+        context = eventtracker.get_tracker().resolve_context()
         event = {
             "username": username,
-            "session": scookie,
+            "session": context.get('session', ''),
             "ip": _get_request_header(request, 'REMOTE_ADDR'),
             "event_source": "browser",
             "event_type": request.REQUEST['event_type'],
@@ -61,7 +56,7 @@ def user_track(request):
             "page": page,
             "time": datetime.datetime.utcnow(),
             "host": _get_request_header(request, 'SERVER_NAME'),
-            "context": eventtracker.get_tracker().resolve_context(),
+            "context": context,
         }
 
     log_event(event)

@@ -1,7 +1,7 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.locator import BlockUsageLocator, LocalId, CourseLocator
+from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xblock.runtime import KvsFieldData
@@ -66,7 +66,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         json_data = self.module_data.get(block_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [block_id], lazy=self.lazy)
+            course_info = course_entry_override or self.course_entry
+            course_key = CourseLocator(
+                course_info.get('org'), course_info.get('offering'), course_info.get('branch'),
+                course_info['structure']['_id']
+            )
+            self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
             json_data = self.module_data.get(block_id)
             if json_data is None:
                 raise ItemNotFoundError(block_id)
@@ -112,9 +117,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             block_id=block_id,
         )
 
+        converted_fields = self.modulestore.convert_references_to_keys(
+            block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry['structure']['blocks'],
+        )
         kvs = SplitMongoKVS(
             definition,
-            json_data.get('fields', {}),
+            converted_fields,
             json_data.get('_inherited_settings'),
         )
         field_data = KvsFieldData(kvs)

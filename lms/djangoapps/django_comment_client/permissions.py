@@ -5,7 +5,7 @@ Module for checking permissions with the comment_client backend
 import logging
 from types import NoneType
 from django.core import cache
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 
 CACHE = cache.get_cache('default')
 CACHE_LIFESPAN = 60

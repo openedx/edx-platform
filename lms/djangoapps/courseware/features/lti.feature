@@ -1,4 +1,4 @@
-@shard_1
+@shard_1 @requires_stub_lti
 Feature: LMS.LTI component
   As a student, I want to view LTI component in LMS.
 
@@ -79,7 +79,7 @@ Feature: LMS.LTI component
   And I see graph with total progress "5%"
 
   #9
-  Scenario: Graded LTI component in LMS is correctly works with LTI2.0 PUT callback
+  Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
   | open_in_a_new_page | weight | is_graded | has_score |
@@ -97,7 +97,7 @@ Feature: LMS.LTI component
   Then I see LTI component feedback with text "This is awesome."
 
   #10
-  Scenario: Graded LTI component in LMS is correctly works with LTI2.0 PUT delete callback
+  Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT delete callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
   | open_in_a_new_page | weight | is_graded | has_score |

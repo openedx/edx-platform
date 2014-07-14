@@ -7,6 +7,8 @@ from freezegun import freeze_time
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from eventtracking import tracker
+
 from datetime import datetime
 expected_time = datetime(2013, 10, 3, 8, 24, 55)
 
@@ -34,11 +36,12 @@ class TestTrackViews(TestCase):
             'event_type': sentinel.event_type,
             'event': {}
         })
-        views.user_track(request)
+        with tracker.get_tracker().context('edx.request', {'session': sentinel.session}):
+            views.user_track(request)
 
         expected_event = {
             'username': 'anonymous',
-            'session': '',
+            'session': sentinel.session,
             'ip': '127.0.0.1',
             'event_source': 'browser',
             'event_type': str(sentinel.event_type),
@@ -50,6 +53,7 @@ class TestTrackViews(TestCase):
             'context': {
                 'course_id': 'foo/bar/baz',
                 'org_id': 'foo',
+                'session': sentinel.session,
             },
         }
         self.mock_tracker.send.assert_called_once_with(expected_event)

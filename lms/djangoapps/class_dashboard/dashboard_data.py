@@ -12,10 +12,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from analytics.csvs import create_csv_response
 
-from xmodule.modulestore import Location
+from opaque_keys.edx.locations import Location
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
+PROB_TYPE_LIST = [
+    'problem',
+    'lti',
+]
 
 def get_problem_grade_distribution(course_id):
     """
@@ -35,7 +39,7 @@ def get_problem_grade_distribution(course_id):
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         grade__isnull=False,
-        module_type__exact="problem",
+        module_type__in=PROB_TYPE_LIST,
     ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
 
     prob_grade_distrib = {}
@@ -108,7 +112,7 @@ def get_problem_set_grade_distrib(course_id, problem_set):
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         grade__isnull=False,
-        module_type__exact="problem",
+        module_type__in=PROB_TYPE_LIST,
         module_state_key__in=problem_set,
     ).values(
         'module_state_key',
@@ -168,7 +172,7 @@ def get_d3_problem_grade_distrib(course_id):
                 for child in unit.get_children():
 
                     # Student data is at the problem level
-                    if child.location.category == 'problem':
+                    if child.location.category in PROB_TYPE_LIST:
                         c_problem += 1
                         stack_data = []
 
@@ -325,7 +329,7 @@ def get_d3_section_grade_distrib(course_id, section):
             c_unit += 1
             c_problem = 0
             for child in unit.get_children():
-                if (child.location.category == 'problem'):
+                if child.location.category in PROB_TYPE_LIST:
                     c_problem += 1
                     problem_set.append(child.location)
                     problem_info[child.location] = {
@@ -491,7 +495,7 @@ def get_students_problem_grades(request, csv=False):
     # Query for "problem grades" students
     students = models.StudentModule.objects.select_related('student').filter(
         module_state_key=module_state_key,
-        module_type__exact='problem',
+        module_type__in=PROB_TYPE_LIST,
         grade__isnull=False,
     ).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')
 

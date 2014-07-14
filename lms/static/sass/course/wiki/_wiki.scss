@@ -793,7 +793,7 @@ section.wiki {
       @include clearfix;
 
       a {
-        @include inline-block;
+        display: inline-block;
       }
     }
 

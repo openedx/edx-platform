@@ -2,7 +2,7 @@
 from mock import MagicMock
 import xmodule.tabs as tabs
 import unittest
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class TabTestCase(unittest.TestCase):
@@ -298,7 +298,7 @@ class GradingTestCase(TabTestCase):
         self.check_can_display_results(peer_grading_tab, for_authenticated_users_only=True)
         open_ended_grading_tab = self.check_grading_tab(
             tabs.OpenEndedGradingTab,
-            'Open Ended Panel',
+            'Assessment Panel',
             'open_ended_notifications'
         )
         self.check_can_display_results(open_ended_grading_tab, for_authenticated_users_only=True)

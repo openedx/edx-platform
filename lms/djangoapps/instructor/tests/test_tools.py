@@ -17,7 +17,7 @@ from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from ..views import tools
 

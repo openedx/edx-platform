@@ -18,7 +18,7 @@ from django.test.utils import override_settings
 from contentstore.tests.utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
 FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True

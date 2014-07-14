@@ -10,11 +10,11 @@ from django.conf import settings
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 
-from xmodule.video_module import create_youtube_string
+from xmodule.video_module import create_youtube_string, VideoDescriptor
+from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests import get_test_descriptor_system
-from xmodule.modulestore import Location
-from xmodule.video_module import VideoDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.tests.test_video import VideoDescriptorTestBase
+
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -26,13 +26,8 @@ class TestVideoYouTube(TestVideo):
 
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
-        context = self.item_descriptor.render('student_view').content
-
-        sources = {
-            'main': u'example.mp4',
-            u'mp4': u'example.mp4',
-            u'webm': u'example.webm',
-        }
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
@@ -43,6 +38,7 @@ class TestVideoYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'show_captions': 'true',
             'handout': None,
+            'download_video_link': u'example.mp4',
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -57,7 +53,7 @@ class TestVideoYouTube(TestVideo):
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
             'transcript_language': u'en',
-            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk":  u"Українська"})),
+            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk": u"Українська"})),
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation'
             ).rstrip('/?'),
@@ -94,13 +90,8 @@ class TestVideoNonYouTube(TestVideo):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
-        sources = {
-            'main': u'example.mp4',
-            u'mp4': u'example.mp4',
-            u'webm': u'example.webm',
-        }
-
-        context = self.item_descriptor.render('student_view').content
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
@@ -108,6 +99,7 @@ class TestVideoNonYouTube(TestVideo):
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
             'sources': sources,
@@ -149,7 +141,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
-        self.setup_course();
+        self.setup_course()
 
     def test_get_html_track(self):
         SOURCE_XML = """
@@ -202,19 +194,17 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcripts': '<transcript language="uk" src="ukrainian.srt" />',
             },
         ]
+        sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': None,
-            'sources': {
-                'main': u'example.mp4',
-                u'mp4': u'example.mp4',
-                u'webm': u'example.webm'
-            },
+            'sources': sources,
             'start': 3603.0,
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
@@ -242,7 +232,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor, 'transcript', 'download'
             ).rstrip('/?')
 
-            context = self.item_descriptor.render('student_view').content
+            context = self.item_descriptor.render(STUDENT_VIEW).content
 
             expected_context.update({
                 'transcript_download_format': None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt',
@@ -285,9 +275,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'main': u'example_source.mp4',
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'download_video_link': u'example_source.mp4',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
             {
@@ -298,9 +287,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'main': u'example.mp4',
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'download_video_link': u'example.mp4',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
             {
@@ -319,20 +307,20 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    u'mp4': u'example.mp4',
-                    u'webm': u'example.webm',
+                    'sources': json.dumps([u'example.mp4', u'example.webm']),
                 },
             },
         ]
 
-        expected_context = {
+        initial_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
             'display_name': u'A Name',
+            'download_video_link': None,
             'end': 3610.0,
             'id': None,
-            'sources': None,
+            'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,
             'start': 3603.0,
@@ -357,8 +345,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 sources=data['sources']
             )
             self.initialize_module(data=DATA)
-            context = self.item_descriptor.render('student_view').content
+            context = self.item_descriptor.render(STUDENT_VIEW).content
 
+            expected_context = dict(initial_context)
             expected_context.update({
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation'
@@ -367,15 +356,114 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'sources': data['result'],
                 'id': self.item_descriptor.location.html_id(),
             })
+            expected_context.update(data['result'])
 
             self.assertEqual(
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
+    @patch('xmodule.video_module.video_module.get_video_from_cdn')
+    def test_get_html_cdn_source(self, mocked_get_video):
+        """
+        Test if sources got from CDN.
+        """
+        def side_effect(*args, **kwargs):
+            cdn = {
+            'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
+            'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
+            }
+            return cdn.get(args[1])
+
+        mocked_get_video.side_effect = side_effect
+
+        SOURCE_XML = """
+            <video show_captions="true"
+            display_name="A Name"
+            sub="a_sub_file.srt.sjson" source="{source}"
+            download_video="{download_video}"
+            start_time="01:00:03" end_time="01:00:10"
+            >
+                {sources}
+            </video>
+        """
+        cases = [
+            #
+            {
+                'download_video': 'true',
+                'source': 'example_source.mp4',
+                'sources': """
+                    <source src="http://example.com/example.mp4"/>
+                    <source src="http://example.com/example.webm"/>
+                """,
+                'result': {
+                    'download_video_link': u'example_source.mp4',
+                    'sources': json.dumps(
+                        [
+                            u'http://cdn_example.com/example.mp4',
+                            u'http://cdn_example.com/example.webm'
+                        ]
+                    ),
+                },
+            },
+        ]
+
+        initial_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'show_captions': 'true',
+            'handout': None,
+            'display_name': u'A Name',
+            'download_video_link': None,
+            'end': 3610.0,
+            'id': None,
+            'sources': '[]',
+            'speed': 'null',
+            'general_speed': 1.0,
+            'start': 3603.0,
+            'saved_video_position': 0.0,
+            'sub': u'a_sub_file.srt.sjson',
+            'track': None,
+            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_api_url': 'www.youtube.com/iframe_api',
+            'yt_test_url': 'gdata.youtube.com/feeds/api/videos/',
+            'transcript_download_format': 'srt',
+            'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
+            'transcript_language': u'en',
+            'transcript_languages': '{"en": "English"}',
+        }
+
+        for data in cases:
+            DATA = SOURCE_XML.format(
+                download_video=data['download_video'],
+                source=data['source'],
+                sources=data['sources']
+            )
+            self.initialize_module(data=DATA)
+            self.item_descriptor.xmodule_runtime.user_location = 'CN'
+
+            context = self.item_descriptor.render('student_view').content
+
+            expected_context = dict(initial_context)
+            expected_context.update({
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript', 'translation'
+                ).rstrip('/?'),
+                'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript', 'available_translations'
+                ).rstrip('/?'),
+                'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'id': self.item_descriptor.location.html_id(),
+            })
+            expected_context.update(data['result'])
+
+            self.assertEqual(
+                context,
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
 
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -386,7 +474,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
-        self.setup_course();
+        self.setup_course()
 
     def test_source_not_in_html5sources(self):
         metadata = {
@@ -505,20 +593,12 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
-class VideoDescriptorTest(unittest.TestCase):
+class VideoDescriptorTest(VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.
     """
-
     def setUp(self):
-        system = get_test_descriptor_system()
-        course_key = SlashSeparatedCourseKey('org', 'course', 'run')
-        usage_key = course_key.make_usage_key('video', 'name')
-        self.descriptor = system.construct_xblock_from_class(
-            VideoDescriptor,
-            scope_ids=ScopeIds(None, None, usage_key, usage_key),
-            field_data=DictFieldData({}),
-        )
+        super(VideoDescriptorTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
 
     def test_get_context(self):

@@ -7,8 +7,8 @@ from instructor.offline_gradecalc import offline_grade_calculation
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from django.core.management.base import BaseCommand
 

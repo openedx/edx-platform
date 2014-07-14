@@ -40,7 +40,7 @@ nav.course-material {
       &.prominent {
         margin-right: 16px;
         background: rgba(255, 255, 255, .5);
-        border-radius: 3px; 
+        border-radius: 3px;
       }
 
       &.prominent + li {
@@ -112,7 +112,7 @@ header.global.slim {
       font-family: $sans-serif;
       font-size: 14px;
       font-weight: bold;
-      @include inline-block;
+      display: inline-block;
       letter-spacing: 0;
       line-height: 1em;
       margin: 4px;

@@ -4,12 +4,12 @@
     $query: $default-feature nth($query, 1) $total-columns;
   }
 
-  @else if length($query) == 2 or length($query) == 4 {
+  @else if length($query) % 2 == 0 {
     $query: append($query, $total-columns);
   }
 
   @if not belongs-to($query, $visual-grid-breakpoints) {
-    $visual-grid-breakpoints: append($visual-grid-breakpoints, $query, comma);
+    $visual-grid-breakpoints: append($visual-grid-breakpoints, $query, comma) !global;
   }
 
   @return $query;

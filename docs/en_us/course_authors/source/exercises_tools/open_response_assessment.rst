@@ -614,13 +614,13 @@ The Staff Grading Page
 =======================
 
 When a response is available for you to grade, a yellow exclamation mark
-appears next to **Open Ended Panel** at the top of the screen.
+appears next to **Assessment Panel** at the top of the screen.
 
 .. image:: /Images/OpenEndedPanel.png
 
-To access the **Staff Grading** page, click **Open Ended Panel**.
+To access the **Staff Grading** page, click **Assessment Panel**.
 
-When the **Open Ended Console** page opens, click **Staff Grading**.
+When the **Assessment Console** page opens, click **Staff Grading**.
 Notice the **New submissions to grade** notification.
 
 .. image:: /Images/OpenEndedConsole_NewSubmissions.png
@@ -762,19 +762,20 @@ Note that if the same 20-point problem changes the assessment order, the student
 Accessing Scores
 ================
 
-You access your scores for your responses to AI and peer assessment problems through the **Open Ended Console** page.
+You access your scores for your responses to AI and peer assessment
+problems through the **Assessment Console** page.
 
-#. From any page in the LMS, click the **Open Ended Panel** tab at the
+#. From any page in the LMS, click the **Assessment Panel** tab at the
    top of the page.
 
 .. image:: /Images/OpenEndedPanel.png
 
-2. On the **Open Ended Console** page, click **Problems You Have
+2. On the **Assessment Console** page, click **Problems You Have
    Submitted**.
 
 .. image:: /Images/ProblemsYouHaveSubmitted.png
 
-3. On the **Open Ended Problems** page, check the **Status** column to
+3. On the **Assessment Problems** page, check the **Status** column to
    see whether your responses have been graded.
 #. When grading for a problem has been finished, click the name of a
    problem in the list to see your score for that problem. When you

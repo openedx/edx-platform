@@ -20,7 +20,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
@@ -91,6 +91,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         error_descriptor_class=ErrorDescriptor,
         get_user_role=Mock(is_staff=False),
         descriptor_runtime=get_test_descriptor_system(),
+        user_location=Mock(),
     )
 
 

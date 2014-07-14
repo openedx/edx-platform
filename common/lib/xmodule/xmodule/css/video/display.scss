@@ -13,6 +13,7 @@ div.video {
   margin: 0 -12px;
   padding: 12px;
   border-radius: 5px;
+  outline: none;
 
   &:focus, &:active, &:hover {
     border: 0;
@@ -458,14 +459,14 @@ div.video {
           float: left;
           position: relative;
 
-          &.open {
+          &.is-opened {
             .volume-slider-container {
               display: block;
               opacity: 1;
             }
           }
 
-          &.muted {
+          &.is-muted {
             & > a {
               background-image: url('../images/mute.png');
             }

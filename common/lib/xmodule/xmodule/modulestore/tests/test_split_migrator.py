@@ -5,15 +5,14 @@ Tests for split_migrator
 import uuid
 import random
 import mock
+from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.modulestore.split_migrator import SplitMigrator
-from xmodule.modulestore.mongo import draft
 from xmodule.modulestore.tests import test_location_mapper
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
-from nose.tools import nottest
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 
-@nottest
 class TestMigration(SplitWMongoCourseBoostrapper):
     """
     Test the split migrator
@@ -178,11 +177,13 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # check that locations match
         self.assertEqual(
             presplit_dag_root.location,
-            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(revision=None)
+            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(
+                revision=MongoRevisionKey.published
+            )
         )
         # compare all fields but children
-        for name in presplit_dag_root.fields.iterkeys():
-            if name != 'children':
+        for name, field in presplit_dag_root.fields.iteritems():
+            if not isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
                 self.assertEqual(
                     getattr(presplit_dag_root, name),
                     getattr(split_dag_root, name),
@@ -190,19 +191,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
                         split_dag_root.location, name, getattr(presplit_dag_root, name), getattr(split_dag_root, name)
                     )
                 )
-        # test split get_item using old Location: old draft store didn't set revision for things above vertical
-        # but split does distinguish these; so, set revision if not published
-        if not published:
-            location = draft.as_draft(presplit_dag_root.location)
-        else:
-            location = presplit_dag_root.location
-        refetched = self.split_mongo.get_item(location)
-        self.assertEqual(
-            refetched.location, split_dag_root.location,
-            "Fetch from split via old Location {} not same as new {}".format(
-                refetched.location, split_dag_root.location
-            )
-        )
+
         # compare children
         if presplit_dag_root.has_children:
             self.assertEqual(

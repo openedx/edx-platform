@@ -6,6 +6,7 @@ from fs.memoryfs import MemoryFS
 from xmodule.tests import get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
+from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
 
 
 class BaseVerticalModuleTest(XModuleXmlImportTest):
@@ -46,19 +47,28 @@ class VerticalModuleTestCase(BaseVerticalModuleTest):
         """
         Test the rendering of the student view.
         """
-        html = self.module_system.render(self.vertical, 'student_view', {}).content
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, {}).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
 
     def test_render_studio_view(self):
         """
-        Test the rendering of the Studio view
+        Test the rendering of the Studio author view
         """
+        # Vertical shouldn't render children on the unit page
+        context = {
+            'container_view': False,
+        }
+        html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
+        self.assertNotIn(self.test_html_1, html)
+        self.assertNotIn(self.test_html_2, html)
+
+        # Vertical should render reorderable children on the container page
         reorderable_items = set()
         context = {
-            'runtime_type': 'studio',
+            'container_view': True,
             'reorderable_items': reorderable_items,
         }
-        html = self.module_system.render(self.vertical, 'student_view', context).content
+        html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)

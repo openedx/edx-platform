@@ -8,8 +8,8 @@ import csv
 from instructor.views.legacy import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 from django.core.management.base import BaseCommand

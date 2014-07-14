@@ -195,3 +195,14 @@ class CourseNavPage(PageObject):
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
         return self.REMOVE_SPAN_TAG_RE.sub('', element.get_attribute('innerHTML')).strip().split('\n')[0]
+
+    def go_to_sequential_position(self, sequential_position):
+        """
+        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
+
+        Arguments:
+            sequential_position (int): position in sequential bar
+
+        """
+        sequential_position_css = '#tab_{0}'.format(sequential_position - 1)
+        self.q(css=sequential_position_css).first.click()

@@ -1,23 +1,24 @@
 import logging
 import json
 
-from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
 from django.contrib.auth.models import User
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from django.core.urlresolvers import reverse
 from django.core.management import call_command
-from util.testing import UrlResetMixin
-from django_comment_common.models import Role
-from django_comment_common.utils import seed_permissions_roles
-from django_comment_client.base import views
-from django_comment_client.tests.unicode import UnicodeTestMixin
+from django.core.urlresolvers import reverse
+from mock import patch, ANY
+from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
-from mock import patch, ANY
+from django_comment_client.base import views
+from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_common.models import Role, FORUM_ROLE_STUDENT
+from django_comment_common.utils import seed_permissions_roles
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 log = logging.getLogger(__name__)
 
@@ -732,3 +733,85 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_request.called)
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
+
+    def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
+        """
+        sets up a mock response from the comments service for getting post counts for our other_user
+        """
+        self._set_mock_request_data(mock_request, {
+            "threads_count": threads_count,
+            "comments_count": comments_count,
+        })
+
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        self.other_user = UserFactory.create(username="other")
+        CourseEnrollmentFactory(user=self.other_user, course_id=self.course.id)
+
+    def make_request(self, method='get', course_id=None, **kwargs):
+        course_id = course_id or self.course.id
+        request = getattr(RequestFactory(), method)("dummy_url", kwargs)
+        request.user = self.student
+        request.view_name = "users"
+        return views.users(request, course_id=course_id.to_deprecated_string())
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_finds_exact_match(self, mock_request):
+        self.set_post_counts(mock_request)
+        response = self.make_request(username="other")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content)["users"],
+            [{"id": self.other_user.id, "username": self.other_user.username}]
+        )
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_finds_no_match(self, mock_request):
+        self.set_post_counts(mock_request)
+        response = self.make_request(username="othor")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)["users"], [])
+
+    def test_requires_GET(self):
+        response = self.make_request(method='post', username="other")
+        self.assertEqual(response.status_code, 405)
+
+    def test_requires_username_param(self):
+        response = self.make_request()
+        self.assertEqual(response.status_code, 400)
+        content = json.loads(response.content)
+        self.assertIn("errors", content)
+        self.assertNotIn("users", content)
+
+    def test_course_does_not_exist(self):
+        course_id = SlashSeparatedCourseKey.from_deprecated_string("does/not/exist")
+        response = self.make_request(course_id=course_id, username="other")
+
+        self.assertEqual(response.status_code, 404)
+        content = json.loads(response.content)
+        self.assertIn("errors", content)
+        self.assertNotIn("users", content)
+
+    def test_requires_requestor_enrolled_in_course(self):
+        # unenroll self.student from the course.
+        self.enrollment.delete()
+
+        response = self.make_request(username="other")
+        self.assertEqual(response.status_code, 404)
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key("errors"))
+        self.assertFalse(content.has_key("users"))
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_requires_matched_user_has_forum_content(self, mock_request):
+        self.set_post_counts(mock_request, 0, 0)
+        response = self.make_request(username="other")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)["users"], [])
