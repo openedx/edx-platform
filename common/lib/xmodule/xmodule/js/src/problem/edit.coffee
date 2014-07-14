@@ -213,7 +213,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     MarkdownEditingDescriptor.questionHintStrings.push(feedbackString)  # add a feedback string entry (possibly null)
     MarkdownEditingDescriptor.questionHintMatches.push(matchString)     # add a match string entry (possibly null)
-
     return answerString
 
   @parseForProblemHints: (xmlString) ->
@@ -236,19 +235,79 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           hintText = splitMatches[2]
           MarkdownEditingDescriptor.problemHintsBooleanStrings.push(hintText)
           MarkdownEditingDescriptor.problemHintsBooleanExpressions.push(booleanExpression)
-
-        xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
     return xmlString;
 
   @insertBooleanHints: (xmlStringUnderConstruction) ->
     index = 0
     for booleanExpression in MarkdownEditingDescriptor.problemHintsBooleanExpressions
       hintText = MarkdownEditingDescriptor.problemHintsBooleanStrings[index]
-      booleanHintElement  = '    <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
-      booleanHintElement += '    </booleanhint>\n'
+      booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
+      booleanHintElement += '        </booleanhint>\n'
       xmlStringUnderConstruction += booleanHintElement
       index = index + 1
     return xmlStringUnderConstruction
+
+
+
+  @parseForCheckbox: (xmlString) ->
+    isCheckboxType = false
+
+    returnXmlString =  '    <choiceresponse>\n'
+    returnXmlString += '        <checkboxgroup direction="vertical">\n'
+
+    for line in xmlString.split('\n')
+      hintText = ''
+      correctnessText = ''
+      itemText = ''
+      choiceMatches = line.match( /\s+\[\s*x?\s*\][^\n]+/ )
+      if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
+        isCheckboxType = true
+        hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+        if hintMatches
+          matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
+          hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
+          line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+
+
+        itemMatches = line.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+        if itemMatches
+          correctnessText = 'False'
+          if itemMatches[1].match(/X/i)
+            correctnessText = 'True'
+          correctnessTextList = correctnessText
+          itemText = itemMatches[2].trim()
+
+        returnXmlString += '          <choice  correct="' + correctnessText + '">'
+        returnXmlString += '              ' + itemText + '\n'
+        if hintText
+          returnXmlString += '               <choicehint>' + hintText + '\n'
+          returnXmlString += '               </choicehint>\n'
+        returnXmlString += '          </choice>\n'
+
+    returnXmlString += '        </checkboxgroup>\n'
+
+    MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
+    returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+
+    returnXmlString += '    </choiceresponse>\n'
+
+    if not isCheckboxType
+      returnXmlString = xmlString
+
+    return returnXmlString
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
@@ -266,7 +325,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       MarkdownEditingDescriptor.problemHintsBooleanExpressions = [];
       MarkdownEditingDescriptor.problemHintsBooleanStrings = [];
 
-      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);            // pull out any problem hints
+      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);      // pull out any problem hints
+      debugger;
+      xml = MarkdownEditingDescriptor.parseForCheckbox(xml);          // examine the string for a checkbox problem
+      debugger;
 
       // group multiple choice answers
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
@@ -276,7 +338,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
 
-            options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i], i);
+            options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i]);
             hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
             hintElement = '';
             if (hintString.length > 0) {
@@ -312,40 +374,42 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         result += '        </choicegroup>\n';
         result += '    </multiplechoiceresponse>\n\n';
 
-
-
         return result;
       });
 
-      // group check answers
-      xml = MarkdownEditingDescriptor.parseForCompoundConditionHints(xml);  // pull out any compound condition hints
-      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
-          var groupString = '    <choiceresponse>\n',
-              options, value, correct;
 
-          groupString += '        <checkboxgroup direction="vertical">\n';
-          options = match.split('\n');
-
-          for (i = 0; i < options.length; i += 1) {
-              if(options[i].length > 0) {
-                  options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i], i);
-                  hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
-                  hintElement = '';
-                  if (hintString.length > 0) {
-                    hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
-                  }
-                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
-                  correct = /^\s*\[x\]/i.test(options[i]);
-                  groupString += '        <choice  correct="' + correct + '">' + value + hintElement + '        </choice>\n';
-               }
-          }
-
-          groupString += '        </checkboxgroup>\n';
-          groupString += '    </choiceresponse>\n\n';
-          groupString = MarkdownEditingDescriptor.insertBooleanHints(groupString);
-
-          return groupString;
-      });
+//
+//
+//
+//      xml = xml.replace(/(\s+\[\s*x?\s*\].+{\n)+/g, function(match) {
+//          var groupString = '    <choiceresponse>\n',
+//              options, value, correct;
+//
+//          confirm('115 - ' + match)
+//          groupString += '        <checkboxgroup direction="vertical">\n';
+//          options = match.split('\n');
+//          confirm('107 - ' + options[0])
+//
+//          for (i = 0; i < options.length; i += 1) {
+//              if(options[i].length > 0) {
+//                  options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i]);
+//                  hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
+//                  hintElement = '';
+//                  if (hintString.length > 0) {
+//                    hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
+//                  }
+//                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
+//                  correct = /^\s*\[x\]/i.test(options[i]);
+//                  groupString += '        <choice  correct="' + correct + '">' + value + hintElement + '        </choice>\n';
+//               }
+//          }
+//
+//          groupString += '        </checkboxgroup>\n';
+//          groupString += '    </choiceresponse>\n\n';
+//          groupString = MarkdownEditingDescriptor.insertBooleanHints(groupString);
+//
+//          return groupString;
+//      });
 
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
