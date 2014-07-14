@@ -9,8 +9,9 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
+from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xmodule.modulestore.django import modulestore
@@ -260,3 +261,57 @@ class XBlockVisibilityTestCase(TestCase):
             modulestore().publish(location, self.dummy_user)
 
         return vertical
+
+
+class ReleaseDateSourceTest(CourseTestCase):
+    """Tests for finding the source of an xblock's release date."""
+
+    def setUp(self):
+        super(ReleaseDateSourceTest, self).setUp()
+
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+
+        # Read again so that children lists are accurate
+        self.chapter = self.store.get_item(self.chapter.location)
+        self.sequential = self.store.get_item(self.sequential.location)
+        self.vertical = self.store.get_item(self.vertical.location)
+
+        self.date_one = datetime(1980, 1, 1, tzinfo=UTC)
+        self.date_two = datetime(2020, 1, 1, tzinfo=UTC)
+
+    def _update_release_dates(self, chapter_start, sequential_start, vertical_start):
+        """Sets the release dates of the chapter, sequential, and vertical"""
+        self.chapter.start = chapter_start
+        self.chapter = self.store.update_item(self.chapter, ModuleStoreEnum.UserID.test)
+        self.sequential.start = sequential_start
+        self.sequential = self.store.update_item(self.sequential, ModuleStoreEnum.UserID.test)
+        self.vertical.start = vertical_start
+        self.vertical = self.store.update_item(self.vertical, ModuleStoreEnum.UserID.test)
+
+    def _verify_release_date_source(self, item, expected_source):
+        """Helper to verify that the release date source of a given item matches the expected source"""
+        source = utils.find_release_date_source(item)
+        self.assertEqual(source.location, expected_source.location)
+        self.assertEqual(source.start, expected_source.start)
+
+    def test_chapter_source_for_vertical(self):
+        """Tests a vertical's release date being set by its chapter"""
+        self._update_release_dates(self.date_one, self.date_one, self.date_one)
+        self._verify_release_date_source(self.vertical, self.chapter)
+
+    def test_sequential_source_for_vertical(self):
+        """Tests a vertical's release date being set by its sequential"""
+        self._update_release_dates(self.date_one, self.date_two, self.date_two)
+        self._verify_release_date_source(self.vertical, self.sequential)
+
+    def test_chapter_source_for_sequential(self):
+        """Tests a sequential's release date being set by its chapter"""
+        self._update_release_dates(self.date_one, self.date_one, self.date_one)
+        self._verify_release_date_source(self.sequential, self.chapter)
+
+    def test_sequential_source_for_sequential(self):
+        """Tests a sequential's release date being set by itself"""
+        self._update_release_dates(self.date_one, self.date_two, self.date_two)
+        self._verify_release_date_source(self.sequential, self.sequential)
