@@ -9,20 +9,17 @@ import shutil
 import tarfile
 import tempfile
 from path import path
-from pymongo import MongoClient
 from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
 from contentstore.utils import reverse_course_url
 
-from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.tests.factories import ItemFactory
 
 from contentstore.tests.utils import CourseTestCase
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore.django import modulestore
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -70,8 +67,6 @@ class ImportTestCase(CourseTestCase):
 
     def tearDown(self):
         shutil.rmtree(self.content_dir)
-        modulestore().contentstore.drop_database()
-        _CONTENTSTORE.clear()
 
     def test_no_coursexml(self):
         """

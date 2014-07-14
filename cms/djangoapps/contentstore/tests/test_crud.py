@@ -20,7 +20,7 @@ class TemplateTests(unittest.TestCase):
 
     def setUp(self):
         clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
         self.split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 

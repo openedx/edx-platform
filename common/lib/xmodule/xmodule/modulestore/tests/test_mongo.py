@@ -74,7 +74,6 @@ class TestMongoModuleStore(unittest.TestCase):
             tz_aware=True,
             document_class=dict,
         )
-        cls.connection.drop_database(DB)
 
         # NOTE: Creating a single db for all the tests to save time.  This
         # is ok only as long as none of the tests modify the db.

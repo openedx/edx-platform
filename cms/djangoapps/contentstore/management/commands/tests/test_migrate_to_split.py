@@ -56,7 +56,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         password = 'foo'
         self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, ModuleStoreEnum.Type.split)
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
 
     def test_user_email(self):

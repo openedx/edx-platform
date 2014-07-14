@@ -393,11 +393,18 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Close all db connections
         """
-        for mstore in self.modulestores:
-            if hasattr(mstore, 'database'):
-                mstore.database.connection.close()
-            elif hasattr(mstore, 'db'):
-                mstore.db.connection.close()
+        for modulestore in self.modulestores:
+            modulestore.close_connections()
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop all databases and close all db connections.
+        Intended to be used by test code for cleanup.
+        """
+        for modulestore in self.modulestores:
+            # drop database if the store supports it (read-only stores do not)
+            if hasattr(modulestore, '_drop_database'):
+                modulestore._drop_database()  # pylint: disable=protected-access
 
     def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
         """
