@@ -41,6 +41,7 @@ def has_access(user, action, obj, course_key=None):
 
     Things this module understands:
     - start dates for modules
+    - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
 
@@ -247,6 +248,9 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
+            return False
+
         # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")

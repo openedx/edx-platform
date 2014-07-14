@@ -139,6 +139,10 @@ def is_xblock_visible_to_students(xblock):
     except ItemNotFoundError:
         return False
 
+    # If visible_to_staff_only is True, this xblock is not visible to students regardless of start date.
+    if published.visible_to_staff_only:
+        return False
+
     # Check start date
     if 'detached' not in published._class_tags and published.start is not None:
         return datetime.now(UTC) > published.start
