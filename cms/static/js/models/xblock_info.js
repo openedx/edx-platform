@@ -31,11 +31,6 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "has_changes": null,
             /**
-             * True iff a published version of the xblock exists with a release date in the past,
-             * and the xblock is not locked.
-             */
-            "released_to_students": null,
-            /**
              * True iff a published version of the xblock exists.
              */
             "published": null,
@@ -61,12 +56,18 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "published_by": null,
             /**
+             * True iff the release date of the xblock is in the past.
+             */
+            "released_to_students": null,
+            /**
              * If the xblock is published, the date on which it will be released to students.
+             * This can be null if the release date is unscheduled.
              */
             "release_date": null,
             /**
              * The xblock which is determining the release date. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
+             * This can be null if the release date is unscheduled.
              */
             "release_date_from":null
         },
