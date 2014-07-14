@@ -137,32 +137,29 @@ could advertise the start date as **Spring, 2014**.
 To set an advertised start date:
 
 #. From the **Settings** menu, select **Advanced Settings**.
-#. Find the policy key **advertised_start**. The default value is **null**.
-#. Enter the date you want as an advertised start date.  You can use any string,
-   enclosed in double quotation marks. If you format the string as a date (for
-   example, as 02/01/2014), the value is parsed and presented to students as a
-   date.
+#. Find the **Course Advertised Start Date** policy key. The default value is
+   **null**.
+#. Enter the value you want to display as the advertised start date. You can
+   use any string, enclosed in double quotation marks. If you format the string
+   as a date (for example, as 02/01/2014), the value is parsed and presented to
+   students as a date.
 
   .. image:: ../Images/advertised_start.png
-   :alt: Image of the advertised start date policy key
+   :alt: Image of the advertised start date policy key with a value of "anytime, self-paced"
 
 4. Click **Save Changes** at the bottom of the page.
 
-The start date shown on the student's dashboard is now the value of the
-advertised_start policy key:
+  The start date shown on the dashboard is now the value of the **Course
+  Advertised Start Date** policy key:
 
-.. image:: ../Images/dashboard-course_adver_start.png
- :alt: An image of a course listing in the student dashboard, with the
+  .. image:: ../Images/dashboard-course_adver_start.png
+   :alt: An image of a course listing in the student dashboard, with the
      advertised start date circled.
 
 If you do not change the default course start date (01/01/2030), and the
-**advertised_start** policy value is ``null``, then the student dashboard does
-not list a start date for the course.  Students just see that the course has not
-yet started:
-
-.. image:: ../Images/dashboard-course_not_started.png
- :alt: Image of a course listing in the student dashboard, with no start date
-
+**Course Advertised Start Date** policy value is ``null``, then the student
+dashboard does not list a start date for the course. Students just see that
+the course has not yet started.
 
 .. _The Course End Date:
 
