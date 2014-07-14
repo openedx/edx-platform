@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.contentstore.utils import empty_asset_trashcan
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from .prompt import query_yes_no
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
             course_ids = [course_key]
         else:
-            course_ids = [course.id for course in modulestore('direct').get_courses()]
+            course_ids = [course.id for course in modulestore().get_courses()]
 
         if query_yes_no("Emptying trashcan. Confirm?", default="no"):
             empty_asset_trashcan(course_ids)

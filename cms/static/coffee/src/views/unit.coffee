@@ -159,7 +159,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @wait(true)
             $.ajax({
                 type: 'DELETE',
-                url: @model.url() + "?" + $.param({recurse: true})
+                url: @model.url()
             }).success(=>
 
                 analytics.track "Deleted Draft",

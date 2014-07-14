@@ -8,7 +8,7 @@ from lxml import etree
 from xblock.fields import Dict, Scope, ScopeIds
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
-from xmodule.modulestore.xml_exporter import EdxJSONEncoder
+from xmodule.modulestore import EdxJSONEncoder
 from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)

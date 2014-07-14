@@ -22,7 +22,7 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)

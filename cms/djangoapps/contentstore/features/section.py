@@ -66,6 +66,16 @@ def i_click_to_edit_section_name(_step):
     world.css_click('span.section-name-span')
 
 
+@step('I click on section name in Section Release Date modal$')
+def i_click_on_section_name_in_modal(_step):
+    world.css_click('.modal-window .section-name')
+
+
+@step('I see no form for editing section name in modal$')
+def edit_section_name_form_not_exist(_step):
+    assert world.is_css_not_present('.modal-window .section-name input')
+
+
 @step('I see the complete section name with a quote in the editor$')
 def i_see_complete_section_name_with_quote_in_editor(_step):
     css = '.section-name-edit input[type=text]'

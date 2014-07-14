@@ -55,6 +55,7 @@ setup(
         'capa',
         'path.py',
         'webob',
+        'opaque-keys',
     ],
     package_data={
         'xmodule': ['js/module/*'],
@@ -67,20 +68,6 @@ setup(
         'xmodule.v1': XMODULES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
-        ],
-        'course_key': [
-            'slashes = xmodule.modulestore.locations:SlashSeparatedCourseKey',
-            'course-locator = xmodule.modulestore.locator:CourseLocator',
-        ],
-        'usage_key': [
-            'location = xmodule.modulestore.locations:Location',
-            'edx = xmodule.modulestore.locator:BlockUsageLocator',
-        ],
-        'asset_key': [
-            'asset-location = xmodule.modulestore.locations:AssetLocation',
-        ],
-        'definition_key': [
-            'defx = xmodule.modulestore.locator:DefinitionLocator',
         ],
     },
 )

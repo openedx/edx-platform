@@ -9,6 +9,11 @@ It's new improved video module, which support additional feature:
 in-browser HTML5 video method (when in HTML5 mode).
 - Navigational subtitles can be disabled altogether via an attribute
 in XML.
+
+Examples of html5 videos for manual testing:
+    https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4
+    https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
+    https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
 import json
 import logging
@@ -25,23 +30,17 @@ from django.conf import settings
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
-from .video_utils import create_youtube_string
+from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
-from urlparse import urlparse
-
-def get_ext(filename):
-    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
-    path = urlparse(filename).path
-    return path.rpartition('.')[-1]
-
+from xmodule.video_module import manage_video_subtitles_save
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
@@ -71,6 +70,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/00_video_storage.js'),
             resource_string(module, 'js/src/video/00_resizer.js'),
             resource_string(module, 'js/src/video/00_async_process.js'),
+            resource_string(module, 'js/src/video/00_i18n.js'),
             resource_string(module, 'js/src/video/00_sjson.js'),
             resource_string(module, 'js/src/video/00_iterator.js'),
             resource_string(module, 'js/src/video/01_initialize.js'),
@@ -93,17 +93,30 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
     ]}
     js_module_name = "Video"
 
+
     def get_html(self):
         track_url = None
+        download_video_link = None
         transcript_download_format = self.transcript_download_format
+        sources = filter(None, self.html5_sources)
 
-        sources = {get_ext(src): src for src in self.html5_sources}
+        # If the user comes from China use China CDN for html5 videos.
+        # 'CN' is China ISO 3166-1 country code.
+        # Video caching is disabled for Studio. User_location is always None in Studio.
+        # CountryMiddleware disabled for Studio.
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+
+        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            for index, source_url in enumerate(sources):
+                new_url = get_video_from_cdn(cdn_url, source_url)
+                if new_url:
+                    sources[index] = new_url
 
         if self.download_video:
             if self.source:
-                sources['main'] = self.source
+                download_video_link = self.source
             elif self.html5_sources:
-                sources['main'] = self.html5_sources[0]
+                download_video_link = self.html5_sources[0]
 
         if self.download_track:
             if self.track:
@@ -134,7 +147,11 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
                 languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
-        sorted_languages = OrderedDict(sorted(languages.items(), key=itemgetter(1)))
+        sorted_languages = sorted(languages.items(), key=itemgetter(1))
+        if 'table' in self.transcripts:
+            sorted_languages.insert(0, ('table', 'Table of Contents'))
+
+        sorted_languages = OrderedDict(sorted_languages)
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -147,7 +164,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'handout': self.handout,
             'id': self.location.html_id(),
             'show_captions': json.dumps(self.show_captions),
-            'sources': sources,
+            'download_video_link': download_video_link,
+            'sources': json.dumps(sources),
             'speed': json.dumps(self.speed),
             'general_speed': self.global_speed,
             'saved_video_position': self.saved_video_position.total_seconds(),
@@ -229,6 +247,37 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         if not download_track['explicitly_set'] and self.track:
             self.download_track = True
 
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Used to update video values during `self`:save method from CMS.
+
+        old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
+        old_content, same as `old_metadata` but for scope=content.
+
+        Due to nature of code flow in item.py::_save_item, before current function is called,
+        fields of `self` instance have been already updated, but not yet saved.
+
+        To obtain values, which were changed by user input,
+        one should compare own_metadata(self) and old_medatada.
+
+        Video player has two tabs, and due to nature of sync between tabs,
+        metadata from Basic tab is always sent when video player is edited and saved first time, for example:
+        {'youtube_id_1_0': u'OEoXaMPEzfM', 'display_name': u'Video', 'sub': u'OEoXaMPEzfM', 'html5_sources': []},
+        that's why these fields will always present in old_metadata after first save. This should be fixed.
+
+        At consequent save requests html5_sources are always sent too, disregard of their change by user.
+        That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
+        This should be fixed too.
+        """
+        metadata_was_changed_by_user = old_metadata != own_metadata(self)
+        if metadata_was_changed_by_user:
+            manage_video_subtitles_save(
+                self,
+                user,
+                old_metadata if old_metadata else None,
+                generate_translation=True
+            )
+
     def save_with_metadata(self, user):
         """
         Save module with updated metadata to database."
@@ -247,6 +296,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
 
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
+        languages.insert(0, {'label': 'Table of Contents', 'code': 'table'})
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(self, 'studio_transcript', 'translation').rstrip('/?')

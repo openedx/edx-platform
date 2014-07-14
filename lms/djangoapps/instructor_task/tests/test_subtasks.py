@@ -26,7 +26,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
             random_id = uuid4().hex[:8]
             self.create_student(username='student{0}'.format(random_id))
 
-    def _queue_subtasks(self, create_subtask_fcn, items_per_query, items_per_task, initial_count, extra_count):
+    def _queue_subtasks(self, create_subtask_fcn, items_per_task, initial_count, extra_count):
         """Queue subtasks while enrolling more students into course in the middle of the process."""
 
         task_id = str(uuid4())
@@ -53,43 +53,29 @@ class TestSubtasks(InstructorTaskCourseTestCase):
                 create_subtask_fcn=create_subtask_fcn,
                 item_queryset=task_queryset,
                 item_fields=[],
-                items_per_query=items_per_query,
                 items_per_task=items_per_task,
             )
 
     def test_queue_subtasks_for_query1(self):
-        """Test queue_subtasks_for_query() if in last query the subtasks only need to accommodate < items_per_tasks items."""
+        """Test queue_subtasks_for_query() if the last subtask only needs to accommodate < items_per_tasks items."""
 
         mock_create_subtask_fcn = Mock()
-        self._queue_subtasks(mock_create_subtask_fcn, 6, 3, 8, 1)
+        self._queue_subtasks(mock_create_subtask_fcn, 3, 7, 1)
 
         # Check number of items for each subtask
         mock_create_subtask_fcn_args = mock_create_subtask_fcn.call_args_list
         self.assertEqual(len(mock_create_subtask_fcn_args[0][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[1][0][0]), 3)
-        self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 3)
+        self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 2)
 
     def test_queue_subtasks_for_query2(self):
-        """Test queue_subtasks_for_query() if in last query the subtasks need to accommodate > items_per_task items."""
+        """Test queue_subtasks_for_query() if the last subtask needs to accommodate > items_per_task items."""
 
         mock_create_subtask_fcn = Mock()
-        self._queue_subtasks(mock_create_subtask_fcn, 6, 3, 8, 3)
+        self._queue_subtasks(mock_create_subtask_fcn, 3, 8, 3)
 
         # Check number of items for each subtask
         mock_create_subtask_fcn_args = mock_create_subtask_fcn.call_args_list
         self.assertEqual(len(mock_create_subtask_fcn_args[0][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[1][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 5)
-
-    def test_queue_subtasks_for_query3(self):
-        """Test queue_subtasks_for_query() if in last query the number of items available > items_per_query."""
-
-        mock_create_subtask_fcn = Mock()
-        self._queue_subtasks(mock_create_subtask_fcn, 6, 3, 11, 3)
-
-        # Check number of items for each subtask
-        mock_create_subtask_fcn_args = mock_create_subtask_fcn.call_args_list
-        self.assertEqual(len(mock_create_subtask_fcn_args[0][0][0]), 3)
-        self.assertEqual(len(mock_create_subtask_fcn_args[1][0][0]), 3)
-        self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 4)
-        self.assertEqual(len(mock_create_subtask_fcn_args[3][0][0]), 4)

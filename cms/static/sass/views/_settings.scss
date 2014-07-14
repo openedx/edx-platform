@@ -748,6 +748,39 @@
     // specific fields - advanced settings
     &.advanced-policies {
 
+      .wrapper-options {
+        margin: (-$baseline/2) 0 ($baseline/2) 0;
+        text-align: right;
+
+        .wrapper-deprecated-setting {
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
+          opacity: .5;
+          position: relative;
+          display: inline-block;
+          border-radius: 3px;
+          padding: ($baseline/4) ($baseline/2);
+          background-color: $gray-l5;
+          color: $gray-d2;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.is-set {
+            opacity: 1;
+            background-color: $pink-l5;
+            color: $pink;
+          }
+        }
+
+        .deprecated-settings-toggle {
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0;
+        }
+      }
+
       .field-group {
         margin-bottom: ($baseline*1.5);
 
@@ -761,6 +794,11 @@
         @include clearfix();
         position: relative;
 
+        .title {
+          margin-top: ($baseline/2);
+          font-weight: 600;
+        }
+
         .field {
 
           input {
@@ -768,17 +806,7 @@
           }
 
           .tip {
-            @include transition(opacity $tmg-f1 ease-in-out 0s);
-            opacity: 0.0;
-            position: absolute;
-            bottom: ($baseline*1.25);
-          }
-
-          input:focus {
-
-            & + .tip {
-              opacity: 1.0;
-            }
+            color: $gray-l1;
           }
 
           input.error {
@@ -809,6 +837,14 @@
 
           .delete-button {
             margin: 0;
+          }
+        }
+
+        &.is-deprecated {
+          background-color: $pink-l5;
+
+          .status {
+            color: $pink-l2;
           }
         }
       }

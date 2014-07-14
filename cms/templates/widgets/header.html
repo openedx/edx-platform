@@ -170,11 +170,11 @@
       <nav class="nav-not-signedin nav-pitch">
         <h2 class="sr">${_("You're not currently signed in")}</h2>
         <ol>
-          <li class="nav-item nav-not-signedin-hiw">
-            <a href="/">${_("How Studio Works")}</a>
-          </li>
           <li class="nav-item nav-not-signedin-help">
             <a href="https://groups.google.com/d/forum/openedx-studio" target="_blank" rel="external">${_("studio-users group")}</a>
+            <!--
+            <a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_("Contextual Online Help")}" target="${_("_blank")}">${_("Help")}</a>
+            -->
           </li>
           <li class="nav-item nav-not-signedin-signup">
             <a class="action action-signup" href="${reverse('signup')}">${_("Sign Up")}</a>

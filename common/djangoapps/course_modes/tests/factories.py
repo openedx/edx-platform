@@ -1,6 +1,6 @@
 from course_modes.models import CourseMode
 from factory.django import DjangoModelFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting

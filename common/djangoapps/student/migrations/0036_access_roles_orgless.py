@@ -2,12 +2,12 @@
 from south.v2 import DataMigration
 from xmodule.modulestore.django import loc_mapper, modulestore
 import re
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 import logging
 from django.db.models.query_utils import Q
 from django.db.utils import IntegrityError
-from xmodule.modulestore import XML_MODULESTORE_TYPE, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mixed import MixedModuleStore
 
 log = logging.getLogger(__name__)
@@ -24,27 +24,11 @@ class Migration(DataMigration):
         """
         Converts group table entries for write access and beta_test roles to course access roles table.
         """
-        def get_modulestore(ms_type, key):
-            """
-            Find the modulestore of the given type trying the key first
-            """
-            try:
-                store = modulestore(key)
-                if isinstance(store, MixedModuleStore):
-                    store = store.modulestores[key]
-                if store.get_modulestore_type(None) == ms_type:
-                    return store
-                else:
-                    return None
-            except KeyError:
-                return None
-
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
         loc_map_collection = loc_mapper().location_map
-        xml_ms = get_modulestore(XML_MODULESTORE_TYPE, 'xml')
-        mongo_ms = get_modulestore(MONGO_MODULESTORE_TYPE, 'default')
-        if mongo_ms is None:
-            mongo_ms = get_modulestore(MONGO_MODULESTORE_TYPE, 'direct')
+        mixed_ms = modulestore()
+        xml_ms = mixed_ms._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
+        mongo_ms = mixed_ms._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         query = Q(name__startswith='staff') | Q(name__startswith='instructor') | Q(name__startswith='beta_testers')
         for group in orm['auth.Group'].objects.filter(query).exclude(name__contains="/").all():

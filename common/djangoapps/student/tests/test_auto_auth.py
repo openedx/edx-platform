@@ -6,7 +6,7 @@ from django_comment_common.models import (
 from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from mock import patch
 
 

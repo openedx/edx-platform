@@ -2,7 +2,7 @@
 Unit tests for the notes app.
 """
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse

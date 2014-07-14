@@ -21,7 +21,7 @@ import instructor.views.legacy
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from mock import Mock, patch
 
@@ -63,6 +63,6 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         body = response.content.replace('\r', '')
         self.assertEqual(
             body,
-            ('"User ID","Anonymized user ID","Course Specific Anonymized user ID"'
+            ('"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
              '\n"2","41","42"\n')
         )

@@ -601,7 +601,6 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'queued')
 
 
@@ -612,7 +611,6 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'unsubmitted')
         self.assertEqual(the_input.msg, 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT))
 
@@ -625,9 +623,24 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'unsubmitted')
 
+    def test_matlab_api_key(self):
+        """
+        Test that api_key ends up in the xqueue payload
+        """
+        elt = etree.fromstring(self.xml)
+        system = test_capa_system()
+        system.matlab_api_key = 'test_api_key'
+        the_input = lookup_tag('matlabinput')(system, elt, {})
+
+        data = {'submission': 'x = 1234;'}
+        response = the_input.handle_ajax("plot", data)
+
+        body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
+        payload = json.loads(body)
+        self.assertEqual('test_api_key', payload['token'])
+        self.assertEqual('2', payload['endpoint_version'])
 
     def test_get_html(self):
         # usual output
@@ -713,6 +726,45 @@ class MatlabTest(unittest.TestCase):
         expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
+
+    def test_matlab_queue_message_allowed_tags(self):
+        """
+        Test allowed tags.
+        """
+        allowed_tags = ['div', 'p', 'audio', 'pre', 'span']
+        for tag in allowed_tags:
+            queue_msg = "<{0}>Test message</{0}>".format(tag)
+            state = {
+                'input_state': {'queue_msg': queue_msg},
+                'status': 'queued',
+            }
+            elt = etree.fromstring(self.xml)
+            the_input = self.input_class(test_capa_system(), elt, state)
+            self.assertEqual(the_input.queue_msg, queue_msg)
+
+    def test_matlab_queue_message_not_allowed_tag(self):
+        """
+        Test not allowed tag.
+        """
+        not_allowed_tag = 'script'
+        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        state = {
+            'input_state': {'queue_msg': queue_msg},
+            'status': 'queued',
+        }
+        elt = etree.fromstring(self.xml)
+        the_input = self.input_class(test_capa_system(), elt, state)
+        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        self.assertEqual(the_input.queue_msg, expected)
+
+    def test_matlab_sanitize_msg(self):
+        """
+        Check that the_input.msg is sanitized.
+        """
+        not_allowed_tag = 'script'
+        self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        self.assertEqual(self.the_input._get_render_context()['msg'], expected)
 
 
 def html_tree_equal(received, expected):

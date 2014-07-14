@@ -15,6 +15,7 @@ Contents:
     :maxdepth: 2
 
     change_log
+    preface.rst
     overview.rst
     extending_platform/index
     xblocks.rst

@@ -236,7 +236,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_students_opened_subsection_csv(self):
 
-        tooltip = '4162 student(s) opened Subsection 5: Relational Algebra Exercises'
+        tooltip = '4162 students opened Subsection 5: Relational Algebra Exercises'
         attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 

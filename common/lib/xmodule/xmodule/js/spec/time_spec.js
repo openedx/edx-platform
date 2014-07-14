@@ -3,6 +3,13 @@
 
     describe('Time', function () {
         describe('format', function () {
+            describe('with NAN', function () {
+                it('return a correct time format', function () {
+                    expect(Time.format('string')).toEqual('0:00');
+                    expect(Time.format(void(0))).toEqual('0:00');
+                });
+            });
+
             describe('with duration more than or equal to 1 hour', function () {
                 it('return a correct time format', function () {
                     expect(Time.format(3600)).toEqual('1:00:00');

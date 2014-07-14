@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^xmodule_django\.models\.CourseKeyField"])

@@ -13,13 +13,11 @@ import copy
 from django.contrib.auth.models import User
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import _CONTENTSTORE
 
 from xmodule.exceptions import NotFoundError
@@ -30,7 +28,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreImportTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
@@ -38,8 +36,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     """
     def setUp(self):
 
-        settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
-        settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
         uname = 'testuser'
         email = 'test+courses@edx.org'
         password = 'foo'
@@ -69,9 +65,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         (for do_import_static=False behavior).
         '''
         content_store = contentstore()
-        module_store = modulestore('direct')
+        module_store = modulestore()
         import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['test_import_course'],
             static_content_store=content_store,
@@ -91,6 +88,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store, __, course = self.load_test_import_course()
         __, course_items = import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data',
             ['test_import_course_2'],
             target_course_id=course.id,
@@ -102,10 +100,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         """
         # Test that importing course with unicode 'id' and 'display name' doesn't give UnicodeEncodeError
         """
-        module_store = modulestore('direct')
+        module_store = modulestore()
         course_id = SlashSeparatedCourseKey(u'Юникода', u'unicode_course', u'échantillon')
         import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['2014_Uni'],
             target_course_id=course_id
@@ -150,8 +149,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         '''
         content_store = contentstore()
 
-        module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
+        module_store = modulestore()
+        import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
         course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -161,8 +160,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertEqual(count, 0)
 
     def test_no_static_link_rewrites_on_import(self):
-        module_store = modulestore('direct')
-        _, courses = import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        module_store = modulestore()
+        _, courses = import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -177,10 +176,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_rewrite_reference_list(self):
-        module_store = modulestore('direct')
+        module_store = modulestore()
         target_course_id = SlashSeparatedCourseKey('testX', 'conditional_copy', 'copy_run')
         import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['conditional'],
             target_course_id=target_course_id
@@ -206,10 +206,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         )
 
     def test_rewrite_reference(self):
-        module_store = modulestore('direct')
+        module_store = modulestore()
         target_course_id = SlashSeparatedCourseKey('testX', 'peergrading_copy', 'copy_run')
         import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['open_ended'],
             target_course_id=target_course_id
@@ -224,10 +225,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         )
 
     def test_rewrite_reference_value_dict(self):
-        module_store = modulestore('direct')
+        module_store = modulestore()
         target_course_id = SlashSeparatedCourseKey('testX', 'split_test_copy', 'copy_run')
         import_from_xml(
             module_store,
+            '**replace_user**',
             'common/test/data/',
             ['split_test_module'],
             target_course_id=target_course_id

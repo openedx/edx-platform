@@ -32,37 +32,16 @@ def seed():
 # This is an ERROR level warning so we need to set the threshold at CRITICAL
 logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
 
-# Use the mongo store for acceptance tests
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'acceptance_xmodule',
-    'collection': 'acceptance_modulestore_%s' % seed(),
-}
-
-modulestore_options = {
-    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-    'fs_root': TEST_ROOT / "data",
-    'render_template': 'edxmako.shortcuts.render_to_string',
-}
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
-        'OPTIONS': {
-            'mappings': {},
-            'stores': {
-                'default': {
-                    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                    'OPTIONS': modulestore_options
-                }
-            }
-        }
+update_module_store_settings(
+    MODULESTORE,
+    doc_store_settings={
+        'db': 'acceptance_xmodule',
+        'collection': 'acceptance_modulestore_%s' % seed(),
+    },
+    module_store_options={
+        'fs_root': TEST_ROOT / "data",
     }
-}
-
-MODULESTORE['direct'] = MODULESTORE['default']
-
+)
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {

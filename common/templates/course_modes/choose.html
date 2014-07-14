@@ -93,7 +93,7 @@ $(document).ready(function() {
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I don't meet all the requirements?")}</h5>
+                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I want a free honor code certificate?")}</h5>
 
                 <div class="copy expandable-area">
                   <dl class="list-faq">
@@ -110,17 +110,13 @@ $(document).ready(function() {
                     % if "honor" in modes:
                     <dt class="faq-question">${_("What if I can't afford it or don't have the necessary equipment?")}</dt>
                     <dd class="faq-answer">
-                      <p>${_("If you can't afford the minimum fee or don't meet the requirements, you can audit the course or elect to pursue an honor code certificate at no cost. If you would like to pursue the honor code certificate, please check the honor code certificate box, tell us why you can't pursue the verified certificate below, and then click the 'Select Certificate' button to complete your registration.")}</p>
+                    <p>${_("If you can't afford the minimum fee or don't meet the requirements, you can audit the course or elect to pursue an honor code certificate at no cost.")}
+                       ${_("If you would like to pursue the honor code certificate, please check the honor code certificate box and then click the 'Select Certificate' button to complete your registration.")}</p>
 
                       <ul class="list-fields">
                         <li class="field field-honor-code checkbox">
                           <input type="checkbox" name="honor-code" id="honor-code">
                           <label for="honor-code">${_("Select Honor Code Certificate")}</label>
-                        </li>
-
-                        <li class="field field-explain">
-                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Please write a few sentences about why you'd like to opt out of the paid verified certificate to pursue the honor code certificate:")}</label>
-                          <textarea name="explain"></textarea>
                         </li>
                       </ul>
                     </dd>

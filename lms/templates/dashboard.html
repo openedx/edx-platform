@@ -110,9 +110,9 @@
                function(data) {
                  if (data.success) {
                    $("#change_email_title").html("${_('Please verify your new email')}");
-                   $("#change_email_form").html("<p>${_(('You\'ll receive a confirmation in your in-box.'
+                   $("#change_email_form").html("<p>${_('You\'ll receive a confirmation in your inbox.'
                                                     ' Please click the link in the email to confirm'
-                                                    ' the email change.'))}</p>");
+                                                    ' the email change.')}</p>");
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }

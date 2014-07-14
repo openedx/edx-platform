@@ -10,7 +10,7 @@ from student.tests.factories import UserFactory
 from mock import patch
 
 from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class CourseEmailTest(TestCase):

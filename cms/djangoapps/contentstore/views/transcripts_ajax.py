@@ -22,7 +22,7 @@ from opaque_keys import InvalidKeyError
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -421,7 +421,7 @@ def replace_transcripts(request):
         return error_response(response, 'YouTube id {} is not presented in request data.'.format(youtube_id))
 
     try:
-        download_youtube_subs({1.0: youtube_id}, item, settings)
+        download_youtube_subs(youtube_id, item, settings)
     except GetTranscriptsFromYouTubeException as e:
         return error_response(response, e.message)
 

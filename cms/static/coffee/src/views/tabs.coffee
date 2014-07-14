@@ -101,8 +101,8 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
     deleteTab: (event) =>
       confirm = new PromptView.Warning
-        title: gettext('Delete Component Confirmation')
-        message: gettext('Are you sure you want to delete this component? This action cannot be undone.')
+        title: gettext('Delete Page Confirmation')
+        message: gettext('Are you sure you want to delete this page? This action cannot be undone.')
         actions:
           primary:
             text: gettext("OK")

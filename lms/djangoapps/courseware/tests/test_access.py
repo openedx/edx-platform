@@ -10,7 +10,7 @@ from courseware.tests.factories import UserFactory, StaffFactory, InstructorFact
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 # pylint: disable=protected-access
@@ -90,6 +90,7 @@ class AccessTestCase(TestCase):
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(user, 'load', date))
+        self.assertTrue(access._has_access_descriptor(user, 'instructor', date))
         with self.assertRaises(ValueError):
             access._has_access_descriptor(user, 'not_load_or_staff', date)
 

@@ -284,7 +284,7 @@ function _deleteItem($el, type) {
 
                     $.ajax({
                         type: 'DELETE',
-                        url: ModuleUtils.getUpdateUrl(locator) +'?'+ $.param({recurse: true, all_versions: true}),
+                        url: ModuleUtils.getUpdateUrl(locator),
                         success: function () {
                             $el.remove();
                             deleting.hide();

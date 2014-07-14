@@ -1,7 +1,7 @@
 <li class="studio-xblock-wrapper is-draggable">
     <header class="xblock-header">
         <div class="header-details">
-            <span>Mock XBlock</span>
+            <span class="xblock-display-name">Mock XBlock</span>
         </div>
         <div class="header-actions">
             <ul class="actions-list">

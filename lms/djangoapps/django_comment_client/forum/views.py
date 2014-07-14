@@ -3,9 +3,9 @@ import logging
 import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 import newrelic.agent
@@ -21,7 +21,7 @@ from django_comment_client.utils import (merge_dict, extract, strip_none, add_co
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -85,7 +85,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'sort_order', 'text',
                                                   'commentable_ids', 'flagged'])))
 
-    threads, page, num_pages = cc.Thread.search(query_params)
+    threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
     #now add the group name if the thread has a group id
     for thread in threads:
@@ -103,6 +103,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
+    query_params['corrected_text'] = corrected_text
 
     return threads, query_params
 
@@ -198,6 +199,7 @@ def forum_form_discussion(request, course_id):
             'annotated_content_info': annotated_content_info,
             'num_pages': query_params['num_pages'],
             'page': query_params['page'],
+            'corrected_text': query_params['corrected_text'],
         })
     else:
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
@@ -223,7 +225,8 @@ def forum_form_discussion(request, course_id):
             'cohorts': cohorts,
             'user_cohort': user_cohort_id,
             'cohorted_commentables': cohorted_commentables,
-            'is_course_cohorted': is_course_cohorted(course_id)
+            'is_course_cohorted': is_course_cohorted(course_id),
+            'sort_preference': user.default_sort_key,
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -294,7 +297,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             cohorts = get_course_cohorts(course_id)
             cohorted_commentables = get_cohorted_commentables(course_id)
             user_cohort = get_cohort_id(request.user, course_id)
-
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
@@ -314,9 +316,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
-            'cohorted_commentables': cohorted_commentables
+            'cohorted_commentables': cohorted_commentables,
+            'sort_preference': cc_user.default_sort_key,
         }
-
         return render_to_response('discussion/index.html', context)
 
 @require_GET

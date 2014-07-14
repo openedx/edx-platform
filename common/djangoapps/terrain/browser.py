@@ -19,6 +19,7 @@ from json import dumps
 from pymongo import MongoClient
 import xmodule.modulestore.django
 from xmodule.contentstore.django import _CONTENTSTORE
+from xmodule.modulestore import ModuleStoreEnum
 
 # There is an import issue when using django-staticfiles with lettuce
 # Lettuce assumes that we are using django.contrib.staticfiles,
@@ -41,7 +42,7 @@ LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
 MAX_VALID_BROWSER_ATTEMPTS = 20
-GLOBAL_SCRIPT_TIMEOUT = 20
+GLOBAL_SCRIPT_TIMEOUT = 60
 
 
 def get_saucelabs_username_and_key():
@@ -189,7 +190,7 @@ def reset_databases(scenario):
     mongo.drop_database(settings.CONTENTSTORE['DOC_STORE_CONFIG']['db'])
     _CONTENTSTORE.clear()
 
-    modulestore = xmodule.modulestore.django.editable_modulestore()
+    modulestore = xmodule.modulestore.django.modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
     modulestore.collection.drop()
     xmodule.modulestore.django.clear_existing_modulestores()
 

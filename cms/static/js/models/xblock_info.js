@@ -11,7 +11,7 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "is_container": null,
             "data": null,
             "metadata" : null,
-            "children": []
+            "children": null
         }
     });
     return XBlockInfo;

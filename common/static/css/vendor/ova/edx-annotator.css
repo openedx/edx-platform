@@ -1,4 +1,8 @@
 /*This is written to fix some design problems with edX*/
+.annotatable-wrapper .annotatable-header .annotatable-title{
+    padding-top: 20px !important;
+}
+
 .annotator-wrapper .annotator-adder button {
         opacity:0;
 }

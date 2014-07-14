@@ -4,7 +4,7 @@ Tests that check that we ignore the appropriate files when importing courses.
 import unittest
 from mock import Mock
 from xmodule.modulestore.xml_importer import import_static_content
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
 
 

@@ -13,18 +13,31 @@ define(["backbone"], function (Backbone) {
             templates: []
         },
         parse: function (response) {
+            // Returns true only for templates that both have no boilerplate and are of
+            // the overall type of the menu. This allows other component types to be added
+            // and they will get sorted alphabetically rather than just at the top.
+            // e.g. The ORA openassessment xblock is listed as an advanced problem.
+            var isPrimaryBlankTemplate = function(template) {
+                return !template.boilerplate_name && template.category === response.type;
+            };
+
             this.type = response.type;
             this.templates = response.templates;
+            this.display_name = response.display_name;
 
             // Sort the templates.
             this.templates.sort(function (a, b) {
-                // The entry without a boilerplate always goes first
-                if (!a.boilerplate_name || (a.display_name < b.display_name)) {
+                // The blank problem for the current type goes first
+                if (isPrimaryBlankTemplate(a)) {
+                    return -1;
+                } else if (isPrimaryBlankTemplate(b)) {
+                    return 1;
+                } else if (a.display_name > b.display_name) {
+                    return 1;
+                } else if (a.display_name < b.display_name) {
                     return -1;
                 }
-                else {
-                    return (a.display_name > b.display_name) ? 1 : 0;
-                }
+                return 0;
             });
         }
     });

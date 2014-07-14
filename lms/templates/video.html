@@ -13,10 +13,7 @@
     ${'data-sub="{}"'.format(sub) if sub else ''}
     ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
 
-    ${'data-mp4-source="{}"'.format(sources.get('mp4')) if sources.get('mp4') else ''}
-    ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
-    ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
-
+    data-sources='${sources}'
     data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
     data-show-captions="${show_captions}"
@@ -79,8 +76,8 @@
                           <ol class="video-speeds menu" role="menu"></ol>
                       </div>
                       <div class="volume">
-                          <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
-                          <div class="volume-slider-container">
+                          <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"></a>
+                          <div role="presentation" class="volume-slider-container">
                               <div class="volume-slider"></div>
                           </div>
                       </div>
@@ -106,9 +103,9 @@
 
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
-    % if sources.get('main'):
+    % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
         </li>
     % endif
     % if track:
@@ -125,6 +122,7 @@
                   % else:
                   <li class="a11y-menu-item">
                   % endif
+		      ## This is necessary so we don't scrape 'display_name' as a string.
 		      <% dname = item['display_name'] %>
                       <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
                         ${_(dname)}

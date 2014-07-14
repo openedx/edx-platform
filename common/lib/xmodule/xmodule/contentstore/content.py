@@ -7,9 +7,10 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 import os
 import logging
 import StringIO
-from urlparse import urlparse, urlunparse
+from urlparse import urlparse, urlunparse, parse_qsl
+from urllib import urlencode
 
-from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -47,7 +48,7 @@ class StaticContent(object):
         - course_key: the course that this asset belongs to
         - path: is the name of the static asset
         - revision: is the object's revision information
-        - is_tumbnail: is whether or not we want the thumbnail version of this
+        - is_thumbnail: is whether or not we want the thumbnail version of this
             asset
         """
         path = path.replace('/', '_')
@@ -123,8 +124,22 @@ class StaticContent(object):
         loc = StaticContent.compute_location(course_id, orig_path)
         loc_url = loc.to_deprecated_string()
 
+        # parse the query params for "^/static/" and replace with the location url
+        orig_query = parse_qsl(query)
+        new_query_list = []
+        for query_name, query_value in orig_query:
+            if query_value.startswith("/static/"):
+                new_query = StaticContent.compute_location(
+                    course_id,
+                    query_value[len('/static/'):],
+                )
+                new_query_url = new_query.to_deprecated_string()
+                new_query_list.append((query_name, new_query_url))
+            else:
+                new_query_list.append((query_name, query_value))
+
         # Reconstruct with new path
-        return urlunparse((scheme, netloc, loc_url, params, query, fragment))
+        return urlunparse((scheme, netloc, loc_url, params, urlencode(new_query_list), fragment))
 
     def stream_data(self):
         yield self._data

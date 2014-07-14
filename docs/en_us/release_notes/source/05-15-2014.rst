@@ -48,7 +48,7 @@ The following documentation is available:
   * Updated the `LTI Component`_ section to reflect new settings.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
   
   Recent changes include:
 
@@ -57,7 +57,7 @@ The following documentation is available:
   ``edx.course.enrollment.deactivated``.
   
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
    Recent changes include: 
 

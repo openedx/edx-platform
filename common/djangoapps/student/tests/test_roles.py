@@ -11,7 +11,7 @@ from student.roles import (
     GlobalStaff, CourseRole, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, RoleCache, CourseBetaTesterRole
 )
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class RolesTestCase(TestCase):

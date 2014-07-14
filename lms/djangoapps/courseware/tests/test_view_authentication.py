@@ -112,22 +112,38 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
 
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
-        self.overview_chapter = ItemFactory.create(display_name='Overview')
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
+        self.overview_chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            display_name='Super Overview'
+        )
+        self.welcome_section = ItemFactory.create(
+            parent_location=self.overview_chapter.location,
+            display_name='Super Welcome'
+        )
+        self.welcome_unit = ItemFactory.create(
+            parent_location=self.welcome_section.location,
+            display_name='Super Unit'
+        )
         self.course = modulestore().get_course(self.course.id)
 
         self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
         self.other_org_course = CourseFactory.create(org='Other_Org_Course')
         self.sub_courseware_chapter = ItemFactory.create(
-            parent_location=self.test_course.location, display_name='courseware'
+            parent_location=self.test_course.location,
+            display_name='courseware'
         )
         self.sub_overview_chapter = ItemFactory.create(
             parent_location=self.sub_courseware_chapter.location,
             display_name='Overview'
         )
-        self.welcome_section = ItemFactory.create(
-            parent_location=self.overview_chapter.location,
+        self.sub_welcome_section = ItemFactory.create(
+            parent_location=self.sub_overview_chapter.location,
             display_name='Welcome'
+        )
+        self.sub_welcome_unit = ItemFactory.create(
+            parent_location=self.sub_welcome_section.location,
+            display_name='New Unit'
         )
         self.test_course = modulestore().get_course(self.test_course.id)
 
@@ -151,9 +167,13 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(self.unenrolled_user)
         response = self.client.get(reverse('courseware',
                                            kwargs={'course_id': self.course.id.to_deprecated_string()}))
-        self.assertRedirects(response,
-                             reverse('about_course',
-                                     args=[self.course.id.to_deprecated_string()]))
+        self.assertRedirects(
+            response,
+            reverse(
+                'about_course',
+                args=[self.course.id.to_deprecated_string()]
+            )
+        )
 
     def test_redirection_enrolled(self):
         """
@@ -162,14 +182,22 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.enrolled_user)
 
-        response = self.client.get(reverse('courseware',
-                                           kwargs={'course_id': self.course.id.to_deprecated_string()}))
+        response = self.client.get(
+            reverse(
+                'courseware',
+                kwargs={'course_id': self.course.id.to_deprecated_string()}
+            )
+        )
 
-        self.assertRedirects(response,
-                             reverse('courseware_section',
-                                     kwargs={'course_id': self.course.id.to_deprecated_string(),
-                                             'chapter': 'Overview',
-                                             'section': 'Welcome'}))
+        self.assertRedirects(
+            response,
+            reverse(
+                'courseware_section',
+                kwargs={'course_id': self.course.id.to_deprecated_string(),
+                        'chapter': self.overview_chapter.url_name,
+                        'section': self.welcome_section.url_name}
+            )
+        )
 
     def test_instructor_page_access_nonstaff(self):
         """
@@ -314,6 +342,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
+
         self.course.start = tomorrow
         self.test_course.start = tomorrow
         self.course = self.update_course(self.course)

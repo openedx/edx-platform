@@ -19,7 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
-from xmodule.modulestore.keys import CourseKey, AssetKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
 
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse

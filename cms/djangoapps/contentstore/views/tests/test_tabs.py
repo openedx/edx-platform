@@ -4,7 +4,7 @@ import json
 from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
-from xmodule.modulestore.django import loc_mapper
+from xmodule.x_module import STUDENT_VIEW
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTabList, WikiTab
 from contentstore.utils import reverse_course_url
@@ -178,7 +178,7 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        preview_url = '/xblock/{}/student_view'.format(self.test_tab.location)
+        preview_url = '/xblock/{}/{}'.format(self.test_tab.location, STUDENT_VIEW)
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)

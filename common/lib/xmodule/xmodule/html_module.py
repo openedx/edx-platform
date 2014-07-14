@@ -30,7 +30,7 @@ class HtmlFields(object):
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Text"
+        default=_("Text")
     )
     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
     source_code = String(help=_("Source code for LaTeX documents. This feature is not well-supported."), scope=Scope.settings)
@@ -44,8 +44,8 @@ class HtmlFields(object):
         display_name=_("Editor"),
         default="visual",
         values=[
-            {"display_name": "Visual", "value": "visual"},
-            {"display_name": "Raw", "value": "raw"}
+            {"display_name": _("Visual"), "value": "visual"},
+            {"display_name": _("Raw"), "value": "raw"}
         ],
         scope=Scope.settings
     )

@@ -38,7 +38,7 @@ class AnnotatableFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Annotation',
+        default=_('Annotation'),
     )
 
 

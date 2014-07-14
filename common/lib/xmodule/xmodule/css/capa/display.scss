@@ -1,3 +1,5 @@
+$annotation-yellow: rgba(255,255,10,0.3);
+
 h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -156,7 +158,7 @@ div.problem {
 
     &.unanswered {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 14px;
         height: 14px;
         background: url('../images/unanswered-icon.png') center center no-repeat;
@@ -165,7 +167,7 @@ div.problem {
 
     &.correct, &.ui-icon-check {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 25px;
         height: 20px;
         background: url('../images/correct-icon.png') center center no-repeat;
@@ -178,7 +180,7 @@ div.problem {
 
     &.processing {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 20px;
         height: 20px;
         background: url('../images/spinner.gif') center center no-repeat;
@@ -191,7 +193,7 @@ div.problem {
 
     &.incorrect, &.incomplete, &.ui-icon-close {
       p.status {
-        @include inline-block();
+        display: inline-block;
         width: 20px;
         height: 20px;
         background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -209,7 +211,7 @@ div.problem {
     }
 
     p.answer {
-      @include inline-block();
+      display: inline-block;
       margin-bottom: 0;
       margin-left: $baseline/2;
 
@@ -244,7 +246,7 @@ div.problem {
         margin-bottom: 0;
 
         &.math {
-          @include inline-block;
+          display: inline-block;
           padding: 6px;
           min-width: 30px;
           border: 1px solid #e3e3e3;
@@ -256,7 +258,7 @@ div.problem {
 
     span {
       &.unanswered, &.ui-icon-bullet {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 4px;
         width: 14px;
@@ -265,7 +267,7 @@ div.problem {
       }
 
       &.processing, &.ui-icon-processing {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 6px;
         width: 25px;
@@ -274,7 +276,7 @@ div.problem {
       }
 
       &.correct, &.ui-icon-check {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 3px;
         width: 25px;
@@ -283,7 +285,7 @@ div.problem {
       }
 
       &.partially-correct {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 6px;
         width: 25px;
@@ -292,7 +294,7 @@ div.problem {
       }
 
       &.incorrect, &.incomplete, &.ui-icon-close {
-        @include inline-block();
+        display: inline-block;
         position: relative;
         top: 3px;
         width: 20px;
@@ -623,7 +625,7 @@ div.problem {
       // border-radius: 3px;
       // padding: 8px 12px;
       // margin-top: 10px;
-      @include inline-block;
+      display: inline-block;
       margin: 8px 0 0 $baseline/2;
       color: #777;
       font-style: italic;
@@ -779,8 +781,12 @@ div.problem {
         text-align: right;
         font-size: 1em;
 
-        &.full-top{
+        &.full-top {
           @include position(absolute, 1px 0px auto 0px);
+        }
+
+        &.full-bottom {
+          @include position(absolute, auto 0px 1px 0px);
         }
       }
     }
@@ -929,7 +935,6 @@ div.problem {
   }
 
   .annotation-input {
-    $yellow: rgba(255,255,10,0.3);
     margin: 0 0 1em 0;
     border: 1px solid #ccc;
     border-radius: 1em;
@@ -957,8 +962,8 @@ div.problem {
 
     .block-highlight {
       padding: .5em;
-      border: 1px solid darken($yellow, 10%);
-      background-color: $yellow;
+      border: 1px solid darken($annotation-yellow, 10%);
+      background-color: $annotation-yellow;
       color:  #333;
       font-style: normal;
     }
@@ -982,7 +987,7 @@ div.problem {
           cursor: pointer;
 
           &.selected {
-            background-color: $yellow;
+            background-color: $annotation-yellow;
           }
         }
         .tag-status {

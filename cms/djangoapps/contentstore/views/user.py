@@ -8,7 +8,7 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey
 from util.json_request import JsonResponse, expect_json
 from student.roles import CourseInstructorRole, CourseStaffRole
 from course_creators.views import user_requested_access

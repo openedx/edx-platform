@@ -1,4 +1,4 @@
-@shard_3
+@shard_3 @requires_stub_youtube
 Feature: CMS Video Component Handout
   As a course author, I want to be able to create video handout
 

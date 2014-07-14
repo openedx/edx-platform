@@ -13,10 +13,9 @@ class StudentNotes
             $(el).data('notes-instance', @)
 
     # Initializes annotations on a container element in response to an init event.
-    onInitNotes: (event, uri=null) =>
+    onInitNotes: (event, uri=null, storage_url=null, token=null) =>
         event.stopPropagation()
 
-        storeConfig = @getStoreConfig uri
         found = @targets.some (target) -> target is event.target
 
         # Get uri   
@@ -47,10 +46,10 @@ class StudentNotes
                         return user.id  if user and user.id
                         user 
                 auth: 
-                    tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                    token: token
 
                 store:
-                    prefix: 'http://catch.aws.af.cm/annotator'
+                    prefix: storage_url
 
                     annotationData: uri:uri
 
@@ -87,33 +86,6 @@ class StudentNotes
                 ova = new OpenVideoAnnotation.Annotator($(event.target), options)  
             else
                 @targets.push(event.target)
-
-    # Returns a JSON config object that can be passed to the annotator Store plugin
-    getStoreConfig: (uri) ->
-        prefix = @getPrefix()
-        if uri is null
-            uri = @getURIPath()
-
-        storeConfig =
-            prefix: prefix
-            loadFromSearch:
-                uri: uri
-                limit: 0
-            annotationData:
-                uri: uri
-        storeConfig
-
-    # Returns the API endpoint for the annotation store
-    getPrefix: () ->
-        re = /^(\/courses\/[^/]+\/[^/]+\/[^/]+)/
-        match = re.exec(@getURIPath())
-        prefix = (if match then match[1] else '')
-        return "#{prefix}/notes/api"
-
-    # Returns the URI path of the current page for filtering annotations
-    getURIPath: () ->
-        window.location.href.toString().split(window.location.host)[1]
-
 
 # Enable notes by default on the document root.
 # To initialize annotations on a container element in the document:

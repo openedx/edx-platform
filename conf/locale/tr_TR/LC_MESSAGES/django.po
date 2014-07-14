@@ -4,12 +4,13 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# brscvs <brscvs@gmail.com>, 2013
-# brscvs <brscvs@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
+# baris <brscvs@gmail.com>, 2013
+# baris <brscvs@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # iron_man <yunus_bakir92@hotmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -17,28 +18,29 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# brscvs <brscvs@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# xibalbian <ekinhazalbayar@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
+# baris <brscvs@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Ekin Hazal Bayar <ekinhazalbayar@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# brscvs <brscvs@gmail.com>, 2013
-# brscvs <brscvs@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
-# Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
+# baris <brscvs@gmail.com>, 2013
+# baris <brscvs@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Kerim Kaan <ben@kerimkaan.com>, 2013
+# Kerim Kaan <ben@kerimkaan.com>, 2013
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2013
-# onurbektas <mustafaonurbektas@gmail.com>, 2013
-# onurbektas <mustafaonurbektas@gmail.com>, 2013
+# Onur Bektas <mustafaonurbektas@gmail.com>, 2013
+# Onur Bektas <mustafaonurbektas@gmail.com>, 2013
+# ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # iron_man <yunus_bakir92@hotmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -46,38 +48,39 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# brscvs <brscvs@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
+# baris <brscvs@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Kerim Kaan <ben@kerimkaan.com>, 2013
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2013
-# onurbektas <mustafaonurbektas@gmail.com>, 2013
+# Onur Bektas <mustafaonurbektas@gmail.com>, 2013
+# ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# burakozalp <realburq@gmail.com>, 2013
-# burakozalp <realburq@gmail.com>, 2013
-# Hakan Senel <hgsenel@gmail.com>, 2014
-# Hakan Senel <hgsenel@gmail.com>, 2014
+# Burak Özalp <realburq@gmail.com>, 2013
+# Burak Özalp <realburq@gmail.com>, 2013
+# Hakan Şenel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Şenel <hgsenel@gmail.com>, 2014
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-05-26 20:45-0400\n"
+"POT-Creation-Date: 2014-06-19 00:16-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
+"Last-Translator: Hakan Şenel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,6 +96,25 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "Açıklı Uçlu Paneli"
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "Tartışma"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Problem"
+msgstr "Soru"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Advanced"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -235,7 +257,7 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid ""
 "Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the Forgot "
+"reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
@@ -391,15 +413,21 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -428,6 +456,10 @@ msgstr "Bu e-postaya ait bir hesap zaten bulunmaktadır."
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "Eski e-posta adresiniz yenisi ile aynıdır."
+
+#: common/djangoapps/student/views.py
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -856,13 +888,25 @@ msgstr "cevaplanmamış"
 msgid "processing"
 msgstr ""
 
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"Dosya(ları)nız yüklendi. Yüklemeniz ne zaman notlandırılırsa, bu mesaj "
-"içinde notlandırıcının geri beslemesi yer alacaktır."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -884,6 +928,35 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Tavsiye fonksiyonunda {hintfn} hata {err} "
@@ -895,6 +968,10 @@ msgstr "(Kaynak kodu satırı bilinmiyor)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "XML kaynak satırına {sourcenum} bakınız."
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr ""
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -986,7 +1063,7 @@ msgid "No answer provided."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Error checking problem: no external queueing server is configured."
+msgid "Error: No grader has been set up for this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1034,6 +1111,19 @@ msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr "ŞematikTepkiyi değerlendirirlen hata. Hata şöyleydi: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
 msgstr "Personelin cevabı bir sayı olarak algılanamadı."
 
@@ -1042,6 +1132,7 @@ msgid "Could not interpret '{given_answer}' as a number."
 msgstr "'{given_answer}' bir sayı olarak algılanamadı."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
@@ -1057,6 +1148,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -1828,6 +1920,47 @@ msgstr ""
 msgid "Secret Token String for Annotation"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -1973,6 +2106,75 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Warning"
+msgstr ""
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "Hata"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration for how users are grouped for this content experiment. "
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/templates/split_test_studio_header.html
+msgid "You must select a group configuration for this content experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment will not be shown to students because it refers to a"
+" group configuration that has been deleted. You can delete this experiment "
+"or reinstate the group configuration to repair it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This content experiment is in an invalid state and cannot be repaired. "
+"Please delete and recreate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
 #. the content of a course
@@ -2005,13 +2207,6 @@ msgstr ""
 #: lms/templates/wiki/base.html
 msgid "Wiki"
 msgstr "Wiki"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
-msgid "Discussion"
-msgstr "Tartışma"
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
@@ -2069,6 +2264,16 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -2370,10 +2575,6 @@ msgid "Basic"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Advanced"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -2474,6 +2675,7 @@ msgstr ""
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
 "Students will be able to view the first listed video that's compatible with "
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
@@ -2655,18 +2857,12 @@ msgstr ""
 msgid "subsections"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Problem"
-msgstr "Soru"
-
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "% of Students"
+msgid "Percent of Students"
 msgstr ""
 
 #: lms/templates/folditchallenge.html
@@ -2762,42 +2958,84 @@ msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
 "Belirlenen dala geçiş başarısız oldu. Dal ismini lütfen kontrol ediniz."
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
-msgstr "{0}'ın kimliğini denetlerken başarısız olundu, hata {1}\n"
+#: cms/templates/login.html cms/templates/register.html
+msgid "Email Address"
+msgstr "E-posta Adresi"
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "Kimlik denetimi {0} için başarısız oldu\n"
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "Ders No"
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr ""
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "sabit şifre"
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
 msgstr "Herşey tamam!"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
 msgstr "Kullanıcı adı vermelisiniz"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
 msgstr "Tam isim vermelisiniz"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "eposta şununla bitmeli"
+msgid "Email address must end in {domain}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "Başarısız - eposta {0} external_id olarak zaten mevcut"
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -2808,24 +3046,24 @@ msgid "email address required (not username)"
 msgstr "e-posta adresi gerekli (kullanıcı adı değil)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "Ups, {0} kullanıcısı oluşturulamadı, IntegrityError"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "Kullanıcı {0} başarıyla oluşturuldu!"
+msgid "User {user} created successfully!"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "Eposta adresi {0} olan kullanıcı bulunamadı"
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "{0} - {1} kullanıcı adıyla olan kullanıcı bulunamadı"
+msgid "Cannot find user with username {username} - {error}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "Silinmiş kullanıcı {0}"
+msgid "Deleted user {username}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -2848,7 +3086,6 @@ msgid "Courses loaded in the modulestore"
 msgstr "Modül Mağazasına Yüklenen Dersler"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 #, fuzzy
 msgid "username"
@@ -2859,7 +3096,6 @@ msgstr ""
 "kullanıcıadı"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
 msgstr "e-posta"
 
@@ -2884,6 +3120,9 @@ msgstr "Git havuz yeri '.git' ile bitmeli ve geçerli bir url'si olmalı"
 msgid "Added Course"
 msgstr "Eklenmiş Ders"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -2914,16 +3153,16 @@ msgstr ""
 "Çıktı şöyleydi: {0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "Havuzu {0}'a klonlama başarısız oldu"
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "Başarıyla dala geçildi:  {branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "Yüklenmiş ders  {0} {1}<br/>Hatalar:"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
@@ -2934,6 +3173,8 @@ msgstr "Ders Adı"
 msgid "Directory/ID"
 msgstr "Dizin/No"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "Git Teslimi"
@@ -2959,7 +3200,6 @@ msgid "Deleted"
 msgstr "Silindi"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
 msgstr "ders_no"
 
@@ -2980,12 +3220,10 @@ msgid "Enrollment information for all courses"
 msgstr "Bütün dersler için kayıt bilgileri"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
 msgstr "rol"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
 msgstr "tam_isim"
 
@@ -2996,26 +3234,6 @@ msgid ""
 msgstr ""
 "Belirlenen git deposunu ve opsiyonel dalı modül mağazasına ve opsiyonel "
 "olarak belirlenmiş dizine aktarma."
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with email address"
-msgstr "Eposta adresiyle kullanıcı bulunamadı"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Cannot find user with username"
-msgstr "Bu kullanıcı adıyla bir kullanıcı bulunamadı"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Failed in authenticating"
-msgstr "Şifre kontrolünde hata"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Unable to clone or pull repository"
-msgstr "Havuz klonlanamadı veya çekilemedi"
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
-msgid "Error - cannot get course with ID"
-msgstr "Hata - ID si olan ders getirilemedi"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -3073,6 +3291,10 @@ msgstr "Böyle bir kullanıcı yok."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "Görev zaten devam ediyor."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User ID"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3176,6 +3398,10 @@ msgstr "Veri İndir"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "Analitikler"
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "Ölçümler"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -3972,12 +4198,10 @@ msgid "The course you requested does not exist."
 msgstr "Talep ettiğiniz ders bulunmamaktadır."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
 msgstr "{0} dersi zaten alışveriş sepetinizde."
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
 msgstr "{0} dersine zaten kayıtlısınız."
 
@@ -4394,6 +4618,51 @@ msgstr "Seçili ücret yok veya seçilen ücret minimumdan daha küçük"
 msgid "Skip to this view's content"
 msgstr "Bu görüntünün içeriğine atla"
 
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -4597,7 +4866,9 @@ msgstr "Yazıyı sil"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -4639,6 +4910,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Bir yazıyı silmek üzeresiniz. Lütfen onaylayın."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5105,6 +5377,18 @@ msgstr ""
 msgid "Upload completed"
 msgstr "Yükleme Tamamlandı"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "HTML"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
@@ -5257,7 +5541,7 @@ msgstr "Yüklüyor..."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
-#: cms/templates/studio_container_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Görüntüle"
@@ -5376,8 +5660,9 @@ msgstr "Hizmet Şartları"
 msgid "Privacy Policy"
 msgstr "Gizlilik İlkeleri"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+#: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Yardım"
@@ -5420,8 +5705,8 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
-msgstr "Neden ödeme yapmalıyım? Eğer bütün isterleri sağlamıyorsam?"
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5461,34 +5746,19 @@ msgstr "Eğer param yoksa veya gerekli cihazların bulunmuyorsa?"
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
-"Minimum ücreti karşılayamıyorsanız veya gereklerini yerine getiremiyorsanız,"
-" dersi izleyebilir veya ücretsiz olarak onur kodu sertifikası programını "
-"alabilirsiniz. Onur kodu sertifikası almak istiyorsanız, onur kodu "
-"opsiyonunu seçiniz, onaylı sertifkayı neden alamadığınızı bize anlatınız ve "
-"'Sertifika Seç' butonuna basarak kayıt sürecinizi bitiriniz."
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "Onur Kodu Sertifikasını Seçiniz"
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "Durumunuzu açıklayın:"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"Lütfen bir kaç kelimeyle ödemeli kimlik denetimli sertifika almaktan "
-"vazgeçip yerine onur kodu sertifikası almayı tercih ettiğinizi kısaca "
-"anlatınız:"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -5677,6 +5947,12 @@ msgstr "Bir hata oluştu. Lütfen daha sonra tekrar deneyin"
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "Yeni e-postanızı onaylayınız"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -6173,13 +6449,9 @@ msgstr "Lütfen {link_start}bize eposta gönderin{link_end}."
 msgid "Please try again later."
 msgstr "Lütfen daha sonra tekrar deneyiniz."
 
-#. Translators: Notes below refer to annotations. They wil later be put under
-#. a
-#. "Notes" section.
-#: lms/templates/imageannotation.html lms/templates/notes.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "Notunuz yok."
+#: lms/templates/imageannotation.html
+msgid "Note: only instructors may annotate."
+msgstr ""
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -6435,11 +6707,6 @@ msgstr "Ham veri:"
 msgid "Accepted"
 msgstr "Kabul Edildi"
 
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Hata"
-
 #: lms/templates/name_changes.html
 msgid "Rejected"
 msgstr "Reddedildi"
@@ -6511,6 +6778,11 @@ msgstr ""
 "<strong>Uyarı:</strong> Tarayıcınız tamamen desteklenmiyor.  "
 "{chrome_link_start}Chrome{chrome_link_end} yada "
 "{ff_link_start}Firefox{ff_link_end} kullanmanızı öneririz."
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "Notunuz yok."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -6856,6 +7128,10 @@ msgstr "Giriş."
 msgid "Group {group_id}"
 msgstr "Grup {group_id} "
 
+#: lms/templates/split_test_studio_header.html
+msgid "Select a Group Configuration"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr "Personel Hata Ayıklama bilgisi"
@@ -7053,11 +7329,6 @@ msgstr "Platform Sürümü"
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
 msgstr "Tarih"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "Ders No"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7560,6 +7831,10 @@ msgid "Course Navigation"
 msgstr "Ders Navigasyonu"
 
 #: lms/templates/courseware/courseware.html
+msgid "No content has been added to this course"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
 msgstr "Hesap Makinesini Aç"
 
@@ -7746,10 +8021,6 @@ msgstr "DataDump"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
 msgstr "Grupları yönet"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "Ölçümler"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -8117,11 +8388,9 @@ msgstr "Öğrenci sayısı"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-"Ülkelere göre öğrencilerin dağılımı, bütün dersler, Eyl-12'den Eki-17, 1 "
-"sunucu (aşağıda örnek olarak gösterilmektedir):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9573,10 +9842,6 @@ msgid ""
 "clicking the 'Revert to Legacy Dashboard' button above."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "bölüm_görüntü_ismi"
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -10418,15 +10683,12 @@ msgstr "sipariş edilen maddeler:"
 msgid "Qty"
 msgstr "Miktar"
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "Not: üzeri çizili maddeler şuna benzer"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "iade edildi."
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -10592,10 +10854,6 @@ msgstr "Sipariş No."
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "Toplam"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "bu"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -11905,7 +12163,9 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "Kopyasını Çıkar"
@@ -11921,7 +12181,6 @@ msgstr "Bu bileşeni silin"
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_container_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
@@ -11929,10 +12188,6 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Container"
 msgstr "Taşıyıcı"
-
-#: cms/templates/container.html
-msgid "This page has no content yet."
-msgstr ""
 
 #: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
@@ -11964,6 +12219,11 @@ msgid ""
 "this page. In the case of experiment blocks, this allows you to confirm that"
 " you have properly configured your experiment groups and make changes to "
 "existing content."
+msgstr ""
+
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -12400,10 +12660,8 @@ msgstr "Hoşgeldiniz"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your courses online, so you can focus on teaching them"
+"Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
-"Stüdyo derslerinizi ayarlamanıza yardımcı olur ki böylece siz onları "
-"öğretmeye yoğunlaşın"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
@@ -12446,10 +12704,8 @@ msgstr "İstediğin Zaman Fikrini Değiştir"
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
-"let your reorganize quickly."
+"let you reorganize quickly."
 msgstr ""
-"İstediğin yerde ders iskeletinin taslağını hazırla. Basit sürükle ve bırak "
-"araçları bunları hızlıca ayarlamanıza yardımcı olacak."
 
 #: cms/templates/howitworks.html
 msgid "Go A Week Or A Semester At A Time"
@@ -12471,13 +12727,9 @@ msgstr "Öğrenmek Sadece Derslerden İbaret Değildir."
 #: cms/templates/howitworks.html
 msgid ""
 "Studio lets you weave your content together in a way that reinforces "
-"learning &mdash; short video lectures interleaved with exercises and more. "
-"Insert videos and author a wide variety of exercise types with just a few "
-"clicks."
+"learning. Insert videos, discussions, and a wide variety of exercises with "
+"just a few clicks."
 msgstr ""
-"Studio içeriği öğrenmeyi takviye ederek işlemenizi sağlar &mdash; "
-"alıştırmalarla iç içe girmiş kısa video seansları ve bir çokları. Videoları "
-"ekleyin ve bir çok türde olabilen alıştırma tiplerini kullanın."
 
 #: cms/templates/howitworks.html
 msgid "Create Learning Pathways"
@@ -12485,11 +12737,9 @@ msgstr "Öğrenme Yolları Yarat"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Help your students understand a small interactive piece at a time with "
-"multimedia, HTML, and exercises."
+"Help your students understand one concept at a time with multimedia, HTML, "
+"and exercises."
 msgstr ""
-"Multimedia, html ve alıştırmaları kullanarak öğrencilerinizin etkileşimli "
-"bir şekilde anlamasına yardımcı olun."
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
@@ -12509,11 +12759,9 @@ msgstr "Geniş Problem Çeşitleri Kütüphanesi"
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio has nearly a dozen types of "
-"problems to challenge your learners."
+"It's more than just multiple choice. Studio supports more than a dozen types"
+" of problems to challenge your learners."
 msgstr ""
-"Çoklu seçmeliden çok daha fazlası. Stüdyo öğrencileriniz için bir düzine "
-"problem çeşidine sahip"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
@@ -12544,11 +12792,9 @@ msgstr "Anlık Değişiklikler"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes to live when you hit "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
-"Programda hatayla mı karşılaştınız? Sorun yok. Ne zaman isterseniz, "
-"değişiklikleriniz Kaydet butonuna basınca kaydedilecektir."
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
@@ -13127,10 +13373,6 @@ msgstr "Studio Hesabınız Yok mu? Kaydolun!"
 msgid "Required Information to Sign In to edX Studio"
 msgstr "edX Studio'ya kaydolmak için gerekli bilgi"
 
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr "E-posta Adresi"
-
 #: cms/templates/login.html
 msgid "Studio Support"
 msgstr "Studio Destek"
@@ -13598,16 +13840,8 @@ msgid ""
 "they are <strong>not the dates shown on your course summary page</strong>.  "
 "To provide the course start and registration dates as shown on your course "
 "summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
-"email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+" Manager\">PM</abbr>."
 msgstr ""
-"Bu tarihler <strong>dersinizin görülebileceği günleri</strong> "
-"etkilemektedir, ama bunlar <strong>ders özetinizde yer alan tarihler "
-"değildir</strong>. Dersinizin özet sayfasında yer aldığı gibi başlangıç ve "
-"kayıt tarihlerinizi belirlemek için, <abbr title=\"Program "
-"Manager\">PM</abbr> veya Conrad Warre <a rel=\"email\" class=\"action "
-"action-email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a> "
-"sayfalarında yer alan komutları izleyiniz."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -14125,7 +14359,7 @@ msgstr "Dışa Aktar"
 msgid "Help &amp; Account Navigation"
 msgstr "Yardım &amp; Hesap Navigasyonu"
 
-#: cms/templates/widgets/header.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
 
@@ -14140,14 +14374,6 @@ msgstr "Çıkış Yap"
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
 msgstr "Henüz giriş yapmadınız"
-
-#: cms/templates/widgets/header.html
-msgid "How Studio Works"
-msgstr "Stüdyo Nasıl Çalışır"
-
-#: cms/templates/widgets/header.html
-msgid "Studio Help"
-msgstr "Stüdyo Yardım"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -14234,6 +14460,22 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about edX Studio?"
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"This content experiment refers to a group configuration that has been "
+"deleted."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid "This content experiment uses group configuration '{0}'."
+msgstr ""
+
+#: cms/templates/widgets/split-edit.html
+msgid ""
+"After you select the group configuration and save the content experiment, "
+"you cannot change this setting."
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

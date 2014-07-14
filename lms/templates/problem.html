@@ -1,4 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from xmodule.util.date_utils import get_time_display
+from django.conf import settings
+%>
 
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
@@ -6,6 +10,20 @@
 </h2>
 
 <div class="problem-progress"></div>
+
+% if problem_is_timed:
+  <div class="time_limit">
+    <p>
+      ${_("At {start_time}, you started this exam.").format(
+          start_time=get_time_display(start_time, coerce_tz=settings.TIME_ZONE))}
+      <br />
+      <b>
+      ${_("By {end_time}, you must manually click the 'Final Submit' button below!").format(
+          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE))}
+      </b>
+    </p>
+  </div>
+% endif
 
 <div class="problem" role="application">
   ${ problem['html'] }

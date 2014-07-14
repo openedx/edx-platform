@@ -170,14 +170,14 @@
       <i class="icon icon-remove"></i><span class="sr">${_("Delete Comment")}</span></div>
     <div class="discussion-edit-comment action-edit" data-tooltip="${_('Edit') | h}" role="button" tabindex="0">
       <i class="icon icon-pencil"></i><span class="sr">${_("Edit")}</span></div>
-      <% 
+      <%
       js_block = u"""
         interpolate(
           '{}',
           {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
           true
           )""".format(
-                 ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago) 
+                 ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
                  escapejs(_('-posted %(time_ago)s by'))
                )
              %>
@@ -207,9 +207,9 @@
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
-        <% 
+        <%
         js_block =  u"""
-        var fmt; 
+        var fmt;
         var data = {{
             'span_sr_open': '<span class=\"sr\">',
             'span_close': '</span>',
@@ -232,7 +232,7 @@
         <span class="comments-count">
             ${'<%'}${js_block}${'%>'}
         </span>
-        <% 
+        <%
         js_block = u"""
             interpolate(
                 '{}',
@@ -255,7 +255,7 @@
         <h1 class="home-title">${course.display_name_with_default}</h1>
       % endif
     </section>
-  
+
       % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
         <span class="label label-settings">${_("HOW TO USE DISCUSSIONS")}</span>
         <table class="home-helpgrid">
@@ -306,4 +306,16 @@
       % endif
 
   </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="search-alert-template">
+    <div class="search-alert" id="search-alert-${'<%- cid %>'}">
+        <div class="search-alert-content">
+          <p class="message">${'<%= message %>'}</p>
+        </div>
+
+        <div class="search-alert-controls">
+          <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
+        </div>
+    </div>
 </script>

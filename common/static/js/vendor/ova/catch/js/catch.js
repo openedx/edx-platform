@@ -614,36 +614,49 @@ CatchAnnotation.prototype = {
                 tot = typeof annotations !='undefined'?annotations.length:0,
                 attempts = 0; // max 100
             if(annotation.media == "image"){
-            	self.refreshCatch(true);
-            	self.checkTotAnnotations();
+                self.refreshCatch(true);
+                self.checkTotAnnotations();
             } else {
             //This is to watch the annotations object, to see when is deleted the annotation
-				var ischanged = function(){
-					var new_tot = annotator.plugins['Store'].annotations.length;
-					if (attempts<100)
-						setTimeout(function(){
-							if (new_tot != tot){
-								self.refreshCatch(true);
-								self.checkTotAnnotations();
-							}else{
-								attempts++;
-								ischanged();
-							}
-						},100); //wait for the change in the annotations
-				};
-				ischanged();
+                var ischanged = function(){
+                    var new_tot = annotator.plugins['Store'].annotations.length;
+                    if (attempts<100)
+                        setTimeout(function(){
+                            if (new_tot != tot){
+                                self.refreshCatch(true);
+                                self.checkTotAnnotations();
+                            }else{
+                                attempts++;
+                                ischanged();
+                            }
+                        },100); //wait for the change in the annotations
+                };
+                ischanged();
             }
         });
         annotator.subscribe("annotationCreated", function (annotation){
             var attempts = 0; // max 100
-            //wait to get an annotation id
+            //There is a delay between calls to the backend--especially reading after
+            //writing. This function listens to when a function is created and waits
+            //until the server provides it with an annotation id before doing anything
+            //with it. 
             var ischanged = function(){
                 if (attempts<100)
                     setTimeout(function(){
                         if (typeof annotation.id!='undefined'){
+                        
+                        	//once it gets the annotation id, the table refreshes to show
+                        	//the edits
                             self.refreshCatch();
                             if (typeof annotation.parent != 'undefined' && annotation.parent != '0'){
+                                
+                                //if annotation made was actually a replay to an annotation
+                                //i.e. the only difference is that annotations that are
+                                //not replies have no "parent"
                                 var replies = $("[annotationid="+annotation.parent+"]").find(".controlReplies .hideReplies");
+                                
+                                //forces "Show replies" section to show and then refreshes
+                                //via two clicks
                                 replies.show();
                                 replies.click();
                                 replies.click();
@@ -826,6 +839,9 @@ CatchAnnotation.prototype = {
         }
         for(var item in allannotations){
             var an = allannotations[item];
+            //Makes sure that all images are set to transparent in case one was
+            //previously selected.
+            an.highlights[0].style.background = "rgba(0,0,0,0)";
             if (typeof an.id!='undefined' && an.id == osdaId){//this is the annotation
                 var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
                 osda.viewer.viewport.fitBounds(bounds, false);
@@ -833,6 +849,9 @@ CatchAnnotation.prototype = {
                 console.log(an.target.container);
                 $('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
                                         'slow');
+                //signifies a selected annotation once OSD has zoomed in on the
+                //appropriate area, it turns the background a bit yellow
+                an.highlights[0].style.background = "rgba(255,255,10,0.2)";
             }
         }
     },

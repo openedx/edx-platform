@@ -17,7 +17,7 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from verify_student.models import SoftwareSecurePhotoVerification
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 
@@ -78,7 +78,7 @@ class ChooseModeView(View):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
-        # This is a bit redundant with logic in student.views.change_enrollement,
+        # This is a bit redundant with logic in student.views.change_enrollment,
         # but I don't really have the time to refactor it more nicely and test.
         course = modulestore().get_course(course_key)
         if not has_access(user, 'enroll', course):

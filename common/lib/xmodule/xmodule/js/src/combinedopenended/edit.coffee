@@ -87,8 +87,9 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
   ###
   onShowXMLButton: (e) =>
     e.preventDefault();
-    if @cheatsheet != undefined
-      @addRemoveCheatsheetCSS()
+    if @cheatsheet && @cheatsheet.hasClass('shown')
+      @cheatsheet.toggleClass('shown')
+      @toggleCheatsheetVisibility()
     if @confirmConversionToXml()
       @createXMLEditor(OpenEndedMarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
@@ -133,21 +134,16 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
       @cheatsheet = $($('#simple-editor-open-ended-cheatsheet').html())
       $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
-    @addRemoveCheatsheetCSS()
+    @toggleCheatsheetVisibility()
 
     setTimeout (=> @cheatsheet.toggleClass('shown')), 10
 
 
   ###
-  Function to add/remove CSS for cheatsheet.
+  Function to toggle cheatsheet visibility.
   ###
-  addRemoveCheatsheetCSS: () =>
-    if !@cheatsheet.hasClass("shown")
-      $(".CodeMirror").css({"overflow": "visible"})
-      $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
-    else
-      $(".CodeMirror").css({"overflow": ""})
-      $(".modal-content").removeAttr("style")
+  toggleCheatsheetVisibility: () =>
+    $('.modal-content').toggleClass('cheatsheet-is-shown')
 
 
   ###

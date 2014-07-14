@@ -6,7 +6,7 @@ The *edX Research Guide* is created using RST_ files and Sphinx_. You, the
 user community, can help update and revise this documentation project on
 GitHub::
 
-  https://github.com/edx/edx-platform/tree/master/docs/course_authors/source
+  https://github.com/edx/edx-platform/docs/en_us/data/source
 
 To suggest a revision, fork the project, make changes in your fork, and submit
 a pull request back to the original project: this is known as the `GitHub Flow`_.

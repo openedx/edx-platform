@@ -96,8 +96,8 @@ urlpatterns += patterns(
 
 js_info_dict = {
     'domain': 'djangojs',
-    # No packages needed, we get LOCALE_PATHS anyway.
-    'packages': (),
+    # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
+    'packages': ('openassessment',),
 }
 
 urlpatterns += patterns('',

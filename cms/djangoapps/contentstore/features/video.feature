@@ -1,4 +1,4 @@
-@shard_3
+@shard_3 @requires_stub_youtube
 Feature: CMS Video Component
   As a course author, I want to be able to view my created videos in Studio
 

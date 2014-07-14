@@ -16,4 +16,4 @@ Installing, Configuring, and Running the edX Platform
    install_options
    devstack/install_devstack
    devstack/run_devstack
-..   devstack/test_devstack
+   prodstack/install_prodstack

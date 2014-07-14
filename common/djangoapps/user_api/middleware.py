@@ -5,7 +5,7 @@ Adds user's tags to tracking event context.
 from track.contexts import COURSE_REGEX
 from eventtracking import tracker
 from user_api.models import UserCourseTag
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class UserTagsEventContextMiddleware(object):

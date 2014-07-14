@@ -18,8 +18,8 @@ from django.utils.importlib import import_module
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.django import editable_modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from external_auth.models import ExternalAuthMap
 from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
@@ -80,7 +80,7 @@ class ShibSPTest(ModuleStoreTestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        self.store = editable_modulestore()
+        self.store = modulestore()
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_exception_shib_login(self):

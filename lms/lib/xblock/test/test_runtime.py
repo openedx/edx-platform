@@ -8,7 +8,7 @@ from ddt import ddt, data
 from mock import Mock
 from unittest import TestCase
 from urlparse import urlparse
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 
 TEST_STRINGS = [

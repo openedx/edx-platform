@@ -5,7 +5,7 @@ from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory as StudentUserFactory
 from instructor_task.models import InstructorTask
 from celery.states import PENDING
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class InstructorTaskFactory(DjangoModelFactory):

@@ -2,7 +2,7 @@ import logging
 from dogapi import dog_stats_api
 
 from .grading_service_module import GradingService
-from xmodule.modulestore.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey
 
 log = logging.getLogger(__name__)
 

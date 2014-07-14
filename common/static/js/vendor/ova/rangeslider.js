@@ -1,6 +1,6 @@
 /* 
 RangeSlider v1.0 (https://github.com/danielcebrian/rangeslider-videojs)
-Copyright (C) 2014 Daniel Cebri‡n Robles
+Copyright (C) 2014 Daniel Cebrian Robles
 License: https://github.com/danielcebrian/rangeslider-videojs/blob/master/License.rst
 
 This program is free software; you can redistribute it and/or

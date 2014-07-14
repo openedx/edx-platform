@@ -44,6 +44,24 @@
   }
 }
 
+@function container-shift($shift: $shift) {
+  $parent-columns: $grid-columns !global !default;
+
+  @if length($shift) == 3 {
+    $container-columns: nth($shift, 3);
+    @return $container-columns;
+  }
+
+  @else if length($shift) == 2 {
+    $container-columns: nth($shift, 2);
+    @return $container-columns;
+  }
+
+  @else {
+    @return $parent-columns;
+  }
+}
+
 // Generates a striped background
 @function gradient-stops($grid-columns, $color: $visual-grid-color) {
   $transparent: rgba(0,0,0,0);

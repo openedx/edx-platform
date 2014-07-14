@@ -1,6 +1,6 @@
 #lean_overlay {
     background: transparent;
-    @include background-image(radial-gradient(50% 30%, circle cover, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
+    @include background-image(radial-gradient(circle at 50% 30%, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
     display: none;
     height:100%;
     left: 0px;
@@ -277,7 +277,7 @@
     .close-modal {
       border-radius: 2px;
       cursor: pointer;
-      @include inline-block;
+      display: inline-block;
       padding: 10px;
       position: absolute;
       right: 2px;

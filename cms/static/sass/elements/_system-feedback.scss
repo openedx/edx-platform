@@ -323,8 +323,8 @@
   // shorter/status notifications
   &.wrapper-notification-status {
     @include border-top-radius(3px);
-    width: ($baseline*8);
     right: ($baseline);
+    width: auto;
     border: 4px solid $black;
     border-bottom: none;
     padding: ($baseline/2) $baseline;
@@ -345,7 +345,7 @@
       [class^="icon"] {
         width: $baseline;
         height: ($baseline*1.25);
-        margin-right: ($baseline*0.75);
+        margin-right: ($baseline/4);
         line-height: 3rem;
       }
 
@@ -477,12 +477,23 @@
   }
 
   &.mini {
+    width: auto;
+    max-width: none;
+    min-width: 0;
 
     [class^="icon"] {
       @include animation(rotateCW $tmg-s3 linear infinite);
       width: 25px;
       margin: -4px 10px 0 0;
       @include transform-origin(52% 60%);
+    }
+
+    .copy {
+      width: auto;
+    }
+
+    .title {
+      @extend %cont-truncated;
     }
 
     .copy p {

@@ -330,7 +330,7 @@
         @include box-sizing(border-box);
         color: $base-font-color;
         font-family: $sans-serif;
-        @include inline-block;
+        display: inline-block;
         letter-spacing: 1px;
         margin-left: 5px;
         padding: 5px 10px;

@@ -5,7 +5,7 @@ import logging
 
 from mock import Mock
 from pkg_resources import resource_string
-from xmodule.modulestore.locations import Location
+from opaque_keys.edx.locations import Location
 from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

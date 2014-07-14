@@ -5,7 +5,7 @@ Tests for instructor.basic
 from django.test import TestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from analytics.basic import enrolled_students_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 

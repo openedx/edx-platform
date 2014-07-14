@@ -1,12 +1,13 @@
-define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
     "js/views/feedback_prompt", "js/views/pages/container", "js/models/xblock_info"],
-    function ($, _, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
+    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, XBlockInfo) {
 
         describe("ContainerPage", function() {
             var lastRequest, renderContainerPage, expectComponents, respondWithHtml,
                 model, containerPage, requests,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore'),
+                mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
             beforeEach(function () {
@@ -14,8 +15,8 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 appendSetFixtures(mockContainerPage);
 
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/draft/block/verticalFFF',
-                    display_name: 'Test Unit',
+                    id: 'locator-container',
+                    display_name: 'Test Container',
                     category: 'vertical'
                 });
                 containerPage = new ContainerPage({
@@ -51,19 +52,75 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
             };
 
-            describe("Basic display", function() {
+            describe("Initial display", function() {
                 it('can render itself', function() {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
                     expect(containerPage.$('.wrapper-xblock')).not.toHaveClass('is-hidden');
                     expect(containerPage.$('.no-container-content')).toHaveClass('is-hidden');
                 });
+
                 it('shows a loading indicator', function() {
                     requests = create_sinon.requests(this);
                     containerPage.render();
                     expect(containerPage.$('.ui-loading')).not.toHaveClass('is-hidden');
                     respondWithHtml(mockContainerXBlockHtml);
                     expect(containerPage.$('.ui-loading')).toHaveClass('is-hidden');
+                });
+            });
+
+            describe("Editing the container", function() {
+                var newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXBlock({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXBlock();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                it('can edit itself', function() {
+                    var editButtons,
+                        updatedTitle = 'Updated Test Container';
+                    renderContainerPage(mockContainerXBlockHtml, this);
+
+                    // Click the root edit button
+                    editButtons = containerPage.$('.nav-actions .edit-button');
+                    editButtons.first().click();
+
+                    // Expect a request to be made to show the studio view for the container
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-container/studio_view')).toBeTruthy();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockContainerXBlockHtml,
+                        resources: []
+                    });
+                    expect(edit_helpers.isShowingModal()).toBeTruthy();
+
+                    // Expect the correct title to be shown
+                    expect(edit_helpers.getModalTitle()).toBe('Editing: Test Container');
+
+                    // Press the save button and respond with a success message to the save
+                    edit_helpers.pressModalButton('.action-save');
+                    create_sinon.respondWithJson(requests, { });
+                    expect(edit_helpers.isShowingModal()).toBeFalsy();
+
+                    // Expect the last request be to refresh the container page
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-container/container_preview')).toBeTruthy();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockUpdatedContainerXBlockHtml,
+                        resources: []
+                    });
+
+                    // Expect the title and breadcrumb to be updated
+                    expect(containerPage.$('.page-header-title').text().trim()).toBe(updatedTitle);
+                    expect(containerPage.$('.page-header .subtitle a').last().text().trim()).toBe(updatedTitle);
                 });
             });
 
@@ -87,14 +144,12 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 it('can show an edit modal for a child xblock', function() {
                     var editButtons;
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    editButtons = containerPage.$('.edit-button');
-                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
+                    editButtons = containerPage.$('.wrapper-xblock .edit-button');
+                    // The container should have rendered six mock xblocks
                     expect(editButtons.length).toBe(6);
-                    editButtons.first().click();
+                    editButtons[0].click();
                     // Make sure that the correct xblock is requested to be edited
-                    expect(lastRequest().url).toBe(
-                        '/xblock/locator-component-A1/studio_view'
-                    );
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/studio_view')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []
@@ -125,10 +180,10 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     var editButtons, modal, mockUpdatedXBlockHtml;
                     mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    editButtons = containerPage.$('.edit-button');
-                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
+                    editButtons = containerPage.$('.wrapper-xblock .edit-button');
+                    // The container should have rendered six mock xblocks
                     expect(editButtons.length).toBe(6);
-                    editButtons.first().click();
+                    editButtons[0].click();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditor,
                         resources: []
@@ -151,16 +206,6 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
                     // Verify that the xblock was updated
                     expect(containerPage.$('.mock-updated-content').text()).toBe('Mock Update');
-                });
-            });
-
-            describe("Empty container", function() {
-                var mockEmptyContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
-
-                it('shows the "no children" message', function() {
-                    renderContainerPage(mockEmptyContainerXBlockHtml, this);
-                    expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');
-                    expect(containerPage.$('.wrapper-xblock')).toHaveClass('is-hidden');
                 });
             });
 

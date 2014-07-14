@@ -225,7 +225,7 @@ def parse_ticket_references(text):
     Given a commit message, return a list of all JIRA ticket references in that
     message. If there are no ticket references, return an empty list.
     """
-    return JIRA_RE.findall(text)
+    return set(JIRA_RE.findall(text))
 
 
 class DoesNotExist(Exception):

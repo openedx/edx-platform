@@ -10,7 +10,7 @@ import factory
 from factory.django import DjangoModelFactory
 from uuid import uuid4
 from pytz import UTC
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111

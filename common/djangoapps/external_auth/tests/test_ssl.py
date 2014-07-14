@@ -23,7 +23,6 @@ from opaque_keys import InvalidKeyError
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
@@ -207,7 +206,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Expect an InvalidKeyError from course page as we don't have anything else built
         with self.assertRaisesRegexp(
                 InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
         ):
             self.client.get(
                 reverse('signup'), follow=True,
@@ -219,7 +218,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Now that we are logged in, make sure we don't see the registration page
         with self.assertRaisesRegexp(
                 InvalidKeyError,
-                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
         ):
             self.client.get(reverse('signup'), follow=True)
 
