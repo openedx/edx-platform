@@ -25,6 +25,7 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
+DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -173,7 +174,7 @@ class CourseFields(object):
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible",
-                 default=datetime(2030, 1, 1, tzinfo=UTC()),
+                 default=DEFAULT_START_DATE,
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(

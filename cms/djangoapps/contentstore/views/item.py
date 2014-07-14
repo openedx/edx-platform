@@ -4,6 +4,8 @@ from __future__ import absolute_import
 import hashlib
 import logging
 from uuid import uuid4
+from datetime import datetime
+from pytz import UTC
 
 from collections import OrderedDict
 from functools import partial
@@ -26,6 +28,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
+
+from xmodule.course_module import DEFAULT_START_DATE
+from contentstore.utils import find_release_date_source
 from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
@@ -596,6 +601,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     """
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
+    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
+    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+
     def safe_get_username(user_id):
         """
         Guard against bad user_ids, like the infamous "**replace_user**".
@@ -624,6 +632,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
         "published_by": safe_get_username(xblock.published_by),
         'studio_url': xblock_studio_url(xblock),
+        "released_to_students": datetime.now(UTC) > xblock.start,
+        "release_date": release_date,
+        "release_date_from": _get_release_date_from(xblock) if release_date else None,
     }
     if data is not None:
         xblock_info["data"] = data
@@ -682,3 +693,15 @@ def _create_xblock_child_info(xblock, include_children_predicate=NEVER):
             ) for child in xblock.get_children()
         ]
     return child_info
+
+
+def _get_release_date_from(xblock):
+    """
+    Returns a string representation of the section or subsection that sets the xblock's release date
+    """
+    source = find_release_date_source(xblock)
+    # Translators: this will be a part of the release date message.
+    # For example, 'Released: Jul 02, 2014 at 4:00 UTC with Section "Week 1"'
+    return _('{section_or_subsection} "{display_name}"').format(
+        section_or_subsection=xblock_type_display_name(source),
+        display_name=source.display_name_with_default)
