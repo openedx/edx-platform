@@ -86,8 +86,8 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         existing draft for both the new item and the parent
         """
         location = self.old_course_key.make_usage_key(category, name)
-        self.draft_mongo.create_and_save_xmodule(
-            location, self.user_id, definition_data=data, metadata=metadata, runtime=self.runtime
+        self.draft_mongo.create_item(
+            self.user_id, location, definition_data=data, metadata=metadata, runtime=self.runtime
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)

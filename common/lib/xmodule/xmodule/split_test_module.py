@@ -569,7 +569,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         This appends the new vertical to the end of children, and updates group_id_to_child.
         A mutable modulestore is needed to call this method (will need to update after mixed
-        modulestore work, currently relies on mongo's create_and_save_xmodule method).
+        modulestore work, currently relies on mongo's create_item method).
         """
         assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
             "editor_saved should only be called when a mutable modulestore is available"
