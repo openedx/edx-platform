@@ -8,7 +8,7 @@ import unittest
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
@@ -132,7 +132,6 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         if isinstance(course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
-            self.writable_chapter_location = chapter.location.version_agnostic()
         else:
             self.assertEqual(course.id, course_key)
             self.assertEqual(chapter.location, self.writable_chapter_location)
@@ -215,7 +214,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # convert to CourseKeys
         self.course_locations = {
-            course_id: SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id: CourseLocator.from_string(course_id)
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         # and then to the root UsageKey
