@@ -10,6 +10,8 @@ Representation:
     ** 'edited_by': user_id of user who created the original entry,
     ** 'edited_on': the datetime of the original creation,
     ** 'versions': versions_dict: {branch_id: structure_id, ...}
+    ** 'search_targets': a dict of search key and value. For example, wiki_slug. Add any fields whose edits
+        should change the search targets to SplitMongoModuleStore.SEARCH_TARGET dict
 * structure:
     ** '_id': an ObjectId (guid),
     ** 'root': root_block_id (string of key in 'blocks' for the root of this structure,
@@ -106,6 +108,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     SCHEMA_VERSION = 1
     reference_type = Locator
+    # a list of field name to store in course index search_targets. Note, this will
+    # only record one value per key. If the draft and published disagree, the last one set wins.
+    # It won't recompute the value on operations such as update_course_index (e.g., to revert to a prev
+    # version) but those functions will have an optional arg for setting these.
+    SEARCH_TARGET_DICT = ['wiki_slug']
 
     def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
@@ -871,6 +878,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         # update the index entry if appropriate
         if index_entry is not None:
+            # see if any search targets changed
+            if fields is not None:
+                self._update_search_targets(index_entry, fields)
             if not continue_version:
                 self._update_head(index_entry, course_key.branch, new_id)
             item_loc = BlockUsageLocator(
@@ -945,12 +955,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         source_index = self.get_course_index_info(source_course_id)
         return self.create_course(
             dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=None,  # override start_date?
-            versions_dict=source_index['versions']
+            versions_dict=source_index['versions'], search_targets=source_index['search_targets']
         )
 
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
-        versions_dict=None, root_category='course',
+        versions_dict=None, search_targets=None, root_category='course',
         root_block_id='course', **kwargs
     ):
         """
@@ -1073,9 +1083,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'edited_on': datetime.datetime.now(UTC),
             'versions': versions_dict,
             'schema_version': self.SCHEMA_VERSION,
+            'search_targets': search_targets or {},
         }
+        if fields is not None:
+            self._update_search_targets(index_entry, fields)
         self.db_connection.insert_course_index(index_entry)
-        return self.get_course(locator)
+        # expensive hack to persist default field values set in __init__ method (e.g., wiki_slug)
+        course = self.get_course(locator)
+        return self.update_item(course, user_id)
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
         """
@@ -1095,8 +1110,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         original_structure = self._lookup_course(descriptor.location)['structure']
         index_entry = self._get_index_if_valid(descriptor.location, force)
 
+        definition_fields = descriptor.get_explicitly_set_fields_by_scope(Scope.content)
         descriptor.definition_locator, is_updated = self.update_definition_from_data(
-            descriptor.definition_locator, descriptor.get_explicitly_set_fields_by_scope(Scope.content), user_id)
+            descriptor.definition_locator, definition_fields, user_id
+        )
 
         original_entry = self._get_block_from_structure(original_structure, descriptor.location.block_id)
         # check metadata
@@ -1130,6 +1147,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             self.db_connection.insert_structure(new_structure)
             # update the index entry if appropriate
             if index_entry is not None:
+                self._update_search_targets(index_entry, definition_fields)
+                self._update_search_targets(index_entry, settings)
                 self._update_head(index_entry, descriptor.location.branch, new_id)
                 course_key = CourseLocator(
                     org=index_entry['org'],
@@ -1657,6 +1676,17 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 return True
         return False
 
+    def _update_search_targets(self, index_entry, fields):
+        """
+        Update the index entry if any of the given fields are in SEARCH_TARGET_DICT. (doesn't save
+        the changes, just changes them in the entry dict)
+        :param index_entry:
+        :param fields: a dictionary of fields and values usually only those explicitly set and already
+            ready for persisting (e.g., references converted to block_ids)
+        """
+        for field_name, field_value in fields.iteritems():
+            if field_name in self.SEARCH_TARGET_DICT:
+                index_entry.setdefault('search_targets', {})[field_name] = field_value
 
     def _update_head(self, index_entry, branch, new_id):
         """
@@ -1853,16 +1883,27 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         structure['blocks'][encode_key_for_mongo(block_id)] = content
 
+    def find_courses_by_search_target(self, field_name, field_value):
+        """
+        Find all the courses which cached that they have the given field with the given value.
+
+        Returns: list of course_keys
+        """
+        entries = self.db_connection.find_matching_course_indexes(
+            {'search_targets.{}'.format(field_name): field_value}
+        )
+        return [
+            CourseLocator(entry['org'], entry['course'], entry['run'])  # which branch? TODO
+            for entry in entries
+        ]
+
     def get_courses_for_wiki(self, wiki_slug):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
         :return: list of course locations
-
-        Todo: Needs to be implemented.
         """
-        courses = []
-        return courses
+        return self.find_courses_by_search_target('wiki_slug', wiki_slug)
 
     def heartbeat(self):
         """

@@ -204,6 +204,8 @@ class TemplateTests(unittest.TestCase):
 
         # course root only updated 2x
         version_history = self.split_store.get_block_generations(test_course.location)
+        # create course causes 2 versions for the time being; skip the first.
+        version_history = version_history.children[0]
         self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
         self.assertEqual(len(version_history.children), 1)
         self.assertEqual(version_history.children[0].children, [])
