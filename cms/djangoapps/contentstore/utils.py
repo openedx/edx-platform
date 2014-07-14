@@ -151,6 +151,28 @@ def is_xblock_visible_to_students(xblock):
     return True
 
 
+def find_release_date_source(xblock):
+    """
+    Finds the ancestor of xblock that set its release date.
+    """
+
+    # Stop searching at the section level
+    if xblock.category == 'chapter':
+        return xblock
+
+    parent_location = modulestore().get_parent_location(xblock.location,
+                                                        revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+    # Orphaned xblocks set their own release date
+    if not parent_location:
+        return xblock
+
+    parent = modulestore().get_item(parent_location)
+    if parent.start != xblock.start:
+        return xblock
+    else:
+        return find_release_date_source(parent)
+
+
 def add_extra_panel_tab(tab_type, course):
     """
     Used to add the panel tab to a course if it does not exist.
