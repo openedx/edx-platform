@@ -1,9 +1,10 @@
 import pymongo
 from uuid import uuid4
 import ddt
-from mock import patch, Mock
+from mock import patch
 from importlib import import_module
 from collections import namedtuple
+import unittest
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
@@ -11,20 +12,19 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
+# TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.mongo.base import MongoRevisionKey
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
 
 
 @ddt.ddt
-class TestMixedModuleStore(LocMapperSetupSansDjango):
+class TestMixedModuleStore(unittest.TestCase):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -67,7 +67,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             },
             {
                 'NAME': 'split',
-                'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+                'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                 'OPTIONS': modulestore_options
             },
@@ -106,7 +106,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         patcher = patch.multiple(
             'xmodule.modulestore.mixed',
-            loc_mapper=Mock(return_value=LocMapperSetupSansDjango.loc_store),
             create_modulestore_instance=create_modulestore_instance,
         )
         patcher.start()
@@ -221,7 +220,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+        if default == 'split':
+            self.fake_location = CourseLocator(
+                'foo', 'bar', 'slowly', branch=ModuleStoreEnum.BranchName.draft
+            ).make_usage_key('vertical', 'baz')
+        else:
+            self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
         self.writable_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
@@ -229,9 +233,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             category='chapter', name='Overview'
         )
 
-        # get Locators and set up the loc mapper if app is Locator based
-        if default == 'split':
-            self.fake_location = loc_mapper().translate_location(self.fake_location)
 
         self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
 

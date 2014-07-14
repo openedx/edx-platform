@@ -29,7 +29,7 @@ class TestOrphan(SplitWMongoCourseBoostrapper):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.old_mongo.get_orphans(self.old_course_key)
+        orphans = self.draft_mongo.get_orphans(self.old_course_key)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.old_course_key.make_usage_key('chapter', 'OrphanChapter')
         self.assertIn(location.to_deprecated_string(), orphans)

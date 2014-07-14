@@ -12,7 +12,7 @@ import random
 from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import (InsufficientSpecificationError, ItemNotFoundError, VersionConflictError,
+from xmodule.modulestore.exceptions import (ItemNotFoundError, VersionConflictError,
             DuplicateItemError, DuplicateCourseError)
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -45,7 +45,7 @@ class SplitModuleTest(unittest.TestCase):
     }
 
     MODULESTORE = {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }
@@ -667,7 +667,7 @@ class SplitModuleCourseTests(SplitModuleTest):
 
     def test_get_course_negative(self):
         # Now negative testing
-        with self.assertRaises(InsufficientSpecificationError):
+        with self.assertRaises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='edu', course='meh', run='blah'))
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='edu', course='nosuchthing', run="run", branch=BRANCH_NAME_DRAFT))

@@ -11,8 +11,8 @@ from contextlib import contextmanager
 from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
-from xmodule.modulestore import PublishState, ModuleStoreEnum, split_migrator
-from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import create_modulestore_instance
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -20,6 +20,7 @@ from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 import itertools
+from xmodule.modulestore.split_migrator import SplitMigrator
 
 
 log = logging.getLogger(__name__)
@@ -66,8 +67,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
             )
-            if key == 'split':
-                store.loc_mapper = loc_mapper()
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
                 if store_name == key:
@@ -83,8 +82,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         if hasattr(course_id, 'version_agnostic'):
             course_id = course_id.version_agnostic()
-        if hasattr(course_id, 'branch_agnostic'):
-            course_id = course_id.branch_agnostic()
+        if hasattr(course_id, 'branch'):
+            course_id = course_id.replace(branch=None)
         return course_id
 
     def _get_modulestore_for_courseid(self, course_id=None):
@@ -185,26 +184,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
             # check if the course is not None - possible if the mappings file is outdated
             # TODO - log an error if the course is None, but move it to an initialization method to keep it less noisy
             if course is not None:
-                courses[course_id] = store.get_course(course_id)
+                courses[course_id] = course
 
-        has_locators = any(issubclass(CourseLocator, store.reference_type) for store in self.modulestores)
         for store in self.modulestores:
 
             # filter out ones which were fetched from earlier stores but locations may not be ==
             for course in store.get_courses():
                 course_id = self._clean_course_id_for_mapping(course.id)
                 if course_id not in courses:
-                    if has_locators and isinstance(course_id, CourseKey):
-
-                        # see if a locator version of course is in the result
-                        try:
-                            course_locator = loc_mapper().translate_location_to_course_locator(course_id)
-                            if course_locator in courses:
-                                continue
-                        except ItemNotFoundError:
-                            # if there's no existing mapping, then the course can't have been in split
-                            pass
-
                     # course is indeed unique. save it in result
                     courses[course_id] = course
 
@@ -325,12 +312,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
 
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
-            if not hasattr(self, 'split_migrator'):
-                self.split_migrator = split_migrator.SplitMigrator(
-                    dest_modulestore, source_modulestore, loc_mapper()
-                )
-            self.split_migrator.migrate_mongo_course(
-                source_course_id, user_id, dest_course_id.org, dest_course_id.offering
+            split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
+            split_migrator.migrate_mongo_course(
+                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run
             )
 
     def create_item(self, course_or_parent_loc, category, user_id, **kwargs):

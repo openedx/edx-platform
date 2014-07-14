@@ -63,7 +63,7 @@ STATICFILES_DIRS += [
 MODULESTORE['default']['OPTIONS']['stores'].append(
     {
         'NAME': 'split',
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': {
             'render_template': 'edxmako.shortcuts.render_to_string',

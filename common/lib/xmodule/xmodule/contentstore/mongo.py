@@ -12,8 +12,7 @@ from fs.osfs import OSFS
 import os
 import json
 from bson.son import SON
-from opaque_keys.edx.locator import AssetLocator
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import AssetKey
 
 
 class MongoContentStore(ContentStore):
@@ -74,7 +73,7 @@ class MongoContentStore(ContentStore):
         return content
 
     def delete(self, location_or_id):
-        if isinstance(location_or_id, AssetLocator):
+        if isinstance(location_or_id, AssetKey):
             location_or_id, _ = self.asset_db_key(location_or_id)
         # Deletes of non-existent files are considered successful
         self.fs.delete(location_or_id)
@@ -272,7 +271,7 @@ class MongoContentStore(ContentStore):
             # don't convert from string until fs access
             source_content = self.fs.get(asset_key)
             if isinstance(asset_key, basestring):
-                asset_key = AssetLocation.from_string(asset_key)
+                asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
             asset_key['org'] = dest_course_key.org
             asset_key['course'] = dest_course_key.course
