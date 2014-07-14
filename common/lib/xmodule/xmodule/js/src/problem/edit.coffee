@@ -201,8 +201,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
 
-  @findTargetedFeedbackItem: (answerString) ->
-    # parse a single answer string for any targeted feedback specifications
+  @parseForQuestionHints: (answerString) ->
+    # parse a single answer string for any hint text associated with this single answer item
     feedbackString = ''
     matchString = ''
     matches = answerString.match( /{{(.+)}}/ )       # string surrounded by {{...}} is a match group
@@ -211,17 +211,44 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         feedbackString = matches[1]     # group 1 holds the matching characters (our string)
         answerString = answerString.replace(matchString, '')
 
-    MarkdownEditingDescriptor.itemFeedbackStrings.push(feedbackString)  # add a feedback string entry (possibly null)
-    MarkdownEditingDescriptor.itemFeedbackMatches.push(matchString)     # add a match string entry (possibly null)
+    MarkdownEditingDescriptor.questionHintStrings.push(feedbackString)  # add a feedback string entry (possibly null)
+    MarkdownEditingDescriptor.questionHintMatches.push(matchString)     # add a match string entry (possibly null)
 
     return answerString
 
+  @parseForProblemHints: (xmlString) ->
+    for line in xmlString.split('\n')
+      matches = line.match( /\|\|(.+)\|\|/ )      # string surrounded by ||...|| is a match group
+      if matches
+        problemHint = matches[1]
+        MarkdownEditingDescriptor.problemHintsStrings.push(problemHint)
+        xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
+    return xmlString;
 
+  @parseForCompoundConditionHints: (xmlString) ->
+    for line in xmlString.split('\n')
+      matches = line.match( /\{\{(.+)\}\}/ )      # string surrounded by {{...}} is a match group
+      if matches
+        questionHintString = matches[1]
+        splitMatches = questionHintString.match(  /\(\((.+)\)\)(.+)/)    # surrounded by ((...)) is a boolean condition
+        if splitMatches
+          booleanExpression = splitMatches[1]
+          hintText = splitMatches[2]
+          MarkdownEditingDescriptor.problemHintsBooleanStrings.push(hintText)
+          MarkdownEditingDescriptor.problemHintsBooleanExpressions.push(booleanExpression)
 
+        xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
+    return xmlString;
 
-
-
-
+  @insertBooleanHints: (xmlStringUnderConstruction) ->
+    index = 0
+    for booleanExpression in MarkdownEditingDescriptor.problemHintsBooleanExpressions
+      hintText = MarkdownEditingDescriptor.problemHintsBooleanStrings[index]
+      booleanHintElement  = '    <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
+      booleanHintElement += '    </booleanhint>\n'
+      xmlStringUnderConstruction += booleanHintElement
+      index = index + 1
+    return xmlStringUnderConstruction
 
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
@@ -233,9 +260,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // initialize the targeted feedback working arrays
-      MarkdownEditingDescriptor.itemFeedbackStrings = [];
-      MarkdownEditingDescriptor.itemFeedbackMatches = [];
-      MarkdownEditingDescriptor.itemFeedbackTruthValue = [];
+      MarkdownEditingDescriptor.questionHintStrings = [];
+      MarkdownEditingDescriptor.questionHintMatches = [];
+      MarkdownEditingDescriptor.problemHintsStrings = [];
+      MarkdownEditingDescriptor.problemHintsBooleanExpressions = [];
+      MarkdownEditingDescriptor.problemHintsBooleanStrings = [];
+
+      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);            // pull out any problem hints
 
       // group multiple choice answers
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
@@ -245,8 +276,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
 
-            options[i] = MarkdownEditingDescriptor.findTargetedFeedbackItem(options[i], i);
-            hintString = String(MarkdownEditingDescriptor.itemFeedbackStrings[i]);
+            options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i], i);
+            hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
             hintElement = '';
             if (hintString.length > 0) {
               hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
@@ -280,10 +311,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         result += choices;
         result += '        </choicegroup>\n';
         result += '    </multiplechoiceresponse>\n\n';
+
+
+
         return result;
       });
 
       // group check answers
+      xml = MarkdownEditingDescriptor.parseForCompoundConditionHints(xml);  // pull out any compound condition hints
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
           var groupString = '    <choiceresponse>\n',
               options, value, correct;
@@ -293,8 +328,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
           for (i = 0; i < options.length; i += 1) {
               if(options[i].length > 0) {
-                  options[i] = MarkdownEditingDescriptor.findTargetedFeedbackItem(options[i], i);
-                  hintString = String(MarkdownEditingDescriptor.itemFeedbackStrings[i]);
+                  options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i], i);
+                  hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
                   hintElement = '';
                   if (hintString.length > 0) {
                     hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
@@ -307,6 +342,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
           groupString += '        </checkboxgroup>\n';
           groupString += '    </choiceresponse>\n\n';
+          groupString = MarkdownEditingDescriptor.insertBooleanHints(groupString);
 
           return groupString;
       });
