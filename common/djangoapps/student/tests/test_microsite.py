@@ -41,7 +41,7 @@ class TestMicrosite(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
         # check to see if the mailchimp synchronization will filter out this microsite user
-        users = User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id_id from student_usersignupsource)')
+        users = User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
         self.assertEqual(len(list(users)), 0)
 
     def test_user_signup_from_non_micro_site(self):
@@ -53,5 +53,5 @@ class TestMicrosite(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
         # check to see if the mailchimp synchronization will filter out this microsite user
-        users = User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id_id from student_usersignupsource)')
+        users = User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
         self.assertEqual(len(list(users)), 1)
