@@ -3,7 +3,14 @@
 
 .view-outline {
 
+  // outline-centric stuff to abstract
+  // --------------------
+  $outline-indent-width: $baseline;
+
+
+
   // page structure
+  // --------------------
   .content-primary,
   .content-supplementary {
     @include box-sizing(border-box);
@@ -37,7 +44,8 @@
   }
 
 
-  // page header bits
+  // page header
+  // --------------------
   .toggle-button-sections {
     @extend %t-copy-sub2;
     position: relative;
@@ -55,8 +63,10 @@
     }
   }
 
+  // adding outline elements
+  // --------------------
 
-  // new section, subsection, unit
+  // forms
   .new-section-name,
   .new-subsection-name-input {
     @include font-size(16);
@@ -84,6 +94,7 @@
     color: $gray-l1;
   }
 
+  // buttons
   .new-subsection-item,
   .new-unit-item {
     @extend %ui-btn-flat-outline;
@@ -106,490 +117,288 @@
 
 
   // UI: general action list styles (section and subsection)
-
+  // --------------------
   .expand-collapse {
     @extend %expand-collapse;
-    margin: 0 ($baseline/4);
   }
 
   // UI: element actions list
-  // TODO: outline page can be updated to reflect styling from %actions-list in _controls.scss
-  .actions-list {
-    display: inline-block;
-    margin-bottom: 0;
+  // --------------------
+
+  // outline
+  // --------------------
+  .outline {
+
   }
 
-  .actions-item {
-    @include font-size(13);
-    display: inline-block;
-    padding: 0 ($baseline/5);
-    vertical-align: middle;
+  .outline-item {
 
-    .action {
-      min-width: ($baseline*.75);
-      color: $gray-l2;
-
-      &:hover,
-      &.is-set {
-        color: $blue;
-        visibility: visible;
-      }
-
-      //reset old drag handle style
-      &.drag-handle {
-        float: none;
-        margin: 0;
-        background: transparent url(../img/drag-handles.png) right 5px no-repeat;
-        text-align: center;
-      }
-
+    .status-release {
+      @extend %t-strong;
     }
+
+    // STATE: not published + not scheduled/released
+
+
   }
 
+  // sections
+  // --------------------
+  .list-sections {
 
-  // section styles
-  .courseware-section {
+  }
+
+  .outline-section {
     @extend %ui-window;
-    @include transition(background $tmg-avg ease-in-out 0);
-    position: relative;
-    padding: ($baseline*1.5) $baseline $baseline $baseline;
+    margin-bottom: $baseline;
+    padding: ($baseline/4) $baseline ($baseline*0.75) $baseline;
 
-    &.collapsed {
-      padding-bottom: 0;
+    // CASE: last-child in UI
+    &:last-child {
+      margin-bottom: 0;
     }
 
-    &.collapsed .subsection-list,
-    .collapsed .subsection-list,
-    .collapsed > ol {
-        display: none !important;
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left: ($baseline/4) solid $color-draft;
     }
 
-    &.new-section {
-      padding: ($baseline*1.5) $baseline 0 $baseline;
+    // CASE: is published by not released
+    &.is-published {
+      border-left-color: $color-published;
 
-      header {
-        @include clearfix();
-        height: auto;
-        border-bottom: 0;
 
-        .expand-collapse {
-          display: none;
-        }
+    &.is-published.is-released {
+        border-left-color: $color-released;
+      }
+    }
 
-        .item-details {
-          width: auto;
+    // CASE: has staff-only content
+    &.has-staff-only {
+      border-left-color: $color-staff-only;
+    }
 
-          .section-name {
-            float: none;
-            width: 100%;
-          }
+    // CASE: has changes
+    &.is-published.is-released.has-changes, // needed for poor specificity
+    &.has-changes {
+      border-left-color: $color-warning;
+
+      .section-status .status-message {
+
+        *[class^='icon-'] {
+          color: $color-warning;
         }
       }
     }
 
-    .section {
+    // CASE: has errors
+    &.is-published.is-released.has-errors, // needed for poor specificity
+    &.has-errors {
+      border-left-color: $color-error;
+
+      .section-status .status-message {
+        color: $color-error;
+      }
+    }
+
+    // header
+    .section-header {
       @include clearfix();
-      min-height: 65px; // needed to align with edit input
-      margin-bottom: 0;
-      border: 0;
-      padding: 0;
-
-      // section name area
-      .item-details {
-        @include clearfix();
-        width: 400px;
-        float: none;
-        display: inline-block;
-        padding: 0 0 ($baseline/2) 0;
-
-        .section-name {
-          @include font-size(19);
-          margin-right: ($baseline/2);
-        }
-
-        .section-name-span {
-          @include transition(color $tmg-f2 linear 0s);
-          cursor: pointer;
-
-          &:hover {
-            color: $blue;
-          }
-        }
-
-        .section-name-edit {
-          position: relative;
-          width: ($baseline*20);
-          background: $white;
-
-          input {
-            @include font-size(16);
-          }
-
-          .save-button {
-            @include blue-button;
-            padding: 7px $baseline 7px;
-            margin-right: ($baseline/4);
-          }
-
-          .cancel-button {
-            @include white-button;
-            padding: 7px $baseline 7px;
-          }
-        }
-      }
-
-
-      // section specific action styles
-      .item-actions {
-        position: relative;
-        display: inline-block;
-        float: right;
-        margin-bottom: ($baseline/2);
-        top: 0;
-      }
-
-      .actions-item {
-        padding: 0 0 0 8px;
-
-        &:last-child {
-          padding-right: 4px;
-        }
-
-        &.pubdate {
-          padding-right: 0;
-        }
-
-        .action {
-
-          &.pubdate {
-            visibility: hidden;
-          }
-
-          &:hover,
-          &.is-set {
-            color: $blue;
-            visibility: visible;
-          }
-        }
-
-        .section-published-date {
-          padding: ($baseline/5) ($baseline/2);
-          border-radius: 3px;
-          background: $gray-l5;
-          text-align: right;
-
-          .published-status {
-            @include font-size(12);
-            margin-right: 15px;
-
-            strong {
-              font-weight: bold;
-            }
-          }
-
-          &.released .section-published-date {
-            background-color: transparent;
-            color: $gray-l1;
-
-            a {
-              color: $gray-l2;
-
-              &:hover {
-                color: $blue;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  // subsection styles
-  .courseware-subsection {
-    @include clearfix();
-    padding: 3px 0;
-
-    &.visible {
-      border-left: 5px solid $green;
     }
 
-    &.mixed {
-      border-left: 5px solid $yellow-s1;
+    .section-header-details {
+      float: left;
+      width: flex-grid(6, 9);
     }
 
-    .status {
-      @extend %cont-text-sr;
-    }
-
-    .section-item {
-      @include transition(background $tmg-avg ease-in-out 0);
-      @include font-size(13);
-      position: relative;
-      display: block;
-      background-color: $gray-l5;
-      padding: 6px 8px 8px 16px;
-
-      &:hover {
-        background: $blue-l5;
-
-        .item-actions {
-          display: block;
-        }
-      }
-
-      &.editing {
-        background: $orange-l4;
-      }
-    }
-
-    .details {
-      display: block;
-      margin-bottom: 0;
-      width: 600px;
-
-      a {
-        color: $baseFontColor;
-      }
-    }
-  }
-
-  // gradable drop down
-  .gradable-status {
-    display: inline-block;
-    position: relative;
-
-    .status-label {
-      @include font-size(12);
-      width: 110px;
-      padding: 5px 40px 5px 10px;
-      border-radius: 3px;
-      color: transparent;
+    .section-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
       text-align: right;
-      font-weight: bold;
-      line-height: 16px;
-    }
 
-    .menu-toggle {
-      @extend %ui-depth1;
-      position: absolute;
-      top: 0;
-      right: 5px;
-      padding: 2px 5px;
-      color: $gray-l2;
-
-      &:hover,
-      &.is-active {
-        color: $blue;
-      }
-
-      &:focus {
-        outline: 0;
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
+        // margin-right: ($baseline*1.25);
       }
     }
 
-
-    // gradable dropdown menu default
-    .menu {
-      @include font-size(12);
-      @include transition(opacity $tmg-f2 linear 0s);
-      display: none;
-      opacity: 0.0;
-      z-index: 1;
-      position: absolute;
-      top: -4px;
-      right: 0;
-      margin: 0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-      border: 1px solid $gray-l2;
-      border-radius: 4px;
-      padding: 8px 12px;
-      background: $white;
-
-      li {
-        width: 115px;
-        margin-bottom: 3px;
-        border-bottom: 1px solid $gray-l4;
-        padding-bottom: 3px;
-
-        &:last-child {
-          margin-bottom: 0;
-          border: none;
-          padding-bottom: 0;
-
-          .gradable-status-notgraded {
-            color: $gray;
-          }
-        }
-      }
-
-      a {
-        color: $blue;
-
-        &.is-selected {
-          font-weight: bold;
-        }
-      }
+    // header - title
+    .section-title {
+      @extend %t-title5;
+      @extend %t-strong;
+      color: $color-heading-base;
     }
 
-    // gradable dropdown state
-    &.is-active {
-
-      .menu {
-        @extend %ui-depth3;
-        display: block;
-        opacity: 1.0;
-      }
-
-      .menu-toggle {
-        @extend %ui-depth4;
-      }
+    // status
+    .section-status {
+      @extend %t-copy-sub2;
+      margin: 0 0 0 $outline-indent-width;
+      color: $color-copy-base;
     }
 
-    // set state
-    &.is-set {
-
-      .menu-toggle {
-        color: $blue;
-      }
-
-      .status-label {
-        display: block;
-        color: $blue;
-      }
-    }
-  }
-
-  .courseware-subsection .sortable-unit-list {
-    margin: ($baseline/4) 0 0 0;
-  }
-
-  // unit styles
-  .courseware-unit {
-    margin: -1px 0 0 ($baseline*1.75);
-
-    &.add-new-unit {
-      margin: 5px ($baseline*1.75) 0 ($baseline*1.75);
-    }
-
-    .section-item {
-      border: 0;
-      background-color: $white;
-    }
-
-    .public-item {
-      color: $black;
-    }
-
-    .private-item {
-      color: $gray-l1;
-    }
-
-    .draft-item {
-      color: $yellow-d1;
-    }
-
-    .draft-item:after,
-    .public-item:after,
-    .private-item:after {
-      @include font-size(9);
-      margin-left: 3px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .draft-item:after {
-      content: "- draft";
-    }
-
-    .private-item:after {
-      content: "- private";
-    }
-  }
-
-
-
-  // modal to edit section publish settings
-  // basic non-backbone modal-window set-up
-  .wrapper-modal-window {
-    @extend %ui-depth4;
-    @include transition(all $tmg-f2 ease-in-out);
-    visibility: hidden;
-    pointer-events: none;
-    display: none;
-    position: fixed;
-    top: 0;
-    overflow: scroll;
-    background: $black-t2;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-
-    &:before {
-      content: '';
+    // status - release
+    .status-release {
       display: inline-block;
-      height: 100%;
       vertical-align: middle;
-      margin-right: -0.25em; /* Adjusts for spacing */
-    }
 
-    .modal-window {
-      -webkit-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      opacity: 0;
-    }
-  }
-
-  // modal-window showing/hiding
-  &.modal-window-is-shown {
-    overflow: hidden;
-
-    .wrapper-modal-window.is-shown {
-      visibility: visible;
-      pointer-events: auto;
-      display: block;
-
-      .modal-window {
-        opacity: 1.0;
+      *[class^='icon-'] {
+        margin-right: ($baseline/4);
       }
     }
+
+    // status - grading
+    .status-grading {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/2);
+    }
+
+    .status-grading-value {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+
+    // status - message
+    .status-message {
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/4);
+
+      *[class^='icon-'] {
+        margin-right: ($baseline/4);
+      }
+    }
+
+    .status-message-copy {
+      display: inline-block;
+    }
   }
 
-  .edit-section-publish-settings {
+  // subsections
+  // --------------------
+  .list-subsections {
+    margin: $baseline 0 0 0;
+  }
 
-    .picker {
+  .outline-subsection {
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: ($baseline/2) ($baseline*0.75);
+
+    // CASE: last-child in UI
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left: ($baseline/4) solid $color-draft;
+    }
+
+    // header
+    .subsection-header {
       @include clearfix();
+    }
 
+    .subsection-header-details {
+      float: left;
+      width: flex-grid(6, 9);
+    }
 
-      .field {
-        float: left;
-        margin: 0 ($baseline/2) ($baseline/2);
+    .subsection-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
+      text-align: right;
 
-        label,
-        input {
-          display: block;
-          text-align: left;
-        }
-
-        label {
-          @extend %t-copy-sub1;
-          margin-bottom: ($baseline/4);
-          font-weight: 600;
-        }
-
-        input[type="text"] {
-          @extend %t-copy-sub1;
-        }
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
+        margin-right: ($baseline/2);
       }
+    }
+
+    // header - title
+    .subsection-title {
+      @extend %t-title6;
+      color: $color-heading-base;
+    }
+
+    // status
+    .subsection-status {
+      @extend %t-copy-sub2;
+      margin: -($baseline/4) 0 0 $outline-indent-width;
+      color: $color-copy-base;
+    }
+  }
+
+  // units
+  // --------------------
+  .list-units {
+    margin: $baseline 0 0 0;
+  }
+
+  .outline-unit {
+    margin-left: $outline-indent-width;
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    padding: ($baseline/4) ($baseline/2);
+
+    // CASE: last-child in UI
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    // header
+    .unit-header {
+      @include clearfix();
+      // margin-bottom: ($baseline/4);
+    }
+
+    .unit-header-details {
+      float: left;
+      width: flex-grid(6, 9);
+      margin-top: ($baseline/4);
+    }
+
+    .unit-header-actions {
+      float: right;
+      width: flex-grid(3, 9);
+      text-align: right;
+
+      .actions-list {
+        @extend %actions-list;
+        @extend %t-action2;
+      }
+    }
+
+    // header - title
+    .unit-title {
+      @extend %t-title7;
+      color: $color-heading-base;
+    }
+
+    .unit-status {
+      @extend %t-copy-sub2;
+      margin-left: $outline-indent-width;
+      color: $color-copy-base;
     }
   }
 
 
+  // UI: drag and drop
 
-  // UI: DnD - specific elems/cases - section
+
+  // UI: drag and drop: section
+  // --------------------
   .courseware-section {
 
     .draggable-drop-indicator-before {
@@ -613,7 +422,7 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - subsection
+  // UI: drag and drop: subsection
   .courseware-subsection {
 
     .draggable-drop-indicator-before {
@@ -638,7 +447,7 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - unit
+  // // UI: drag and drop: unit
   .courseware-unit {
 
     .draggable-drop-indicator-before {
@@ -658,7 +467,7 @@
     }
   }
 
-  // UI: DnD - specific elems/cases - empty parents splint
+  // UI: drag and drop: splints
   .ui-splint-indicator {
     position: relative;
   }
