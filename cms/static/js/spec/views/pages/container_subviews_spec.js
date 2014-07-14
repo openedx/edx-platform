@@ -102,6 +102,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     publishButtonCss = ".action-publish",
                     discardChangesButtonCss = ".action-discard",
                     lastDraftCss = ".wrapper-last-draft",
+                    releaseDateTitleCss = ".wrapper-release .title",
+                    releaseDateContentCss = ".wrapper-release .copy",
                     lastRequest, promptSpies, sendDiscardChangesToServer;
 
                 lastRequest = function() { return requests[requests.length - 1]; };
@@ -275,6 +277,43 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
                     expect(containerPage.$(lastDraftCss).text()).
                         toContain("Draft saved on Jul 02, 2014 at 14:20 UTC by joe");
+                });
+
+                it('renders the release date correctly when unreleased', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true, "released_to_students": false,
+                        "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"'});
+                    expect(containerPage.$(releaseDateTitleCss).text()).toContain("Scheduled:");
+                    expect(containerPage.$(releaseDateContentCss).text()).
+                        toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
+                });
+
+                it('renders the release date correctly when released', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true, "released_to_students": true,
+                        "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"' });
+                    expect(containerPage.$(releaseDateTitleCss).text()).toContain("Released:");
+                    expect(containerPage.$(releaseDateContentCss).text()).
+                        toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
+                });
+
+                it('renders the release date correctly when the release date is not set', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true, "released_to_students": false,
+                        "release_date": null, "release_date_from": null });
+                    expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
+                    expect(containerPage.$(releaseDateContentCss).text()).toContain("Unscheduled");
+                });
+
+                it('renders the release date correctly when the unit is not published', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": false, "released_to_students": true,
+                        "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"' });
+                    // Force a render because none of the fetched fields will trigger a render
+                    containerPage.xblockPublisher.render();
+                    expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
+                    expect(containerPage.$(releaseDateContentCss).text()).
+                        toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
                 });
             });
 
