@@ -14,7 +14,6 @@ import django.utils
 import re
 import threading
 
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
 from xmodule.contentstore.django import contentstore
@@ -102,36 +101,8 @@ def clear_existing_modulestores():
 
     This is useful for flushing state between unit tests.
     """
-    global _MIXED_MODULESTORE, _loc_singleton  # pylint: disable=global-statement
+    global _MIXED_MODULESTORE  # pylint: disable=global-statement
     _MIXED_MODULESTORE = None
-    # pylint: disable=W0603
-    cache = getattr(_loc_singleton, "cache", None)
-    if cache:
-        cache.clear()
-    _loc_singleton = None
-
-
-# singleton instance of the loc_mapper
-_loc_singleton = None
-
-
-def loc_mapper():
-    """
-    Get the loc mapper which bidirectionally maps Locations to Locators. Used like modulestore() as
-    a singleton accessor.
-    """
-    # pylint: disable=W0603
-    global _loc_singleton
-    # pylint: disable=W0212
-    if _loc_singleton is None:
-        try:
-            loc_cache = get_cache('loc_cache')
-        except InvalidCacheBackendError:
-            loc_cache = get_cache('default')
-        # instantiate
-        _loc_singleton = LocMapperStore(loc_cache, **settings.DOC_STORE_CONFIG)
-
-    return _loc_singleton
 
 
 class ModuleI18nService(object):

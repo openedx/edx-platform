@@ -173,7 +173,7 @@ class SplitMigrator(object):
         """
         def get_translation(location):
             """
-            Convert the location and add to loc mapper
+            Convert the location
             """
             return new_course_key.make_usage_key(
                 location.category,
@@ -207,7 +207,7 @@ class SplitMigrator(object):
         """
         def get_translation(location):
             """
-            Convert the location and add to loc mapper
+            Convert the location
             """
             return new_course_key.make_usage_key(
                 location.category,
