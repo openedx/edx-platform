@@ -18,6 +18,7 @@ from logsettings import get_logger_config
 import os
 
 from path import path
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.

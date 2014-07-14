@@ -30,11 +30,11 @@ import sys
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
+    update_module_store_settings
 )
 from path import path
 from warnings import simplefilter
-from lms.envs.modulestore_settings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from dealer.git import git
