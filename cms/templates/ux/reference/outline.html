@@ -52,7 +52,7 @@ from django.core.urlresolvers import reverse
               <!-- section -->
               <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-expanded.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -64,7 +64,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-expanded.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -78,13 +78,6 @@ from django.core.urlresolvers import reverse
                           <!-- unit -->
                           <li class="outline-item outline-unit is-draggable" data-parent="" data-locator="">
                             <%include file="outline_unit_header.html" />
-
-                            <div class="unit-status">
-                              <div class="status-message">
-                                <!-- conditional status message here -->
-                              </div>
-                            </div>
-                            <!-- /unit-status -->
                           </li>
                         </ol>
                         <!-- /list: units -->
@@ -118,7 +111,7 @@ from django.core.urlresolvers import reverse
               <!-- section: not published + not scheduled/released -->
               <li class="outline-item outline-section is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-draft.html" />
@@ -134,7 +127,7 @@ from django.core.urlresolvers import reverse
               <!-- section: not published + release date in future -->
               <li class="outline-item outline-section is-collapsible is-draggable is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -150,7 +143,7 @@ from django.core.urlresolvers import reverse
               <!-- section: not published + release date in past -->
               <li class="outline-item outline-section is-collapsible is-draggable is-released is-scheduled  is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-released.html" />
@@ -166,7 +159,7 @@ from django.core.urlresolvers import reverse
               <!-- section: published + scheduled -->
               <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -182,7 +175,7 @@ from django.core.urlresolvers import reverse
               <!-- section: published + released -->
               <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-released.html" />
@@ -198,7 +191,7 @@ from django.core.urlresolvers import reverse
               <!-- section: published + scheduled + locked content -->
               <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -216,7 +209,7 @@ from django.core.urlresolvers import reverse
               <!-- section: published + released + locked content -->
               <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-released.html" />
@@ -234,7 +227,7 @@ from django.core.urlresolvers import reverse
               <!-- section: locked content -->
               <li class="outline-item outline-section is-collapsible is-draggable has-staff-only is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-lock.html" />
@@ -248,9 +241,9 @@ from django.core.urlresolvers import reverse
               <!-- /section: locked content -->
 
               <!-- section: published + released + has changes -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released has-changes is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-released.html" />
@@ -266,9 +259,9 @@ from django.core.urlresolvers import reverse
               <!-- /section: published + released + has changes -->
 
               <!-- section: published + scheduled + has changes -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -284,9 +277,9 @@ from django.core.urlresolvers import reverse
               <!-- /section: published + scheduled + has changes -->
 
               <!-- section: published + released + has error -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released has-errors is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-released.html" />
@@ -302,9 +295,9 @@ from django.core.urlresolvers import reverse
               <!-- /section: published + released + has error -->
 
               <!-- section: published + scheduled + has error -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-collapsed.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-scheduled.html" />
@@ -326,7 +319,7 @@ from django.core.urlresolvers import reverse
               <!-- section: placeholder -->
               <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-expanded.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-draft.html" />
@@ -338,7 +331,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: not published + not scheduled/released -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-draft.html" />
@@ -355,16 +348,12 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: not published + not scheduled/released + graded -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-graded is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-draft.html" />
 
                         <%include file="outline_status_grading.html" />
-
-                        <div class="status-message">
-                          <!-- conditional status message here -->
-                        </div>
                       </div>
                       <!-- /subsection-status -->
 
@@ -377,7 +366,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + scheduled w/ section -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled_with_parent.html" />
@@ -393,7 +382,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + scheduled + graded  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -411,7 +400,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + scheduled + graded + due date  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -429,7 +418,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + scheduled + graded + due date + locked content  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -449,7 +438,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-released_with_parent.html" />
@@ -465,7 +454,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released (on specific date) + graded  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <div class="status-release">
@@ -492,7 +481,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released + graded + due date  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-released_with_parent.html" />
@@ -510,7 +499,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released + graded + due date + locked content  -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-released_with_parent.html" />
@@ -530,7 +519,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: locked content -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_message-lock.html" />
@@ -546,7 +535,7 @@ from django.core.urlresolvers import reverse
                     <!-- /subsection: published + scheduled + has changes -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -564,7 +553,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released + has changes -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-released.html" />
@@ -582,7 +571,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + released + has error -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-released.html" />
@@ -600,7 +589,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: published + scheduled + has error -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-collapsed.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
@@ -626,7 +615,7 @@ from django.core.urlresolvers import reverse
               <!-- section: placeholder -->
               <li class="outline-item outline-section is-collapsible is-draggable" data-parent="" data-locator="">
 
-                <%include file="outline_section_header.html" />
+                <%include file="outline_section_header-expanded.html" />
 
                 <div class="section-status">
                   <%include file="outline_status_release-draft.html" />
@@ -638,7 +627,7 @@ from django.core.urlresolvers import reverse
                     <!-- subsection: placeholder -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable" data-parent="" data-locator="">
 
-                      <%include file="outline_subsection_header.html" />
+                      <%include file="outline_subsection_header-expanded.html" />
 
                       <div class="subsection-status">
                         <%include file="outline_status_release-scheduled.html" />
