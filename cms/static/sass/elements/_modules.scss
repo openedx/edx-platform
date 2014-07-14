@@ -3,6 +3,7 @@
 // Patterns for pieces of content - modules - used throughout the app
 
 // basic gray module with a strong top border and title, with related content box attached
+// --------------------
 %bar-module {
   margin-bottom: $baseline;
   border-top: 5px solid $gray-l1;
@@ -31,6 +32,7 @@
 }
 
 // blue bar and title bg version
+// --------------------
 %bar-module-blue {
   @extend %bar-module;
   border-top: 5px solid $blue;
@@ -42,6 +44,7 @@
 
 
 // green bar and title bg version
+// --------------------
 %bar-module-green {
   @extend %bar-module;
   border-top: 5px solid $green;
@@ -53,6 +56,7 @@
 
 
 // yellow bar and title bg version
+// --------------------
 %bar-module-yellow {
   @extend %bar-module;
   border-top: 5px solid $orange-l2;
@@ -65,6 +69,7 @@
 
 
 // red bar and title bg version
+// --------------------
 %bar-module-red {
   @extend %bar-module;
   border-top: 5px solid $red-l2;
@@ -76,6 +81,7 @@
 
 // Add new component menu with big green buttons
 // outermost wrapper for add a new component menu
+// --------------------
 .add-xblock-component {
   margin: $baseline ($baseline/2);
   border: 1px solid $gray-l3;
@@ -134,6 +140,7 @@
 
   // outer most wrapper div for scroll up component picker menus
   // swaps in when a green button is clicked
+  // --------------------
   .new-component-templates {
     @include clearfix;
     display: none;
@@ -163,6 +170,7 @@
   }
 
   // individual menus
+  // --------------------
   .new-component-template {
     @include clearfix;
 
@@ -195,6 +203,7 @@
   }
 
   // basic and advanced problem tabs - also handled by jquery-ui tabs
+  // --------------------
   .problem-type-tabs {
     @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     list-style-type: none;
@@ -238,6 +247,12 @@
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
     }
   }
+}
+
+// outline UI
+// --------------------
+.outline {
+
 }
 
 

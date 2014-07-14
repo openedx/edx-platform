@@ -90,7 +90,7 @@
 // extends - UI - window
 %ui-window {
   @include clearfix();
-  border-radius: 3px;
+  border-radius: ($baseline/10);
   box-shadow: 0 1px 1px $shadow-l1;
   margin-bottom: $baseline;
   border: 1px solid $gray-l2;
