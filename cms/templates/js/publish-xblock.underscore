@@ -25,14 +25,30 @@
         </p>
     </div>
 
-    <!--To be added in STUD-1829-->
-    <!--<div class="wrapper-release bar-mod-content">-->
-        <!--<h5 class="title">Will Release:</h5>-->
-        <!--<p class="copy">-->
-            <!--<span class="release-date">July 25, 2014</span> with-->
-            <!--<span class="release-with">Section "Week 1"</span>-->
-        <!--</p>-->
-    <!--</div>-->
+    <!--TODO this needs strikeout styles once staff lock exists-->
+    <div class="wrapper-release bar-mod-content">
+        <h5 class="title">
+            <% if (published && release_date) {
+                if (released_to_students) { %>
+                    <%= gettext("Released:") %>
+                <% } else { %>
+                    <%= gettext("Scheduled:") %>
+                <% }
+            } else { %>
+                <%= gettext("Release:") %>
+            <% } %>
+        </h5>
+        <p class="copy">
+            <% if (release_date) { %>
+                <% var message = gettext("%(release_date)s with %(section_or_subsection)s") %>
+                <%= interpolate(message, {
+                    release_date: '<span class="release-date">' + release_date + '</span>',
+                    section_or_subsection: '<span class="release-with">' + release_date_from + '</span>' }, true) %>
+            <% } else { %>
+                <%= gettext("Unscheduled") %>
+            <% } %>
+        </p>
+    </div>
 
     <!--To be added in STUD-1830-->
     <!--<div class="wrapper-visibility bar-mod-content">-->
