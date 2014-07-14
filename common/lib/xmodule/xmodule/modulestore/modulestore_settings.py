@@ -2,6 +2,12 @@
 This file contains helper functions for configuring module_store_setting settings and support for backward compatibility with older formats.
 """
 
+import warnings
+
+
+# Python 2.7 by default suppresses DeprecationWarnings. Make sure we show these, always.
+warnings.simplefilter('once', DeprecationWarning)
+
 
 def convert_module_store_setting_if_needed(module_store_setting):
     """
@@ -23,6 +29,7 @@ def convert_module_store_setting_if_needed(module_store_setting):
 
             # migrate request for the old 'direct' Mongo store to the Draft store
             if store_settings['ENGINE'] == 'xmodule.modulestore.mongo.MongoModuleStore':
+                warnings.warn("MongoModuleStore is deprecated! Please use DraftModuleStore.", DeprecationWarning)
                 store_settings['ENGINE'] = 'xmodule.modulestore.mongo.draft.DraftModuleStore'
 
         return new_store_list
@@ -31,6 +38,8 @@ def convert_module_store_setting_if_needed(module_store_setting):
         return None
 
     if module_store_setting['default']['ENGINE'] != 'xmodule.modulestore.mixed.MixedModuleStore':
+        warnings.warn("Direct access to a modulestore is deprecated. Please use MixedModuleStore.", DeprecationWarning)
+
         # convert to using mixed module_store
         new_module_store_setting = {
             "default": {
@@ -50,6 +59,11 @@ def convert_module_store_setting_if_needed(module_store_setting):
         module_store_setting = new_module_store_setting
 
     elif isinstance(module_store_setting['default']['OPTIONS']['stores'], dict):
+        warnings.warn(
+            "Using a dict for the Stores option in the MixedModuleStore is deprecated.  Please use a list instead.",
+            DeprecationWarning
+        )
+
         # convert old-style (unordered) dict to (an ordered) list
         module_store_setting['default']['OPTIONS']['stores'] = convert_old_stores_into_list(
             module_store_setting['default']['OPTIONS']['stores']
