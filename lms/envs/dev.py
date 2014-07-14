@@ -291,6 +291,9 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
 
+### This settings is for the course registration code length ############
+REGISTRATION_CODE_LENGTH = 8
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

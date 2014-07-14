@@ -6,6 +6,7 @@ Serve miscellaneous course and student data
 from shoppingcart.models import PaidCourseRegistration, CouponRedemption
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
+from django.core.exceptions import ObjectDoesNotExist
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -15,6 +16,7 @@ ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
+COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'transaction_group_name', 'created_by')
 
 
 def purchase_transactions(course_id, features):
@@ -96,6 +98,42 @@ def enrolled_students_features(course_id, features):
         return student_dict
 
     return [extract_student(student, features) for student in students]
+
+
+def course_registration_features(features, registration_codes, csv_type):
+    """
+    Return list of Course Registration Codes as dictionaries.
+
+    course_registration_features
+    would return [
+        {'code': 'code1', 'course_id': 'edX/Open_DemoX/edx_demo_course, ..... }
+        {'code': 'code2', 'course_id': 'edX/Open_DemoX/edx_demo_course, ..... }
+    ]
+    """
+
+    def extract_course_registration(registration_code, features, csv_type):
+        """ convert registration_code to dictionary
+        :param registration_code:
+        :param features:
+        :param csv_type:
+        """
+        registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
+
+        course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
+        course_registration_dict['redeemed_by'] = None
+
+        # we have to capture the redeemed_by value in the case of the downloading and spent registration
+        # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
+        #  They have not been redeemed yet
+        if csv_type is not None:
+            try:
+                course_registration_dict['redeemed_by'] = getattr(registration_code.registrationcoderedemption_set.get(registration_code=registration_code), 'redeemed_by')
+            except ObjectDoesNotExist:
+                pass
+
+        course_registration_dict['course_id'] = course_registration_dict['course_id'].to_deprecated_string()
+        return course_registration_dict
+    return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 
 
 def dump_grading_context(course):
