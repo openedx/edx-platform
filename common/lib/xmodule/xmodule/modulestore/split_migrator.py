@@ -129,11 +129,7 @@ class SplitMigrator(object):
             else:
                 # only a draft version (aka, 'private').
                 _new_module = self.split_modulestore.create_item(
-<<<<<<< HEAD
-                    new_draft_course_loc, module.category, user_id,
-=======
-                    user.id, new_locator, parent_location=new_draft_course_loc,
->>>>>>> converge create_item.
+                    user_id, new_locator, parent_location=new_draft_course_loc,
                     block_id=new_locator.block_id,
                     fields=self._get_json_fields_translate_references(
                         module, new_draft_course_loc, published_course_usage_key.block_id
