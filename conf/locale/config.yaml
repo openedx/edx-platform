@@ -31,6 +31,7 @@ locales:
     - fa  # Persian
     - fa_IR  # Persian (Iran)
     - fi_FI  # Finnish (Finland)
+    - fil  # Filipino
     - fr  # French
     - gl  # Galician
     - gu  # Gujarati
@@ -49,6 +50,7 @@ locales:
     - lt_LT  # Lithuanian (Lithuania)
     - ml  # Malayalam
     - mn  # Mongolian
+    - mr  # Marathi
     - ms  # Malay
     - nb  # Norwegian Bokmål
     - ne  # Nepali
@@ -62,11 +64,14 @@ locales:
     - si  # Sinhala
     - sk  # Slovak
     - sl  # Slovenian
+    - sr  # Serbian
     - ta  # Tamil
+    - te  # Telugu
     - th  # Thai
     - tr_TR  # Turkish (Turkey)
     - uk  # Ukranian
     - ur  # Urdu
+    - uz  # Uzbek
     - vi  # Vietnamese
     - zh_CN  # Chinese (China)
     - zh_HK  # Chinese (Hong Kong)
