@@ -870,7 +870,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
     )
 
     logging.debug('course_module = {0}'.format(tab_module))
