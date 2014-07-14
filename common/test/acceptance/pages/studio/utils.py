@@ -2,6 +2,8 @@
 Utility methods useful for Studio page tests.
 """
 from bok_choy.promise import Promise
+import pdb
+
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -13,10 +15,10 @@ def click_css(page, css, source_index=0, require_notification=True):
     If require_notification is False (default value is True), the method will return immediately.
     Otherwise, it will wait for the "mini-notification" to appear and disappear.
     """
-    css_for_button_that_we_care_about = \
-        ':nth-of-type({source_index}){{{css}}}'.format(source_index=source_index, css=css)
-    page.wait_for_element_visibility(css_for_button_that_we_care_about, "Target not visible")
-    target = page.q(css=css_for_button_that_we_care_about)
+    css_for_button_that_we_care_about = '{css}:nth-of-type({source_index})'.format(source_index=source_index, css=css)
+    # pdb.set_trace()
+    page.wait_for_element_presence(css, "Target not visible")
+    target = page.q(css=css)[source_index]
     target.click()
     if require_notification:
         wait_for_notification(page)
