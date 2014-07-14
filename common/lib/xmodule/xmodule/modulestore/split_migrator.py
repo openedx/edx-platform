@@ -84,7 +84,9 @@ class SplitMigrator(object):
                 # it doesn't need the parent as the first arg. That is, it translates and populates
                 # the 'children' field as it goes.
                 _new_module = self.split_modulestore.create_item(
-                    user_id, module.location, parent_location=course_version_locator,
+                    user_id,
+                    course_version_locator.make_usage_key(module.location.category, module.location.block_id),
+                    parent_location=course_version_locator,
                     block_id=module.location.block_id,
                     fields=self._get_json_fields_translate_references(
                         module, course_version_locator, new_course.location.block_id
