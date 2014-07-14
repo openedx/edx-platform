@@ -4,8 +4,46 @@
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 
 <div class="ecommerce-wrapper">
+  <h3 class="coupon-errors" id="code-error"></h3>
+  <h2>Registration Codes</h2>
+  <p>Enter the transaction group name and number of registration codes that you want to generate. Click to generate a CSV :</p>
+  <p>
+     <form action="${ section_data['generate_registration_code_csv_url'] }" id="course_codes_number" method="post">
+       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+       <input type="text" name="transaction_group_name" placeholder="Transaction Group Name"/>
+       <input type="text" name="course_registration_code_number" placeholder="Number of Registration Codes" maxlength="4"/>
+       <input type="submit" name="generate-registration-codes-csv" value="${_("Generate Registration Codes")}" data-csv="true">
+     </form>
+  </p>
 
-%if section_data['access']['finance_admin'] is True:
+  <p>Click to generate a CSV file of all Course Registrations Codes:</p>
+  <p>
+    <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
+       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+       <input type="text" name="download_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+       <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
+    </form>
+  </p>
+
+  <p>Click to generate a CSV file of all Active Course Registrations Codes:</p>
+  <p>
+    <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
+       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+       <input type="text" name="active_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+       <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
+    </form>
+  </p>
+
+  <p>Click to generate a CSV file of all Spent Course Registrations Codes:</p>
+  <p>
+    <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
+       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+       <input type="text" name="spent_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+       <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
+    </form>
+  </p>
+  <hr>
+  %if section_data['access']['finance_admin'] is True:
 
   <h2>${_("Transactions")}</h2>
   %if section_data['total_amount'] is not None:

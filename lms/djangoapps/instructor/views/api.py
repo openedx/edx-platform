@@ -5,6 +5,7 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
+from django.views.decorators.http import require_POST
 
 import json
 import logging
@@ -14,11 +15,14 @@ from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
+import string  # pylint: disable=W0402
+import random
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -34,6 +38,7 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response
 from courseware.models import StudentModule
+from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -561,7 +566,7 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
         'order_id',
     ]
 
-    student_data = analytics.basic.purchase_transactions(course_id, query_features)
+    student_data = instructor_analytics.basic.purchase_transactions(course_id, query_features)
 
     if not csv:
         response_payload = {
@@ -628,6 +633,155 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     else:
         header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
         return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+
+
+def save_registration_codes(request, course_id, generated_codes_list, group_name):
+    """
+    recursive function that generate a new code every time and saves in the Course Registration Table
+    if validation check passes
+    """
+    code = random_code_generator()
+
+    # check if the generated code is in the Coupon Table
+    matching_coupons = Coupon.objects.filter(code=code, is_active=True)
+    if matching_coupons:
+        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+
+    course_registration = CourseRegistrationCode(
+        code=code, course_id=course_id.to_deprecated_string(),
+        transaction_group_name=group_name, created_by=request.user
+    )
+    try:
+        course_registration.save()
+        generated_codes_list.append(course_registration)
+    except IntegrityError:
+        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+
+
+def registration_codes_csv(file_name, codes_list, csv_type=None):
+    """
+    Respond with the csv headers and data rows
+    given a dict of codes list
+    :param file_name:
+    :param codes_list:
+    :param csv_type:
+    """
+    # csv headers
+    query_features = ['code', 'course_id', 'transaction_group_name', 'created_by', 'redeemed_by']
+
+    registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
+    header, data_rows = instructor_analytics.csvs.format_dictlist(registration_codes, query_features)
+    return analytics.csvs.create_csv_response(file_name, header, data_rows)
+
+
+def random_code_generator():
+    """
+    generate a random alphanumeric code of length defined in
+    REGISTRATION_CODE_LENGTH settings
+    """
+    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
+    return string.join((random.choice(chars) for _ in range(code_length)), '')
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def get_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    #filter all the  course registration codes
+    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+
+    group_name = request.POST['download_transaction_group_name']
+    if group_name:
+        registration_codes = registration_codes.filter(transaction_group_name=group_name)
+
+    csv_type = 'download'
+    return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def generate_registration_codes(request, course_id):
+    """
+    Respond with csv which contains a summary of all Generated Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_registration_codes = []
+
+    # covert the course registration code number into integer
+    try:
+        course_code_number = int(request.POST['course_registration_code_number'])
+    except ValueError:
+        course_code_number = int(float(request.POST['course_registration_code_number']))
+
+    group_name = request.POST['transaction_group_name']
+
+    for _ in range(course_code_number):  # pylint: disable=W0621
+        save_registration_codes(request, course_id, course_registration_codes, group_name)
+
+    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def active_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Active Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    # find all the registration codes in this course
+    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+
+    group_name = request.POST['active_transaction_group_name']
+    if group_name:
+        registration_codes_list = registration_codes_list.filter(transaction_group_name=group_name)
+    # find the redeemed registration codes if any exist in the db
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    if code_redemption_set.exists():
+        redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
+        # exclude the redeemed registration codes from the registration codes list and you will get
+        # all the registration codes that are active
+        registration_codes_list = registration_codes_list.exclude(code__in=redeemed_registration_codes)
+
+    return registration_codes_csv("Active_Registration_Codes.csv", registration_codes_list)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def spent_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Spent(used) Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    # find the redeemed registration codes if any exist in the db
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    spent_codes_list = []
+    if code_redemption_set.exists():
+        redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
+        # filter the Registration Codes by course id and the redeemed codes and
+        # you will get a list of all the spent(Redeemed) Registration Codes
+        spent_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id, code__in=redeemed_registration_codes).order_by('transaction_group_name')
+
+        group_name = request.POST['spent_transaction_group_name']
+        if group_name:
+            spent_codes_list = spent_codes_list.filter(transaction_group_name=group_name)  # pylint:  disable=E1103
+
+    csv_type = 'spent'
+    return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
 
 
 @ensure_csrf_cookie
