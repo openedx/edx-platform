@@ -15,6 +15,7 @@
 # Maria J Crespo, 2014
 # Marta, 2014
 # mcolomer <mcmlilhity@gmail.com>, 2014
+# Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # RUTH QUINTANA <rqvaquero@gmail.com>, 2014
 # Tesaur <pablo15892@hotmail.com>, 2014
 # valenciaupv <valenciaupv@gmail.com>, 2014
@@ -82,6 +83,7 @@
 # mcolomer <mcmlilhity@gmail.com>, 2014
 # Natalia, 2013
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
+# Raúl Aguilera Ortega <raguiler@db.uc3m.es>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -103,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 10:29-0400\n"
+"POT-Creation-Date: 2014-07-11 16:04-0400\n"
 "PO-Revision-Date: 2014-04-25 10:00+0000\n"
 "Last-Translator: spentamanyu <i.delamo@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -3424,6 +3426,8 @@ msgid "Email Address"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Course ID"
 msgstr "Id del Curso"
 
@@ -3817,6 +3821,51 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id is None"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) is already inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) added successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id not found"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) already exists"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "E-Commerce"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4605,30 +4654,52 @@ msgid "Course added to cart."
 msgstr "Cursos añadidos al carrito de la compra."
 
 #: lms/djangoapps/shoppingcart/views.py
+msgid "Discount does not exist against coupon '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' already used."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is inactive."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -4642,6 +4713,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4654,6 +4726,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4678,6 +4751,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Successful transaction."
 msgstr ""
 
@@ -4686,6 +4760,7 @@ msgid "The request is missing one or more required fields."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "One or more fields in the request contains invalid data."
 msgstr ""
 
@@ -4728,6 +4803,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Expired card. You might also receive this if the expiration date you\n"
@@ -4737,6 +4813,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            General decline of the card. No other information provided by the issuing bank.\n"
@@ -4745,6 +4822,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
@@ -4756,11 +4834,13 @@ msgid "Unknown reason"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Inactive card or card not authorized for card-not-present transactions.\n"
@@ -4769,6 +4849,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
@@ -4781,11 +4862,13 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type is not accepted by the payment processor.\n"
@@ -4794,6 +4877,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
@@ -4811,6 +4895,7 @@ msgid "The requested amount exceeds the originally authorized amount."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr ""
 
@@ -4824,6 +4909,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
@@ -4870,6 +4956,87 @@ msgstr ""
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource.'\n"
+"            Possible fix: retry with a different form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
+"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
+"            Possible fix: retry the payment after 15 minutes.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Only a partial amount was approved."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
+"            becouse it did not pass the Address Verification System (AVS).\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The issuing bank has questions about the request. You do not receive an\n"
+"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stolen or lost card"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid card verification number (CVN). Possible fix: retry with another "
+"form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The customer matched an entry on the processors negative file."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Account frozen. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by\n"
+"            CyberSource because it did not pass the CVN check.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            There is a problem with the information in your CyberSource account.  Please let us know at {0}\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The cardholder is enrolled for payer authentication"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Payer authentication could not be authenticated"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
+"            on your legacy Smart Authorization settings.\n"
 "            Possible fix: retry with a different form of payment.\n"
 "            "
 msgstr ""
@@ -5084,6 +5251,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Required Information"
 msgstr "Información Requerida"
 
@@ -5130,10 +5299,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
+" user account at %(site_name)s."
 msgstr ""
-"Usted ha recibido este correo porque solicitó un reinicio de la contraseña "
-"para su cuenta en edx.org"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -5150,8 +5317,8 @@ msgid "Thanks for using our site!"
 msgstr "Gracias por utilizar nuestro sitio!"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The edX Team"
-msgstr "El equipo de edX"
+msgid "The %(platform_name)s Team"
+msgstr ""
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -5246,6 +5413,8 @@ msgstr "Previsualizar"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
@@ -5823,7 +5992,7 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -5836,6 +6005,13 @@ msgstr ""
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Ver"
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -5883,13 +6059,6 @@ msgstr "¿Olvidaste tu contraseña?"
 #: lms/templates/register.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 msgid "Password"
-msgstr ""
-
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -5942,8 +6111,8 @@ msgstr ""
 msgid "Terms of Service"
 msgstr ""
 
-#: cms/templates/widgets/footer.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr ""
@@ -6132,12 +6301,13 @@ msgstr "Visión"
 msgid "Faq"
 msgstr "Faq"
 
-#: lms/templates/contact.html lms/templates/footer.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html
 msgid "Press"
 msgstr "Prensa"
 
-#: lms/templates/contact.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "Contacto"
@@ -6393,6 +6563,43 @@ msgstr "Borrar tu inscripción"
 msgid "View Unit in Studio"
 msgstr ""
 
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "About"
+msgstr "Acerca de"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/jobs.html
+msgid "Jobs"
+msgstr "Trabajos"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "Preguntas Frecuentes"
+
+#: lms/templates/edx_footer.html
+msgid "edX Logo"
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr ""
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "Términos del Servicio y Código de Honor"
+
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
 msgstr "El cambio de su correo electrónico falló."
@@ -6492,48 +6699,12 @@ msgid "User"
 msgstr "Usuario"
 
 #: lms/templates/footer.html
-msgid "About"
-msgstr "Acerca de"
-
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/jobs.html
-msgid "Jobs"
-msgstr "Trabajos"
-
-#: lms/templates/footer.html lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "Preguntas Frecuentes"
-
-#: lms/templates/footer.html
-msgid "{platform_name} Logo"
-msgstr "Logo de {platform_name}"
-
-#: lms/templates/footer.html
-msgid ""
-"{platform_name} is a non-profit created by founding partners {Harvard} and "
-"{MIT} whose mission is to bring the best of higher education to students of "
-"all ages anywhere in the world, wherever there is Internet access. "
-"{platform_name}'s free online MOOCs are interactive and subjects include "
-"computer science, public health, and artificial intelligence."
+msgid "&copy; 2014 {platform_name}, some rights reserved"
 msgstr ""
-"{platform_name} es un proyecto sin animo de lucro creado por los fundadores "
-"asociado {Harvard} y {MIT} cuya misión es llevar lo mejor de la educación "
-"superior a estudiantes de todas las edades en cualquier parte del mundo a "
-"través de Internet. Los cursos en línea masivos de la plataforma "
-"{platform_name} son interactivos y sus temas incluyen ciencias de la "
-"computación, salud pública e inteligencia artificial."
-
-#: lms/templates/footer.html
-msgid "&copy; 2014 {platform_name}, some rights reserved."
-msgstr ""
-
-#: lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "Términos del Servicio y Código de Honor"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Password Reset"
 msgstr "Contraseña restablecida"
 
@@ -7042,13 +7213,8 @@ msgstr "Iniciar sesión"
 #: lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link_start}Chrome{chrome_link_end} or "
-"{ff_link_start}Firefox{ff_link_end}."
+"recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"<strong> Advertencia: </strong> Su navegador no es totalmente compatible. Se"
-" recomienda encarecidamente el uso de "
-"{chrome_link_start}Chrome{chrome_link_end} o "
-"{ff_link_start}Firefox{ff_link_end}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -7462,6 +7628,7 @@ msgid "Staff Debug"
 msgstr "Depuración de los administradores"
 
 #: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr ""
 
@@ -8230,7 +8397,7 @@ msgstr ""
 msgid "Course Updates &amp; News"
 msgstr "Novedades y noticias del curso"
 
-#: lms/templates/courseware/info.html
+#: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Handout Navigation"
 msgstr "Navegación de apuntes"
 
@@ -8899,6 +9066,7 @@ msgid "View Archived Course"
 msgstr "Ver Curso Archivado"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "Ver curso"
 
@@ -9726,6 +9894,26 @@ msgstr ""
 msgid "Skip"
 msgstr "Omitir"
 
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Please enter Coupon detail below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Percentage Discount"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Active Students"
 msgstr ""
@@ -9909,6 +10097,65 @@ msgstr ""
 msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons List"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Total Amount: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons Information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "+ Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Course_id"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Discount(%)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Count"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Discount Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Numeric value for Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Edit Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon Information"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -10767,6 +11014,10 @@ msgstr "Artículos solicitados"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Qty"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "URL"
 msgstr ""
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
@@ -11824,12 +12075,6 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"{ff_a_start}Firefox{a_end}, {chrome_a_start}Chrome{a_end}, "
-"{safari_a_start}Safari{a_end}, {ie_a_start}IE9+{a_end}"
-msgstr ""
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
 "Please make sure your browser is updated to the most recent version possible"
 msgstr ""
 
@@ -12535,6 +12780,45 @@ msgstr ""
 msgid "Course git url:"
 msgstr ""
 
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Group Configurations"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "This module is disabled at the moment."
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Grading"
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr ""
+
 #: cms/templates/howitworks.html
 msgid "Welcome"
 msgstr ""
@@ -13187,12 +13471,6 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr ""
 
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr ""
-
 #: cms/templates/manage_users.html
 msgid "New Team Member"
 msgstr ""
@@ -13702,22 +13980,6 @@ msgid ""
 "new courses to take."
 msgstr ""
 
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr ""
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr ""
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr ""
-
 #: cms/templates/settings_advanced.html
 msgid "Hide Deprecated Settings"
 msgstr ""
@@ -13767,10 +14029,6 @@ msgid ""
 "{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
 " you use double quotation marks (&quot;) around the string. Do not use "
 "single quotation marks (&apos;)."
-msgstr ""
-
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
 msgstr ""
 
 #: cms/templates/settings_graders.html

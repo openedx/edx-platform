@@ -624,6 +624,7 @@ LANGUAGES = (
     ('fa', u'فارسی'),  # Persian
     ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
     ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fil', u'Filipino'),  # Filipino
     ('fr', u'Français'),  # French
     ('gl', u'Galego'),  # Galician
     ('gu', u'ગુજરાતી'),  # Gujarati
@@ -642,6 +643,7 @@ LANGUAGES = (
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
     ('mn', u'Монгол хэл'),  # Mongolian
+    ('mr', u'मराठी'),  # Marathi
     ('ms', u'Bahasa Melayu'),  # Malay
     ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
     ('ne', u'नेपाली'),  # Nepali
@@ -655,12 +657,15 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('sr', u'Српски'),  # Serbian
     ('ta', u'தமிழ்'),  # Tamil
+    ('te', u'తెలుగు'),  # Telugu
     ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Ukranian
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
+    ('uz', u'Ўзбек'),  # Uzbek
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
     ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
