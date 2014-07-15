@@ -87,7 +87,13 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         """
         location = self.old_course_key.make_usage_key(category, name)
         self.draft_mongo.create_item(
-            self.user_id, location, definition_data=data, metadata=metadata, runtime=self.runtime
+            self.user_id,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id,
+            definition_data=data,
+            metadata=metadata,
+            runtime=self.runtime
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
@@ -104,16 +110,28 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.draft_mongo.update_item(parent, self.user_id)
             if not draft:
                 self.draft_mongo.publish(parent_location, self.user_id)
-            # create pointer for split
-            course_or_parent_locator = BlockUsageLocator(
-                course_key=self.split_course_key,
-                block_type=parent_category,
-                block_id=parent_name
-            )
+            # create child for split
+            if split:
+                self.split_mongo.create_child(
+                    self.user_id,
+                    BlockUsageLocator(
+                        course_key=self.split_course_key,
+                        block_type=parent_category,
+                        block_id=parent_name
+                    ),
+                    category,
+                    block_id=name,
+                    fields=fields
+                )
         else:
-            course_or_parent_locator = self.split_course_key
-        if split:
-            self.split_mongo.create_item(course_or_parent_locator, category, self.user_id, block_id=name, fields=fields)
+            if split:
+                self.split_mongo.create_item(
+                    self.user_id,
+                    self.split_course_key,
+                    category,
+                    block_id=name,
+                    fields=fields
+                )
 
     def _create_course(self, split=True):
         """

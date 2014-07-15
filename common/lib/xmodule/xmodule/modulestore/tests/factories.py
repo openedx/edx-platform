@@ -174,7 +174,15 @@ class ItemFactory(XModuleFactory):
             if display_name is not None:
                 metadata['display_name'] = display_name
             runtime = parent.runtime if parent else None
-            store.create_item(user_id, location, metadata=metadata, definition_data=data, runtime=runtime)
+            store.create_item(
+                user_id,
+                location.course_key,
+                location.block_type,
+                block_id=location.block_id,
+                metadata=metadata,
+                definition_data=data,
+                runtime=runtime
+            )
 
             module = store.get_item(location)
 

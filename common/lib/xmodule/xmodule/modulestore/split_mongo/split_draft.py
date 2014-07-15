@@ -6,6 +6,7 @@ from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
@@ -13,13 +14,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
-    def __init__(self, **kwargs):
-        super(DraftVersioningModuleStore, self).__init__(**kwargs)
-
     def create_course(self, org, course, run, user_id, **kwargs):
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         return super(DraftVersioningModuleStore, self).create_course(
-            org, course, run, user_id, master_branch, **kwargs
+            org, course, run, user_id, master_branch=master_branch, **kwargs
         )
 
     def get_courses(self):
@@ -31,32 +29,81 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     def delete_item(self, location, user_id, revision=None, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
+
+        Args:
+            location: UsageKey of the item to be deleted
+            user_id: id of the user deleting the item
+            revision:
+                None - deletes the item and its subtree, and updates the parents per description above
+                ModuleStoreEnum.RevisionOption.published_only - removes only Published versions
+                ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
+                    currently only provided by contentstore.views.item.orphan_handler
+                Otherwise, raises a ValueError.
         """
         if revision == ModuleStoreEnum.RevisionOption.published_only:
             branches_to_delete = [ModuleStoreEnum.BranchName.published]
         elif revision == ModuleStoreEnum.RevisionOption.all:
             branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
-        else:
+        elif revision is None:
             branches_to_delete = [ModuleStoreEnum.BranchName.draft]
+        else:
+            raise ValueError('revision not one of None, ModuleStoreEnum.RevisionOption.published_only, or ModuleStoreEnum.RevisionOption.all')
         for branch in branches_to_delete:
             SplitMongoModuleStore.delete_item(self, location.for_branch(branch), user_id, **kwargs)
+
+    def _map_revision_to_branch(self, key, revision=None):
+        """
+        Maps RevisionOptions to BranchNames, inserting them into the key
+        """
+        if revision == ModuleStoreEnum.RevisionOption.published_only:
+            return key.for_branch(ModuleStoreEnum.BranchName.published)
+        elif revision == ModuleStoreEnum.RevisionOption.draft_only:
+            return key.for_branch(ModuleStoreEnum.BranchName.draft)
+        else:
+            return key
+
+    def has_item(self, usage_key, revision=None):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        usage_key = self._map_revision_to_branch(usage_key, revision=revision)
+        return super(DraftVersioningModuleStore, self).has_item(usage_key)
 
     def get_item(self, usage_key, depth=0, revision=None):
         """
         Returns the item identified by usage_key and revision.
         """
-        def for_branch(branch_state):
-            if usage_key.branch is not None and usage_key.branch is not branch_state:
-                raise ValueError('{} already has a branch.'.format(usage_key))
-            return usage_key.for_branch(branch_state)
-        if revision == ModuleStoreEnum.RevisionOption.published_only:
-            usage_key = for_branch(ModuleStoreEnum.BranchName.published)
-        elif revision == ModuleStoreEnum.RevisionOption.draft_only:
-            usage_key = for_branch(ModuleStoreEnum.BranchName.draft)
+        usage_key = self._map_revision_to_branch(usage_key, revision=revision)
         return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth)
 
+    def get_items(self, course_locator, settings=None, content=None, revision=None, **kwargs):
+        """
+        Returns a list of XModuleDescriptor instances for the matching items within the course with
+        the given course_locator.
+        """
+        course_locator = self._map_revision_to_branch(course_locator, revision=revision)
+        return super(DraftVersioningModuleStore, self).get_items(
+            course_locator,
+            settings=settings,
+            content=content,
+            **kwargs
+        )
+
     def get_parent_location(self, location, revision=None, **kwargs):
-        # NAATODO - support draft_preferred
+        '''
+        Returns the given location's parent location in this course.
+        Args:
+            revision:
+                None - uses the branch setting for the revision
+                ModuleStoreEnum.RevisionOption.published_only
+                    - return only the PUBLISHED parent if it exists, else returns None
+                ModuleStoreEnum.RevisionOption.draft_preferred
+                    - return either the DRAFT or PUBLISHED parent, preferring DRAFT, if parent(s) exists,
+                        else returns None
+        '''
+        if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
+            revision = ModuleStoreEnum.RevisionOption.draft_only
+        location = self._map_revision_to_branch(location, revision=revision)
         return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
 
     def has_changes(self, usage_key):
@@ -65,6 +112,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         :param usage_key: the block to check
         :return: True if the draft and published versions differ
         """
+        # TODO for better performance: lookup the courses and get the block entry, don't create the instances
         draft = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.draft))
         try:
             published = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.published))
@@ -120,20 +168,21 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
             return self._get_block_from_structure(course_structure, xblock.location.block_id)
 
-        if xblock.location.branch is None:
-            raise ValueError(u'{} is not in a branch; so, this is nonsensical'.format(xblock.location))
         if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
-            other = get_head(ModuleStoreEnum.BranchName.published)
+            try:
+                other = get_head(ModuleStoreEnum.BranchName.published)
+            except ItemNotFoundError:
+                return PublishState.private
         elif xblock.location.branch == ModuleStoreEnum.BranchName.published:
             other = get_head(ModuleStoreEnum.BranchName.draft)
         else:
-            raise ValueError(u'{} is not in a branch other than draft or published; so, this is nonsensical'.format(xblock.location))
+            raise ValueError(u'{} is in a branch other than draft or published.'.format(xblock.location))
 
         if not other:
             if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
                 return PublishState.private
             else:
-                return PublishState.public  # a bit nonsensical
+                return PublishState.public
         elif xblock.update_version != other['edit_info']['update_version']:
             return PublishState.draft
         else:

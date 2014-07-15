@@ -30,8 +30,7 @@ class TestDraftVersioningModuleStore(unittest.TestCase):
             render_template=render_to_template_mock,
             xblock_mixins=(InheritanceMixin, XModuleMixin),
         )
-        # NAATODO - uncomment once merged with drop_database PR
-        # self.addCleanup(module_store._drop_database)
+        self.addCleanup(self.module_store._drop_database)
 
         SplitModuleTest.bootstrapDB(self.module_store)
 

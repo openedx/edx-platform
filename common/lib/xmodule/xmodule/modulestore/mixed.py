@@ -7,21 +7,23 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 
 import logging
 from contextlib import contextmanager
-from opaque_keys import InvalidKeyError
+import itertools
 
-from . import ModuleStoreWriteBase
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-import itertools
-from xmodule.modulestore.split_migrator import SplitMigrator
+
+from . import ModuleStoreWriteBase
+from . import ModuleStoreEnum
+from .exceptions import ItemNotFoundError
+from .draft_and_published import ModuleStoreDraftAndPublished
+from .split_migrator import SplitMigrator
 
 
 log = logging.getLogger(__name__)
 
 
-class MixedModuleStore(ModuleStoreWriteBase):
+class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
@@ -282,7 +284,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         Returns: a CourseDescriptor
         """
-        store = self._get_modulestore_for_courseid(None)
+        store = self._verify_modulestore_support(None, 'create_course')
         return store.create_course(org, course, run, user_id, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
@@ -312,40 +314,57 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run
             )
 
-    def create_item(self, user_id, location=None, parent_location=None, **kwargs):
+    def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
-        Creates and saves a new item.
-        Either location or (category, parent_location) or both must be provided.
-        If parent_location is provided, a new item of the given category is added as a child.
-        If location is not provided, a new item with the given category and given block_id
-          is added to the parent_location.  If the block_id is not provided, a unique name
-          is automatically generated.
+        Creates and saves a new item in a course.
 
         Returns the newly created item.
 
-        :param user_id: ID of the user creating and saving the xmodule
-        :param location: a Location--must have a category
-        :param parent_location: optional parameter, specifying the Location of the parent item
-        :param category: optional parameter for the category of the new item
-        :param block_id: a unique identifier for the new item
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            course_key: A :class:`~opaque_keys.edx.CourseKey` identifying which course to create
+                this item in
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+            fields (dict): A dictionary specifying initial values for some or all fields
+                in the newly created block
         """
-        location = compute_location_from_args(location, parent_location, **kwargs)
-        modulestore = self._verify_modulestore_support(location, 'create_item')
-        return modulestore.create_item(user_id, location, parent_location, **kwargs)
+        modulestore = self._verify_modulestore_support(course_key, 'create_item')
+        return modulestore.create_item(user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs)
+
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
+        """
+        Creates and saves a new xblock that is a child of the specified block
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifying the
+                block that this item should be parented under
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+            fields (dict): A dictionary specifying initial values for some or all fields
+                in the newly created block
+        """
+        modulestore = self._verify_modulestore_support(parent_usage_key.course_key, 'create_child')
+        return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)
 
     def update_item(self, xblock, user_id, allow_not_found=False):
         """
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
         """
-        store = self._verify_modulestore_support(xblock.location, 'update_item')
+        store = self._verify_modulestore_support(xblock.location.course_key, 'update_item')
         return store.update_item(xblock, user_id, allow_not_found)
 
     def delete_item(self, location, user_id, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
-        store = self._verify_modulestore_support(location, 'delete_item')
+        store = self._verify_modulestore_support(location.course_key, 'delete_item')
         store.delete_item(location, user_id=user_id, **kwargs)
 
     def revert_to_published(self, location, user_id):
@@ -358,7 +377,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         :raises InvalidVersionError: if no published version exists for the location specified
         """
-        store = self._verify_modulestore_support(location, 'revert_to_published')
+        store = self._verify_modulestore_support(location.course_key, 'revert_to_published')
         return store.revert_to_published(location, user_id)
 
     def close_all_connections(self):
@@ -388,7 +407,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         :param runtime: if you already have an xblock from the course, the xblock.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        store = self._verify_modulestore_support(location, 'create_xmodule')
+        store = self._verify_modulestore_support(location.course_key, 'create_xmodule')
         return store.create_xmodule(location, definition_data, metadata, runtime, fields, **kwargs)
 
     def get_courses_for_wiki(self, wiki_slug):
@@ -433,7 +452,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Save a current draft to the underlying modulestore
         Returns the newly published item.
         """
-        store = self._verify_modulestore_support(location, 'publish')
+        store = self._verify_modulestore_support(location.course_key, 'publish')
         return store.publish(location, user_id)
 
     def unpublish(self, location, user_id):
@@ -441,7 +460,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Save a current draft to the underlying modulestore
         Returns the newly unpublished item.
         """
-        store = self._verify_modulestore_support(location, 'unpublish')
+        store = self._verify_modulestore_support(location.course_key, 'unpublish')
         return store.unpublish(location, user_id)
 
     def convert_to_draft(self, location, user_id):
@@ -451,18 +470,26 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         :param source: the location of the source (its revision must be None)
         """
-        store = self._verify_modulestore_support(location, 'convert_to_draft')
+        store = self._verify_modulestore_support(location.course_key, 'convert_to_draft')
         return store.convert_to_draft(location, user_id)
 
-    def _verify_modulestore_support(self, location, method):
+    def has_changes(self, usage_key):
+        """
+        Checks if the given block has unpublished changes
+        :param usage_key: the block to check
+        :return: True if the draft and published versions differ
+        """
+        store = self._verify_modulestore_support(usage_key.course_key, 'has_changes')
+        return store.has_changes(usage_key)
+
+    def _verify_modulestore_support(self, course_key, method):
         """
         Finds and returns the store that contains the course for the given location, and verifying
         that the store supports the given method.
 
         Raises NotImplementedError if the found store does not support the given method.
         """
-        course_id = location.course_key
-        store = self._get_modulestore_for_courseid(course_id)
+        store = self._get_modulestore_for_courseid(course_key)
         if hasattr(store, method):
             return store
         else:

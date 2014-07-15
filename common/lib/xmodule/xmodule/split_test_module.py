@@ -578,7 +578,9 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         metadata = {'display_name': group.name}
         modulestore.create_item(
             user_id,
-            dest_usage_key,
+            self.location.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
             runtime=self.system,

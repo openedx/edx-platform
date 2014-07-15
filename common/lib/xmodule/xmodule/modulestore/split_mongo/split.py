@@ -65,7 +65,7 @@ from opaque_keys.edx.locator import (
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, compute_location_from_args
+    inheritance, ModuleStoreWriteBase, ModuleStoreEnum
 )
 
 from ..exceptions import ItemNotFoundError
@@ -267,7 +267,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param course_version_guid: if provided, clear only this entry
         """
         if course_version_guid:
-            del self.thread_cache.course_cache[course_version_guid]
+            try:
+                del self.thread_cache.course_cache[course_version_guid]
+            except KeyError:
+                pass
         else:
             self.thread_cache.course_cache = {}
 
@@ -630,7 +633,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Find the history of this block. Return as a VersionTree of each place the block changed (except
         deletion).
 
-        The block's history tracks its explicit changes but not the changes in its children.
+        The block's history tracks its explicit changes but not the changes in its children starting
+        from when the block was created.
 
         '''
         # course_agnostic means we don't care if the head and version don't align, trust the version
@@ -640,7 +644,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         all_versions_with_block = self.db_connection.find_matching_structures(
             {
                 'original_version': course_struct['original_version'],
-                update_version_field: {'$exists': True}
+                update_version_field: {'$exists': True},
             }
         )
         # find (all) root versions and build map {previous: {successors}..}
@@ -650,6 +654,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_payload = self._get_block_from_structure(version, block_id)
             if version['_id'] == block_payload['edit_info']['update_version']:
                 if block_payload['edit_info'].get('previous_version') is None:
+                    # this was when this block was created
                     possible_roots.append(block_payload['edit_info']['update_version'])
                 else:  # map previous to {update..}
                     result.setdefault(block_payload['edit_info']['previous_version'], set()).add(
@@ -763,19 +768,16 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             serial += 1
         return category + str(serial)
 
-    # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
-    # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
-    # validation behavior a responsibility of the model layer rather than the persistence layer.
-    def create_item(self, user_id, location=None, parent_location=None,
-        definition_locator=None, force=False, continue_version=False, **kwargs
+    def create_item(
+        self, user_id, course_key, block_type, block_id=None,
+        definition_locator=None, fields=None,
+        force=False, continue_version=False, **kwargs
     ):
         """
-        Add a descriptor to persistence as the last child of the optional parent_location or just as an element
-        of the course (if no parent provided). Return the resulting post saved version with populated locators.
+        Add a descriptor to persistence as an element
+        of the course. Return the resulting post saved version with populated locators.
 
-        :param course_or_parent_locator: If BlockUsageLocator, then it's assumed to be the parent.
-        If it's a CourseLocator, then it's
-        merely the containing course. If it has a version_guid and a course org + course + run + branch, this
+        :param course_key: If it has a version_guid and a course org + course + run + branch, this
         method ensures that the version is the head of the given course branch before making the change.
 
         raises InsufficientSpecificationError if there is no course locator.
@@ -815,27 +817,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
-        location = compute_location_from_args(location, parent_location, **kwargs)
-
-        if not isinstance(location, (CourseLocator, BlockUsageLocator)):
-            raise ValueError(u"Cannot create item {} in split. Wrong repr.".format(location))
-
-        # convert fields into a single dict if separated by scope
-        fields = kwargs.get('fields', {})
-        fields.update(kwargs.pop('metadata', {}))
-        fields.update(kwargs.pop('definition_data', {}))
-        kwargs['fields'] = fields
-
         # find course_index entry if applicable and structures entry
-        index_entry = self._get_index_if_valid(location, force, continue_version)
-        structure = self._lookup_course(location)['structure']
+        index_entry = self._get_index_if_valid(course_key, force, continue_version)
+        structure = self._lookup_course(course_key)['structure']
 
-        category = location.block_type
-        partitioned_fields = self.partition_fields_by_scope(category, fields)
+        partitioned_fields = self.partition_fields_by_scope(block_type, fields)
         new_def_data = partitioned_fields.get(Scope.content, {})
         # persist the definition if persisted != passed
         if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
-            definition_locator = self.create_definition_from_data(new_def_data, category, user_id)
+            definition_locator = self.create_definition_from_data(new_def_data, block_type, user_id)
         elif new_def_data is not None:
             definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
 
@@ -848,22 +838,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         new_id = new_structure['_id']
 
         # generate usage id
-        block_id = kwargs.pop('block_id', location.block_id)
         if block_id is not None:
             if encode_key_for_mongo(block_id) in new_structure['blocks']:
                 raise DuplicateItemError(block_id, self, 'structures')
             else:
                 new_block_id = block_id
         else:
-            new_block_id = self._generate_block_id(new_structure['blocks'], category)
+            new_block_id = self._generate_block_id(new_structure['blocks'], block_type)
 
         block_fields = partitioned_fields.get(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
         self._update_block_in_structure(new_structure, new_block_id, {
-            "category": category,
+            "category": block_type,
             "definition": definition_locator.definition_id,
-            "fields": self._serialize_fields(category, block_fields),
+            "fields": self._serialize_fields(block_type, block_fields),
             'edit_info': {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
@@ -872,17 +861,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             }
         })
 
-        # if given parent, add new block as child and update parent's version
-        parent = None
-        if isinstance(parent_location, BlockUsageLocator) and parent_location.block_id is not None:
-            encoded_block_id = encode_key_for_mongo(parent_location.block_id)
-            parent = new_structure['blocks'][encoded_block_id]
-            parent['fields'].setdefault('children', []).append(new_block_id)
-            if not continue_version or parent['edit_info']['update_version'] != structure['_id']:
-                parent['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-                parent['edit_info']['edited_by'] = user_id
-                parent['edit_info']['previous_version'] = parent['edit_info']['update_version']
-                parent['edit_info']['update_version'] = new_id
         if continue_version:
             # db update
             self.db_connection.update_structure(new_structure)
@@ -894,21 +872,67 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # update the index entry if appropriate
         if index_entry is not None:
             if not continue_version:
-                self._update_head(index_entry, location.branch, new_id)
+                self._update_head(index_entry, course_key.branch, new_id)
             item_loc = BlockUsageLocator(
-                location.version_agnostic(),
-                block_type=category,
+                course_key.version_agnostic(),
+                block_type=block_type,
                 block_id=new_block_id,
             )
         else:
             item_loc = BlockUsageLocator(
                 CourseLocator(version_guid=new_id),
-                block_type=category,
+                block_type=block_type,
                 block_id=new_block_id,
             )
 
         # reconstruct the new_item from the cache
         return self.get_item(item_loc)
+
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, continue_version=False, **kwargs):
+        """
+        Creates and saves a new xblock that as a child of the specified block
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifying the
+                block that this item should be parented under
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+            fields (dict): A dictionary specifying initial values for some or all fields
+                in the newly created block
+        """
+        xblock = self.create_item(
+            user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
+            continue_version=continue_version,
+            **kwargs)
+
+        # don't version the structure as create_item handled that already.
+        new_structure = self._lookup_course(xblock.location.course_key)['structure']
+
+        # add new block as child and update parent's version
+        encoded_block_id = encode_key_for_mongo(parent_usage_key.block_id)
+        parent = new_structure['blocks'][encoded_block_id]
+        parent['fields'].setdefault('children', []).append(xblock.location.block_id)
+        if parent['edit_info']['update_version'] != new_structure['_id']:
+            # if the parent hadn't been previously changed in this bulk transaction, indicate that it's
+            # part of the bulk transaction
+            parent['edit_info'] = {
+                'edited_on': datetime.datetime.now(UTC),
+                'edited_by': user_id,
+                'previous_version': parent['edit_info']['update_version'],
+                'update_version': new_structure['_id'],
+            }
+
+        # db update
+        self.db_connection.update_structure(new_structure)
+            # clear cache so things get refetched and inheritance recomputed
+        self._clear_cache(new_structure['_id'])
+
+        # don't need to update the index b/c create_item did it for this version
+        return xblock
 
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
