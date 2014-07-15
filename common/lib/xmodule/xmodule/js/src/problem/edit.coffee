@@ -365,8 +365,23 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     # try to parse the supplied string to find a drop down problem
     # return the string unmodified if this is not a drop down problem
     dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
+
     if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
-      returnXmlString =  '    <optionresponse>\n'
+
+
+      returnXmlString = ''
+      reducedXmlString = xmlString.replace(dropdownMatches[0], '')
+      for line in reducedXmlString.split('\n')
+        returnXmlString += '<p>\n'
+        returnXmlString += line
+        returnXmlString += '</p>\n'
+
+
+
+
+
+
+      returnXmlString +=  '    <optionresponse>\n'
       returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
 
       optionsString = ''
@@ -453,6 +468,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
       xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
+debugger;
       xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
 
