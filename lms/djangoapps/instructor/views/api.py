@@ -47,6 +47,7 @@ from instructor.enrollment import (
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
+from microsite_configuration import microsite
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -562,11 +563,16 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     available_features = analytics.basic.AVAILABLE_FEATURES
-    query_features = [
-        'id', 'username', 'name', 'email', 'language', 'location',
-        'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-        'goals',
-    ]
+
+    # allow microsites to specify which values get returned in profile reports
+    query_features = microsite.get_value(
+        'student_profile_download_fields',
+        [
+            'id', 'username', 'name', 'email', 'language', 'location',
+            'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+            'goals'
+        ]
+    )
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
 
@@ -585,6 +591,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
+        'meta': _('Enhanced Profile'),
     }
 
     if not csv:
