@@ -117,6 +117,19 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 }
             },
 
+            onChildDeleted: function(childView) {
+                var xblockInfo = this.model,
+                    childCategory = childView.model.get('category'),
+                    children = xblockInfo.get('child_info') && xblockInfo.get('child_info').children;
+                // If deleting a section that isn't the final one, just remove it for efficiency
+                // as it cannot visually effect the other sections.
+                if (childCategory === 'chapter' && children && children.length > 1) {
+                    childView.$el.remove();
+                } else {
+                    this.refresh();
+                }
+            },
+
             createNewItemViewState: function(locator, scrollOffset) {
                 return {
                     locator_to_show: locator,
