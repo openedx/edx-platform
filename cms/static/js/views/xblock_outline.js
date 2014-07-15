@@ -135,10 +135,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
              */
             addButtonActions: function(element) {
                 var self = this;
-                element.find('.delete-button').click(function(event) {
-                    event.preventDefault();
-                    self.deleteXBlock($(event.target));
-                });
+                element.find('.delete-button').click(_.bind(this.handleDeleteEvent, this));
                 element.find('.add-button').click(_.bind(this.handleAddEvent, this));
             },
 
@@ -203,6 +200,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.initialState = null;
             },
 
+            /**
+             * Refresh the view's model from the server, which will cause the view to refresh.
+             * @returns {jQuery promise} A promise representing the refresh operation.
+             */
+            refresh: function() {
+                return this.model.fetch();
+            },
+
             onChildAdded: function(locator, category) {
                 // For units, redirect to the new page, and for everything else just refresh inline.
                 if (category === 'vertical') {
@@ -220,21 +225,15 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.refresh();
             },
 
-            deleteXBlock: function() {
-                var parentView = this.parentView;
+            handleDeleteEvent: function(event) {
+                var self = this,
+                    parentView = this.parentView;
+                event.preventDefault();
                 XBlockViewUtils.deleteXBlock(this.model).done(function() {
                     if (parentView) {
-                        parentView.onChildDeleted();
+                        parentView.onChildDeleted(self, event);
                     }
                 });
-            },
-
-            /**
-             * Refresh the view's model from the server, which will cause the view to refresh.
-             * @returns {jQuery promise} A promise representing the refresh operation.
-             */
-            refresh: function() {
-                return this.model.fetch();
             },
 
             handleAddEvent: function(event) {

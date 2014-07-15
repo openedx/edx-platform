@@ -1195,7 +1195,7 @@ class TestXBlockInfo(ItemTest):
                 for child_response in xblock_info['child_info']['children']:
                     self.validate_xblock_info_consistency(
                         child_response,
-                        has_child_info=(not child_response.get('child_info', None) == None)
+                        has_child_info=(not child_response.get('child_info', None) is None)
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
