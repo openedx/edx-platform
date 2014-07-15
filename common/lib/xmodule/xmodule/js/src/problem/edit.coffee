@@ -8,6 +8,11 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
 
+  #@CHECKBOX_MARKER_PATTERN: "/(\s+\[\s*x?\s*\])(.+)[^\n]+/"   # expression searches for the checkbox [...] pattern
+ # @MULTIPLE_CHOICE_MARKER_PATTERN: "/\s+\(\s*x?\s*\)[^\n]+/"  # expression searches for the multiple choice (...) pattern
+ # @COMPOUND_CONDITION_PATTERN: "/\{\{(.+)\}\}/"               # expression searches for the compound condition {{...}} pattern
+ # @BOOLEAN_CONDITION_PATTERN: "/\(\((.+)\)\)(.+)/"            # expression searches for the boolean marker (...) pattern
+
   constructor: (element) ->
     @element = element
 
@@ -240,10 +245,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   #________________________________________________________________________________
   @parseForCompoundConditionHints: (xmlString) ->
     for line in xmlString.split('\n')
-      matches = line.match( /\{\{(.+)\}\}/ )      # string surrounded by {{...}} is a match group
+      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
       if matches
         questionHintString = matches[1]
-        splitMatches = questionHintString.match(  /\(\((.+)\)\)(.+)/)    # surrounded by ((...)) is a boolean condition
+        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
         if splitMatches
           booleanExpression = splitMatches[1]
           hintText = splitMatches[2]
@@ -268,10 +273,29 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       for line in reducedXmlString.split('\n')
         trimmedLine = line.trim()
         if trimmedLine.length > 0
-          returnXmlString += '<p>\n'
-          returnXmlString += trimmedLine
-          returnXmlString += '</p>\n'
+          compoundConditionMatches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
+          if compoundConditionMatches == null
+            returnXmlString += '<p>\n'
+            returnXmlString += trimmedLine
+            returnXmlString += '</p>\n'
       return returnXmlString
+
+  #________________________________________________________________________________
+  @matchCompoundConditionPattern: (testString) ->
+    return testString.match( /\{\{(.+)\}\}/ )
+
+  #________________________________________________________________________________
+  @matchBooleanConditionPattern: (testString) ->
+    return testString.match( /\(\((.+)\)\)(.+)/ )
+
+#________________________________________________________________________________
+  @matchMultipleChoicePattern: (testString) ->
+    return testString.match( /\s+\(\s*x?\s*\)[^\n]+/ )
+
+#________________________________________________________________________________
+  @matchCheckboxMarkerPattern: (testString) ->
+    return testString.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+
 
   #________________________________________________________________________________
   @parseForCheckbox: (xmlString) ->
@@ -280,10 +304,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     isCheckboxType = false
     returnXmlString = ''
     reducedXmlString = ''
-    CHECKBOX_MARKER_PATTERN = /(\s+\[\s*x?\s*\])(.+)[^\n]+/   # expression searches for the checkbox [...] pattern
 
     for line in xmlString.split('\n')
-      choiceMatches = line.match( CHECKBOX_MARKER_PATTERN )
+     # choiceMatches = matchCheckboxMarkerPattern( line )
+     # this works:  choiceMatches = line.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+      choiceMatches = line.match( '(\s+\[\s*x?\s*\])(.+)[^\n]+' )
+
       if choiceMatches              # this line includes '(...)' so it must be a checkbox item
         isCheckboxType = true
       else
@@ -299,7 +325,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         hintText = ''
         correctnessText = ''
         itemText = ''
-        choiceMatches = line.match( /\s+\[\s*x?\s*\][^\n]+/ )
+        choiceMatches = @matchCheckboxMarkerPattern( line )
         if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
           isCheckboxType = true
           hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
@@ -341,10 +367,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     isMultipleChoiceType = false
     returnXmlString = ''
     reducedXmlString = ''
-    MULTIPLE_CHOICE_MARKER_PATTERN = /\s+\(\s*x?\s*\)[^\n]+/   # expression searches for the multiple choice (...) pattern
 
     for line in xmlString.split('\n')
-      choiceMatches = line.match( MULTIPLE_CHOICE_MARKER_PATTERN )
+      choiceMatches = @matchMultipleChoicePattern( line )
       if choiceMatches              # this line includes '(...)' so it must be a multiple choice item
         isMultipleChoiceType = true
       else
@@ -360,7 +385,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         hintText = ''
         correctnessText = ''
         itemText = ''
-        choiceMatches = line.match( MULTIPLE_CHOICE_MARKER_PATTERN )
+        choiceMatches = @matchMultipleChoicePattern( line )
         if choiceMatches                          # this line includes '(...)' so it must be a multiple choice item
           isMultipleChoiceType = true
           hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
@@ -488,8 +513,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       MarkdownEditingDescriptor.problemHintsBooleanStrings = [];
 
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
-      xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
 debugger;
+      xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
       xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
       xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
