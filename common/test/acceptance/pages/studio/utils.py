@@ -2,8 +2,6 @@
 Utility methods useful for Studio page tests.
 """
 from bok_choy.promise import Promise
-import pdb
-
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -15,11 +13,17 @@ def click_css(page, css, source_index=0, require_notification=True):
     If require_notification is False (default value is True), the method will return immediately.
     Otherwise, it will wait for the "mini-notification" to appear and disappear.
     """
-    css_for_button_that_we_care_about = '{css}:nth-of-type({source_index})'.format(source_index=source_index, css=css)
-    # pdb.set_trace()
-    page.wait_for_element_presence(css, "Target not visible")
-    target = page.q(css=css)[source_index]
+    #from nose.tools import set_trace
+    #set_trace()
+    css_for_button_that_we_care_about = '{css}:nth-of-type({source_index})'.format(source_index=source_index+1, css=css)
+    #print css_for_button_that_we_care_about
+    page.wait_for_element_presence(css_for_button_that_we_care_about, "Target not visible")
+    target = page.q(css=css_for_button_that_we_care_about)
     target.click()
+    #buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
+    #target = buttons[source_index]
+    #from selenium.webdriver.common.action_chains import ActionChains
+    #ActionChains(page.browser).click(target).release().perform()
     if require_notification:
         wait_for_notification(page)
 
