@@ -41,22 +41,53 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         for branch in branches_to_delete:
             SplitMongoModuleStore.delete_item(self, location.for_branch(branch), user_id, **kwargs)
 
+    def _map_revision_to_branch(self, key, revision=None):
+        """
+        Maps RevisionOptions to BranchNames, inserting them into the key
+        """
+        def for_branch(branch_state):
+            if key.branch is not None and key.branch is not branch_state:
+                raise ValueError('{} already has a branch.'.format(key))
+            return key.for_branch(branch_state)
+        if revision == ModuleStoreEnum.RevisionOption.published_only:
+            return for_branch(ModuleStoreEnum.BranchName.published)
+        elif revision == ModuleStoreEnum.RevisionOption.draft_only:
+            return for_branch(ModuleStoreEnum.BranchName.draft)
+        else:
+            return key
+
+    def has_item(self, usage_key, revision=None):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        usage_key = self._map_revision_to_branch(usage_key, revision=revision)
+        return super(DraftVersioningModuleStore, self).has_item(usage_key)
+
     def get_item(self, usage_key, depth=0, revision=None):
         """
         Returns the item identified by usage_key and revision.
         """
-        def for_branch(branch_state):
-            if usage_key.branch is not None and usage_key.branch is not branch_state:
-                raise ValueError('{} already has a branch.'.format(usage_key))
-            return usage_key.for_branch(branch_state)
-        if revision == ModuleStoreEnum.RevisionOption.published_only:
-            usage_key = for_branch(ModuleStoreEnum.BranchName.published)
-        elif revision == ModuleStoreEnum.RevisionOption.draft_only:
-            usage_key = for_branch(ModuleStoreEnum.BranchName.draft)
+        usage_key = self._map_revision_to_branch(usage_key, revision=revision)
         return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth)
+
+    def get_items(self, course_locator, settings=None, content=None, revision=None, **kwargs):
+        """
+        Returns a list of XModuleDescriptor instances for th matching items within the course with
+        the given course_locator.
+        """
+        course_locator = self._map_revision_to_branch(course_locator, revision=revision)
+        return super(DraftVersioningModuleStore, self).get_items(
+            course_locator,
+            settings=settings,
+            content=content,
+            **kwargs
+        )
 
     def get_parent_location(self, location, revision=None, **kwargs):
         # NAATODO - support draft_preferred
+        if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
+            revision = ModuleStoreEnum.RevisionOption.draft_only
+        location = self._map_revision_to_branch(location, revision=revision)
         return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
 
     def has_changes(self, usage_key):
