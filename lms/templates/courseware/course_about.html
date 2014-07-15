@@ -171,6 +171,10 @@
           <span class="register disabled">
             ${_("Course is full")}
           </span>
+        % elif invitation_only and not can_enroll:
+          <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
+        % elif not can_enroll:
+          <span class="register disabled">${_("Enrollment is Closed")}</span>
         %else:
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}
@@ -335,7 +339,7 @@
   </section>
 </section>
 
-%if not registered:
+%if active_reg_button:
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
