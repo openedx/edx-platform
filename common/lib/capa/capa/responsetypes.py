@@ -1310,7 +1310,7 @@ class OptionResponse(LoncapaResponse):
                                     correctness_string = 'CORRECT: '
 
                             new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' \
-                                + correctness_string + choice_hint_text.text.strip() + '</div>'
+                                + correctness_string + choice_hint_text.strip() + '</div>'
 
 
 
